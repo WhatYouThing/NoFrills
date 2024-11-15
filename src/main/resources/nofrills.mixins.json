@@ -1,0 +1,33 @@
+{
+  "required": true,
+  "package": "nofrills.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "ArmorStandEntityMixin",
+    "ChatHudMixin",
+    "ClientConnectionMixin",
+    "ClientPlayerEntityMixin",
+    "ClientPlayNetworkHandlerMixin",
+    "ClientWorldMixin",
+    "EnderPearlMixin",
+    "EntityMixin",
+    "EntityRenderDispatcherMixin",
+    "GameOptionsMixin",
+    "HandledScreenAccessor",
+    "HandledScreenMixin",
+    "HeldItemRendererMixin",
+    "InGameHudMixin",
+    "ItemStackMixin",
+    "KeyboardMixin",
+    "LivingEntityMixin",
+    "MinecraftClientMixin",
+    "MouseMixin",
+    "PlayerEntityMixin",
+    "RaycastContextMixin",
+    "SnowBlockMixin",
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

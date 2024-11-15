@@ -2,7 +2,6 @@ package nofrills.misc;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.render.RenderLayer;
@@ -19,7 +18,6 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -214,7 +212,7 @@ public class Utils {
                     info("§aNoFrills is up to date.");
                 }
             } catch (IOException e) {
-                info("§cAn error occurred while checking for an update. Printing stack trace to the log.");
+                info("§cAn error occurred while checking for an update. Additional information can be found in the log.");
                 StringBuilder trace = new StringBuilder();
                 for (StackTraceElement element : e.getStackTrace()) {
                     trace.append("\n\tat ").append(element.toString());

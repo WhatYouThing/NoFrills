@@ -4,17 +4,14 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 ## Feature Highlights
 
-- **Stonk Fix**: Remove the accidental stonking patch that Microsoft introduced in 1.19, letting you stonk through
-  blocks
-  just as a 1.8.9 player would.
+- **Stonk Fix**: Undoes the accidental stonking patch that Microsoft introduced in 1.19 by adding client-side code that teleports you out of blocks (which is entirely useless, as this is already handled on the server-side). 
 - **Party Commands**: Adds the `warp`, `ptme`, and `allinv` commands for your party members to use, along with a player
   whitelist/blacklist system, and a manual approval mode for strangers.
 - **Hotbar Swap**: Essentially allows you to have a 2nd hotbar, by simplifying the action of clicking a number key on an
   item in your inventory, to a simple Ctrl + Left Click.
 - **Fishing**: Keep track of the sea creature cap, and notify yourself (and your party too) when the cap is reached.
   Also includes effects, such as sounds, for when you catch rare sea creatures.
-- **Kuudra**: Various features for Kuudra, such as hitbox rendering, health rendering (during the DPS phase), fixing
-  being unable to use abilities while building the ballista, and sending a message on mana drain/fresh tools activating.
+- **Kuudra**: Hitbox rendering, DPS phase health rendering, fixing being unable to use abilities while building the ballista, and sending a message on mana drain/fresh tools activating.
 - `/yeet`: Funny command that instantly closes Minecraft.
 - `/nofrills sendCoords`: Patcher-like command for sending your coordinates in chat, along with an option to specify a
   different coords format.
@@ -32,7 +29,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - Additional dependencies needed to launch the mod:
     - [Fabric API](https://modrinth.com/mod/fabric-api)
     - [YetAnotherConfigLib](https://modrinth.com/mod/yacl) (Optional if using Skyblocker, it has YACL bundled in)
-    - [Mod Menu](https://modrinth.com/mod/modmenu) (Optional, settings can be accessed with `/nofrills`)
+    - [Mod Menu](https://modrinth.com/mod/modmenu) (Optional, settings can be accessed with `/nofrills`, or `/nf`)
 - To finish off, open the mod's settings, and configure it to your liking. **Every feature is off by default**.
 
 ## Incompatibilities

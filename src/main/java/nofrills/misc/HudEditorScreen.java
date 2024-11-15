@@ -2,7 +2,6 @@ package nofrills.misc;
 
 import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import java.util.List;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.font.MultilineText;
@@ -12,18 +11,19 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
-import org.lwjgl.glfw.GLFW;
+
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class HudEditorScreen extends Screen {
     private static final int TITLE_BOTTOM_MARGIN = 20;
+    protected final BooleanConsumer callback;
     private final Text message;
-    private MultilineText messageSplit = MultilineText.EMPTY;
+    private final List<ButtonWidget> buttons = Lists.newArrayList();
     protected Text yesText;
     protected Text noText;
+    private MultilineText messageSplit = MultilineText.EMPTY;
     private int buttonEnableTimer;
-    protected final BooleanConsumer callback;
-    private final List<ButtonWidget> buttons = Lists.<ButtonWidget>newArrayList();
 
     public HudEditorScreen(BooleanConsumer callback, Text title, Text message) {
         this(callback, title, message, ScreenTexts.YES, ScreenTexts.NO);

@@ -15,7 +15,7 @@ public abstract class KeyboardMixin {
     @Inject(method = "onKey", at = @At("HEAD"), cancellable = true)
     private void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
         if (key != GLFW.GLFW_KEY_UNKNOWN) {
-            if (eventBus.post(InputEvent.get(key, modifiers, action)).isCancelled()) {
+            if (eventBus.post(new InputEvent(key, modifiers, action)).isCancelled()) {
                 ci.cancel();
             }
         }

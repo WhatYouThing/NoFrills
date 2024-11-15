@@ -16,7 +16,7 @@ import static nofrills.Main.mc;
 public abstract class MouseMixin {
     @Inject(method = "onMouseButton", at = @At("HEAD"), cancellable = true)
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        if (eventBus.post(InputEvent.get(button, mods, action)).isCancelled()) {
+        if (eventBus.post(new InputEvent(button, mods, action)).isCancelled()) {
             ci.cancel();
         }
     }

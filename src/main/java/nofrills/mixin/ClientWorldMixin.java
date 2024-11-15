@@ -69,6 +69,6 @@ public abstract class ClientWorldMixin extends World {
             }
             Utils.scoreboardLines = lines;
         }
-        eventBus.post(WorldTickEvent.get());
+        eventBus.post(new WorldTickEvent());
     }
 }

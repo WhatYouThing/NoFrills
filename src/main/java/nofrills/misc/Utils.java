@@ -224,21 +224,6 @@ public class Utils {
         }).start();
     }
 
-    public static boolean isNearWater() {
-        Vec3d pos = mc.player.getPos();
-        BlockPos blockPos = new BlockPos((int) Math.floor(pos.x), (int) Math.floor(pos.y), (int) Math.floor(pos.z));
-        for (int y = -1; y <= 2; y++) {
-            for (int x = -1; x <= 1; x++) {
-                for (int z = -1; z <= 1; z++) {
-                    if (mc.world.getBlockState(blockPos.add(x, y, z)).getBlock() == Blocks.WATER) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     /**
      * Checks if our player entity is currently within an area, made from 2 sets of coordinates.
      */

@@ -1,6 +1,6 @@
 # NoFrills Mod
 
-It's in the name. Simple and effective Hypixel Skyblock mod for modern versions of Minecraft.
+It's in the name. Simple and effective Hypixel Skyblock mod for modern versions (1.20+) of Minecraft.
 
 ## Feature Highlights
 
@@ -42,7 +42,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 ## Credits
 
-- [Orbit](https://github.com/MeteorDevelopment/orbit): Goated event system which keeps the mod blazing fast.
+- [Orbit](https://github.com/MeteorDevelopment/orbit): Event system which keeps the mod blazing fast.
 - [Skyblocker](https://github.com/SkyblockerMod/Skyblocker): Has more info on how YACL works than its wiki. Also
   borrowed a tiny bit of code I guess.
 - [clientcommands](https://github.com/Earthcomputer/clientcommands): Taught me rendering magic with mixins.

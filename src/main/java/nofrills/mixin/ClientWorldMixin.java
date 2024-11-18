@@ -28,6 +28,7 @@ import java.util.function.Supplier;
 
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
+import static nofrills.misc.Utils.SkyblockData;
 
 @Mixin(ClientWorld.class)
 public abstract class ClientWorldMixin extends World {
@@ -49,25 +50,37 @@ public abstract class ClientWorldMixin extends World {
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void onWorldTick(CallbackInfo ci) {
-        if (mc.player != null) {
-            List<String> lines = new ArrayList<>();
-            Scoreboard scoreboard = mc.player.getScoreboard();
-            ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
-            for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
-                if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
-                    Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
-                    if (team != null) {
-                        String line = team.getPrefix().getString() + team.getSuffix().getString();
-                        if (!line.trim().isEmpty()) {
-                            lines.add(Formatting.strip(line.trim()));
+        if (mc.player == null) {
+            return;
+        }
+        List<String> lines = new ArrayList<>();
+        SkyblockData data = new SkyblockData();
+        Scoreboard scoreboard = mc.player.getScoreboard();
+        ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
+        for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
+            if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
+                Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
+                if (team != null) {
+                    String line = team.getPrefix().getString() + team.getSuffix().getString();
+                    if (!line.trim().isEmpty()) {
+                        String cleanLine = Formatting.strip(line.trim());
+                        if (cleanLine.startsWith(Utils.Symbols.zone) || cleanLine.startsWith(Utils.Symbols.zoneRift)) {
+                            data.currentLocation = cleanLine;
                         }
+                        lines.add(cleanLine);
                     }
                 }
+
             }
             if (objective != null) {
-                lines.add(objective.getDisplayName().getString());
+                String objectiveLine = Formatting.strip(objective.getDisplayName().getString());
+                if (objectiveLine.contains("SKYBLOCK")) {
+                    data.isInSkyblock = true;
+                }
+                lines.add(objectiveLine);
             }
             Utils.scoreboardLines = lines;
+            Utils.skyblockData = data;
         }
         eventBus.post(new WorldTickEvent());
     }

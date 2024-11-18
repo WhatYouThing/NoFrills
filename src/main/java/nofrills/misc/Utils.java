@@ -41,6 +41,7 @@ public class Utils {
     public static final Pattern partyMessagePattern = Pattern.compile("Party > .*: .*");
     private static final Random soundRandom = Random.create(0);
     public static List<String> scoreboardLines = new ArrayList<>();
+    public static SkyblockData skyblockData = new SkyblockData();
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         mc.inGameHud.setTitle(Text.of(title));
@@ -152,15 +153,10 @@ public class Utils {
     }
 
     public static boolean isInZone(String zone, boolean containsCheck) {
-        for (String line : scoreboardLines) {
-            if (!containsCheck && line.startsWith(zone)) {
-                return true;
-            }
-            if (containsCheck && line.contains(zone)) {
-                return true;
-            }
+        if (containsCheck) {
+            return skyblockData.currentLocation.contains(zone);
         }
-        return false;
+        return skyblockData.currentLocation.startsWith(zone);
     }
 
     public static boolean isInDungeons() {
@@ -181,6 +177,10 @@ public class Utils {
 
     public static boolean isOnGardenPlot() {
         return isInZone("Plot -", true);
+    }
+
+    public static boolean isInSkyblock() {
+        return skyblockData.isInSkyblock;
     }
 
     private static String[] getVersionNumber(String version) {
@@ -206,7 +206,7 @@ public class Utils {
                     if (versionNewest != null) {
                         for (int i = 0; i <= versionLocal.length - 1; i++) {
                             if (Integer.parseInt(versionLocal[i]) < Integer.parseInt(versionNewest[i])) {
-                                infoLink("§a§lNew version available! §aClick here to open the GitHub releases page.\n§7Current Version: " + String.join(".", versionLocal) + "\n§7Newest Version: " + String.join(".", versionNewest), "https://github.com/WhatYouThing/NoFrills/releases");
+                                infoLink("§a§lNew version available! §aClick here to open the GitHub releases page. §7Current: " + String.join(".", versionLocal) + ", Newest: " + String.join(".", versionNewest), "https://github.com/WhatYouThing/NoFrills/releases");
                                 return;
                             }
                         }
@@ -299,6 +299,14 @@ public class Utils {
         public static String heart = "❤";
         public static String skull = "☠";
         public static String format = "§";
+    }
+
+    public static class SkyblockData {
+        public String currentLocation = "";
+        public boolean isInSkyblock = false;
+
+        public SkyblockData() {
+        }
     }
 
     public static class renderLayers {

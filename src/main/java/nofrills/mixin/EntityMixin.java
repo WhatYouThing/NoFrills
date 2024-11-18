@@ -22,8 +22,6 @@ public abstract class EntityMixin implements EntityRendering {
     @Shadow
     @Final
     private static int SPRINTING_FLAG_INDEX;
-    @Shadow
-    public int age;
     @Unique
     boolean outlineRender = false;
     @Unique
@@ -82,7 +80,7 @@ public abstract class EntityMixin implements EntityRendering {
 
     @Override
     public float[] nofrills_mod$getRenderingFilledColors() {
-        return outlineColors;
+        return filledColors;
     }
 
     @Override

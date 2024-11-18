@@ -37,6 +37,11 @@ public abstract class InGameHudMixin implements TitleRendering {
         titleColor = color;
     }
 
+    @Override
+    public boolean nofrills_mod$isRenderingTitle() {
+        return titleTicks > 0;
+    }
+
     @Inject(method = "renderTitleAndSubtitle", at = @At("HEAD"))
     private void onRenderTitle(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (titleTicks > 0) {

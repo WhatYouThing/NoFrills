@@ -52,6 +52,10 @@ public class Utils {
         ((TitleRendering) mc.inGameHud).nofrills_mod$setRenderTitle(title, stayTicks, yOffset, scale, color);
     }
 
+    public static boolean isRenderingCustomTitle() {
+        return ((TitleRendering) mc.inGameHud).nofrills_mod$isRenderingTitle();
+    }
+
     public static void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
         Vec3d coords = mc.cameraEntity.getPos();
         PositionedSoundInstance sound = new PositionedSoundInstance(event, category, volume, pitch, soundRandom, coords.getX(), coords.getY(), coords.getZ());
@@ -160,19 +164,19 @@ public class Utils {
     }
 
     public static boolean isInDungeons() {
-        return isInZone(LocationPrefix.Normal + " The Catacombs", false);
+        return isInZone(Symbols.zone + " The Catacombs", false);
     }
 
     public static boolean isInKuudra() {
-        return isInZone(LocationPrefix.Normal + " Kuudra's Hollow", false);
+        return isInZone(Symbols.zone + " Kuudra's Hollow", false);
     }
 
     public static boolean isInChateau() {
-        return isInZone(LocationPrefix.Rift + " Stillgore Château", false) || isInZone(LocationPrefix.Rift + " Oubliette", false);
+        return isInZone(Symbols.zoneRift + " Stillgore Château", false) || isInZone(Symbols.zoneRift + " Oubliette", false);
     }
 
     public static boolean isOnPrivateIsland() {
-        return isInZone(LocationPrefix.Normal + " Your Island", false);
+        return isInZone(Symbols.zone + " Your Island", false);
     }
 
     public static boolean isOnGardenPlot() {
@@ -288,9 +292,13 @@ public class Utils {
         return entity;
     }
 
-    public static class LocationPrefix {
-        public static String Normal = "⏣";
-        public static String Rift = "ф";
+    public static class Symbols {
+        public static String zone = "⏣";
+        public static String zoneRift = "ф";
+        public static String star = "✯";
+        public static String heart = "❤";
+        public static String skull = "☠";
+        public static String format = "§";
     }
 
     public static class renderLayers {

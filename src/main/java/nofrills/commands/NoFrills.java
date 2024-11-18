@@ -12,10 +12,6 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 
 public class NoFrills {
-    private static void joinInstance(String id) {
-        Utils.sendMessage("/joininstance " + id);
-    }
-
     public static final ModCommand[] commands = {
             new ModCommand("settings", "Opens the settings GUI.", literal("settings").executes(context -> {
                 Config.openConfigScreen();
@@ -209,6 +205,10 @@ public class NoFrills {
                         return SINGLE_SUCCESS;
                     }))),
     };
+
+    private static void joinInstance(String id) {
+        Utils.sendMessage("/joininstance " + id);
+    }
 
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {
         LiteralArgumentBuilder<FabricClientCommandSource> helpArg = literal("help").executes(context -> {

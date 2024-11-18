@@ -15,7 +15,7 @@ import static nofrills.Main.mc;
 public class CorpseHighlight {
     @EventHandler
     public static void tick(WorldTickEvent event) {
-        if (Config.miningCorpseGlow && Utils.isInZone(Utils.LocationPrefix.Normal + " Glacite Mineshafts", false)) {
+        if (Config.miningCorpseGlow && Utils.isInZone(Utils.Symbols.zone + " Glacite Mineshafts", false)) {
             for (Entity ent : mc.world.getEntities()) {
                 if (ent.getType() == EntityType.ARMOR_STAND && !ent.isInvisible() && !Utils.isGlowing(ent)) {
                     Iterable<ItemStack> armor = ((ArmorStandEntity) ent).getArmorItems();

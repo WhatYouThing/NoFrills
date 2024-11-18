@@ -91,6 +91,8 @@ public class Config {
     // Fixes
 
     @SerialEntry
+    public static boolean stonkFix = false;
+    @SerialEntry
     public static boolean oldSneak = false;
     @SerialEntry
     public static boolean antiSwim = false;
@@ -142,8 +144,6 @@ public class Config {
     // Dungeons
 
     @SerialEntry
-    public static boolean stonkFix = false;
-    @SerialEntry
     public static boolean starredMobHighlight = false;
     @SerialEntry
     public static Color starredMobColor = new Color(0, 255, 255, 255);
@@ -183,20 +183,28 @@ public class Config {
     @SerialEntry
     public static boolean lockView = false;
 
-    // Slayers (unreleased)
+    // Slayers
 
     @SerialEntry
     public static boolean slayerHitboxes = false;
     @SerialEntry
+    public static boolean slayerKillTime = false;
+    @SerialEntry
     public static boolean slayerBlazeNoSpam = false;
     @SerialEntry
     public static boolean slayerBlazePillarWarn = false;
+    @SerialEntry
+    public static boolean slayerVampIndicatorIce = false;
+    @SerialEntry
+    public static boolean slayerVampIndicatorSteak = false;
     @SerialEntry
     public static boolean slayerVampManiaSilence = false;
     @SerialEntry
     public static boolean slayerVampManiaReplace = false;
     @SerialEntry
     public static boolean slayerVampSpringSilence = false;
+    @SerialEntry
+    public static boolean slayerVampSpringReplace = false;
     @SerialEntry
     public static boolean slayerEmanHitDisplay = false;
 
@@ -221,10 +229,11 @@ public class Config {
                 .title(Text.of("NoFrills Config"))
                 .category(General.create(defaults, config))
                 .category(Fixes.create(defaults, config))
-                .category(Solvers.create(defaults, config))
+                //.category(Solvers.create(defaults, config)) section currently empty, table solver still WIP
                 .category(Fishing.create(defaults, config))
                 .category(Dungeons.create(defaults, config))
                 .category(Kuudra.create(defaults, config))
+                .category(Slayers.create(defaults, config))
                 .category(Mining.create(defaults, config))
                 .category(Farming.create(defaults, config))
         ).generateScreen(parent);

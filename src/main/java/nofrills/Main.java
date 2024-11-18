@@ -52,7 +52,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(Config.class);
         eventBus.subscribe(KuudraFeatures.class);
         eventBus.subscribe(PartyFeatures.class);
-        eventBus.subscribe(SlayerFeatures.class); // unfinished, comment out for release versions
+        eventBus.subscribe(SlayerFeatures.class);
         eventBus.subscribe(ExperimentSolver.class); // unfinished, comment out for release versions
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);

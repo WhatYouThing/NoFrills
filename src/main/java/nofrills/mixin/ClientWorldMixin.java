@@ -1,15 +1,14 @@
 package nofrills.mixin;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.profiler.Profiler;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
@@ -20,6 +19,7 @@ import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
@@ -37,15 +37,12 @@ public abstract class ClientWorldMixin extends World {
         super(properties, registryRef, registryManager, dimensionEntry, profiler, isClient, debugWorld, biomeAccess, maxChainedNeighborUpdates);
     }
 
-    @Inject(method = "processPendingUpdate", at = @At("HEAD"), cancellable = true)
-    private void onBlockUpdate(BlockPos pos, BlockState state, Vec3d playerPos, CallbackInfo ci) {
+    @Redirect(method = "processPendingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;collidesWithStateAtPos(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z"))
+    private boolean doesCollide(PlayerEntity instance, BlockPos blockPos, BlockState blockState) {
         if (Config.stonkFix) {
-            BlockState blockState = this.getBlockState(pos);
-            if (blockState != state) {
-                this.setBlockState(pos, state, Block.NOTIFY_ALL | Block.FORCE_STATE);
-            }
-            ci.cancel();
+            return false;
         }
+        return instance.collidesWithStateAtPos(blockPos, blockState);
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
@@ -70,7 +67,6 @@ public abstract class ClientWorldMixin extends World {
                         lines.add(cleanLine);
                     }
                 }
-
             }
             if (objective != null) {
                 String objectiveLine = Formatting.strip(objective.getDisplayName().getString());

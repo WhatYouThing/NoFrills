@@ -1,11 +1,13 @@
 package nofrills.mixin;
 
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.text.Text;
 import nofrills.config.Config;
 import nofrills.misc.ScreenOptions;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +25,7 @@ import java.util.List;
 import static nofrills.misc.Utils.SpoofedSlot;
 
 @Mixin(HandledScreen.class)
-public abstract class HandledScreenMixin<T extends ScreenHandler> implements ScreenOptions {
+public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen implements ScreenOptions {
     @Shadow
     @Nullable
     protected Slot focusedSlot;
@@ -32,8 +34,15 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> implements Scr
     @Unique
     List<SpoofedSlot> spoofedSlots = new ArrayList<>();
 
+    protected HandledScreenMixin(Text title) {
+        super(title);
+    }
+
     @Unique
-    private static boolean isStackNameEmpty(Slot slot) {
+    private boolean isStackNameEmpty(Slot slot) {
+        if (title.getString().startsWith("Ultrasequencer (")) {
+            return false;
+        }
         if (slot != null) {
             return slot.getStack().getName().getString().trim().isEmpty();
         }

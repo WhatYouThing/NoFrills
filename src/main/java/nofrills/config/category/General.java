@@ -52,7 +52,7 @@ public class General {
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Ignore Background"))
-                                .description(OptionDescription.of(Text.of("Hides the tooltips for, and prevents clicking on items with empty names (such as the filler Glass Panes in most Skyblock GUI's).")))
+                                .description(OptionDescription.of(Text.of("Hides the tooltips for, and prevents clicking on items with empty names (such as the filler Glass Panes in most Skyblock GUI's). Does not activate in the Ultrasequencer add-on so that it can be completed normally.")))
                                 .binding(false, () -> Config.ignoreBackground, value -> Config.ignoreBackground = value)
                                 .controller(Config::booleanController)
                                 .build())

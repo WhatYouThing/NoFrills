@@ -12,6 +12,7 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.ClickEvent;
@@ -125,21 +126,10 @@ public class Utils {
      * Disables a specific slot in the provided screen, preventing it from being clicked and hiding its tooltip.
      *
      * @param screen The current screen
-     * @param slotId The ID of the slot to disable
+     * @param slot   The slot to disable
      */
-    public static void setDisabled(Screen screen, int slotId, boolean disabled) {
-        ((ScreenOptions) screen).nofrills_mod$disableSlot(slotId, disabled);
-    }
-
-    /**
-     * Disables a specific slot in the provided screen, while also replacing it with a specific item.
-     *
-     * @param screen      The current screen
-     * @param slotId      The ID of the slot to disable
-     * @param replacement The item stack to put in place of the previous item
-     */
-    public static void setDisabled(Screen screen, int slotId, boolean disabled, ItemStack replacement) {
-        ((ScreenOptions) screen).nofrills_mod$disableSlot(slotId, disabled, replacement);
+    public static void setDisabled(Screen screen, Slot slot, boolean disabled) {
+        ((ScreenOptions) screen).nofrills_mod$disableSlot(slot, disabled);
     }
 
     public static void sendCoords(String format) {
@@ -175,8 +165,23 @@ public class Utils {
         return isInZone(Symbols.zone + " Your Island", false);
     }
 
+    /**
+     * Returns true if the player is on any of their garden plots, which doesn't count the barn.
+     */
     public static boolean isOnGardenPlot() {
-        return isInZone("Plot -", true);
+        for (String line : scoreboardLines) {
+            if (line.contains("Plot -")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true if the player is anywhere on their garden
+     */
+    public static boolean isInGarden() {
+        return isInZone(Symbols.zone + " The Garden", true) || isOnGardenPlot();
     }
 
     public static boolean isInSkyblock() {
@@ -282,9 +287,10 @@ public class Utils {
     public static Entity findNametagOwner(Entity armorStand, List<Entity> otherEntities) {
         Entity entity = null;
         float lowestDist = 2.0f;
+        double maxY = armorStand.getPos().getY();
         for (Entity ent : otherEntities) {
             float dist = horizontalDistance(ent, armorStand);
-            if (ent.getType() != EntityType.ARMOR_STAND && dist < lowestDist) {
+            if (ent.getType() != EntityType.ARMOR_STAND && ent.getPos().getY() < maxY && dist < lowestDist) {
                 entity = ent;
                 lowestDist = dist;
             }
@@ -306,6 +312,16 @@ public class Utils {
         public boolean isInSkyblock = false;
 
         public SkyblockData() {
+        }
+    }
+
+    public static class SpoofedSlot {
+        public Slot slot;
+        public ItemStack replacementStack;
+
+        public SpoofedSlot(Slot slot, ItemStack replacementStack) {
+            this.slot = slot;
+            this.replacementStack = replacementStack;
         }
     }
 

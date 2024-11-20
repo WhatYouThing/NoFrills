@@ -109,9 +109,6 @@ public class Config {
 
     // Solvers
 
-    @SerialEntry
-    public static boolean solveExperiments = false;
-
     // Fishing
 
     @SerialEntry
@@ -229,7 +226,6 @@ public class Config {
                 .title(Text.of("NoFrills Config"))
                 .category(General.create(defaults, config))
                 .category(Fixes.create(defaults, config))
-                //.category(Solvers.create(defaults, config)) section currently empty, table solver still WIP
                 .category(Fishing.create(defaults, config))
                 .category(Dungeons.create(defaults, config))
                 .category(Kuudra.create(defaults, config))

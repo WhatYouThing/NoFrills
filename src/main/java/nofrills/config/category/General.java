@@ -59,6 +59,17 @@ public class General {
                         .build())
 
                 .group(OptionGroup.createBuilder()
+                        .name(Text.of("Visual"))
+                        .collapsed(true)
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.of("Hide Dead Mobs"))
+                                .description(OptionDescription.of(Text.of("Prevents the game from rendering dead/dying mobs. Additionally, this feature will try to hide the name tags of dead mobs.")))
+                                .binding(false, () -> Config.hideDeadMobs, value -> Config.hideDeadMobs = value)
+                                .controller(Config::booleanController)
+                                .build())
+                        .build())
+
+                .group(OptionGroup.createBuilder()
                         .name(Text.of("Overlays"))
                         .collapsed(true)
                         .option(Option.<Boolean>createBuilder()

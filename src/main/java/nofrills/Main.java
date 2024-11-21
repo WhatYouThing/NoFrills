@@ -53,6 +53,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(KuudraFeatures.class);
         eventBus.subscribe(PartyFeatures.class);
         eventBus.subscribe(SlayerFeatures.class);
+        eventBus.subscribe(HideDeadMobs.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
     }

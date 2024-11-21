@@ -46,6 +46,8 @@ public class Config {
     @SerialEntry
     public static boolean ignoreBackground = false;
     @SerialEntry
+    public static boolean hideDeadMobs = false;
+    @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry
     public static boolean partyQuickKick = false;
@@ -106,6 +108,8 @@ public class Config {
     public static boolean itemCountFix = false;
     @SerialEntry
     public static boolean ridingCamFix = false;
+    @SerialEntry
+    public static boolean oldSkins = false;
 
     // Solvers
 

@@ -9,6 +9,7 @@
     "ClientPlayerEntityMixin",
     "ClientPlayNetworkHandlerMixin",
     "ClientWorldMixin",
+    "DefaultSkinHelperMixin",
     "EnderPearlMixin",
     "EntityMixin",
     "EntityRenderDispatcherMixin",

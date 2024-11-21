@@ -58,12 +58,6 @@ public class Fixes {
                         .binding(false, () -> Config.ridingCamFix, value -> Config.ridingCamFix = value)
                         .controller(Config::booleanController)
                         .build())
-                .option(Option.<Boolean>createBuilder()
-                        .name(Text.of("Old Skins"))
-                        .description(OptionDescription.of(Text.of("Back in my day the only default skins were Steve and Alex.")))
-                        .binding(false, () -> Config.oldSkins, value -> Config.oldSkins = value)
-                        .controller(Config::booleanController)
-                        .build())
                 .build();
     }
 }

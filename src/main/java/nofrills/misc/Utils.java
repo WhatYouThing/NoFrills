@@ -132,14 +132,14 @@ public class Utils {
         ((ScreenOptions) screen).nofrills_mod$disableSlot(slot, disabled);
     }
 
-    public static void sendCoords(String format) {
+    public static String getCoordsFormatted(String format) {
         Vec3d pos = mc.player.getPos();
         DecimalFormat decimalFormat = new DecimalFormat("#");
-        sendMessage(format
+        return format
                 .replace("{x}", decimalFormat.format(Math.ceil(pos.x)))
                 .replace("{y}", decimalFormat.format(Math.floor(pos.y)))
-                .replace("{z}", decimalFormat.format(Math.ceil(pos.z)))
-        );
+                .replace("{z}", decimalFormat.format(Math.ceil(pos.z)));
+
     }
 
     public static boolean isInZone(String zone, boolean containsCheck) {

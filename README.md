@@ -4,7 +4,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 ## Features
 
-<details open>
+<details>
 <summary>Click to expand</summary>
 
 ### General

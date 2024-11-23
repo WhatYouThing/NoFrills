@@ -5,7 +5,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 ## Features
 
 <details>
-<summary>Click to expand</summary>
+<summary>Click to expand feature list</summary>
 
 ### General
 
@@ -103,6 +103,21 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Space Farmer**: Allows you to farm by holding your space bar, so that you don't have to change your keybinds
   constantly. Also has an option to lock your view while using the feature.
+
+</details>
+
+<details>
+<summary>Click to expand command list</summary>
+
+- **Mod Commands** (accessed under `/nofrills`, or `/nf` for short)
+    - **checkUpdate**: Manually check if a new version of the mod is available for download.
+    - **copyCoords**: Copy your current coordinates to your clipboard, optionally in a specific format.
+    - **party**: Command for managing the `Party Commands` feature.
+    - **queue**: Shortcut for the Skyblock `/joininstance` command, letting you easily start a Kuudra/Dungeon run.
+    - **sendCoords**: Send your current coordinates in the chat, optionally in a specific format.
+    - **settings**: Opens the settings GUI (same behavior as running `/nofrills` without any arguments).
+- **Other Commands** (not under `/nofrills`)
+    - **/yeet**: instantly closes Minecraft.
 
 </details>
 

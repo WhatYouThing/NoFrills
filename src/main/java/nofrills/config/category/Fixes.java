@@ -58,6 +58,12 @@ public class Fixes {
                         .binding(false, () -> Config.ridingCamFix, value -> Config.ridingCamFix = value)
                         .controller(Config::booleanController)
                         .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Sneak Fix"))
+                        .description(OptionDescription.of(Text.of("Fixes weird behavior with sneaking, such as not having your walk speed reduced when inside of a block, and the ancient bug where the un-sneak animation plays twice when quickly tapping sneak.")))
+                        .binding(false, () -> Config.sneakFix, value -> Config.sneakFix = value)
+                        .controller(Config::booleanController)
+                        .build())
                 .build();
     }
 }

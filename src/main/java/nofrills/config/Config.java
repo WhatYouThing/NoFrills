@@ -110,6 +110,8 @@ public class Config {
     public static boolean itemCountFix = false;
     @SerialEntry
     public static boolean ridingCamFix = false;
+    @SerialEntry
+    public static boolean sneakFix = false;
 
     // Solvers
 

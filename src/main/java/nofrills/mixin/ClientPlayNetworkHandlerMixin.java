@@ -6,6 +6,7 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
 import net.minecraft.util.Formatting;
+import nofrills.config.Config;
 import nofrills.events.EntityNamedEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,8 +18,18 @@ import static nofrills.Main.mc;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
+    @Inject(method = "onEntityTrackerUpdate", at = @At("HEAD"))
+    private void onTrackerUpdateHead(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci) {
+        Entity entity = mc.world.getEntityById(packet.id());
+        if (entity != null) {
+            if (Config.sneakFix && entity == mc.player) {
+                packet.trackedValues().removeIf(entry -> entry.handler().equals(TrackedDataHandlerRegistry.ENTITY_POSE));
+            }
+        }
+    }
+
     @Inject(method = "onEntityTrackerUpdate", at = @At("TAIL"))
-    private void onTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci) {
+    private void onTrackerUpdateTail(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci) {
         Entity entity = mc.world.getEntityById(packet.id());
         if (entity != null) {
             for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {

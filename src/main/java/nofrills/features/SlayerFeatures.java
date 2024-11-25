@@ -198,7 +198,7 @@ public class SlayerFeatures {
                 if (Config.slayerVampIndicatorIce && statusName.contains("TWINCLAWS")) {
                     String time = statusName.split("TWINCLAWS")[1].trim().split(" ")[0];
                     Utils.showTitleCustom("Ice: " + time, 1, 25, 4.0f, 0x00ffff);
-                } else if (Config.slayerVampIndicatorSteak && bossName.contains("҉")) {
+                } else if (Config.slayerVampIndicatorSteak && bossName.contains(Utils.Symbols.vampLow)) {
                     Utils.showTitleCustom("Steak!", 1, 25, 4.0f, 0xff0000);
                 }
             }

@@ -269,6 +269,7 @@ public class Utils {
         public static String heart = "❤";
         public static String skull = "☠";
         public static String format = "§";
+        public static String vampLow = "҉";
     }
 
     public static class SkyblockData {

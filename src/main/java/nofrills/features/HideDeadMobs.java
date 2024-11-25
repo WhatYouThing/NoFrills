@@ -12,7 +12,8 @@ import static nofrills.misc.Utils.Symbols;
 public class HideDeadMobs {
     private static final Pattern[] deadPatterns = {
             Pattern.compile(".* 0" + Symbols.heart),
-            Pattern.compile(".* 0/.*" + Symbols.heart)
+            Pattern.compile(".* 0/.*" + Symbols.heart),
+            Pattern.compile(".* 0/.*" + Symbols.heart + " " + Symbols.vampLow)
     };
 
     @EventHandler

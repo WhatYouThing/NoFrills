@@ -12,9 +12,10 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.events.WorldTickEvent;
+import nofrills.misc.RenderColor;
+import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
-import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -24,7 +25,6 @@ import static nofrills.Main.mc;
 public class SlayerFeatures {
     private static final Pattern firePillarRegex = Pattern.compile("[0-9]s [0-9] hits");
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
-    private static final Color colorDefault = new Color(0, 255, 255, 255);
     private static final SlayerBoss[] slayerBosses = {
             new SlayerBoss("Revenant Horror",
                     new String[]{"Revenant Horror", "Atoned Horror"},
@@ -73,29 +73,25 @@ public class SlayerFeatures {
         return Utils.getNearbyEntities(ent, 0.6, 2, 0.6, entity -> isEntityValid(entity, validTypes));
     }
 
-    private static void render(Entity ent, boolean render, Color color) {
-        float r = (float) color.getRed() / 255;
-        float g = (float) color.getGreen() / 255;
-        float b = (float) color.getBlue() / 255;
-        float a = (float) color.getAlpha() / 255;
-        Utils.setRenderOutline(ent, render, r, g, b, a);
-        Utils.setRenderFilled(ent, render, r, g, b, a * 0.33f);
+    private static void render(Entity ent, boolean render, int r, int g, int b, int a) {
+        Rendering.Entities.drawOutline(ent, render, new RenderColor(r, g, b, a));
+        Rendering.Entities.drawFilled(ent, render, new RenderColor(r, g, b, 85));
     }
 
     private static void renderBlaze(Entity ent, String customName) {
         String name = Formatting.strip(customName);
         if (name.startsWith("IMMUNE")) {
-            render(ent, false, new Color(0, 0, 0, 0));
+            render(ent, false, 0, 0, 0, 0);
         } else if (name.startsWith("ASHEN")) {
-            render(ent, true, new Color(0, 0, 0, 255));
+            render(ent, true, 0, 0, 0, 255);
         } else if (name.startsWith("SPIRIT")) {
-            render(ent, true, new Color(255, 255, 255, 255));
+            render(ent, true, 255, 255, 255, 255);
         } else if (name.startsWith("AURIC")) {
-            render(ent, true, new Color(255, 255, 0, 255));
+            render(ent, true, 255, 255, 0, 255);
         } else if (name.startsWith("CRYSTAL")) {
-            render(ent, true, new Color(0, 255, 255, 255));
+            render(ent, true, 0, 255, 255, 255);
         } else {
-            render(ent, true, colorDefault);
+            render(ent, true, 0, 255, 255, 255);
         }
     }
 
@@ -178,8 +174,8 @@ public class SlayerFeatures {
         }
         if (currentBoss != null) {
             if (Config.slayerHitboxes) {
-                if (!currentBoss.bossData.scoreboardName.equals("Inferno Demonlord") && !Utils.isRenderingOutline(currentBoss.bossEntity)) {
-                    render(currentBoss.bossEntity, true, colorDefault);
+                if (!currentBoss.bossData.scoreboardName.equals("Inferno Demonlord") && !Rendering.Entities.isDrawingOutline(currentBoss.bossEntity)) {
+                    render(currentBoss.bossEntity, true, 0, 255, 255, 255);
                 }
             }
             if (Config.slayerEmanHitDisplay && currentBoss.bossData.scoreboardName.equals("Voidgloom Seraph")) {

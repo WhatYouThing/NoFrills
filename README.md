@@ -72,7 +72,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Render Health**: Renders Kuudra's exact health during the DPS phase.
 - **Announce Missing**: Announces in party chat if no supply spawns at either your pre, or at your next spot.
 - **Pile Fix**: Allows you to use your abilities (such as Fire Veil) while building the ballista.
-- **Quick Buy**: Easily buy the upgrades you need by pressing space with the perk shop open.
 - **Announce Fresh**: Send a message when the Fresh Tools perk activates.
 - **Fresh Timer**: Shows a timer for Fresh Tools.
 - **Announce Drain**: Send a message when you drain your mana with an End Stone Sword.

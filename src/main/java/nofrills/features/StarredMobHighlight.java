@@ -9,9 +9,10 @@ import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import nofrills.config.Config;
 import nofrills.events.EntityNamedEvent;
+import nofrills.misc.RenderColor;
+import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
-import java.awt.*;
 import java.util.List;
 
 import static net.minecraft.entity.EntityType.ARMOR_STAND;
@@ -30,34 +31,16 @@ public class StarredMobHighlight {
         };
     }
 
-    private static Entity findClosestEntity(List<Entity> entityList, Entity target) {
-        Entity closest = null;
-        float lowestDist = 2.0f;
-        for (Entity ent : entityList) {
-            float dist = Utils.horizontalDistance(ent, target);
-            if (dist < lowestDist) {
-                closest = ent;
-                lowestDist = dist;
-            }
-        }
-        return closest;
-    }
-
     @EventHandler
     public static void onNamed(EntityNamedEvent event) {
         if (Config.starredMobHighlight && Utils.isInDungeons()) {
             if (event.entity.getType() == ARMOR_STAND && event.namePlain.startsWith(star)) {
                 if (event.namePlain.replace(star, "").equals(event.namePlain.replaceAll(star, ""))) {
-                    List<Entity> otherEntities = event.entity.getWorld().getOtherEntities(
-                            event.entity,
-                            event.entity.getBoundingBox().expand(0.5, 1, 0.5),
-                            StarredMobHighlight::isDungeonMob
-                    );
+                    List<Entity> otherEntities = Utils.getNearbyEntities(event.entity, 0.6, 2, 0.6, StarredMobHighlight::isDungeonMob);
                     if (!otherEntities.isEmpty()) {
-                        Entity closest = findClosestEntity(otherEntities, event.entity);
+                        Entity closest = Utils.findNametagOwner(event.entity, otherEntities);
                         if (closest != null) {
-                            Color colors = Config.starredMobColor;
-                            Utils.setRenderOutline(closest, true, (float) colors.getRed() / 255, (float) colors.getGreen() / 255, (float) colors.getBlue() / 255, (float) colors.getAlpha() / 255);
+                            Rendering.Entities.drawOutline(closest, true, RenderColor.fromColor(Config.starredMobColor));
                         }
                     }
                 }

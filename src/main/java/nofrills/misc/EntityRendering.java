@@ -1,19 +1,19 @@
 package nofrills.misc;
 
 public interface EntityRendering {
-    void nofrills_mod$setGlowingColored(boolean glowing, int color);
+    void nofrills_mod$setGlowingColored(boolean glowing, RenderColor color);
 
     boolean nofrills_mod$getGlowing();
 
-    void nofrills_mod$setRenderBoxOutline(boolean render, float red, float green, float blue, float alpha);
+    void nofrills_mod$setRenderBoxOutline(boolean render, RenderColor color);
 
     boolean nofrills_mod$getRenderingOutline();
 
-    float[] nofrills_mod$getRenderingOutlineColors();
+    RenderColor nofrills_mod$getOutlineColors();
 
-    void nofrills_mod$setRenderBoxFilled(boolean render, float red, float green, float blue, float alpha);
+    void nofrills_mod$setRenderBoxFilled(boolean render, RenderColor color);
 
     boolean nofrills_mod$getRenderingFilled();
 
-    float[] nofrills_mod$getRenderingFilledColors();
+    RenderColor nofrills_mod$getFilledColors();
 }

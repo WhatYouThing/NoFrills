@@ -1,5 +1,6 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.data.DataTracker;
@@ -18,26 +19,20 @@ import static nofrills.Main.mc;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
-    @Inject(method = "onEntityTrackerUpdate", at = @At("HEAD"))
-    private void onTrackerUpdateHead(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci) {
-        Entity entity = mc.world.getEntityById(packet.id());
-        if (entity != null) {
-            if (Config.sneakFix && entity == mc.player) {
-                packet.trackedValues().removeIf(entry -> entry.handler().equals(TrackedDataHandlerRegistry.ENTITY_POSE));
-            }
+    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"))
+    private void onTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
+        if (Config.sneakFix && ent == mc.player) {
+            packet.trackedValues().removeIf(entry -> entry.handler().equals(TrackedDataHandlerRegistry.ENTITY_POSE));
         }
     }
 
-    @Inject(method = "onEntityTrackerUpdate", at = @At("TAIL"))
-    private void onTrackerUpdateTail(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci) {
-        Entity entity = mc.world.getEntityById(packet.id());
-        if (entity != null) {
-            for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
-                if (entry.handler() == TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) {
-                    if (entry.value() != null && entity.getCustomName() != null) {
-                        eventBus.post(new EntityNamedEvent(entity, Formatting.strip(entity.getCustomName().getString())));
-                        break;
-                    }
+    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V", shift = At.Shift.AFTER))
+    private void onPostTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
+        for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
+            if (entry.handler() == TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) {
+                if (entry.value() != null && ent.getCustomName() != null) {
+                    eventBus.post(new EntityNamedEvent(ent, Formatting.strip(ent.getCustomName().getString())));
+                    break;
                 }
             }
         }

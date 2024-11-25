@@ -4,10 +4,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -88,38 +84,6 @@ public class Utils {
     public static void infoLink(String message, String url) {
         ClickEvent click = new ClickEvent(ClickEvent.Action.OPEN_URL, url);
         mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r " + message + "§r").setStyle(Style.EMPTY.withClickEvent(click)), null, noFrillsIndicator);
-    }
-
-    /**
-     * Enable/disable the glowing effect for a specific entity. Only needs to be called once.
-     *
-     * @param color color in hex format
-     */
-    public static void setGlowing(Entity ent, boolean glowing, int color) {
-        ((EntityRendering) ent).nofrills_mod$setGlowingColored(glowing, color);
-    }
-
-    /**
-     * Checks if an entity has had the glowing effect applied with the <code>setGlowing</code> function. Vanilla/Server glows will return false.
-     */
-    public static boolean isGlowing(Entity ent) {
-        return ((EntityRendering) ent).nofrills_mod$getGlowing();
-    }
-
-    public static void setRenderOutline(Entity ent, boolean render, float red, float green, float blue, float alpha) {
-        ((EntityRendering) ent).nofrills_mod$setRenderBoxOutline(render, red, green, blue, alpha);
-    }
-
-    public static boolean isRenderingOutline(Entity ent) {
-        return ((EntityRendering) ent).nofrills_mod$getRenderingOutline();
-    }
-
-    public static void setRenderFilled(Entity ent, boolean render, float red, float green, float blue, float alpha) {
-        ((EntityRendering) ent).nofrills_mod$setRenderBoxFilled(render, red, green, blue, alpha);
-    }
-
-    public static boolean isRenderingFilled(Entity ent) {
-        return ((EntityRendering) ent).nofrills_mod$getRenderingFilled();
     }
 
     /**
@@ -323,34 +287,5 @@ public class Utils {
             this.slot = slot;
             this.replacementStack = replacementStack;
         }
-    }
-
-    public static class renderLayers {
-        public static final RenderLayer.MultiPhase boxFilledNoCull = RenderLayer.of(
-                "nofrills_filled_no_cull",
-                VertexFormats.POSITION_COLOR,
-                VertexFormat.DrawMode.TRIANGLE_STRIP,
-                1536,
-                false,
-                true,
-                RenderLayer.MultiPhaseParameters.builder()
-                        .program(RenderPhase.COLOR_PROGRAM)
-                        .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                        .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                        .depthTest(RenderPhase.ALWAYS_DEPTH_TEST) // doesnt work most of the time with sodium installed
-                        .cull(RenderPhase.DISABLE_CULLING)
-                        .build(false));
-        public static final RenderLayer.MultiPhase boxFilled = RenderLayer.of(
-                "nofrills_filled",
-                VertexFormats.POSITION_COLOR,
-                VertexFormat.DrawMode.TRIANGLE_STRIP,
-                1536,
-                false,
-                true,
-                RenderLayer.MultiPhaseParameters.builder()
-                        .program(RenderPhase.COLOR_PROGRAM)
-                        .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                        .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                        .build(false));
     }
 }

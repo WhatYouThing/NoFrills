@@ -168,8 +168,6 @@ public class Config {
     @SerialEntry
     public static boolean kuudraFreshTimer = false;
     @SerialEntry
-    public static boolean kuudraQuickBuy = false;
-    @SerialEntry
     public static boolean kuudraDrain = false;
     @SerialEntry
     public static String kuudraDrainMsg = "/pc Used {mana} Mana on {players} players!";

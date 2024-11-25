@@ -1,21 +1,16 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MagmaCubeEntity;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
-import nofrills.events.InputEvent;
 import nofrills.events.WorldTickEvent;
+import nofrills.misc.RenderColor;
+import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.text.DecimalFormat;
 
@@ -150,8 +145,8 @@ public class KuudraFeatures {
                     updateKuudraEntity();
                 }
             } else {
-                if (Config.kuudraHitbox && !Utils.isRenderingOutline(kuudraEntity)) {
-                    Utils.setRenderOutline(kuudraEntity, true, 1.0f, 1.0f, 0.0f, 1.0f);
+                if (Config.kuudraHitbox && !Rendering.Entities.isDrawingOutline(kuudraEntity)) {
+                    Rendering.Entities.drawOutline(kuudraEntity, true, new RenderColor(255, 255, 0, 255));
                 }
                 if (Config.kuudraHealth && getCurrentPhase() == kuudraPhases.DPS) {
                     float health = kuudraEntity.getHealth() / kuudraEntity.getMaxHealth();
@@ -198,34 +193,6 @@ public class KuudraFeatures {
                     event.cancel();
                 }
                 if (msg.equals("Your Extreme Focus has worn off.")) {
-                    event.cancel();
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    private static void onInput(InputEvent event) {
-        if (Config.kuudraQuickBuy && Utils.isInKuudra() && event.key == GLFW.GLFW_KEY_SPACE) {
-            if (mc.currentScreen instanceof GenericContainerScreen containerScreen) {
-                String screenName = containerScreen.getTitle().getString();
-                if (screenName.equals("Perk Menu") || screenName.equals("Are you sure?")) {
-                    if (event.action == GLFW.GLFW_PRESS || event.action == GLFW.GLFW_REPEAT) {
-                        ScreenHandler handler = containerScreen.getScreenHandler();
-                        for (Slot slot : handler.slots) {
-                            String stackName = Formatting.strip(slot.getStack().getName().getString());
-                            if (getCurrentPhase() == kuudraPhases.DPS && stackName.equals("Human Cannonball")) {
-                                mc.interactionManager.clickSlot(handler.syncId, slot.id, 0, SlotActionType.THROW, mc.player);
-                            } else {
-                                for (String phaseLine : new String[]{"Specialist Route", "Confirm", "Ballista Mechanic"}) {
-                                    if (stackName.startsWith(phaseLine)) {
-                                        mc.interactionManager.clickSlot(handler.syncId, slot.id, 0, SlotActionType.THROW, mc.player);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
                     event.cancel();
                 }
             }

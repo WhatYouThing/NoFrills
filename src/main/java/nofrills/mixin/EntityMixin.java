@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import nofrills.config.Config;
 import nofrills.misc.EntityRendering;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,15 +26,15 @@ public abstract class EntityMixin implements EntityRendering {
     @Unique
     boolean outlineRender = false;
     @Unique
-    float[] outlineColors;
+    private RenderColor outlineColors;
     @Unique
-    boolean filledRender = false;
+    private boolean filledRender = false;
     @Unique
-    float[] filledColors;
+    private RenderColor filledColors;
     @Unique
     private boolean glowRender = false;
     @Unique
-    private int glowColor = 0;
+    private RenderColor glowColor;
 
     @Shadow
     public abstract void setSprinting(boolean sprinting);
@@ -42,14 +43,11 @@ public abstract class EntityMixin implements EntityRendering {
     public abstract boolean isTouchingWater();
 
     @Override
-    public void nofrills_mod$setRenderBoxOutline(boolean render, float red, float green, float blue, float alpha) {
+    public void nofrills_mod$setRenderBoxOutline(boolean render, RenderColor color) {
         if (render) {
-            outlineRender = true;
-            outlineColors = new float[]{red, green, blue, alpha};
-        } else {
-            outlineRender = false;
-            outlineColors = null;
+            outlineColors = color;
         }
+        outlineRender = render;
     }
 
     @Override
@@ -58,19 +56,16 @@ public abstract class EntityMixin implements EntityRendering {
     }
 
     @Override
-    public float[] nofrills_mod$getRenderingOutlineColors() {
+    public RenderColor nofrills_mod$getOutlineColors() {
         return outlineColors;
     }
 
     @Override
-    public void nofrills_mod$setRenderBoxFilled(boolean render, float red, float green, float blue, float alpha) {
+    public void nofrills_mod$setRenderBoxFilled(boolean render, RenderColor color) {
         if (render) {
-            filledRender = true;
-            filledColors = new float[]{red, green, blue, alpha};
-        } else {
-            filledRender = false;
-            filledColors = null;
+            filledColors = color;
         }
+        filledRender = render;
     }
 
     @Override
@@ -79,12 +74,12 @@ public abstract class EntityMixin implements EntityRendering {
     }
 
     @Override
-    public float[] nofrills_mod$getRenderingFilledColors() {
+    public RenderColor nofrills_mod$getFilledColors() {
         return filledColors;
     }
 
     @Override
-    public void nofrills_mod$setGlowingColored(boolean glowing, int color) {
+    public void nofrills_mod$setGlowingColored(boolean glowing, RenderColor color) {
         glowRender = glowing;
         glowColor = color;
     }
@@ -104,8 +99,8 @@ public abstract class EntityMixin implements EntityRendering {
 
     @ModifyReturnValue(method = "getTeamColorValue", at = @At("RETURN"))
     private int getTeamColorValue(int original) {
-        if (glowColor != 0) {
-            return glowColor;
+        if (glowRender) {
+            return glowColor.hex;
         }
         return original;
     }

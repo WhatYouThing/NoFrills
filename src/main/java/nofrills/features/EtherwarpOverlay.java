@@ -10,6 +10,7 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import nofrills.config.Config;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.RenderColor;
@@ -73,10 +74,11 @@ public class EtherwarpOverlay {
                 HitResult hitResult = Utils.raycastFullBlock(mc.player, dist, event.tickCounter.getTickDelta(true));
                 if (hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHitResult) {
                     BlockPos pos = blockHitResult.getBlockPos();
+                    Box box = Box.enclosing(pos, pos);
                     if (isBlockValid(pos, 0) && isBlockValid(pos, 1) && isBlockValid(pos, 2)) {
-                        Rendering.drawFilled(event.matrices, event.consumer, event.camera, pos, true, colorCorrect);
+                        Rendering.drawFilled(event.matrices, event.consumer, event.camera, box, true, colorCorrect);
                     } else {
-                        Rendering.drawFilled(event.matrices, event.consumer, event.camera, pos, true, colorWrong);
+                        Rendering.drawFilled(event.matrices, event.consumer, event.camera, box, true, colorWrong);
                     }
                 }
             }

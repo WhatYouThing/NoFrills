@@ -175,7 +175,7 @@ public class Utils {
                     if (versionNewest != null) {
                         for (int i = 0; i <= versionLocal.length - 1; i++) {
                             if (Integer.parseInt(versionLocal[i]) < Integer.parseInt(versionNewest[i])) {
-                                infoLink("§a§lNew version available! §aClick here to open the GitHub releases page. §7Current: " + String.join(".", versionLocal) + ", Newest: " + String.join(".", versionNewest), "https://github.com/WhatYouThing/NoFrills/releases");
+                                infoLink("§a§lNew version available! §aClick here to open the Modrinth releases page. §7Current: " + String.join(".", versionLocal) + ", Newest: " + String.join(".", versionNewest), "https://modrinth.com/mod/nofrills/versions");
                                 return;
                             }
                         }

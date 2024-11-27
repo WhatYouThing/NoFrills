@@ -15,8 +15,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
-    @Shadow
-    private boolean inSneakingPose;
 
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);
@@ -36,7 +34,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @ModifyReturnValue(method = "shouldSlowDown", at = @At("RETURN"))
     private boolean shouldSlowDown(boolean original) {
         if (Config.sneakFix) {
-            return isSneaking() || isCrawling();
+            return (isSneaking() && !getAbilities().flying) || isCrawling();
         }
         return original;
     }

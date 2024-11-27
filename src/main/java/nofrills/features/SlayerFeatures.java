@@ -7,16 +7,18 @@ import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.EntityNamedEvent;
-import nofrills.events.ReceivePacketEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -25,6 +27,7 @@ import static nofrills.Main.mc;
 public class SlayerFeatures {
     private static final Pattern firePillarRegex = Pattern.compile("[0-9]s [0-9] hits");
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
+    private static final Pattern yanDevChaliceRegex = Pattern.compile("[0-9]*\\.[0-9]*s");
     private static final SlayerBoss[] slayerBosses = {
             new SlayerBoss("Revenant Horror",
                     new String[]{"Revenant Horror", "Atoned Horror"},
@@ -51,7 +54,15 @@ public class SlayerFeatures {
                     new EntityType<?>[]{EntityType.BLAZE, EntityType.ZOMBIFIED_PIGLIN, EntityType.WITHER_SKELETON}
             ),
     };
+    private static final RenderColor ashenColor = RenderColor.fromHex(0x000000);
+    private static final RenderColor spiritColor = RenderColor.fromHex(0xffffff);
+    private static final RenderColor auricColor = RenderColor.fromHex(0xffff00);
+    private static final RenderColor crystalColor = RenderColor.fromHex(0x00ffff);
+    private static final RenderColor defaultColor = RenderColor.fromHex(0x00ffff);
+    private static final RenderColor steakColor = RenderColor.fromHex(0xff2500);
+    private static final RenderColor yanDevColor = RenderColor.fromHex(0xff0000, 0.67f);
     private static final DecimalFormat killTimeFormat = new DecimalFormat("0.##");
+    private static final List<Entity> yanDevData = new ArrayList<>();
     private static CurrentBoss currentBoss = null;
     private static int bossAliveTicks = 0;
     private static boolean springsActive = false;
@@ -73,25 +84,26 @@ public class SlayerFeatures {
         return Utils.getNearbyEntities(ent, 0.6, 2, 0.6, entity -> isEntityValid(entity, validTypes));
     }
 
-    private static void render(Entity ent, boolean render, int r, int g, int b, int a) {
-        Rendering.Entities.drawOutline(ent, render, new RenderColor(r, g, b, a));
-        Rendering.Entities.drawFilled(ent, render, new RenderColor(r, g, b, 85));
+    private static void render(Entity ent, boolean render, RenderColor color) {
+        Rendering.Entities.drawOutline(ent, render, color);
+        RenderColor copy = RenderColor.fromFloat(color.r, color.g, color.b, 0.33f);
+        Rendering.Entities.drawFilled(ent, render, copy);
     }
 
     private static void renderBlaze(Entity ent, String customName) {
         String name = Formatting.strip(customName);
         if (name.startsWith("IMMUNE")) {
-            render(ent, false, 0, 0, 0, 0);
+            render(ent, false, defaultColor);
         } else if (name.startsWith("ASHEN")) {
-            render(ent, true, 0, 0, 0, 255);
+            render(ent, true, ashenColor);
         } else if (name.startsWith("SPIRIT")) {
-            render(ent, true, 255, 255, 255, 255);
+            render(ent, true, spiritColor);
         } else if (name.startsWith("AURIC")) {
-            render(ent, true, 255, 255, 0, 255);
+            render(ent, true, auricColor);
         } else if (name.startsWith("CRYSTAL")) {
-            render(ent, true, 0, 255, 255, 255);
+            render(ent, true, crystalColor);
         } else {
-            render(ent, true, 0, 255, 255, 255);
+            render(ent, true, defaultColor);
         }
     }
 
@@ -152,8 +164,15 @@ public class SlayerFeatures {
                             }
                         }
                     }
-                    if (Config.slayerBlazePillarWarn && firePillarRegex.matcher(event.namePlain).matches() && event.entity.distanceTo(mc.player) <= 16) {
+                    if (Config.blazePillarWarn && firePillarRegex.matcher(event.namePlain).matches() && event.entity.distanceTo(mc.player) <= 16) {
                         Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, 0xffff00);
+                    }
+                }
+                if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice) {
+                    if (yanDevChaliceRegex.matcher(event.namePlain).matches() && !yanDevData.contains(event.entity)) {
+                        if (event.entity.distanceTo(mc.player) <= 24) {
+                            yanDevData.add(event.entity);
+                        }
                     }
                 }
             }
@@ -164,6 +183,7 @@ public class SlayerFeatures {
     public static void onTick(WorldTickEvent event) {
         if (!Utils.scoreboardLines.contains("Slay the boss!")) {
             currentBoss = null;
+            yanDevData.clear();
             if (Config.slayerKillTime && bossAliveTicks > 0) {
                 Utils.info(Utils.Symbols.format + "aSlayer boss took " + killTimeFormat.format(bossAliveTicks / 20.0f) + "s to kill.");
                 bossAliveTicks = 0;
@@ -175,10 +195,10 @@ public class SlayerFeatures {
         if (currentBoss != null) {
             if (Config.slayerHitboxes) {
                 if (!currentBoss.bossData.scoreboardName.equals("Inferno Demonlord") && !Rendering.Entities.isDrawingOutline(currentBoss.bossEntity)) {
-                    render(currentBoss.bossEntity, true, 0, 255, 255, 255);
+                    render(currentBoss.bossEntity, true, defaultColor);
                 }
             }
-            if (Config.slayerEmanHitDisplay && currentBoss.bossData.scoreboardName.equals("Voidgloom Seraph")) {
+            if (Config.emanHitDisplay && currentBoss.bossData.scoreboardName.equals("Voidgloom Seraph")) {
                 String name = Formatting.strip(currentBoss.nameEntity.getCustomName().getString());
                 if (name.endsWith("Hits")) {
                     String[] parts = name.split(" ");
@@ -195,11 +215,17 @@ public class SlayerFeatures {
                 if (springsActive && !statusName.contains("KILLER SPRING")) {
                     springsActive = false;
                 }
-                if (Config.slayerVampIndicatorIce && statusName.contains("TWINCLAWS")) {
+                if (Config.vampIce && statusName.contains("TWINCLAWS")) {
                     String time = statusName.split("TWINCLAWS")[1].trim().split(" ")[0];
                     Utils.showTitleCustom("Ice: " + time, 1, 25, 4.0f, 0x00ffff);
-                } else if (Config.slayerVampIndicatorSteak && bossName.contains(Utils.Symbols.vampLow)) {
-                    Utils.showTitleCustom("Steak!", 1, 25, 4.0f, 0xff0000);
+                }
+                if (bossName.contains(Utils.Symbols.vampLow)) {
+                    if (Config.vampSteak && !statusName.contains("TWINCLAWS")) {
+                        Utils.showTitleCustom("Steak!", 1, 25, 4.0f, 0xff0000);
+                    }
+                    if (Config.vampSteakHighlight) {
+                        render(currentBoss.bossEntity, true, steakColor);
+                    }
                 }
             }
             if (Config.slayerKillTime) {
@@ -210,7 +236,7 @@ public class SlayerFeatures {
 
     @EventHandler
     public static void onChat(ChatMsgEvent event) {
-        if (Config.slayerBlazeNoSpam) {
+        if (Config.blazeNoSpam) {
             String msg = event.getPlainMessage();
             if (msg.equals("Your hit was reduced by Hellion Shield!")) {
                 event.cancel();
@@ -226,20 +252,46 @@ public class SlayerFeatures {
         if (event.packet instanceof PlaySoundS2CPacket soundPacket) {
             if (Utils.isInChateau()) {
                 String soundName = soundPacket.getSound().value().getId().toString();
-                if (Config.slayerVampManiaSilence && soundName.equalsIgnoreCase("minecraft:entity.elder_guardian.curse")) {
-                    if (Config.slayerVampManiaReplace && currentBoss != null && currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend")) {
+                if (Config.vampManiaSilence && soundName.equalsIgnoreCase("minecraft:entity.elder_guardian.curse")) {
+                    if (Config.vampManiaReplace && currentBoss != null && currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend")) {
                         Utils.playSound(SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.MASTER, 1, 0);
                     }
                     event.cancel();
                 }
-                if (Config.slayerVampSpringSilence && soundName.equalsIgnoreCase("minecraft:entity.wither.spawn") && currentBoss != null) {
+                if (Config.vampSpringSilence && soundName.equalsIgnoreCase("minecraft:entity.wither.spawn") && currentBoss != null) {
                     String statusName = Formatting.strip(currentBoss.statusEntity.getCustomName().getString());
                     if (statusName.contains("KILLER SPRING")) {
-                        if (Config.slayerVampSpringReplace && !springsActive) {
+                        if (Config.vampSpringReplace && !springsActive) {
                             Utils.playSound(SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.MASTER, 1, -1);
                             springsActive = true;
                         }
                         event.cancel();
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public static void onRender(WorldRenderEvent event) {
+        if (currentBoss != null) {
+            if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice) {
+                Iterator<Entity> iterator = yanDevData.iterator();
+                while (iterator.hasNext()) {
+                    Entity ent = iterator.next();
+                    if (!ent.isAlive()) {
+                        iterator.remove();
+                    } else {
+                        BlockPos blockPos = ent.getBlockPos();
+                        for (int i = 0; i <= 4; i++) {
+                            BlockPos below = blockPos.down(i);
+                            if (!mc.world.getBlockState(below).isAir()) {
+                                Vec3d pos = ent.getPos();
+                                Vec3d posAdjust = new Vec3d(pos.x, below.up(1).getY() + 0.5, pos.z);
+                                Rendering.drawFilled(event.matrices, event.consumer, event.camera, Box.of(posAdjust, 1, 1.25, 1), true, yanDevColor);
+                                break;
+                            }
+                        }
                     }
                 }
             }

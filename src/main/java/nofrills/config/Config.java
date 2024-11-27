@@ -191,23 +191,27 @@ public class Config {
     @SerialEntry
     public static boolean slayerKillTime = false;
     @SerialEntry
-    public static boolean slayerBlazeNoSpam = false;
+    public static boolean blazeNoSpam = false;
     @SerialEntry
-    public static boolean slayerBlazePillarWarn = false;
+    public static boolean blazePillarWarn = false;
     @SerialEntry
-    public static boolean slayerVampIndicatorIce = false;
+    public static boolean vampIce = false;
     @SerialEntry
-    public static boolean slayerVampIndicatorSteak = false;
+    public static boolean vampSteak = false;
     @SerialEntry
-    public static boolean slayerVampManiaSilence = false;
+    public static boolean vampSteakHighlight = false;
     @SerialEntry
-    public static boolean slayerVampManiaReplace = false;
+    public static boolean vampChalice = false;
     @SerialEntry
-    public static boolean slayerVampSpringSilence = false;
+    public static boolean vampManiaSilence = false;
     @SerialEntry
-    public static boolean slayerVampSpringReplace = false;
+    public static boolean vampManiaReplace = false;
     @SerialEntry
-    public static boolean slayerEmanHitDisplay = false;
+    public static boolean vampSpringSilence = false;
+    @SerialEntry
+    public static boolean vampSpringReplace = false;
+    @SerialEntry
+    public static boolean emanHitDisplay = false;
 
     // end of setting values
 

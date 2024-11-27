@@ -87,6 +87,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Ice Indicator**: Displays a timer on screen when the boss is about to use Twinclaws, so that you know when to
       use Holy Ice.
     - **Steak Indicator**: Displays text on screen when you're able to finish off the boss with your steak.
+    - **Ichor Highlight**: Highlights the Blood Ichors spawned by your boss.
     - **Silence Mania**: Allows you to get rid of the extremely loud Mania sound effects, and optionally to replace
       them.
     - **Silence Springs**: Allows you to get rid of the buggy Killer Springs sound effects, and optionally to replace

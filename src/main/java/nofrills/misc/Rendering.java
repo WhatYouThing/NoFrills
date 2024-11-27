@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.opengl.GL11;
 
@@ -12,9 +12,9 @@ import java.util.OptionalDouble;
 
 public final class Rendering {
     /**
-     * Draws a filled box over the specified block for the current frame. Also performs the required matrix stack translation.
+     * Draws a filled box for the current frame. Automatically performs the required matrix stack translation.
      */
-    public static void drawFilled(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, BlockPos pos, boolean throughWalls, RenderColor color) {
+    public static void drawFilled(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, Box box, boolean throughWalls, RenderColor color) {
         matrices.push();
         Vec3d camPos = camera.getPos().negate();
         matrices.translate(camPos.x, camPos.y, camPos.z);
@@ -22,11 +22,8 @@ public final class Rendering {
             RenderSystem.enableDepthTest();
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
         }
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
         VertexConsumer buffer = throughWalls ? consumer.getBuffer(Layers.BoxFilledNoCull) : consumer.getBuffer(Layers.BoxFilled);
-        WorldRenderer.renderFilledBox(matrices, buffer, x, y, z, x + 1, y + 1, z + 1, color.r, color.g, color.b, color.a);
+        WorldRenderer.renderFilledBox(matrices, buffer, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color.r, color.g, color.b, color.a);
         if (throughWalls) {
             RenderSystem.disableDepthTest();
             RenderSystem.depthFunc(GL11.GL_LEQUAL);
@@ -35,9 +32,9 @@ public final class Rendering {
     }
 
     /**
-     * Draws an outline box over the specified block for the current frame. Also performs the required matrix stack translation.
+     * Draws an outline box for the current frame. Automatically performs the required matrix stack translation.
      */
-    public static void drawOutline(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, BlockPos pos, boolean throughWalls, RenderColor color) {
+    public static void drawOutline(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, Box box, boolean throughWalls, RenderColor color) {
         matrices.push();
         Vec3d camPos = camera.getPos().negate();
         matrices.translate(camPos.x, camPos.y, camPos.z);
@@ -45,11 +42,8 @@ public final class Rendering {
             RenderSystem.enableDepthTest();
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
         }
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
         VertexConsumer buffer = throughWalls ? consumer.getBuffer(Layers.BoxOutlineNoCull) : consumer.getBuffer(Layers.BoxOutline);
-        WorldRenderer.drawBox(matrices, buffer, x, y, z, x + 1, y + 1, z + 1, color.r, color.g, color.b, color.a);
+        WorldRenderer.drawBox(matrices, buffer, box, color.r, color.g, color.b, color.a);
         if (throughWalls) {
             RenderSystem.disableDepthTest();
             RenderSystem.depthFunc(GL11.GL_LEQUAL);

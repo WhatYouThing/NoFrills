@@ -63,6 +63,7 @@ public class SlayerFeatures {
     private static final RenderColor yanDevColor = RenderColor.fromHex(0xff0000, 0.67f);
     private static final DecimalFormat killTimeFormat = new DecimalFormat("0.##");
     private static final List<Entity> yanDevData = new ArrayList<>();
+    private static final List<Entity> pillarData = new ArrayList<>();
     private static CurrentBoss currentBoss = null;
     private static int bossAliveTicks = 0;
     private static boolean springsActive = false;
@@ -164,8 +165,10 @@ public class SlayerFeatures {
                             }
                         }
                     }
-                    if (Config.blazePillarWarn && firePillarRegex.matcher(event.namePlain).matches() && event.entity.distanceTo(mc.player) <= 16) {
-                        Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, 0xffff00);
+                    if (Config.blazePillarWarn && firePillarRegex.matcher(event.namePlain).matches() && !pillarData.contains(event.entity)) {
+                        if (event.entity.distanceTo(mc.player) <= 30) {
+                            pillarData.add(event.entity);
+                        }
                     }
                 }
                 if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice) {
@@ -181,9 +184,10 @@ public class SlayerFeatures {
 
     @EventHandler
     public static void onTick(WorldTickEvent event) {
-        if (!Utils.scoreboardLines.contains("Slay the boss!")) {
+        if (!Utils.scoreboardLines.contains("Slay the boss!") && currentBoss != null) { // runs when boss is killed or if we fail the slayer quest
             currentBoss = null;
             yanDevData.clear();
+            pillarData.clear();
             if (Config.slayerKillTime && bossAliveTicks > 0) {
                 Utils.info(Utils.Symbols.format + "aSlayer boss took " + killTimeFormat.format(bossAliveTicks / 20.0f) + "s to kill.");
                 bossAliveTicks = 0;
@@ -191,6 +195,7 @@ public class SlayerFeatures {
             if (Utils.isRenderingCustomTitle()) {
                 Utils.showTitleCustom("", 0, 0, 0, 0);
             }
+            return;
         }
         if (currentBoss != null) {
             if (Config.slayerHitboxes) {
@@ -208,6 +213,26 @@ public class SlayerFeatures {
                         Utils.showTitleCustom("", 0, 0, 0, 0);
                     }
                 }
+            }
+            if (Config.blazePillarWarn && currentBoss.bossData.scoreboardName.equals("Inferno Demonlord")) {
+                Entity nearest = null;
+                float lowestDist = 30.0f;
+                if (pillarData.size() == 1) {
+                    nearest = pillarData.getFirst();
+                } else {
+                    for (Entity ent : pillarData) {
+                        float dist = Utils.horizontalDistance(ent, mc.player);
+                        if (dist <= lowestDist) {
+                            nearest = ent;
+                            lowestDist = dist;
+                        }
+                    }
+                }
+                if (nearest != null) {
+                    String name = Formatting.strip(nearest.getCustomName().getString());
+                    Utils.showTitleCustom("Pillar: " + name, 1, 25, 4.0f, 0xffff00);
+                }
+                pillarData.removeIf(ent -> !ent.isAlive());
             }
             if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend")) {
                 String statusName = Formatting.strip(currentBoss.statusEntity.getCustomName().getString());

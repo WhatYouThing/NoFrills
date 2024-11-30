@@ -26,13 +26,12 @@ public abstract class ChatHudMixin {
             if (eventBus.post(new ChatMsgEvent(message, msg, signatureData, indicator)).isCancelled()) {
                 ci.cancel();
             }
-            if (partyMessagePattern.matcher(message.getString()).matches()) {
+            if (partyMessagePattern.matcher(msg).matches()) {
                 int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");
                 String[] clean = msg.replace(msg.substring(0, nameStart + 1), "").split(":", 2);
                 String author = clean[0].trim(), content = clean[1].trim();
                 boolean self = author.equalsIgnoreCase(mc.getSession().getUsername());
-                PartyChatMsgEvent event = eventBus.post(new PartyChatMsgEvent(content, author, self));
-                if (event.isCancelled() && !ci.isCancelled()) {
+                if (eventBus.post(new PartyChatMsgEvent(content, author, self)).isCancelled() && !ci.isCancelled()) {
                     ci.cancel();
                 }
             }

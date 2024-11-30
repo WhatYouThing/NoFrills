@@ -228,7 +228,7 @@ public class SlayerFeatures {
                         }
                     }
                 }
-                if (nearest != null) {
+                if (nearest != null && nearest.getCustomName() != null) {
                     String name = Formatting.strip(nearest.getCustomName().getString());
                     Utils.showTitleCustom("Pillar: " + name, 1, 25, 4.0f, 0xffff00);
                 }

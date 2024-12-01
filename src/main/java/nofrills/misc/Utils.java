@@ -113,6 +113,13 @@ public class Utils {
         return skyblockData.currentLocation.startsWith(zone);
     }
 
+    /**
+     * Checks if the provided location matches with the current area on the tab list. For example, isInArea("Private Island") is true if "Area: Private Island" is on the tab list.
+     */
+    public static boolean isInArea(String area) {
+        return skyblockData.currentArea.equals(area);
+    }
+
     public static boolean isInDungeons() {
         return isInZone(Symbols.zone + " The Catacombs", false);
     }
@@ -273,7 +280,8 @@ public class Utils {
     }
 
     public static class SkyblockData {
-        public String currentLocation = "";
+        public String currentLocation = ""; // from scoreboard, for example "⏣ Your Island"
+        public String currentArea = ""; // from tab list, for example "Area: Private Island"
         public boolean isInSkyblock = false;
 
         public SkyblockData() {

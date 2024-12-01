@@ -6,6 +6,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.PlaySoundEvent;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.misc.Utils;
 
@@ -52,14 +53,10 @@ public class RareSeaCreatures {
     }
 
     @EventHandler
-    private static void onPacket(ReceivePacketEvent event) {
-        if (Config.fishMuteDrake) {
-            if (event.packet instanceof PlaySoundS2CPacket soundPacket) {
-                if (soundPacket.getSound().value().getId().toString().equalsIgnoreCase("minecraft:item.totem.use")) {
-                    if (soundPacket.getPitch() < 0.75) {
-                        event.cancel();
-                    }
-                }
+    private static void onSound(PlaySoundEvent event) {
+        if (Config.fishMuteDrake && Utils.isInArea("Jerry's Workshop")) {
+            if (event.packet.getSound().value().equals(SoundEvents.ITEM_TOTEM_USE)) {
+                event.cancel();
             }
         }
     }

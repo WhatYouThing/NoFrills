@@ -18,8 +18,6 @@ import java.util.List;
 import static net.minecraft.entity.EntityType.ARMOR_STAND;
 
 public class StarredMobHighlight {
-    private static final String star = "✯";
-
     private static boolean isDungeonMob(Entity entity) {
         return switch (entity) {
             case ZombieEntity ignored -> true;
@@ -34,8 +32,8 @@ public class StarredMobHighlight {
     @EventHandler
     public static void onNamed(EntityNamedEvent event) {
         if (Config.starredMobHighlight && Utils.isInDungeons()) {
-            if (event.entity.getType() == ARMOR_STAND && event.namePlain.startsWith(star)) {
-                if (event.namePlain.replace(star, "").equals(event.namePlain.replaceAll(star, ""))) {
+            if (event.entity.getType() == ARMOR_STAND && event.namePlain.startsWith(Utils.Symbols.star)) {
+                if (event.namePlain.indexOf(Utils.Symbols.star) == event.namePlain.lastIndexOf(Utils.Symbols.star)) {
                     List<Entity> otherEntities = Utils.getNearbyEntities(event.entity, 0.6, 2, 0.6, StarredMobHighlight::isDungeonMob);
                     if (!otherEntities.isEmpty()) {
                         Entity closest = Utils.findNametagOwner(event.entity, otherEntities);

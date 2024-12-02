@@ -63,6 +63,7 @@ public class SlayerFeatures {
     private static final DecimalFormat killTimeFormat = new DecimalFormat("0.##");
     private static final List<Entity> yanDevData = new ArrayList<>();
     private static final List<Vec3d> pillarData = new ArrayList<>();
+    private static int pillarClearTicks = -1;
     private static CurrentBoss currentBoss = null;
     private static int bossAliveTicks = 0;
     private static boolean springsActive = false;
@@ -171,12 +172,9 @@ public class SlayerFeatures {
                     }
                     if (Config.blazePillarWarn && !pillarData.isEmpty() && firePillarRegex.matcher(event.namePlain).matches()) {
                         double dist = Utils.horizontalDistance(event.entity.getPos(), pillarData.getLast());
-                        Utils.info("pillar spawned " + dist + " blocks away from last sound pos");
                         if (dist <= 3) {
                             Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, 0xffff00);
-                        }
-                        if (event.namePlain.startsWith("1s")) {
-                            pillarData.clear();
+                            pillarClearTicks = 100;
                         }
                     }
                 }
@@ -197,6 +195,7 @@ public class SlayerFeatures {
             currentBoss = null;
             yanDevData.clear();
             pillarData.clear();
+            pillarClearTicks = -1;
             if (Config.slayerKillTime && bossAliveTicks > 0) {
                 Utils.info(Utils.Symbols.format + "aSlayer boss took " + killTimeFormat.format(bossAliveTicks / 20.0f) + "s to kill.");
                 bossAliveTicks = 0;
@@ -207,6 +206,12 @@ public class SlayerFeatures {
             return;
         }
         if (currentBoss != null) {
+            if (pillarClearTicks > 0) {
+                pillarClearTicks--;
+            } else if (pillarClearTicks == 0) {
+                pillarData.clear();
+                pillarClearTicks = -1;
+            }
             if (Config.slayerHitboxes) {
                 if (!currentBoss.bossData.scoreboardName.equals("Inferno Demonlord") && !Rendering.Entities.isDrawingOutline(currentBoss.bossEntity)) {
                     render(currentBoss.bossEntity, true, defaultColor);
@@ -287,15 +292,15 @@ public class SlayerFeatures {
                     Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
                     if (pillarData.isEmpty()) {
                         double dist = Utils.horizontalDistance(pos, currentBoss.spawnerEntity.getPos());
-                        Utils.info("first egg sound located at " + dist + " blocks away from boss");
                         if (dist <= 1.5) {
                             pillarData.add(pos);
+                            pillarClearTicks = 100;
                         }
                     } else {
                         double dist = Utils.horizontalDistance(pos, pillarData.getLast());
-                        Utils.info("egg sound located at " + dist + " blocks away from previous sound");
                         if (dist <= 4) {
                             pillarData.add(pos);
+                            pillarClearTicks = 100;
                         }
                     }
                 }

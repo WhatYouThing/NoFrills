@@ -37,7 +37,7 @@ public class Slayers {
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Pillar Warning"))
-                                .description(OptionDescription.of(Text.of("Displays the status (countdown, hits) of your fire pillars. This option might give you a false alarm when someone else's boss spawns a pillar. In the case that multiple pillars exist, the one nearest to you is considered as yours.")))
+                                .description(OptionDescription.of(Text.of("Displays the status (countdown, hits) of your fire pillars.\n\nThis option will try to target exclusively your own pillars, so that no false alarms occur if another player spawns a pillar nearby.")))
                                 .binding(false, () -> Config.blazePillarWarn, value -> Config.blazePillarWarn = value)
                                 .controller(Config::booleanController)
                                 .build())

@@ -3,8 +3,8 @@ package nofrills.features;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -63,7 +63,7 @@ public class SlayerFeatures {
     private static final RenderColor yanDevColor = RenderColor.fromHex(0xff0000, 0.67f);
     private static final DecimalFormat killTimeFormat = new DecimalFormat("0.##");
     private static final List<Entity> yanDevData = new ArrayList<>();
-    private static final List<Entity> pillarData = new ArrayList<>();
+    private static final List<Vec3d> pillarData = new ArrayList<>();
     private static CurrentBoss currentBoss = null;
     private static int bossAliveTicks = 0;
     private static boolean springsActive = false;
@@ -115,7 +115,7 @@ public class SlayerFeatures {
                 for (SlayerBoss boss : slayerBosses) {
                     for (String line : Utils.scoreboardLines) {
                         if (line.startsWith(boss.scoreboardName)) {
-                            String playerName = mc.player.getName().getString();
+                            String playerName = mc.player.getName().getString(); // should work while nicked
                             if (event.namePlain.equals("Spawned by: " + playerName)) {
                                 List<Entity> otherEntities = getNearby(event.entity, boss.entityTypes);
                                 Entity nameEnt = null;
@@ -151,23 +151,30 @@ public class SlayerFeatures {
                     }
                 }
             } else {
-                if (currentBoss.bossData.scoreboardName.equals("Inferno Demonlord") && Config.slayerHitboxes) { // special boss needs special highlighting
-                    if (bossTimerRegex.matcher(event.namePlain).matches() && event.entity.distanceTo(mc.player) <= 16) {
-                        List<Entity> otherEntities = getNearby(event.entity, currentBoss.bossData.entityTypes);
-                        for (Entity ent : otherEntities) {
-                            for (EntityType<?> type : currentBoss.bossData.entityTypes) {
-                                if (ent.getType() == type) {
-                                    Entity nearest = Utils.findNametagOwner(event.entity, otherEntities);
-                                    if (nearest != null) {
-                                        renderBlaze(nearest, event.namePlain);
+                if (currentBoss.bossData.scoreboardName.equals("Inferno Demonlord")) { // special boss needs special highlighting
+                    if (Config.slayerHitboxes) {
+                        if (bossTimerRegex.matcher(event.namePlain).matches() && event.entity.distanceTo(mc.player) <= 16) {
+                            List<Entity> otherEntities = getNearby(event.entity, currentBoss.bossData.entityTypes);
+                            for (Entity ent : otherEntities) {
+                                for (EntityType<?> type : currentBoss.bossData.entityTypes) {
+                                    if (ent.getType() == type) {
+                                        Entity nearest = Utils.findNametagOwner(event.entity, otherEntities);
+                                        if (nearest != null) {
+                                            renderBlaze(nearest, event.namePlain);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    if (Config.blazePillarWarn && firePillarRegex.matcher(event.namePlain).matches() && !pillarData.contains(event.entity)) {
-                        if (event.entity.distanceTo(mc.player) <= 30) {
-                            pillarData.add(event.entity);
+                    if (Config.blazePillarWarn && !pillarData.isEmpty() && firePillarRegex.matcher(event.namePlain).matches()) {
+                        double dist = event.entity.getPos().distanceTo(pillarData.getLast());
+                        Utils.info("pillar spawned " + dist + " blocks away from last sound pos");
+                        if (dist <= 3) {
+                            Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, 0xffff00);
+                        }
+                        if (event.namePlain.startsWith("1s")) {
+                            pillarData.clear();
                         }
                     }
                 }
@@ -214,26 +221,6 @@ public class SlayerFeatures {
                     }
                 }
             }
-            if (Config.blazePillarWarn && currentBoss.bossData.scoreboardName.equals("Inferno Demonlord")) {
-                Entity nearest = null;
-                float lowestDist = 30.0f;
-                if (pillarData.size() == 1) {
-                    nearest = pillarData.getFirst();
-                } else {
-                    for (Entity ent : pillarData) {
-                        float dist = Utils.horizontalDistance(ent, mc.player);
-                        if (dist <= lowestDist) {
-                            nearest = ent;
-                            lowestDist = dist;
-                        }
-                    }
-                }
-                if (nearest != null && nearest.getCustomName() != null) {
-                    String name = Formatting.strip(nearest.getCustomName().getString());
-                    Utils.showTitleCustom("Pillar: " + name, 1, 25, 4.0f, 0xffff00);
-                }
-                pillarData.removeIf(ent -> !ent.isAlive());
-            }
             if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend")) {
                 String statusName = Formatting.strip(currentBoss.statusEntity.getCustomName().getString());
                 String bossName = Formatting.strip(currentBoss.nameEntity.getCustomName().getString());
@@ -273,24 +260,49 @@ public class SlayerFeatures {
     }
 
     @EventHandler
-    private static void onPacket(ReceivePacketEvent event) {
-        if (event.packet instanceof PlaySoundS2CPacket soundPacket) {
-            if (Utils.isInChateau()) {
-                String soundName = soundPacket.getSound().value().getId().toString();
-                if (Config.vampManiaSilence && soundName.equalsIgnoreCase("minecraft:entity.elder_guardian.curse")) {
-                    if (Config.vampManiaReplace && currentBoss != null && currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend")) {
-                        Utils.playSound(SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.MASTER, 1, 0);
+    private static void onSound(PlaySoundEvent event) {
+        if (Utils.isInChateau()) {
+            if (Config.vampManiaSilence && event.isSound(SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE)) {
+                if (Config.vampManiaReplace && currentBoss != null && currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend")) {
+                    Utils.playSound(SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.MASTER, 1, 0);
+                }
+                event.cancel();
+            }
+            if (Config.vampSpringSilence && event.isSound(SoundEvents.ENTITY_WITHER_SPAWN) && currentBoss != null) {
+                String statusName = Formatting.strip(currentBoss.statusEntity.getCustomName().getString());
+                if (statusName.contains("KILLER SPRING")) {
+                    if (Config.vampSpringReplace && !springsActive) {
+                        Utils.playSound(SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.MASTER, 1, -1);
+                        springsActive = true;
                     }
                     event.cancel();
                 }
-                if (Config.vampSpringSilence && soundName.equalsIgnoreCase("minecraft:entity.wither.spawn") && currentBoss != null) {
-                    String statusName = Formatting.strip(currentBoss.statusEntity.getCustomName().getString());
-                    if (statusName.contains("KILLER SPRING")) {
-                        if (Config.vampSpringReplace && !springsActive) {
-                            Utils.playSound(SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.MASTER, 1, -1);
-                            springsActive = true;
+            }
+        }
+        if (currentBoss != null) {
+            if (Config.blazePillarWarn && currentBoss.bossData.scoreboardName.equals("Inferno Demonlord")) {
+                if (event.isSound(SoundEvents.ENTITY_CHICKEN_EGG)) {
+                    Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
+                    if (pillarData.isEmpty()) {
+                        for (Entity ent : mc.world.getEntities()) {
+                            if (ent.getType() == EntityType.ARMOR_STAND && ent.hasCustomName()) {
+                                String name = Formatting.strip(ent.getCustomName().getString());
+                                if (name.equals("Spawned by: " + mc.player.getName().getString())) {
+                                    double dist = ent.getPos().distanceTo(pos);
+                                    Utils.info("first egg sound located at " + dist + " blocks away from boss");
+                                    if (dist <= 2) {
+                                        pillarData.add(pos);
+                                        break;
+                                    }
+                                }
+                            }
                         }
-                        event.cancel();
+                    } else {
+                        double dist = pos.distanceTo(pillarData.getLast());
+                        Utils.info("first egg sound located at " + dist + " blocks away from boss");
+                        if (dist <= 1.5) {
+                            pillarData.add(pos);
+                        }
                     }
                 }
             }

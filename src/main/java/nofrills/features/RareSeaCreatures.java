@@ -1,13 +1,11 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.PlaySoundEvent;
-import nofrills.events.ReceivePacketEvent;
 import nofrills.misc.Utils;
 
 public class RareSeaCreatures {
@@ -55,7 +53,7 @@ public class RareSeaCreatures {
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
         if (Config.fishMuteDrake && Utils.isInArea("Jerry's Workshop")) {
-            if (event.packet.getSound().value().equals(SoundEvents.ITEM_TOTEM_USE)) {
+            if (event.isSound(SoundEvents.ITEM_TOTEM_USE)) {
                 event.cancel();
             }
         }

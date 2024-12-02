@@ -4,7 +4,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -152,6 +151,9 @@ public class SlayerFeatures {
                 }
             } else {
                 if (currentBoss.bossData.scoreboardName.equals("Inferno Demonlord")) { // special boss needs special highlighting
+                    if (event.namePlain.equals("Spawned by: " + mc.player.getName().getString())) {
+                        currentBoss.spawnerEntity = event.entity;
+                    }
                     if (Config.slayerHitboxes) {
                         if (bossTimerRegex.matcher(event.namePlain).matches() && event.entity.distanceTo(mc.player) <= 16) {
                             List<Entity> otherEntities = getNearby(event.entity, currentBoss.bossData.entityTypes);
@@ -168,7 +170,7 @@ public class SlayerFeatures {
                         }
                     }
                     if (Config.blazePillarWarn && !pillarData.isEmpty() && firePillarRegex.matcher(event.namePlain).matches()) {
-                        double dist = event.entity.getPos().distanceTo(pillarData.getLast());
+                        double dist = Utils.horizontalDistance(event.entity.getPos(), pillarData.getLast());
                         Utils.info("pillar spawned " + dist + " blocks away from last sound pos");
                         if (dist <= 3) {
                             Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, 0xffff00);
@@ -284,23 +286,15 @@ public class SlayerFeatures {
                 if (event.isSound(SoundEvents.ENTITY_CHICKEN_EGG)) {
                     Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
                     if (pillarData.isEmpty()) {
-                        for (Entity ent : mc.world.getEntities()) {
-                            if (ent.getType() == EntityType.ARMOR_STAND && ent.hasCustomName()) {
-                                String name = Formatting.strip(ent.getCustomName().getString());
-                                if (name.equals("Spawned by: " + mc.player.getName().getString())) {
-                                    double dist = ent.getPos().distanceTo(pos);
-                                    Utils.info("first egg sound located at " + dist + " blocks away from boss");
-                                    if (dist <= 2) {
-                                        pillarData.add(pos);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        double dist = pos.distanceTo(pillarData.getLast());
+                        double dist = Utils.horizontalDistance(pos, currentBoss.spawnerEntity.getPos());
                         Utils.info("first egg sound located at " + dist + " blocks away from boss");
                         if (dist <= 1.5) {
+                            pillarData.add(pos);
+                        }
+                    } else {
+                        double dist = Utils.horizontalDistance(pos, pillarData.getLast());
+                        Utils.info("egg sound located at " + dist + " blocks away from previous sound");
+                        if (dist <= 4) {
                             pillarData.add(pos);
                         }
                     }

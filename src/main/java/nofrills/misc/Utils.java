@@ -223,7 +223,7 @@ public class Utils {
         return entity == mc.player;
     }
 
-    public static float horizontalDistance(Entity from, Entity to) {
+    public static float horizontalDistance(Vec3d from, Vec3d to) {
         float x = (float) (from.getX() - to.getX());
         float z = (float) (from.getZ() - to.getZ());
         return MathHelper.sqrt(x * x + z * z);
@@ -260,7 +260,7 @@ public class Utils {
         float lowestDist = 2.0f;
         double maxY = armorStand.getPos().getY();
         for (Entity ent : otherEntities) {
-            float dist = horizontalDistance(ent, armorStand);
+            float dist = horizontalDistance(ent.getPos(), armorStand.getPos());
             if (ent.getType() != EntityType.ARMOR_STAND && ent.getPos().getY() < maxY && dist < lowestDist) {
                 entity = ent;
                 lowestDist = dist;

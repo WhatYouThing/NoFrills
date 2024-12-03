@@ -36,10 +36,10 @@ public abstract class ClientConnectionMixin {
             for (PlayerListS2CPacket.Entry entry : listPacket.getEntries()) {
                 Text name = entry.displayName();
                 if (name != null) {
-                    String nameClean = Formatting.strip(name.getString()).trim();
+                    String nameClean = Formatting.strip(name.getString().trim());
                     if (!nameClean.isEmpty()) {
                         if (nameClean.startsWith("Area: ")) {
-                            Utils.skyblockData.currentArea = nameClean.replace("Area: ", "").trim();
+                            Utils.skyblockData.currentArea = nameClean.replace("Area:", "").trim();
                             break;
                         }
                     }

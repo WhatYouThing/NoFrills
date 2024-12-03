@@ -75,6 +75,10 @@ public abstract class ClientWorldMixin extends World {
                 }
                 lines.add(objectiveLine);
             }
+            String area = Utils.skyblockData.currentArea;
+            if (!area.isEmpty()) {
+                data.currentArea = area;
+            }
             Utils.scoreboardLines = lines;
             Utils.skyblockData = data;
         }

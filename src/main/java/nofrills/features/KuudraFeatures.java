@@ -39,7 +39,9 @@ public class KuudraFeatures {
     };
     private static int freshTicks = 0;
     private static int missingTicks = 20;
-    private static MagmaCubeEntity kuudraEntity;
+    private static int dpsTicks = 0;
+    private static float previousHealth = 0.0f;
+    private static MagmaCubeEntity kuudraEntity = null;
 
     private static kuudraPhases getCurrentPhase() {
         if (Utils.isInZone(-133, 59, -75, -73, 1, -138)) {
@@ -93,8 +95,11 @@ public class KuudraFeatures {
 
     @EventHandler
     public static void onTick(WorldTickEvent event) {
-        kuudraPhases phase = getCurrentPhase();
-        if (Utils.isInKuudra() && phase != kuudraPhases.Starting) {
+        if (Utils.isInKuudra()) {
+            kuudraPhases phase = getCurrentPhase();
+            if (phase == kuudraPhases.Starting) {
+                return;
+            }
             if (Config.kuudraMissing && phase == kuudraPhases.Collect) {
                 if (missingTicks == 0) {
                     PickupSpot preSpot = null;
@@ -148,15 +153,32 @@ public class KuudraFeatures {
                 if (Config.kuudraHitbox && !Rendering.Entities.isDrawingOutline(kuudraEntity)) {
                     Rendering.Entities.drawOutline(kuudraEntity, true, new RenderColor(255, 255, 0, 255));
                 }
-                if (Config.kuudraHealth && getCurrentPhase() == kuudraPhases.DPS) {
+                if (Config.kuudraHealth && phase == kuudraPhases.DPS) {
                     float health = kuudraEntity.getHealth() / kuudraEntity.getMaxHealth();
                     Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health) + "% HP", 1, 25, 2.5f, 0xffff00);
+                }
+                if (Config.kuudraDPS && phase == kuudraPhases.Lair) {
+                    if (dpsTicks < 20) {
+                        dpsTicks++;
+                    } else {
+                        float health = kuudraEntity.getHealth();
+                        float dps = previousHealth - health;
+                        if (dps > 0) {
+                            Utils.showTitleCustom("DPS: " + kuudraHealthFormat.format(dps), 20, 25, 2.5f, 0xffff00);
+                        } else { // decimal format function seems to break if dps is equal to 0
+                            Utils.showTitleCustom("DPS: 0", 20, 25, 2.5f, 0xffff00);
+                        }
+                        previousHealth = health;
+                        dpsTicks = 0;
+                    }
                 }
             }
         } else {
             freshTicks = 0;
             kuudraEntity = null;
             missingTicks = 20;
+            previousHealth = 0.0f;
+            dpsTicks = 0;
         }
     }
 

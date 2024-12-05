@@ -158,6 +158,8 @@ public class Config {
     @SerialEntry
     public static boolean kuudraHealth = false;
     @SerialEntry
+    public static boolean kuudraDPS = false;
+    @SerialEntry
     public static boolean kuudraMissing = false;
     @SerialEntry
     public static boolean kuudraPileFix = false;

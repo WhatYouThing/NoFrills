@@ -155,6 +155,15 @@ public class Utils {
         return isInZone(Symbols.zone + " The Garden", true) || isOnGardenPlot();
     }
 
+    public static boolean isInstanceClosing() {
+        for (String line : scoreboardLines) {
+            if (line.startsWith("Instance Shutdown")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static boolean isInSkyblock() {
         return skyblockData.isInSkyblock;
     }

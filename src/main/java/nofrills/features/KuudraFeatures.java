@@ -17,7 +17,7 @@ import java.text.DecimalFormat;
 import static nofrills.Main.mc;
 
 public class KuudraFeatures {
-    private static final DecimalFormat kuudraHealthFormat = new DecimalFormat("#.00");
+    private static final DecimalFormat kuudraHealthFormat = new DecimalFormat("0.00");
     private static final Vec3d[] supplyDropSpots = {
             new Vec3d(-98.00, 79.00, -112.94),
             new Vec3d(-106.00, 79.00, -112.94),
@@ -93,6 +93,10 @@ public class KuudraFeatures {
         }
     }
 
+    private static float calculateHealth(float health) {
+        return (health - 1024.0f) * 10000.0f; // kuudra's health for whatever reason starts at 24000 + 1024
+    }
+
     @EventHandler
     public static void onTick(WorldTickEvent event) {
         if (Utils.isInKuudra()) {
@@ -132,7 +136,7 @@ public class KuudraFeatures {
                             Utils.sendMessage("/pc No " + preSpot.secondary.name + "!");
                         }
                     } else {
-                        Utils.info("§eCouldn't find your Pre, which means that you're probably AFK, or getting carried (gross, git gud scrub).");
+                        Utils.info("§eCouldn't find your Pre spot, meaning that you're probably AFK (or even worse, getting carried, very gross).");
                     }
                     missingTicks = -1;
                 } else if (missingTicks > 0) {
@@ -158,15 +162,13 @@ public class KuudraFeatures {
                     Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health) + "% HP", 1, 25, 2.5f, 0xffff00);
                 }
                 if (Config.kuudraDPS && phase == kuudraPhases.Lair && !Utils.isInstanceClosing()) {
-                    if (dpsTicks < 20) {
+                    if (dpsTicks < 19) {
                         dpsTicks++;
                     } else {
-                        float health = kuudraEntity.getHealth();
+                        float health = calculateHealth(kuudraEntity.getHealth());
                         float dps = previousHealth - health;
-                        if (dps > 0) {
-                            Utils.showTitleCustom("DPS: " + kuudraHealthFormat.format(dps), 20, 25, 2.5f, 0xffff00);
-                        } else { // decimal format function seems to break if dps is equal to 0
-                            Utils.showTitleCustom("DPS: 0", 20, 25, 2.5f, 0xffff00);
+                        if (dps >= 0.0f) {
+                            Utils.showTitleCustom("DPS: " + kuudraHealthFormat.format(dps / 1000000) + "M", 20, 25, 2.5f, 0xffff00);
                         }
                         previousHealth = health;
                         dpsTicks = 0;

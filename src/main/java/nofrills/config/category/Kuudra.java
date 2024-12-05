@@ -26,7 +26,7 @@ public class Kuudra {
                         .build())
                 .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Render DPS"))
-                        .description(OptionDescription.of(Text.of("Renders your team's DPS during the lair phase. Infernal tier only.")))
+                        .description(OptionDescription.of(Text.of("Calculates your team's DPS on Kuudra during the last phase, and renders it on screen. Only applies in Infernal tier.")))
                         .binding(false, () -> Config.kuudraDPS, value -> Config.kuudraDPS = value)
                         .controller(Config::booleanController)
                         .build())

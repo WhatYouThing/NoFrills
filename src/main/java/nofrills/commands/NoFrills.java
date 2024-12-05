@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import nofrills.config.Config;
+import nofrills.features.PearlRefill;
 import nofrills.misc.Utils;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -200,7 +201,11 @@ public class NoFrills {
                 mc.keyboard.setClipboard(coords);
                 return SINGLE_SUCCESS;
             }))),
-            new ModCommand("queue", "Command that lets you queue for any Dungeon floor/Kuudra tier.", queueCommandBuilder)
+            new ModCommand("queue", "Command that lets you queue for any Dungeon floor/Kuudra tier.", queueCommandBuilder),
+            new ModCommand("getPearls", "Refills your Ender Pearls (up to 16) directly from your sacks.", literal("getPearls").executes(context -> {
+                PearlRefill.getPearls();
+                return SINGLE_SUCCESS;
+            }))
     };
 
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {

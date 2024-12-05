@@ -6,6 +6,7 @@ import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
 import nofrills.commands.NoFrills;
@@ -16,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+
+import static nofrills.misc.Utils.Keybinds;
 
 public class Main implements ModInitializer {
     public static final String MOD_ID = "nofrills";
@@ -54,7 +57,10 @@ public class Main implements ModInitializer {
         eventBus.subscribe(PartyFeatures.class);
         eventBus.subscribe(SlayerFeatures.class);
         eventBus.subscribe(HideDeadMobs.class);
+        eventBus.subscribe(PearlRefill.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
+
+        KeyBindingHelper.registerKeyBinding(Keybinds.getPearls);
     }
 }

@@ -4,7 +4,9 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
@@ -20,6 +22,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -286,6 +289,10 @@ public class Utils {
         public static String skull = "☠";
         public static String format = "§";
         public static String vampLow = "҉";
+    }
+
+    public static class Keybinds {
+        public static final KeyBinding getPearls = new KeyBinding("Refill Pearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "NoFrills");
     }
 
     public static class SkyblockData {

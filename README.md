@@ -70,6 +70,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Render Hitbox**: Renders a hitbox for Kuudra.
 - **Render Health**: Renders Kuudra's exact health during the DPS phase.
+- **Render DPS**: Renders your team's DPS during the last phase. Infernal tier only.
 - **Announce Missing**: Announces in party chat if no supply spawns at either your pre, or at your next spot.
 - **Pile Fix**: Allows you to use your abilities (such as Fire Veil) while building the ballista.
 - **Announce Fresh**: Send a message when the Fresh Tools perk activates.
@@ -104,6 +105,10 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Space Farmer**: Allows you to farm by holding your space bar, so that you don't have to change your keybinds
   constantly. Also has an option to lock your view while using the feature.
 
+### Keybinds (configured with Minecraft's Key Binds menu)
+
+- **Refill Pearls**: Refills your Ender Pearls (up to 16) directly from your sacks after pressing.
+
 </details>
 
 <details>
@@ -116,6 +121,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **queue**: Shortcut for the Skyblock `/joininstance` command, letting you easily start a Kuudra/Dungeon run.
     - **sendCoords**: Send your current coordinates in the chat, optionally in a specific format.
     - **settings**: Opens the settings GUI (same behavior as running `/nofrills` without any arguments).
+    - **getPearls**: Same behavior as the Refill Pearls hotkey.
 - **Other Commands** (not under `/nofrills`)
     - **/yeet**: instantly closes Minecraft.
 

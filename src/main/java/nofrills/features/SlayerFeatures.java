@@ -58,6 +58,7 @@ public class SlayerFeatures {
     private static final RenderColor auricColor = RenderColor.fromHex(0xffff00);
     private static final RenderColor crystalColor = RenderColor.fromHex(0x00ffff);
     private static final RenderColor defaultColor = RenderColor.fromHex(0x00ffff);
+    private static final RenderColor hitsColor = RenderColor.fromHex(0xff55ff);
     private static final RenderColor steakColor = RenderColor.fromHex(0xff2500);
     private static final RenderColor yanDevColor = RenderColor.fromHex(0xff0000, 0.67f);
     private static final DecimalFormat killTimeFormat = new DecimalFormat("0.##");
@@ -222,9 +223,15 @@ public class SlayerFeatures {
                 if (name.endsWith("Hits")) {
                     String[] parts = name.split(" ");
                     Utils.showTitleCustom("Shield: " + parts[parts.length - 2] + " hits", 100, 25, 4.0f, 0xff55ff);
+                    if (Config.slayerHitboxes) {
+                        render(currentBoss.bossEntity, true, hitsColor);
+                    }
                 } else {
                     if (Utils.isRenderingCustomTitle()) {
                         Utils.showTitleCustom("", 0, 0, 0, 0);
+                    }
+                    if (Config.slayerHitboxes) {
+                        render(currentBoss.bossEntity, true, defaultColor);
                     }
                 }
             }

@@ -3,7 +3,7 @@ package nofrills.features;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Config;
 import nofrills.events.InputEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.ScreenOpenedEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
@@ -14,13 +14,13 @@ public class SpaceFarmer {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (Config.spaceFarmer && event.key == GLFW.GLFW_KEY_SPACE && Utils.isOnGardenPlot()) {
-            if (mc.currentScreen != null) {
+        if (Config.spaceFarmer && event.key == GLFW.GLFW_KEY_SPACE) {
+            if (mc.currentScreen != null && spaceHeld) {
                 spaceHeld = false;
                 mc.options.attackKey.setPressed(false);
                 return;
             }
-            if (event.action == GLFW.GLFW_PRESS && mc.options.sneakKey.isPressed()) {
+            if (event.action == GLFW.GLFW_PRESS && mc.options.sneakKey.isPressed() && Utils.isOnGardenPlot()) {
                 spaceHeld = true;
                 mc.options.attackKey.setPressed(true);
                 event.cancel();
@@ -37,8 +37,8 @@ public class SpaceFarmer {
     }
 
     @EventHandler
-    public static void onTick(WorldTickEvent event) {
-        if (mc.currentScreen != null) {
+    public static void onScreen(ScreenOpenedEvent event) {
+        if (spaceHeld) {
             spaceHeld = false;
             mc.options.attackKey.setPressed(false);
         }

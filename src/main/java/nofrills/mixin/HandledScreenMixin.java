@@ -83,8 +83,18 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))
-    private boolean onDrawHighlight(Slot instance) {
+    @Redirect(method = "drawSlotHighlightBack", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))
+    private boolean onDrawHighlightBack(Slot instance) {
+        if (focusedSlot != null && disabledSlots.contains(focusedSlot)) {
+            return false;
+        } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
+            return false;
+        }
+        return instance.canBeHighlighted();
+    }
+
+    @Redirect(method = "drawSlotHighlightFront", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))
+    private boolean onDrawHighlightFront(Slot instance) {
         if (focusedSlot != null && disabledSlots.contains(focusedSlot)) {
             return false;
         } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {

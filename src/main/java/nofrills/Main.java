@@ -42,7 +42,8 @@ public class Main implements ModInitializer {
 
         eventBus.registerLambdaFactory("nofrills", (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
 
-        eventBus.subscribe(StarredMobHighlight.class);
+        eventBus.subscribe(DungeonHighlight.class);
+        eventBus.subscribe(DungeonSolvers.class);
         eventBus.subscribe(RareSeaCreatures.class);
         eventBus.subscribe(EtherwarpOverlay.class);
         eventBus.subscribe(CorpseHighlight.class);

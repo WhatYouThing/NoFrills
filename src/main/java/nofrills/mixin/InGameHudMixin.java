@@ -6,13 +6,16 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import nofrills.events.HudRenderEvent;
 import nofrills.misc.TitleRendering;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
 
 @Mixin(InGameHud.class)
@@ -27,6 +30,9 @@ public abstract class InGameHudMixin implements TitleRendering {
     private static float titleScale;
     @Unique
     private static int titleColor;
+
+    @Shadow
+    public abstract TextRenderer getTextRenderer();
 
     @Override
     public void nofrills_mod$setRenderTitle(String title, int stayTicks, int yOffset, float scale, int color) {
@@ -64,5 +70,10 @@ public abstract class InGameHudMixin implements TitleRendering {
         if (titleTicks > 0) {
             titleTicks--;
         }
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDrawer;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
+    private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        eventBus.post(new HudRenderEvent(context, this.getTextRenderer(), tickCounter));
     }
 }

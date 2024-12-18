@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
@@ -97,6 +98,22 @@ public class Utils {
      */
     public static void setDisabled(Screen screen, Slot slot, boolean disabled) {
         ((ScreenOptions) screen).nofrills_mod$disableSlot(slot, disabled);
+    }
+
+    public static ItemStack setStackName(ItemStack stack, String name) {
+        stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(name));
+        return stack;
+    }
+
+    /**
+     * Spoofs a slot to render a specific item stack, rather than the item that is actually in that slot.
+     *
+     * @param screen      The current screen
+     * @param slot        The slot to spoof
+     * @param replacement The ItemStack to spoof as
+     */
+    public static void setSpoofed(Screen screen, Slot slot, ItemStack replacement) {
+        ((ScreenOptions) screen).nofrills_mod$spoofSlot(slot, replacement);
     }
 
     public static String getCoordsFormatted(String format) {
@@ -279,6 +296,13 @@ public class Utils {
             }
         }
         return entity;
+    }
+
+    /**
+     * Checks if the provided ItemStack has a glint. Ignores the glint override flag to work correctly with items such as Nether Stars.
+     */
+    public static boolean hasGlint(ItemStack stack) {
+        return stack.getItem().hasGlint(stack);
     }
 
     public static class Symbols {

@@ -2,10 +2,10 @@ package nofrills.events;
 
 import net.minecraft.client.gui.screen.Screen;
 
-public class ScreenOpenedEvent {
+public class ScreenOpenEvent {
     public Screen screen;
 
-    public ScreenOpenedEvent(Screen screen) {
+    public ScreenOpenEvent(Screen screen) {
         this.screen = screen;
     }
 }

@@ -7,7 +7,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Hand;
 import nofrills.config.Config;
-import nofrills.events.ScreenOpenedEvent;
+import nofrills.events.ScreenOpenEvent;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,7 +32,7 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "setScreen", at = @At("TAIL"))
     private void onOpenScreen(Screen screen, CallbackInfo ci) {
         if (screen != null && world != null) {
-            eventBus.post(new ScreenOpenedEvent(screen));
+            eventBus.post(new ScreenOpenEvent(screen));
         }
     }
 }

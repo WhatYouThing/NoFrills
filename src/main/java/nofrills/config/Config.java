@@ -152,6 +152,12 @@ public class Config {
     public static boolean starredMobHighlight = false;
     @SerialEntry
     public static Color starredMobColor = new Color(0, 255, 255, 255);
+    @SerialEntry
+    public static boolean miniHighlight = false;
+    @SerialEntry
+    public static Color miniColor = new Color(255, 255, 0, 255);
+    @SerialEntry
+    public static boolean solveTerminals = false;
 
     // Kuudra
 

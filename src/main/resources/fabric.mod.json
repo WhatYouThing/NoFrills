@@ -1,34 +1,34 @@
 {
-	"schemaVersion": 1,
-	"id": "nofrills",
-	"version": "${version}",
-	"name": "NoFrills",
-	"description": "It's in the name. Simple and effective Hypixel Skyblock mod for modern versions of Minecraft. ",
-	"authors": [
-		"WhatYouThing"
-	],
-	"contact": {
-		"sources": "https://github.com/WhatYouThing/NoFrills"
-	},
-	"license": "GPL-3.0",
-	"icon": "assets/nofrills/icon.png",
-	"environment": "client",
-	"entrypoints": {
-		"main": [
-			"nofrills.Main"
-		],
-		"modmenu": [
-			"nofrills.misc.ModMenuIntegration"
-		]
-	},
-	"mixins": [
-		"nofrills.mixins.json"
-	],
-	"depends": {
-		"fabricloader": ">=0.16.2",
-		"fabric-api": "*",
-		"minecraft": "~1.21.1",
-		"java": ">=21",
-		"yet_another_config_lib_v3": "*"
-	}
+  "schemaVersion": 1,
+  "id": "nofrills",
+  "version": "${version}",
+  "name": "NoFrills",
+  "description": "It's in the name. Simple and effective Hypixel Skyblock mod for modern versions of Minecraft. ",
+  "authors": [
+    "WhatYouThing"
+  ],
+  "contact": {
+    "sources": "https://github.com/WhatYouThing/NoFrills"
+  },
+  "license": "GPL-3.0",
+  "icon": "assets/nofrills/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "nofrills.Main"
+    ],
+    "modmenu": [
+      "nofrills.misc.ModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "nofrills.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "fabric-api": "*",
+    "minecraft": "~1.21.4",
+    "java": ">=21",
+    "yet_another_config_lib_v3": "*"
+  }
 }

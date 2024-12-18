@@ -112,6 +112,8 @@ public class Config {
     public static boolean ridingCamFix = false;
     @SerialEntry
     public static boolean sneakFix = false;
+    @SerialEntry
+    public static boolean terrorFix = false;
 
     // Solvers
 

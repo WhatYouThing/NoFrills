@@ -64,6 +64,12 @@ public class Fixes {
                         .binding(false, () -> Config.sneakFix, value -> Config.sneakFix = value)
                         .controller(Config::booleanController)
                         .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Terror Fix"))
+                        .description(OptionDescription.of(Text.of("Replicates the behavior of old Terror armor by playing the piston sound effect on each arrow hit.")))
+                        .binding(false, () -> Config.terrorFix, value -> Config.terrorFix = value)
+                        .controller(Config::booleanController)
+                        .build())
                 .build();
     }
 }

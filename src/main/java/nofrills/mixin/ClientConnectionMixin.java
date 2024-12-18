@@ -4,11 +4,9 @@ import net.minecraft.network.ClientConnection;
 import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import nofrills.events.PlaySoundEvent;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.events.SendPacketEvent;
 import nofrills.misc.Utils;
@@ -26,11 +24,6 @@ public abstract class ClientConnectionMixin {
     private static void onPacketReceive(Packet<?> packet, PacketListener listener, CallbackInfo ci) {
         if (eventBus.post(new ReceivePacketEvent(packet)).isCancelled()) {
             ci.cancel();
-        }
-        if (packet instanceof PlaySoundS2CPacket soundPacket) {
-            if (eventBus.post(new PlaySoundEvent(soundPacket)).isCancelled() && !ci.isCancelled()) {
-                ci.cancel();
-            }
         }
         if (packet instanceof PlayerListS2CPacket listPacket) {
             for (PlayerListS2CPacket.Entry entry : listPacket.getEntries()) {

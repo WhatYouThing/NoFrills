@@ -41,7 +41,7 @@ public class DungeonSolvers {
                 for (Slot slot : handler.slots) {
                     ItemStack stack = inventory.getStack(slot.id);
                     if (!stack.isEmpty()) {
-                        if (stack.getItem() == Items.RED_STAINED_GLASS_PANE) {
+                        if (stack.getItem() == Items.RED_STAINED_GLASS_PANE && event.isFinal) {
                             Utils.setSpoofed(event.screen, slot, firstStack);
                         } else {
                             Utils.setSpoofed(event.screen, slot, backgroundStack);
@@ -49,13 +49,12 @@ public class DungeonSolvers {
                         }
                     }
                 }
-            }
-            if (inOrderRegex.matcher(title).matches()) {
+            } else if (inOrderRegex.matcher(title).matches()) {
                 List<Slot> slots = new ArrayList<>();
                 for (Slot slot : handler.slots) {
                     ItemStack stack = inventory.getStack(slot.id);
                     if (!stack.isEmpty()) {
-                        if (stack.getItem() == Items.RED_STAINED_GLASS_PANE) {
+                        if (stack.getItem() == Items.RED_STAINED_GLASS_PANE && event.isFinal) {
                             slots.add(slot);
                         } else {
                             Utils.setSpoofed(event.screen, slot, backgroundStack);
@@ -74,14 +73,13 @@ public class DungeonSolvers {
                 if (slots.size() > 1) {
                     Utils.setSpoofed(event.screen, slots.get(1), secondStack);
                 }
-            }
-            if (startsWithRegex.matcher(title).matches()) {
+            } else if (startsWithRegex.matcher(title).matches()) {
                 String character = String.valueOf(title.charAt(title.indexOf("'") + 1)).toLowerCase();
                 for (Slot slot : handler.slots) {
                     ItemStack stack = inventory.getStack(slot.id);
                     if (!stack.isEmpty()) {
                         String name = Formatting.strip(stack.getName().getString()).toLowerCase();
-                        if (name.startsWith(character)) {
+                        if (name.startsWith(character) && event.isFinal) {
                             Utils.setSpoofed(event.screen, slot, firstStack);
                         } else {
                             Utils.setSpoofed(event.screen, slot, backgroundStack);

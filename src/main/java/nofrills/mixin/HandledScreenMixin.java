@@ -66,9 +66,14 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Override
     public void nofrills_mod$spoofSlot(Slot slot, ItemStack replacement) {
         SpoofedSlot spoofedSlot = new SpoofedSlot(slot, replacement);
-        if (!spoofedSlots.contains(spoofedSlot)) {
-            spoofedSlots.add(spoofedSlot);
+        for (SpoofedSlot spoofed : spoofedSlots) {
+            if (spoofed.slot.equals(slot)) {
+                int index = spoofedSlots.indexOf(spoofed);
+                spoofedSlots.set(index, spoofedSlot);
+                return;
+            }
         }
+        spoofedSlots.add(spoofedSlot);
     }
 
     @Override

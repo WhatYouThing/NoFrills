@@ -33,7 +33,7 @@ public class DungeonSolvers {
 
     @EventHandler
     public static void onInventory(ScreenSlotUpdateEvent event) {
-        if (Config.solveTerminals && Utils.isInDungeons()) {
+        if (Config.solveTerminals && Utils.isInDungeons() && event.packet.getSlot() != -1) {
             String title = event.screen.getTitle().getString();
             GenericContainerScreenHandler handler = event.screen.getScreenHandler();
             Inventory inventory = handler.getInventory();
@@ -43,6 +43,7 @@ public class DungeonSolvers {
                     if (!stack.isEmpty()) {
                         if (stack.getItem() == Items.RED_STAINED_GLASS_PANE && event.isFinal) {
                             Utils.setSpoofed(event.screen, slot, firstStack);
+                            Utils.setDisabled(event.screen, slot, false);
                         } else {
                             Utils.setSpoofed(event.screen, slot, backgroundStack);
                             Utils.setDisabled(event.screen, slot, true);
@@ -62,16 +63,18 @@ public class DungeonSolvers {
                         }
                     }
                 }
-                slots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
-                if (slots.isEmpty()) {
-                    return;
-                }
-                Utils.setSpoofed(event.screen, slots.getFirst(), firstStack);
-                if (slots.size() > 2) {
-                    Utils.setSpoofed(event.screen, slots.get(2), thirdStack);
-                }
-                if (slots.size() > 1) {
-                    Utils.setSpoofed(event.screen, slots.get(1), secondStack);
+                if (!slots.isEmpty()) {
+                    slots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
+                    Utils.setSpoofed(event.screen, slots.getFirst(), firstStack);
+                    Utils.setDisabled(event.screen, slots.getFirst(), false);
+                    if (slots.size() > 2) {
+                        Utils.setSpoofed(event.screen, slots.get(2), thirdStack);
+                        Utils.setDisabled(event.screen, slots.get(2), false);
+                    }
+                    if (slots.size() > 1) {
+                        Utils.setSpoofed(event.screen, slots.get(1), secondStack);
+                        Utils.setDisabled(event.screen, slots.get(1), false);
+                    }
                 }
             } else if (startsWithRegex.matcher(title).matches()) {
                 String character = String.valueOf(title.charAt(title.indexOf("'") + 1)).toLowerCase();
@@ -79,8 +82,9 @@ public class DungeonSolvers {
                     ItemStack stack = inventory.getStack(slot.id);
                     if (!stack.isEmpty()) {
                         String name = Formatting.strip(stack.getName().getString()).toLowerCase();
-                        if (name.startsWith(character) && event.isFinal) {
+                        if (name.startsWith(character) && !Utils.hasGlint(stack) && event.isFinal) {
                             Utils.setSpoofed(event.screen, slot, firstStack);
+                            Utils.setDisabled(event.screen, slot, false);
                         } else {
                             Utils.setSpoofed(event.screen, slot, backgroundStack);
                             Utils.setDisabled(event.screen, slot, true);

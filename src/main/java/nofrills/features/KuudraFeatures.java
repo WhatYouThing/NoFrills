@@ -174,12 +174,12 @@ public class KuudraFeatures {
                 }
                 if (Config.kuudraDPS && phase == kuudraPhases.Lair && !Utils.isInstanceClosing()) {
                     float health = calculateHealth(kuudraEntity.getHealth());
-                    float damage = previousHealth - health;
+                    float damage = Math.clamp(previousHealth - health, 0, 240_000_000);
                     dpsData.add(damage);
                     if (dpsData.size() > 20) {
                         dpsData.removeFirst();
                     }
-                    Utils.showTitleCustom("DPS: " + kuudraHealthFormat.format(calculateDPS() / 1000000) + "M", 1, 25, 2.5f, 0xffff00);
+                    Utils.showTitleCustom("DPS: " + kuudraHealthFormat.format(calculateDPS() * 20 * 0.000001) + "M", 1, 25, 2.5f, 0xffff00);
                     previousHealth = health;
                 }
             }

@@ -299,10 +299,11 @@ public class Utils {
     }
 
     /**
-     * Checks if the provided ItemStack has a glint. Ignores the glint override flag to work correctly with items such as Nether Stars.
+     * Checks if the provided ItemStack has a glint. Ignores the default glint override flag to work correctly with items such as Nether Stars.
      */
+    @SuppressWarnings("optional")
     public static boolean hasGlint(ItemStack stack) {
-        return stack.getItem().hasGlint(stack);
+        return stack.getComponentChanges().get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) != null;
     }
 
     public static class Symbols {
@@ -329,12 +330,28 @@ public class Utils {
     }
 
     public static class SpoofedSlot {
-        public Slot slot;
+        public int slotId;
         public ItemStack replacementStack;
 
         public SpoofedSlot(Slot slot, ItemStack replacementStack) {
-            this.slot = slot;
+            this.slotId = slot.id;
             this.replacementStack = replacementStack;
+        }
+
+        public boolean isSlot(Slot slot) {
+            return slot != null && slot.id == slotId;
+        }
+    }
+
+    public static class DisabledSlot {
+        public int slotId;
+
+        public DisabledSlot(Slot slot) {
+            this.slotId = slot.id;
+        }
+
+        public boolean isSlot(Slot slot) {
+            return slot != null && slot.id == slotId;
         }
     }
 }

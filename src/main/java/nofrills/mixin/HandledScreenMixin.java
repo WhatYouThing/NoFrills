@@ -9,6 +9,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import nofrills.config.Config;
+import nofrills.features.DungeonSolvers;
 import nofrills.misc.ScreenOptions;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -22,7 +23,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import static nofrills.misc.Utils.DisabledSlot;
 import static nofrills.misc.Utils.SpoofedSlot;
 
 @Mixin(HandledScreen.class)
@@ -34,7 +37,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Final
     protected T handler;
     @Unique
-    List<Slot> disabledSlots = new ArrayList<>();
+    List<DisabledSlot> disabledSlots = new ArrayList<>();
     @Unique
     List<SpoofedSlot> spoofedSlots = new ArrayList<>();
 
@@ -55,55 +58,42 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Override
     public void nofrills_mod$disableSlot(Slot slot, boolean disabled) {
-        if (disabled && !disabledSlots.contains(slot)) {
-            disabledSlots.add(slot);
-        }
-        if (!disabled) {
-            disabledSlots.remove(slot);
+        disabledSlots.removeIf(disabledSlot -> disabledSlot.isSlot(slot));
+        if (disabled) {
+            disabledSlots.add(new DisabledSlot(slot));
         }
     }
 
     @Override
     public void nofrills_mod$spoofSlot(Slot slot, ItemStack replacement) {
-        SpoofedSlot spoofedSlot = new SpoofedSlot(slot, replacement);
-        for (SpoofedSlot spoofed : spoofedSlots) {
-            if (spoofed.slot.equals(slot)) {
-                int index = spoofedSlots.indexOf(spoofed);
-                spoofedSlots.set(index, spoofedSlot);
-                return;
-            }
-        }
-        spoofedSlots.add(spoofedSlot);
+        spoofedSlots.removeIf(spoofed -> spoofed.isSlot(slot));
+        spoofedSlots.add(new SpoofedSlot(slot, replacement));
     }
 
     @Override
     public void nofrills_mod$clearSpoof(Slot slot) {
-        spoofedSlots.removeIf(spoofedSlot -> spoofedSlot.slot.equals(slot));
+        spoofedSlots.removeIf(spoofed -> spoofed.isSlot(slot));
     }
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        if (disabledSlots.contains(slot)) {
+        if (disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(slot))) {
             ci.cancel();
-        } else if (Config.ignoreBackground) {
-            if (isStackNameEmpty(slot)) {
-                ci.cancel();
-            }
+        } else if (Config.ignoreBackground && isStackNameEmpty(slot)) {
+            ci.cancel();
         }
     }
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("TAIL"))
     private void onClickSlotTail(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        for (SpoofedSlot spoofedSlot : spoofedSlots) {
-            if (spoofedSlot.slot.equals(slot)) {
-                this.handler.setCursorStack(ItemStack.EMPTY);
-            }
+        if (spoofedSlots.stream().anyMatch(spoofed -> spoofed.isSlot(slot))) {
+            this.handler.setCursorStack(ItemStack.EMPTY); // prevents the real item from showing at the cursor
         }
     }
 
     @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))
     private boolean onDrawHighlight(Slot instance) {
-        if (focusedSlot != null && disabledSlots.contains(focusedSlot)) {
+        if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
             return false;
         } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
             return false;
@@ -113,7 +103,9 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
     private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (focusedSlot != null && disabledSlots.contains(focusedSlot)) {
+        if (Config.solveTerminals && DungeonSolvers.resolveTerminal(title.getString()) != null) {
+            ci.cancel();
+        } else if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
             ci.cancel();
         } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
             ci.cancel();
@@ -122,20 +114,18 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Redirect(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
     private ItemStack onDrawStack(Slot instance) {
-        for (SpoofedSlot spoofedSlot : spoofedSlots) {
-            if (spoofedSlot.slot.equals(instance)) {
-                return spoofedSlot.replacementStack;
-            }
+        Optional<SpoofedSlot> spoofedSlot = spoofedSlots.stream().filter(spoofed -> spoofed.isSlot(instance)).findFirst();
+        if (spoofedSlot.isPresent()) {
+            return spoofedSlot.get().replacementStack;
         }
         return instance.getStack();
     }
 
     @Redirect(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
     private ItemStack onDrawSpoofedTooltip(Slot instance) {
-        for (SpoofedSlot spoofedSlot : spoofedSlots) {
-            if (spoofedSlot.slot.equals(instance)) {
-                return spoofedSlot.replacementStack;
-            }
+        Optional<SpoofedSlot> spoofedSlot = spoofedSlots.stream().filter(spoofed -> spoofed.isSlot(instance)).findFirst();
+        if (spoofedSlot.isPresent()) {
+            return spoofedSlot.get().replacementStack;
         }
         return instance.getStack();
     }

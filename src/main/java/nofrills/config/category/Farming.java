@@ -31,6 +31,13 @@ public class Farming {
                                 .build())
                         .build())
 
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Glowing Shroom Highlight"))
+                        .description(OptionDescription.of(Text.of("Highlights glowing mushrooms (the ones with particles) while you are in the glowing mushroom caves.")))
+                        .binding(false, () -> Config.shroomHighlight, value -> Config.shroomHighlight = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .build();
     }
 }

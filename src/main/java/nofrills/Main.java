@@ -60,6 +60,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(HideDeadMobs.class);
         eventBus.subscribe(PearlRefill.class);
         eventBus.subscribe(TerrorFix.class);
+        eventBus.subscribe(GlowingShroomHighlight.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

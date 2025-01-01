@@ -103,7 +103,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
     private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (Config.solveTerminals && DungeonSolvers.resolveTerminal(title.getString()) != null) {
+        if (Config.solveTerminals && DungeonSolvers.isInTerminal) {
             ci.cancel();
         } else if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
             ci.cancel();

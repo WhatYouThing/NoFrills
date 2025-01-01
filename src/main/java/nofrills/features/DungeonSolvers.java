@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import nofrills.config.Config;
 import nofrills.events.ScreenOpenEvent;
@@ -16,17 +17,8 @@ import nofrills.misc.Utils;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class DungeonSolvers {
-    private static final Terminal[] terminalData = {
-            new Terminal(Pattern.compile("Correct all the panes!"), "Panes", true),
-            new Terminal(Pattern.compile("Change all to same color!"), "Colors", false),
-            new Terminal(Pattern.compile("Select all the .* items!"), "Select", false),
-            new Terminal(Pattern.compile("What starts with: '.'\\?"), "Starts With", true),
-            new Terminal(Pattern.compile("Click in order!"), "In Order", true),
-            new Terminal(Pattern.compile("Click the button on time!"), "Melodeez Nuts", false),
-    };
     private static final Item[] colorsOrder = {
             Items.GREEN_STAINED_GLASS_PANE,
             Items.YELLOW_STAINED_GLASS_PANE,
@@ -37,20 +29,30 @@ public class DungeonSolvers {
     private static final ItemStack backgroundStack = Utils.setStackName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
     private static final ItemStack firstStack = Utils.setStackName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
     private static final ItemStack secondStack = Utils.setStackName(Items.BLUE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "eClick next.");
+    public static boolean isInTerminal = false;
     private static boolean isTerminalBuilt = false;
 
-    public static Terminal resolveTerminal(String title) {
-        for (Terminal terminal : terminalData) {
-            if (terminal.pattern.matcher(title).matches()) {
-                return terminal;
-            }
+    public static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
+        Item item = stack.getItem();
+        if (Formatting.strip(stack.getName().getString()).trim().isEmpty()) {
+            return false;
         }
-        return null;
+        if (stack.getItem().toString().startsWith("minecraft:" + colorName)) {
+            return true;
+        }
+        return switch (color) {
+            case BLACK -> item.equals(Items.INK_SAC);
+            case BLUE -> item.equals(Items.LAPIS_LAZULI);
+            case BROWN -> item.equals(Items.COCOA_BEANS);
+            case WHITE -> item.equals(Items.BONE_MEAL);
+            default -> false;
+        };
     }
 
     @EventHandler
     public static void onScreenOpen(ScreenOpenEvent event) {
         isTerminalBuilt = false;
+        isInTerminal = false;
     }
 
     @EventHandler
@@ -59,65 +61,72 @@ public class DungeonSolvers {
             String title = event.screen.getTitle().getString();
             GenericContainerScreenHandler handler = event.screen.getScreenHandler();
             Inventory inventory = handler.getInventory();
-            Terminal terminal = resolveTerminal(title);
-            if (terminal != null && terminal.solve) {
-                isTerminalBuilt = event.isFinal;
-                List<Slot> orderSlots = new ArrayList<>();
-                for (Slot slot : handler.slots) {
-                    ItemStack stack = inventory.getStack(slot.id);
-                    if (!stack.isEmpty()) {
-                        if (!event.isFinal) {
+            isTerminalBuilt = event.isFinal;
+            List<Slot> orderSlots = new ArrayList<>();
+            for (Slot slot : handler.slots) {
+                ItemStack stack = inventory.getStack(slot.id);
+                if (!stack.isEmpty()) {
+                    if (title.startsWith("Correct all the panes!")) {
+                        isInTerminal = true;
+                        if (stack.getItem() == Items.RED_STAINED_GLASS_PANE) {
+                            Utils.setSpoofed(event.screen, slot, firstStack);
+                            Utils.setDisabled(event.screen, slot, false);
+                        } else {
                             Utils.setSpoofed(event.screen, slot, backgroundStack);
                             Utils.setDisabled(event.screen, slot, true);
+                        }
+                    }
+                    if (title.startsWith("Click in order!")) {
+                        isInTerminal = true;
+                        if (stack.getItem() == Items.RED_STAINED_GLASS_PANE && event.isFinal) {
+                            orderSlots.add(slot);
                         } else {
-                            switch (terminal.name) {
-                                case "Panes": {
-                                    if (stack.getItem() == Items.RED_STAINED_GLASS_PANE) {
-                                        Utils.setSpoofed(event.screen, slot, firstStack);
-                                        Utils.setDisabled(event.screen, slot, false);
-                                    }
+                            Utils.setSpoofed(event.screen, slot, backgroundStack);
+                            Utils.setDisabled(event.screen, slot, true);
+                        }
+                    }
+                    if (title.startsWith("What starts with:") && title.endsWith("?")) {
+                        isInTerminal = true;
+                        String character = String.valueOf(title.charAt(title.indexOf("'") + 1)).toLowerCase();
+                        String name = Formatting.strip(stack.getName().getString()).toLowerCase().trim();
+                        if (!name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(stack)) {
+                            Utils.setSpoofed(event.screen, slot, firstStack);
+                            Utils.setDisabled(event.screen, slot, false);
+                        } else {
+                            Utils.setSpoofed(event.screen, slot, backgroundStack);
+                            Utils.setDisabled(event.screen, slot, true);
+                        }
+                    }
+                    if (title.startsWith("Select all the") && title.endsWith("items!")) {
+                        isInTerminal = true;
+                        String color = title.replace("Select all the", "").replace("items!", "").trim();
+                        String colorName = color.equals("SILVER") ? "light_gray" : color.toLowerCase().replace(" ", "_");
+                        for (DyeColor dye : DyeColor.values()) {
+                            if (dye.getName().equals(colorName)) {
+                                if (!Utils.hasGlint(stack) && checkStackColor(stack, dye, colorName)) {
+                                    Utils.setSpoofed(event.screen, slot, firstStack);
+                                    Utils.setDisabled(event.screen, slot, false);
+                                } else {
+                                    Utils.setSpoofed(event.screen, slot, backgroundStack);
+                                    Utils.setDisabled(event.screen, slot, true);
                                 }
-                                case "In Order": {
-                                    if (stack.getItem() == Items.RED_STAINED_GLASS_PANE) {
-                                        orderSlots.add(slot);
-                                    }
-                                }
-                                case "Starts With": {
-                                    String character = String.valueOf(title.charAt(title.indexOf("'") + 1)).toLowerCase();
-                                    String name = Formatting.strip(stack.getName().getString()).toLowerCase().trim();
-                                    if (!name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(stack) && event.isFinal) {
-                                        Utils.setSpoofed(event.screen, slot, firstStack);
-                                        Utils.setDisabled(event.screen, slot, false);
-                                    }
-                                }
+                                break;
                             }
                         }
                     }
                 }
-                if (!orderSlots.isEmpty()) {
-                    orderSlots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
-                    Slot first = orderSlots.getFirst();
-                    Utils.setSpoofed(event.screen, first, firstStack);
-                    Utils.setDisabled(event.screen, first, false);
-                    if (orderSlots.size() > 1) {
-                        Slot second = orderSlots.get(1);
-                        Utils.setSpoofed(event.screen, second, secondStack);
-                        Utils.setDisabled(event.screen, second, true);
-                    }
+            }
+            if (!orderSlots.isEmpty()) {
+                orderSlots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
+                Slot first = orderSlots.getFirst();
+                Utils.setSpoofed(event.screen, first, firstStack);
+                Utils.setDisabled(event.screen, first, false);
+                if (orderSlots.size() > 1) {
+                    Slot second = orderSlots.get(1);
+                    Utils.setSpoofed(event.screen, second, secondStack);
+                    Utils.setDisabled(event.screen, second, true);
                 }
             }
-        }
-    }
-
-    public static class Terminal {
-        public Pattern pattern;
-        public String name;
-        public boolean solve; // specify if the terminal should be solved, and if the invalid clicks should be hidden
-
-        public Terminal(Pattern pattern, String name, boolean solve) {
-            this.pattern = pattern;
-            this.name = name;
-            this.solve = solve;
         }
     }
 }

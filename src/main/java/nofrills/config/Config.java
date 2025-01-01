@@ -193,6 +193,8 @@ public class Config {
     public static boolean spaceFarmer = false;
     @SerialEntry
     public static boolean lockView = false;
+    @SerialEntry
+    public static boolean shroomHighlight = false;
 
     // Slayers
 

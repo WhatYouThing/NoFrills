@@ -22,22 +22,24 @@ import static nofrills.Main.mc;
 
 public class GlowingShroomHighlight {
     private static final List<BlockPos> shroomData = new ArrayList<>();
+    private static final List<BlockPos> shroomPartial = new ArrayList<>();
     private static final RenderColor shroomColor = RenderColor.fromHex(0x00ff00, 0.5f);
     private static boolean isInCave = false;
 
+    private static boolean isShroom(BlockPos pos) {
+        Block block = mc.world.getBlockState(pos).getBlock();
+        return block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM;
+    }
+
     @EventHandler
     public static void onParticle(SpawnParticleEvent event) {
-        if (!Config.shroomHighlight) {
-            return;
-        }
-        if (isInCave && event.packet.getParameters().getType() == ParticleTypes.ENTITY_EFFECT) {
+        if (Config.shroomHighlight && isInCave && event.packet.getParameters().getType() == ParticleTypes.ENTITY_EFFECT) {
             BlockPos pos = BlockPos.ofFloored(event.packet.getX(), event.packet.getY(), event.packet.getZ());
-            Block block = mc.world.getBlockState(pos).getBlock();
-            if (shroomData.contains(pos)) {
+            if (shroomData.contains(pos) || shroomPartial.contains(pos)) {
                 return;
             }
-            if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {
-                shroomData.add(pos);
+            if (isShroom(pos)) {
+                shroomPartial.add(pos);
             }
         }
     }
@@ -47,23 +49,24 @@ public class GlowingShroomHighlight {
         isInCave = Utils.skyblockData.currentLocation.equals(Utils.Symbols.zone + " Glowing Mushroom Cave");
         if (!isInCave && !shroomData.isEmpty()) {
             shroomData.clear();
+            shroomPartial.clear();
         }
     }
 
     @EventHandler
     public static void onRender(WorldRenderEvent event) {
-        if (!Config.shroomHighlight) {
-            return;
-        }
-        Iterator<BlockPos> iterator = shroomData.iterator();
-        while (iterator.hasNext() && isInCave) {
-            BlockPos pos = iterator.next();
-            Block block = mc.world.getBlockState(pos).getBlock();
-            if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {
-                Rendering.drawFilled(event.matrices, event.consumer, event.camera, Box.enclosing(pos, pos), false, shroomColor);
-            } else {
-                iterator.remove();
+        if (Config.shroomHighlight && isInCave) {
+            Iterator<BlockPos> iterator = shroomData.iterator();
+            while (iterator.hasNext() && isInCave) {
+                BlockPos pos = iterator.next();
+                if (isShroom(pos)) {
+                    Rendering.drawFilled(event.matrices, event.consumer, event.camera, Box.enclosing(pos, pos), false, shroomColor);
+                } else {
+                    iterator.remove();
+                }
             }
+            shroomData.addAll(shroomPartial);
+            shroomPartial.clear();
         }
     }
 }

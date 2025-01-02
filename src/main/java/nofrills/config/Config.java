@@ -158,6 +158,10 @@ public class Config {
     public static Color miniColor = new Color(255, 255, 0, 255);
     @SerialEntry
     public static boolean solveTerminals = false;
+    @SerialEntry
+    public static boolean melodyAnnounce = false;
+    @SerialEntry
+    public static String melodyMessage = "/pc Melody";
 
     // Kuudra
 

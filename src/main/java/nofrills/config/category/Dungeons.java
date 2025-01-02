@@ -4,6 +4,7 @@ import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
+import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import net.minecraft.text.Text;
 import nofrills.config.Config;
 
@@ -51,6 +52,20 @@ public class Dungeons {
                         .description(OptionDescription.of(Text.of("Solves the F7/M7 terminals for you, turning (most of) them into a simple point and click minigame. Also hides tooltips in every terminal for better visibility.\n\nThis option is still WIP, it currently only solves:\n- Correct all panes\n- Starts With\n- Click in order")))
                         .binding(false, () -> Config.solveTerminals, value -> Config.solveTerminals = value)
                         .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Announce Melody"))
+                        .description(OptionDescription.of(Text.of("Automatically send a message in chat when you get the Melody terminal.")))
+                        .binding(false, () -> Config.melodyAnnounce, value -> Config.melodyAnnounce = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<String>createBuilder()
+                        .name(Text.of("Melody Message"))
+                        .description(OptionDescription.of(Text.of("The message to send when a Melody terminal is opened.")))
+                        .binding("/pc Melody", () -> Config.melodyMessage, value -> Config.melodyMessage = value)
+                        .controller(StringControllerBuilder::create)
                         .build())
 
                 .build();

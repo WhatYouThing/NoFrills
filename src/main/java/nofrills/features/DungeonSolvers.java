@@ -12,6 +12,7 @@ import net.minecraft.util.Formatting;
 import nofrills.config.Config;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenSlotUpdateEvent;
+import nofrills.events.WorldTickEvent;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -19,6 +20,9 @@ import java.util.Comparator;
 import java.util.List;
 
 public class DungeonSolvers {
+    private static final ItemStack backgroundStack = Utils.setStackName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
+    private static final ItemStack firstStack = Utils.setStackName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
+    private static final ItemStack secondStack = Utils.setStackName(Items.BLUE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
     private static final Item[] colorsOrder = {
             Items.GREEN_STAINED_GLASS_PANE,
             Items.YELLOW_STAINED_GLASS_PANE,
@@ -26,11 +30,9 @@ public class DungeonSolvers {
             Items.RED_STAINED_GLASS_PANE,
             Items.BLUE_STAINED_GLASS_PANE,
     };
-    private static final ItemStack backgroundStack = Utils.setStackName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
-    private static final ItemStack firstStack = Utils.setStackName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
-    private static final ItemStack secondStack = Utils.setStackName(Items.BLUE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "eClick next.");
     public static boolean isInTerminal = false;
     private static boolean isTerminalBuilt = false;
+    private static int melodyTicks = 0;
 
     public static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
         Item item = stack.getItem();
@@ -53,6 +55,23 @@ public class DungeonSolvers {
     public static void onScreenOpen(ScreenOpenEvent event) {
         isTerminalBuilt = false;
         isInTerminal = false;
+
+        if (Utils.isInDungeons() && event.screen.getTitle().getString().equals("Click the button on time!")) {
+            isInTerminal = true;
+            if (Config.melodyAnnounce) {
+                if (melodyTicks == 0 && !Config.melodyMessage.isEmpty()) {
+                    Utils.sendMessage(Config.melodyMessage);
+                    melodyTicks = 100;
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public static void onTick(WorldTickEvent event) {
+        if (melodyTicks > 0) {
+            melodyTicks--;
+        }
     }
 
     @EventHandler
@@ -113,6 +132,9 @@ public class DungeonSolvers {
                                 break;
                             }
                         }
+                    }
+                    if (title.startsWith("Change all to same color!")) {
+                        isInTerminal = true;
                     }
                 }
             }

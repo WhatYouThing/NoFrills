@@ -56,7 +56,7 @@ public class GlowingShroomHighlight {
             return;
         }
         Iterator<BlockPos> iterator = shroomData.iterator();
-        while (iterator.hasNext()) {
+        while (iterator.hasNext() && isInCave) {
             BlockPos pos = iterator.next();
             Block block = mc.world.getBlockState(pos).getBlock();
             if (block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM) {

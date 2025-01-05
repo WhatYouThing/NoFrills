@@ -3,6 +3,8 @@ package nofrills.features;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
@@ -19,7 +21,7 @@ public class RecipeLookup {
     @EventHandler
     public static void onKey(InputEvent event) {
         if (Utils.Keybinds.recipeLookup.matchesKey(event.key, 0) && event.action == GLFW.GLFW_PRESS) {
-            if (mc.currentScreen != null) {
+            if (mc.currentScreen instanceof InventoryScreen || mc.currentScreen instanceof GenericContainerScreen) {
                 Slot focused = ((HandledScreenAccessor) mc.currentScreen).getFocusedSlot();
                 if (focused == null) {
                     return;
@@ -33,15 +35,15 @@ public class RecipeLookup {
                         if (itemId.contains("GENERATOR")) {
                             int index = itemId.lastIndexOf("_");
                             String id = itemId.substring(0, index);
-                            Utils.info(Utils.Symbols.format + "7Looking up recipes for " + Utils.Symbols.format + "f" + id.replace("GENERATOR", "MINION").replaceAll("_", " ") + ".");
+                            Utils.info(Utils.Symbols.format + "7Looking up recipes for " + Utils.Symbols.format + "a" + id.replace("GENERATOR", "MINION").replaceAll("_", " ") + ".");
                             Utils.sendMessage("/recipe " + id);
                         } else if (itemId.equals("PET")) {
                             JsonObject petData = JsonParser.parseString(data.getString("petInfo")).getAsJsonObject();
                             String petName = petData.get("type").getAsString().replaceAll("_", " ");
-                            Utils.info(Utils.Symbols.format + "7Looking up recipes for " + Utils.Symbols.format + "f" + petName + " PET.");
+                            Utils.info(Utils.Symbols.format + "7Looking up recipes for " + Utils.Symbols.format + "a" + petName + " PET.");
                             Utils.sendMessage("/recipe " + petName + " PET");
                         } else {
-                            Utils.info(Utils.Symbols.format + "7Looking up recipes for " + Utils.Symbols.format + "f" + itemId.replaceAll("_", " ") + ".");
+                            Utils.info(Utils.Symbols.format + "7Looking up recipes for " + Utils.Symbols.format + "a" + itemId.replaceAll("_", " ") + ".");
                             Utils.sendMessage("/recipe " + itemId);
                         }
                         event.cancel();

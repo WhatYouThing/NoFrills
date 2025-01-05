@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import nofrills.config.Config;
 import nofrills.features.PearlRefill;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -172,7 +173,7 @@ public class NoFrills {
                 Utils.sendMessage(coords);
                 return SINGLE_SUCCESS;
             })).then(literal("location").executes(context -> {
-                String location = Utils.skyblockData.currentLocation;
+                String location = SkyblockData.getLocation();
                 String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
                 if (!location.isEmpty()) {
                     coords += " [ " + location + " ]";
@@ -193,7 +194,7 @@ public class NoFrills {
                 mc.keyboard.setClipboard(coords);
                 return SINGLE_SUCCESS;
             })).then(literal("location").executes(context -> {
-                String location = Utils.skyblockData.currentLocation;
+                String location = SkyblockData.getLocation();
                 String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
                 if (!location.isEmpty()) {
                     coords += " [ " + location + " ]";

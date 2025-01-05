@@ -10,6 +10,7 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.text.DecimalFormat;
@@ -49,7 +50,7 @@ public class KuudraFeatures {
         if (Utils.isInZone(-133, 59, -75, -73, 1, -138)) {
             return kuudraPhases.Lair;
         }
-        for (String line : Utils.scoreboardLines) {
+        for (String line : SkyblockData.getLines()) {
             if (line.startsWith("Rescue supplies")) {
                 return kuudraPhases.Collect;
             }

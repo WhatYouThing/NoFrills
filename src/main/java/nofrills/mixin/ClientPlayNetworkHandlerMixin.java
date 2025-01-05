@@ -7,16 +7,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.util.Formatting;
 import nofrills.config.Config;
-import nofrills.events.EntityNamedEvent;
-import nofrills.events.PlaySoundEvent;
-import nofrills.events.ScreenSlotUpdateEvent;
-import nofrills.events.SpawnParticleEvent;
+import nofrills.events.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -65,5 +59,15 @@ public class ClientPlayNetworkHandlerMixin {
         if (eventBus.post(new SpawnParticleEvent(packet)).isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "onScoreboardObjectiveUpdate", at = @At("TAIL"))
+    private void onObjectiveUpdate(ScoreboardObjectiveUpdateS2CPacket packet, CallbackInfo ci) {
+        eventBus.post(new ObjectiveUpdateEvent(packet));
+    }
+
+    @Inject(method = "onTeam", at = @At("TAIL"))
+    private void onScoreUpdate(TeamS2CPacket packet, CallbackInfo ci) {
+        eventBus.post(new ScoreboardUpdateEvent(packet));
     }
 }

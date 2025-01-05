@@ -13,6 +13,7 @@ import nofrills.commands.NoFrills;
 import nofrills.commands.Yeet;
 import nofrills.config.Config;
 import nofrills.features.*;
+import nofrills.misc.SkyblockData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +62,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(PearlRefill.class);
         eventBus.subscribe(TerrorFix.class);
         eventBus.subscribe(GlowingShroomHighlight.class);
+        eventBus.subscribe(SkyblockData.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

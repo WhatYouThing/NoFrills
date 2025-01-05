@@ -12,6 +12,7 @@ import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class GlowingShroomHighlight {
 
     @EventHandler
     public static void onTick(WorldTickEvent event) {
-        isInCave = Utils.skyblockData.currentLocation.equals(Utils.Symbols.zone + " Glowing Mushroom Cave");
+        isInCave = SkyblockData.getLocation().equals(Utils.Symbols.zone + " Glowing Mushroom Cave");
         if (!isInCave && !shroomData.isEmpty()) {
             shroomData.clear();
             shroomPartial.clear();
@@ -65,8 +66,10 @@ public class GlowingShroomHighlight {
                     iterator.remove();
                 }
             }
-            shroomData.addAll(shroomPartial);
-            shroomPartial.clear();
+            if (!shroomPartial.isEmpty()) {
+                shroomData.addAll(shroomPartial);
+                shroomPartial.clear();
+            }
         }
     }
 }

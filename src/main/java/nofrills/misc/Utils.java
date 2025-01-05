@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
@@ -41,8 +40,6 @@ public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0xff5555, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     public static final Pattern partyMessagePattern = Pattern.compile("Party > .*: .*");
     private static final Random soundRandom = Random.create(0);
-    public static List<String> scoreboardLines = new ArrayList<>();
-    public static SkyblockData skyblockData = new SkyblockData();
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         mc.inGameHud.setTitle(Text.of(title));
@@ -128,16 +125,16 @@ public class Utils {
 
     public static boolean isInZone(String zone, boolean containsCheck) {
         if (containsCheck) {
-            return skyblockData.currentLocation.contains(zone);
+            return SkyblockData.getLocation().contains(zone);
         }
-        return skyblockData.currentLocation.startsWith(zone);
+        return SkyblockData.getLocation().startsWith(zone);
     }
 
     /**
      * Checks if the provided location matches with the current area on the tab list. For example, isInArea("Private Island") is true if "Area: Private Island" is on the tab list.
      */
     public static boolean isInArea(String area) {
-        return skyblockData.currentArea.equals(area);
+        return SkyblockData.getArea().equals(area);
     }
 
     public static boolean isInDungeons() {
@@ -160,12 +157,7 @@ public class Utils {
      * Returns true if the player is on any of their garden plots, which doesn't count the barn.
      */
     public static boolean isOnGardenPlot() {
-        for (String line : scoreboardLines) {
-            if (line.contains("Plot -")) {
-                return true;
-            }
-        }
-        return false;
+        return SkyblockData.getLines().stream().anyMatch(line -> line.contains("Plot -"));
     }
 
     /**
@@ -176,16 +168,11 @@ public class Utils {
     }
 
     public static boolean isInstanceClosing() {
-        for (String line : scoreboardLines) {
-            if (line.startsWith("Instance Shutdown")) {
-                return true;
-            }
-        }
-        return false;
+        return SkyblockData.getLines().stream().anyMatch(line -> line.startsWith("Instance Shutdown"));
     }
 
     public static boolean isInSkyblock() {
-        return skyblockData.isInSkyblock;
+        return SkyblockData.isInSkyblock();
     }
 
     private static String[] getVersionNumber(String version) {
@@ -318,15 +305,7 @@ public class Utils {
 
     public static class Keybinds {
         public static final KeyBinding getPearls = new KeyBinding("Refill Pearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "NoFrills");
-    }
-
-    public static class SkyblockData {
-        public String currentLocation = ""; // from scoreboard, for example "⏣ Your Island"
-        public String currentArea = ""; // from tab list, for example "Area: Private Island"
-        public boolean isInSkyblock = false;
-
-        public SkyblockData() {
-        }
+        public static final KeyBinding recipeLookup = new KeyBinding("Recipe Lookup", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "NoFrills");
     }
 
     public static class SpoofedSlot {

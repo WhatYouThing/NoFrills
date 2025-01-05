@@ -63,9 +63,11 @@ public class Main implements ModInitializer {
         eventBus.subscribe(TerrorFix.class);
         eventBus.subscribe(GlowingShroomHighlight.class);
         eventBus.subscribe(SkyblockData.class);
+        eventBus.subscribe(RecipeLookup.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 
         KeyBindingHelper.registerKeyBinding(Keybinds.getPearls);
+        KeyBindingHelper.registerKeyBinding(Keybinds.recipeLookup);
     }
 }

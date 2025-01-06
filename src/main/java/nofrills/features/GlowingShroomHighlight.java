@@ -16,14 +16,12 @@ import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import static nofrills.Main.mc;
 
 public class GlowingShroomHighlight {
     private static final List<BlockPos> shroomData = new ArrayList<>();
-    private static final List<BlockPos> shroomPartial = new ArrayList<>();
     private static final RenderColor shroomColor = RenderColor.fromHex(0x00ff00, 0.5f);
     private static boolean isInCave = false;
 
@@ -36,11 +34,8 @@ public class GlowingShroomHighlight {
     public static void onParticle(SpawnParticleEvent event) {
         if (Config.shroomHighlight && isInCave && event.packet.getParameters().getType() == ParticleTypes.ENTITY_EFFECT) {
             BlockPos pos = BlockPos.ofFloored(event.packet.getX(), event.packet.getY(), event.packet.getZ());
-            if (shroomData.contains(pos) || shroomPartial.contains(pos)) {
-                return;
-            }
-            if (isShroom(pos)) {
-                shroomPartial.add(pos);
+            if (!shroomData.contains(pos) && isShroom(pos)) {
+                shroomData.add(pos);
             }
         }
     }
@@ -50,25 +45,19 @@ public class GlowingShroomHighlight {
         isInCave = SkyblockData.getLocation().equals(Utils.Symbols.zone + " Glowing Mushroom Cave");
         if (!isInCave && !shroomData.isEmpty()) {
             shroomData.clear();
-            shroomPartial.clear();
         }
     }
 
     @EventHandler
     public static void onRender(WorldRenderEvent event) {
-        if (Config.shroomHighlight && isInCave) {
-            Iterator<BlockPos> iterator = shroomData.iterator();
-            while (iterator.hasNext() && isInCave) {
-                BlockPos pos = iterator.next();
+        if (Config.shroomHighlight && isInCave && !shroomData.isEmpty()) {
+            List<BlockPos> shrooms = new ArrayList<>(shroomData);
+            for (BlockPos pos : shrooms) {
                 if (isShroom(pos)) {
                     Rendering.drawFilled(event.matrices, event.consumer, event.camera, Box.enclosing(pos, pos), false, shroomColor);
                 } else {
-                    iterator.remove();
+                    shroomData.remove(pos);
                 }
-            }
-            if (!shroomPartial.isEmpty()) {
-                shroomData.addAll(shroomPartial);
-                shroomPartial.clear();
             }
         }
     }

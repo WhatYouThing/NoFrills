@@ -14,6 +14,28 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class SkyblockData {
+    public static final InstanceType[] instances = {
+            new InstanceType("f0", "CATACOMBS_ENTRANCE"),
+            new InstanceType("f1", "CATACOMBS_FLOOR_ONE"),
+            new InstanceType("f2", "CATACOMBS_FLOOR_TWO"),
+            new InstanceType("f3", "CATACOMBS_FLOOR_THREE"),
+            new InstanceType("f4", "CATACOMBS_FLOOR_FOUR "),
+            new InstanceType("f5", "CATACOMBS_FLOOR_FIVE"),
+            new InstanceType("f6", "CATACOMBS_FLOOR_SIX"),
+            new InstanceType("f7", "CATACOMBS_FLOOR_SEVEN"),
+            new InstanceType("m1", "MASTER_CATACOMBS_FLOOR_ONE"),
+            new InstanceType("m2", "MASTER_CATACOMBS_FLOOR_TWO"),
+            new InstanceType("m3", "MASTER_CATACOMBS_FLOOR_THREE"),
+            new InstanceType("m4", "MASTER_CATACOMBS_FLOOR_FOUR"),
+            new InstanceType("m5", "MASTER_CATACOMBS_FLOOR_FIVE"),
+            new InstanceType("m6", "MASTER_CATACOMBS_FLOOR_SIX"),
+            new InstanceType("m7", "MASTER_CATACOMBS_FLOOR_SEVEN"),
+            new InstanceType("k1", "KUUDRA_NORMAL"),
+            new InstanceType("k2", "KUUDRA_HOT"),
+            new InstanceType("k3", "KUUDRA_BURNING"),
+            new InstanceType("k4", "KUUDRA_FIERY"),
+            new InstanceType("k5", "KUUDRA_INFERNAL")
+    };
     private static String location = "";
     private static String area = "";
     private static boolean inSkyblock = false;
@@ -87,5 +109,15 @@ public class SkyblockData {
             }
         }
         lines = currentLines;
+    }
+
+    public static class InstanceType {
+        public String name;
+        public String type;
+
+        public InstanceType(String name, String type) {
+            this.name = name;
+            this.type = type;
+        }
     }
 }

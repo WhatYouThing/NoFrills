@@ -34,16 +34,12 @@ public class RecipeLookup {
                     if (!itemId.isEmpty()) {
                         if (itemId.contains("GENERATOR")) {
                             int index = itemId.lastIndexOf("_");
-                            String id = itemId.substring(0, index);
-                            Utils.info(Utils.Symbols.format + "7Looking up recipes for " + Utils.Symbols.format + "a" + id.replace("GENERATOR", "MINION").replaceAll("_", " ") + ".");
-                            Utils.sendMessage("/recipe " + id);
+                            Utils.sendMessage("/recipe " + itemId.substring(0, index));
                         } else if (itemId.equals("PET")) {
                             JsonObject petData = JsonParser.parseString(data.getString("petInfo")).getAsJsonObject();
                             String petName = petData.get("type").getAsString().replaceAll("_", " ");
-                            Utils.info(Utils.Symbols.format + "7Looking up recipes for " + Utils.Symbols.format + "a" + petName + " PET.");
                             Utils.sendMessage("/recipe " + petName + " PET");
                         } else {
-                            Utils.info(Utils.Symbols.format + "7Looking up recipes for " + Utils.Symbols.format + "a" + itemId.replaceAll("_", " ") + ".");
                             Utils.sendMessage("/recipe " + itemId);
                         }
                         event.cancel();

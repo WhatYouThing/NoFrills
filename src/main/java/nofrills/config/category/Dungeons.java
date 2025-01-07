@@ -49,7 +49,7 @@ public class Dungeons {
 
                 .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Solve Terminals"))
-                        .description(OptionDescription.of(Text.of("Solves the F7/M7 terminals for you, turning (most of) them into a simple point and click minigame. Also hides tooltips in every terminal for better visibility.\n\nThis option is still WIP, it currently only solves:\n- Correct all panes\n- Starts With\n- Click in order")))
+                        .description(OptionDescription.of(Text.of("Solves (most of) the F7/M7 terminals for you, turning them into a simple point and click minigame. This option also hides item tooltips in every terminal for better visibility.")))
                         .binding(false, () -> Config.solveTerminals, value -> Config.solveTerminals = value)
                         .controller(Config::booleanController)
                         .build())

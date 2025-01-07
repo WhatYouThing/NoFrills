@@ -52,7 +52,7 @@ public class Config {
     @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry
-    public static boolean partyQuickKick = false;
+    public static boolean partyFinderOptions = false;
     @SerialEntry
     public static String partyPrefixes = "! ?";
     @SerialEntry
@@ -67,6 +67,10 @@ public class Config {
     public static boolean partyCmdTransfer = false;
     @SerialEntry
     public static boolean partyCmdAllInvite = false;
+    @SerialEntry
+    public static boolean partyCmdDowntime = false;
+    @SerialEntry
+    public static boolean partyCmdQueue = false;
     @SerialEntry
     public static boolean noHaste = false;
     @SerialEntry

@@ -87,6 +87,10 @@ public class Utils {
         mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r " + message + "§r").setStyle(Style.EMPTY.withClickEvent(click)), null, noFrillsIndicator);
     }
 
+    public static void infoRaw(Text message) {
+        mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r ").append(message).append("§r"), null, noFrillsIndicator);
+    }
+
     /**
      * Disables a specific slot in the provided screen, preventing it from being clicked and hiding its tooltip.
      *

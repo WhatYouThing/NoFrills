@@ -91,24 +91,22 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
-    @Redirect(method = "drawSlotHighlightBack", at = @At("HEAD"))
-    private boolean onDrawHighlight(Slot instance) {
+    @Inject(method = "drawSlotHighlightBack", at = @At("HEAD"), cancellable = true)
+    private void onDrawHighlight(DrawContext context, CallbackInfo ci) {
         if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
-            return false;
+            ci.cancel();
         } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
-            return false;
+            ci.cancel();
         }
-        return instance.canBeHighlighted();
     }
 
-    @Redirect(method = "drawSlotHighlightFront", at = @At("HEAD"))
-    private boolean onDrawHighlightFront(Slot instance) {
+    @Inject(method = "drawSlotHighlightFront", at = @At("HEAD"), cancellable = true)
+    private void onDrawHighlightFront(DrawContext context, CallbackInfo ci) {
         if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
-            return false;
+            ci.cancel();
         } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
-            return false;
+            ci.cancel();
         }
-        return instance.canBeHighlighted();
     }
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)

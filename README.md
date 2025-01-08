@@ -33,7 +33,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
       has an option to play a sound effect when using the feature.
 
 - **Party**
-    - **Quick Kick**: Adds a kick button in the chat when anyone joins your party through Party Finder.
+  - **Finder Options**: Adds various buttons in the chat when anyone joins your party through Party Finder, such as
+    copy name and kick.
     - **Party Commands**: Adds a few commands that your party members can use, customizable.
 
 - **Viewmodel**
@@ -54,6 +55,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Item Count Fix**: Prevents the game from hiding item counts for unstackable items. Mostly noticeable in the Bazaar
   and the Experimentation Table.
 - **Riding Camera Fix**: Gets rid of the delayed/floaty camera movement while riding any entity.
+- **Sneak Fix**: Fixes the ancient bug where the un-sneak animation plays twice if you do it too quickly, and fixes
+  sneaking not slowing you down while inside a block.
+- **Terror Fix**: Replicates the glorious sounds of pre-nerf Terror armor.
 
 ### Fishing
 

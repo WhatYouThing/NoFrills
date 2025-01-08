@@ -3,7 +3,7 @@ package nofrills.features;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Config;
 import nofrills.events.InputEvent;
-import nofrills.events.ScreenOpenedEvent;
+import nofrills.events.ScreenOpenEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
@@ -37,7 +37,7 @@ public class SpaceFarmer {
     }
 
     @EventHandler
-    public static void onScreen(ScreenOpenedEvent event) {
+    public static void onScreen(ScreenOpenEvent event) {
         if (spaceHeld) {
             spaceHeld = false;
             mc.options.attackKey.setPressed(false);

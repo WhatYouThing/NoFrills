@@ -6,37 +6,16 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import nofrills.config.Config;
 import nofrills.features.PearlRefill;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 import static nofrills.Main.mc;
+import static nofrills.misc.SkyblockData.instances;
 
 public class NoFrills {
-    public static final InstanceType[] instances = {
-            new InstanceType("f0", "CATACOMBS_ENTRANCE"),
-            new InstanceType("f1", "CATACOMBS_FLOOR_ONE"),
-            new InstanceType("f2", "CATACOMBS_FLOOR_TWO"),
-            new InstanceType("f3", "CATACOMBS_FLOOR_THREE"),
-            new InstanceType("f4", "CATACOMBS_FLOOR_FOUR "),
-            new InstanceType("f5", "CATACOMBS_FLOOR_FIVE"),
-            new InstanceType("f6", "CATACOMBS_FLOOR_SIX"),
-            new InstanceType("f7", "CATACOMBS_FLOOR_SEVEN"),
-            new InstanceType("m1", "MASTER_CATACOMBS_FLOOR_ONE"),
-            new InstanceType("m2", "MASTER_CATACOMBS_FLOOR_TWO"),
-            new InstanceType("m3", "MASTER_CATACOMBS_FLOOR_THREE"),
-            new InstanceType("m4", "MASTER_CATACOMBS_FLOOR_FOUR"),
-            new InstanceType("m5", "MASTER_CATACOMBS_FLOOR_FIVE"),
-            new InstanceType("m6", "MASTER_CATACOMBS_FLOOR_SIX"),
-            new InstanceType("m7", "MASTER_CATACOMBS_FLOOR_SEVEN"),
-            new InstanceType("k1", "KUUDRA_NORMAL"),
-            new InstanceType("k2", "KUUDRA_HOT"),
-            new InstanceType("k3", "KUUDRA_BURNING"),
-            new InstanceType("k4", "KUUDRA_FIERY"),
-            new InstanceType("k5", "KUUDRA_INFERNAL")
-    };
-
     private static final LiteralArgumentBuilder<FabricClientCommandSource> queueCommandBuilder = literal("queue").executes(context -> SINGLE_SUCCESS);
 
     public static final ModCommand[] commands = {
@@ -172,7 +151,7 @@ public class NoFrills {
                 Utils.sendMessage(coords);
                 return SINGLE_SUCCESS;
             })).then(literal("location").executes(context -> {
-                String location = Utils.skyblockData.currentLocation;
+                String location = SkyblockData.getLocation();
                 String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
                 if (!location.isEmpty()) {
                     coords += " [ " + location + " ]";
@@ -193,7 +172,7 @@ public class NoFrills {
                 mc.keyboard.setClipboard(coords);
                 return SINGLE_SUCCESS;
             })).then(literal("location").executes(context -> {
-                String location = Utils.skyblockData.currentLocation;
+                String location = SkyblockData.getLocation();
                 String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
                 if (!location.isEmpty()) {
                     coords += " [ " + location + " ]";
@@ -216,7 +195,7 @@ public class NoFrills {
             }
             return SINGLE_SUCCESS;
         });
-        for (InstanceType instanceType : instances) {
+        for (SkyblockData.InstanceType instanceType : instances) {
             queueCommandBuilder.then(literal(instanceType.name).executes(context -> {
                 Utils.sendMessage("/joininstance " + instanceType.type);
                 return SINGLE_SUCCESS;
@@ -249,16 +228,6 @@ public class NoFrills {
             this.command = command;
             this.description = description;
             this.builder = builder;
-        }
-    }
-
-    public static class InstanceType {
-        public String name;
-        public String type;
-
-        public InstanceType(String name, String type) {
-            this.name = name;
-            this.type = type;
         }
     }
 }

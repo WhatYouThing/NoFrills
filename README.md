@@ -65,6 +65,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 ### Dungeons
 
 - **Starred Mob Highlight**: Renders hitboxes for every starred mob, making clearing much easier.
+- **Mini Boss Highlight**: Renders hitboxes for mini bosses.
+- **Solve Terminals**: Turns (most) terminals into a fish brain point-and-click minigame.
+- **Melody Message**: Sends a message when you get the Melody terminal.
 
 ### Kuudra
 
@@ -104,10 +107,12 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Space Farmer**: Allows you to farm by holding your space bar, so that you don't have to change your keybinds
   constantly. Also has an option to lock your view while using the feature.
+- **Glowing Mushroom Highlight**: Highlights every glowing mushroom while you are in the Glowing Mushroom Caves.
 
 ### Keybinds (configured with Minecraft's Key Binds menu)
 
 - **Refill Pearls**: Refills your Ender Pearls (up to 16) directly from your sacks after pressing.
+- **Recipe Lookup**: Easily look up the recipe for the item you are hovering over in a GUI.
 
 </details>
 

@@ -52,7 +52,7 @@ public class Config {
     @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry
-    public static boolean partyQuickKick = false;
+    public static boolean partyFinderOptions = false;
     @SerialEntry
     public static String partyPrefixes = "! ?";
     @SerialEntry
@@ -67,6 +67,10 @@ public class Config {
     public static boolean partyCmdTransfer = false;
     @SerialEntry
     public static boolean partyCmdAllInvite = false;
+    @SerialEntry
+    public static boolean partyCmdDowntime = false;
+    @SerialEntry
+    public static boolean partyCmdQueue = false;
     @SerialEntry
     public static boolean noHaste = false;
     @SerialEntry
@@ -112,6 +116,8 @@ public class Config {
     public static boolean ridingCamFix = false;
     @SerialEntry
     public static boolean sneakFix = false;
+    @SerialEntry
+    public static boolean terrorFix = false;
 
     // Solvers
 
@@ -150,6 +156,16 @@ public class Config {
     public static boolean starredMobHighlight = false;
     @SerialEntry
     public static Color starredMobColor = new Color(0, 255, 255, 255);
+    @SerialEntry
+    public static boolean miniHighlight = false;
+    @SerialEntry
+    public static Color miniColor = new Color(255, 255, 0, 255);
+    @SerialEntry
+    public static boolean solveTerminals = false;
+    @SerialEntry
+    public static boolean melodyAnnounce = false;
+    @SerialEntry
+    public static String melodyMessage = "/pc Melody";
 
     // Kuudra
 
@@ -185,6 +201,8 @@ public class Config {
     public static boolean spaceFarmer = false;
     @SerialEntry
     public static boolean lockView = false;
+    @SerialEntry
+    public static boolean shroomHighlight = false;
 
     // Slayers
 

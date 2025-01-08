@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
@@ -28,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
@@ -40,8 +40,6 @@ public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0xff5555, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     public static final Pattern partyMessagePattern = Pattern.compile("Party > .*: .*");
     private static final Random soundRandom = Random.create(0);
-    public static List<String> scoreboardLines = new ArrayList<>();
-    public static SkyblockData skyblockData = new SkyblockData();
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         mc.inGameHud.setTitle(Text.of(title));
@@ -89,6 +87,10 @@ public class Utils {
         mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r " + message + "§r").setStyle(Style.EMPTY.withClickEvent(click)), null, noFrillsIndicator);
     }
 
+    public static void infoRaw(Text message) {
+        mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r ").append(message).append("§r"), null, noFrillsIndicator);
+    }
+
     /**
      * Disables a specific slot in the provided screen, preventing it from being clicked and hiding its tooltip.
      *
@@ -97,6 +99,22 @@ public class Utils {
      */
     public static void setDisabled(Screen screen, Slot slot, boolean disabled) {
         ((ScreenOptions) screen).nofrills_mod$disableSlot(slot, disabled);
+    }
+
+    public static ItemStack setStackName(ItemStack stack, String name) {
+        stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(name));
+        return stack;
+    }
+
+    /**
+     * Spoofs a slot to render a specific item stack, rather than the item that is actually in that slot.
+     *
+     * @param screen      The current screen
+     * @param slot        The slot to spoof
+     * @param replacement The ItemStack to spoof as
+     */
+    public static void setSpoofed(Screen screen, Slot slot, ItemStack replacement) {
+        ((ScreenOptions) screen).nofrills_mod$spoofSlot(slot, replacement);
     }
 
     public static String getCoordsFormatted(String format) {
@@ -111,16 +129,16 @@ public class Utils {
 
     public static boolean isInZone(String zone, boolean containsCheck) {
         if (containsCheck) {
-            return skyblockData.currentLocation.contains(zone);
+            return SkyblockData.getLocation().contains(zone);
         }
-        return skyblockData.currentLocation.startsWith(zone);
+        return SkyblockData.getLocation().startsWith(zone);
     }
 
     /**
      * Checks if the provided location matches with the current area on the tab list. For example, isInArea("Private Island") is true if "Area: Private Island" is on the tab list.
      */
     public static boolean isInArea(String area) {
-        return skyblockData.currentArea.equals(area);
+        return SkyblockData.getArea().equals(area);
     }
 
     public static boolean isInDungeons() {
@@ -143,12 +161,7 @@ public class Utils {
      * Returns true if the player is on any of their garden plots, which doesn't count the barn.
      */
     public static boolean isOnGardenPlot() {
-        for (String line : scoreboardLines) {
-            if (line.contains("Plot -")) {
-                return true;
-            }
-        }
-        return false;
+        return SkyblockData.getLines().stream().anyMatch(line -> line.contains("Plot -"));
     }
 
     /**
@@ -159,16 +172,11 @@ public class Utils {
     }
 
     public static boolean isInstanceClosing() {
-        for (String line : scoreboardLines) {
-            if (line.startsWith("Instance Shutdown")) {
-                return true;
-            }
-        }
-        return false;
+        return SkyblockData.getLines().stream().anyMatch(line -> line.startsWith("Instance Shutdown"));
     }
 
     public static boolean isInSkyblock() {
-        return skyblockData.isInSkyblock;
+        return SkyblockData.isInSkyblock();
     }
 
     private static String[] getVersionNumber(String version) {
@@ -281,6 +289,14 @@ public class Utils {
         return entity;
     }
 
+    /**
+     * Checks if the provided ItemStack has a glint. Ignores the default glint override flag to work correctly with items such as Nether Stars.
+     */
+    @SuppressWarnings("optional")
+    public static boolean hasGlint(ItemStack stack) {
+        return stack.getComponentChanges().get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) != null;
+    }
+
     public static class Symbols {
         public static String zone = "⏣";
         public static String zoneRift = "ф";
@@ -293,24 +309,32 @@ public class Utils {
 
     public static class Keybinds {
         public static final KeyBinding getPearls = new KeyBinding("Refill Pearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "NoFrills");
-    }
-
-    public static class SkyblockData {
-        public String currentLocation = ""; // from scoreboard, for example "⏣ Your Island"
-        public String currentArea = ""; // from tab list, for example "Area: Private Island"
-        public boolean isInSkyblock = false;
-
-        public SkyblockData() {
-        }
+        public static final KeyBinding recipeLookup = new KeyBinding("Recipe Lookup", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "NoFrills");
     }
 
     public static class SpoofedSlot {
-        public Slot slot;
+        public int slotId;
         public ItemStack replacementStack;
 
         public SpoofedSlot(Slot slot, ItemStack replacementStack) {
-            this.slot = slot;
+            this.slotId = slot.id;
             this.replacementStack = replacementStack;
+        }
+
+        public boolean isSlot(Slot slot) {
+            return slot != null && slot.id == slotId;
+        }
+    }
+
+    public static class DisabledSlot {
+        public int slotId;
+
+        public DisabledSlot(Slot slot) {
+            this.slotId = slot.id;
+        }
+
+        public boolean isSlot(Slot slot) {
+            return slot != null && slot.id == slotId;
         }
     }
 }

@@ -10,9 +10,12 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import static nofrills.Main.mc;
 
@@ -37,9 +40,9 @@ public class KuudraFeatures {
                     new PickupSpot("Square", new Vec3d(-143.0, 76.0, -80.0), 20.0f, 0.0f, null)),
             new PickupSpot("Equals", new Vec3d(-65.5, 76.0, -87.5), 18.0f, 15.0f, null),
     };
+    private static final List<Float> dpsData = new ArrayList<>();
     private static int freshTicks = 0;
     private static int missingTicks = 20;
-    private static int dpsTicks = 0;
     private static float previousHealth = 0.0f;
     private static MagmaCubeEntity kuudraEntity = null;
 
@@ -47,7 +50,7 @@ public class KuudraFeatures {
         if (Utils.isInZone(-133, 59, -75, -73, 1, -138)) {
             return kuudraPhases.Lair;
         }
-        for (String line : Utils.scoreboardLines) {
+        for (String line : SkyblockData.getLines()) {
             if (line.startsWith("Rescue supplies")) {
                 return kuudraPhases.Collect;
             }
@@ -86,7 +89,8 @@ public class KuudraFeatures {
                     maxY = y;
                 }
             }
-            if (cubesFound == 2) { // scuffed, but needed, because the average tps in kuudra is too low even for dr. disrespect
+            if (cubesFound == 2 || (getCurrentPhase() == kuudraPhases.Lair && kuudra != null)) {
+                // scuffed, but needed, because the average tps in kuudra is too low even for dr. disrespect
                 kuudraEntity = (MagmaCubeEntity) kuudra;
                 break;
             }
@@ -95,6 +99,14 @@ public class KuudraFeatures {
 
     private static float calculateHealth(float health) {
         return (health - 1024.0f) * 10000.0f; // kuudra's health for whatever reason starts at 24000 + 1024
+    }
+
+    private static float calculateDPS() {
+        float total = 0.0f;
+        for (float damage : dpsData) {
+            total += damage;
+        }
+        return total / dpsData.size();
     }
 
     @EventHandler
@@ -162,17 +174,14 @@ public class KuudraFeatures {
                     Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health) + "% HP", 1, 25, 2.5f, 0xffff00);
                 }
                 if (Config.kuudraDPS && phase == kuudraPhases.Lair && !Utils.isInstanceClosing()) {
-                    if (dpsTicks < 19) {
-                        dpsTicks++;
-                    } else {
-                        float health = calculateHealth(kuudraEntity.getHealth());
-                        float dps = previousHealth - health;
-                        if (dps >= 0.0f) {
-                            Utils.showTitleCustom("DPS: " + kuudraHealthFormat.format(dps / 1000000) + "M", 20, 25, 2.5f, 0xffff00);
-                        }
-                        previousHealth = health;
-                        dpsTicks = 0;
+                    float health = calculateHealth(kuudraEntity.getHealth());
+                    float damage = Math.clamp(previousHealth - health, 0, 240_000_000);
+                    dpsData.add(damage);
+                    if (dpsData.size() > 20) {
+                        dpsData.removeFirst();
                     }
+                    Utils.showTitleCustom("DPS: " + kuudraHealthFormat.format(calculateDPS() * 20 * 0.000001) + "M", 1, 25, 2.5f, 0xffff00);
+                    previousHealth = health;
                 }
             }
         } else {
@@ -180,7 +189,6 @@ public class KuudraFeatures {
             kuudraEntity = null;
             missingTicks = 20;
             previousHealth = 0.0f;
-            dpsTicks = 0;
         }
     }
 

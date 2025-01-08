@@ -13,6 +13,7 @@ import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.text.DecimalFormat;
@@ -111,10 +112,10 @@ public class SlayerFeatures {
 
     @EventHandler
     public static void onNamed(EntityNamedEvent event) {
-        if (Utils.scoreboardLines.contains("Slay the boss!")) {
+        if (SkyblockData.getLines().contains("Slay the boss!")) {
             if (currentBoss == null) {
                 for (SlayerBoss boss : slayerBosses) {
-                    for (String line : Utils.scoreboardLines) {
+                    for (String line : SkyblockData.getLines()) {
                         if (line.startsWith(boss.scoreboardName)) {
                             String playerName = mc.player.getName().getString(); // should work while nicked
                             if (event.namePlain.equals("Spawned by: " + playerName)) {
@@ -192,7 +193,7 @@ public class SlayerFeatures {
 
     @EventHandler
     public static void onTick(WorldTickEvent event) {
-        if (!Utils.scoreboardLines.contains("Slay the boss!") && currentBoss != null) { // runs when boss is killed or if we fail the slayer quest
+        if (!SkyblockData.getLines().contains("Slay the boss!") && currentBoss != null) { // runs when boss is killed or if we fail the slayer quest
             currentBoss = null;
             yanDevData.clear();
             pillarData.clear();

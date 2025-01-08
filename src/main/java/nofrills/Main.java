@@ -13,6 +13,7 @@ import nofrills.commands.NoFrills;
 import nofrills.commands.Yeet;
 import nofrills.config.Config;
 import nofrills.features.*;
+import nofrills.misc.SkyblockData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,8 @@ public class Main implements ModInitializer {
 
         eventBus.registerLambdaFactory("nofrills", (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
 
-        eventBus.subscribe(StarredMobHighlight.class);
+        eventBus.subscribe(DungeonHighlight.class);
+        eventBus.subscribe(DungeonSolvers.class);
         eventBus.subscribe(RareSeaCreatures.class);
         eventBus.subscribe(EtherwarpOverlay.class);
         eventBus.subscribe(CorpseHighlight.class);
@@ -58,9 +60,14 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SlayerFeatures.class);
         eventBus.subscribe(HideDeadMobs.class);
         eventBus.subscribe(PearlRefill.class);
+        eventBus.subscribe(TerrorFix.class);
+        eventBus.subscribe(GlowingShroomHighlight.class);
+        eventBus.subscribe(SkyblockData.class);
+        eventBus.subscribe(RecipeLookup.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 
         KeyBindingHelper.registerKeyBinding(Keybinds.getPearls);
+        KeyBindingHelper.registerKeyBinding(Keybinds.recipeLookup);
     }
 }

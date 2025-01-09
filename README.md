@@ -113,10 +113,11 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
   constantly. Also has an option to lock your view while using the feature.
 - **Glowing Mushroom Highlight**: Highlights every glowing mushroom while you are in the Glowing Mushroom Caves.
 
-### Keybinds (configured with Minecraft's Key Binds menu)
+### Keybinds
 
 - **Refill Pearls**: Refills your Ender Pearls (up to 16) directly from your sacks after pressing.
 - **Recipe Lookup**: Easily look up the recipe for the item you are hovering over in a GUI.
+- All of these keybinds are configured with Minecraft's dedicated Key Binds menu.
 
 </details>
 
@@ -148,8 +149,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 ## Incompatibilities
 
-- The mod currently has no known incompatibilities, but some features might collide with other mods. Make sure that
-  you configure your mods properly.
+- [Skyblockmod](https://modrinth.com/mod/skyblockmod) - All Versions: Mixin conflict with NoFrills, causing a crash on
+  startup. There are no plans to fix this incompatibility, as this mod is entirely replaced by Skyblocker.
 
 ## Credits
 

@@ -24,6 +24,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Hide Dead Mobs**: Prevents the game from rendering dead mobs, and also hides the Skyblock name tags of dead
       mobs.
     - **Old Skins**: Makes only Steve and Alex appear as the default player skins.
+  - **Keep Chunks**: Prevents chunks from being unloaded client-side, letting you see them from further away with high
+    render distance. This is pretty much a simplistic version of the features from Nvidium/Distant Horizons.
 
 - **Overlays**
     - **Etherwarp**: Highlights the block you're aiming at when trying to use the Ether Transmission ability.
@@ -33,7 +35,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
       has an option to play a sound effect when using the feature.
 
 - **Party**
-    - **Quick Kick**: Adds a kick button in the chat when anyone joins your party through Party Finder.
+  - **Finder Options**: Adds various buttons in the chat when anyone joins your party through Party Finder, such as
+    copy name and kick.
     - **Party Commands**: Adds a few commands that your party members can use, customizable.
 
 - **Viewmodel**
@@ -54,6 +57,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Item Count Fix**: Prevents the game from hiding item counts for unstackable items. Mostly noticeable in the Bazaar
   and the Experimentation Table.
 - **Riding Camera Fix**: Gets rid of the delayed/floaty camera movement while riding any entity.
+- **Sneak Fix**: Fixes the ancient bug where the un-sneak animation plays twice if you do it too quickly, and fixes
+  sneaking not slowing you down while inside a block.
+- **Terror Fix**: Replicates the glorious sounds of pre-nerf Terror armor.
 
 ### Fishing
 
@@ -109,10 +115,11 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
   constantly. Also has an option to lock your view while using the feature.
 - **Glowing Mushroom Highlight**: Highlights every glowing mushroom while you are in the Glowing Mushroom Caves.
 
-### Keybinds (configured with Minecraft's Key Binds menu)
+### Keybinds
 
 - **Refill Pearls**: Refills your Ender Pearls (up to 16) directly from your sacks after pressing.
 - **Recipe Lookup**: Easily look up the recipe for the item you are hovering over in a GUI.
+- All of these keybinds are configured with Minecraft's dedicated Key Binds menu.
 
 </details>
 

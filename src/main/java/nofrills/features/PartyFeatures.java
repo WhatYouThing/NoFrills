@@ -1,14 +1,13 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
-import meteordevelopment.orbit.EventPriority;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.PartyChatMsgEvent;
-import nofrills.events.ScoreboardUpdateEvent;
+import nofrills.events.WorldTickEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -30,10 +29,13 @@ public class PartyFeatures {
             }
             ClickEvent copyName = new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, name);
             ClickEvent kick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party kick " + name);
+            ClickEvent ignoreAdd = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ignore add " + name);
             Text message = Text.literal("§aOptions for §6" + name + "§a: ")
-                    .append(Text.literal("§b[COPY NAME]").setStyle(Style.EMPTY.withClickEvent(copyName)))
+                    .append(Text.literal("§b§l[COPY NAME]").setStyle(Style.EMPTY.withClickEvent(copyName)))
                     .append(Text.literal(" "))
-                    .append(Text.literal("§c[KICK]").setStyle(Style.EMPTY.withClickEvent(kick)));
+                    .append(Text.literal("§c§l[KICK]").setStyle(Style.EMPTY.withClickEvent(kick)))
+                    .append(Text.literal(" "))
+                    .append(Text.literal("§e§l[IGNORE ADD]").setStyle(Style.EMPTY.withClickEvent(ignoreAdd)));
             Utils.infoRaw(message);
         }
     }
@@ -79,7 +81,7 @@ public class PartyFeatures {
                             Utils.info("§aScheduled downtime reminder for §6" + event.sender + "§a.");
                             downtimeNeeded = true;
                         } else {
-                            Utils.showTitle("§6DOWNTIME NEEDED", "", 5, 20, 5);
+                            Utils.showTitle("§6§lDOWNTIME", "", 5, 40, 5);
                         }
                     }
                     if (Config.partyCmdQueue) {
@@ -99,13 +101,17 @@ public class PartyFeatures {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public static void onScoreboard(ScoreboardUpdateEvent event) {
-        if (downtimeNeeded && Utils.isInstanceClosing()) {
+    @EventHandler
+    public static void onTick(WorldTickEvent event) {
+        if (downtimeNeeded) {
             if (Utils.isInDungeons() || Utils.isInKuudra()) {
-                Utils.showTitle("§6DOWNTIME NEEDED", "", 5, 60, 5);
+                if (Utils.isInstanceClosing()) {
+                    Utils.showTitle("§6§lDOWNTIME", "", 5, 80, 5);
+                    downtimeNeeded = false;
+                }
+            } else {
+                downtimeNeeded = false;
             }
-            downtimeNeeded = false;
         }
     }
 }

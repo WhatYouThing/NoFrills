@@ -1,5 +1,6 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -18,7 +19,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
@@ -91,14 +91,14 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))
-    private boolean onDrawHighlight(Slot instance) {
+    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))
+    private boolean onDrawHighlight(boolean original) {
         if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
             return false;
         } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
             return false;
         }
-        return instance.canBeHighlighted();
+        return original;
     }
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
@@ -112,21 +112,21 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
-    @Redirect(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
-    private ItemStack onDrawStack(Slot instance) {
-        Optional<SpoofedSlot> spoofedSlot = spoofedSlots.stream().filter(spoofed -> spoofed.isSlot(instance)).findFirst();
+    @ModifyExpressionValue(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
+    private ItemStack onDrawStack(ItemStack original, DrawContext context, Slot slot) {
+        Optional<SpoofedSlot> spoofedSlot = spoofedSlots.stream().filter(spoofed -> spoofed.isSlot(slot)).findFirst();
         if (spoofedSlot.isPresent()) {
             return spoofedSlot.get().replacementStack;
         }
-        return instance.getStack();
+        return original;
     }
 
-    @Redirect(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
-    private ItemStack onDrawSpoofedTooltip(Slot instance) {
-        Optional<SpoofedSlot> spoofedSlot = spoofedSlots.stream().filter(spoofed -> spoofed.isSlot(instance)).findFirst();
+    @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
+    private ItemStack onDrawSpoofedTooltip(ItemStack original) {
+        Optional<SpoofedSlot> spoofedSlot = spoofedSlots.stream().filter(spoofed -> spoofed.isSlot(focusedSlot)).findFirst();
         if (spoofedSlot.isPresent()) {
             return spoofedSlot.get().replacementStack;
         }
-        return instance.getStack();
+        return original;
     }
 }

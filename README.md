@@ -24,6 +24,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Hide Dead Mobs**: Prevents the game from rendering dead mobs, and also hides the Skyblock name tags of dead
       mobs.
     - **Old Skins**: Makes only Steve and Alex appear as the default player skins.
+  - **Keep Chunks**: Prevents chunks from being unloaded client-side, letting you see them from further away with high
+    render distance. This is pretty much a simplistic version of the features from Nvidium/Distant Horizons.
 
 - **Overlays**
     - **Etherwarp**: Highlights the block you're aiming at when trying to use the Ether Transmission ability.
@@ -149,8 +151,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 ## Incompatibilities
 
-- [Skyblockmod](https://modrinth.com/mod/skyblockmod) - All Versions: Mixin conflict with NoFrills, causing a crash on
-  startup. There are no plans to fix this incompatibility, as this mod is entirely replaced by Skyblocker.
+- The mod currently has no known incompatibilities, but some features might collide with other mods. Make sure that
+  you configure your mods properly.
 
 ## Credits
 

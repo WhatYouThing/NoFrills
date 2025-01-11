@@ -73,6 +73,12 @@ public class General {
                                 .binding(false, () -> Config.oldSkins, value -> Config.oldSkins = value)
                                 .controller(Config::booleanController)
                                 .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.of("Keep Chunks"))
+                                .description(OptionDescription.of(Text.of("Prevents the server from unloading chunks client-side, letting you see previously visited chunks from further away (depending on your render distance).")))
+                                .binding(false, () -> Config.keepChunks, value -> Config.keepChunks = value)
+                                .controller(Config::booleanController)
+                                .build())
                         .build())
 
                 .group(OptionGroup.createBuilder()

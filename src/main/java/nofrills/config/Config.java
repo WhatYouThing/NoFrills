@@ -50,6 +50,8 @@ public class Config {
     @SerialEntry
     public static boolean oldSkins = false;
     @SerialEntry
+    public static boolean keepChunks = false;
+    @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry
     public static boolean partyFinderOptions = false;

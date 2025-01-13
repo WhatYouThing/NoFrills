@@ -22,6 +22,7 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -199,6 +200,22 @@ public class Utils {
             }
         }
         return entity == mc.player;
+    }
+
+    /**
+     * Tries to find ground (any block that isn't air) below the specified BlockPos, and returns the BlockPos of that block if is found. Otherwise, returns the same BlockPos.
+     *
+     * @param maxDistance The maximum downward Y distance the check will travel
+     */
+    public static BlockPos findGround(BlockPos pos, int maxDistance) {
+        int dist = Math.clamp(maxDistance, 0, 256);
+        for (int i = 0; i <= dist; i++) {
+            BlockPos below = pos.down(i);
+            if (!mc.world.getBlockState(below).isAir()) {
+                return below;
+            }
+        }
+        return pos;
     }
 
     private static String[] getVersionNumber(String version) {

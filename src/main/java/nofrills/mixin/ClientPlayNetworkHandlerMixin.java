@@ -78,4 +78,9 @@ public class ClientPlayNetworkHandlerMixin {
             ci.cancel();
         }
     }
+
+    @Inject(method = "onGameJoin", at = @At("TAIL"))
+    private void onJoinGame(GameJoinS2CPacket packet, CallbackInfo ci) {
+        eventBus.post(new ServerJoinEvent());
+    }
 }

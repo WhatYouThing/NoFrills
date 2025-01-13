@@ -4,12 +4,11 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
-import nofrills.events.ObjectiveUpdateEvent;
-import nofrills.events.ScoreboardUpdateEvent;
-import nofrills.events.TabListUpdateEvent;
+import nofrills.events.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
@@ -36,9 +35,11 @@ public class SkyblockData {
             new InstanceType("k4", "KUUDRA_FIERY"),
             new InstanceType("k5", "KUUDRA_INFERNAL")
     };
+    private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
     private static String location = "";
     private static String area = "";
     private static boolean inSkyblock = false;
+    private static boolean instanceOver = false;
     private static List<String> lines = new ArrayList<>();
 
     /*
@@ -57,6 +58,10 @@ public class SkyblockData {
 
     public static boolean isInSkyblock() {
         return inSkyblock;
+    }
+
+    public static boolean isInstanceOver() {
+        return instanceOver;
     }
 
     /*
@@ -109,6 +114,28 @@ public class SkyblockData {
             }
         }
         lines = currentLines;
+        if (Utils.isInKuudra() && !instanceOver) {
+            Utils.info("instance is over");
+            instanceOver = getLines().stream().anyMatch(line -> line.startsWith("Instance Shutdown"));
+        }
+    }
+
+    @EventHandler
+    public static void onChat(ChatMsgEvent event) {
+        if (Utils.isInDungeons() && !instanceOver) {
+            if (scoreRegex.matcher(event.messagePlain.trim()).matches()) {
+                Utils.info("instance is over");
+                instanceOver = true;
+            }
+        }
+    }
+
+    @EventHandler
+    public static void onJoinServer(ServerJoinEvent event) {
+        if (instanceOver) {
+            Utils.info("reset instance over flag");
+            instanceOver = false;
+        }
     }
 
     public static class InstanceType {

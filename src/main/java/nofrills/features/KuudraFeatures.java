@@ -173,7 +173,7 @@ public class KuudraFeatures {
                     float health = kuudraEntity.getHealth() / kuudraEntity.getMaxHealth();
                     Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health) + "% HP", 1, 25, 2.5f, 0xffff00);
                 }
-                if (Config.kuudraDPS && phase == kuudraPhases.Lair && !Utils.isInstanceClosing()) {
+                if (Config.kuudraDPS && phase == kuudraPhases.Lair && !Utils.isInstanceOver()) {
                     float health = calculateHealth(kuudraEntity.getHealth());
                     float damage = Math.clamp(previousHealth - health, 0, 240_000_000);
                     dpsData.add(damage);

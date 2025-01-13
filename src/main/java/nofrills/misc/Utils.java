@@ -4,12 +4,15 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
@@ -17,6 +20,7 @@ import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -171,12 +175,30 @@ public class Utils {
         return isInZone(Symbols.zone + " The Garden", true) || isOnGardenPlot();
     }
 
-    public static boolean isInstanceClosing() {
-        return SkyblockData.getLines().stream().anyMatch(line -> line.startsWith("Instance Shutdown"));
+    public static boolean isInstanceOver() {
+        return SkyblockData.isInstanceOver();
     }
 
     public static boolean isInSkyblock() {
         return SkyblockData.isInSkyblock();
+    }
+
+    /**
+     * Checks if a PlayerEntity is a real player, and not an enemy or NPC. Some NPCs might falsely return true for a few seconds after spawning.
+     */
+    public static boolean isPlayer(PlayerEntity entity) {
+        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+        if (handler != null) {
+            PlayerListEntry listEntry = handler.getPlayerListEntry(entity.getUuid());
+            if (listEntry != null) {
+                Text displayName = listEntry.getDisplayName();
+                if (displayName != null) {
+                    String name = Formatting.strip(displayName.getString());
+                    return !name.contains(" ");
+                }
+            }
+        }
+        return false;
     }
 
     private static String[] getVersionNumber(String version) {

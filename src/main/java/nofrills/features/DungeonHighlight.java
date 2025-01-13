@@ -33,13 +33,13 @@ public class DungeonHighlight {
             case SkeletonEntity ignored -> true;
             case EndermanEntity ignored -> true;
             case WitherSkeletonEntity ignored -> true;
-            case PlayerEntity ignored -> true;
+            case PlayerEntity player -> !Utils.isPlayer(player);
             default -> false;
         };
     }
 
     private static void renderOutline(Entity entity, RenderColor color) {
-        List<Entity> otherEntities = Utils.getNearbyEntities(entity, 0.6, 2, 0.6, DungeonHighlight::isDungeonMob);
+        List<Entity> otherEntities = Utils.getNearbyEntities(entity, 0.7, 2, 0.7, DungeonHighlight::isDungeonMob);
         if (!otherEntities.isEmpty()) {
             Entity closest = Utils.findNametagOwner(entity, otherEntities);
             if (closest != null) {

@@ -18,7 +18,6 @@ import nofrills.misc.Utils;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -60,13 +59,13 @@ public class SlayerFeatures {
     private static final RenderColor crystalColor = RenderColor.fromHex(0x00ffff);
     private static final RenderColor defaultColor = RenderColor.fromHex(0x00ffff);
     private static final RenderColor hitsColor = RenderColor.fromHex(0xff55ff);
-    private static final RenderColor steakColor = RenderColor.fromHex(0xff2500);
-    private static final RenderColor yanDevColor = RenderColor.fromHex(0xff0000, 0.67f);
+    private static final RenderColor steakColor = RenderColor.fromHex(0xaf00ff);
     private static final DecimalFormat killTimeFormat = new DecimalFormat("0.##");
     private static final List<Entity> yanDevData = new ArrayList<>();
     private static final List<Vec3d> pillarData = new ArrayList<>();
     private static int pillarClearTicks = -1;
     private static CurrentBoss currentBoss = null;
+    private static CurrentBoss currentBossPartial = null;
     private static int bossAliveTicks = 0;
     private static boolean springsActive = false;
 
@@ -118,36 +117,8 @@ public class SlayerFeatures {
                     for (String line : SkyblockData.getLines()) {
                         if (line.startsWith(boss.scoreboardName)) {
                             String playerName = mc.player.getName().getString(); // should work while nicked
-                            if (event.namePlain.equals("Spawned by: " + playerName)) {
-                                List<Entity> otherEntities = getNearby(event.entity, boss.entityTypes);
-                                Entity nameEnt = null;
-                                Entity statusEnt = null;
-                                Entity bossEnt = null;
-                                for (Entity ent : otherEntities) {
-                                    if (ent.hasCustomName()) {
-                                        String name = Formatting.strip(ent.getCustomName().getString());
-                                        if (bossTimerRegex.matcher(name).matches()) {
-                                            statusEnt = ent;
-                                        } else {
-                                            for (String entName : boss.entityNames) {
-                                                if (name.contains(entName)) {
-                                                    nameEnt = ent;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        for (EntityType<?> type : boss.entityTypes) {
-                                            if (ent.getType() == type) {
-                                                bossEnt = Utils.findNametagOwner(event.entity, otherEntities);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                if (nameEnt != null && statusEnt != null && bossEnt != null) {
-                                    currentBoss = new CurrentBoss(boss, nameEnt, statusEnt, event.entity, bossEnt);
-                                }
+                            if (event.namePlain.equals("Spawned by: " + playerName) && currentBossPartial == null) {
+                                currentBossPartial = new CurrentBoss(boss, null, null, event.entity, null);
                             }
                         }
                     }
@@ -193,6 +164,41 @@ public class SlayerFeatures {
 
     @EventHandler
     public static void onTick(WorldTickEvent event) {
+        if (currentBoss == null && currentBossPartial != null) {
+            SlayerBoss boss = currentBossPartial.bossData;
+            List<Entity> otherEntities = getNearby(currentBossPartial.spawnerEntity, boss.entityTypes);
+            if (otherEntities.size() != 4) { // ensures that there are no other entities/bosses near our own boss to correctly locate it
+                Entity nameEnt = null;
+                Entity statusEnt = null;
+                Entity bossEnt = null;
+                for (Entity ent : otherEntities) {
+                    if (ent.hasCustomName()) {
+                        String name = Formatting.strip(ent.getCustomName().getString());
+                        if (bossTimerRegex.matcher(name).matches()) {
+                            statusEnt = ent;
+                        } else {
+                            for (String entName : boss.entityNames) {
+                                if (name.contains(entName)) {
+                                    nameEnt = ent;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        for (EntityType<?> type : boss.entityTypes) {
+                            if (ent.getType() == type) {
+                                bossEnt = Utils.findNametagOwner(currentBossPartial.spawnerEntity, otherEntities);
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (nameEnt != null && statusEnt != null && bossEnt != null) {
+                    currentBoss = new CurrentBoss(boss, nameEnt, statusEnt, currentBossPartial.spawnerEntity, bossEnt);
+                    currentBossPartial = null;
+                }
+            }
+        }
         if (!SkyblockData.getLines().contains("Slay the boss!") && currentBoss != null) { // runs when boss is killed or if we fail the slayer quest
             currentBoss = null;
             yanDevData.clear();
@@ -320,22 +326,15 @@ public class SlayerFeatures {
     public static void onRender(WorldRenderEvent event) {
         if (currentBoss != null) {
             if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice) {
-                Iterator<Entity> iterator = yanDevData.iterator();
-                while (iterator.hasNext()) {
-                    Entity ent = iterator.next();
-                    if (!ent.isAlive()) {
-                        iterator.remove();
+                List<Entity> entities = new ArrayList<>(yanDevData);
+                for (Entity ent : entities) {
+                    if (ent.isAlive()) {
+                        BlockPos blockPos = Utils.findGround(ent.getBlockPos(), 4);
+                        Vec3d pos = ent.getPos();
+                        Vec3d posAdjust = new Vec3d(pos.x, blockPos.up(1).getY() + 0.5, pos.z);
+                        Rendering.drawFilled(event.matrices, event.consumer, event.camera, Box.of(posAdjust, 1, 1.25, 1), true, RenderColor.fromColor(Config.vampChaliceColor));
                     } else {
-                        BlockPos blockPos = ent.getBlockPos();
-                        for (int i = 0; i <= 4; i++) {
-                            BlockPos below = blockPos.down(i);
-                            if (!mc.world.getBlockState(below).isAir()) {
-                                Vec3d pos = ent.getPos();
-                                Vec3d posAdjust = new Vec3d(pos.x, below.up(1).getY() + 0.5, pos.z);
-                                Rendering.drawFilled(event.matrices, event.consumer, event.camera, Box.of(posAdjust, 1, 1.25, 1), true, yanDevColor);
-                                break;
-                            }
-                        }
+                        yanDevData.remove(ent);
                     }
                 }
             }

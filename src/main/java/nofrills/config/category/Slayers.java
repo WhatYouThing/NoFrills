@@ -4,8 +4,11 @@ import dev.isxander.yacl3.api.ConfigCategory;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.OptionDescription;
 import dev.isxander.yacl3.api.OptionGroup;
+import dev.isxander.yacl3.api.controller.ColorControllerBuilder;
 import net.minecraft.text.Text;
 import nofrills.config.Config;
+
+import java.awt.*;
 
 public class Slayers {
     public static ConfigCategory create(Config defaults, Config config) {
@@ -69,6 +72,14 @@ public class Slayers {
                                 .description(OptionDescription.of(Text.of("Draws a bright red box over the stupid Blood Ichor chalice, so that you can actually see it once your boss spawns one.")))
                                 .binding(false, () -> Config.vampChalice, value -> Config.vampChalice = value)
                                 .controller(Config::booleanController)
+                                .build())
+                        .option(Option.<Color>createBuilder()
+                                .name(Text.of("Ichor Highlight Color"))
+                                .description(OptionDescription.of(Text.of("The color used for the Blood Ichor chalice highlight.")))
+                                .binding(new Color(175, 0, 255, 170),
+                                        () -> Config.vampChaliceColor,
+                                        value -> Config.vampChaliceColor = value)
+                                .controller(v -> ColorControllerBuilder.create(v).allowAlpha(true))
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Silence Mania"))

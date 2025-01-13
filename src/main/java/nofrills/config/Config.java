@@ -225,6 +225,8 @@ public class Config {
     @SerialEntry
     public static boolean vampChalice = false;
     @SerialEntry
+    public static Color vampChaliceColor = new Color(175, 0, 255, 170);
+    @SerialEntry
     public static boolean vampManiaSilence = false;
     @SerialEntry
     public static boolean vampManiaReplace = false;
@@ -282,12 +284,5 @@ public class Config {
         Automatic,
         Manual,
         Ignore
-    }
-
-    public enum mobRenderTypes {
-        None,
-        Outline,
-        Filled,
-        Both
     }
 }

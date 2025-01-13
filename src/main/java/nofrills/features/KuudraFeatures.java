@@ -7,6 +7,7 @@ import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
@@ -173,7 +174,7 @@ public class KuudraFeatures {
                     float health = kuudraEntity.getHealth() / kuudraEntity.getMaxHealth();
                     Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health) + "% HP", 1, 25, 2.5f, 0xffff00);
                 }
-                if (Config.kuudraDPS && phase == kuudraPhases.Lair && !Utils.isInstanceClosing()) {
+                if (Config.kuudraDPS && phase == kuudraPhases.Lair && !Utils.isInstanceOver()) {
                     float health = calculateHealth(kuudraEntity.getHealth());
                     float damage = Math.clamp(previousHealth - health, 0, 240_000_000);
                     dpsData.add(damage);
@@ -184,11 +185,6 @@ public class KuudraFeatures {
                     previousHealth = health;
                 }
             }
-        } else {
-            freshTicks = 0;
-            kuudraEntity = null;
-            missingTicks = 20;
-            previousHealth = 0.0f;
         }
     }
 
@@ -229,6 +225,14 @@ public class KuudraFeatures {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public static void onJoin(ServerJoinEvent event) {
+        freshTicks = 0;
+        kuudraEntity = null;
+        missingTicks = 20;
+        previousHealth = 0.0f;
     }
 
     private enum kuudraPhases {

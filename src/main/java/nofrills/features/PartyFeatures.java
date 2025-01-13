@@ -105,7 +105,7 @@ public class PartyFeatures {
     public static void onTick(WorldTickEvent event) {
         if (downtimeNeeded) {
             if (Utils.isInDungeons() || Utils.isInKuudra()) {
-                if (Utils.isInstanceClosing()) {
+                if (Utils.isInstanceOver()) {
                     Utils.showTitle("§6§lDOWNTIME", "", 5, 80, 5);
                     downtimeNeeded = false;
                 }

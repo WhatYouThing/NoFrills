@@ -23,7 +23,7 @@ public final class Rendering {
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
         }
         VertexConsumer buffer = throughWalls ? consumer.getBuffer(Layers.BoxFilledNoCull) : consumer.getBuffer(Layers.BoxFilled);
-        WorldRenderer.renderFilledBox(matrices, buffer, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color.r, color.g, color.b, color.a);
+        VertexRendering.drawFilledBox(matrices, buffer, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color.r, color.g, color.b, color.a);
         if (throughWalls) {
             RenderSystem.disableDepthTest();
             RenderSystem.depthFunc(GL11.GL_LEQUAL);
@@ -43,7 +43,7 @@ public final class Rendering {
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
         }
         VertexConsumer buffer = throughWalls ? consumer.getBuffer(Layers.BoxOutlineNoCull) : consumer.getBuffer(Layers.BoxOutline);
-        WorldRenderer.drawBox(matrices, buffer, box, color.r, color.g, color.b, color.a);
+        VertexRendering.drawBox(matrices, buffer, box, color.r, color.g, color.b, color.a);
         if (throughWalls) {
             RenderSystem.disableDepthTest();
             RenderSystem.depthFunc(GL11.GL_LEQUAL);
@@ -104,7 +104,7 @@ public final class Rendering {
                 false,
                 true,
                 RenderLayer.MultiPhaseParameters.builder()
-                        .program(RenderPhase.COLOR_PROGRAM)
+                        .program(RenderPhase.POSITION_COLOR_PROGRAM)
                         .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
                         .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
                         .build(false));
@@ -116,7 +116,7 @@ public final class Rendering {
                 false,
                 true,
                 RenderLayer.MultiPhaseParameters.builder()
-                        .program(RenderPhase.COLOR_PROGRAM)
+                        .program(RenderPhase.POSITION_COLOR_PROGRAM)
                         .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
                         .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
                         .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)

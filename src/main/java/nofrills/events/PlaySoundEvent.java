@@ -15,6 +15,6 @@ public class PlaySoundEvent extends Cancellable {
      * Returns true if the SoundEvent from the packet matches the provided SoundEvent.
      */
     public boolean isSound(SoundEvent sound) {
-        return packet.getSound().value().getId().equals(sound.getId());
+        return packet.getSound().value().id().equals(sound.id());
     }
 }

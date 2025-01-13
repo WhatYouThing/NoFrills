@@ -2,6 +2,7 @@ package nofrills.mixin;
 
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.BufferAllocator;
+import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import nofrills.events.WorldRenderEvent;
 import org.joml.Matrix4f;
@@ -24,7 +25,7 @@ public abstract class WorldRendererMixin {
     // the compiler sometimes claims that the inject target wasn't found, but it works fine regardless
     @SuppressWarnings("mapping")
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4fStack;popMatrix()Lorg/joml/Matrix4fStack;"))
-    private void onRenderWorld(RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, Matrix4f matrix4f2, CallbackInfo ci) {
+    private void onRenderWorld(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
         eventBus.post(new WorldRenderEvent(immediate, tickCounter, camera, new MatrixStack()));
         immediate.draw();
     }

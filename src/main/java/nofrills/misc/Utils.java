@@ -198,7 +198,7 @@ public class Utils {
                 }
             }
         }
-        return false;
+        return entity == mc.player;
     }
 
     private static String[] getVersionNumber(String version) {

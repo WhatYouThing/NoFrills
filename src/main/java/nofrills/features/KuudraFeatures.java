@@ -7,6 +7,7 @@ import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
@@ -184,11 +185,6 @@ public class KuudraFeatures {
                     previousHealth = health;
                 }
             }
-        } else {
-            freshTicks = 0;
-            kuudraEntity = null;
-            missingTicks = 20;
-            previousHealth = 0.0f;
         }
     }
 
@@ -229,6 +225,14 @@ public class KuudraFeatures {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public static void onJoin(ServerJoinEvent event) {
+        freshTicks = 0;
+        kuudraEntity = null;
+        missingTicks = 20;
+        previousHealth = 0.0f;
     }
 
     private enum kuudraPhases {

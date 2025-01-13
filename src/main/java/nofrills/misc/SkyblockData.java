@@ -115,7 +115,6 @@ public class SkyblockData {
         }
         lines = currentLines;
         if (Utils.isInKuudra() && !instanceOver) {
-            Utils.info("instance is over");
             instanceOver = getLines().stream().anyMatch(line -> line.startsWith("Instance Shutdown"));
         }
     }
@@ -124,7 +123,6 @@ public class SkyblockData {
     public static void onChat(ChatMsgEvent event) {
         if (Utils.isInDungeons() && !instanceOver) {
             if (scoreRegex.matcher(event.messagePlain.trim()).matches()) {
-                Utils.info("instance is over");
                 instanceOver = true;
             }
         }
@@ -133,7 +131,6 @@ public class SkyblockData {
     @EventHandler
     public static void onJoinServer(ServerJoinEvent event) {
         if (instanceOver) {
-            Utils.info("reset instance over flag");
             instanceOver = false;
         }
     }

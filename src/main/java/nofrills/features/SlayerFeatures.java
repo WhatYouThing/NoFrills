@@ -61,7 +61,6 @@ public class SlayerFeatures {
     private static final RenderColor defaultColor = RenderColor.fromHex(0x00ffff);
     private static final RenderColor hitsColor = RenderColor.fromHex(0xff55ff);
     private static final RenderColor steakColor = RenderColor.fromHex(0xff2500);
-    private static final RenderColor yanDevColor = RenderColor.fromHex(0xff0000, 0.67f);
     private static final DecimalFormat killTimeFormat = new DecimalFormat("0.##");
     private static final List<Entity> yanDevData = new ArrayList<>();
     private static final List<Vec3d> pillarData = new ArrayList<>();
@@ -332,7 +331,7 @@ public class SlayerFeatures {
                             if (!mc.world.getBlockState(below).isAir()) {
                                 Vec3d pos = ent.getPos();
                                 Vec3d posAdjust = new Vec3d(pos.x, below.up(1).getY() + 0.5, pos.z);
-                                Rendering.drawFilled(event.matrices, event.consumer, event.camera, Box.of(posAdjust, 1, 1.25, 1), true, yanDevColor);
+                                Rendering.drawFilled(event.matrices, event.consumer, event.camera, Box.of(posAdjust, 1, 1.25, 1), true, RenderColor.fromColor(Config.vampChaliceColor));
                                 break;
                             }
                         }

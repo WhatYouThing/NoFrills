@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -203,7 +204,7 @@ public class Utils {
     }
 
     /**
-     * Tries to find ground (any block that isn't air) below the specified BlockPos, and returns the BlockPos of that block if is found. Otherwise, returns the same BlockPos.
+     * Tries to find ground (any block that isn't air) below the specified BlockPos, and returns the BlockPos of that block if found. Otherwise, returns the same BlockPos.
      *
      * @param maxDistance The maximum downward Y distance the check will travel
      */
@@ -329,11 +330,11 @@ public class Utils {
     }
 
     /**
-     * Checks if the provided ItemStack has a glint. Ignores the default glint override flag to work correctly with items such as Nether Stars.
+     * Checks if the provided ItemStack has a glint override flag. Ignores the default flag to work correctly with items such as Nether Stars.
      */
-    @SuppressWarnings("optional")
     public static boolean hasGlint(ItemStack stack) {
-        return stack.getComponentChanges().get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE) != null;
+        Optional<? extends Boolean> component = stack.getComponentChanges().get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE);
+        return component != null && component.isPresent();
     }
 
     public static class Symbols {

@@ -69,7 +69,7 @@ public class Slayers {
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Ichor Highlight"))
-                                .description(OptionDescription.of(Text.of("Draws a bright red box over the stupid Blood Ichor chalice, so that you can actually see it once your boss spawns one.")))
+                                .description(OptionDescription.of(Text.of("Draws a highlight over the stupid Blood Ichor chalices, so that you can actually see it once your boss spawns one.")))
                                 .binding(false, () -> Config.vampChalice, value -> Config.vampChalice = value)
                                 .controller(Config::booleanController)
                                 .build())

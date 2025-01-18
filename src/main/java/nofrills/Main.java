@@ -64,6 +64,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(GlowingShroomHighlight.class);
         eventBus.subscribe(SkyblockData.class);
         eventBus.subscribe(RecipeLookup.class);
+        eventBus.subscribe(MiningFeatures.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

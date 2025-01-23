@@ -77,7 +77,7 @@ public class PartyFeatures {
                         }
                     }
                     if (Config.partyCmdDowntime && command.startsWith("dt")) {
-                        if (Utils.isInDungeons() || Utils.isInKuudra()) {
+                        if (!Utils.isInstanceOver() && (Utils.isInDungeons() || Utils.isInKuudra())) {
                             Utils.info("§aScheduled downtime reminder for §6" + event.sender + "§a.");
                             downtimeNeeded = true;
                         } else {

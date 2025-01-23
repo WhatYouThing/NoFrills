@@ -200,6 +200,8 @@ public class Config {
     public static boolean templeLocator = false;
     @SerialEntry
     public static boolean ghostVision = false;
+    @SerialEntry
+    public static boolean betterSkymall = false;
 
     // Farming
 

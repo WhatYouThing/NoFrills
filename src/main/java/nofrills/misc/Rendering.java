@@ -1,14 +1,19 @@
 package nofrills.misc;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.OptionalDouble;
+
+import static nofrills.Main.mc;
 
 public final class Rendering {
     /**
@@ -49,6 +54,29 @@ public final class Rendering {
             RenderSystem.depthFunc(GL11.GL_LEQUAL);
         }
         matrices.pop();
+    }
+
+    /**
+     * Draws text within the world for the current frame. Automatically performs the required matrix stack translation.
+     */
+    public static void drawText(VertexConsumerProvider.Immediate consumer, Camera camera, Vec3d pos, Text text, float scale, boolean throughWalls, RenderColor color) {
+        Matrix4f matrices = new Matrix4f();
+        Vec3d camPos = camera.getPos();
+        float textX = (float) (pos.getX() - camPos.getX());
+        float textY = (float) (pos.getY() - camPos.getY());
+        float textZ = (float) (pos.getZ() - camPos.getZ());
+        matrices.translate(textX, textY, textZ);
+        matrices.rotate(camera.getRotation());
+        matrices.scale(scale, -scale, scale);
+        if (throughWalls) {
+            RenderSystem.enableDepthTest();
+            RenderSystem.depthFunc(GL11.GL_ALWAYS);
+        }
+        mc.textRenderer.draw(text, -mc.textRenderer.getWidth(text) / 2f, 1.0f, color.hex, false, matrices, consumer, throughWalls ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        if (throughWalls) {
+            RenderSystem.disableDepthTest();
+            RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        }
     }
 
     public static class Entities {

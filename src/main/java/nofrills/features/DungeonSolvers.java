@@ -9,6 +9,7 @@ import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
 import nofrills.config.Config;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenSlotUpdateEvent;
@@ -30,6 +31,7 @@ public class DungeonSolvers {
             Items.RED_STAINED_GLASS_PANE,
             Items.BLUE_STAINED_GLASS_PANE,
     };
+    private static final List<ArrowAlignPart> arrowAlignSteps = new ArrayList<>();
     public static boolean isInTerminal = false;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
@@ -48,6 +50,21 @@ public class DungeonSolvers {
             case BROWN -> item.equals(Items.COCOA_BEANS);
             case WHITE -> item.equals(Items.BONE_MEAL);
             default -> false;
+        };
+    }
+
+    // for WIP arrow align solver
+    public static BlockPos applyRotationOffset(BlockPos pos, int rotation) {
+        return switch (rotation) {
+            case 0 -> pos.add(0, 1, -1);
+            case 1 -> pos.add(0, 0, -1);
+            case 2 -> pos.add(0, -1, -1);
+            case 3 -> pos.add(0, -1, 0);
+            case 4 -> pos.add(0, -1, 1);
+            case 5 -> pos.add(0, 0, 1);
+            case 6 -> pos.add(0, 1, 1);
+            case 7 -> pos.add(0, 1, 0);
+            default -> pos;
         };
     }
 
@@ -149,6 +166,16 @@ public class DungeonSolvers {
                     Utils.setDisabled(event.screen, second, true);
                 }
             }
+        }
+    }
+
+    static class ArrowAlignPart {
+        public BlockPos pos;
+        public int clicks;
+
+        public ArrowAlignPart(BlockPos pos, int clicks) {
+            this.pos = pos;
+            this.clicks = clicks;
         }
     }
 }

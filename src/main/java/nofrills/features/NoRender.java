@@ -2,14 +2,17 @@ package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.EntityType;
+import net.minecraft.particle.ParticleType;
+import net.minecraft.particle.ParticleTypes;
 import nofrills.config.Config;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.SpawnParticleEvent;
 
 import java.util.regex.Pattern;
 
 import static nofrills.misc.Utils.Symbols;
 
-public class HideDeadMobs {
+public class NoRender {
     private static final Pattern[] deadPatterns = {
             Pattern.compile(".* 0" + Symbols.heart),
             Pattern.compile(".* 0/.*" + Symbols.heart),
@@ -24,6 +27,16 @@ public class HideDeadMobs {
                     event.entity.setCustomNameVisible(false);
                     return;
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    public static void onParticle(SpawnParticleEvent event) {
+        if (Config.noExplosions) {
+            ParticleType<?> particle = event.packet.getParameters().getType();
+            if (particle == ParticleTypes.EXPLOSION || particle == ParticleTypes.EXPLOSION_EMITTER) {
+                event.cancel();
             }
         }
     }

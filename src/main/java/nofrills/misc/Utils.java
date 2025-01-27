@@ -34,11 +34,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static nofrills.Main.*;
 
@@ -217,6 +219,17 @@ public class Utils {
             }
         }
         return pos;
+    }
+
+    /**
+     * Makes the 1st letter of each word in the string uppercase.
+     *
+     * @param replaceUnderscores if true, automatically replace all underscores with spaces
+     */
+    public static String uppercaseFirst(String text, boolean replaceUnderscores) {
+        return Arrays.stream(replaceUnderscores ? text.replaceAll("_", " ").split("\\s") : text.split("\\s"))
+                .map(word -> Character.toTitleCase(word.charAt(0)) + word.substring(1))
+                .collect(Collectors.joining(" ")).trim();
     }
 
     private static String[] getVersionNumber(String version) {

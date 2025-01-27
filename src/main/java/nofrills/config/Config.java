@@ -40,6 +40,8 @@ public class Config {
     @SerialEntry
     public static boolean wardrobeHotkeysSound = false;
     @SerialEntry
+    public static boolean priceTooltips = false;
+    @SerialEntry
     public static boolean hotbarSwap = false;
     @SerialEntry
     public static int hotbarSwapOverride = 8;
@@ -48,9 +50,11 @@ public class Config {
     @SerialEntry
     public static boolean hideDeadMobs = false;
     @SerialEntry
-    public static boolean oldSkins = false;
-    @SerialEntry
     public static boolean keepChunks = false;
+    @SerialEntry
+    public static boolean noExplosions = false;
+    @SerialEntry
+    public static boolean noFireOverlay = false;
     @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry

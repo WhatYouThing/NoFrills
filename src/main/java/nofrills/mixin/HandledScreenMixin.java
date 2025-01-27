@@ -1,8 +1,5 @@
 package nofrills.mixin;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -10,14 +7,13 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import nofrills.config.Config;
+import nofrills.events.DrawItemTooltip;
 import nofrills.features.DungeonSolvers;
-import nofrills.misc.NoFrillsApi;
 import nofrills.misc.ScreenOptions;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -32,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static nofrills.Main.eventBus;
 import static nofrills.misc.Utils.DisabledSlot;
 import static nofrills.misc.Utils.SpoofedSlot;
 
@@ -121,38 +118,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;getTooltipFromItem(Lnet/minecraft/item/ItemStack;)Ljava/util/List;"))
     private List<Text> onGetTooltipFromItem(List<Text> original) {
-        JsonObject prices = NoFrillsApi.getItemPricing();
-        if (prices != null && focusedSlot != null) {
+        if (Config.priceTooltips && focusedSlot != null) {
             ItemStack stack = focusedSlot.getStack();
             NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
             if (!stack.isEmpty() && component != null) {
-                NbtCompound data = component.copyNbt();
-                String itemId = data.getString("id");
-                if (itemId.equals("PET")) {
-                    JsonObject petData = JsonParser.parseString(data.getString("petInfo")).getAsJsonObject();
-                    itemId = petData.get("type").getAsString() + "_PET_" + petData.get("tier").getAsString();
-                }
-                if (itemId.equals("RUNE")) {
-                    NbtCompound runeData = data.getCompound("runes");
-                    String runeId = (String) runeData.getKeys().toArray()[0];
-                    int runeLevel = runeData.getInt(runeId);
-                    itemId = runeId + "_" + runeLevel + "_RUNE";
-                }
-                JsonObject auctionPrices = prices.get("auction").getAsJsonObject();
-                if (auctionPrices.has(itemId)) {
-                    Text text = Text.of("§c[NF] §eLowest BIN: §6" + auctionPrices.get(itemId).getAsDouble());
-                    original.add(text);
-                    return original;
-                }
-                JsonObject bazaarPrices = prices.get("bazaar").getAsJsonObject();
-                if (bazaarPrices.has(itemId)) {
-                    JsonArray bzPrices = bazaarPrices.get(itemId).getAsJsonArray();
-                    Text buyText = Text.of("§c[NF] §eLowest BZ Insta-buy: §6" + bzPrices.get(0).getAsDouble());
-                    Text sellText = Text.of("§c[NF] §eLowest BZ Insta-sell: §6" + bzPrices.get(1).getAsDouble());
-                    original.add(buyText);
-                    original.add(sellText);
-                    return original;
-                }
+                eventBus.post(new DrawItemTooltip(original, stack, component.copyNbt()));
             }
         }
         return original;

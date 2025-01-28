@@ -67,6 +67,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(RecipeLookup.class);
         eventBus.subscribe(MiningFeatures.class);
         eventBus.subscribe(NoFrillsAPI.class);
+        eventBus.subscribe(NoFrills.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

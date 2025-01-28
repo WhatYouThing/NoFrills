@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import static nofrills.Main.LOGGER;
-import static nofrills.misc.Utils.info;
 
 public class NoFrillsAPI {
     private static final String[] kuudraPieceTypes = new String[]{"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS"};
@@ -73,7 +72,6 @@ public class NoFrillsAPI {
                 bazaarPrices = JsonParser.parseString(responseJson.get("bazaar").getAsString()).getAsJsonObject();
                 attributePrices = JsonParser.parseString(responseJson.get("attribute").getAsString()).getAsJsonObject();
             } catch (IOException e) {
-                info("§cAn error occurred while refreshing the item pricing. Additional information can be found in the log.");
                 StringBuilder trace = new StringBuilder();
                 for (StackTraceElement element : e.getStackTrace()) {
                     trace.append("\n\tat ").append(element.toString());
@@ -85,7 +83,7 @@ public class NoFrillsAPI {
 
     @EventHandler
     public static void onTick(WorldTickEvent event) {
-        if (Config.priceTooltips) {
+        if (Config.priceTooltips && Utils.isInSkyblock()) {
             if (pricingRefreshTicks == 0) {
                 refreshItemPricing();
                 pricingRefreshTicks = 1200;
@@ -202,7 +200,7 @@ public class NoFrillsAPI {
             }
         }
         JsonObject bazaarPrices = NoFrillsAPI.getBazaarPrices();
-        if (auctionPrices != null && bazaarPrices.has(itemId)) {
+        if (bazaarPrices != null && bazaarPrices.has(itemId)) {
             JsonArray bzPrices = bazaarPrices.get(itemId).getAsJsonArray();
             long buyPrice = bzPrices.get(0).getAsLong();
             long sellPrice = bzPrices.get(1).getAsLong();

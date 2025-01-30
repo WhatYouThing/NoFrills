@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.util.Util;
 import nofrills.commands.NoFrills;
 import nofrills.commands.Yeet;
 import nofrills.config.Config;
@@ -36,7 +37,7 @@ public class Main implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("It's time to get real, NoFrills mod initialized.");
+        long start = Util.getMeasuringTimeMs();
 
         mc = MinecraftClient.getInstance();
 
@@ -67,11 +68,12 @@ public class Main implements ModInitializer {
         eventBus.subscribe(RecipeLookup.class);
         eventBus.subscribe(MiningFeatures.class);
         eventBus.subscribe(NoFrillsAPI.class);
-        eventBus.subscribe(NoFrills.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 
         KeyBindingHelper.registerKeyBinding(Keybinds.getPearls);
         KeyBindingHelper.registerKeyBinding(Keybinds.recipeLookup);
+
+        LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }
 }

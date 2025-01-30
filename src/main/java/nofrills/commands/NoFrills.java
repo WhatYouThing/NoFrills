@@ -3,13 +3,8 @@ package nofrills.commands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
-import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
-import net.minecraft.util.Util;
 import nofrills.config.Config;
-import nofrills.events.ReceivePacketEvent;
 import nofrills.features.PearlRefill;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -22,7 +17,6 @@ import static nofrills.misc.SkyblockData.instances;
 
 public class NoFrills {
     private static final LiteralArgumentBuilder<FabricClientCommandSource> queueCommandBuilder = literal("queue").executes(context -> SINGLE_SUCCESS);
-    private static boolean hasPinged = false;
 
     public static final ModCommand[] commands = {
             new ModCommand("settings", "Opens the settings GUI.", literal("settings").executes(context -> {
@@ -193,8 +187,7 @@ public class NoFrills {
             })),
             new ModCommand("ping", "Checks your current ping.", literal("ping").executes(context -> {
                 Utils.info("§7Pinging...");
-                hasPinged = true;
-                mc.getNetworkHandler().sendPacket(new QueryPingC2SPacket(Util.getMeasuringTimeMs()));
+                SkyblockData.showPing();
                 return SINGLE_SUCCESS;
             }))
     };
@@ -229,14 +222,6 @@ public class NoFrills {
         }
         dispatcher.register(commandMain);
         dispatcher.register(commandShort);
-    }
-
-    @EventHandler
-    public static void onPing(ReceivePacketEvent event) {
-        if (hasPinged && event.packet instanceof PingResultS2CPacket pingPacket) {
-            Utils.info("§aPing: " + (Util.getMeasuringTimeMs() - pingPacket.startTime()) + "ms");
-            hasPinged = false;
-        }
     }
 
     public static class ModCommand {

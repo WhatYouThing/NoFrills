@@ -159,6 +159,8 @@ public class Config {
     // Dungeons
 
     @SerialEntry
+    public static String dungeonClass = "Berserk"; // this stores the user's last selected/known Dungeon class, not for use with config screens
+    @SerialEntry
     public static boolean starredMobHighlight = false;
     @SerialEntry
     public static Color starredMobColor = new Color(0, 255, 255, 255);
@@ -167,11 +169,21 @@ public class Config {
     @SerialEntry
     public static Color miniColor = new Color(255, 255, 0, 255);
     @SerialEntry
+    public static boolean keyHighlight = false;
+    @SerialEntry
+    public static Color keyColor = new Color(0, 255, 0, 85);
+    @SerialEntry
+    public static boolean spiritHighlight = false;
+    @SerialEntry
+    public static Color spiritColor = new Color(175, 0, 255, 170);
+    @SerialEntry
     public static boolean solveTerminals = false;
     @SerialEntry
     public static boolean melodyAnnounce = false;
     @SerialEntry
     public static String melodyMessage = "/pc Melody";
+    @SerialEntry
+    public static boolean wishReminder = false;
 
     // Kuudra
 

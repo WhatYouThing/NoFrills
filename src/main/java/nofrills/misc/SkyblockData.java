@@ -1,9 +1,13 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
+import nofrills.config.Config;
 import nofrills.events.*;
 
 import java.util.ArrayList;
@@ -35,12 +39,20 @@ public class SkyblockData {
             new InstanceType("k4", "KUUDRA_FIERY"),
             new InstanceType("k5", "KUUDRA_INFERNAL")
     };
+    private static final String[] dungeonClasses = {
+            "Healer",
+            "Mage",
+            "Berserk",
+            "Archer",
+            "Tank"
+    };
     private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
     private static String location = "";
     private static String area = "";
     private static boolean inSkyblock = false;
     private static boolean instanceOver = false;
     private static List<String> lines = new ArrayList<>();
+    private static boolean showPing = false;
 
     /*
         Returns the current location from the scoreboard, such as "⏣ Your Island". The location prefix is not omitted.
@@ -69,6 +81,11 @@ public class SkyblockData {
     */
     public static List<String> getLines() {
         return new ArrayList<>(lines); // return a copy to avoid a potential concurrent modification exception
+    }
+
+    public static void showPing() {
+        showPing = true;
+        mc.getNetworkHandler().sendPacket(new QueryPingC2SPacket(Util.getMeasuringTimeMs()));
     }
 
     @EventHandler
@@ -126,12 +143,30 @@ public class SkyblockData {
                 instanceOver = true;
             }
         }
+        String msg = event.messagePlain;
+        for (String dungeonClass : dungeonClasses) {
+            boolean isClassChanged = (msg.startsWith("[" + dungeonClass + "]") && msg.contains("->")) ||
+                    msg.equals(mc.player.getName().getString() + " selected the " + dungeonClass + " Class!") ||
+                    msg.equals("You have selected the " + dungeonClass + " Dungeon Class!");
+            if (isClassChanged) {
+                Config.dungeonClass = dungeonClass;
+                break;
+            }
+        }
     }
 
     @EventHandler
     public static void onJoinServer(ServerJoinEvent event) {
         if (instanceOver) {
             instanceOver = false;
+        }
+    }
+
+    @EventHandler
+    public static void onPing(ReceivePacketEvent event) {
+        if (showPing && event.packet instanceof PingResultS2CPacket pingPacket) {
+            Utils.info("§aPing: " + (Util.getMeasuringTimeMs() - pingPacket.startTime()) + "ms");
+            showPing = false;
         }
     }
 

@@ -88,7 +88,7 @@ public class PartyFeatures {
                         for (SkyblockData.InstanceType instance : SkyblockData.instances) {
                             if (command.equals(instance.name)) {
                                 if (privilege == Config.partyBehaviorList.Manual) {
-                                    Utils.infoButton("§aClick here to queue for §6" + instance.type + "§a.", "/joininstance " + instance.type);
+                                    Utils.infoButton("§aClick to queue for §6" + Utils.uppercaseFirst(instance.type.toLowerCase(), true) + "§a.", "/joininstance " + instance.type);
                                 } else {
                                     Utils.sendMessage("/joininstance " + instance.type);
                                 }

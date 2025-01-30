@@ -68,6 +68,45 @@ public class Dungeons {
                         .controller(StringControllerBuilder::create)
                         .build())
 
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Key Highlight"))
+                        .description(OptionDescription.of(Text.of("Renders highlights for Wither and Blood keys.")))
+                        .binding(false, () -> Config.keyHighlight, value -> Config.keyHighlight = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Color>createBuilder()
+                        .name(Text.of("Key Highlight Color"))
+                        .description(OptionDescription.of(Text.of("The color used for the key highlight.")))
+                        .binding(new Color(0, 255, 0, 85),
+                                () -> Config.keyColor,
+                                value -> Config.keyColor = value)
+                        .controller(v -> ColorControllerBuilder.create(v).allowAlpha(true))
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Spirit Bow Highlight"))
+                        .description(OptionDescription.of(Text.of("Renders a highlight for the Spirit Bow in the F4/M4 boss fight.")))
+                        .binding(false, () -> Config.spiritHighlight, value -> Config.spiritHighlight = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Color>createBuilder()
+                        .name(Text.of("Spirit Bow Highlight Color"))
+                        .description(OptionDescription.of(Text.of("The color used for the Spirit Bow highlight.")))
+                        .binding(new Color(175, 0, 255, 170),
+                                () -> Config.spiritColor,
+                                value -> Config.spiritColor = value)
+                        .controller(v -> ColorControllerBuilder.create(v).allowAlpha(true))
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Wish Reminder"))
+                        .description(OptionDescription.of(Text.of("Get notified when to use your Wish ultimate while playing as Healer in F7/M7.")))
+                        .binding(false, () -> Config.wishReminder, value -> Config.wishReminder = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .build();
     }
 }

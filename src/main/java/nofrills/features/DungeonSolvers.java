@@ -1,19 +1,23 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.Entity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
-import nofrills.events.ScreenOpenEvent;
-import nofrills.events.ScreenSlotUpdateEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -32,6 +36,8 @@ public class DungeonSolvers {
             Items.BLUE_STAINED_GLASS_PANE,
     };
     private static final List<ArrowAlignPart> arrowAlignSteps = new ArrayList<>();
+    private static final List<Entity> dungeonKeys = new ArrayList<>();
+    private static final List<Entity> spiritBows = new ArrayList<>();
     public static boolean isInTerminal = false;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
@@ -164,6 +170,64 @@ public class DungeonSolvers {
                     Slot second = orderSlots.get(1);
                     Utils.setSpoofed(event.screen, second, secondStack);
                     Utils.setDisabled(event.screen, second, true);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public static void onChat(ChatMsgEvent event) {
+        if (Config.wishReminder && Utils.isInDungeons() && Config.dungeonClass.equals("Healer")) {
+            if (event.messagePlain.equals("⚠ Maxor is enraged! ⚠")) {
+                Utils.showTitle("§a§lWISH!", "", 5, 40, 5);
+                Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+            }
+        }
+    }
+
+    @EventHandler
+    public static void onNamed(EntityNamedEvent event) {
+        if (Utils.isInDungeons()) {
+            if (Config.keyHighlight && !dungeonKeys.contains(event.entity)) {
+                if (event.namePlain.equals("Wither Key") || event.namePlain.equals("Blood Key")) {
+                    dungeonKeys.add(event.entity);
+                }
+            }
+            if (Config.spiritHighlight && !spiritBows.contains(event.entity)) {
+                if (event.namePlain.equals("Spirit Bow")) {
+                    spiritBows.add(event.entity);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public static void onRender(WorldRenderEvent event) {
+        if (Utils.isInDungeons()) {
+            if (!dungeonKeys.isEmpty()) {
+                List<Entity> keys = new ArrayList<>(dungeonKeys);
+                for (Entity ent : keys) {
+                    if (ent.isAlive()) {
+                        BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
+                        Vec3d pos = ent.getPos();
+                        Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
+                        event.drawFilled(Box.of(posAdjust, 1, 1.5, 1), false, RenderColor.fromColor(Config.keyColor));
+                    } else {
+                        dungeonKeys.remove(ent);
+                    }
+                }
+            }
+            if (!spiritBows.isEmpty()) {
+                List<Entity> bows = new ArrayList<>(spiritBows);
+                for (Entity ent : bows) {
+                    if (ent.isAlive()) {
+                        BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
+                        Vec3d pos = ent.getPos();
+                        Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
+                        event.drawFilled(Box.of(posAdjust, 0.8, 1.75, 0.8), true, RenderColor.fromColor(Config.spiritColor));
+                    } else {
+                        spiritBows.remove(ent);
+                    }
                 }
             }
         }

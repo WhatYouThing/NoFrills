@@ -40,7 +40,7 @@ public class General {
                         .collapsed(true)
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Price Tooltips"))
-                                .description(OptionDescription.of(Text.of("Adds the lowest auction house, bazaar, and attribute prices to item tooltips.\n\nFor items with attributes, prices are listed for both attributes separately, and for the roll itself (this is mostly for price checking your Kuudra loot).\n\nPrices won't be listed for items that aren't listed in any existing BIN auctions.")))
+                                .description(OptionDescription.of(Text.of("Adds the lowest auction house, bazaar, and attribute prices to item tooltips.\n\n\"Lowest BIN\" - The lowest available Buy It Now price for the specific item.\n\"BZ Insta-buy\" - The lowest instant buy Bazaar price for the specific item.\n\"BZ Insta-sell\" - The lowest instant sell Bazaar price for the specific item.\n\"Price for Attribute ?\" - The lowest price for the exact attribute on the item.\n\"Price for Attribute ? (?x Level ?)\" - The lowest price for the attribute, but calculated from a level below, because the exact level doesn't exist on the Auction House.\n\"Price for Roll\" - The lowest available price for the exact item + attribute combo, regardless of attribute levels.")))
                                 .binding(false, () -> Config.priceTooltips, value -> Config.priceTooltips = value)
                                 .controller(Config::booleanController)
                                 .build())

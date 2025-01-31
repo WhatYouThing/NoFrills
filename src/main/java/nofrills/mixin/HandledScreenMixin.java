@@ -4,12 +4,15 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import nofrills.config.Config;
+import nofrills.events.DrawItemTooltip;
 import nofrills.features.DungeonSolvers;
 import nofrills.misc.ScreenOptions;
 import org.jetbrains.annotations.Nullable;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static nofrills.Main.eventBus;
 import static nofrills.misc.Utils.DisabledSlot;
 import static nofrills.misc.Utils.SpoofedSlot;
 
@@ -118,6 +122,18 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
             ci.cancel();
         }
+    }
+
+    @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;getTooltipFromItem(Lnet/minecraft/item/ItemStack;)Ljava/util/List;"))
+    private List<Text> onGetTooltipFromItem(List<Text> original) {
+        if (Config.priceTooltips && focusedSlot != null) {
+            ItemStack stack = focusedSlot.getStack();
+            NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
+            if (!stack.isEmpty() && component != null) {
+                eventBus.post(new DrawItemTooltip(original, stack, component.copyNbt()));
+            }
+        }
+        return original;
     }
 
     @ModifyExpressionValue(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))

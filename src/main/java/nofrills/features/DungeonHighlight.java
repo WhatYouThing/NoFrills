@@ -28,7 +28,7 @@ public class DungeonHighlight {
     };
 
     private static boolean isDungeonMob(Entity entity) {
-        return switch (entity) {
+        return !Rendering.Entities.isDrawingOutline(entity) && switch (entity) {
             case ZombieEntity ignored -> true;
             case SkeletonEntity ignored -> true;
             case EndermanEntity ignored -> true;

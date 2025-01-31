@@ -40,6 +40,8 @@ public class Config {
     @SerialEntry
     public static boolean wardrobeHotkeysSound = false;
     @SerialEntry
+    public static boolean priceTooltips = false;
+    @SerialEntry
     public static boolean hotbarSwap = false;
     @SerialEntry
     public static int hotbarSwapOverride = 8;
@@ -48,9 +50,11 @@ public class Config {
     @SerialEntry
     public static boolean hideDeadMobs = false;
     @SerialEntry
-    public static boolean oldSkins = false;
-    @SerialEntry
     public static boolean keepChunks = false;
+    @SerialEntry
+    public static boolean noExplosions = false;
+    @SerialEntry
+    public static boolean noFireOverlay = false;
     @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry
@@ -155,6 +159,8 @@ public class Config {
     // Dungeons
 
     @SerialEntry
+    public static String dungeonClass = "Berserk"; // this stores the user's last selected/known Dungeon class, not for use with config screens
+    @SerialEntry
     public static boolean starredMobHighlight = false;
     @SerialEntry
     public static Color starredMobColor = new Color(0, 255, 255, 255);
@@ -163,11 +169,21 @@ public class Config {
     @SerialEntry
     public static Color miniColor = new Color(255, 255, 0, 255);
     @SerialEntry
+    public static boolean keyHighlight = false;
+    @SerialEntry
+    public static Color keyColor = new Color(0, 255, 0, 85);
+    @SerialEntry
+    public static boolean spiritHighlight = false;
+    @SerialEntry
+    public static Color spiritColor = new Color(175, 0, 255, 170);
+    @SerialEntry
     public static boolean solveTerminals = false;
     @SerialEntry
     public static boolean melodyAnnounce = false;
     @SerialEntry
     public static String melodyMessage = "/pc Melody";
+    @SerialEntry
+    public static boolean wishReminder = false;
 
     // Kuudra
 
@@ -196,6 +212,12 @@ public class Config {
 
     @SerialEntry
     public static boolean miningCorpseGlow = false;
+    @SerialEntry
+    public static boolean templeLocator = false;
+    @SerialEntry
+    public static boolean ghostVision = false;
+    @SerialEntry
+    public static boolean betterSkymall = false;
 
     // Farming
 

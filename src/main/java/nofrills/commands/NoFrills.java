@@ -184,6 +184,11 @@ public class NoFrills {
             new ModCommand("getPearls", "Refills your Ender Pearls (up to 16) directly from your sacks.", literal("getPearls").executes(context -> {
                 PearlRefill.getPearls();
                 return SINGLE_SUCCESS;
+            })),
+            new ModCommand("ping", "Checks your current ping.", literal("ping").executes(context -> {
+                Utils.info("§7Pinging...");
+                SkyblockData.showPing();
+                return SINGLE_SUCCESS;
             }))
     };
 

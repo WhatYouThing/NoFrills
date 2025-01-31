@@ -9,10 +9,12 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.util.Util;
 import nofrills.commands.NoFrills;
 import nofrills.commands.Yeet;
 import nofrills.config.Config;
 import nofrills.features.*;
+import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.SkyblockData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +37,7 @@ public class Main implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        LOGGER.info("It's time to get real, NoFrills mod initialized.");
+        long start = Util.getMeasuringTimeMs();
 
         mc = MinecraftClient.getInstance();
 
@@ -58,16 +60,20 @@ public class Main implements ModInitializer {
         eventBus.subscribe(KuudraFeatures.class);
         eventBus.subscribe(PartyFeatures.class);
         eventBus.subscribe(SlayerFeatures.class);
-        eventBus.subscribe(HideDeadMobs.class);
+        eventBus.subscribe(NoRender.class);
         eventBus.subscribe(PearlRefill.class);
         eventBus.subscribe(TerrorFix.class);
         eventBus.subscribe(GlowingShroomHighlight.class);
         eventBus.subscribe(SkyblockData.class);
         eventBus.subscribe(RecipeLookup.class);
+        eventBus.subscribe(MiningFeatures.class);
+        eventBus.subscribe(NoFrillsAPI.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 
         KeyBindingHelper.registerKeyBinding(Keybinds.getPearls);
         KeyBindingHelper.registerKeyBinding(Keybinds.recipeLookup);
+
+        LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }
 }

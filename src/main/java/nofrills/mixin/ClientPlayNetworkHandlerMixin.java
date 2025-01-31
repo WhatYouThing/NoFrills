@@ -6,8 +6,9 @@ import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.util.Formatting;
 import nofrills.config.Config;
 import nofrills.events.*;
@@ -42,9 +43,12 @@ public class ClientPlayNetworkHandlerMixin {
     }
 
     @Inject(method = "onScreenHandlerSlotUpdate", at = @At("TAIL"))
-    private void onUpdateInventory(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci, @Local PlayerEntity entity) {
+    private void onUpdateInventory(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
         if (mc.currentScreen instanceof GenericContainerScreen containerScreen) {
-            eventBus.post(new ScreenSlotUpdateEvent(packet, containerScreen, packet.getSlot() == containerScreen.getScreenHandler().slots.getLast().id));
+            GenericContainerScreenHandler handler = containerScreen.getScreenHandler();
+            Inventory inventory = handler.getInventory();
+            int slot = packet.getSlot();
+            eventBus.post(new ScreenSlotUpdateEvent(packet, containerScreen, handler, inventory, slot, inventory.getStack(slot), containerScreen.getTitle().getString(), packet.getSlot() == handler.slots.getLast().id));
         }
     }
 

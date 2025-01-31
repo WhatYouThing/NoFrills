@@ -1,15 +1,15 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
@@ -21,20 +21,22 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.BinaryOperator;
 
 public class DungeonSolvers {
     private static final ItemStack backgroundStack = Utils.setStackName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
     private static final ItemStack firstStack = Utils.setStackName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
     private static final ItemStack secondStack = Utils.setStackName(Items.BLUE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
-    private static final Item[] colorsOrder = {
+    private static final List<Item> colorsOrder = List.of(new Item[]{
             Items.GREEN_STAINED_GLASS_PANE,
             Items.YELLOW_STAINED_GLASS_PANE,
             Items.ORANGE_STAINED_GLASS_PANE,
             Items.RED_STAINED_GLASS_PANE,
             Items.BLUE_STAINED_GLASS_PANE,
-    };
+    });
     private static final List<ArrowAlignPart> arrowAlignSteps = new ArrayList<>();
     private static final List<Entity> dungeonKeys = new ArrayList<>();
     private static final List<Entity> spiritBows = new ArrayList<>();
@@ -57,6 +59,13 @@ public class DungeonSolvers {
             case WHITE -> item.equals(Items.BONE_MEAL);
             default -> false;
         };
+    }
+
+    private static ItemStack stackWithCount(int count) {
+        ItemStack stack = count > 0 ? Items.LIME_CONCRETE.getDefaultStack() : Items.BLUE_CONCRETE.getDefaultStack();
+        stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(" "));
+        stack.setCount(Math.abs(count));
+        return stack;
     }
 
     // for WIP arrow align solver
@@ -100,15 +109,13 @@ public class DungeonSolvers {
     @EventHandler
     public static void onSlotUpdate(ScreenSlotUpdateEvent event) {
         if (Config.solveTerminals && Utils.isInDungeons() && !isTerminalBuilt) {
-            String title = event.screen.getTitle().getString();
-            GenericContainerScreenHandler handler = event.screen.getScreenHandler();
-            Inventory inventory = handler.getInventory();
             isTerminalBuilt = event.isFinal;
             List<Slot> orderSlots = new ArrayList<>();
-            for (Slot slot : handler.slots) {
-                ItemStack stack = inventory.getStack(slot.id);
+            List<Slot> colorSlots = new ArrayList<>();
+            for (Slot slot : event.handler.slots) {
+                ItemStack stack = event.inventory.getStack(slot.id);
                 if (!stack.isEmpty()) {
-                    if (title.startsWith("Correct all the panes!")) {
+                    if (event.title.startsWith("Correct all the panes!")) {
                         isInTerminal = true;
                         if (stack.getItem() == Items.RED_STAINED_GLASS_PANE) {
                             Utils.setSpoofed(event.screen, slot, firstStack);
@@ -118,7 +125,7 @@ public class DungeonSolvers {
                             Utils.setDisabled(event.screen, slot, true);
                         }
                     }
-                    if (title.startsWith("Click in order!")) {
+                    if (event.title.startsWith("Click in order!")) {
                         isInTerminal = true;
                         if (stack.getItem() == Items.RED_STAINED_GLASS_PANE && event.isFinal) {
                             orderSlots.add(slot);
@@ -127,9 +134,9 @@ public class DungeonSolvers {
                             Utils.setDisabled(event.screen, slot, true);
                         }
                     }
-                    if (title.startsWith("What starts with:") && title.endsWith("?")) {
+                    if (event.title.startsWith("What starts with:") && event.title.endsWith("?")) {
                         isInTerminal = true;
-                        String character = String.valueOf(title.charAt(title.indexOf("'") + 1)).toLowerCase();
+                        String character = String.valueOf(event.title.charAt(event.title.indexOf("'") + 1)).toLowerCase();
                         String name = Formatting.strip(stack.getName().getString()).toLowerCase().trim();
                         if (!name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(stack)) {
                             Utils.setSpoofed(event.screen, slot, firstStack);
@@ -139,9 +146,9 @@ public class DungeonSolvers {
                             Utils.setDisabled(event.screen, slot, true);
                         }
                     }
-                    if (title.startsWith("Select all the") && title.endsWith("items!")) {
+                    if (event.title.startsWith("Select all the") && event.title.endsWith("items!")) {
                         isInTerminal = true;
-                        String color = title.replace("Select all the", "").replace("items!", "").trim();
+                        String color = event.title.replace("Select all the", "").replace("items!", "").trim();
                         String colorName = color.equals("SILVER") ? "light_gray" : color.toLowerCase().replace(" ", "_");
                         for (DyeColor dye : DyeColor.values()) {
                             if (dye.getName().equals(colorName)) {
@@ -156,8 +163,13 @@ public class DungeonSolvers {
                             }
                         }
                     }
-                    if (title.startsWith("Change all to same color!")) {
+                    if (event.title.startsWith("Change all to same color!")) {
                         isInTerminal = true;
+                        if (colorsOrder.contains(stack.getItem()) && !colorSlots.contains(slot)) {
+                            colorSlots.add(slot);
+                        }
+                        Utils.setSpoofed(event.screen, slot, backgroundStack);
+                        Utils.setDisabled(event.screen, slot, true);
                     }
                 }
             }
@@ -170,6 +182,26 @@ public class DungeonSolvers {
                     Slot second = orderSlots.get(1);
                     Utils.setSpoofed(event.screen, second, secondStack);
                     Utils.setDisabled(event.screen, second, true);
+                }
+            }
+            if (!colorSlots.isEmpty() && colorSlots.size() >= 9) {
+                List<Integer> currentPattern = new ArrayList<>();
+                for (Slot slot : colorSlots) {
+                    currentPattern.add(colorsOrder.indexOf(slot.getStack().getItem()));
+                }
+                int mostCommon = currentPattern.stream()
+                        .reduce(BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(currentPattern, o))))
+                        .orElse(colorsOrder.indexOf(colorSlots.get(4).getStack().getItem()));
+                for (Slot slot : colorSlots) {
+                    int index = colorsOrder.indexOf(slot.getStack().getItem());
+                    int target = mostCommon - index;
+                    if (target == 0) {
+                        Utils.setSpoofed(event.screen, slot, backgroundStack);
+                        Utils.setDisabled(event.screen, slot, true);
+                    } else {
+                        Utils.setSpoofed(event.screen, slot, stackWithCount(-target));
+                        Utils.setDisabled(event.screen, slot, false);
+                    }
                 }
             }
         }
@@ -211,7 +243,7 @@ public class DungeonSolvers {
                         BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
                         Vec3d pos = ent.getPos();
                         Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
-                        event.drawFilled(Box.of(posAdjust, 1, 1.5, 1), false, RenderColor.fromColor(Config.keyColor));
+                        event.drawFilled(Box.of(posAdjust, 0.9, 1.25, 0.9), false, RenderColor.fromColor(Config.keyColor));
                     } else {
                         dungeonKeys.remove(ent);
                     }

@@ -21,10 +21,8 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.BinaryOperator;
 
 public class DungeonSolvers {
     private static final ItemStack backgroundStack = Utils.setStackName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
@@ -185,21 +183,26 @@ public class DungeonSolvers {
                 }
             }
             if (!colorSlots.isEmpty() && colorSlots.size() >= 9) {
-                List<Integer> currentPattern = new ArrayList<>();
-                for (Slot slot : colorSlots) {
-                    currentPattern.add(colorsOrder.indexOf(slot.getStack().getItem()));
-                }
-                int mostCommon = currentPattern.stream()
-                        .reduce(BinaryOperator.maxBy(Comparator.comparingInt(o -> Collections.frequency(currentPattern, o))))
-                        .orElse(colorsOrder.indexOf(colorSlots.get(4).getStack().getItem()));
+                int[] colorCounts = {0, 0, 0, 0, 0};
                 for (Slot slot : colorSlots) {
                     int index = colorsOrder.indexOf(slot.getStack().getItem());
-                    int target = mostCommon - index;
+                    colorCounts[index] += 1;
+                }
+                int mostCommon = -1, highestCommon = 0;
+                for (int i = 0; i < 5; i++) {
+                    if (colorCounts[i] > highestCommon) {
+                        highestCommon = colorCounts[i];
+                        mostCommon = i;
+                    }
+                }
+                for (Slot slot : colorSlots) {
+                    int index = colorsOrder.indexOf(slot.getStack().getItem());
+                    int target = Math.negateExact(mostCommon - index);
                     if (target == 0) {
                         Utils.setSpoofed(event.screen, slot, backgroundStack);
                         Utils.setDisabled(event.screen, slot, true);
                     } else {
-                        Utils.setSpoofed(event.screen, slot, stackWithCount(-target));
+                        Utils.setSpoofed(event.screen, slot, stackWithCount(target));
                         Utils.setDisabled(event.screen, slot, false);
                     }
                 }

@@ -243,10 +243,7 @@ public class DungeonSolvers {
                 List<Entity> keys = new ArrayList<>(dungeonKeys);
                 for (Entity ent : keys) {
                     if (ent.isAlive()) {
-                        BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
-                        Vec3d pos = ent.getPos();
-                        Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
-                        event.drawFilled(Box.of(posAdjust, 0.9, 1.25, 0.9), false, RenderColor.fromColor(Config.keyColor));
+                        event.drawFilled(Box.of(ent.getPos().add(0, 1.5, 0), 0.9, 1.25, 0.9), false, RenderColor.fromColor(Config.keyColor));
                     } else {
                         dungeonKeys.remove(ent);
                     }

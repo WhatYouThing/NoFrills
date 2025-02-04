@@ -171,7 +171,7 @@ public class Config {
     @SerialEntry
     public static boolean keyHighlight = false;
     @SerialEntry
-    public static Color keyColor = new Color(0, 255, 0, 85);
+    public static Color keyColor = new Color(0, 255, 0, 128);
     @SerialEntry
     public static boolean spiritHighlight = false;
     @SerialEntry

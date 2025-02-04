@@ -78,7 +78,7 @@ public class Dungeons {
                 .option(Option.<Color>createBuilder()
                         .name(Text.of("Key Highlight Color"))
                         .description(OptionDescription.of(Text.of("The color used for the key highlight.")))
-                        .binding(new Color(0, 255, 0, 85),
+                        .binding(new Color(0, 255, 0, 128),
                                 () -> Config.keyColor,
                                 value -> Config.keyColor = value)
                         .controller(v -> ColorControllerBuilder.create(v).allowAlpha(true))

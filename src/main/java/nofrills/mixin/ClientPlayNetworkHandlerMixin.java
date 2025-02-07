@@ -87,4 +87,9 @@ public class ClientPlayNetworkHandlerMixin {
     private void onJoinGame(GameJoinS2CPacket packet, CallbackInfo ci) {
         eventBus.post(new ServerJoinEvent());
     }
+
+    @Inject(method = "onBlockUpdate", at = @At("TAIL"))
+    private void onBlockUpdate(BlockUpdateS2CPacket packet, CallbackInfo ci) {
+        eventBus.post(new BlockUpdateEvent(packet));
+    }
 }

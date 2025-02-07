@@ -1,8 +1,10 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -24,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static nofrills.Main.mc;
+
 public class DungeonSolvers {
     private static final ItemStack backgroundStack = Utils.setStackName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
     private static final ItemStack firstStack = Utils.setStackName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
@@ -35,14 +39,17 @@ public class DungeonSolvers {
             Items.RED_STAINED_GLASS_PANE,
             Items.BLUE_STAINED_GLASS_PANE,
     });
-    private static final List<ArrowAlignPart> arrowAlignSteps = new ArrayList<>();
+    private static final List<BlockPos> sharpshooterList = new ArrayList<>();
+    private static final Box sharpshooterTarget = Box.enclosing(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
+    private static final Box sharpshooterArea = Box.enclosing(new BlockPos(63, 127, 35), new BlockPos(63, 128, 35));
     private static final List<Entity> dungeonKeys = new ArrayList<>();
     private static final List<Entity> spiritBows = new ArrayList<>();
     public static boolean isInTerminal = false;
+    private static BlockPos sharpshooterNext = null;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
 
-    public static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
+    private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
         Item item = stack.getItem();
         if (Formatting.strip(stack.getName().getString()).trim().isEmpty()) {
             return false;
@@ -67,18 +74,18 @@ public class DungeonSolvers {
     }
 
     // for WIP arrow align solver
-    public static BlockPos applyRotationOffset(BlockPos pos, int rotation) {
+    private static BlockPos getRotationOffset(BlockPos pos, int rotation) {
         return switch (rotation) {
-            case 0 -> pos.add(0, 1, -1);
             case 1 -> pos.add(0, 0, -1);
-            case 2 -> pos.add(0, -1, -1);
             case 3 -> pos.add(0, -1, 0);
-            case 4 -> pos.add(0, -1, 1);
             case 5 -> pos.add(0, 0, 1);
-            case 6 -> pos.add(0, 1, 1);
             case 7 -> pos.add(0, 1, 0);
             default -> pos;
         };
+    }
+
+    private static boolean isSharpshooterActive() {
+        return !mc.world.getOtherEntities(null, sharpshooterArea, ent -> ent.getType() == EntityType.PLAYER).isEmpty();
     }
 
     @EventHandler
@@ -99,8 +106,16 @@ public class DungeonSolvers {
 
     @EventHandler
     public static void onTick(WorldTickEvent event) {
-        if (melodyTicks > 0) {
-            melodyTicks--;
+        if (Utils.isInDungeons()) {
+            if (melodyTicks > 0) {
+                melodyTicks--;
+            }
+            if (sharpshooterNext != null || !sharpshooterList.isEmpty()) {
+                if (!isSharpshooterActive()) {
+                    sharpshooterNext = null;
+                    sharpshooterList.clear();
+                }
+            }
         }
     }
 
@@ -237,41 +252,51 @@ public class DungeonSolvers {
     }
 
     @EventHandler
-    public static void onRender(WorldRenderEvent event) {
-        if (Utils.isInDungeons()) {
-            if (!dungeonKeys.isEmpty()) {
-                List<Entity> keys = new ArrayList<>(dungeonKeys);
-                for (Entity ent : keys) {
-                    if (ent.isAlive()) {
-                        event.drawFilled(Box.of(ent.getPos().add(0, 1.5, 0), 0.9, 1.25, 0.9), false, RenderColor.fromColor(Config.keyColor));
-                    } else {
-                        dungeonKeys.remove(ent);
-                    }
+    public static void onBlockUpdate(BlockUpdateEvent event) {
+        if (Config.solveDevices && Utils.isInDungeons()) {
+            if (sharpshooterTarget.contains(event.packet.getPos().toCenterPos()) && isSharpshooterActive()) {
+                if (event.packet.getState() == Blocks.EMERALD_BLOCK.getDefaultState()) {
+                    sharpshooterNext = event.packet.getPos();
                 }
-            }
-            if (!spiritBows.isEmpty()) {
-                List<Entity> bows = new ArrayList<>(spiritBows);
-                for (Entity ent : bows) {
-                    if (ent.isAlive()) {
-                        BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
-                        Vec3d pos = ent.getPos();
-                        Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
-                        event.drawFilled(Box.of(posAdjust, 0.8, 1.75, 0.8), true, RenderColor.fromColor(Config.spiritColor));
-                    } else {
-                        spiritBows.remove(ent);
-                    }
+                if (event.packet.getState() == Blocks.BLUE_TERRACOTTA.getDefaultState()) {
+                    sharpshooterList.add(event.packet.getPos());
                 }
             }
         }
     }
 
-    static class ArrowAlignPart {
-        public BlockPos pos;
-        public int clicks;
-
-        public ArrowAlignPart(BlockPos pos, int clicks) {
-            this.pos = pos;
-            this.clicks = clicks;
+    @EventHandler
+    public static void onRender(WorldRenderEvent event) {
+        if (sharpshooterNext != null) {
+            event.drawFilled(Box.enclosing(sharpshooterNext, sharpshooterNext), true, RenderColor.fromHex(0x00ff00, 1.0f));
+        }
+        if (!sharpshooterList.isEmpty()) {
+            for (BlockPos pos : sharpshooterList) {
+                event.drawFilled(Box.enclosing(pos, pos), true, RenderColor.fromHex(0xff0000, 1.0f));
+            }
+        }
+        if (!dungeonKeys.isEmpty()) {
+            List<Entity> keys = new ArrayList<>(dungeonKeys);
+            for (Entity ent : keys) {
+                if (ent.isAlive()) {
+                    event.drawFilled(Box.of(ent.getPos().add(0, 1.5, 0), 0.9, 1.25, 0.9), false, RenderColor.fromColor(Config.keyColor));
+                } else {
+                    dungeonKeys.remove(ent);
+                }
+            }
+        }
+        if (!spiritBows.isEmpty()) {
+            List<Entity> bows = new ArrayList<>(spiritBows);
+            for (Entity ent : bows) {
+                if (ent.isAlive()) {
+                    BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
+                    Vec3d pos = ent.getPos();
+                    Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
+                    event.drawFilled(Box.of(posAdjust, 0.8, 1.75, 0.8), true, RenderColor.fromColor(Config.spiritColor));
+                } else {
+                    spiritBows.remove(ent);
+                }
+            }
         }
     }
 }

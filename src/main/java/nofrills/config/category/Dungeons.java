@@ -49,8 +49,15 @@ public class Dungeons {
 
                 .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Solve Terminals"))
-                        .description(OptionDescription.of(Text.of("Solves (most of) the F7/M7 terminals for you, turning them into a simple point and click minigame. This option also hides item tooltips in every terminal for better visibility.")))
+                        .description(OptionDescription.of(Text.of("Solves (most of) the F7/M7 terminals for you, turning them into a simple point and click minigame. This option also hides item tooltips in every terminal for better visibility.\n\nPro tip: Lime Concrete means left click, and Blue Concrete means right click in the \"Change all to same color!\" terminal.")))
                         .binding(false, () -> Config.solveTerminals, value -> Config.solveTerminals = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Solve Devices"))
+                        .description(OptionDescription.of(Text.of("Solves (most of) the F7/M7 devices for you.")))
+                        .binding(false, () -> Config.solveDevices, value -> Config.solveDevices = value)
                         .controller(Config::booleanController)
                         .build())
 

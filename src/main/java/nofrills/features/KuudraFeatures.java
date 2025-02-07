@@ -90,10 +90,11 @@ public class KuudraFeatures {
                     maxY = y;
                 }
             }
-            if (cubesFound == 2 || (getCurrentPhase() == kuudraPhases.Lair && kuudra != null)) {
+        }
+        if (kuudra != null) {
+            if (cubesFound == 2 || getCurrentPhase() == kuudraPhases.Lair) {
                 // scuffed, but needed, because the average tps in kuudra is too low even for dr. disrespect
                 kuudraEntity = (MagmaCubeEntity) kuudra;
-                break;
             }
         }
     }

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import static nofrills.Main.LOGGER;
+import static nofrills.Main.mc;
 
 public class NoFrillsAPI {
     private static final String[] kuudraPieceTypes = new String[]{"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS"};
@@ -29,6 +30,7 @@ public class NoFrillsAPI {
     private static JsonObject bazaarPrices = null;
     private static JsonObject attributePrices = null;
     private static int pricingRefreshTicks = 0;
+    private static boolean isOutage = false;
 
     private static String getKuudraPieceType(String itemId) {
         for (String type : kuudraPieceTypes) {
@@ -39,6 +41,46 @@ public class NoFrillsAPI {
             }
         }
         return "";
+    }
+
+    private static String parseItemId(NbtCompound data) {
+        String itemId = data.getString("id");
+        if (itemId == null || itemId.isEmpty()) {
+            return "";
+        }
+        switch (itemId) {
+            case "PET" -> {
+                if (data.contains("petInfo")) {
+                    JsonObject petData = JsonParser.parseString(data.getString("petInfo")).getAsJsonObject();
+                    return petData.get("type").getAsString() + "_PET_" + petData.get("tier").getAsString();
+                } else {
+                    return "UNKNOWN_PET";
+                }
+            }
+            case "RUNE" -> {
+                if (data.contains("runes")) {
+                    NbtCompound runeData = data.getCompound("runes");
+                    String runeId = (String) runeData.getKeys().toArray()[0];
+                    return runeId + "_" + runeData.getInt(runeId) + "_RUNE";
+                } else {
+                    return "EMPTY_RUNE";
+                }
+            }
+            case "ENCHANTED_BOOK" -> {
+                if (data.contains("enchantments")) {
+                    NbtCompound enchantData = data.getCompound("enchantments");
+                    Set<String> enchants = enchantData.getKeys();
+                    if (enchants.size() == 1) {
+                        String enchantId = (String) enchantData.getKeys().toArray()[0];
+                        int enchantLevel = enchantData.getInt(enchantId);
+                        itemId = "ENCHANTMENT_" + enchantId.toUpperCase() + "_" + enchantLevel;
+                    }
+                } else {
+                    return "ENCHANTMENT_UNKNOWN";
+                }
+            }
+        }
+        return itemId;
     }
 
     /**
@@ -71,7 +113,15 @@ public class NoFrillsAPI {
                 auctionPrices = JsonParser.parseString(responseJson.get("auction").getAsString()).getAsJsonObject();
                 bazaarPrices = JsonParser.parseString(responseJson.get("bazaar").getAsString()).getAsJsonObject();
                 attributePrices = JsonParser.parseString(responseJson.get("attribute").getAsString()).getAsJsonObject();
+                if (isOutage) {
+                    Utils.info("§aSuccessfully reconnected to the NoFrills API, item pricing data has been refreshed.");
+                    isOutage = false;
+                }
             } catch (IOException e) {
+                if (!isOutage) {
+                    Utils.info("§cFailed to refresh item pricing data, the NoFrills API might be having a temporary outage.");
+                    isOutage = true;
+                }
                 StringBuilder trace = new StringBuilder();
                 for (StackTraceElement element : e.getStackTrace()) {
                     trace.append("\n\tat ").append(element.toString());
@@ -84,7 +134,7 @@ public class NoFrillsAPI {
     @EventHandler
     public static void onTick(WorldTickEvent event) {
         if (Config.priceTooltips && Utils.isInSkyblock()) {
-            if (pricingRefreshTicks == 0) {
+            if (pricingRefreshTicks == 0 && mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
                 refreshItemPricing();
                 pricingRefreshTicks = 1200;
             } else {
@@ -95,28 +145,9 @@ public class NoFrillsAPI {
 
     @EventHandler
     public static void onTooltip(DrawItemTooltip event) {
-        String itemId = event.customData.getString("id");
-        if (itemId == null || itemId.isEmpty()) {
+        String itemId = parseItemId(event.customData);
+        if (itemId.isEmpty()) {
             return;
-        }
-        if (itemId.equals("PET")) {
-            JsonObject petData = JsonParser.parseString(event.customData.getString("petInfo")).getAsJsonObject();
-            itemId = petData.get("type").getAsString() + "_PET_" + petData.get("tier").getAsString();
-        }
-        if (itemId.equals("RUNE")) {
-            NbtCompound runeData = event.customData.getCompound("runes");
-            String runeId = (String) runeData.getKeys().toArray()[0];
-            int runeLevel = runeData.getInt(runeId);
-            itemId = runeId + "_" + runeLevel + "_RUNE";
-        }
-        if (itemId.equals("ENCHANTED_BOOK")) {
-            NbtCompound enchantData = event.customData.getCompound("enchantments");
-            Set<String> enchants = enchantData.getKeys();
-            if (enchants.size() == 1) {
-                String enchantId = (String) enchantData.getKeys().toArray()[0];
-                int enchantLevel = enchantData.getInt(enchantId);
-                itemId = "ENCHANTMENT_" + enchantId.toUpperCase() + "_" + enchantLevel;
-            }
         }
         JsonObject auctionPrices = NoFrillsAPI.getAuctionPrices();
         if (auctionPrices != null && auctionPrices.has(itemId)) {

@@ -170,8 +170,8 @@ public class KuudraFeatures {
                 if (Config.kuudraHealth && phase == kuudraPhases.DPS) {
                     Collection<ClientBossBar> bossBars = ((BossBarHudAccessor) mc.inGameHud.getBossBarHud()).getBossBars().values();
                     if (!bossBars.isEmpty()) {
-                        float health = bossBars.stream().findFirst().get().getPercent();
-                        Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health) + "% HP", 1, 25, 2.5f, 0xffff00);
+                        float health = ((ClientBossBar) bossBars.toArray()[0]).getPercent();
+                        Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health * 100) + "% HP", 1, 25, 2.5f, 0xffff00);
                     }
                 }
                 updateKuudraEntity();

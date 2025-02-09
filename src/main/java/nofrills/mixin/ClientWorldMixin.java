@@ -20,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Supplier;
 
@@ -49,10 +48,8 @@ public abstract class ClientWorldMixin extends World {
         eventBus.post(new WorldTickEvent());
     }
 
-    @Inject(method = "setBlockState", at = @At("HEAD"))
-    private void onUpdateBlock(BlockPos pos, BlockState state, int flags, int maxUpdateDepth, CallbackInfoReturnable<Boolean> cir) {
-        if (mc.world != null && mc.world.isClient) {
-            eventBus.post(new BlockUpdateEvent(pos, getBlockState(pos), state));
-        }
+    @Inject(method = "handleBlockUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;II)Z"))
+    private void onUpdateBlock(BlockPos pos, BlockState state, int flags, CallbackInfo ci) {
+        eventBus.post(new BlockUpdateEvent(pos, getBlockState(pos), state));
     }
 }

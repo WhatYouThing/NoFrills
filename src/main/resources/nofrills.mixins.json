@@ -28,7 +28,6 @@
     "PlayerEntityMixin",
     "RaycastContextMixin",
     "SnowBlockMixin",
-    "WorldChunkMixin",
     "WorldRendererMixin"
   ],
   "injectors": {

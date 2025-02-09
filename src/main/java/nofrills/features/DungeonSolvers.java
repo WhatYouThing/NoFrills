@@ -41,7 +41,7 @@ public class DungeonSolvers {
     });
     private static final List<BlockPos> sharpshooterList = new ArrayList<>();
     private static final Box sharpshooterTarget = Box.enclosing(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
-    private static final Box sharpshooterArea = Box.enclosing(new BlockPos(63, 127, 35), new BlockPos(63, 128, 35));
+    private static final Box sharpshooterArea = new Box(63.2, 127, 35.8, 63.8, 128, 35.2);
     private static final List<Entity> dungeonKeys = new ArrayList<>();
     private static final List<Entity> spiritBows = new ArrayList<>();
     public static boolean isInTerminal = false;
@@ -88,6 +88,21 @@ public class DungeonSolvers {
         return !mc.world.getOtherEntities(null, sharpshooterArea, ent -> ent.getType() == EntityType.PLAYER).isEmpty();
     }
 
+    private static void findSharpshooterTarget() {
+        for (double x = sharpshooterTarget.minX; x <= sharpshooterTarget.maxX; x++) {
+            for (double y = sharpshooterTarget.minY; y <= sharpshooterTarget.maxY; y++) {
+                for (double z = sharpshooterTarget.minZ; z <= sharpshooterTarget.maxZ; z++) {
+                    BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
+                    if (mc.world.getBlockState(pos).getBlock() == Blocks.EMERALD_BLOCK) {
+                        sharpshooterNext = pos;
+                        return;
+                    }
+                }
+            }
+        }
+        sharpshooterNext = null;
+    }
+
     @EventHandler
     public static void onScreenOpen(ScreenOpenEvent event) {
         isTerminalBuilt = false;
@@ -110,8 +125,10 @@ public class DungeonSolvers {
             if (melodyTicks > 0) {
                 melodyTicks--;
             }
-            if (sharpshooterNext != null || !sharpshooterList.isEmpty()) {
-                if (!isSharpshooterActive()) {
+            if (isSharpshooterActive()) {
+                findSharpshooterTarget();
+            } else {
+                if (sharpshooterNext != null || !sharpshooterList.isEmpty()) {
                     sharpshooterNext = null;
                     sharpshooterList.clear();
                 }
@@ -255,9 +272,7 @@ public class DungeonSolvers {
     public static void onBlockUpdate(BlockUpdateEvent event) {
         if (Config.solveDevices && Utils.isInDungeons()) {
             if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
-                if (event.newState.getBlock() == Blocks.EMERALD_BLOCK) {
-                    sharpshooterNext = event.pos;
-                }
+                // cant easily check for the emerald block here because hypixel does some mumbo jumbo with packets
                 if (event.newState.getBlock() == Blocks.BLUE_TERRACOTTA) {
                     if (sharpshooterNext == event.pos) {
                         sharpshooterNext = null;

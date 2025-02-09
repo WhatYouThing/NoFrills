@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class LivingEntityMixin {
     @ModifyExpressionValue(method = "travel", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
     private boolean onTravel(boolean original) {
-        if (Config.antiSwim) {
+        if (Utils.isFixEnabled(Config.antiSwim)) {
             return false;
         }
         return original;
@@ -20,7 +20,7 @@ public abstract class LivingEntityMixin {
 
     @ModifyExpressionValue(method = "applyFluidMovingSpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
     private boolean onApplyFluidSpeed(boolean original) {
-        if (Config.antiSwim) {
+        if (Utils.isFixEnabled(Config.antiSwim)) {
             return false;
         }
         return original;

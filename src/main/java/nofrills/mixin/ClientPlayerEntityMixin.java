@@ -7,6 +7,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.EntityPose;
 import nofrills.config.Config;
+import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -25,7 +26,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @ModifyReturnValue(method = "getYaw", at = @At("RETURN"))
     private float onGetYaw(float original) {
-        if (Config.ridingCamFix) {
+        if (Utils.isFixEnabled(Config.ridingCamFix)) {
             return getYaw();
         }
         return original;
@@ -33,7 +34,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @ModifyReturnValue(method = "shouldSlowDown", at = @At("RETURN"))
     private boolean shouldSlowDown(boolean original) {
-        if (Config.sneakFix) {
+        if (Utils.isFixEnabled(Config.sneakFix)) {
             return (isSneaking() && !getAbilities().flying) || isCrawling();
         }
         return original;
@@ -41,7 +42,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @ModifyReturnValue(method = "isInSneakingPose", at = @At("RETURN"))
     private boolean isInSneakPose(boolean original) {
-        if (Config.sneakFix) {
+        if (Utils.isFixEnabled(Config.sneakFix)) {
             return !getAbilities().flying && !isSwimming() && !hasVehicle() && !isSleeping() && isSneaking();
         }
         return original;
@@ -49,7 +50,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @Inject(method = "tickMovement", at = @At("HEAD"))
     private void onTickMovement(CallbackInfo ci) {
-        if (Config.sneakFix) {
+        if (Utils.isFixEnabled(Config.sneakFix)) {
             if (getPose().equals(EntityPose.CROUCHING) && !isSneaking()) {
                 setPose(EntityPose.STANDING);
             }

@@ -254,12 +254,15 @@ public class DungeonSolvers {
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
         if (Config.solveDevices && Utils.isInDungeons()) {
-            if (sharpshooterTarget.contains(event.packet.getPos().toCenterPos()) && isSharpshooterActive()) {
-                if (event.packet.getState() == Blocks.EMERALD_BLOCK.getDefaultState()) {
-                    sharpshooterNext = event.packet.getPos();
+            if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
+                if (event.newState.getBlock() == Blocks.EMERALD_BLOCK) {
+                    sharpshooterNext = event.pos;
                 }
-                if (event.packet.getState() == Blocks.BLUE_TERRACOTTA.getDefaultState()) {
-                    sharpshooterList.add(event.packet.getPos());
+                if (event.newState.getBlock() == Blocks.BLUE_TERRACOTTA) {
+                    if (sharpshooterNext == event.pos) {
+                        sharpshooterNext = null;
+                    }
+                    sharpshooterList.add(event.pos);
                 }
             }
         }

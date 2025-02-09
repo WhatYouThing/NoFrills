@@ -105,25 +105,25 @@ public class Config {
     // Fixes
 
     @SerialEntry
-    public static boolean stonkFix = false;
+    public static fixModes stonkFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean oldSneak = false;
+    public static fixModes oldSneak = fixModes.Disabled;
     @SerialEntry
-    public static boolean antiSwim = false;
+    public static fixModes antiSwim = fixModes.Disabled;
     @SerialEntry
-    public static boolean noPearlCooldown = false;
+    public static fixModes noPearlCooldown = fixModes.Disabled;
     @SerialEntry
-    public static boolean snowFix = false;
+    public static fixModes snowFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean noDropSwing = false;
+    public static fixModes noDropSwing = fixModes.Disabled;
     @SerialEntry
-    public static boolean itemCountFix = false;
+    public static fixModes itemCountFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean ridingCamFix = false;
+    public static fixModes ridingCamFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean sneakFix = false;
+    public static fixModes sneakFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean terrorFix = false;
+    public static fixModes terrorFix = fixModes.Disabled;
 
     // Solvers
 
@@ -308,5 +308,11 @@ public class Config {
         Automatic,
         Manual,
         Ignore
+    }
+
+    public enum fixModes {
+        Disabled,
+        SkyblockOnly,
+        Enabled
     }
 }

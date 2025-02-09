@@ -100,13 +100,11 @@ public class SkyblockData {
     }
 
     @EventHandler
-    public static void onTabList(ObjectiveUpdateEvent event) {
+    public static void onObjective(ObjectiveUpdateEvent event) {
         Scoreboard scoreboard = mc.player.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
         if (objective != null) {
             inSkyblock = Formatting.strip(objective.getDisplayName().getString()).contains("SKYBLOCK");
-        } else {
-            inSkyblock = false;
         }
     }
 
@@ -160,6 +158,10 @@ public class SkyblockData {
         if (instanceOver) {
             instanceOver = false;
         }
+        inSkyblock = false;
+        location = "";
+        area = "";
+        lines.clear();
     }
 
     @EventHandler

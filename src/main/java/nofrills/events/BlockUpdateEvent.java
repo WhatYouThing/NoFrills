@@ -1,12 +1,17 @@
 package nofrills.events;
 
-import net.minecraft.network.packet.s2c.play.BlockUpdateS2CPacket;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
 
 public class BlockUpdateEvent {
 
-    public BlockUpdateS2CPacket packet;
+    public BlockPos pos;
+    public BlockState oldState;
+    public BlockState newState;
 
-    public BlockUpdateEvent(BlockUpdateS2CPacket packet) {
-        this.packet = packet;
+    public BlockUpdateEvent(BlockPos pos, BlockState oldState, BlockState newState) {
+        this.pos = pos;
+        this.oldState = oldState;
+        this.newState = newState;
     }
 }

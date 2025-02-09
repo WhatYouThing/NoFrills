@@ -28,6 +28,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
+import nofrills.config.Config;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
@@ -203,6 +204,10 @@ public class Utils {
             }
         }
         return entity == mc.player;
+    }
+
+    public static boolean isFixEnabled(Config.fixModes fix) {
+        return fix == Config.fixModes.Enabled || (fix == Config.fixModes.SkyblockOnly && SkyblockData.isInSkyblock());
     }
 
     /**

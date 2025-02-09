@@ -25,7 +25,7 @@ import static nofrills.Main.mc;
 public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"))
     private void onTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
-        if (Config.sneakFix && ent == mc.player) {
+        if (Utils.isFixEnabled(Config.sneakFix) && ent == mc.player) {
             packet.trackedValues().removeIf(entry -> entry.handler().equals(TrackedDataHandlerRegistry.ENTITY_POSE));
         }
     }
@@ -86,10 +86,5 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onGameJoin", at = @At("TAIL"))
     private void onJoinGame(GameJoinS2CPacket packet, CallbackInfo ci) {
         eventBus.post(new ServerJoinEvent());
-    }
-
-    @Inject(method = "onBlockUpdate", at = @At("TAIL"))
-    private void onBlockUpdate(BlockUpdateS2CPacket packet, CallbackInfo ci) {
-        eventBus.post(new BlockUpdateEvent(packet));
     }
 }

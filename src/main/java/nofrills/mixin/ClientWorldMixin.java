@@ -12,12 +12,15 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import nofrills.config.Config;
+import nofrills.events.BlockUpdateEvent;
 import nofrills.events.WorldTickEvent;
+import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Supplier;
 
@@ -26,14 +29,13 @@ import static nofrills.Main.mc;
 
 @Mixin(ClientWorld.class)
 public abstract class ClientWorldMixin extends World {
-
     protected ClientWorldMixin(MutableWorldProperties properties, RegistryKey<World> registryRef, DynamicRegistryManager registryManager, RegistryEntry<DimensionType> dimensionEntry, Supplier<Profiler> profiler, boolean isClient, boolean debugWorld, long biomeAccess, int maxChainedNeighborUpdates) {
         super(properties, registryRef, registryManager, dimensionEntry, profiler, isClient, debugWorld, biomeAccess, maxChainedNeighborUpdates);
     }
 
     @Redirect(method = "processPendingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;collidesWithStateAtPos(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z"))
     private boolean doesCollide(PlayerEntity instance, BlockPos blockPos, BlockState blockState) {
-        if (Config.stonkFix) {
+        if (Utils.isFixEnabled(Config.stonkFix)) {
             return false;
         }
         return instance.collidesWithStateAtPos(blockPos, blockState);
@@ -45,5 +47,12 @@ public abstract class ClientWorldMixin extends World {
             return;
         }
         eventBus.post(new WorldTickEvent());
+    }
+
+    @Inject(method = "setBlockState", at = @At("HEAD"))
+    private void onUpdateBlock(BlockPos pos, BlockState state, int flags, int maxUpdateDepth, CallbackInfoReturnable<Boolean> cir) {
+        if (mc.world != null && mc.world.isClient) {
+            eventBus.post(new BlockUpdateEvent(pos, getBlockState(pos), state));
+        }
     }
 }

@@ -10,6 +10,7 @@ import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import nofrills.config.Config;
+import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,7 +22,7 @@ public abstract class SnowBlockMixin {
 
     @ModifyReturnValue(method = "getCollisionShape", at = @At("RETURN"))
     private VoxelShape getSnowCollision(VoxelShape original, BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        if (Config.snowFix) {
+        if (Utils.isFixEnabled(Config.snowFix)) {
             if (state.get(Properties.LAYERS) == 1) {
                 return singleLayerShape;
             }

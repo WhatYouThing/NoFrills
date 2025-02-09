@@ -134,8 +134,10 @@ public class NoFrillsAPI {
     @EventHandler
     public static void onTick(WorldTickEvent event) {
         if (Config.priceTooltips && Utils.isInSkyblock()) {
-            if (pricingRefreshTicks == 0 && mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
-                refreshItemPricing();
+            if (pricingRefreshTicks == 0) {
+                if (mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
+                    refreshItemPricing();
+                }
                 pricingRefreshTicks = 1200;
             } else {
                 pricingRefreshTicks--;

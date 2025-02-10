@@ -28,14 +28,14 @@ public class TerrorFix {
 
     @EventHandler
     public static void onTick(WorldTickEvent event) {
-        if (Config.terrorFix) {
+        if (Utils.isFixEnabled(Config.terrorFix)) {
             terrorPieces = countPieces();
         }
     }
 
     @EventHandler
     public static void onSound(PlaySoundEvent event) {
-        if (Config.terrorFix && terrorPieces >= 2) {
+        if (Utils.isFixEnabled(Config.terrorFix) && terrorPieces >= 2) {
             if (event.isSound(SoundEvents.ENTITY_ARROW_HIT_PLAYER) && event.packet.getPitch() == 0.7936508f) {
                 Utils.playSound(SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.MASTER, 3.0f, 1.0f);
                 Utils.playSound(SoundEvents.BLOCK_PISTON_CONTRACT, SoundCategory.MASTER, 3.0f, 1.0f);

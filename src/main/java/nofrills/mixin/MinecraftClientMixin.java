@@ -8,6 +8,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.Hand;
 import nofrills.config.Config;
 import nofrills.events.ScreenOpenEvent;
+import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,7 +27,7 @@ public abstract class MinecraftClientMixin {
 
     @WrapWithCondition(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(ClientPlayerEntity instance, Hand hand) {
-        return !Config.noDropSwing;
+        return !Utils.isFixEnabled(Config.noDropSwing);
     }
 
     @Inject(method = "setScreen", at = @At("TAIL"))

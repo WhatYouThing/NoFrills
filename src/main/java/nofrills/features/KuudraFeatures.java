@@ -1,6 +1,7 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MagmaCubeEntity;
@@ -13,9 +14,11 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
+import nofrills.mixin.BossBarHudAccessor;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static nofrills.Main.mc;
@@ -90,10 +93,11 @@ public class KuudraFeatures {
                     maxY = y;
                 }
             }
-            if (cubesFound == 2 || (getCurrentPhase() == kuudraPhases.Lair && kuudra != null)) {
+        }
+        if (kuudra != null) {
+            if (cubesFound == 2 || getCurrentPhase() == kuudraPhases.Lair) {
                 // scuffed, but needed, because the average tps in kuudra is too low even for dr. disrespect
                 kuudraEntity = (MagmaCubeEntity) kuudra;
-                break;
             }
         }
     }
@@ -163,9 +167,14 @@ public class KuudraFeatures {
             }
             if (kuudraEntity == null || !kuudraEntity.isAlive()) {
                 // alive check is needed in case kuudra goes out of render distance, and we need to find him again.
-                if (phase != kuudraPhases.Lair) {
-                    updateKuudraEntity();
+                if (Config.kuudraHealth && phase == kuudraPhases.DPS) {
+                    Collection<ClientBossBar> bossBars = ((BossBarHudAccessor) mc.inGameHud.getBossBarHud()).getBossBars().values();
+                    if (!bossBars.isEmpty()) {
+                        float health = ((ClientBossBar) bossBars.toArray()[0]).getPercent();
+                        Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health * 100) + "% HP", 1, 25, 2.5f, 0xffff00);
+                    }
                 }
+                updateKuudraEntity();
             } else {
                 if (Config.kuudraHitbox && !Rendering.Entities.isDrawingOutline(kuudraEntity)) {
                     Rendering.Entities.drawOutline(kuudraEntity, true, new RenderColor(255, 255, 0, 255));
@@ -178,7 +187,7 @@ public class KuudraFeatures {
                     float health = calculateHealth(kuudraEntity.getHealth());
                     float damage = Math.clamp(previousHealth - health, 0, 240_000_000);
                     dpsData.add(damage);
-                    if (dpsData.size() > 20) {
+                    if (dpsData.size() > 100) {
                         dpsData.removeFirst();
                     }
                     Utils.showTitleCustom("DPS: " + kuudraHealthFormat.format(calculateDPS() * 20 * 0.000001) + "M", 1, 25, 2.5f, 0xffff00);

@@ -107,7 +107,7 @@ public abstract class EntityMixin implements EntityRendering {
 
     @ModifyReturnValue(method = "getPose", at = @At("RETURN"))
     private EntityPose getPose(EntityPose original) {
-        if (Config.antiSwim && original == EntityPose.SWIMMING) {
+        if (Utils.isFixEnabled(Config.antiSwim) && original == EntityPose.SWIMMING) {
             return EntityPose.STANDING;
         }
         return original;
@@ -115,10 +115,10 @@ public abstract class EntityMixin implements EntityRendering {
 
     @ModifyReturnValue(method = "getFlag", at = @At("RETURN"))
     private boolean getFlag(boolean original, int index) {
-        if (Config.antiSwim && index == SWIMMING_FLAG_INDEX) {
+        if (Utils.isFixEnabled(Config.antiSwim) && index == SWIMMING_FLAG_INDEX) {
             return false;
         }
-        if (Config.antiSwim && index == SPRINTING_FLAG_INDEX && Utils.isSelf(this)) {
+        if (Utils.isFixEnabled(Config.antiSwim) && index == SPRINTING_FLAG_INDEX && Utils.isSelf(this)) {
             if (original && isTouchingWater()) {
                 setSprinting(false);
                 return false;
@@ -129,7 +129,7 @@ public abstract class EntityMixin implements EntityRendering {
 
     @Inject(method = "setFlag", at = @At("HEAD"), cancellable = true)
     private void setFlag(int index, boolean value, CallbackInfo ci) {
-        if (Config.antiSwim && index == SWIMMING_FLAG_INDEX && value) {
+        if (Utils.isFixEnabled(Config.antiSwim) && index == SWIMMING_FLAG_INDEX && value) {
             ci.cancel();
         }
     }

@@ -11,7 +11,9 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import nofrills.config.Config;
+import nofrills.events.BlockUpdateEvent;
 import nofrills.events.WorldTickEvent;
+import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -30,7 +32,7 @@ public abstract class ClientWorldMixin extends World {
 
     @Redirect(method = "processPendingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;collidesWithStateAtPos(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)Z"))
     private boolean doesCollide(PlayerEntity instance, BlockPos blockPos, BlockState blockState) {
-        if (Config.stonkFix) {
+        if (Utils.isFixEnabled(Config.stonkFix)) {
             return false;
         }
         return instance.collidesWithStateAtPos(blockPos, blockState);
@@ -42,5 +44,10 @@ public abstract class ClientWorldMixin extends World {
             return;
         }
         eventBus.post(new WorldTickEvent());
+    }
+
+    @Inject(method = "handleBlockUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;II)Z"))
+    private void onUpdateBlock(BlockPos pos, BlockState state, int flags, CallbackInfo ci) {
+        eventBus.post(new BlockUpdateEvent(pos, getBlockState(pos), state));
     }
 }

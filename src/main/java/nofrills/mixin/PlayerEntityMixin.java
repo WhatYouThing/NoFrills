@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import nofrills.config.Config;
+import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -22,10 +23,10 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @ModifyReturnValue(method = "getBaseDimensions", at = @At("RETURN"))
     private EntityDimensions getDimensions(EntityDimensions original, EntityPose pose) {
-        if (Config.oldSneak && pose == EntityPose.CROUCHING) {
+        if (Utils.isFixEnabled(Config.oldSneak) && pose == EntityPose.CROUCHING) {
             return EntityDimensions.changing(0.6F, 1.8F).withEyeHeight(1.54F);
         }
-        if (Config.antiSwim && pose == EntityPose.SWIMMING) {
+        if (Utils.isFixEnabled(Config.antiSwim) && pose == EntityPose.SWIMMING) {
             return EntityDimensions.changing(0.6F, 1.8F).withEyeHeight(1.62F);
         }
         return original;
@@ -33,6 +34,6 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @WrapWithCondition(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/ItemEntity;", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(PlayerEntity instance, Hand hand) {
-        return !Config.noDropSwing;
+        return !Utils.isFixEnabled(Config.noDropSwing);
     }
 }

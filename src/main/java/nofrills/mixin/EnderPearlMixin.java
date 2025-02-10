@@ -5,6 +5,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.EnderPearlItem;
 import net.minecraft.stat.Stat;
 import nofrills.config.Config;
+import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -12,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 public class EnderPearlMixin {
     @WrapWithCondition(method = "use", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerEntity;incrementStat(Lnet/minecraft/stat/Stat;)V"))
     private boolean onUsePearl(PlayerEntity instance, Stat<?> stat) {
-        return !Config.noPearlCooldown;
+        return !Utils.isFixEnabled(Config.noPearlCooldown);
     }
 }

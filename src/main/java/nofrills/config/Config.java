@@ -105,25 +105,25 @@ public class Config {
     // Fixes
 
     @SerialEntry
-    public static boolean stonkFix = false;
+    public static fixModes stonkFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean oldSneak = false;
+    public static fixModes oldSneak = fixModes.Disabled;
     @SerialEntry
-    public static boolean antiSwim = false;
+    public static fixModes antiSwim = fixModes.Disabled;
     @SerialEntry
-    public static boolean noPearlCooldown = false;
+    public static fixModes noPearlCooldown = fixModes.Disabled;
     @SerialEntry
-    public static boolean snowFix = false;
+    public static fixModes snowFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean noDropSwing = false;
+    public static fixModes noDropSwing = fixModes.Disabled;
     @SerialEntry
-    public static boolean itemCountFix = false;
+    public static fixModes itemCountFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean ridingCamFix = false;
+    public static fixModes ridingCamFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean sneakFix = false;
+    public static fixModes sneakFix = fixModes.Disabled;
     @SerialEntry
-    public static boolean terrorFix = false;
+    public static fixModes terrorFix = fixModes.Disabled;
 
     // Solvers
 
@@ -171,13 +171,15 @@ public class Config {
     @SerialEntry
     public static boolean keyHighlight = false;
     @SerialEntry
-    public static Color keyColor = new Color(0, 255, 0, 85);
+    public static Color keyColor = new Color(0, 255, 0, 128);
     @SerialEntry
     public static boolean spiritHighlight = false;
     @SerialEntry
     public static Color spiritColor = new Color(175, 0, 255, 170);
     @SerialEntry
     public static boolean solveTerminals = false;
+    @SerialEntry
+    public static boolean solveDevices = false;
     @SerialEntry
     public static boolean melodyAnnounce = false;
     @SerialEntry
@@ -218,6 +220,8 @@ public class Config {
     public static boolean ghostVision = false;
     @SerialEntry
     public static boolean betterSkymall = false;
+    @SerialEntry
+    public static String skymallWhitelist = "titanium, goblins";
 
     // Farming
 
@@ -306,5 +310,11 @@ public class Config {
         Automatic,
         Manual,
         Ignore
+    }
+
+    public enum fixModes {
+        Disabled,
+        SkyblockOnly,
+        Enabled
     }
 }

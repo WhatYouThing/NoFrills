@@ -220,6 +220,8 @@ public class Config {
     public static boolean ghostVision = false;
     @SerialEntry
     public static boolean betterSkymall = false;
+    @SerialEntry
+    public static String skymallWhitelist = "titanium, goblins";
 
     // Farming
 

@@ -28,7 +28,7 @@ public class Mining {
 
                 .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Better Sky Mall"))
-                        .description(OptionDescription.of(Text.of("Compacts the new buff messages from the Sky Mall HOTM perk. If you are not wearing any mining armor, the messages will be hidden instead of compacted.")))
+                        .description(OptionDescription.of(Text.of("Compacts and improves the Sky Mall new buff messages. The buff messages are hidden instead of compacted if none of your armor pieces have mining stats.")))
                         .binding(false, () -> Config.betterSkymall, value -> Config.betterSkymall = value)
                         .controller(Config::booleanController)
                         .build())

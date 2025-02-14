@@ -91,6 +91,12 @@ public class General {
                                 .binding(false, () -> Config.noFireOverlay, value -> Config.noFireOverlay = value)
                                 .controller(Config::booleanController)
                                 .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.of("No Break Particles"))
+                                .description(OptionDescription.of(Text.of("Stops your game from spawning any particles for broken blocks.")))
+                                .binding(false, () -> Config.noBreakParticles, value -> Config.noBreakParticles = value)
+                                .controller(Config::booleanController)
+                                .build())
                         .build())
 
                 .group(OptionGroup.createBuilder()

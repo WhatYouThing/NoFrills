@@ -20,13 +20,6 @@ public class Mining {
                         .build())
 
                 .option(Option.<Boolean>createBuilder()
-                        .name(Text.of("Temple Spot Locator"))
-                        .description(OptionDescription.of(Text.of("Automatically locates the Jungle Temple cheese spot for you (and highlights it) once you approach the entrance to the temple. This option is only useful if you know how to do the crystal cheese (and have MVP+ or higher along with the Nucleus warp scroll, as otherwise this requires either a well timed pearl or Tactical Insertion not to get stuck).")))
-                        .binding(false, () -> Config.templeLocator, value -> Config.templeLocator = value)
-                        .controller(Config::booleanController)
-                        .build())
-
-                .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Ghost Vision"))
                         .description(OptionDescription.of(Text.of("Makes Ghosts way easier to see by turning them into blue blobs.")))
                         .binding(false, () -> Config.ghostVision, value -> Config.ghostVision = value)

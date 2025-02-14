@@ -217,8 +217,6 @@ public class Config {
     @SerialEntry
     public static boolean miningCorpseGlow = false;
     @SerialEntry
-    public static boolean templeLocator = false;
-    @SerialEntry
     public static boolean ghostVision = false;
     @SerialEntry
     public static boolean betterSkymall = false;

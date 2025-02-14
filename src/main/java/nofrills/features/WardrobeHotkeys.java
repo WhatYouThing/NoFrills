@@ -38,7 +38,7 @@ public class WardrobeHotkeys {
                                     if (slot.getStack().getItem() == slotItem) {
                                         mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, 0, SlotActionType.PICKUP, mc.player);
                                         if (Config.wardrobeHotkeysSound) {
-                                            Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR, SoundCategory.MASTER, 0.65f, 1.0f);
+                                            Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR.value(), SoundCategory.MASTER, 0.65f, 1.0f);
                                         }
                                         event.cancel();
                                         return;

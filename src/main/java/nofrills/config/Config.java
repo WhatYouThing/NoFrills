@@ -56,6 +56,8 @@ public class Config {
     @SerialEntry
     public static boolean noFireOverlay = false;
     @SerialEntry
+    public static boolean noBreakParticles = false;
+    @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry
     public static boolean partyFinderOptions = false;
@@ -214,8 +216,6 @@ public class Config {
 
     @SerialEntry
     public static boolean miningCorpseGlow = false;
-    @SerialEntry
-    public static boolean templeLocator = false;
     @SerialEntry
     public static boolean ghostVision = false;
     @SerialEntry

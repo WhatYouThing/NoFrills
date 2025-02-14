@@ -54,6 +54,19 @@ public class SkyblockData {
     private static List<String> lines = new ArrayList<>();
     private static boolean showPing = false;
 
+    private static void updateDungeonClass(String msg) {
+        if (mc.player != null) {
+            for (String dungeonClass : dungeonClasses) {
+                if ((msg.startsWith("[" + dungeonClass + "]") && msg.contains("->")) ||
+                        msg.equals(mc.player.getName().getString() + " selected the " + dungeonClass + " Class!") ||
+                        msg.equals("You have selected the " + dungeonClass + " Dungeon Class!")) {
+                    Config.dungeonClass = dungeonClass;
+                    return;
+                }
+            }
+        }
+    }
+
     /*
         Returns the current location from the scoreboard, such as "⏣ Your Island". The location prefix is not omitted.
     */
@@ -141,15 +154,8 @@ public class SkyblockData {
                 instanceOver = true;
             }
         }
-        String msg = event.messagePlain;
-        for (String dungeonClass : dungeonClasses) {
-            boolean isClassChanged = (msg.startsWith("[" + dungeonClass + "]") && msg.contains("->")) ||
-                    msg.equals(mc.player.getName().getString() + " selected the " + dungeonClass + " Class!") ||
-                    msg.equals("You have selected the " + dungeonClass + " Dungeon Class!");
-            if (isClassChanged) {
-                Config.dungeonClass = dungeonClass;
-                break;
-            }
+        if (Utils.isInDungeons() || getArea().equals("Dungeon Hub")) {
+            updateDungeonClass(event.messagePlain);
         }
     }
 

@@ -25,6 +25,7 @@
     "LivingEntityMixin",
     "MinecraftClientMixin",
     "MouseMixin",
+    "ParticleManagerMixin",
     "PlayerEntityMixin",
     "RaycastContextMixin",
     "SnowBlockMixin",

@@ -15,6 +15,7 @@ import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
 import nofrills.features.DungeonSolvers;
 import nofrills.misc.ScreenOptions;
+import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -142,6 +143,14 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         Optional<SpoofedSlot> spoofedSlot = spoofedSlots.stream().filter(spoofed -> spoofed.isSlot(focusedSlot)).findFirst();
         if (spoofedSlot.isPresent()) {
             return spoofedSlot.get().replacementStack;
+        }
+        return original;
+    }
+
+    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;hasCreativeInventory()Z"))
+    private boolean onMiddleClick(boolean original) {
+        if (Utils.isFixEnabled(Config.middleClickFix)) {
+            return true;
         }
         return original;
     }

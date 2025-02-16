@@ -91,6 +91,14 @@ public class Fixes {
                                 .enumClass(Config.fixModes.class)
                                 .formatValue(value -> Text.of(value.name())))
                         .build())
+                .option(Option.<Config.fixModes>createBuilder()
+                        .name(Text.of("Middle Click Fix"))
+                        .description(OptionDescription.of(Text.of("Allows Pick Block (the middle mouse button) to work just as it does in 1.8.9.")))
+                        .binding(Config.fixModes.Disabled, () -> Config.middleClickFix, value -> Config.middleClickFix = value)
+                        .controller(option -> EnumControllerBuilder.create(option)
+                                .enumClass(Config.fixModes.class)
+                                .formatValue(value -> Text.of(value.name())))
+                        .build())
                 .build();
     }
 }

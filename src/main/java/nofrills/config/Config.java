@@ -126,6 +126,8 @@ public class Config {
     public static fixModes sneakFix = fixModes.Disabled;
     @SerialEntry
     public static fixModes terrorFix = fixModes.Disabled;
+    @SerialEntry
+    public static fixModes middleClickFix = fixModes.Disabled;
 
     // Solvers
 

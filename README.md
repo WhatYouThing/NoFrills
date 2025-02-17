@@ -23,6 +23,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Ignore Background**: Prevents you from clicking on the glass panes which act as a background in Skyblock GUI's.
 
 - **Visual**
+
     - **Hide Dead Mobs**: Prevents the game from rendering dead mobs, and also hides the Skyblock name tags of dead
       mobs.
     - **Old Skins**: Makes only Steve and Alex appear as the default player skins.

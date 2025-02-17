@@ -16,6 +16,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Inventory**
 
+  - **Price Tooltips**: Adds the lowest available Auction House, Bazaar, and attribute (separate attributes + roll)
+    prices to item tooltips.
     - **Hotbar Swap**: Allows you to easily move items from your inventory to your hotbar by pressing Ctrl + Left Click.
       Essentially like pressing a number key, but much simpler.
     - **Ignore Background**: Prevents you from clicking on the glass panes which act as a background in Skyblock GUI's.
@@ -26,6 +28,10 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Old Skins**: Makes only Steve and Alex appear as the default player skins.
   - **Keep Chunks**: Prevents chunks from being unloaded client-side, letting you see them from further away with high
     render distance. This is pretty much a simplistic version of the features from Nvidium/Distant Horizons.
+  - **No Explosions**: Block explosion particles spawned by the server (such as the large explosion from Wither
+    Impact).
+  - **No Fire Overlay**: Prevents the on fire overlay from rendering.
+  - **No Break Particles**: Prevents any broken block particles from spawning.
 
 - **Overlays**
     - **Etherwarp**: Highlights the block you're aiming at when trying to use the Ether Transmission ability.
@@ -60,6 +66,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Sneak Fix**: Fixes the ancient bug where the un-sneak animation plays twice if you do it too quickly, and fixes
   sneaking not slowing you down while inside a block.
 - **Terror Fix**: Replicates the glorious sounds of pre-nerf Terror armor.
+- **Middle Click Fix**: Allows Pick Block (the middle mouse button) to work just as it does in 1.8.9.
 
 ### Fishing
 
@@ -73,7 +80,11 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Starred Mob Highlight**: Renders hitboxes for every starred mob, making clearing much easier.
 - **Mini Boss Highlight**: Renders hitboxes for mini bosses.
 - **Solve Terminals**: Turns (most) terminals into a fish brain point-and-click minigame.
+- **Solve Devices**: Helps you solve (most) devices on F7/M7.
 - **Melody Message**: Sends a message when you get the Melody terminal.
+- **Key Highlight**: Draws a box over Wither/Blood Keys to make them more visible.
+- **Spirit Bow Highlight**: Highlights the Spirit Bow in F4/M4.
+- **Wish Reminder**: Reminds you to wish when Maxor is enraged while playing as Healer in F7/M7.
 
 ### Kuudra
 
@@ -108,6 +119,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 ### Mining
 
 - **Corpse Highlight**: Highlights every nearby corpse in the Glacite Mineshafts.
+- **Ghost Vision**: Makes Ghosts way easier to see in the Dwarven Mines.
+- **Better Sky Mall**: Get Sky Mall buff messages only when you're mining. Also compacts the buff message, and mentions
+  the day which the buff is for, e.g. "Sky Mall Buff for Day Summer 1st"
 
 ### Farming
 

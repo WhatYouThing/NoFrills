@@ -16,8 +16,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Inventory**
 
-  - **Price Tooltips**: Adds the lowest available Auction House, Bazaar, and attribute (separate attributes + roll)
-    prices to item tooltips.
+    - **Price Tooltips**: Adds the lowest available Auction House, Bazaar, and attribute (separate attributes + roll)
+      prices to item tooltips.
     - **Hotbar Swap**: Allows you to easily move items from your inventory to your hotbar by pressing Ctrl + Left Click.
       Essentially like pressing a number key, but much simpler.
     - **Ignore Background**: Prevents you from clicking on the glass panes which act as a background in Skyblock GUI's.
@@ -27,12 +27,12 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Hide Dead Mobs**: Prevents the game from rendering dead mobs, and also hides the Skyblock name tags of dead
       mobs.
     - **Old Skins**: Makes only Steve and Alex appear as the default player skins.
-  - **Keep Chunks**: Prevents chunks from being unloaded client-side, letting you see them from further away with high
-    render distance. This is pretty much a simplistic version of the features from Nvidium/Distant Horizons.
-  - **No Explosions**: Block explosion particles spawned by the server (such as the large explosion from Wither
-    Impact).
-  - **No Fire Overlay**: Prevents the on fire overlay from rendering.
-  - **No Break Particles**: Prevents any broken block particles from spawning.
+    - **Keep Chunks**: Prevents chunks from being unloaded client-side, letting you see them from further away with high
+      render distance. This is pretty much a simplistic version of the features from Nvidium/Distant Horizons.
+    - **No Explosions**: Block explosion particles spawned by the server (such as the large explosion from Wither
+      Impact).
+    - **No Fire Overlay**: Prevents the on fire overlay from rendering.
+    - **No Break Particles**: Prevents any broken block particles from spawning.
 
 - **Overlays**
     - **Etherwarp**: Highlights the block you're aiming at when trying to use the Ether Transmission ability.
@@ -42,8 +42,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
       has an option to play a sound effect when using the feature.
 
 - **Party**
-  - **Finder Options**: Adds various buttons in the chat when anyone joins your party through Party Finder, such as
-    copy name and kick.
+    - **Finder Options**: Adds various buttons in the chat when anyone joins your party through Party Finder, such as
+      copy name and kick.
     - **Party Commands**: Adds a few commands that your party members can use, customizable.
 
 - **Viewmodel**

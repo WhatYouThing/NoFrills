@@ -8,5 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(CreeperEntity.class)
 public interface CreeperEntityAccessor {
     @Accessor("CHARGED")
-    TrackedData<Boolean> getChargedFlag();
+    static TrackedData<Boolean> getChargedFlag() {
+        return null;
+    }
 }

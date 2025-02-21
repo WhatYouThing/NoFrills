@@ -5,6 +5,8 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -79,12 +81,15 @@ public class FishingFeatures {
     private static int notifyTicks = 0;
 
     private static boolean isHoldingRod() {
-        LoreComponent lore = mc.player.getMainHandStack().getComponents().get(DataComponentTypes.LORE);
-        if (lore != null) {
-            for (Text line : lore.lines()) {
-                String lineClean = Formatting.strip(line.getString());
-                if (lineClean.startsWith("Sea Creature Chance:")) {
-                    return true;
+        ItemStack stack = mc.player.getMainHandStack();
+        if (stack != null && !stack.isEmpty() && stack.getItem().equals(Items.FISHING_ROD)) {
+            LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+            if (lore != null) {
+                for (Text line : lore.lines()) {
+                    String lineClean = Formatting.strip(line.getString());
+                    if (lineClean.startsWith("Sea Creature Chance:")) {
+                        return true;
+                    }
                 }
             }
         }

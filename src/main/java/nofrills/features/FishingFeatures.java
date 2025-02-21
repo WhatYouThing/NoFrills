@@ -5,6 +5,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundCategory;
@@ -12,10 +13,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import nofrills.config.Config;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.EntityNamedEvent;
-import nofrills.events.PlaySoundEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
@@ -78,17 +76,20 @@ public class FishingFeatures {
             SeaCreature.plain("Lava Blaze"),
             SeaCreature.plain("Lava Pigman"),
     };
+    private static final RenderColor rareColor = new RenderColor(255, 170, 0, 0);
     private static int notifyTicks = 0;
 
     private static boolean isHoldingRod() {
-        ItemStack stack = mc.player.getMainHandStack();
-        if (stack != null && !stack.isEmpty() && stack.getItem().equals(Items.FISHING_ROD)) {
-            LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
-            if (lore != null) {
-                for (Text line : lore.lines()) {
-                    String lineClean = Formatting.strip(line.getString());
-                    if (lineClean.startsWith("Sea Creature Chance:")) {
-                        return true;
+        if (mc.player != null) {
+            ItemStack stack = mc.player.getMainHandStack();
+            if (stack != null && !stack.isEmpty() && stack.getItem().equals(Items.FISHING_ROD)) {
+                LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+                if (lore != null) {
+                    for (Text line : lore.lines()) {
+                        String lineClean = Formatting.strip(line.getString());
+                        if (lineClean.startsWith("Sea Creature Chance:")) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -104,7 +105,7 @@ public class FishingFeatures {
             } else {
                 List<Entity> creatures = new ArrayList<>(seaCreatures);
                 for (Entity ent : creatures) {
-                    if (!ent.isAlive()) {
+                    if (ent == null || !ent.isAlive()) {
                         seaCreatures.remove(ent);
                     }
                 }
@@ -123,7 +124,7 @@ public class FishingFeatures {
                 }
             }
         }
-        if (Config.capRender && isHoldingRod()) {
+        if (Config.capRender && !seaCreatures.isEmpty() && isHoldingRod()) {
             Utils.showTitleCustom(String.valueOf(seaCreatures.size()), 1, 5, 2.0f, 0x00aaaa);
         }
     }
@@ -139,9 +140,14 @@ public class FishingFeatures {
                     }
                 }
                 if (Config.rareGlow && creature.rare && event.entity.age < 10 && name.contains(creature.name.toLowerCase())) {
-                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, ent -> ent instanceof LivingEntity));
+                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, Utils::isNonPlayerCharacter));
                     if (owner != null) {
-                        Rendering.Entities.drawGlow(owner, true, new RenderColor(255, 170, 0, 0));
+                        Rendering.Entities.drawGlow(owner, true, rareColor);
+                        if (owner.hasVehicle()) {
+                            Rendering.Entities.drawGlow(owner.getVehicle(), true, rareColor);
+                        } else if (owner.hasPassengers()) {
+                            Rendering.Entities.drawGlow(owner.getFirstPassenger(), true, rareColor);
+                        }
                     }
                 }
             }

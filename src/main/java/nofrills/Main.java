@@ -47,11 +47,10 @@ public class Main implements ModInitializer {
 
         eventBus.subscribe(DungeonHighlight.class);
         eventBus.subscribe(DungeonSolvers.class);
-        eventBus.subscribe(RareSeaCreatures.class);
+        eventBus.subscribe(FishingFeatures.class);
         eventBus.subscribe(EtherwarpOverlay.class);
         eventBus.subscribe(CorpseHighlight.class);
         eventBus.subscribe(WardrobeHotkeys.class);
-        eventBus.subscribe(SeaCreatureCap.class);
         eventBus.subscribe(UpdateChecker.class);
         eventBus.subscribe(SpaceFarmer.class);
         eventBus.subscribe(AutoSprint.class);

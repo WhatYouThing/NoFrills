@@ -4,7 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -73,19 +73,8 @@ public class DungeonSolvers {
         return stack;
     }
 
-    // for WIP arrow align solver
-    private static BlockPos getRotationOffset(BlockPos pos, int rotation) {
-        return switch (rotation) {
-            case 1 -> pos.add(0, 0, -1);
-            case 3 -> pos.add(0, -1, 0);
-            case 5 -> pos.add(0, 0, 1);
-            case 7 -> pos.add(0, 1, 0);
-            default -> pos;
-        };
-    }
-
     private static boolean isSharpshooterActive() {
-        return !mc.world.getOtherEntities(null, sharpshooterArea, ent -> ent.getType() == EntityType.PLAYER).isEmpty();
+        return !mc.world.getOtherEntities(null, sharpshooterArea, ent -> ent instanceof PlayerEntity).isEmpty();
     }
 
     private static void findSharpshooterTarget() {

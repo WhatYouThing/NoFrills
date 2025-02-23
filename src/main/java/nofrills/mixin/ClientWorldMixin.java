@@ -1,7 +1,9 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
@@ -12,6 +14,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import nofrills.config.Config;
 import nofrills.events.BlockUpdateEvent;
+import nofrills.events.EntityRemoveEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,5 +52,10 @@ public abstract class ClientWorldMixin extends World {
     @Inject(method = "handleBlockUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;II)Z"))
     private void onUpdateBlock(BlockPos pos, BlockState state, int flags, CallbackInfo ci) {
         eventBus.post(new BlockUpdateEvent(pos, getBlockState(pos), state));
+    }
+
+    @Inject(method = "removeEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setRemoved(Lnet/minecraft/entity/Entity$RemovalReason;)V"))
+    private void onTrackerUpdate(int entityId, Entity.RemovalReason removalReason, CallbackInfo ci, @Local Entity ent) {
+        eventBus.post(new EntityRemoveEvent(ent, removalReason));
     }
 }

@@ -36,6 +36,8 @@ public class Config {
     @SerialEntry
     public static boolean noSelfieCam = false;
     @SerialEntry
+    public static boolean terrorFix = false;
+    @SerialEntry
     public static boolean wardrobeHotkeys = false;
     @SerialEntry
     public static boolean wardrobeHotkeysSound = false;
@@ -125,38 +127,42 @@ public class Config {
     @SerialEntry
     public static fixModes sneakFix = fixModes.Disabled;
     @SerialEntry
-    public static fixModes terrorFix = fixModes.Disabled;
+    public static fixModes middleClickFix = fixModes.Disabled;
 
     // Solvers
 
     // Fishing
 
     @SerialEntry
-    public static boolean fishCapEnabled = false;
+    public static boolean capEnabled = false;
     @SerialEntry
-    public static int fishCap = 50;
+    public static int capTarget = 50;
     @SerialEntry
-    public static int fishCapDelay = 30;
+    public static int capDelay = 30;
     @SerialEntry
-    public static boolean fishCapSendMsg = false;
+    public static boolean capRender = false;
     @SerialEntry
-    public static String fishCapMsg = "/pc SEA CREATURE CAP REACHED!";
+    public static boolean capSendMsg = false;
     @SerialEntry
-    public static boolean fishCapSound = false;
+    public static String capMsg = "/pc SEA CREATURE CAP REACHED!";
     @SerialEntry
-    public static boolean fishCapTitle = false;
+    public static boolean capSound = false;
     @SerialEntry
-    public static boolean fishRareTitle = false;
+    public static boolean capTitle = false;
     @SerialEntry
-    public static boolean fishRareMsgSend = false;
+    public static boolean rareTitle = false;
     @SerialEntry
-    public static String fishRareMsg = "/pc {spawnmsg}";
+    public static boolean rareGlow = false;
     @SerialEntry
-    public static boolean fishRareSound = false;
+    public static boolean rareSendMsg = false;
     @SerialEntry
-    public static boolean fishRareReplace = false;
+    public static String rareMsg = "/pc {spawnmsg}";
     @SerialEntry
-    public static boolean fishMuteDrake = false;
+    public static boolean rareSound = false;
+    @SerialEntry
+    public static boolean rareReplace = false;
+    @SerialEntry
+    public static boolean muteDrake = false;
 
     // Dungeons
 

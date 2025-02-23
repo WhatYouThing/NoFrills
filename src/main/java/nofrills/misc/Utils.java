@@ -12,6 +12,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -196,14 +197,25 @@ public class Utils {
         if (handler != null) {
             PlayerListEntry listEntry = handler.getPlayerListEntry(entity.getUuid());
             if (listEntry != null) {
-                Text displayName = listEntry.getDisplayName();
+                String displayName = listEntry.getProfile().getName();
                 if (displayName != null) {
-                    String name = Formatting.strip(displayName.getString());
-                    return !name.contains(" ");
+                    String name = Formatting.strip(displayName);
+                    return !name.isEmpty() && !name.contains(" ");
                 }
             }
         }
         return entity == mc.player;
+    }
+
+    /**
+     * Check if the provided entity is a living entity (and in the case of player entities, if it isn't a real player).
+     */
+    public static boolean isNonPlayerCharacter(Entity entity) {
+        if (entity instanceof PlayerEntity player) {
+            return isPlayer(player);
+        } else {
+            return entity instanceof LivingEntity;
+        }
     }
 
     public static boolean isFixEnabled(Config.fixModes fix) {

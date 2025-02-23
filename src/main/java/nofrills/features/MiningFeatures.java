@@ -67,7 +67,7 @@ public class MiningFeatures {
                     CreeperEntity creeper = (CreeperEntity) ent;
                     if (creeper.getMaxHealth() >= 1000.0f) {
                         creeper.setInvisible(true);
-                        creeper.getDataTracker().set(((CreeperEntityAccessor) creeper).getChargedFlag(), false);
+                        creeper.getDataTracker().set(CreeperEntityAccessor.getChargedFlag(), false);
                         Rendering.Entities.drawFilled(ent, true, ghostColor);
                     }
                 }

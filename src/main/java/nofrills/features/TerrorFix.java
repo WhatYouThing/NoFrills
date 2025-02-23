@@ -2,6 +2,7 @@ package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Formatting;
@@ -28,14 +29,14 @@ public class TerrorFix {
 
     @EventHandler
     public static void onTick(WorldTickEvent event) {
-        if (Utils.isFixEnabled(Config.terrorFix)) {
+        if (Config.terrorFix) {
             terrorPieces = countPieces();
         }
     }
 
     @EventHandler
     public static void onSound(PlaySoundEvent event) {
-        if (Utils.isFixEnabled(Config.terrorFix) && terrorPieces >= 2) {
+        if (Config.terrorFix && terrorPieces >= 2 && mc.player.isHolding(Items.BOW)) {
             if (event.isSound(SoundEvents.ENTITY_ARROW_HIT_PLAYER) && event.packet.getPitch() == 0.7936508f) {
                 Utils.playSound(SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.MASTER, 3.0f, 1.0f);
                 Utils.playSound(SoundEvents.BLOCK_PISTON_CONTRACT, SoundCategory.MASTER, 3.0f, 1.0f);

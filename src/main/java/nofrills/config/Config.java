@@ -36,6 +36,8 @@ public class Config {
     @SerialEntry
     public static boolean noSelfieCam = false;
     @SerialEntry
+    public static boolean terrorFix = false;
+    @SerialEntry
     public static boolean wardrobeHotkeys = false;
     @SerialEntry
     public static boolean wardrobeHotkeysSound = false;
@@ -124,8 +126,6 @@ public class Config {
     public static fixModes ridingCamFix = fixModes.Disabled;
     @SerialEntry
     public static fixModes sneakFix = fixModes.Disabled;
-    @SerialEntry
-    public static fixModes terrorFix = fixModes.Disabled;
     @SerialEntry
     public static fixModes middleClickFix = fixModes.Disabled;
 

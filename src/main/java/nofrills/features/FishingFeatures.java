@@ -4,8 +4,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundCategory;
@@ -186,6 +184,11 @@ public class FishingFeatures {
                 event.cancel();
             }
         }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        seaCreatures.clear();
     }
 
     private static class SeaCreature {

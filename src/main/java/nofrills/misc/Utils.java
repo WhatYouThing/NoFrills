@@ -213,8 +213,7 @@ public class Utils {
     public static boolean isNonPlayerCharacter(Entity entity) {
         if (entity instanceof PlayerEntity player) {
             return isPlayer(player);
-        }
-        else {
+        } else {
             return entity instanceof LivingEntity;
         }
     }

@@ -64,23 +64,27 @@ public class Config {
     @SerialEntry
     public static boolean partyFinderOptions = false;
     @SerialEntry
+    public static boolean partyWaypoints = false;
+    @SerialEntry
+    public static Color partyWaypointColor = new Color(85, 85, 255, 170);
+    @SerialEntry
+    public static int partyWaypointTime = 60;
+    @SerialEntry
     public static String partyPrefixes = "! ?";
     @SerialEntry
     public static List<String> partyWhitelist = new ArrayList<>();
     @SerialEntry
     public static List<String> partyBlacklist = new ArrayList<>();
     @SerialEntry
-    public static partyBehaviorList partyBehavior = partyBehaviorList.Manual;
+    public static partyBehaviorList partyCmdWarp = partyBehaviorList.Disabled;
     @SerialEntry
-    public static boolean partyCmdWarp = false;
+    public static partyBehaviorList partyCmdTransfer = partyBehaviorList.Disabled;
     @SerialEntry
-    public static boolean partyCmdTransfer = false;
+    public static partyBehaviorList partyCmdAllInvite = partyBehaviorList.Disabled;
     @SerialEntry
-    public static boolean partyCmdAllInvite = false;
+    public static partyBehaviorList partyCmdDowntime = partyBehaviorList.Disabled;
     @SerialEntry
-    public static boolean partyCmdDowntime = false;
-    @SerialEntry
-    public static boolean partyCmdQueue = false;
+    public static partyBehaviorList partyCmdQueue = partyBehaviorList.Disabled;
     @SerialEntry
     public static boolean noHaste = false;
     @SerialEntry
@@ -315,7 +319,8 @@ public class Config {
     public enum partyBehaviorList {
         Automatic,
         Manual,
-        Ignore
+        Ignore,
+        Disabled
     }
 
     public enum fixModes {

@@ -37,7 +37,12 @@ public class SkyblockData {
             new InstanceType("k2", "KUUDRA_HOT"),
             new InstanceType("k3", "KUUDRA_BURNING"),
             new InstanceType("k4", "KUUDRA_FIERY"),
-            new InstanceType("k5", "KUUDRA_INFERNAL")
+            new InstanceType("k5", "KUUDRA_INFERNAL"),
+            new InstanceType("t1", "KUUDRA_NORMAL"),
+            new InstanceType("t2", "KUUDRA_HOT"),
+            new InstanceType("t3", "KUUDRA_BURNING"),
+            new InstanceType("t4", "KUUDRA_FIERY"),
+            new InstanceType("t5", "KUUDRA_INFERNAL")
     };
     private static final String[] dungeonClasses = {
             "Healer",

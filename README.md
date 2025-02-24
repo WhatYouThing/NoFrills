@@ -13,6 +13,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
     - **Auto Sprint**
     - **No Selfie Camera**: Prevents you from going into the front facing perspective when pressing F5.
+    - **Terror Fix**: Replicates the glorious sounds of pre-nerf Terror armor.
 
 - **Inventory**
 
@@ -66,14 +67,16 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Riding Camera Fix**: Gets rid of the delayed/floaty camera movement while riding any entity.
 - **Sneak Fix**: Fixes the ancient bug where the un-sneak animation plays twice if you do it too quickly, and fixes
   sneaking not slowing you down while inside a block.
-- **Terror Fix**: Replicates the glorious sounds of pre-nerf Terror armor.
 - **Middle Click Fix**: Allows Pick Block (the middle mouse button) to work just as it does in 1.8.9.
 
 ### Fishing
 
-- **Sea Creature Cap**: Keeps track of how many sea creatures are alive, and allows you to notify yourself (and your
+- **Track Cap**: Keeps track of how many sea creatures are alive, and allows you to notify yourself (and your
   party) once the cap is reached. Customizable.
+- **Render Cap**: Shows the current amount of alive sea creatures as a small number on screen while you hold your
+  fishing rod.
 - **Rare Sea Creatures**: Notify yourself (and your party) when catching any rare/profitable sea creature.
+- **Apply Glow**: Applies a gold-colored glow to any nearby rare sea creature.
 - **Mute Drake**: Prevents the Reindrake from blowing up your ears, because he's very loud on 1.20+.
 
 ### Dungeons

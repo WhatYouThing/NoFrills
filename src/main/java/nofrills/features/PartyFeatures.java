@@ -189,6 +189,7 @@ public class PartyFeatures {
             List<PlayerWaypoint> waypoints = new ArrayList<>(waypointList);
             for (PlayerWaypoint waypoint : waypoints) {
                 event.drawFilled(waypoint.box, true, RenderColor.fromColor(Config.partyWaypointColor));
+                event.drawBeam(waypoint.box.getCenter().add(0, 0.5, 0), 128, true, RenderColor.fromColor(Config.partyWaypointColor));
                 event.drawText(waypoint.box.getCenter().add(0, 1, 0), Text.of(waypoint.name), 0.05f, true, RenderColor.fromHex(0xffffff));
             }
         }

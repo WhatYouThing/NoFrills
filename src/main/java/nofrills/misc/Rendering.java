@@ -79,6 +79,13 @@ public final class Rendering {
         }
     }
 
+    /**
+     * Draws a simulated beacon beam for the current frame. Automatically performs the required matrix stack translation.
+     */
+    public static void drawBeam(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, Vec3d pos, int height, boolean throughWalls, RenderColor color) {
+        drawFilled(matrices, consumer, camera, Box.of(pos, 0.35, 0, 0.35).stretch(0, height, 0), throughWalls, color);
+    }
+
     public static class Entities {
         /**
          * Enable/disable filled box rendering for an entity.

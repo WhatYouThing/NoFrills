@@ -57,7 +57,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(HotbarSwap.class);
         eventBus.subscribe(Config.class);
         eventBus.subscribe(KuudraFeatures.class);
-        eventBus.subscribe(PartyFeatures.class);
+        eventBus.subscribe(ChatFeatures.class);
         eventBus.subscribe(SlayerFeatures.class);
         eventBus.subscribe(NoRender.class);
         eventBus.subscribe(PearlRefill.class);

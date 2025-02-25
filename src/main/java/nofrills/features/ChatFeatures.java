@@ -1,6 +1,8 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -13,17 +15,19 @@ import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
-public class PartyFeatures {
+public class ChatFeatures {
     private static final Pattern partyFinderPattern = Pattern.compile("Party Finder > .* joined .*");
     private static final Config.partyBehaviorList auto = Config.partyBehaviorList.Automatic;
     private static final Config.partyBehaviorList ignore = Config.partyBehaviorList.Ignore;
     private static final Config.partyBehaviorList disabled = Config.partyBehaviorList.Disabled;
     private static final List<PlayerWaypoint> waypointList = new ArrayList<>();
+    private static final RenderColor textColor = RenderColor.fromHex(0xffffff);
     private static boolean downtimeNeeded = false;
 
     private static void setDowntimeReminder(String sender) {
@@ -39,7 +43,7 @@ public class PartyFeatures {
         return Character.isDigit(character.charAt(0)) || character.equals("-") || character.equals(".");
     }
 
-    private static void highlightCoords(String message, String sender) {
+    private static void highlightCoords(String message, String sender, boolean party) {
         StringBuilder lastCoord = new StringBuilder();
         int lastCoordEnd = -1;
         List<Double> coords = new ArrayList<>();
@@ -73,14 +77,32 @@ public class PartyFeatures {
         }
         if (coords.size() == 3) {
             int x = (int) Math.floor(coords.getFirst()), y = (int) Math.floor(coords.get(1)), z = (int) Math.floor(coords.get(2));
+            int duration = party ? Config.partyWaypointTime * 20 : Config.chatWaypointTime * 20;
             waypointList.removeIf(waypoint -> waypoint.name.equals(sender));
-            waypointList.add(new PlayerWaypoint(sender, new BlockPos(x, y, z), Config.partyWaypointTime * 20));
+            waypointList.add(new PlayerWaypoint(sender, new BlockPos(x, y, z), duration, party));
         }
     }
 
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
         String msg = event.getPlainMessage();
+        if (Config.chatWaypoints) {
+            if (msg.startsWith("[NPC]") || msg.startsWith("[BOSS]") || msg.startsWith("Guild > ")) {
+                return;
+            }
+            int msgStart = msg.indexOf(":");
+            if (msgStart != -1) {
+                String senderInfo = msg.substring(0, msgStart);
+                String sender = senderInfo.contains(" ") ? Arrays.stream(senderInfo.split(" ")).toList().getLast().trim() : senderInfo;
+                ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+                if (handler != null && mc.player != null && !mc.player.getName().getString().equals(sender)) {
+                    PlayerListEntry entry = handler.getPlayerListEntry(sender);
+                    if (entry != null) {
+                        highlightCoords(msg.substring(msgStart), sender, false);
+                    }
+                }
+            }
+        }
         if (Config.partyFinderOptions && msg.startsWith("Party Finder >") && partyFinderPattern.matcher(msg).matches()) {
             String name = msg.replace("Party Finder >", "").trim().split(" ", 2)[0].toLowerCase();
             if (name.equalsIgnoreCase(mc.getSession().getUsername())) {
@@ -102,7 +124,7 @@ public class PartyFeatures {
     @EventHandler
     private static void onPartyMessage(PartyChatMsgEvent event) {
         if (Config.partyWaypoints && !event.self) {
-            highlightCoords(event.message, event.sender);
+            highlightCoords(event.message, event.sender, true);
         }
         if (!Config.partyPrefixes.isEmpty() && !event.self) {
             String msg = event.message.toLowerCase();
@@ -188,9 +210,10 @@ public class PartyFeatures {
         if (!waypointList.isEmpty()) {
             List<PlayerWaypoint> waypoints = new ArrayList<>(waypointList);
             for (PlayerWaypoint waypoint : waypoints) {
-                event.drawFilled(waypoint.box, true, RenderColor.fromColor(Config.partyWaypointColor));
-                event.drawBeam(waypoint.box.getCenter().add(0, 0.5, 0), 128, true, RenderColor.fromColor(Config.partyWaypointColor));
-                event.drawText(waypoint.box.getCenter().add(0, 1, 0), Text.of(waypoint.name), 0.05f, true, RenderColor.fromHex(0xffffff));
+                RenderColor color = waypoint.party ? RenderColor.fromColor(Config.partyWaypointColor) : RenderColor.fromColor(Config.chatWaypointColor);
+                event.drawFilled(waypoint.box, true, color);
+                event.drawBeam(waypoint.box.getCenter().add(0, 0.5, 0), 128, true, color);
+                event.drawText(waypoint.box.getCenter().add(0, 1, 0), Text.of(waypoint.name), 0.05f, true, textColor);
             }
         }
     }
@@ -206,11 +229,13 @@ public class PartyFeatures {
         public String name;
         public Box box;
         public int duration;
+        public boolean party;
 
-        public PlayerWaypoint(String name, BlockPos pos, int duration) {
+        public PlayerWaypoint(String name, BlockPos pos, int duration, boolean party) {
             this.name = name;
             this.box = Box.enclosing(pos, pos);
             this.duration = duration;
+            this.party = party;
         }
     }
 }

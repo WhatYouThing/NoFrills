@@ -70,6 +70,12 @@ public class Config {
     @SerialEntry
     public static int partyWaypointTime = 60;
     @SerialEntry
+    public static boolean chatWaypoints = false;
+    @SerialEntry
+    public static Color chatWaypointColor = new Color(85, 255, 255, 170);
+    @SerialEntry
+    public static int chatWaypointTime = 30;
+    @SerialEntry
     public static String partyPrefixes = "! ?";
     @SerialEntry
     public static List<String> partyWhitelist = new ArrayList<>();

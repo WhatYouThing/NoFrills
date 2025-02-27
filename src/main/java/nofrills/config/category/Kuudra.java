@@ -72,6 +72,12 @@ public class Kuudra {
                         .binding("/pc Used {mana} Mana on {players} players!", () -> Config.kuudraDrainMsg, value -> Config.kuudraDrainMsg = value)
                         .controller(StringControllerBuilder::create)
                         .build())
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Stun Waypoint"))
+                        .description(OptionDescription.of(Text.of("Render a waypoint for the easiest to break pod while you are stunning Kuudra.")))
+                        .binding(false, () -> Config.kuudraStunWaypoint, value -> Config.kuudraStunWaypoint = value)
+                        .controller(Config::booleanController)
+                        .build())
 
                 .build();
     }

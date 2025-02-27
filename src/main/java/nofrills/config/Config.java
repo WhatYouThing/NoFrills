@@ -231,6 +231,8 @@ public class Config {
     public static boolean kuudraDrain = false;
     @SerialEntry
     public static String kuudraDrainMsg = "/pc Used {mana} Mana on {players} players!";
+    @SerialEntry
+    public static boolean kuudraStunWaypoint = false;
 
     // Mining
 

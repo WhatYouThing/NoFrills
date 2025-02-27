@@ -3,6 +3,7 @@ package nofrills.misc;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.ColorHelper;
 import nofrills.features.LeapOverlay;
 
 import static nofrills.Main.mc;
@@ -27,14 +28,14 @@ public class LeapMenuButton implements Drawable {
         this.nameColor = LeapOverlay.nameColor.hex;
         this.classColor = classColor.hex;
         if (index == 0 || index == 2) {
-            offsetX = 0.2f;
+            offsetX = 0.25f;
         } else {
-            offsetX = 0.6f;
+            offsetX = 0.55f;
         }
         if (index <= 1) {
-            offsetY = 0.2f;
+            offsetY = 0.25f;
         } else {
-            offsetY = 0.6f;
+            offsetY = 0.55f;
         }
     }
 
@@ -51,11 +52,12 @@ public class LeapMenuButton implements Drawable {
         minY = getY(context, this.offsetY);
         maxX = getX(context, this.offsetX + 0.2f);
         maxY = getY(context, this.offsetY + 0.2f);
-        int textX = getX(context, this.offsetX + 0.01f);
-        int textY = getY(context, this.offsetY + 0.01f);
-        context.drawTextWithShadow(mc.textRenderer, this.player, textX, textY, this.nameColor);
-        context.drawTextWithShadow(mc.textRenderer, this.dungeonClass, textX, textY + 2 + mc.textRenderer.fontHeight, this.classColor);
+        context.drawCenteredTextWithShadow(mc.textRenderer, this.player, minX + (maxX - minX) / 2, (int) (minY + (maxY - minY) * 0.35), this.nameColor);
+        context.drawCenteredTextWithShadow(mc.textRenderer, this.dungeonClass, minX + (maxX - minX) / 2, (int) (minY + (maxY - minY) * 0.5), this.classColor);
         context.fill(minX, minY, maxX, maxY, 0xaa000000); // for some reason its ARGB rather than RGBA
+        if (slotId != -1) {
+            context.drawBorder(minX, minY, maxX - minX, maxY - minY, ColorHelper.Argb.withAlpha(255, this.classColor));
+        }
     }
 }
 

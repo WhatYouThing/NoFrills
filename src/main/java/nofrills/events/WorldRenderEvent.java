@@ -34,4 +34,8 @@ public class WorldRenderEvent {
     public void drawText(Vec3d pos, Text text, float scale, boolean throughWalls, RenderColor color) {
         Rendering.drawText(consumer, camera, pos, text, scale, throughWalls, color);
     }
+
+    public void drawBeam(Vec3d pos, int height, boolean throughWalls, RenderColor color) {
+        Rendering.drawBeam(matrices, consumer, camera, pos, height, throughWalls, color);
+    }
 }

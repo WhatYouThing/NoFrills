@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import static nofrills.Main.mc;
 
 public class SkyblockData {
-    public static final InstanceType[] instances = {
+    public static final List<InstanceType> instances = List.of(
             new InstanceType("f0", "CATACOMBS_ENTRANCE"),
             new InstanceType("f1", "CATACOMBS_FLOOR_ONE"),
             new InstanceType("f2", "CATACOMBS_FLOOR_TWO"),
@@ -37,15 +37,20 @@ public class SkyblockData {
             new InstanceType("k2", "KUUDRA_HOT"),
             new InstanceType("k3", "KUUDRA_BURNING"),
             new InstanceType("k4", "KUUDRA_FIERY"),
-            new InstanceType("k5", "KUUDRA_INFERNAL")
-    };
-    private static final String[] dungeonClasses = {
+            new InstanceType("k5", "KUUDRA_INFERNAL"),
+            new InstanceType("t1", "KUUDRA_NORMAL"),
+            new InstanceType("t2", "KUUDRA_HOT"),
+            new InstanceType("t3", "KUUDRA_BURNING"),
+            new InstanceType("t4", "KUUDRA_FIERY"),
+            new InstanceType("t5", "KUUDRA_INFERNAL")
+    );
+    public static final List<String> dungeonClasses = List.of(
             "Healer",
             "Mage",
             "Berserk",
             "Archer",
             "Tank"
-    };
+    );
     private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
     private static String location = "";
     private static String area = "";

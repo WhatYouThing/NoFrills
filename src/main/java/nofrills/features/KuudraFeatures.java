@@ -5,10 +5,14 @@ import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MagmaCubeEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.ServerJoinEvent;
+import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
@@ -45,10 +49,14 @@ public class KuudraFeatures {
             new PickupSpot("Equals", new Vec3d(-65.5, 76.0, -87.5), 18.0f, 15.0f, null),
     };
     private static final List<Float> dpsData = new ArrayList<>();
+    private static final RenderColor kuudraColor = RenderColor.fromHex(0xffff00, 0.67f);
+    private static final BlockPos stunPos = new BlockPos(-169, 26, -167);
+    private static final Box stunBox = Box.enclosing(stunPos, stunPos);
     private static int freshTicks = 0;
     private static int missingTicks = 20;
     private static float previousHealth = 0.0f;
     private static MagmaCubeEntity kuudraEntity = null;
+    private static boolean isStunning = false;
 
     private static kuudraPhases getCurrentPhase() {
         if (Utils.isInZone(-133, 59, -75, -73, 1, -138)) {
@@ -165,6 +173,9 @@ public class KuudraFeatures {
                 Utils.showTitleCustom("FRESH: " + seconds + "s", 1, 25, 2.5f, 0x55ff55);
                 freshTicks--;
             }
+            if (Config.kuudraStunWaypoint) {
+                isStunning = phase == kuudraPhases.DPS && mc.player.getPos().getY() <= 60;
+            }
             if (kuudraEntity == null || !kuudraEntity.isAlive()) {
                 // alive check is needed in case kuudra goes out of render distance, and we need to find him again.
                 if (Config.kuudraHealth && phase == kuudraPhases.DPS) {
@@ -214,8 +225,8 @@ public class KuudraFeatures {
                     String mana = msg.replace("Used Extreme Focus! (", "").replace(" Mana)", "");
                     int players = 0;
                     for (Entity ent : mc.world.getEntities()) {
-                        if (ent.getType() == EntityType.PLAYER && ent != mc.player && !ent.isInvisible()) {
-                            if (ent.distanceTo(mc.player) <= 5) {
+                        if (ent instanceof PlayerEntity player && player != mc.player) {
+                            if (Utils.isPlayer(player) && !player.isInvisible() && player.distanceTo(mc.player) <= 5) {
                                 players++;
                             }
                         }
@@ -242,6 +253,14 @@ public class KuudraFeatures {
         kuudraEntity = null;
         missingTicks = 20;
         previousHealth = 0.0f;
+    }
+
+    @EventHandler
+    private static void onRender(WorldRenderEvent event) {
+        if (isStunning) {
+            event.drawFilled(stunBox, true, kuudraColor);
+            event.drawBeam(stunBox.getCenter().add(0, 0.5, 0), 64, true, kuudraColor);
+        }
     }
 
     private enum kuudraPhases {

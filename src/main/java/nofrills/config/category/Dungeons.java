@@ -114,6 +114,20 @@ public class Dungeons {
                         .controller(Config::booleanController)
                         .build())
 
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Leap Overlay"))
+                        .description(OptionDescription.of(Text.of("Replaces the Spirit Leap/Infinileap menu with a custom version, similar to the Odin mod for 1.8.9.")))
+                        .binding(false, () -> Config.leapOverlay, value -> Config.leapOverlay = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Leap Message"))
+                        .description(OptionDescription.of(Text.of("Sends a message in party chat when you leap to a teammate. Requires the Leap Overlay.")))
+                        .binding(false, () -> Config.leapOverlayMsg, value -> Config.leapOverlayMsg = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .build();
     }
 }

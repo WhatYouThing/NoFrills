@@ -45,7 +45,7 @@ public abstract class MinecraftClientMixin {
     private boolean isBreakingBlock(boolean original) {
         if (Config.treasureHelper && Utils.isInArea("Crystal Hollows")) {
             if (mc.crosshairTarget instanceof BlockHitResult blockHit) {
-                return mc.world.getBlockState(blockHit.getBlockPos()).getBlock().equals(Blocks.CHEST);
+                return !mc.world.getBlockState(blockHit.getBlockPos()).getBlock().equals(Blocks.CHEST);
             }
         }
         return original;

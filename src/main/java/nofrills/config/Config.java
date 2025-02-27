@@ -204,6 +204,10 @@ public class Config {
     public static String melodyMessage = "/pc Melody";
     @SerialEntry
     public static boolean wishReminder = false;
+    @SerialEntry
+    public static boolean leapOverlay = false;
+    @SerialEntry
+    public static boolean leapOverlayMsg = false;
 
     // Kuudra
 

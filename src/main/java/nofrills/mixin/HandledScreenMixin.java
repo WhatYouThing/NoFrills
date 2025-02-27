@@ -14,9 +14,13 @@ import net.minecraft.text.Text;
 import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
 import nofrills.features.DungeonSolvers;
+import nofrills.features.LeapOverlay;
+import nofrills.misc.LeapMenuButton;
+import nofrills.misc.RenderColor;
 import nofrills.misc.ScreenOptions;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,12 +28,14 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static nofrills.Main.eventBus;
+import static nofrills.Main.mc;
 import static nofrills.misc.Utils.DisabledSlot;
 import static nofrills.misc.Utils.SpoofedSlot;
 
@@ -45,6 +51,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     List<DisabledSlot> disabledSlots = new ArrayList<>();
     @Unique
     List<SpoofedSlot> spoofedSlots = new ArrayList<>();
+    @Unique
+    List<LeapMenuButton> leapButtons = new ArrayList<>();
 
     protected HandledScreenMixin(Text title) {
         super(title);
@@ -59,6 +67,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             return slot.getStack().getName().getString().trim().isEmpty();
         }
         return false;
+    }
+
+    @Unique
+    private boolean isLeapMenu() {
+        return Config.leapOverlay && title.getString().equals(LeapOverlay.leapMenuName);
     }
 
     @Override
@@ -80,11 +93,14 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         spoofedSlots.removeIf(spoofed -> spoofed.isSlot(slot));
     }
 
+    @Override
+    public void nofrills_mod$addLeapButton(int slotId, String name, String dungeonClass, RenderColor classColor) {
+        leapButtons.add(new LeapMenuButton(slotId, leapButtons.size(), name, dungeonClass, classColor));
+    }
+
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        if (disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(slot))) {
-            ci.cancel();
-        } else if (Config.ignoreBackground && isStackNameEmpty(slot)) {
+        if (isLeapMenu() || (Config.ignoreBackground && isStackNameEmpty(slot)) || disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(slot))) {
             ci.cancel();
         }
     }
@@ -145,6 +161,33 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             return spoofedSlot.get().replacementStack;
         }
         return original;
+    }
+
+    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
+    private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (isLeapMenu()) {
+            for (LeapMenuButton button : leapButtons) {
+                button.render(context, mouseX, mouseY, delta);
+            }
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
+    private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+        if (isLeapMenu() && button == GLFW.GLFW_MOUSE_BUTTON_1) {
+            for (LeapMenuButton leapButton : leapButtons) {
+                if (leapButton.slotId != -1 && mouseX >= leapButton.minX && mouseX <= leapButton.maxX && mouseY >= leapButton.minY && mouseY <= leapButton.maxY) {
+                    mc.interactionManager.clickSlot(handler.syncId, leapButton.slotId, 0, SlotActionType.PICKUP, mc.player);
+                    this.handler.setCursorStack(ItemStack.EMPTY);
+                    if (Config.leapOverlayMsg) {
+                        Utils.sendMessage("/pc Leaped to " + leapButton.player.getString() + "!");
+                    }
+                    cir.setReturnValue(true);
+                }
+            }
+            cir.setReturnValue(false);
+        }
     }
 
     @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;hasCreativeInventory()Z"))

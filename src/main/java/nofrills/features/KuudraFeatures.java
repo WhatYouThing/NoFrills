@@ -5,6 +5,7 @@ import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MagmaCubeEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -224,8 +225,8 @@ public class KuudraFeatures {
                     String mana = msg.replace("Used Extreme Focus! (", "").replace(" Mana)", "");
                     int players = 0;
                     for (Entity ent : mc.world.getEntities()) {
-                        if (ent.getType() == EntityType.PLAYER && ent != mc.player && !ent.isInvisible()) {
-                            if (ent.distanceTo(mc.player) <= 5) {
+                        if (ent instanceof PlayerEntity player && player != mc.player) {
+                            if (Utils.isPlayer(player) && !player.isInvisible() && player.distanceTo(mc.player) <= 5) {
                                 players++;
                             }
                         }
@@ -254,6 +255,7 @@ public class KuudraFeatures {
         previousHealth = 0.0f;
     }
 
+    @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (isStunning) {
             event.drawFilled(stunBox, true, kuudraColor);

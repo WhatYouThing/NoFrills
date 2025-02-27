@@ -12,8 +12,8 @@ public class LeapMenuButton implements Drawable {
     public final int slotId;
     public final Text player;
     public final Text dungeonClass;
-    private final int nameColor;
-    private final int classColor;
+    private final RenderColor nameColor;
+    private final RenderColor classColor;
     private final float offsetX;
     private final float offsetY;
     public int minX = 0;
@@ -25,8 +25,8 @@ public class LeapMenuButton implements Drawable {
         this.slotId = slotId;
         this.player = Text.of(player);
         this.dungeonClass = Text.of(dungeonClass);
-        this.nameColor = LeapOverlay.nameColor.hex;
-        this.classColor = classColor.hex;
+        this.nameColor = LeapOverlay.nameColor;
+        this.classColor = classColor;
         if (index == 0 || index == 2) {
             offsetX = 0.25f;
         } else {
@@ -52,11 +52,11 @@ public class LeapMenuButton implements Drawable {
         minY = getY(context, this.offsetY);
         maxX = getX(context, this.offsetX + 0.2f);
         maxY = getY(context, this.offsetY + 0.2f);
-        context.drawCenteredTextWithShadow(mc.textRenderer, this.player, minX + (maxX - minX) / 2, (int) (minY + (maxY - minY) * 0.35), this.nameColor);
-        context.drawCenteredTextWithShadow(mc.textRenderer, this.dungeonClass, minX + (maxX - minX) / 2, (int) (minY + (maxY - minY) * 0.5), this.classColor);
+        context.drawCenteredTextWithShadow(mc.textRenderer, this.player, minX + (maxX - minX) / 2, (int) (minY + (maxY - minY) * 0.35), this.nameColor.hex);
+        context.drawCenteredTextWithShadow(mc.textRenderer, this.dungeonClass, minX + (maxX - minX) / 2, (int) (minY + (maxY - minY) * 0.5), this.classColor.hex);
         context.fill(minX, minY, maxX, maxY, 0xaa000000); // for some reason its ARGB rather than RGBA
         if (slotId != -1) {
-            context.drawBorder(minX, minY, maxX - minX, maxY - minY, ColorHelper.Argb.withAlpha(255, this.classColor));
+            context.drawBorder(minX, minY, maxX - minX, maxY - minY, ColorHelper.fromFloats(1.0f, this.classColor.r, this.classColor.g, this.classColor.b));
         }
     }
 }

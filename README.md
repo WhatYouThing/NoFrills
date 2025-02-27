@@ -42,10 +42,12 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Wardrobe Hotkeys**: Adds number hotkeys (1-9) to the Wardrobe, letting you easily switch your armor sets. Also
       has an option to play a sound effect when using the feature.
 
-- **Party**
+- **Chat**
     - **Finder Options**: Adds various buttons in the chat when anyone joins your party through Party Finder, such as
       copy name and kick.
     - **Party Commands**: Adds a few commands that your party members can use, customizable.
+    - **Party Waypoints**: Automatically creates temporary waypoints for coordinates sent by your party members.
+    - **Global Chat Waypoints**: Automatically creates temporary waypoints for coordinates sent in global chat.
 
 - **Viewmodel**
     - **No Haste**: Prevents Haste (and Mining Fatigue) from affecting your swing speed.
@@ -89,6 +91,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Key Highlight**: Draws a box over Wither/Blood Keys to make them more visible.
 - **Spirit Bow Highlight**: Highlights the Spirit Bow in F4/M4.
 - **Wish Reminder**: Reminds you to wish when Maxor is enraged while playing as Healer in F7/M7.
+- **Leap Overlay**: Replaces the Spirit Leap/Infinileap menu with a custom version, similar to the Odin mod for 1.8.9.
+- **Leap Message**: Sends a message in party chat when you leap to a teammate. Requires the Leap Overlay.
 
 ### Kuudra
 
@@ -100,6 +104,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Announce Fresh**: Send a message when the Fresh Tools perk activates.
 - **Fresh Timer**: Shows a timer for Fresh Tools.
 - **Announce Drain**: Send a message when you drain your mana with an End Stone Sword.
+- **Stun Waypoint**: Renders a waypoint for the easiest to break pod while you are stunning Kuudra.
 
 ### Slayers
 
@@ -126,6 +131,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Ghost Vision**: Makes Ghosts way easier to see in the Dwarven Mines.
 - **Better Sky Mall**: Get Sky Mall buff messages only when you're mining. Also compacts the buff message, and mentions
   the day which the buff is for, e.g. "Sky Mall Buff for Day Summer 1st"
+- **Treasure Helper**: Allows you to open chests in the Crystal Hollows without having to stop holding left click.
 
 ### Farming
 

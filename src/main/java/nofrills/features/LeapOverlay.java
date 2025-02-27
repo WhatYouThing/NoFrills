@@ -46,7 +46,9 @@ public class LeapOverlay {
     @EventHandler
     private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
         if (Config.leapOverlay && event.isFinal && event.title.equals(leapMenuName)) {
-            List<LeapTarget> targets = new ArrayList<>();
+            List<LeapTarget> validTargets = new ArrayList<>();
+            List<LeapTarget> deadTargets = new ArrayList<>();
+            List<LeapTarget> emptyTargets = new ArrayList<>();
             for (Slot slot : event.handler.slots) {
                 ItemStack stack = event.inventory.getStack(slot.id);
                 if (!stack.isEmpty() && stack.getItem().equals(Items.PLAYER_HEAD)) {
@@ -55,9 +57,9 @@ public class LeapOverlay {
                         String line = Formatting.strip(lore.lines().getFirst().getString());
                         String name = Formatting.strip(stack.getName().getString());
                         if (name.equals("Unknown Player") || line.equals("This player is offline!")) {
-                            targets.add(new LeapTarget(-1, "", "", true, false));
+                            emptyTargets.add(new LeapTarget(-1, "", "", true, false));
                         } else if (line.equals("This player is currently dead!")) {
-                            targets.add(new LeapTarget(-1, name, "", false, true));
+                            deadTargets.add(new LeapTarget(-1, name, "", false, true));
                         } else if (line.equals("Click to teleport!")) {
                             for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
                                 Text displayName = entry.getDisplayName();
@@ -68,7 +70,7 @@ public class LeapOverlay {
                                             if (entryName.contains("(" + dungeonClass) && entryName.endsWith(")")) {
                                                 int rankStart = entryName.indexOf("(");
                                                 int rankEnd = Math.min(entryName.indexOf(" ", rankStart), entryName.indexOf(")", rankStart));
-                                                targets.add(new LeapTarget(slot.id, name, entryName.substring(rankStart + 1, rankEnd), false, false));
+                                                validTargets.add(new LeapTarget(slot.id, name, entryName.substring(rankStart + 1, rankEnd), false, false));
                                                 break;
                                             }
                                         }
@@ -79,16 +81,17 @@ public class LeapOverlay {
                     }
                 }
             }
+            validTargets.sort(Comparator.comparing(target -> target.dungeonClass + target.name));
+            deadTargets.sort(Comparator.comparing(target -> target.name));
+            List<LeapTarget> targets = new ArrayList<>();
+            targets.addAll(validTargets);
+            targets.addAll(deadTargets);
             if (targets.size() < 4) {
                 int missing = 4 - targets.size();
                 for (int i = 1; i <= missing; i++) {
                     targets.add(new LeapTarget(-1, "", "", true, false));
                 }
             }
-            targets.sort(Comparator.comparing(target -> target.dungeonClass));
-            targets.sort(Comparator.comparing(target -> target.name));
-            targets.sort(Comparator.comparingInt(target -> target.empty ? 0 : 1));
-            targets.sort(Comparator.comparingInt(target -> target.dead ? 0 : 1));
             for (LeapTarget target : targets) {
                 String name = target.empty ? "Empty" : target.name;
                 String dungeonClass = target.dead ? "DEAD" : target.dungeonClass;

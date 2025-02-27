@@ -112,14 +112,22 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
-    @ModifyExpressionValue(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;canBeHighlighted()Z"))
-    private boolean onDrawHighlight(boolean original) {
+    @Inject(method = "drawSlotHighlightBack", at = @At("HEAD"), cancellable = true)
+    private void onDrawHighlight(DrawContext context, CallbackInfo ci) {
         if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
-            return false;
+            ci.cancel();
         } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
-            return false;
+            ci.cancel();
         }
-        return original;
+    }
+
+    @Inject(method = "drawSlotHighlightFront", at = @At("HEAD"), cancellable = true)
+    private void onDrawHighlightFront(DrawContext context, CallbackInfo ci) {
+        if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
+            ci.cancel();
+        } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
+            ci.cancel();
+        }
     }
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)

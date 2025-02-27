@@ -14,6 +14,7 @@ import nofrills.events.ScreenSlotUpdateEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.ScreenOptions;
 import nofrills.misc.SkyblockData;
+import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,7 +29,7 @@ public class LeapOverlay {
     private static final RenderColor mageColor = RenderColor.fromHex(0x1793c4);
     private static final RenderColor bersColor = RenderColor.fromHex(0xe7413c);
     private static final RenderColor archColor = RenderColor.fromHex(0x4a14b7);
-    private static final RenderColor tankColor = RenderColor.fromHex(0x65605a);
+    private static final RenderColor tankColor = RenderColor.fromHex(0x768f46);
     private static final RenderColor deadColor = RenderColor.fromHex(0xaaaaaa);
 
     private static RenderColor getColor(String className) {
@@ -45,10 +46,9 @@ public class LeapOverlay {
 
     @EventHandler
     private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
-        if (Config.leapOverlay && event.isFinal && event.title.equals(leapMenuName)) {
+        if (Config.leapOverlay && event.isFinal && event.title.equals(leapMenuName) && Utils.isInDungeons()) {
             List<LeapTarget> validTargets = new ArrayList<>();
             List<LeapTarget> deadTargets = new ArrayList<>();
-            List<LeapTarget> emptyTargets = new ArrayList<>();
             for (Slot slot : event.handler.slots) {
                 ItemStack stack = event.inventory.getStack(slot.id);
                 if (!stack.isEmpty() && stack.getItem().equals(Items.PLAYER_HEAD)) {
@@ -57,8 +57,9 @@ public class LeapOverlay {
                         String line = Formatting.strip(lore.lines().getFirst().getString());
                         String name = Formatting.strip(stack.getName().getString());
                         if (name.equals("Unknown Player") || line.equals("This player is offline!")) {
-                            emptyTargets.add(new LeapTarget(-1, "", "", true, false));
-                        } else if (line.equals("This player is currently dead!")) {
+                            continue;
+                        }
+                        if (line.equals("This player is currently dead!")) {
                             deadTargets.add(new LeapTarget(-1, name, "", false, true));
                         } else if (line.equals("Click to teleport!")) {
                             for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {

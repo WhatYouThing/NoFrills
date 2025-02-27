@@ -71,7 +71,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Unique
     private boolean isLeapMenu() {
-        return Config.leapOverlay && title.getString().equals(LeapOverlay.leapMenuName);
+        return Config.leapOverlay && title.getString().equals(LeapOverlay.leapMenuName) && Utils.isInDungeons();
     }
 
     @Override

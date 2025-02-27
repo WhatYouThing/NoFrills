@@ -244,6 +244,8 @@ public class Config {
     public static boolean betterSkymall = false;
     @SerialEntry
     public static String skymallWhitelist = "titanium, goblins";
+    @SerialEntry
+    public static boolean treasureHelper = false;
 
     // Farming
 

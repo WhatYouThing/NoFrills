@@ -20,6 +20,7 @@ public class LeapMenuButton implements Drawable {
     public int minY = 0;
     public int maxX = 0;
     public int maxY = 0;
+    public boolean hovered = false;
 
     public LeapMenuButton(int slotId, int index, String player, String dungeonClass, RenderColor classColor) {
         this.slotId = slotId;
@@ -47,6 +48,10 @@ public class LeapMenuButton implements Drawable {
         return (int) Math.floor(context.getScaledWindowHeight() * yOffset);
     }
 
+    public boolean isHovered(double mouseX, double mouseY) {
+        return mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY;
+    }
+
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         minX = getX(context, this.offsetX);
         minY = getY(context, this.offsetY);
@@ -54,7 +59,8 @@ public class LeapMenuButton implements Drawable {
         maxY = getY(context, this.offsetY + 0.2f);
         context.drawCenteredTextWithShadow(mc.textRenderer, this.player, minX + (maxX - minX) / 2, (int) (minY + (maxY - minY) * 0.35), this.nameColor.hex);
         context.drawCenteredTextWithShadow(mc.textRenderer, this.dungeonClass, minX + (maxX - minX) / 2, (int) (minY + (maxY - minY) * 0.5), this.classColor.hex);
-        context.fill(minX, minY, maxX, maxY, 0xaa000000); // for some reason its ARGB rather than RGBA
+        int background = hovered ? ColorHelper.fromFloats(0.67f, this.classColor.r * 0.33f, this.classColor.g * 0.33f, this.classColor.b * 0.33f) : 0xaa000000;
+        context.fill(minX, minY, maxX, maxY, background); // for some reason its ARGB rather than RGBA
         if (slotId != -1) {
             context.drawBorder(minX, minY, maxX - minX, maxY - minY, ColorHelper.fromFloats(1.0f, this.classColor.r, this.classColor.g, this.classColor.b));
         }

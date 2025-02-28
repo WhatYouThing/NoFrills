@@ -53,6 +53,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     List<SpoofedSlot> spoofedSlots = new ArrayList<>();
     @Unique
     List<LeapMenuButton> leapButtons = new ArrayList<>();
+    @Unique
+    boolean sentLeapMsg = false;
 
     protected HandledScreenMixin(Text title) {
         super(title);
@@ -175,6 +177,9 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (isLeapMenu()) {
             for (LeapMenuButton button : leapButtons) {
+                if (button.slotId != -1) {
+                    button.hovered = button.isHovered(mouseX, mouseY);
+                }
                 button.render(context, mouseX, mouseY, delta);
             }
             ci.cancel();
@@ -185,10 +190,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (isLeapMenu() && button == GLFW.GLFW_MOUSE_BUTTON_1) {
             for (LeapMenuButton leapButton : leapButtons) {
-                if (leapButton.slotId != -1 && mouseX >= leapButton.minX && mouseX <= leapButton.maxX && mouseY >= leapButton.minY && mouseY <= leapButton.maxY) {
+                if (leapButton.slotId != -1 && leapButton.isHovered(mouseX, mouseY)) {
                     mc.interactionManager.clickSlot(handler.syncId, leapButton.slotId, 0, SlotActionType.PICKUP, mc.player);
                     this.handler.setCursorStack(ItemStack.EMPTY);
-                    if (Config.leapOverlayMsg) {
+                    if (Config.leapOverlayMsg && !sentLeapMsg) {
+                        sentLeapMsg = true;
                         Utils.sendMessage("/pc Leaped to " + leapButton.player.getString() + "!");
                     }
                     cir.setReturnValue(true);

@@ -206,6 +206,10 @@ public class Config {
     public static boolean leapOverlay = false;
     @SerialEntry
     public static boolean leapOverlayMsg = false;
+    @SerialEntry
+    public static boolean campReminder = false;
+    @SerialEntry
+    public static boolean ragAxeReminder = false;
 
     // Kuudra
 

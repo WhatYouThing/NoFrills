@@ -20,6 +20,7 @@ import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -44,6 +45,9 @@ public class DungeonSolvers {
     private static final Box sharpshooterArea = new Box(63.2, 127, 35.8, 63.8, 128, 35.2);
     private static final List<Entity> dungeonKeys = new ArrayList<>();
     private static final List<Entity> spiritBows = new ArrayList<>();
+    private static final String wishMsg = "⚠ Maxor is enraged! ⚠";
+    private static final String campMsg = "[BOSS] The Watcher: Let's see how you can handle this.";
+    private static final String ragAxeMsg = "[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.";
     public static boolean isInTerminal = false;
     private static BlockPos sharpshooterNext = null;
     private static boolean isTerminalBuilt = false;
@@ -233,10 +237,20 @@ public class DungeonSolvers {
 
     @EventHandler
     public static void onChat(ChatMsgEvent event) {
-        if (Config.wishReminder && Utils.isInDungeons() && Config.dungeonClass.equals("Healer")) {
-            if (event.messagePlain.equals("⚠ Maxor is enraged! ⚠")) {
+        if (Utils.isInDungeons()) {
+            if (Config.wishReminder && Config.dungeonClass.equals("Healer") && event.messagePlain.equals(wishMsg)) {
                 Utils.showTitle("§a§lWISH!", "", 5, 40, 5);
                 Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+            }
+            if (Config.dungeonClass.equals("Mage")) {
+                if (Config.campReminder && event.messagePlain.equals(campMsg)) {
+                    Utils.showTitle("§c§lCAMP BLOOD!", "", 5, 40, 5);
+                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+                }
+                if (Config.ragAxeReminder && SkyblockData.getLocation().endsWith("(M5)") && event.messagePlain.equals(ragAxeMsg)) {
+                    Utils.showTitle("§6§lRAG AXE!", "", 5, 40, 5);
+                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+                }
             }
         }
     }

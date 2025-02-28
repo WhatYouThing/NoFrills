@@ -69,9 +69,9 @@ public class LeapOverlay {
                                     if (entryName.contains(name)) {
                                         for (String dungeonClass : SkyblockData.dungeonClasses) {
                                             if (entryName.contains("(" + dungeonClass) && entryName.endsWith(")")) {
-                                                int rankStart = entryName.indexOf("(");
-                                                int rankEnd = Math.min(entryName.indexOf(" ", rankStart), entryName.indexOf(")", rankStart));
-                                                validTargets.add(new LeapTarget(slot.id, name, entryName.substring(rankStart + 1, rankEnd), false, false));
+                                                int classStart = entryName.indexOf("("); // this may or may not be broken with a nick hider. too bad!
+                                                int classEnd = Math.min(entryName.indexOf(" ", classStart), entryName.indexOf(")", classStart));
+                                                validTargets.add(new LeapTarget(slot.id, name, entryName.substring(classStart + 1, classEnd), false, false));
                                                 break;
                                             }
                                         }

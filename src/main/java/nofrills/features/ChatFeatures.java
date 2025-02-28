@@ -17,12 +17,10 @@ import nofrills.misc.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
 public class ChatFeatures {
-    private static final Pattern partyFinderPattern = Pattern.compile("Party Finder > .* joined .*");
     private static final Config.partyBehaviorList auto = Config.partyBehaviorList.Automatic;
     private static final Config.partyBehaviorList ignore = Config.partyBehaviorList.Ignore;
     private static final Config.partyBehaviorList disabled = Config.partyBehaviorList.Disabled;
@@ -103,7 +101,7 @@ public class ChatFeatures {
                 }
             }
         }
-        if (Config.partyFinderOptions && msg.startsWith("Party Finder >") && partyFinderPattern.matcher(msg).matches()) {
+        if (Config.partyFinderOptions && msg.startsWith("Party Finder >") && msg.contains("joined")) {
             String name = msg.replace("Party Finder >", "").trim().split(" ", 2)[0].toLowerCase();
             if (name.equalsIgnoreCase(mc.getSession().getUsername())) {
                 return;

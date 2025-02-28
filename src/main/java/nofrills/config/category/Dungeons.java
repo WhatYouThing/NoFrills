@@ -122,9 +122,16 @@ public class Dungeons {
                         .build())
 
                 .option(Option.<Boolean>createBuilder()
-                        .name(Text.of("Leap Message"))
-                        .description(OptionDescription.of(Text.of("Sends a message in party chat when you leap to a teammate. Requires the Leap Overlay.")))
-                        .binding(false, () -> Config.leapOverlayMsg, value -> Config.leapOverlayMsg = value)
+                        .name(Text.of("Blood Camp Reminder"))
+                        .description(OptionDescription.of(Text.of("Get notified when its time to start camping Blood Room while playing as Mage. This option is generally useless in slow and/or low cata level parties.")))
+                        .binding(false, () -> Config.campReminder, value -> Config.campReminder = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("M5 Ragnarock Axe Reminder"))
+                        .description(OptionDescription.of(Text.of("Get notified when its time to use your Rag Axe in M5 as Mage. This option is useless if you are (somehow) not playing LCM.")))
+                        .binding(false, () -> Config.ragAxeReminder, value -> Config.ragAxeReminder = value)
                         .controller(Config::booleanController)
                         .build())
 

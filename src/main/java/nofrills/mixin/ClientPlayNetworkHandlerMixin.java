@@ -76,13 +76,6 @@ public class ClientPlayNetworkHandlerMixin {
         eventBus.post(new ScoreboardUpdateEvent(packet));
     }
 
-    @Inject(method = "onUnloadChunk", at = @At("HEAD"), cancellable = true)
-    private void onUnloadChunk(UnloadChunkS2CPacket packet, CallbackInfo ci) {
-        if (Config.keepChunks && Utils.isInSkyblock()) {
-            ci.cancel();
-        }
-    }
-
     @Inject(method = "onGameJoin", at = @At("TAIL"))
     private void onJoinGame(GameJoinS2CPacket packet, CallbackInfo ci) {
         eventBus.post(new ServerJoinEvent());

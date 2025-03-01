@@ -109,7 +109,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
         if (isLeapMenu() || (Config.ignoreBackground && isStackNameEmpty(slot)) || isSlotDisabled(slot)) {
             ci.cancel();
-        } else if (Config.fastTerminals && DungeonSolvers.isInTerminal && button == GLFW.GLFW_MOUSE_BUTTON_1) {
+        }
+        if (Config.fastTerminals && DungeonSolvers.isInTerminal && button == GLFW.GLFW_MOUSE_BUTTON_1 && !ci.isCancelled() && !isSlotDisabled(slot)) {
             mc.interactionManager.clickSlot(handler.syncId, slot != null ? slot.id : slotId, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
             ci.cancel();
         }

@@ -3,7 +3,9 @@ package nofrills.features;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -33,13 +35,13 @@ public class DungeonSolvers {
     private static final ItemStack backgroundStack = Utils.setStackName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
     private static final ItemStack firstStack = Utils.setStackName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
     private static final ItemStack secondStack = Utils.setStackName(Items.BLUE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
-    private static final List<Item> colorsOrder = List.of(new Item[]{
+    private static final List<Item> colorsOrder = List.of(
             Items.GREEN_STAINED_GLASS_PANE,
             Items.YELLOW_STAINED_GLASS_PANE,
             Items.ORANGE_STAINED_GLASS_PANE,
             Items.RED_STAINED_GLASS_PANE,
-            Items.BLUE_STAINED_GLASS_PANE,
-    });
+            Items.BLUE_STAINED_GLASS_PANE
+    );
     private static final List<BlockPos> sharpshooterList = new ArrayList<>();
     private static final Box sharpshooterTarget = Box.enclosing(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
     private static final Box sharpshooterArea = new Box(63.2, 127, 35.8, 63.8, 128, 35.2);
@@ -52,6 +54,7 @@ public class DungeonSolvers {
     private static BlockPos sharpshooterNext = null;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
+    private static BlockPos mimicChestPos = null;
 
     private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
         Item item = stack.getItem();
@@ -96,8 +99,23 @@ public class DungeonSolvers {
         sharpshooterNext = null;
     }
 
+    private static boolean isMimic(ZombieEntity zombie) {
+        if (zombie.isBaby()) {
+            if (mimicChestPos != null && Box.enclosing(mimicChestPos, mimicChestPos).contains(zombie.getPos())) {
+                return true;
+            }
+            for (ItemStack armor : zombie.getArmorItems()) {
+                DyedColorComponent color = armor.getComponents().get(DataComponentTypes.DYED_COLOR);
+                if (color != null && color.rgb() == 15589253) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @EventHandler
-    public static void onScreenOpen(ScreenOpenEvent event) {
+    private static void onScreenOpen(ScreenOpenEvent event) {
         isTerminalBuilt = false;
         isInTerminal = false;
 
@@ -113,7 +131,7 @@ public class DungeonSolvers {
     }
 
     @EventHandler
-    public static void onTick(WorldTickEvent event) {
+    private static void onTick(WorldTickEvent event) {
         if (Utils.isInDungeons()) {
             if (melodyTicks > 0) {
                 melodyTicks--;
@@ -130,7 +148,7 @@ public class DungeonSolvers {
     }
 
     @EventHandler
-    public static void onSlotUpdate(ScreenSlotUpdateEvent event) {
+    private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
         if (Config.solveTerminals && Utils.isInDungeons() && !isTerminalBuilt) {
             isTerminalBuilt = event.isFinal;
             List<Slot> orderSlots = new ArrayList<>();
@@ -236,7 +254,7 @@ public class DungeonSolvers {
     }
 
     @EventHandler
-    public static void onChat(ChatMsgEvent event) {
+    private static void onChat(ChatMsgEvent event) {
         if (Utils.isInDungeons()) {
             if (Config.wishReminder && Config.dungeonClass.equals("Healer") && event.messagePlain.equals(wishMsg)) {
                 Utils.showTitle("§a§lWISH!", "", 5, 40, 5);
@@ -256,7 +274,7 @@ public class DungeonSolvers {
     }
 
     @EventHandler
-    public static void onNamed(EntityNamedEvent event) {
+    private static void onNamed(EntityNamedEvent event) {
         if (Utils.isInDungeons()) {
             if (Config.keyHighlight && !dungeonKeys.contains(event.entity)) {
                 if (event.namePlain.equals("Wither Key") || event.namePlain.equals("Blood Key")) {
@@ -272,22 +290,41 @@ public class DungeonSolvers {
     }
 
     @EventHandler
-    public static void onBlockUpdate(BlockUpdateEvent event) {
-        if (Config.solveDevices && Utils.isInDungeons()) {
-            if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
-                // cant easily check for the emerald block here because hypixel does some mumbo jumbo with packets
-                if (event.newState.getBlock() == Blocks.BLUE_TERRACOTTA) {
-                    if (sharpshooterNext == event.pos) {
-                        sharpshooterNext = null;
+    private static void onBlockUpdate(BlockUpdateEvent event) {
+        if (Utils.isInDungeons()) {
+            if (Config.solveDevices) {
+                if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
+                    // cant easily check for the emerald block here because hypixel does some mumbo jumbo with packets
+                    if (event.newState.getBlock() == Blocks.BLUE_TERRACOTTA) {
+                        if (sharpshooterNext == event.pos) {
+                            sharpshooterNext = null;
+                        }
+                        sharpshooterList.add(event.pos);
                     }
-                    sharpshooterList.add(event.pos);
+                }
+            }
+            if (Config.mimicAnnounce) {
+                if (event.oldState.getBlock().equals(Blocks.TRAPPED_CHEST) && event.newState.getBlock().equals(Blocks.AIR)) {
+                    mimicChestPos = event.pos;
                 }
             }
         }
     }
 
     @EventHandler
-    public static void onRender(WorldRenderEvent event) {
+    private static void onEntityRemoved(EntityRemoveEvent event) {
+        if (Config.mimicAnnounce && Utils.isInDungeons() && event.entity instanceof ZombieEntity zombie) {
+            if (isMimic(zombie) && zombie.getHealth() == 0) {
+                if (!Config.mimicMessage.isEmpty()) {
+                    Utils.sendMessage(Config.mimicMessage);
+                }
+                mimicChestPos = null;
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onRender(WorldRenderEvent event) {
         if (sharpshooterNext != null) {
             event.drawFilled(Box.enclosing(sharpshooterNext, sharpshooterNext), true, RenderColor.fromHex(0x00ff00, 1.0f));
         }
@@ -319,5 +356,10 @@ public class DungeonSolvers {
                 }
             }
         }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        mimicChestPos = null;
     }
 }

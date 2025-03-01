@@ -212,6 +212,12 @@ public class Config {
     public static boolean campReminder = false;
     @SerialEntry
     public static boolean ragAxeReminder = false;
+    @SerialEntry
+    public static boolean mimicHighlight = false;
+    @SerialEntry
+    public static boolean mimicAnnounce = false;
+    @SerialEntry
+    public static String mimicMessage = "/pc Mimic Killed!";
 
     // Kuudra
 

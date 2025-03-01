@@ -56,7 +56,7 @@ public class Dungeons {
 
                 .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Fast Terminals"))
-                        .description(OptionDescription.of(Text.of("Replaces your left clicks with middle clicks while in any terminal, slightly reducing the time until you can click again.")))
+                        .description(OptionDescription.of(Text.of("Replaces your left clicks with middle clicks while in any terminal, slightly reducing the delay until you can click on another element.")))
                         .binding(false, () -> Config.fastTerminals, value -> Config.fastTerminals = value)
                         .controller(Config::booleanController)
                         .build())
@@ -136,10 +136,24 @@ public class Dungeons {
                         .build())
 
                 .option(Option.<Boolean>createBuilder()
-                        .name(Text.of("M5 Ragnarock Axe Reminder"))
+                        .name(Text.of("M5 Rag Axe Reminder"))
                         .description(OptionDescription.of(Text.of("Get notified when its time to use your Rag Axe in M5 as Mage. This option is useless if you are (somehow) not playing LCM.")))
                         .binding(false, () -> Config.ragAxeReminder, value -> Config.ragAxeReminder = value)
                         .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Announce Mimic"))
+                        .description(OptionDescription.of(Text.of("Automatically send a message in chat once you (or a teammate nearby) kills the Mimic. Should work even if the Mimic is instantly killed.")))
+                        .binding(false, () -> Config.mimicAnnounce, value -> Config.mimicAnnounce = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<String>createBuilder()
+                        .name(Text.of("Mimic Message"))
+                        .description(OptionDescription.of(Text.of("The message to send when the Mimic is killed.")))
+                        .binding("/pc Mimic Killed!", () -> Config.mimicMessage, value -> Config.mimicMessage = value)
+                        .controller(StringControllerBuilder::create)
                         .build())
 
                 .build();

@@ -72,6 +72,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     }
 
     @Unique
+    private boolean isSlotDisabled(Slot slot) {
+        return slot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(slot));
+    }
+
+    @Unique
     private boolean isLeapMenu() {
         return Config.leapOverlay && title.getString().equals(LeapOverlay.leapMenuName) && Utils.isInDungeons();
     }
@@ -102,7 +107,10 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        if (isLeapMenu() || (Config.ignoreBackground && isStackNameEmpty(slot)) || disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(slot))) {
+        if (isLeapMenu() || (Config.ignoreBackground && isStackNameEmpty(slot)) || isSlotDisabled(slot)) {
+            ci.cancel();
+        } else if (Config.fastTerminals && DungeonSolvers.isInTerminal && button == GLFW.GLFW_MOUSE_BUTTON_1) {
+            mc.interactionManager.clickSlot(handler.syncId, slot != null ? slot.id : slotId, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
             ci.cancel();
         }
     }
@@ -116,29 +124,21 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "drawSlotHighlightBack", at = @At("HEAD"), cancellable = true)
     private void onDrawHighlight(DrawContext context, CallbackInfo ci) {
-        if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
-            ci.cancel();
-        } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
+        if ((Config.ignoreBackground && isStackNameEmpty(focusedSlot)) || isSlotDisabled(focusedSlot)) {
             ci.cancel();
         }
     }
 
     @Inject(method = "drawSlotHighlightFront", at = @At("HEAD"), cancellable = true)
     private void onDrawHighlightFront(DrawContext context, CallbackInfo ci) {
-        if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
-            ci.cancel();
-        } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
+        if ((Config.ignoreBackground && isStackNameEmpty(focusedSlot)) || isSlotDisabled(focusedSlot)) {
             ci.cancel();
         }
     }
 
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
     private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (Config.solveTerminals && DungeonSolvers.isInTerminal) {
-            ci.cancel();
-        } else if (focusedSlot != null && disabledSlots.stream().anyMatch(disabled -> disabled.isSlot(focusedSlot))) {
-            ci.cancel();
-        } else if (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) {
+        if ((Config.solveTerminals && DungeonSolvers.isInTerminal) || (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) || isSlotDisabled(focusedSlot)) {
             ci.cancel();
         }
     }

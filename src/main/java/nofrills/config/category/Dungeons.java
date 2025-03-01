@@ -55,6 +55,13 @@ public class Dungeons {
                         .build())
 
                 .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Fast Terminals"))
+                        .description(OptionDescription.of(Text.of("Replaces your left clicks with middle clicks while in any terminal, slightly reducing the time until you can click again.")))
+                        .binding(false, () -> Config.fastTerminals, value -> Config.fastTerminals = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Solve Devices"))
                         .description(OptionDescription.of(Text.of("Solves (most of) the F7/M7 devices for you.")))
                         .binding(false, () -> Config.solveDevices, value -> Config.solveDevices = value)

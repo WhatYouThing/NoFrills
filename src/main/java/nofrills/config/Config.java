@@ -195,6 +195,8 @@ public class Config {
     @SerialEntry
     public static boolean solveTerminals = false;
     @SerialEntry
+    public static boolean fastTerminals = false;
+    @SerialEntry
     public static boolean solveDevices = false;
     @SerialEntry
     public static boolean melodyAnnounce = false;

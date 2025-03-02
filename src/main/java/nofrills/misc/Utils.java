@@ -217,9 +217,9 @@ public class Utils {
     /**
      * Check if the provided entity is a living entity (and in the case of player entities, if it isn't a real player).
      */
-    public static boolean isNonPlayerCharacter(Entity entity) {
+    public static boolean isMob(Entity entity) {
         if (entity instanceof PlayerEntity player) {
-            return isPlayer(player);
+            return !isPlayer(player);
         } else {
             return entity instanceof LivingEntity;
         }

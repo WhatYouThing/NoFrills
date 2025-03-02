@@ -68,6 +68,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(MiningFeatures.class);
         eventBus.subscribe(NoFrillsAPI.class);
         eventBus.subscribe(LeapOverlay.class);
+        eventBus.subscribe(EventFeatures.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

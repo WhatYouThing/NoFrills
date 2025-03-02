@@ -218,7 +218,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         return original;
     }
 
-    @Inject(method = "init", at = @At("HEAD"))
+    @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
         if (isLeapMenu()) {
             int x = mc.getWindow().getWidth() / 2;

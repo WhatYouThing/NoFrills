@@ -137,7 +137,14 @@ public class Config {
     @SerialEntry
     public static fixModes middleClickFix = fixModes.Disabled;
 
-    // Solvers
+    // Events
+
+    @SerialEntry
+    public static boolean spookyChestAlert = false;
+    @SerialEntry
+    public static boolean spookyChestHighlight = false;
+    @SerialEntry
+    public static Color spookyChestHighlightColor = new Color(255, 170, 0, 170);
 
     // Fishing
 
@@ -312,6 +319,7 @@ public class Config {
                 .title(Text.of("NoFrills Config"))
                 .category(General.create(defaults, config))
                 .category(Fixes.create(defaults, config))
+                .category(Events.create(defaults, config))
                 .category(Fishing.create(defaults, config))
                 .category(Dungeons.create(defaults, config))
                 .category(Kuudra.create(defaults, config))

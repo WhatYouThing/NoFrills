@@ -38,4 +38,10 @@ public class WorldRenderEvent {
     public void drawBeam(Vec3d pos, int height, boolean throughWalls, RenderColor color) {
         Rendering.drawBeam(matrices, consumer, camera, pos, height, throughWalls, color);
     }
+
+    public void drawFilledWithBeam(Box box, int height, boolean throughWalls, RenderColor color) {
+        Rendering.drawFilled(matrices, consumer, camera, box, throughWalls, color);
+        Vec3d center = box.getCenter();
+        Rendering.drawBeam(matrices, consumer, camera, center.add(0, box.maxY - center.getY(), 0), height, throughWalls, color);
+    }
 }

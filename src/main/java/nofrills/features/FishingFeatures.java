@@ -103,7 +103,7 @@ public class FishingFeatures {
             } else {
                 List<Entity> creatures = new ArrayList<>(seaCreatures);
                 for (Entity ent : creatures) {
-                    if (ent == null || !ent.isAlive()) {
+                    if (ent == null || ent.isRemoved()) {
                         seaCreatures.remove(ent);
                     }
                 }
@@ -137,8 +137,8 @@ public class FishingFeatures {
                         seaCreatures.add(event.entity);
                     }
                 }
-                if (Config.rareGlow && creature.rare && event.entity.age < 10 && name.contains(creature.name.toLowerCase())) {
-                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, Utils::isNonPlayerCharacter));
+                if (Config.rareGlow && creature.rare && event.entity.age <= 20 && name.contains(creature.name.toLowerCase())) {
+                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, Utils::isMob));
                     if (owner != null) {
                         Rendering.Entities.drawGlow(owner, true, rareColor);
                         if (owner.hasVehicle()) {

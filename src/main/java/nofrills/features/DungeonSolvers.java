@@ -3,9 +3,7 @@ package nofrills.features;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.DyedColorComponent;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -22,7 +20,6 @@ import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
-import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -120,18 +117,18 @@ public class DungeonSolvers {
                 melodyTicks--;
             }
             if (Config.solveDevices && Utils.isOnDungeonFloor("7")) {
-                    if (isSharpshooterActive()) {
-                        BlockPos target = findSharpshooterTarget();
-                        if (target != null) {
-                            if (sharpshooterNext != null && sharpshooterNext != target) {
-                                sharpshooterList.add(sharpshooterNext);
-                            }
-                            sharpshooterNext = target;
+                if (isSharpshooterActive()) {
+                    BlockPos target = findSharpshooterTarget();
+                    if (target != null) {
+                        if (sharpshooterNext != null && sharpshooterNext != target) {
+                            sharpshooterList.add(sharpshooterNext);
                         }
-                    } else if (sharpshooterNext != null || !sharpshooterList.isEmpty()) {
-                        sharpshooterNext = null;
-                        sharpshooterList.clear();
+                        sharpshooterNext = target;
                     }
+                } else if (sharpshooterNext != null || !sharpshooterList.isEmpty()) {
+                    sharpshooterNext = null;
+                    sharpshooterList.clear();
+                }
             }
         }
     }

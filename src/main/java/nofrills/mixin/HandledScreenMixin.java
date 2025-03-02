@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
@@ -47,6 +48,10 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Shadow
     @Final
     protected T handler;
+    @Shadow
+    protected int y;
+    @Shadow
+    protected int x;
     @Unique
     List<DisabledSlot> disabledSlots = new ArrayList<>();
     @Unique
@@ -211,5 +216,16 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             return true;
         }
         return original;
+    }
+
+    @Inject(method = "init", at = @At("HEAD"))
+    private void onInit(CallbackInfo ci) {
+        if (isLeapMenu()) {
+            int x = mc.getWindow().getWidth() / 2;
+            int y = mc.getWindow().getHeight() / 2;
+            this.x = x;
+            this.y = y;
+            InputUtil.setCursorParameters(mc.getWindow().getHandle(), InputUtil.GLFW_CURSOR_NORMAL, x, y);
+        }
     }
 }

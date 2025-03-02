@@ -10,7 +10,6 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import nofrills.config.Config;
 import nofrills.events.*;
@@ -19,8 +18,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import javax.swing.text.html.Option;
 
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;

@@ -54,7 +54,6 @@ public class DungeonSolvers {
     private static BlockPos sharpshooterNext = null;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
-    private static BlockPos mimicChestPos = null;
 
     private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
         Item item = stack.getItem();
@@ -84,34 +83,18 @@ public class DungeonSolvers {
         return !mc.world.getOtherEntities(null, sharpshooterArea, ent -> ent instanceof PlayerEntity).isEmpty();
     }
 
-    private static void findSharpshooterTarget() {
+    private static BlockPos findSharpshooterTarget() {
         for (double x = sharpshooterTarget.minX; x <= sharpshooterTarget.maxX; x++) {
             for (double y = sharpshooterTarget.minY; y <= sharpshooterTarget.maxY; y++) {
                 for (double z = sharpshooterTarget.minZ; z <= sharpshooterTarget.maxZ; z++) {
                     BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
                     if (mc.world.getBlockState(pos).getBlock() == Blocks.EMERALD_BLOCK) {
-                        sharpshooterNext = pos;
-                        return;
+                        return pos;
                     }
                 }
             }
         }
-        sharpshooterNext = null;
-    }
-
-    private static boolean isMimic(ZombieEntity zombie) {
-        if (zombie.isBaby()) {
-            if (mimicChestPos != null && Box.enclosing(mimicChestPos, mimicChestPos).contains(zombie.getPos())) {
-                return true;
-            }
-            for (ItemStack armor : zombie.getArmorItems()) {
-                DyedColorComponent color = armor.getComponents().get(DataComponentTypes.DYED_COLOR);
-                if (color != null && color.rgb() == 15589253) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return null;
     }
 
     @EventHandler
@@ -136,13 +119,19 @@ public class DungeonSolvers {
             if (melodyTicks > 0) {
                 melodyTicks--;
             }
-            if (isSharpshooterActive()) {
-                findSharpshooterTarget();
-            } else {
-                if (sharpshooterNext != null || !sharpshooterList.isEmpty()) {
-                    sharpshooterNext = null;
-                    sharpshooterList.clear();
-                }
+            if (Config.solveDevices && Utils.isOnDungeonFloor("7")) {
+                    if (isSharpshooterActive()) {
+                        BlockPos target = findSharpshooterTarget();
+                        if (target != null) {
+                            if (sharpshooterNext != null && sharpshooterNext != target) {
+                                sharpshooterList.add(sharpshooterNext);
+                            }
+                            sharpshooterNext = target;
+                        }
+                    } else if (sharpshooterNext != null || !sharpshooterList.isEmpty()) {
+                        sharpshooterNext = null;
+                        sharpshooterList.clear();
+                    }
             }
         }
     }
@@ -265,7 +254,7 @@ public class DungeonSolvers {
                     Utils.showTitle("§c§lCAMP BLOOD!", "", 5, 40, 5);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
-                if (Config.ragAxeReminder && SkyblockData.getLocation().endsWith("(M5)") && event.messagePlain.equals(ragAxeMsg)) {
+                if (Config.ragAxeReminder && Utils.isOnDungeonFloor("M5") && event.messagePlain.equals(ragAxeMsg)) {
                     Utils.showTitle("§6§lRAG AXE!", "", 5, 40, 5);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
@@ -285,40 +274,6 @@ public class DungeonSolvers {
                 if (event.namePlain.equals("Spirit Bow")) {
                     spiritBows.add(event.entity);
                 }
-            }
-        }
-    }
-
-    @EventHandler
-    private static void onBlockUpdate(BlockUpdateEvent event) {
-        if (Utils.isInDungeons()) {
-            if (Config.solveDevices) {
-                if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
-                    // cant easily check for the emerald block here because hypixel does some mumbo jumbo with packets
-                    if (event.newState.getBlock() == Blocks.BLUE_TERRACOTTA) {
-                        if (sharpshooterNext == event.pos) {
-                            sharpshooterNext = null;
-                        }
-                        sharpshooterList.add(event.pos);
-                    }
-                }
-            }
-            if (Config.mimicAnnounce) {
-                if (event.oldState.getBlock().equals(Blocks.TRAPPED_CHEST) && event.newState.getBlock().equals(Blocks.AIR)) {
-                    mimicChestPos = event.pos;
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    private static void onEntityRemoved(EntityRemoveEvent event) {
-        if (Config.mimicAnnounce && Utils.isInDungeons() && event.entity instanceof ZombieEntity zombie) {
-            if (isMimic(zombie) && zombie.getHealth() == 0) {
-                if (!Config.mimicMessage.isEmpty()) {
-                    Utils.sendMessage(Config.mimicMessage);
-                }
-                mimicChestPos = null;
             }
         }
     }
@@ -356,10 +311,5 @@ public class DungeonSolvers {
                 }
             }
         }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        mimicChestPos = null;
     }
 }

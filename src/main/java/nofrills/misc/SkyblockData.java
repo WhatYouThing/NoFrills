@@ -72,16 +72,16 @@ public class SkyblockData {
         }
     }
 
-    /*
-        Returns the current location from the scoreboard, such as "⏣ Your Island". The location prefix is not omitted.
-    */
+    /**
+     * Returns the current location from the scoreboard, such as "⏣ Your Island". The location prefix is not omitted.
+     */
     public static String getLocation() {
         return location;
     }
 
-    /*
-        Returns the current area from the tab list, such as "Area: Private Island". The area/dungeon prefix is omitted.
-    */
+    /**
+     * Returns the current area from the tab list, such as "Area: Private Island". The area/dungeon prefix is omitted.
+     */
     public static String getArea() {
         return area;
     }
@@ -94,9 +94,9 @@ public class SkyblockData {
         return instanceOver;
     }
 
-    /*
-        Returns a list with every line that is currently displayed on the scoreboard.
-    */
+    /**
+     * Returns a list with every line that is currently displayed on the scoreboard.
+     */
     public static List<String> getLines() {
         return new ArrayList<>(lines); // return a copy to avoid a potential concurrent modification exception
     }

@@ -142,20 +142,6 @@ public class Dungeons {
                         .controller(Config::booleanController)
                         .build())
 
-                .option(Option.<Boolean>createBuilder()
-                        .name(Text.of("Announce Mimic"))
-                        .description(OptionDescription.of(Text.of("Automatically send a message in chat once you (or a teammate nearby) kills the Mimic. Should work even if the Mimic is instantly killed.")))
-                        .binding(false, () -> Config.mimicAnnounce, value -> Config.mimicAnnounce = value)
-                        .controller(Config::booleanController)
-                        .build())
-
-                .option(Option.<String>createBuilder()
-                        .name(Text.of("Mimic Message"))
-                        .description(OptionDescription.of(Text.of("The message to send when the Mimic is killed.")))
-                        .binding("/pc Mimic Killed!", () -> Config.mimicMessage, value -> Config.mimicMessage = value)
-                        .controller(StringControllerBuilder::create)
-                        .build())
-
                 .build();
     }
 }

@@ -155,6 +155,13 @@ public class Utils {
         return isInZone(Symbols.zone + " The Catacombs", false);
     }
 
+    /**
+     * Checks if the player is currently on the specific Dungeon floor. For example, "F7" checks for F7 only, "M7" checks for M7 only, and "7" checks for both of them.
+     */
+    public static boolean isOnDungeonFloor(String floor) {
+        return isInDungeons() && SkyblockData.getLocation().endsWith(floor + ")");
+    }
+
     public static boolean isInKuudra() {
         return isInZone(Symbols.zone + " Kuudra's Hollow", false);
     }

@@ -4,8 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
 import nofrills.events.WorldTickEvent;
@@ -83,6 +88,28 @@ public class NoFrillsAPI {
         return itemId;
     }
 
+    private static int getStackQuantity(ItemStack stack) {
+        if (mc.currentScreen instanceof GenericContainerScreen container) {
+            if (container.getTitle().getString().endsWith("Sack")) {
+                LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+                if (lore != null) {
+                    for (Text line : lore.lines()) {
+                        String clear = Formatting.strip(line.getString());
+                        if (clear.startsWith("Stored: ") && clear.contains("/")) {
+                            String count = clear.substring(clear.indexOf(":") + 1, clear.indexOf("/")).trim();
+                            try {
+                                int countInt = Integer.parseInt(count.replaceAll(",", ""));
+                                return countInt > 0 ? countInt : 1;
+                            } catch (NumberFormatException ignored) {
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return stack.getCount();
+    }
+
     /**
      * Returns a copy of the Auction House pricing data from memory, otherwise null if the data hasn't been pulled yet.
      */
@@ -153,7 +180,7 @@ public class NoFrillsAPI {
         }
         JsonObject auctionPrices = NoFrillsAPI.getAuctionPrices();
         if (auctionPrices != null && auctionPrices.has(itemId)) {
-            int quantity = event.stack.getCount();
+            int quantity = getStackQuantity(event.stack);
             long lbin = auctionPrices.get(itemId).getAsLong();
             if (!itemId.equals("ATTRIBUTE_SHARD")) {
                 String msg = "§c[NF] §eLowest BIN: §6" + String.format("%,d", lbin * quantity);
@@ -237,7 +264,7 @@ public class NoFrillsAPI {
             JsonArray bzPrices = bazaarPrices.get(itemId).getAsJsonArray();
             long buyPrice = bzPrices.get(0).getAsLong();
             long sellPrice = bzPrices.get(1).getAsLong();
-            int quantity = event.stack.getCount();
+            int quantity = getStackQuantity(event.stack);
             String buyMsg = "§c[NF] §eBZ Insta-buy: §6" + String.format("%,d", buyPrice * quantity);
             String sellMsg = "§c[NF] §eBZ Insta-sell: §6" + String.format("%,d", sellPrice * quantity);
             if (quantity > 1) {

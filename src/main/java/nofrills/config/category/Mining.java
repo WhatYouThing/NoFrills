@@ -40,13 +40,6 @@ public class Mining {
                         .controller(StringControllerBuilder::create)
                         .build())
 
-                .option(Option.<Boolean>createBuilder()
-                        .name(Text.of("Treasure Helper"))
-                        .description(OptionDescription.of(Text.of("Allows you to click on treasure chests in the Crystal Hollows without having to let go of left click. This feature is only useful for powder mining with the Great Explorer HOTM perk maxed.")))
-                        .binding(false, () -> Config.treasureHelper, value -> Config.treasureHelper = value)
-                        .controller(Config::booleanController)
-                        .build())
-
                 .build();
     }
 }

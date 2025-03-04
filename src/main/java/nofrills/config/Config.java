@@ -136,6 +136,8 @@ public class Config {
     public static fixModes sneakFix = fixModes.Disabled;
     @SerialEntry
     public static fixModes middleClickFix = fixModes.Disabled;
+    @SerialEntry
+    public static fixModes miningAbilityFix = fixModes.Disabled;
 
     // Events
 
@@ -255,8 +257,6 @@ public class Config {
     public static boolean betterSkymall = false;
     @SerialEntry
     public static String skymallWhitelist = "titanium, goblins";
-    @SerialEntry
-    public static boolean treasureHelper = false;
 
     // Farming
 

@@ -39,6 +39,7 @@ import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
 import static nofrills.misc.Utils.DisabledSlot;
 import static nofrills.misc.Utils.SpoofedSlot;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_CAPTURED;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen implements ScreenOptions {
@@ -225,7 +226,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             int y = mc.getWindow().getHeight() / 2;
             this.x = x;
             this.y = y;
-            InputUtil.setCursorParameters(mc.getWindow().getHandle(), InputUtil.GLFW_CURSOR_NORMAL, x, y);
+            InputUtil.setCursorParameters(mc.getWindow().getHandle(), GLFW_CURSOR_CAPTURED, x, y);
         }
     }
 }

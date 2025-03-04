@@ -27,9 +27,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
     - **Hide Dead Mobs**: Prevents the game from rendering dead mobs, and also hides the Skyblock name tags of dead
       mobs.
-    - **Old Skins**: Makes only Steve and Alex appear as the default player skins.
-    - **Keep Chunks**: Prevents chunks from being unloaded client-side, letting you see them from further away with high
-      render distance. This is pretty much a simplistic version of the features from Nvidium/Distant Horizons.
     - **No Explosions**: Block explosion particles spawned by the server (such as the large explosion from Wither
       Impact).
     - **No Fire Overlay**: Prevents the on fire overlay from rendering.
@@ -70,6 +67,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Sneak Fix**: Fixes the ancient bug where the un-sneak animation plays twice if you do it too quickly, and fixes
   sneaking not slowing you down while inside a block.
 - **Middle Click Fix**: Allows Pick Block (the middle mouse button) to work just as it does in 1.8.9.
+- **Mining Ability Fix**: Allows you to use item abilities (and open treasure chests) without having to stop mining.
 
 ### Fishing
 
@@ -86,6 +84,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Starred Mob Highlight**: Renders hitboxes for every starred mob, making clearing much easier.
 - **Mini Boss Highlight**: Renders hitboxes for mini bosses.
 - **Solve Terminals**: Turns (most) terminals into a fish brain point-and-click minigame.
+- **Fast Terminals**: Replaces your left clicks with middle clicks while in any terminal, slightly reducing the delay
+  until you can click on another element.
 - **Solve Devices**: Helps you solve (most) devices on F7/M7.
 - **Melody Message**: Sends a message when you get the Melody terminal.
 - **Key Highlight**: Draws a box over Wither/Blood Keys to make them more visible.
@@ -93,6 +93,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Wish Reminder**: Reminds you to wish when Maxor is enraged while playing as Healer in F7/M7.
 - **Leap Overlay**: Replaces the Spirit Leap/Infinileap menu with a custom version, similar to the Odin mod for 1.8.9.
 - **Leap Message**: Sends a message in party chat when you leap to a teammate. Requires the Leap Overlay.
+- **Blood Camp Reminder**: Reminds you to start camping in the Blood Room when playing as Mage.
+- **M5 Rag Axe Reminder**: Reminds you to use your Ragnarock Axe when playing M5 as Mage.
 
 ### Kuudra
 
@@ -131,7 +133,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Ghost Vision**: Makes Ghosts way easier to see in the Dwarven Mines.
 - **Better Sky Mall**: Get Sky Mall buff messages only when you're mining. Also compacts the buff message, and mentions
   the day which the buff is for, e.g. "Sky Mall Buff for Day Summer 1st"
-- **Treasure Helper**: Allows you to open chests in the Crystal Hollows without having to stop holding left click.
 
 ### Farming
 

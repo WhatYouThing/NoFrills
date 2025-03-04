@@ -93,7 +93,7 @@ public class Fixes {
                         .build())
                 .option(Option.<Config.fixModes>createBuilder()
                         .name(Text.of("Mining Ability Fix"))
-                        .description(OptionDescription.of(Text.of("Allows you to use item abilities (and open treasure chests) without having to stop mining a block.")))
+                        .description(OptionDescription.of(Text.of("Allows you to use item abilities (and open treasure chests) without having to stop mining.")))
                         .binding(Config.fixModes.Disabled, () -> Config.miningAbilityFix, value -> Config.miningAbilityFix = value)
                         .controller(option -> EnumControllerBuilder.create(option)
                                 .enumClass(Config.fixModes.class)

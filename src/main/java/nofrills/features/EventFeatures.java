@@ -56,7 +56,7 @@ public class EventFeatures {
                 if (chest.isRemoved()) {
                     chestList.remove(chest);
                 } else {
-                    BlockPos pos = Utils.findGround(chest.getBlockPos(), 4);
+                    BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);
                     event.drawFilledWithBeam(Box.enclosing(pos, pos), 128, true, RenderColor.fromColor(Config.spookyChestHighlightColor));
                 }
             }

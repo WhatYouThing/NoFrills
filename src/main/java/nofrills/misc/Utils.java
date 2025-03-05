@@ -235,7 +235,7 @@ public class Utils {
         if (lore != null) {
             for (Text line : lore.lines()) {
                 String l = Formatting.strip(line.getString()).trim();
-                if (l.startsWith("Ability:") && l.endsWith("RIGHT CLICK")) {
+                if (l.contains("Ability: ") && l.endsWith("RIGHT CLICK")) {
                     return true;
                 }
             }

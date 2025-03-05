@@ -138,6 +138,10 @@ public class Config {
     public static fixModes middleClickFix = fixModes.Disabled;
     @SerialEntry
     public static fixModes miningAbilityFix = fixModes.Disabled;
+    @SerialEntry
+    public static fixModes armorStandFix = fixModes.Disabled;
+    @SerialEntry
+    public static fixModes abilityPlaceFix = fixModes.Disabled;
 
     // Events
 

@@ -10,6 +10,7 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -227,6 +228,19 @@ public class Utils {
 
     public static boolean isFixEnabled(Config.fixModes fix) {
         return fix == Config.fixModes.Enabled || (fix == Config.fixModes.SkyblockOnly && SkyblockData.isInSkyblock());
+    }
+
+    public static boolean hasRightClickAbility(ItemStack stack) {
+        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+        if (lore != null) {
+            for (Text line : lore.lines()) {
+                String l = Formatting.strip(line.getString()).trim();
+                if (l.startsWith("Ability:") && l.endsWith("RIGHT CLICK")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

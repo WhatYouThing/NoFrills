@@ -99,6 +99,22 @@ public class Fixes {
                                 .enumClass(Config.fixModes.class)
                                 .formatValue(value -> Text.of(value.name())))
                         .build())
+                .option(Option.<Config.fixModes>createBuilder()
+                        .name(Text.of("Armor Stand Fix"))
+                        .description(OptionDescription.of(Text.of("Prevents the game from unnecessarily processing entity cramming for every Armor Stand, which can result in reduced load and improved performance.")))
+                        .binding(Config.fixModes.Disabled, () -> Config.armorStandFix, value -> Config.armorStandFix = value)
+                        .controller(option -> EnumControllerBuilder.create(option)
+                                .enumClass(Config.fixModes.class)
+                                .formatValue(value -> Text.of(value.name())))
+                        .build())
+                .option(Option.<Config.fixModes>createBuilder()
+                        .name(Text.of("Ability Place Fix"))
+                        .description(OptionDescription.of(Text.of("Prevents you from being able to place any Skyblock item that is a block and has a right click ability, such as the Spirit Sceptre or the Egglocator.")))
+                        .binding(Config.fixModes.Disabled, () -> Config.abilityPlaceFix, value -> Config.abilityPlaceFix = value)
+                        .controller(option -> EnumControllerBuilder.create(option)
+                                .enumClass(Config.fixModes.class)
+                                .formatValue(value -> Text.of(value.name())))
+                        .build())
                 .build();
     }
 }

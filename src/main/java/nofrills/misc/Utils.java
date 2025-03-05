@@ -11,11 +11,13 @@ import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -51,6 +53,15 @@ public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0xff5555, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     public static final Pattern partyMessagePattern = Pattern.compile("Party > .*: .*");
     private static final Random soundRandom = Random.create(0);
+    private static final List<String> abilityWhitelist = List.of(
+            "SUPERBOOM_TNT",
+            "INFINITE_SUPERBOOM_TNT",
+            "ARROW_SWAPPER",
+            "PUMPKIN_LAUNCHER",
+            "SNOW_CANNON",
+            "SNOW_BLASTER",
+            "SNOW_HOWITZER"
+    );
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         mc.inGameHud.setTitle(Text.of(title));
@@ -226,17 +237,58 @@ public class Utils {
         }
     }
 
+    /**
+     * Returns the custom data compound of the provided ItemStack, or else null.
+     */
+    public static NbtCompound getCustomData(ItemStack stack) {
+        if (stack != null && !stack.isEmpty()) {
+            NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
+            if (data != null) {
+                return data.copyNbt();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the Skyblock item ID from the provided NbtCompound, or else an empty string.
+     */
+    public static String getSkyblockId(NbtCompound customData) {
+        if (customData != null && customData.contains("id")) {
+            return customData.getString("id");
+        }
+        return "";
+    }
+
+    /**
+     * Returns the Skyblock item ID from the provided ItemStack, or else an empty string.
+     */
+    public static String getSkyblockId(ItemStack stack) {
+        return getSkyblockId(getCustomData(stack));
+    }
+
     public static boolean isFixEnabled(Config.fixModes fix) {
         return fix == Config.fixModes.Enabled || (fix == Config.fixModes.SkyblockOnly && SkyblockData.isInSkyblock());
     }
 
     public static boolean hasRightClickAbility(ItemStack stack) {
-        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
-        if (lore != null) {
-            for (Text line : lore.lines()) {
-                String l = Formatting.strip(line.getString()).trim();
-                if (l.contains("Ability: ") && l.endsWith("RIGHT CLICK")) {
+        String id = getSkyblockId(stack);
+        if (!id.isEmpty()) {
+            if (id.startsWith("ABIPHONE") || id.equals("ABINGOPHONE")) {
+                return true;
+            }
+            for (String item : abilityWhitelist) {
+                if (id.equals(item)) {
                     return true;
+                }
+            }
+            LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+            if (lore != null) {
+                for (Text line : lore.lines()) {
+                    String l = Formatting.strip(line.getString()).trim();
+                    if (l.contains("Ability: ") && l.endsWith("RIGHT CLICK")) {
+                        return true;
+                    }
                 }
             }
         }

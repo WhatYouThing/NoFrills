@@ -9,6 +9,7 @@
     "ChatHudMixin",
     "ClientConnectionMixin",
     "ClientPlayerEntityMixin",
+    "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
     "ClientWorldMixin",
     "CreeperEntityAccessor",

@@ -151,6 +151,8 @@ public class Config {
     public static boolean spookyChestHighlight = false;
     @SerialEntry
     public static Color spookyChestHighlightColor = new Color(255, 170, 0, 170);
+    @SerialEntry
+    public static boolean calendarDate = false;
 
     // Fishing
 

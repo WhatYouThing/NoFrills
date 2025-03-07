@@ -40,6 +40,15 @@ public class Events {
                         .controller(v -> ColorControllerBuilder.create(v).allowAlpha(true))
                         .build())
 
+                .option(LabelOption.create(Text.of("Calendar")))
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Exact Date"))
+                        .description(OptionDescription.of(Text.of("Calculates the exact start date for every event in the Skyblock calendar.")))
+                        .binding(false, () -> Config.calendarDate, value -> Config.calendarDate = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .build();
     }
 }

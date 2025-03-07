@@ -1,19 +1,25 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import nofrills.config.Config;
+import nofrills.events.DrawItemTooltip;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static nofrills.Main.mc;
@@ -28,6 +34,11 @@ public class EventFeatures {
             }
         }
         return false;
+    }
+
+    private static int parseTime(String time, String unit) {
+        int index = time.indexOf(unit);
+        return index != -1 ? Integer.parseInt(time.substring(Math.max(0, time.lastIndexOf(" ", index)), index).trim()) : 0;
     }
 
     @EventHandler
@@ -58,6 +69,41 @@ public class EventFeatures {
                 } else {
                     BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);
                     event.drawFilledWithBeam(Box.enclosing(pos, pos), 128, true, RenderColor.fromColor(Config.spookyChestHighlightColor));
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onTooltip(DrawItemTooltip event) {
+        if (Config.calendarDate && mc.currentScreen instanceof GenericContainerScreen container) {
+            if (container.getTitle().getString().equals("Calendar and Events")) {
+                for (Text line : event.lines) {
+                    String l = Formatting.strip(line.getString());
+                    if (l.startsWith("Starts in: ")) {
+                        String time = l.substring(l.indexOf(":")).trim();
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.add(Calendar.DAY_OF_MONTH, parseTime(time, "d"));
+                        calendar.add(Calendar.HOUR, parseTime(time, "h"));
+                        calendar.add(Calendar.MINUTE, parseTime(time, "m"));
+                        calendar.add(Calendar.SECOND, parseTime(time, "s"));
+                        int second = calendar.get(Calendar.SECOND);
+                        if (second % 5 != 0) { // scuffed patch for when the calendar is desynced and the second is slightly off
+                            calendar.add(Calendar.SECOND, 5 - (second % 5));
+                        }
+                        event.addLine(Text.of(""));
+                        event.addLine(Text.of("§c[NF] §eDate of Event: §b" + DateFormat.getInstance().format(calendar.getTime())));
+                        String stackName = Formatting.strip(event.stack.getName().getString());
+                        if (stackName.endsWith("Spooky Festival")) {
+                            calendar.add(Calendar.HOUR, -1);
+                            event.addLine(Text.of("§c[NF] §6Fear Mongerer Arrives: §b" + DateFormat.getInstance().format(calendar.getTime())));
+                        } else if (stackName.endsWith("Season of Jerry")) {
+                            calendar.add(Calendar.HOUR, -7);
+                            calendar.add(Calendar.MINUTE, -40);
+                            event.addLine(Text.of("§c[NF] §4Workshop Opens: §b" + DateFormat.getInstance().format(calendar.getTime())));
+                        }
+                        return;
+                    }
                 }
             }
         }

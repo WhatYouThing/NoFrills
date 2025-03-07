@@ -174,105 +174,107 @@ public class NoFrillsAPI {
 
     @EventHandler
     public static void onTooltip(DrawItemTooltip event) {
-        String itemId = parseItemId(event.customData);
-        if (itemId.isEmpty()) {
-            return;
-        }
-        JsonObject auctionPrices = NoFrillsAPI.getAuctionPrices();
-        if (auctionPrices != null && auctionPrices.has(itemId)) {
-            int quantity = getStackQuantity(event.stack);
-            long lbin = auctionPrices.get(itemId).getAsLong();
-            if (!itemId.equals("ATTRIBUTE_SHARD")) {
-                String msg = "§c[NF] §eLowest BIN: §6" + String.format("%,d", lbin * quantity);
-                if (quantity > 1) {
-                    msg += " §8(" + quantity + "x " + String.format("%,d", lbin) + ")";
-                }
-                event.addLine(Text.of(msg));
+        if (Config.priceTooltips && event.customData != null) {
+            String itemId = parseItemId(event.customData);
+            if (itemId.isEmpty()) {
+                return;
             }
-            JsonObject attributePrices = NoFrillsAPI.getAttributePrices();
-            if (event.customData.contains("attributes") && attributePrices != null) {
-                NbtCompound attributeData = event.customData.getCompound("attributes");
-                Set<String> attributes = attributeData.getKeys();
-                for (String attribute : attributes) {
-                    int level = attributeData.getInt(attribute);
-                    for (int i = level; i >= 1; i--) {
-                        if (attributePrices.has(attribute + i)) {
-                            JsonObject prices = attributePrices.getAsJsonObject(attribute + i);
-                            List<Long> foundPrices = new ArrayList<>();
-                            String pieceType = getKuudraPieceType(itemId);
-                            if (!pieceType.isEmpty()) {
-                                for (String name : kuudraPieceNames) {
-                                    if (prices.has(name + "_" + pieceType)) {
-                                        foundPrices.add(prices.get(name + "_" + pieceType).getAsLong());
+            JsonObject auctionPrices = NoFrillsAPI.getAuctionPrices();
+            if (auctionPrices != null && auctionPrices.has(itemId)) {
+                int quantity = getStackQuantity(event.stack);
+                long lbin = auctionPrices.get(itemId).getAsLong();
+                if (!itemId.equals("ATTRIBUTE_SHARD")) {
+                    String msg = "§c[NF] §eLowest BIN: §6" + String.format("%,d", lbin * quantity);
+                    if (quantity > 1) {
+                        msg += " §8(" + quantity + "x " + String.format("%,d", lbin) + ")";
+                    }
+                    event.addLine(Text.of(msg));
+                }
+                JsonObject attributePrices = NoFrillsAPI.getAttributePrices();
+                if (event.customData.contains("attributes") && attributePrices != null) {
+                    NbtCompound attributeData = event.customData.getCompound("attributes");
+                    Set<String> attributes = attributeData.getKeys();
+                    for (String attribute : attributes) {
+                        int level = attributeData.getInt(attribute);
+                        for (int i = level; i >= 1; i--) {
+                            if (attributePrices.has(attribute + i)) {
+                                JsonObject prices = attributePrices.getAsJsonObject(attribute + i);
+                                List<Long> foundPrices = new ArrayList<>();
+                                String pieceType = getKuudraPieceType(itemId);
+                                if (!pieceType.isEmpty()) {
+                                    for (String name : kuudraPieceNames) {
+                                        if (prices.has(name + "_" + pieceType)) {
+                                            foundPrices.add(prices.get(name + "_" + pieceType).getAsLong());
+                                        }
+                                    }
+                                } else {
+                                    if (prices.has(itemId)) {
+                                        foundPrices.add(prices.get(itemId).getAsLong());
                                     }
                                 }
-                            } else {
-                                if (prices.has(itemId)) {
-                                    foundPrices.add(prices.get(itemId).getAsLong());
-                                }
-                            }
-                            foundPrices.sort(Comparator.comparingLong(price -> price));
-                            String attributeLabel = Utils.uppercaseFirst(attribute.startsWith("mending") ? "vitality" : attribute, true);
-                            String attributeMsg = "§c[NF] §ePrice for §b" + attributeLabel + " " + level + "§e: ";
-                            if (!foundPrices.isEmpty()) {
-                                if (i == level) {
-                                    attributeMsg += "§6" + String.format("%,d", foundPrices.getFirst());
+                                foundPrices.sort(Comparator.comparingLong(price -> price));
+                                String attributeLabel = Utils.uppercaseFirst(attribute.startsWith("mending") ? "vitality" : attribute, true);
+                                String attributeMsg = "§c[NF] §ePrice for §b" + attributeLabel + " " + level + "§e: ";
+                                if (!foundPrices.isEmpty()) {
+                                    if (i == level) {
+                                        attributeMsg += "§6" + String.format("%,d", foundPrices.getFirst());
+                                    } else {
+                                        int difference = (int) Math.pow(2, level - i);
+                                        attributeMsg += "§6" + String.format("%,d", foundPrices.getFirst() * difference) + " §8(" + difference + "x Level " + i + ")";
+                                    }
                                 } else {
-                                    int difference = (int) Math.pow(2, level - i);
-                                    attributeMsg += "§6" + String.format("%,d", foundPrices.getFirst() * difference) + " §8(" + difference + "x Level " + i + ")";
+                                    if (i > 1) {
+                                        continue;
+                                    } else {
+                                        attributeMsg += "§cUnknown";
+                                    }
                                 }
-                            } else {
-                                if (i > 1) {
-                                    continue;
-                                } else {
-                                    attributeMsg += "§cUnknown";
-                                }
+                                event.addLine(Text.of(attributeMsg));
+                                break;
                             }
-                            event.addLine(Text.of(attributeMsg));
-                            break;
                         }
                     }
-                }
-                if (attributes.size() == 2) {
-                    String first = (String) attributes.toArray()[0];
-                    String second = (String) attributes.toArray()[1];
-                    String rollMsg = "§c[NF] §ePrice for §aRoll§e: ";
-                    for (String combo : new String[]{first + " " + second, second + " " + first}) {
-                        if (attributePrices.has(combo)) {
-                            JsonObject comboPrices = attributePrices.getAsJsonObject(combo);
-                            String id = itemId;
-                            for (String tier : kuudraPieceTiers) {
-                                if (id.startsWith(tier)) {
-                                    id = id.replace(tier + "_", "");
-                                    break;
+                    if (attributes.size() == 2) {
+                        String first = (String) attributes.toArray()[0];
+                        String second = (String) attributes.toArray()[1];
+                        String rollMsg = "§c[NF] §ePrice for §aRoll§e: ";
+                        for (String combo : new String[]{first + " " + second, second + " " + first}) {
+                            if (attributePrices.has(combo)) {
+                                JsonObject comboPrices = attributePrices.getAsJsonObject(combo);
+                                String id = itemId;
+                                for (String tier : kuudraPieceTiers) {
+                                    if (id.startsWith(tier)) {
+                                        id = id.replace(tier + "_", "");
+                                        break;
+                                    }
                                 }
+                                if (comboPrices.has(id)) {
+                                    rollMsg += "§6" + String.format("%,d", comboPrices.get(id).getAsLong());
+                                } else {
+                                    rollMsg += "§cUnknown";
+                                }
+                                break;
                             }
-                            if (comboPrices.has(id)) {
-                                rollMsg += "§6" + String.format("%,d", comboPrices.get(id).getAsLong());
-                            } else {
-                                rollMsg += "§cUnknown";
-                            }
-                            break;
                         }
+                        event.addLine(Text.of(rollMsg));
                     }
-                    event.addLine(Text.of(rollMsg));
                 }
             }
-        }
-        JsonObject bazaarPrices = NoFrillsAPI.getBazaarPrices();
-        if (bazaarPrices != null && bazaarPrices.has(itemId)) {
-            JsonArray bzPrices = bazaarPrices.get(itemId).getAsJsonArray();
-            long buyPrice = bzPrices.get(0).getAsLong();
-            long sellPrice = bzPrices.get(1).getAsLong();
-            int quantity = getStackQuantity(event.stack);
-            String buyMsg = "§c[NF] §eBZ Insta-buy: §6" + String.format("%,d", buyPrice * quantity);
-            String sellMsg = "§c[NF] §eBZ Insta-sell: §6" + String.format("%,d", sellPrice * quantity);
-            if (quantity > 1) {
-                buyMsg += " §8(" + quantity + "x " + String.format("%,d", buyPrice) + ")";
-                sellMsg += " §8(" + quantity + "x " + String.format("%,d", sellPrice) + ")";
+            JsonObject bazaarPrices = NoFrillsAPI.getBazaarPrices();
+            if (bazaarPrices != null && bazaarPrices.has(itemId)) {
+                JsonArray bzPrices = bazaarPrices.get(itemId).getAsJsonArray();
+                long buyPrice = bzPrices.get(0).getAsLong();
+                long sellPrice = bzPrices.get(1).getAsLong();
+                int quantity = getStackQuantity(event.stack);
+                String buyMsg = "§c[NF] §eBZ Insta-buy: §6" + String.format("%,d", buyPrice * quantity);
+                String sellMsg = "§c[NF] §eBZ Insta-sell: §6" + String.format("%,d", sellPrice * quantity);
+                if (quantity > 1) {
+                    buyMsg += " §8(" + quantity + "x " + String.format("%,d", buyPrice) + ")";
+                    sellMsg += " §8(" + quantity + "x " + String.format("%,d", sellPrice) + ")";
+                }
+                event.addLine(Text.of(buyMsg));
+                event.addLine(Text.of(sellMsg));
             }
-            event.addLine(Text.of(buyMsg));
-            event.addLine(Text.of(sellMsg));
         }
     }
 }

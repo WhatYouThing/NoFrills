@@ -152,11 +152,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;getTooltipFromItem(Lnet/minecraft/item/ItemStack;)Ljava/util/List;"))
     private List<Text> onGetTooltipFromItem(List<Text> original) {
-        if (Config.priceTooltips && focusedSlot != null) {
+        if (focusedSlot != null) {
             ItemStack stack = focusedSlot.getStack();
             NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
-            if (!stack.isEmpty() && component != null) {
-                eventBus.post(new DrawItemTooltip(original, stack, component.copyNbt()));
+            if (!stack.isEmpty()) {
+                eventBus.post(new DrawItemTooltip(original, stack, component != null ? component.copyNbt() : null));
             }
         }
         return original;

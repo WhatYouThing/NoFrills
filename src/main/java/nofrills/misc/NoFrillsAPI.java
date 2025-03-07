@@ -34,6 +34,7 @@ public class NoFrillsAPI {
     private static JsonObject auctionPrices = null;
     private static JsonObject bazaarPrices = null;
     private static JsonObject attributePrices = null;
+    private static JsonObject npcPrices = null;
     private static int pricingRefreshTicks = 0;
     private static boolean isOutage = false;
 
@@ -131,6 +132,13 @@ public class NoFrillsAPI {
         return attributePrices;
     }
 
+    /**
+     * Returns a copy of the NPC pricing data from memory, otherwise null if the data hasn't been pulled yet.
+     */
+    public static JsonObject getNPCShopPrices() {
+        return npcPrices;
+    }
+
     private static void refreshItemPricing() {
         new Thread(() -> {
             try {
@@ -140,6 +148,7 @@ public class NoFrillsAPI {
                 auctionPrices = JsonParser.parseString(responseJson.get("auction").getAsString()).getAsJsonObject();
                 bazaarPrices = JsonParser.parseString(responseJson.get("bazaar").getAsString()).getAsJsonObject();
                 attributePrices = JsonParser.parseString(responseJson.get("attribute").getAsString()).getAsJsonObject();
+                npcPrices = JsonParser.parseString(responseJson.get("npc").getAsString()).getAsJsonObject();
                 if (isOutage) {
                     Utils.info("§aSuccessfully reconnected to the NoFrills API, item pricing data has been refreshed.");
                     isOutage = false;
@@ -178,6 +187,26 @@ public class NoFrillsAPI {
             String itemId = parseItemId(event.customData);
             if (itemId.isEmpty()) {
                 return;
+            }
+            JsonObject npcPrices = NoFrillsAPI.getNPCShopPrices();
+            if (npcPrices != null && npcPrices.has(itemId)) {
+                JsonObject prices = npcPrices.get(itemId).getAsJsonObject();
+                int quantity = getStackQuantity(event.stack);
+                if (SkyblockData.getArea().equals("The Rift") && prices.has("mote")) {
+                    double motePrice = prices.get("mote").getAsDouble();
+                    String motesMsg = "§c[NF] §dMotes Price: §6" + String.format("%,.1f", motePrice * quantity);
+                    if (quantity > 1) {
+                        motesMsg += " §8(" + quantity + "x " + String.format("%,.1f", motePrice) + ")";
+                    }
+                    event.addLine(Text.of(motesMsg));
+                } else if (prices.has("coin")) {
+                    double coinPrice = prices.get("coin").getAsDouble();
+                    String coinsMsg = "§c[NF] §eNPC Price: §6" + String.format("%,.1f", coinPrice * quantity);
+                    if (quantity > 1) {
+                        coinsMsg += " §8(" + quantity + "x " + String.format("%,.1f", coinPrice) + ")";
+                    }
+                    event.addLine(Text.of(coinsMsg));
+                }
             }
             JsonObject auctionPrices = NoFrillsAPI.getAuctionPrices();
             if (auctionPrices != null && auctionPrices.has(itemId)) {
@@ -263,14 +292,14 @@ public class NoFrillsAPI {
             JsonObject bazaarPrices = NoFrillsAPI.getBazaarPrices();
             if (bazaarPrices != null && bazaarPrices.has(itemId)) {
                 JsonArray bzPrices = bazaarPrices.get(itemId).getAsJsonArray();
-                long buyPrice = bzPrices.get(0).getAsLong();
-                long sellPrice = bzPrices.get(1).getAsLong();
+                double buyPrice = bzPrices.get(0).getAsDouble();
+                double sellPrice = bzPrices.get(1).getAsDouble();
                 int quantity = getStackQuantity(event.stack);
-                String buyMsg = "§c[NF] §eBZ Insta-buy: §6" + String.format("%,d", buyPrice * quantity);
-                String sellMsg = "§c[NF] §eBZ Insta-sell: §6" + String.format("%,d", sellPrice * quantity);
+                String buyMsg = "§c[NF] §eBazaar Buy: §6" + String.format("%,.1f", buyPrice * quantity);
+                String sellMsg = "§c[NF] §eBazaar Sell: §6" + String.format("%,.1f", sellPrice * quantity);
                 if (quantity > 1) {
-                    buyMsg += " §8(" + quantity + "x " + String.format("%,d", buyPrice) + ")";
-                    sellMsg += " §8(" + quantity + "x " + String.format("%,d", sellPrice) + ")";
+                    buyMsg += " §8(" + quantity + "x " + String.format("%,.1f", buyPrice) + ")";
+                    sellMsg += " §8(" + quantity + "x " + String.format("%,.1f", sellPrice) + ")";
                 }
                 event.addLine(Text.of(buyMsg));
                 event.addLine(Text.of(sellMsg));

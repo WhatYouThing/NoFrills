@@ -243,16 +243,16 @@ public class DungeonSolvers {
     private static void onChat(ChatMsgEvent event) {
         if (Utils.isInDungeons()) {
             if (Config.wishReminder && Config.dungeonClass.equals("Healer") && event.messagePlain.equals(wishMsg)) {
-                Utils.showTitle("§a§lWISH!", "", 5, 40, 5);
+                Utils.showTitleCustom("WISH!", 40, -20, 4.0f, 0x00ff00);
                 Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
             }
             if (Config.dungeonClass.equals("Mage")) {
                 if (Config.campReminder && event.messagePlain.equals(campMsg)) {
-                    Utils.showTitle("§c§lCAMP BLOOD!", "", 5, 40, 5);
+                    Utils.showTitleCustom("CAMP BLOOD!", 40, -20, 4.0f, 0xff4646);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
                 if (Config.ragAxeReminder && Utils.isOnDungeonFloor("M5") && event.messagePlain.equals(ragAxeMsg)) {
-                    Utils.showTitle("§6§lRAG AXE!", "", 5, 40, 5);
+                    Utils.showTitleCustom("RAG AXE!", 40, -20, 4.0f, 0xffff00);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
             }

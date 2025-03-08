@@ -25,20 +25,15 @@ import static nofrills.Main.mc;
 public class LeapOverlay {
     public static final String leapMenuName = "Spirit Leap";
     public static final RenderColor nameColor = RenderColor.fromHex(0xffffff);
-    private static final RenderColor healerColor = RenderColor.fromHex(0xecb50c);
-    private static final RenderColor mageColor = RenderColor.fromHex(0x1793c4);
-    private static final RenderColor bersColor = RenderColor.fromHex(0xe7413c);
-    private static final RenderColor archColor = RenderColor.fromHex(0x4a14b7);
-    private static final RenderColor tankColor = RenderColor.fromHex(0x768f46);
     private static final RenderColor deadColor = RenderColor.fromHex(0xaaaaaa);
 
     private static RenderColor getColor(String className) {
         return switch (className) {
-            case "Healer" -> healerColor;
-            case "Mage" -> mageColor;
-            case "Berserk" -> bersColor;
-            case "Archer" -> archColor;
-            case "Tank" -> tankColor;
+            case "Healer" -> RenderColor.fromColor(Config.leapColorHealer);
+            case "Mage" -> RenderColor.fromColor(Config.leapColorMage);
+            case "Berserk" -> RenderColor.fromColor(Config.leapColorBers);
+            case "Archer" -> RenderColor.fromColor(Config.leapColorArch);
+            case "Tank" -> RenderColor.fromColor(Config.leapColorTank);
             case "DEAD" -> deadColor;
             default -> nameColor;
         };

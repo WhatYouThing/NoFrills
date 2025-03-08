@@ -226,6 +226,16 @@ public class Config {
     @SerialEntry
     public static boolean leapOverlayMsg = false;
     @SerialEntry
+    public static Color leapColorHealer = new Color(0xecb50c);
+    @SerialEntry
+    public static Color leapColorMage = new Color(0x1793c4);
+    @SerialEntry
+    public static Color leapColorBers = new Color(0xe7413c);
+    @SerialEntry
+    public static Color leapColorArch = new Color(0x4a14b7);
+    @SerialEntry
+    public static Color leapColorTank = new Color(0x768f46);
+    @SerialEntry
     public static boolean campReminder = false;
     @SerialEntry
     public static boolean ragAxeReminder = false;

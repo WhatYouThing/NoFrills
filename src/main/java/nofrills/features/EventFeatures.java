@@ -21,6 +21,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import static nofrills.Main.mc;
 
@@ -39,6 +40,10 @@ public class EventFeatures {
     private static int parseTime(String time, String unit) {
         int index = time.indexOf(unit);
         return index != -1 ? Integer.parseInt(time.substring(Math.max(0, time.lastIndexOf(" ", index)), index).trim()) : 0;
+    }
+
+    private static String parseDate(Calendar calendar) {
+        return calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + " " + DateFormat.getInstance().format(calendar.getTime());
     }
 
     @EventHandler
@@ -92,15 +97,15 @@ public class EventFeatures {
                             calendar.add(Calendar.SECOND, 5 - (second % 5));
                         }
                         event.addLine(Text.of(""));
-                        event.addLine(Text.of("§c[NF] §eDate of Event: §b" + DateFormat.getInstance().format(calendar.getTime())));
+                        event.addLine(Text.of("§c[NF] §eDate of Event: §b" + parseDate(calendar)));
                         String stackName = Formatting.strip(event.stack.getName().getString());
                         if (stackName.endsWith("Spooky Festival")) {
                             calendar.add(Calendar.HOUR, -1);
-                            event.addLine(Text.of("§c[NF] §6Fear Mongerer Arrives: §b" + DateFormat.getInstance().format(calendar.getTime())));
+                            event.addLine(Text.of("§c[NF] §6Fear Mongerer Arrives: §b" + parseDate(calendar)));
                         } else if (stackName.endsWith("Season of Jerry")) {
                             calendar.add(Calendar.HOUR, -7);
                             calendar.add(Calendar.MINUTE, -40);
-                            event.addLine(Text.of("§c[NF] §4Workshop Opens: §b" + DateFormat.getInstance().format(calendar.getTime())));
+                            event.addLine(Text.of("§c[NF] §4Workshop Opens: §b" + parseDate(calendar)));
                         }
                         return;
                     }

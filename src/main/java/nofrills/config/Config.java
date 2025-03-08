@@ -142,6 +142,8 @@ public class Config {
     public static fixModes armorStandFix = fixModes.Disabled;
     @SerialEntry
     public static fixModes abilityPlaceFix = fixModes.Disabled;
+    @SerialEntry
+    public static fixModes efficiencyFix = fixModes.Disabled;
 
     // Events
 

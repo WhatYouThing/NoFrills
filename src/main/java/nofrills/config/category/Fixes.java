@@ -115,6 +115,14 @@ public class Fixes {
                                 .enumClass(Config.fixModes.class)
                                 .formatValue(value -> Text.of(value.name())))
                         .build())
+                .option(Option.<Config.fixModes>createBuilder()
+                        .name(Text.of("Efficiency Fix"))
+                        .description(OptionDescription.of(Text.of("Fixes the efficiency enchant being lag and ping dependent, because Microsoft decided to no longer update your mining efficiency attribute client side.")))
+                        .binding(Config.fixModes.Disabled, () -> Config.efficiencyFix, value -> Config.efficiencyFix = value)
+                        .controller(option -> EnumControllerBuilder.create(option)
+                                .enumClass(Config.fixModes.class)
+                                .formatValue(value -> Text.of(value.name())))
+                        .build())
                 .build();
     }
 }

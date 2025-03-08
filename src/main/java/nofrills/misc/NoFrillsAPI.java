@@ -111,34 +111,6 @@ public class NoFrillsAPI {
         return stack.getCount();
     }
 
-    /**
-     * Returns a copy of the Auction House pricing data from memory, otherwise null if the data hasn't been pulled yet.
-     */
-    public static JsonObject getAuctionPrices() {
-        return auctionPrices;
-    }
-
-    /**
-     * Returns a copy of the Bazaar pricing data from memory, otherwise null if the data hasn't been pulled yet.
-     */
-    public static JsonObject getBazaarPrices() {
-        return bazaarPrices;
-    }
-
-    /**
-     * Returns a copy of the Attribute pricing data from memory, otherwise null if the data hasn't been pulled yet.
-     */
-    public static JsonObject getAttributePrices() {
-        return attributePrices;
-    }
-
-    /**
-     * Returns a copy of the NPC pricing data from memory, otherwise null if the data hasn't been pulled yet.
-     */
-    public static JsonObject getNPCShopPrices() {
-        return npcPrices;
-    }
-
     private static void refreshItemPricing() {
         new Thread(() -> {
             try {
@@ -188,7 +160,6 @@ public class NoFrillsAPI {
             if (itemId.isEmpty()) {
                 return;
             }
-            JsonObject npcPrices = NoFrillsAPI.getNPCShopPrices();
             if (npcPrices != null && npcPrices.has(itemId)) {
                 JsonObject prices = npcPrices.get(itemId).getAsJsonObject();
                 int quantity = getStackQuantity(event.stack);
@@ -208,7 +179,6 @@ public class NoFrillsAPI {
                     event.addLine(Text.of(coinsMsg));
                 }
             }
-            JsonObject auctionPrices = NoFrillsAPI.getAuctionPrices();
             if (auctionPrices != null && auctionPrices.has(itemId)) {
                 int quantity = getStackQuantity(event.stack);
                 long lbin = auctionPrices.get(itemId).getAsLong();
@@ -219,7 +189,6 @@ public class NoFrillsAPI {
                     }
                     event.addLine(Text.of(msg));
                 }
-                JsonObject attributePrices = NoFrillsAPI.getAttributePrices();
                 if (event.customData.contains("attributes") && attributePrices != null) {
                     NbtCompound attributeData = event.customData.getCompound("attributes");
                     Set<String> attributes = attributeData.getKeys();
@@ -289,7 +258,6 @@ public class NoFrillsAPI {
                     }
                 }
             }
-            JsonObject bazaarPrices = NoFrillsAPI.getBazaarPrices();
             if (bazaarPrices != null && bazaarPrices.has(itemId)) {
                 JsonArray bzPrices = bazaarPrices.get(itemId).getAsJsonArray();
                 double buyPrice = bzPrices.get(0).getAsDouble();

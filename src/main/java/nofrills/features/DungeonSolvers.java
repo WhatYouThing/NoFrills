@@ -48,7 +48,6 @@ public class DungeonSolvers {
     private static final String campMsg = "[BOSS] The Watcher: Let's see how you can handle this.";
     private static final String ragAxeMsg = "[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.";
     public static boolean isInTerminal = false;
-    private static BlockPos sharpshooterNext = null;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
 
@@ -80,20 +79,6 @@ public class DungeonSolvers {
         return !mc.world.getOtherEntities(null, sharpshooterArea, ent -> ent instanceof PlayerEntity).isEmpty();
     }
 
-    private static BlockPos findSharpshooterTarget() {
-        for (double x = sharpshooterTarget.minX; x <= sharpshooterTarget.maxX; x++) {
-            for (double y = sharpshooterTarget.minY; y <= sharpshooterTarget.maxY; y++) {
-                for (double z = sharpshooterTarget.minZ; z <= sharpshooterTarget.maxZ; z++) {
-                    BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
-                    if (mc.world.getBlockState(pos).getBlock() == Blocks.EMERALD_BLOCK) {
-                        return pos;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     @EventHandler
     private static void onScreenOpen(ScreenOpenEvent event) {
         isTerminalBuilt = false;
@@ -112,21 +97,12 @@ public class DungeonSolvers {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (Utils.isInDungeons()) {
+        if (Utils.isOnDungeonFloor("7")) {
             if (melodyTicks > 0) {
                 melodyTicks--;
             }
-            if (Config.solveDevices && Utils.isOnDungeonFloor("7")) {
-                if (isSharpshooterActive()) {
-                    BlockPos target = findSharpshooterTarget();
-                    if (target != null) {
-                        if (sharpshooterNext != null && sharpshooterNext != target) {
-                            sharpshooterList.add(sharpshooterNext);
-                        }
-                        sharpshooterNext = target;
-                    }
-                } else if (sharpshooterNext != null || !sharpshooterList.isEmpty()) {
-                    sharpshooterNext = null;
+            if (Config.solveDevices) {
+                if (!sharpshooterList.isEmpty() && !isSharpshooterActive()) {
                     sharpshooterList.clear();
                 }
             }
@@ -240,6 +216,19 @@ public class DungeonSolvers {
     }
 
     @EventHandler
+    public static void onBlockUpdate(BlockUpdateEvent event) {
+        if (Config.solveDevices && Utils.isOnDungeonFloor("7")) {
+            if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
+                // cant easily check for the emerald block here because hypixel does some mumbo jumbo with packets
+                Utils.info("old: " + event.oldState.getBlock().toString() + ", new: " + event.newState.getBlock().toString());
+                if (event.newState.getBlock() == Blocks.BLUE_TERRACOTTA) {
+                    sharpshooterList.add(event.pos);
+                }
+            }
+        }
+    }
+
+    @EventHandler
     private static void onChat(ChatMsgEvent event) {
         if (Utils.isInDungeons()) {
             if (Config.wishReminder && Config.dungeonClass.equals("Healer") && event.messagePlain.equals(wishMsg)) {
@@ -277,9 +266,6 @@ public class DungeonSolvers {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (sharpshooterNext != null) {
-            event.drawFilled(Box.enclosing(sharpshooterNext, sharpshooterNext), true, RenderColor.fromHex(0x00ff00, 1.0f));
-        }
         if (!sharpshooterList.isEmpty()) {
             for (BlockPos pos : sharpshooterList) {
                 event.drawFilled(Box.enclosing(pos, pos), true, RenderColor.fromHex(0xff0000, 1.0f));

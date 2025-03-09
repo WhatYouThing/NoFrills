@@ -17,8 +17,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Inventory**
 
-    - **Price Tooltips**: Adds the lowest available Auction House, Bazaar, and attribute (separate attributes + roll)
-      prices to item tooltips.
+    - **Price Tooltips**: Adds the lowest available NPC, Motes, Auction House, Bazaar, and Attribute (separate
+      attributes + roll) prices to item tooltips.
     - **Hotbar Swap**: Allows you to easily move items from your inventory to your hotbar by pressing Ctrl + Left Click.
       Essentially like pressing a number key, but much simpler.
     - **Ignore Background**: Prevents you from clicking on the glass panes which act as a background in Skyblock GUI's.
@@ -68,6 +68,22 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
   sneaking not slowing you down while inside a block.
 - **Middle Click Fix**: Allows Pick Block (the middle mouse button) to work just as it does in 1.8.9.
 - **Mining Ability Fix**: Allows you to use item abilities (and open treasure chests) without having to stop mining.
+- **Armor Stand Fix**: Prevents the game from unnecessarily ticking entity cramming on armor stand entities, which can
+  improve performance.
+- **Ability Place Fix** Prevents you from being able to place any Skyblock item that is a block and has a right click
+  ability, such as the Spirit Sceptre or the Egglocator.
+- **Efficiency Fix**: Fixes the efficiency enchant being lag and ping dependent, because Microsoft decided to no longer
+  update your mining efficiency attribute client side.
+
+### Events
+
+- **Spooky Festival**
+    - **Chest Alert**: Shows a title and plays a sound effect when a Party/Trick or Treat chest spawns nearby during the
+      Spooky Festival.
+    - **Chest Highlight**: Renders a highlight for nearby Party/Trick or Treat chests during the Spooky Festival.
+
+- **Calendar**
+    - **Exact Date**: Calculates the exact start date for every event in the Skyblock calendar.
 
 ### Fishing
 

@@ -11,7 +11,6 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import nofrills.config.Config;
-import nofrills.events.BlockUpdateEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -44,10 +43,5 @@ public abstract class ClientWorldMixin extends World {
             return;
         }
         eventBus.post(new WorldTickEvent());
-    }
-
-    @Inject(method = "handleBlockUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;II)Z"))
-    private void onUpdateBlock(BlockPos pos, BlockState state, int flags, CallbackInfo ci) {
-        eventBus.post(new BlockUpdateEvent(pos, getBlockState(pos), state));
     }
 }

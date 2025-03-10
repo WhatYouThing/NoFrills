@@ -30,6 +30,7 @@
     "PlayerEntityMixin",
     "RaycastContextMixin",
     "SnowBlockMixin",
+    "WorldMixin",
     "WorldRendererMixin"
   ],
   "injectors": {

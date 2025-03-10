@@ -1,10 +1,10 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -42,12 +42,15 @@ public class DungeonSolvers {
     private static final List<BlockPos> sharpshooterList = new ArrayList<>();
     private static final Box sharpshooterTarget = Box.enclosing(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
     private static final Box sharpshooterArea = new Box(63.2, 127, 35.8, 63.8, 128, 35.2);
+    private static final BlockState terracottaState = Blocks.BLUE_TERRACOTTA.getDefaultState();
+    private static final BlockState emeraldState = Blocks.EMERALD_BLOCK.getDefaultState();
     private static final List<Entity> dungeonKeys = new ArrayList<>();
     private static final List<Entity> spiritBows = new ArrayList<>();
     private static final String wishMsg = "⚠ Maxor is enraged! ⚠";
     private static final String campMsg = "[BOSS] The Watcher: Let's see how you can handle this.";
     private static final String ragAxeMsg = "[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.";
     public static boolean isInTerminal = false;
+    private static BlockPos sharpshooterNext = null;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
 
@@ -76,7 +79,21 @@ public class DungeonSolvers {
     }
 
     private static boolean isSharpshooterActive() {
-        return !mc.world.getOtherEntities(null, sharpshooterArea, ent -> ent instanceof PlayerEntity).isEmpty();
+        return mc.player != null && sharpshooterArea.intersects(mc.player.getBoundingBox());
+    }
+
+    private static BlockPos findSharpshooterTarget() {
+        for (double x = sharpshooterTarget.minX; x <= sharpshooterTarget.maxX; x++) {
+            for (double y = sharpshooterTarget.minY; y <= sharpshooterTarget.maxY; y++) {
+                for (double z = sharpshooterTarget.minZ; z <= sharpshooterTarget.maxZ; z++) {
+                    BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
+                    if (mc.world.getBlockState(pos).equals(emeraldState)) {
+                        return pos;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     @EventHandler
@@ -102,7 +119,10 @@ public class DungeonSolvers {
                 melodyTicks--;
             }
             if (Config.solveDevices) {
-                if (!sharpshooterList.isEmpty() && !isSharpshooterActive()) {
+                if (isSharpshooterActive()) {
+                    sharpshooterNext = findSharpshooterTarget();
+                } else if (!sharpshooterList.isEmpty() || sharpshooterNext != null) {
+                    sharpshooterNext = null;
                     sharpshooterList.clear();
                 }
             }
@@ -219,10 +239,13 @@ public class DungeonSolvers {
     public static void onBlockUpdate(BlockUpdateEvent event) {
         if (Config.solveDevices && Utils.isOnDungeonFloor("7")) {
             if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
-                // cant easily check for the emerald block here because hypixel does some mumbo jumbo with packets
-                Utils.info("old: " + event.oldState.getBlock().toString() + ", new: " + event.newState.getBlock().toString());
-                if (event.newState.getBlock() == Blocks.BLUE_TERRACOTTA) {
-                    sharpshooterList.add(event.pos);
+                if (event.oldState.equals(emeraldState) && event.newState.equals(terracottaState)) {
+                    if (sharpshooterNext != null) {
+                        sharpshooterList.add(sharpshooterNext);
+                    }
+                }
+                if (event.oldState.equals(terracottaState) && event.newState.equals(emeraldState)) {
+                    sharpshooterNext = findSharpshooterTarget();
                 }
             }
         }
@@ -270,6 +293,9 @@ public class DungeonSolvers {
             for (BlockPos pos : sharpshooterList) {
                 event.drawFilled(Box.enclosing(pos, pos), true, RenderColor.fromHex(0xff0000, 1.0f));
             }
+        }
+        if (sharpshooterNext != null) {
+            event.drawFilled(Box.enclosing(sharpshooterNext, sharpshooterNext), true, RenderColor.fromHex(0x00ff00, 1.0f));
         }
         if (!dungeonKeys.isEmpty()) {
             List<Entity> keys = new ArrayList<>(dungeonKeys);

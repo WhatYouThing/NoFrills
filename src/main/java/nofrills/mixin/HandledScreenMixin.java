@@ -16,7 +16,7 @@ import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
 import nofrills.features.DungeonSolvers;
 import nofrills.features.LeapOverlay;
-import nofrills.misc.LeapMenuButton;
+import nofrills.hud.LeapMenuButton;
 import nofrills.misc.RenderColor;
 import nofrills.misc.ScreenOptions;
 import nofrills.misc.Utils;

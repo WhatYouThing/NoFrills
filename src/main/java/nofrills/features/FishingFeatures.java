@@ -77,6 +77,10 @@ public class FishingFeatures {
     private static final RenderColor rareColor = new RenderColor(255, 170, 0, 0);
     private static int notifyTicks = 0;
 
+    private static boolean isValidMob(Entity ent) {
+        return !Rendering.Entities.isDrawingGlow(ent) && Utils.isMob(ent);
+    }
+
     private static boolean isHoldingRod() {
         if (mc.player != null) {
             ItemStack stack = mc.player.getMainHandStack();
@@ -138,7 +142,7 @@ public class FishingFeatures {
                     }
                 }
                 if (Config.rareGlow && creature.rare && event.entity.age <= 20 && name.contains(creature.name.toLowerCase())) {
-                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, Utils::isMob));
+                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, FishingFeatures::isValidMob));
                     if (owner != null) {
                         Rendering.Entities.drawGlow(owner, true, rareColor);
                         if (owner.hasVehicle()) {

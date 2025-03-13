@@ -137,8 +137,6 @@ public class Config {
     @SerialEntry
     public static fixModes middleClickFix = fixModes.Disabled;
     @SerialEntry
-    public static fixModes miningAbilityFix = fixModes.Disabled;
-    @SerialEntry
     public static fixModes armorStandFix = fixModes.Disabled;
     @SerialEntry
     public static fixModes abilityPlaceFix = fixModes.Disabled;
@@ -250,8 +248,6 @@ public class Config {
     public static boolean kuudraDPS = false;
     @SerialEntry
     public static boolean kuudraMissing = false;
-    @SerialEntry
-    public static boolean kuudraPileFix = false;
     @SerialEntry
     public static boolean kuudraFresh = false;
     @SerialEntry

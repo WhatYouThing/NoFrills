@@ -67,7 +67,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Sneak Fix**: Fixes the ancient bug where the un-sneak animation plays twice if you do it too quickly, and fixes
   sneaking not slowing you down while inside a block.
 - **Middle Click Fix**: Allows Pick Block (the middle mouse button) to work just as it does in 1.8.9.
-- **Mining Ability Fix**: Allows you to use item abilities (and open treasure chests) without having to stop mining.
 - **Armor Stand Fix**: Prevents the game from unnecessarily ticking entity cramming on armor stand entities, which can
   improve performance.
 - **Ability Place Fix** Prevents you from being able to place any Skyblock item that is a block and has a right click
@@ -118,7 +117,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Render Health**: Renders Kuudra's exact health during the DPS phase.
 - **Render DPS**: Renders your team's DPS during the last phase. Infernal tier only.
 - **Announce Missing**: Announces in party chat if no supply spawns at either your pre, or at your next spot.
-- **Pile Fix**: Allows you to use your abilities (such as Fire Veil) while building the ballista.
 - **Announce Fresh**: Send a message when the Fresh Tools perk activates.
 - **Fresh Timer**: Shows a timer for Fresh Tools.
 - **Announce Drain**: Send a message when you drain your mana with an End Stone Sword.

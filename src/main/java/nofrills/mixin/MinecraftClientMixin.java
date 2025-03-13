@@ -1,6 +1,5 @@
 package nofrills.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -36,13 +35,5 @@ public abstract class MinecraftClientMixin {
         if (screen != null && world != null) {
             eventBus.post(new ScreenOpenEvent(screen));
         }
-    }
-
-    @ModifyExpressionValue(method = "doItemUse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;isBreakingBlock()Z"))
-    private boolean isBreakingBlock(boolean original) {
-        if (Utils.isFixEnabled(Config.miningAbilityFix)) {
-            return false;
-        }
-        return original;
     }
 }

@@ -237,6 +237,8 @@ public class Config {
     public static boolean campReminder = false;
     @SerialEntry
     public static boolean ragAxeReminder = false;
+    @SerialEntry
+    public static boolean hideMageBeam = false;
 
     // Kuudra
 

@@ -203,6 +203,15 @@ public class Dungeons {
                         .controller(StringControllerBuilder::create)
                         .build())
 
+                .option(LabelOption.create(Text.of("Misc")))
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Hide Mage Beam"))
+                        .description(OptionDescription.of(Text.of("Prevents the Mage Beam/Staff particles from spawning, improving visibility when playing Left Click Mage.")))
+                        .binding(false, () -> Config.hideMageBeam, value -> Config.hideMageBeam = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .build();
     }
 }

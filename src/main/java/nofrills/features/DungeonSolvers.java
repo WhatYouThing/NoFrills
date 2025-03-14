@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -49,6 +50,7 @@ public class DungeonSolvers {
     private static final String wishMsg = "⚠ Maxor is enraged! ⚠";
     private static final String campMsg = "[BOSS] The Watcher: Let's see how you can handle this.";
     private static final String ragAxeMsg = "[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.";
+    private static final int beamParticles = 0;
     public static boolean isInTerminal = false;
     private static BlockPos sharpshooterNext = null;
     private static boolean isTerminalBuilt = false;
@@ -319,6 +321,13 @@ public class DungeonSolvers {
                     spiritBows.remove(ent);
                 }
             }
+        }
+    }
+
+    @EventHandler
+    private static void onParticle(SpawnParticleEvent event) {
+        if (Config.hideMageBeam && Utils.isInDungeons() && event.packet.getParameters().getType().equals(ParticleTypes.FIREWORK)) {
+            event.cancel();
         }
     }
 }

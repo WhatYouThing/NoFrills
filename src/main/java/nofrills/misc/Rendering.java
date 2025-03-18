@@ -72,7 +72,7 @@ public final class Rendering {
             RenderSystem.enableDepthTest();
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
         }
-        mc.textRenderer.draw(text, -mc.textRenderer.getWidth(text) / 2f, 1.0f, color.hex, false, matrices, consumer, throughWalls ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
+        mc.textRenderer.draw(text, -mc.textRenderer.getWidth(text) / 2f, 1.0f, color.hex, true, matrices, consumer, throughWalls ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
         if (throughWalls) {
             RenderSystem.disableDepthTest();
             RenderSystem.depthFunc(GL11.GL_LEQUAL);

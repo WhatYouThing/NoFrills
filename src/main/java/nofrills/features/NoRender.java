@@ -2,7 +2,6 @@ package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.EntityType;
-import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import nofrills.config.Config;
 import nofrills.events.EntityNamedEvent;
@@ -33,11 +32,8 @@ public class NoRender {
 
     @EventHandler
     public static void onParticle(SpawnParticleEvent event) {
-        if (Config.noExplosions) {
-            ParticleType<?> particle = event.packet.getParameters().getType();
-            if (particle == ParticleTypes.EXPLOSION || particle == ParticleTypes.EXPLOSION_EMITTER) {
-                event.cancel();
-            }
+        if (Config.noExplosions && (event.type.equals(ParticleTypes.EXPLOSION) || event.type.equals(ParticleTypes.EXPLOSION_EMITTER))) {
+            event.cancel();
         }
     }
 }

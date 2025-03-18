@@ -5,6 +5,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -21,8 +22,10 @@ import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
+import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -40,18 +43,25 @@ public class DungeonSolvers {
             Items.RED_STAINED_GLASS_PANE,
             Items.BLUE_STAINED_GLASS_PANE
     );
+    private static final List<Dragon> dragons = List.of( // box coordinates taken from odin's WitherDragonEnum xqcL
+            new Dragon("Red", 3, 3, RenderColor.fromHex(0xff0000), 0, new Box(14.5, 13, 45.5, 39.5, 28, 70.5)),
+            new Dragon("Orange", 1, 5, RenderColor.fromHex(0xffaa00), 14, new Box(72, 8, 47, 102, 28, 77)),
+            new Dragon("Blue", 4, 2, RenderColor.fromHex(0x55ffff), 0, new Box(71.5, 16, 82.5, 96.5, 26, 107.5)),
+            new Dragon("Purple", 5, 1, RenderColor.fromHex(0xaa00aa), 0, new Box(45.5, 13, 113.5, 68.5, 23, 136.5)),
+            new Dragon("Green", 2, 4, RenderColor.fromHex(0x00ff00), 14, new Box(7, 8, 80, 37, 28, 110))
+    );
+    private static final List<Dragon> spawnedDragons = new ArrayList<>();
     private static final List<BlockPos> sharpshooterList = new ArrayList<>();
     private static final Box sharpshooterTarget = Box.enclosing(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
     private static final Box sharpshooterArea = new Box(63.2, 127, 35.8, 63.8, 128, 35.2);
-    private static final BlockState terracottaState = Blocks.BLUE_TERRACOTTA.getDefaultState();
-    private static final BlockState emeraldState = Blocks.EMERALD_BLOCK.getDefaultState();
     private static final List<Entity> dungeonKeys = new ArrayList<>();
     private static final List<Entity> spiritBows = new ArrayList<>();
+    private static final DecimalFormat decimalFormat = new DecimalFormat("0.##");
     private static final String wishMsg = "⚠ Maxor is enraged! ⚠";
     private static final String campMsg = "[BOSS] The Watcher: Let's see how you can handle this.";
     private static final String ragAxeMsg = "[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.";
-    private static final int beamParticles = 0;
     public static boolean isInTerminal = false;
+    private static boolean dragonSplitDone = false;
     private static BlockPos sharpshooterNext = null;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
@@ -89,13 +99,51 @@ public class DungeonSolvers {
             for (double y = sharpshooterTarget.minY; y <= sharpshooterTarget.maxY; y++) {
                 for (double z = sharpshooterTarget.minZ; z <= sharpshooterTarget.maxZ; z++) {
                     BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
-                    if (mc.world.getBlockState(pos).equals(emeraldState)) {
+                    if (mc.world.getBlockState(pos).equals(Blocks.EMERALD_BLOCK.getDefaultState())) {
                         return pos;
                     }
                 }
             }
         }
         return null;
+    }
+
+    private static boolean isArcherTeam() {
+        return switch (Config.dungeonClass) {
+            case "Archer", "Tank" -> true;
+            default -> false;
+        };
+    }
+
+    private static double getPowerLevel() {
+        double total = 0;
+        for (String line : Utils.getFooterLines()) {
+            if (line.startsWith("Blessing of Power")) {
+                total += Utils.parseRoman(line.replace("Blessing of Power", "").trim());
+            }
+            if (line.startsWith("Blessing of Time")) {
+                total += 0.5 * Utils.parseRoman(line.replace("Blessing of Time", "").trim());
+            }
+        }
+        return total;
+    }
+
+    private static List<Dragon> getSpawnedDragons() {
+        return new ArrayList<>(spawnedDragons);
+    }
+
+    private static boolean isDragonSpawned(Dragon dragon) {
+        for (Dragon drag : getSpawnedDragons()) {
+            if (dragon.name.equals(drag.name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void announceDragonSpawn(Dragon drag) {
+        Utils.showTitleCustom(drag.name.toUpperCase() + " IS SPAWNING!", 40, -20, 4.0f, drag.color.hex);
+        Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
     }
 
     @EventHandler
@@ -241,12 +289,14 @@ public class DungeonSolvers {
     public static void onBlockUpdate(BlockUpdateEvent event) {
         if (Config.solveDevices && Utils.isOnDungeonFloor("7")) {
             if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
-                if (event.oldState.equals(emeraldState) && event.newState.equals(terracottaState)) {
+                BlockState terracotta = Blocks.BLUE_TERRACOTTA.getDefaultState();
+                BlockState emerald = Blocks.EMERALD_BLOCK.getDefaultState();
+                if (event.oldState.equals(emerald) && event.newState.equals(terracotta)) {
                     if (sharpshooterNext != null) {
                         sharpshooterList.add(sharpshooterNext);
                     }
                 }
-                if (event.oldState.equals(terracottaState) && event.newState.equals(emeraldState)) {
+                if (event.oldState.equals(terracotta) && event.newState.equals(emerald)) {
                     sharpshooterNext = findSharpshooterTarget();
                 }
             }
@@ -322,12 +372,141 @@ public class DungeonSolvers {
                 }
             }
         }
+        if (!spawnedDragons.isEmpty()) {
+            for (Dragon drag : getSpawnedDragons()) {
+                if (Config.dragBoxes) {
+                    event.drawOutline(drag.area, false, drag.color);
+                }
+                if (Config.dragTimer && drag.entity == null) {
+                    event.drawText(drag.area.getCenter(), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.1f, true, RenderColor.fromHex(0xffffff));
+                }
+                if (Config.dragHealth && drag.entity != null) {
+                    float health = ((EnderDragonEntity) drag.entity).getHealth();
+                    Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickDelta(true)); // should make the text move smoothly with the dragons
+                    event.drawText(pos, Text.of(decimalFormat.format(health) + " HP"), 0.1f, true, RenderColor.fromHex(0x00ff00));
+                }
+            }
+        }
     }
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (Config.hideMageBeam && Utils.isInDungeons() && event.packet.getParameters().getType().equals(ParticleTypes.FIREWORK)) {
+        if (Config.hideMageBeam && Utils.isInDungeons() && event.type.equals(ParticleTypes.FIREWORK)) {
             event.cancel();
+        }
+        if (Utils.isOnDungeonFloor("M7") && event.type.equals(ParticleTypes.ENCHANT)) {
+            Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
+            for (Dragon drag : dragons) {
+                if (!isDragonSpawned(drag) && drag.area.contains(pos) && pos.y >= drag.spawnMinY) {
+                    spawnedDragons.add(drag.copy());
+                    if (!dragonSplitDone && spawnedDragons.size() == 2) {
+                        if (Config.dragAlert) {
+                            double power = getPowerLevel();
+                            Dragon first = spawnedDragons.getFirst();
+                            Dragon second = spawnedDragons.getLast();
+                            Utils.info(first.name + " and " + second.name + " are spawning");
+                            boolean purple = first.name.equals("Purple") || second.name.equals("Purple");
+                            if ((power >= Config.dragSkipEasy && purple) || power >= Config.dragSkip) {
+                                if (isArcherTeam()) {
+                                    if (first.archPriority > second.archPriority) {
+                                        announceDragonSpawn(first);
+                                    } else {
+                                        announceDragonSpawn(second);
+                                    }
+                                } else {
+                                    if (first.bersPriority > second.bersPriority) {
+                                        announceDragonSpawn(first);
+                                    } else {
+                                        announceDragonSpawn(second);
+                                    }
+                                }
+                            } else { // no split
+                                if (first.archPriority > second.archPriority) {
+                                    announceDragonSpawn(first);
+                                } else {
+                                    announceDragonSpawn(second);
+                                }
+                            }
+                            dragonSplitDone = true;
+                        }
+                    } else {
+                        if (Config.dragAlert) {
+                            Utils.info(drag.name + " is spawning");
+                            announceDragonSpawn(drag);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        dragonSplitDone = false;
+        spawnedDragons.clear();
+    }
+
+    @EventHandler
+    private static void onEntity(EntityAddedEvent event) {
+        if (event.entity instanceof EnderDragonEntity) {
+            for (Dragon drag : getSpawnedDragons()) {
+                if (drag.area.contains(event.entity.getPos())) {
+                    Utils.info(drag.name + " dragon entity spawned");
+                    drag.entity = event.entity;
+                    drag.spawned = true;
+                    if (Config.dragGlow) {
+                        Rendering.Entities.drawGlow(event.entity, true, drag.color);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onRemoved(EntityRemovedEvent event) {
+        if (event.entity instanceof EnderDragonEntity && Utils.isOnDungeonFloor("M7")) {
+            for (Dragon drag : getSpawnedDragons()) {
+                if (drag.spawned && drag.entity != null) {
+                    if (event.entity.getUuid().equals(drag.entity.getUuid())) {
+                        Utils.info(drag.name + " is removed");
+                        spawnedDragons.remove(drag);
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onServerTick(ServerTickEvent event) {
+        for (Dragon drag : getSpawnedDragons()) {
+            if (drag.entity == null) {
+                drag.spawnTicks--;
+            }
+        }
+    }
+
+    private static class Dragon {
+        public String name;
+        public int archPriority;
+        public int bersPriority;
+        public RenderColor color;
+        public double spawnMinY;
+        public Box area;
+        public Entity entity = null;
+        public int spawnTicks = 100;
+        public boolean spawned = false;
+
+        public Dragon(String name, int archPriority, int bersPriority, RenderColor color, double spawnMinY, Box area) {
+            this.name = name;
+            this.archPriority = archPriority;
+            this.bersPriority = bersPriority;
+            this.color = color;
+            this.spawnMinY = spawnMinY;
+            this.area = area;
+        }
+
+        public Dragon copy() {
+            return new Dragon(this.name, this.archPriority, this.bersPriority, this.color, this.spawnMinY, this.area);
         }
     }
 }

@@ -33,16 +33,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
 import nofrills.config.Config;
+import nofrills.mixin.PlayerListHudAccessor;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.DecimalFormat;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -438,6 +436,61 @@ public class Utils {
     public static boolean hasGlint(ItemStack stack) {
         Optional<? extends Boolean> component = stack.getComponentChanges().get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE);
         return component != null && component.isPresent();
+    }
+
+    /**
+     * Returns every line of text from the tab list footer, otherwise an empty list.
+     */
+    public static List<String> getFooterLines() {
+        List<String> list = new ArrayList<>();
+        Text footer = ((PlayerListHudAccessor) mc.inGameHud.getPlayerListHud()).getFooter();
+        if (footer != null) {
+            String[] lines = footer.getString().split("\n");
+            for (String line : lines) {
+                String l = line.trim();
+                if (!l.isEmpty()) {
+                    list.add(l);
+                }
+            }
+        }
+        return list;
+    }
+
+    private static int romanToInt(Character roman) {
+        return switch (Character.toUpperCase(roman)) {
+            case 'I' -> 1;
+            case 'V' -> 5;
+            case 'X' -> 10;
+            case 'L' -> 50;
+            case 'C' -> 100;
+            case 'D' -> 500;
+            case 'M' -> 1000;
+            default -> 0;
+        };
+    }
+
+    /**
+     * Converts a roman numeral to an integer. Returns 0 if the numeral couldn't be parsed.
+     */
+    public static int parseRoman(String roman) {
+        int result = 0;
+        for (int i = 0; i < roman.length(); i++) {
+            int number = romanToInt(roman.charAt(i));
+            if (number == 0) {
+                return 0;
+            }
+            if (i != roman.length() - 1) {
+                int nextNumber = romanToInt(roman.charAt(i + 1));
+                if (number < nextNumber) {
+                    result -= number;
+                } else {
+                    result += number;
+                }
+            } else {
+                result += number;
+            }
+        }
+        return result;
     }
 
     public static class Symbols {

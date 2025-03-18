@@ -31,12 +31,12 @@ public class NoFrillsAPI {
     private static final String[] kuudraPieceTypes = new String[]{"HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS"};
     private static final String[] kuudraPieceNames = new String[]{"CRIMSON", "TERROR", "AURORA", "HOLLOW", "FERVOR"};
     private static final String[] kuudraPieceTiers = new String[]{"HOT", "BURNING", "FIERY", "INFERNAL"};
+    private static JsonObject pendingPricing = null;
     private static JsonObject auctionPrices = null;
     private static JsonObject bazaarPrices = null;
     private static JsonObject attributePrices = null;
     private static JsonObject npcPrices = null;
-    private static int pricingRefreshTicks = 0;
-    private static boolean isOutage = false;
+    private static int refreshTicks = 0;
 
     private static String getKuudraPieceType(String itemId) {
         for (String type : kuudraPieceTypes) {
@@ -111,30 +111,26 @@ public class NoFrillsAPI {
         return stack.getCount();
     }
 
+    private static JsonObject sendRequest(String url) {
+        try {
+            InputStream connection = URI.create(url).toURL().openStream();
+            InputStreamReader reader = new InputStreamReader(connection);
+            return JsonParser.parseReader(reader).getAsJsonObject();
+        } catch (IOException exception) {
+            StringBuilder trace = new StringBuilder();
+            for (StackTraceElement element : exception.getStackTrace()) {
+                trace.append("\n\tat ").append(element.toString());
+            }
+            LOGGER.error("{}{}", exception.getMessage(), trace);
+            return null;
+        }
+    }
+
     private static void refreshItemPricing() {
         new Thread(() -> {
-            try {
-                InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v1/economy/get-item-pricing/").toURL().openStream();
-                InputStreamReader reader = new InputStreamReader(connection);
-                JsonObject responseJson = JsonParser.parseReader(reader).getAsJsonObject();
-                auctionPrices = JsonParser.parseString(responseJson.get("auction").getAsString()).getAsJsonObject();
-                bazaarPrices = JsonParser.parseString(responseJson.get("bazaar").getAsString()).getAsJsonObject();
-                attributePrices = JsonParser.parseString(responseJson.get("attribute").getAsString()).getAsJsonObject();
-                npcPrices = JsonParser.parseString(responseJson.get("npc").getAsString()).getAsJsonObject();
-                if (isOutage) {
-                    Utils.info("§aSuccessfully reconnected to the NoFrills API, item pricing data has been refreshed.");
-                    isOutage = false;
-                }
-            } catch (IOException e) {
-                if (!isOutage) {
-                    Utils.info("§cFailed to refresh item pricing data, the NoFrills API might be having a temporary outage.");
-                    isOutage = true;
-                }
-                StringBuilder trace = new StringBuilder();
-                for (StackTraceElement element : e.getStackTrace()) {
-                    trace.append("\n\tat ").append(element.toString());
-                }
-                LOGGER.error("{}{}", e.getMessage(), trace);
+            JsonObject response = sendRequest("https://whatyouth.ing/api/nofrills/v1/economy/get-item-pricing/");
+            if (response != null) {
+                pendingPricing = response;
             }
         }).start();
     }
@@ -142,13 +138,13 @@ public class NoFrillsAPI {
     @EventHandler
     public static void onTick(WorldTickEvent event) {
         if (Config.priceTooltips && Utils.isInSkyblock()) {
-            if (pricingRefreshTicks == 0) {
+            if (refreshTicks == 0) {
                 if (mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
                     refreshItemPricing();
                 }
-                pricingRefreshTicks = 1200;
+                refreshTicks = 1200;
             } else {
-                pricingRefreshTicks--;
+                refreshTicks--;
             }
         }
     }
@@ -271,6 +267,13 @@ public class NoFrillsAPI {
                 }
                 event.addLine(Text.of(buyMsg));
                 event.addLine(Text.of(sellMsg));
+            }
+            if (pendingPricing != null) {
+                auctionPrices = JsonParser.parseString(pendingPricing.get("auction").getAsString()).getAsJsonObject();
+                bazaarPrices = JsonParser.parseString(pendingPricing.get("bazaar").getAsString()).getAsJsonObject();
+                attributePrices = JsonParser.parseString(pendingPricing.get("attribute").getAsString()).getAsJsonObject();
+                npcPrices = JsonParser.parseString(pendingPricing.get("npc").getAsString()).getAsJsonObject();
+                pendingPricing = null;
             }
         }
     }

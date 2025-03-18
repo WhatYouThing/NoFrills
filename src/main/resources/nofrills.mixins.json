@@ -28,6 +28,7 @@
     "MouseMixin",
     "ParticleManagerMixin",
     "PlayerEntityMixin",
+    "PlayerListHudAccessor",
     "RaycastContextMixin",
     "SnowBlockMixin",
     "WorldMixin",

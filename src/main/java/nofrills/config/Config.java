@@ -218,6 +218,20 @@ public class Config {
     @SerialEntry
     public static String melodyMessage = "/pc Melody";
     @SerialEntry
+    public static boolean dragAlert = false;
+    @SerialEntry
+    public static float dragSkip = 22.0f;
+    @SerialEntry
+    public static float dragSkipEasy = 19.0f;
+    @SerialEntry
+    public static boolean dragHealth = false;
+    @SerialEntry
+    public static boolean dragTimer = false;
+    @SerialEntry
+    public static boolean dragBoxes = false;
+    @SerialEntry
+    public static boolean dragGlow = false;
+    @SerialEntry
     public static boolean wishReminder = false;
     @SerialEntry
     public static boolean leapOverlay = false;

@@ -9,6 +9,7 @@ import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
@@ -132,9 +133,25 @@ public class DungeonSolvers {
         return new ArrayList<>(spawnedDragons);
     }
 
+    private static boolean isDragonParticle(ParticleS2CPacket packet) {
+        return packet.getParameters().getType().equals(ParticleTypes.FLAME) && packet.getCount() == 20
+                && packet.getY() == 19 && packet.getOffsetX() == 2.0f && packet.getOffsetY() == 3.0f
+                && packet.getOffsetZ() == 2.0f && packet.getSpeed() == 0.0f && packet.getX() % 1 == 0.0
+                && packet.getZ() % 1 == 0.0;
+    }
+
     private static boolean isDragonSpawned(Dragon dragon) {
         for (Dragon drag : getSpawnedDragons()) {
             if (dragon.name.equals(drag.name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean doesDragonExist(Entity dragon) {
+        for (Dragon drag : getSpawnedDragons()) {
+            if (drag.entity != null && drag.entity.getUuidAsString().equals(dragon.getUuidAsString())) {
                 return true;
             }
         }
@@ -377,13 +394,12 @@ public class DungeonSolvers {
                 if (Config.dragBoxes) {
                     event.drawOutline(drag.area, false, drag.color);
                 }
-                if (Config.dragTimer && drag.entity == null) {
-                    event.drawText(drag.area.getCenter(), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.1f, true, RenderColor.fromHex(0xffffff));
+                if (Config.dragTimer && !drag.spawned) {
+                    event.drawText(drag.area.getCenter(), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.2f, true, drag.color);
                 }
                 if (Config.dragHealth && drag.entity != null) {
-                    float health = ((EnderDragonEntity) drag.entity).getHealth();
                     Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickDelta(true)); // should make the text move smoothly with the dragons
-                    event.drawText(pos, Text.of(decimalFormat.format(health) + " HP"), 0.1f, true, RenderColor.fromHex(0x00ff00));
+                    event.drawText(pos, Text.of(decimalFormat.format(drag.health * 0.000001) + "M"), 0.2f, true, drag.color);
                 }
             }
         }
@@ -394,7 +410,7 @@ public class DungeonSolvers {
         if (Config.hideMageBeam && Utils.isInDungeons() && event.type.equals(ParticleTypes.FIREWORK)) {
             event.cancel();
         }
-        if (Utils.isOnDungeonFloor("M7") && event.type.equals(ParticleTypes.ENCHANT)) {
+        if (Utils.isOnDungeonFloor("M7") && isDragonParticle(event.packet)) {
             Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             for (Dragon drag : dragons) {
                 if (!isDragonSpawned(drag) && drag.area.contains(pos) && pos.y >= drag.spawnMinY) {
@@ -447,29 +463,25 @@ public class DungeonSolvers {
     }
 
     @EventHandler
-    private static void onEntity(EntityAddedEvent event) {
-        if (event.entity instanceof EnderDragonEntity) {
+    private static void onEntity(EntityUpdatedEvent event) {
+        if (event.entity instanceof EnderDragonEntity dragonEntity && Utils.isOnDungeonFloor("M7")) {
+            float health = dragonEntity.getHealth();
             for (Dragon drag : getSpawnedDragons()) {
-                if (drag.area.contains(event.entity.getPos())) {
+                if (drag.spawning && !doesDragonExist(event.entity) && drag.area.contains(event.entity.getPos())) {
                     Utils.info(drag.name + " dragon entity spawned");
                     drag.entity = event.entity;
+                    drag.health = health;
+                    drag.spawning = false;
                     drag.spawned = true;
                     if (Config.dragGlow) {
                         Rendering.Entities.drawGlow(event.entity, true, drag.color);
                     }
-                }
-            }
-        }
-    }
-
-    @EventHandler
-    private static void onRemoved(EntityRemovedEvent event) {
-        if (event.entity instanceof EnderDragonEntity && Utils.isOnDungeonFloor("M7")) {
-            for (Dragon drag : getSpawnedDragons()) {
-                if (drag.spawned && drag.entity != null) {
-                    if (event.entity.getUuid().equals(drag.entity.getUuid())) {
-                        Utils.info(drag.name + " is removed");
-                        spawnedDragons.remove(drag);
+                } else if (drag.spawned && event.entity.getUuidAsString().equals(drag.entity.getUuidAsString())) {
+                    if (health > 0.0f) {
+                        drag.health = health;
+                    } else {
+                        Utils.info(drag.name + " dragon entity killed and removed");
+                        spawnedDragons.removeIf(dragon -> dragon.name.equals(drag.name));
                     }
                 }
             }
@@ -479,7 +491,7 @@ public class DungeonSolvers {
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
         for (Dragon drag : getSpawnedDragons()) {
-            if (drag.entity == null) {
+            if (drag.entity == null && drag.spawnTicks > 0) {
                 drag.spawnTicks--;
             }
         }
@@ -495,6 +507,8 @@ public class DungeonSolvers {
         public Entity entity = null;
         public int spawnTicks = 100;
         public boolean spawned = false;
+        public boolean spawning = true;
+        public float health = 0.0f;
 
         public Dragon(String name, int archPriority, int bersPriority, RenderColor color, double spawnMinY, Box area) {
             this.name = name;

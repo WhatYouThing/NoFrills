@@ -4,7 +4,9 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.inventory.Inventory;
@@ -34,14 +36,15 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V", shift = At.Shift.AFTER))
     private void onPostTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
         if (ent instanceof ArmorStandEntity) {
+            TrackedDataHandler<?> textComponent = TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT;
             for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
-                if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT)) {
-                    if (entry.value() != null && ent.getCustomName() != null) {
-                        eventBus.post(new EntityNamedEvent(ent, Formatting.strip(ent.getCustomName().getString())));
-                        break;
-                    }
+                if (entry.handler().equals(textComponent) && entry.value() != null && ent.getCustomName() != null) {
+                    eventBus.post(new EntityNamedEvent(ent, Formatting.strip(ent.getCustomName().getString())));
+                    break;
                 }
             }
+        } else if (ent instanceof LivingEntity) {
+            eventBus.post(new EntityUpdatedEvent(ent));
         }
     }
 

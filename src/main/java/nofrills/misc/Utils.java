@@ -493,6 +493,13 @@ public class Utils {
         return result;
     }
 
+    /**
+     * Attempts to calculate the actual health value from the provided Entity's (max) health. Mostly applies to bosses or anything that has millions of HP, because their actual health value is reduced.
+     */
+    public static float getTrueHealth(float health) {
+        return (health - 1024.0f) * 10000.0f;
+    }
+
     public static class Symbols {
         public static String zone = "⏣";
         public static String zoneRift = "ф";

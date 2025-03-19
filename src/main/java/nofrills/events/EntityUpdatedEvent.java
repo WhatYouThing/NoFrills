@@ -2,11 +2,11 @@ package nofrills.events;
 
 import net.minecraft.entity.Entity;
 
-public class EntityAddedEvent {
+public class EntityUpdatedEvent {
 
     public Entity entity;
 
-    public EntityAddedEvent(Entity entity) {
+    public EntityUpdatedEvent(Entity entity) {
         this.entity = entity;
     }
 }

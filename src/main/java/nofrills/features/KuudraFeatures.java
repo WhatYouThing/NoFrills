@@ -29,14 +29,6 @@ import static nofrills.Main.mc;
 
 public class KuudraFeatures {
     private static final DecimalFormat kuudraHealthFormat = new DecimalFormat("0.00");
-    private static final Vec3d[] supplyDropSpots = {
-            new Vec3d(-98.00, 79.00, -112.94),
-            new Vec3d(-106.00, 79.00, -112.94),
-            new Vec3d(-110.00, 79.00, -106.00),
-            new Vec3d(-106.00, 79.00, -99.06),
-            new Vec3d(-98.00, 79.00, -99.06),
-            new Vec3d(-94.00, 79.00, -106.00)
-    };
     private static final PickupSpot[] supplyPickupSpots = {
             // data borrowed from odin
             // originally i tried my own solution, but it was such voodoo that terry davis would resurrect himself to witness it
@@ -78,16 +70,6 @@ public class KuudraFeatures {
         return kuudraPhases.Starting;
     }
 
-    public static boolean isNearPile() {
-        Vec3d playerPos = mc.player.getPos();
-        for (Vec3d drop : supplyDropSpots) {
-            if (drop.distanceTo(playerPos) <= 6) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private static void updateKuudraEntity() {
         Entity kuudra = null;
         double maxY = 0;
@@ -108,10 +90,6 @@ public class KuudraFeatures {
                 kuudraEntity = (MagmaCubeEntity) kuudra;
             }
         }
-    }
-
-    private static float calculateHealth(float health) {
-        return (health - 1024.0f) * 10000.0f; // kuudra's health for whatever reason starts at 24000 + 1024
     }
 
     private static float calculateDPS() {
@@ -195,7 +173,7 @@ public class KuudraFeatures {
                     Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health) + "% HP", 1, 25, 2.5f, 0xffff00);
                 }
                 if (Config.kuudraDPS && phase == kuudraPhases.Lair && !Utils.isInstanceOver()) {
-                    float health = calculateHealth(kuudraEntity.getHealth());
+                    float health = Utils.getTrueHealth(kuudraEntity.getHealth());
                     float damage = Math.clamp(previousHealth - health, 0, 240_000_000);
                     dpsData.add(damage);
                     if (dpsData.size() > 100) {

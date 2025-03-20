@@ -166,6 +166,15 @@ public class Dungeons {
                         .controller(v -> ColorControllerBuilder.create(v).allowAlpha(false))
                         .build())
 
+                .option(LabelOption.create(Text.of("F6")))
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Gyro Timer"))
+                        .description(OptionDescription.of(Text.of("When playing as Mage in F6/M6, renders a timer for when to use your Gyrokinetic Wand on the Terracottas and Sadan's ultimate giant.")))
+                        .binding(false, () -> Config.gyroTimer, value -> Config.gyroTimer = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .option(LabelOption.create(Text.of("F7")))
 
                 .option(Option.<Boolean>createBuilder()

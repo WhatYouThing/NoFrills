@@ -248,6 +248,8 @@ public class Config {
     @SerialEntry
     public static Color leapColorTank = new Color(0x768f46);
     @SerialEntry
+    public static boolean gyroTimer = false;
+    @SerialEntry
     public static boolean campReminder = false;
     @SerialEntry
     public static boolean ragAxeReminder = false;

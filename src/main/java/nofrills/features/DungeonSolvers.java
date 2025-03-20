@@ -57,15 +57,18 @@ public class DungeonSolvers {
     private static final Box sharpshooterArea = new Box(63.2, 127, 35.8, 63.8, 128, 35.2);
     private static final List<Entity> dungeonKeys = new ArrayList<>();
     private static final List<Entity> spiritBows = new ArrayList<>();
-    private static final DecimalFormat decimalFormat = new DecimalFormat("0.##");
+    private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private static final String wishMsg = "⚠ Maxor is enraged! ⚠";
     private static final String campMsg = "[BOSS] The Watcher: Let's see how you can handle this.";
     private static final String ragAxeMsg = "[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.";
+    private static final String sadanEnterMsg = "[BOSS] Sadan: So you made it all the way here... Now you wish to defy me? Sadan?!";
+    private static final String sadanLastMsg = "[BOSS] Sadan: You did it. I understand now, you have earned my respect.";
     public static boolean isInTerminal = false;
     private static boolean dragonSplitDone = false;
     private static BlockPos sharpshooterNext = null;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
+    private static int gyroTicks = 0;
 
     private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
         Item item = stack.getItem();
@@ -181,6 +184,11 @@ public class DungeonSolvers {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
+        if (Utils.isOnDungeonFloor("6")) {
+            if (gyroTicks > 0) {
+                Utils.showTitleCustom("GYRO: " + decimalFormat.format(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, 0xffff00);
+            }
+        }
         if (Utils.isOnDungeonFloor("7")) {
             if (melodyTicks > 0) {
                 melodyTicks--;
@@ -304,6 +312,15 @@ public class DungeonSolvers {
 
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
+        if (Config.gyroTimer && Utils.isOnDungeonFloor("6") && Config.dungeonClass.equals("Mage")) {
+            BlockState terracotta = Blocks.BROWN_TERRACOTTA.getDefaultState();
+            BlockState below = mc.world.getBlockState(event.pos.down(1));
+            if (event.oldState.isAir() && event.newState.getBlock().equals(Blocks.SKELETON_WALL_SKULL) && below.equals(terracotta)) {
+                if (Utils.horizontalDistance(mc.player.getPos(), event.pos.toCenterPos()) <= 4) {
+                    gyroTicks = Utils.isOnDungeonFloor("M6") ? 80 : 100;
+                }
+            }
+        }
         if (Config.solveDevices && Utils.isOnDungeonFloor("7")) {
             if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
                 BlockState terracotta = Blocks.BLUE_TERRACOTTA.getDefaultState();
@@ -335,6 +352,12 @@ public class DungeonSolvers {
                 if (Config.ragAxeReminder && Utils.isOnDungeonFloor("M5") && event.messagePlain.equals(ragAxeMsg)) {
                     Utils.showTitleCustom("RAG AXE!", 40, -20, 4.0f, 0xffff00);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+                }
+                if (Config.gyroTimer && event.messagePlain.equals(sadanEnterMsg)) {
+                    gyroTicks = 270;
+                }
+                if (Config.gyroTimer && event.messagePlain.equals(sadanLastMsg)) {
+                    gyroTicks = 220;
                 }
             }
         }
@@ -490,6 +513,9 @@ public class DungeonSolvers {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
+        if (Config.gyroTimer && gyroTicks > 0) {
+            gyroTicks--;
+        }
         for (Dragon drag : getSpawnedDragons()) {
             if (drag.entity == null && drag.spawnTicks > 0) {
                 drag.spawnTicks--;

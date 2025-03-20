@@ -483,6 +483,8 @@ public class DungeonSolvers {
     private static void onJoin(ServerJoinEvent event) {
         dragonSplitDone = false;
         spawnedDragons.clear();
+        gyroTicks = 0;
+        melodyTicks = 0;
     }
 
     @EventHandler

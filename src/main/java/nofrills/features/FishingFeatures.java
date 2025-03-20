@@ -36,6 +36,12 @@ public class FishingFeatures {
             new SeaCreature("Water Hydra", "The Water Hydra has come to test your strength.", "§1", true),
             new SeaCreature("Sea Emperor", "The Sea Emperor arises from the depths.", "§4", true),
             new SeaCreature("Abyssal Miner", "An Abyssal Miner breaks out of the water!", "§2", true),
+            new SeaCreature("Alligator", "A long snout breaks the surface of the water. It's an Alligator!", "§2", true),
+            new SeaCreature("Titanoboa", "A massive Titanoboa surfaces. It's body stretches as far as the eye can see.", "§e", true),
+            new SeaCreature("Blue Ringed Octopus", "A garish set of tentacles arise. It's a Blue Ringed Octopus!", "§9", true),
+            new SeaCreature("Fiery Scuttler", "A Fiery Scuttler inconspicuously waddles up to you, friends in tow.", "§6", true),
+            new SeaCreature("Wiki Tiki", "The water bubbles and froths. A massive form emerges- you have disturbed the Wiki Tiki! You shall pay the price.", "§d", true),
+            new SeaCreature("Ragnarok", "The sky darkens and the air thickens. The end times are upon us: Ragnarok is here.", "§c", true),
             SeaCreature.plain("Squid"),
             SeaCreature.plain("Sea Walker"),
             SeaCreature.plain("Night Squid"),
@@ -73,6 +79,14 @@ public class FishingFeatures {
             SeaCreature.plain("Flaming Worm"),
             SeaCreature.plain("Lava Blaze"),
             SeaCreature.plain("Lava Pigman"),
+            SeaCreature.plain("Frog Man"),
+            SeaCreature.plain("Trash Gobbler"),
+            SeaCreature.plain("Dumpster Diver"),
+            SeaCreature.plain("Banshee"),
+            SeaCreature.plain("Snapping Turtle"),
+            SeaCreature.plain("Fried Chicken"),
+            SeaCreature.plain("Bayou Sludge"),
+            SeaCreature.plain("Fireproof Witch"),
     };
     private static final RenderColor rareColor = new RenderColor(255, 170, 0, 0);
     private static int notifyTicks = 0;

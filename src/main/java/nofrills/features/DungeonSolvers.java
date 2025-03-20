@@ -1,6 +1,7 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
@@ -313,10 +314,9 @@ public class DungeonSolvers {
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
         if (Config.gyroTimer && Utils.isOnDungeonFloor("6") && Config.dungeonClass.equals("Mage")) {
-            BlockState terracotta = Blocks.BROWN_TERRACOTTA.getDefaultState();
-            BlockState below = mc.world.getBlockState(event.pos.down(1));
-            if (event.oldState.isAir() && event.newState.getBlock().equals(Blocks.SKELETON_WALL_SKULL) && below.equals(terracotta)) {
-                if (Utils.horizontalDistance(mc.player.getPos(), event.pos.toCenterPos()) <= 4) {
+            Block newBlock = event.newState.getBlock();
+            if (gyroTicks == 0 && event.oldState.isAir() && (newBlock.equals(Blocks.SKELETON_WALL_SKULL) || newBlock.equals(Blocks.PLAYER_HEAD))) {
+                if (mc.world.getBlockState(event.pos.down(1)).getBlock().equals(Blocks.BROWN_TERRACOTTA) && Utils.horizontalDistance(mc.player.getPos(), event.pos.toCenterPos()) <= 4.5) {
                     gyroTicks = Utils.isOnDungeonFloor("M6") ? 80 : 100;
                 }
             }

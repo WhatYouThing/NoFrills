@@ -170,7 +170,7 @@ public class Dungeons {
 
                 .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Gyro Timer"))
-                        .description(OptionDescription.of(Text.of("When playing as Mage in F6/M6, renders a timer for when to use your Gyrokinetic Wand on the Terracottas and Sadan's ultimate giant.")))
+                        .description(OptionDescription.of(Text.of("When playing as Mage in F6/M6, renders a timer on screen for when to use your Gyrokinetic Wand on the Terracottas and Sadan's ultimate giant. This option is generally only useful in teams with a good Archer that doesn't just tickle the Terracottas with his bow.")))
                         .binding(false, () -> Config.gyroTimer, value -> Config.gyroTimer = value)
                         .controller(Config::booleanController)
                         .build())

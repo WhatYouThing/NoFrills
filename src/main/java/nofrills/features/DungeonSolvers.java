@@ -415,7 +415,7 @@ public class DungeonSolvers {
             List<Entity> keys = new ArrayList<>(dungeonKeys);
             for (Entity ent : keys) {
                 if (ent.isAlive()) {
-                    event.drawFilled(Box.of(ent.getPos().add(0, 1.5, 0), 0.9, 1.25, 0.9), false, RenderColor.fromColor(Config.keyColor));
+                    event.drawFilledWithBeam(Box.of(ent.getPos().add(0, 1.5, 0), 1, 1, 1), 64, true, RenderColor.fromColor(Config.keyColor));
                 } else {
                     dungeonKeys.remove(ent);
                 }

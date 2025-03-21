@@ -116,28 +116,27 @@ public class FishingFeatures {
     @EventHandler
     public static void tick(WorldTickEvent event) {
         if (Config.capEnabled) {
+            List<Entity> creatures = new ArrayList<>(seaCreatures);
+            for (Entity ent : creatures) {
+                if (ent == null || ent.isRemoved()) {
+                    seaCreatures.remove(ent);
+                }
+            }
+            int count = seaCreatures.size();
+            if (count >= Config.capTarget && notifyTicks == 0) {
+                if (Config.capSendMsg && !Config.capMsg.isEmpty()) {
+                    Utils.sendMessage(Config.capMsg);
+                }
+                if (Config.capSound) {
+                    Utils.playSound(SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.MASTER, 3, 1);
+                }
+                if (Config.capTitle) {
+                    Utils.showTitle("§4§lCAP REACHED!", "§8§l" + count + " SEA CREATURES", 5, 20, 5);
+                }
+                notifyTicks = Config.capDelay * 20;
+            }
             if (notifyTicks > 0) {
                 notifyTicks--;
-            } else {
-                List<Entity> creatures = new ArrayList<>(seaCreatures);
-                for (Entity ent : creatures) {
-                    if (ent == null || ent.isRemoved()) {
-                        seaCreatures.remove(ent);
-                    }
-                }
-                int count = seaCreatures.size();
-                if (count >= Config.capTarget) {
-                    if (Config.capSendMsg && !Config.capMsg.isEmpty()) {
-                        Utils.sendMessage(Config.capMsg);
-                    }
-                    if (Config.capSound) {
-                        Utils.playSound(SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.MASTER, 3, 1);
-                    }
-                    if (Config.capTitle) {
-                        Utils.showTitle("§4§lCAP REACHED!", "§8§l" + count + " SEA CREATURES", 5, 20, 5);
-                    }
-                    notifyTicks = Config.capDelay * 20;
-                }
             }
         }
         if (Config.capRender && !seaCreatures.isEmpty() && isHoldingRod()) {

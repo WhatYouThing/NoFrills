@@ -15,6 +15,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
@@ -113,6 +114,14 @@ public class DungeonSolvers {
         return null;
     }
 
+    private static boolean isDragonPhase() {
+        if (mc.player != null) {
+            Vec3d pos = mc.player.getPos();
+            return Utils.isOnDungeonFloor("M7") && pos.getX() > 0 && pos.getY() < 50 && pos.getZ() > 0;
+        }
+        return false;
+    }
+
     private static boolean isArcherTeam() {
         return switch (Config.dungeonClass) {
             case "Archer", "Tank" -> true;
@@ -162,9 +171,22 @@ public class DungeonSolvers {
         return false;
     }
 
-    private static void announceDragonSpawn(Dragon drag) {
-        Utils.showTitleCustom(drag.name.toUpperCase() + " IS SPAWNING!", 40, -20, 4.0f, drag.color.hex);
+    private static Dragon getHigherPriority(Dragon first, Dragon second, boolean archerTeam) {
+        if (archerTeam) {
+            return first.archPriority > second.archPriority ? first : second;
+        } else {
+            return first.bersPriority > second.bersPriority ? first : second;
+        }
+    }
+
+    private static void announceDragonSpawn(Dragon drag, boolean split) {
+        Utils.showTitleCustom(drag.name.toUpperCase() + " IS SPAWNING!", 60, -20, 4.0f, drag.color.hex);
         Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+        if (split) {
+            Utils.infoRaw(Text.literal(drag.name + " is your priority dragon.").setStyle(Style.EMPTY.withColor(drag.color.hex)));
+        } else {
+            Utils.infoRaw(Text.literal(drag.name + " is spawning.").setStyle(Style.EMPTY.withColor(drag.color.hex)));
+        }
     }
 
     @EventHandler
@@ -433,7 +455,7 @@ public class DungeonSolvers {
         if (Config.hideMageBeam && Utils.isInDungeons() && event.type.equals(ParticleTypes.FIREWORK)) {
             event.cancel();
         }
-        if (Utils.isOnDungeonFloor("M7") && isDragonParticle(event.packet)) {
+        if (isDragonPhase() && isDragonParticle(event.packet)) {
             Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             for (Dragon drag : dragons) {
                 if (!isDragonSpawned(drag) && drag.area.contains(pos) && pos.y >= drag.spawnMinY) {
@@ -443,35 +465,18 @@ public class DungeonSolvers {
                             double power = getPowerLevel();
                             Dragon first = spawnedDragons.getFirst();
                             Dragon second = spawnedDragons.getLast();
-                            Utils.info(first.name + " and " + second.name + " are spawning");
                             boolean purple = first.name.equals("Purple") || second.name.equals("Purple");
                             if ((power >= Config.dragSkipEasy && purple) || power >= Config.dragSkip) {
-                                if (isArcherTeam()) {
-                                    if (first.archPriority > second.archPriority) {
-                                        announceDragonSpawn(first);
-                                    } else {
-                                        announceDragonSpawn(second);
-                                    }
-                                } else {
-                                    if (first.bersPriority > second.bersPriority) {
-                                        announceDragonSpawn(first);
-                                    } else {
-                                        announceDragonSpawn(second);
-                                    }
-                                }
+                                announceDragonSpawn(getHigherPriority(first, second, isArcherTeam()), true);
                             } else { // no split
-                                if (first.archPriority > second.archPriority) {
-                                    announceDragonSpawn(first);
-                                } else {
-                                    announceDragonSpawn(second);
-                                }
+                                announceDragonSpawn(getHigherPriority(first, second, true), true);
                             }
                             dragonSplitDone = true;
                         }
                     } else {
                         if (Config.dragAlert) {
                             Utils.info(drag.name + " is spawning");
-                            announceDragonSpawn(drag);
+                            announceDragonSpawn(drag, false);
                         }
                     }
                 }
@@ -489,7 +494,7 @@ public class DungeonSolvers {
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (event.entity instanceof EnderDragonEntity dragonEntity && Utils.isOnDungeonFloor("M7")) {
+        if (event.entity instanceof EnderDragonEntity dragonEntity && isDragonPhase()) {
             float health = dragonEntity.getHealth();
             for (Dragon drag : getSpawnedDragons()) {
                 if (drag.spawning && !doesDragonExist(event.entity) && drag.area.contains(event.entity.getPos())) {

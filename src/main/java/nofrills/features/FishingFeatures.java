@@ -146,7 +146,7 @@ public class FishingFeatures {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if ((Config.capEnabled || Config.rareGlow) && event.namePlain.contains(Utils.Symbols.heart)) {
+        if (!Utils.isInDungeons() && event.namePlain.contains(Utils.Symbols.heart)) {
             for (SeaCreature creature : seaCreatureData) {
                 String name = event.namePlain.toLowerCase();
                 if (Config.capEnabled && name.contains(creature.name.toLowerCase())) {

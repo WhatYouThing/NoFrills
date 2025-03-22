@@ -475,7 +475,6 @@ public class DungeonSolvers {
                         }
                     } else {
                         if (Config.dragAlert) {
-                            Utils.info(drag.name + " is spawning");
                             announceDragonSpawn(drag, false);
                         }
                     }

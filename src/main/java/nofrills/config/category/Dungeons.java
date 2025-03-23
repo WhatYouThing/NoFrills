@@ -261,6 +261,13 @@ public class Dungeons {
                         .controller(Config::booleanController)
                         .build())
 
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Dragon Stack"))
+                        .description(OptionDescription.of(Text.of("Renders spawn waypoints for every spawning M7 dragon, showing you where to stack your Last Breath arrows (or Terminator arrows as Archer).")))
+                        .binding(false, () -> Config.dragStack, value -> Config.dragStack = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .option(LabelOption.create(Text.of("Misc")))
 
                 .option(Option.<Boolean>createBuilder()

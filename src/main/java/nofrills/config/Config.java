@@ -232,6 +232,8 @@ public class Config {
     @SerialEntry
     public static boolean dragGlow = false;
     @SerialEntry
+    public static boolean dragStack = false;
+    @SerialEntry
     public static boolean wishReminder = false;
     @SerialEntry
     public static boolean leapOverlay = false;

@@ -47,11 +47,11 @@ public class DungeonSolvers {
             Items.BLUE_STAINED_GLASS_PANE
     );
     private static final List<Dragon> dragons = List.of( // box coordinates taken from odin's WitherDragonEnum xqcL
-            new Dragon("Red", 3, 3, RenderColor.fromHex(0xff0000), 0, new Box(14.5, 13, 45.5, 39.5, 28, 70.5)),
-            new Dragon("Orange", 1, 5, RenderColor.fromHex(0xffaa00), 14, new Box(72, 8, 47, 102, 28, 77)),
-            new Dragon("Blue", 4, 2, RenderColor.fromHex(0x55ffff), 0, new Box(71.5, 16, 82.5, 96.5, 26, 107.5)),
-            new Dragon("Purple", 5, 1, RenderColor.fromHex(0xaa00aa), 0, new Box(45.5, 13, 113.5, 68.5, 23, 136.5)),
-            new Dragon("Green", 2, 4, RenderColor.fromHex(0x00ff00), 14, new Box(7, 8, 80, 37, 28, 110))
+            new Dragon("Red", 3, 3, RenderColor.fromHex(0xff0000), new BlockPos(27, 14, 59), new Box(14.5, 12, 45.5, 39.5, 28, 70.5)),
+            new Dragon("Orange", 1, 5, RenderColor.fromHex(0xffaa00), new BlockPos(85, 14, 56), new Box(72, 8, 47, 102, 28, 77)),
+            new Dragon("Blue", 4, 2, RenderColor.fromHex(0x55ffff), new BlockPos(84, 14, 94), new Box(71.5, 11, 82.5, 96.5, 26, 107.5)),
+            new Dragon("Purple", 5, 1, RenderColor.fromHex(0xaa00aa), new BlockPos(56, 14, 125), new Box(45.5, 12, 113.5, 68.5, 23, 136.5)),
+            new Dragon("Green", 2, 4, RenderColor.fromHex(0x00ff00), new BlockPos(27, 14, 94), new Box(7, 8, 80, 37, 28, 110))
     );
     private static final List<Dragon> spawnedDragons = new ArrayList<>();
     private static final List<BlockPos> sharpshooterList = new ArrayList<>();
@@ -162,6 +162,15 @@ public class DungeonSolvers {
         return false;
     }
 
+    private static boolean isPurpleInArea(Dragon dragon) {
+        for (Dragon drag : getSpawnedDragons()) {
+            if (drag.name.equals("Purple") && drag.entity != null && dragon.area.contains(drag.entity.getPos())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean doesDragonExist(Entity dragon) {
         for (Dragon drag : getSpawnedDragons()) {
             if (drag.entity != null && drag.entity.getUuidAsString().equals(dragon.getUuidAsString())) {
@@ -184,7 +193,7 @@ public class DungeonSolvers {
         Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
         if (split) {
             Utils.infoRaw(Text.literal(drag.name + " is your priority dragon.").setStyle(Style.EMPTY.withColor(drag.color.hex)));
-        } else {
+        } else if (dragonSplitDone) {
             Utils.infoRaw(Text.literal(drag.name + " is spawning.").setStyle(Style.EMPTY.withColor(drag.color.hex)));
         }
     }
@@ -439,6 +448,9 @@ public class DungeonSolvers {
                 if (Config.dragBoxes) {
                     event.drawOutline(drag.area, false, drag.color);
                 }
+                if (Config.dragStack && !drag.spawned) {
+                    event.drawFilled(Box.enclosing(drag.spawnPos, drag.spawnPos), true, RenderColor.fromHex(drag.color.hex, 0.67f));
+                }
                 if (Config.dragTimer && !drag.spawned) {
                     event.drawText(drag.area.getCenter(), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.2f, true, drag.color);
                 }
@@ -458,7 +470,7 @@ public class DungeonSolvers {
         if (isDragonPhase() && isDragonParticle(event.packet)) {
             Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             for (Dragon drag : dragons) {
-                if (!isDragonSpawned(drag) && drag.area.contains(pos) && pos.y >= drag.spawnMinY) {
+                if (!isDragonSpawned(drag) && drag.area.contains(pos) && !isPurpleInArea(drag)) {
                     spawnedDragons.add(drag.copy());
                     if (!dragonSplitDone && spawnedDragons.size() == 2) {
                         if (Config.dragAlert) {
@@ -473,7 +485,7 @@ public class DungeonSolvers {
                             }
                             dragonSplitDone = true;
                         }
-                    } else {
+                    } else if (dragonSplitDone) {
                         if (Config.dragAlert) {
                             announceDragonSpawn(drag, false);
                         }
@@ -497,7 +509,6 @@ public class DungeonSolvers {
             float health = dragonEntity.getHealth();
             for (Dragon drag : getSpawnedDragons()) {
                 if (drag.spawning && !doesDragonExist(event.entity) && drag.area.contains(event.entity.getPos())) {
-                    Utils.info(drag.name + " dragon entity spawned");
                     drag.entity = event.entity;
                     drag.health = health;
                     drag.spawning = false;
@@ -506,10 +517,9 @@ public class DungeonSolvers {
                         Rendering.Entities.drawGlow(event.entity, true, drag.color);
                     }
                 } else if (drag.spawned && event.entity.getUuidAsString().equals(drag.entity.getUuidAsString())) {
-                    if (health > 0.0f) {
+                    if (health > 0.0f && !event.entity.isRemoved()) {
                         drag.health = health;
                     } else {
-                        Utils.info(drag.name + " dragon entity killed and removed");
                         spawnedDragons.removeIf(dragon -> dragon.name.equals(drag.name));
                     }
                 }
@@ -534,7 +544,7 @@ public class DungeonSolvers {
         public int archPriority;
         public int bersPriority;
         public RenderColor color;
-        public double spawnMinY;
+        public BlockPos spawnPos;
         public Box area;
         public Entity entity = null;
         public int spawnTicks = 100;
@@ -542,17 +552,17 @@ public class DungeonSolvers {
         public boolean spawning = true;
         public float health = 0.0f;
 
-        public Dragon(String name, int archPriority, int bersPriority, RenderColor color, double spawnMinY, Box area) {
+        public Dragon(String name, int archPriority, int bersPriority, RenderColor color, BlockPos spawnPos, Box area) {
             this.name = name;
             this.archPriority = archPriority;
             this.bersPriority = bersPriority;
             this.color = color;
-            this.spawnMinY = spawnMinY;
+            this.spawnPos = spawnPos;
             this.area = area;
         }
 
         public Dragon copy() {
-            return new Dragon(this.name, this.archPriority, this.bersPriority, this.color, this.spawnMinY, this.area);
+            return new Dragon(this.name, this.archPriority, this.bersPriority, this.color, this.spawnPos, this.area);
         }
     }
 }

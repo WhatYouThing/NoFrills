@@ -110,6 +110,17 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Leap Message**: Sends a message in party chat when you leap to a teammate. Requires the Leap Overlay.
 - **Blood Camp Reminder**: Reminds you to start camping in the Blood Room when playing as Mage.
 - **M5 Rag Axe Reminder**: Reminds you to use your Ragnarock Axe when playing M5 as Mage.
+- **Hide Mage Beam**: Prevents the Mage Beam/Staff particles from spawning, improving visibility when playing Left Click
+  Mage.
+- **Dragon Alert**: Notifies you when a dragon is about to spawn in M7, while also accounting for the dragon priority on
+  the initial double spawn.
+- **Dragon Timer**: Renders a TPS synced timer for exactly when a M7 dragon is supposed to spawn.
+- **Dragon Boxes**: Renders the kill areas for every spawning/alive dragon in M7.
+- **Dragon Glow**: Applies a glow effect to every spawned M7 dragon.
+- **Dragon Stack**: Renders spawn waypoints for every spawning M7 dragon, showing you where to stack your Last Breath
+  arrows (or Terminator arrows as Archer).
+- **F6/M6 Gyro Timer**: When playing as Mage in F6/M6, renders a timer on screen for when to use your Gyrokinetic Wand
+  on the Terracottas and Sadan's ultimate giant.
 
 ### Kuudra
 

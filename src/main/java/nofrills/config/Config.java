@@ -8,24 +8,20 @@ import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
-import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
 import nofrills.config.category.*;
-import nofrills.events.WorldTickEvent;
 
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import static nofrills.Main.mc;
-
 public class Config {
     public static final ConfigClassHandler<Config> configHandler = ConfigClassHandler.createBuilder(Config.class)
             .serializer(cfg -> GsonConfigSerializerBuilder.create(cfg).setPath(FabricLoader.getInstance().getConfigDir().resolve("NoFrills/Config.json")).setJson5(false).build()).build();
-    private static final DecimalFormat floatSliderFormat = new DecimalFormat("0.##");
+    private static final DecimalFormat floatSliderFormat = new DecimalFormat("0.00");
 
     // General
 
@@ -334,8 +330,6 @@ public class Config {
 
     // end of setting values
 
-    public static Screen configScreen = null;
-
     public static BooleanControllerBuilder booleanController(Option<Boolean> option) {
         return BooleanControllerBuilder.create(option).formatValue(value -> value ? Text.of("Enabled") : Text.of("Disabled")).coloured(true);
     }
@@ -361,19 +355,6 @@ public class Config {
                 .category(Mining.create(defaults, config))
                 .category(Farming.create(defaults, config))
         ).generateScreen(parent);
-    }
-
-    public static void openConfigScreen() {
-        configScreen = getConfigScreen(null);
-    }
-
-    @EventHandler
-    private static void onTick(WorldTickEvent event) {
-        if (configScreen != null) {
-            mc.setScreen(configScreen);
-            configScreen = null;
-        }
-        // we have to use this voodoo because running setScreen directly from a command does absolutely nothing.
     }
 
     public enum partyBehaviorList {

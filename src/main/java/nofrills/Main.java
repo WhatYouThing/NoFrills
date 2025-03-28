@@ -16,6 +16,7 @@ import nofrills.config.Config;
 import nofrills.features.*;
 import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.SkyblockData;
+import nofrills.misc.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SpaceFarmer.class);
         eventBus.subscribe(AutoSprint.class);
         eventBus.subscribe(HotbarSwap.class);
-        eventBus.subscribe(Config.class);
+        eventBus.subscribe(Utils.class);
         eventBus.subscribe(KuudraFeatures.class);
         eventBus.subscribe(ChatFeatures.class);
         eventBus.subscribe(SlayerFeatures.class);

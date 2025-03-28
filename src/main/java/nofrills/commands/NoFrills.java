@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import nofrills.config.Config;
 import nofrills.features.PearlRefill;
+import nofrills.hud.HudEditorScreen;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -20,7 +21,7 @@ public class NoFrills {
 
     public static final ModCommand[] commands = {
             new ModCommand("settings", "Opens the settings GUI.", literal("settings").executes(context -> {
-                Config.openConfigScreen();
+                Utils.setScreen(Config.getConfigScreen(null));
                 return SINGLE_SUCCESS;
             })),
             new ModCommand("party", "Allows you to manage the player whitelist and blacklist for the Party Commands feature.", literal("party").executes(context -> {
@@ -189,6 +190,10 @@ public class NoFrills {
                 Utils.info("§7Pinging...");
                 SkyblockData.showPing();
                 return SINGLE_SUCCESS;
+            })),
+            new ModCommand("test", "test command", literal("test").executes(context -> {
+                Utils.setScreen(new HudEditorScreen());
+                return SINGLE_SUCCESS;
             }))
     };
 
@@ -207,11 +212,11 @@ public class NoFrills {
             }));
         }
         LiteralArgumentBuilder<FabricClientCommandSource> commandMain = literal("nofrills").executes(context -> {
-            Config.openConfigScreen();
+            Utils.setScreen(Config.getConfigScreen(null));
             return SINGLE_SUCCESS;
         });
         LiteralArgumentBuilder<FabricClientCommandSource> commandShort = literal("nf").executes(context -> {
-            Config.openConfigScreen();
+            Utils.setScreen(Config.getConfigScreen(null));
             return SINGLE_SUCCESS;
         });
         commandMain.then(helpArg);

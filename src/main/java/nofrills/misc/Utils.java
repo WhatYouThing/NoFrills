@@ -1,5 +1,6 @@
 package nofrills.misc;
 
+import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.gui.hud.MessageIndicator;
@@ -33,6 +34,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
 import nofrills.config.Config;
+import nofrills.events.WorldTickEvent;
 import nofrills.mixin.PlayerListHudAccessor;
 import org.lwjgl.glfw.GLFW;
 
@@ -60,6 +62,7 @@ public class Utils {
             "SNOW_BLASTER",
             "SNOW_HOWITZER"
     );
+    private static Screen newScreen = null;
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         mc.inGameHud.setTitle(Text.of(title));
@@ -500,6 +503,18 @@ public class Utils {
         return (health - 1024.0f) * 10000.0f;
     }
 
+    public static void setScreen(Screen screen) {
+        newScreen = screen;
+    }
+
+    @EventHandler
+    private static void onTick(WorldTickEvent event) {
+        if (newScreen != null) {
+            mc.setScreen(newScreen);
+            newScreen = null;
+        }
+    }
+
     public static class Symbols {
         public static String zone = "⏣";
         public static String zoneRift = "ф";
@@ -511,8 +526,8 @@ public class Utils {
     }
 
     public static class Keybinds {
-        public static final KeyBinding getPearls = new KeyBinding("Refill Pearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "NoFrills");
-        public static final KeyBinding recipeLookup = new KeyBinding("Recipe Lookup", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "NoFrills");
+        public static final KeyBinding getPearls = new KeyBinding("key.nofrills.refillPearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
+        public static final KeyBinding recipeLookup = new KeyBinding("key.nofrills.recipeLookup", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
     }
 
     public static class SpoofedSlot {

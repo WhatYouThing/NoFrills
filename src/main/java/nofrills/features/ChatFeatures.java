@@ -114,7 +114,7 @@ public class ChatFeatures {
                     .append(Text.literal(" "))
                     .append(Text.literal("§c§l[KICK]").setStyle(Style.EMPTY.withClickEvent(kick)))
                     .append(Text.literal(" "))
-                    .append(Text.literal("§e§l[IGNORE ADD]").setStyle(Style.EMPTY.withClickEvent(ignoreAdd)));
+                    .append(Text.literal("§e§l[BLOCK]").setStyle(Style.EMPTY.withClickEvent(ignoreAdd)));
             Utils.infoRaw(message);
         }
     }
@@ -141,7 +141,7 @@ public class ChatFeatures {
                             Utils.infoButton("§aClick here to warp your party.", "/party warp");
                         }
                     }
-                    if (Config.partyCmdTransfer != disabled && command.startsWith("ptme")) {
+                    if (Config.partyCmdTransfer != disabled && command.startsWith("pt")) {
                         if (whitelisted || Config.partyCmdTransfer == auto) {
                             Utils.sendMessage("/party transfer " + author);
                         } else if (Config.partyCmdTransfer != ignore) {

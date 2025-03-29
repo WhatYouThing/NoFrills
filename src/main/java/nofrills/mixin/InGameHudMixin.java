@@ -72,7 +72,7 @@ public abstract class InGameHudMixin implements TitleRendering {
         }
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/LayeredDrawer;render(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/client/render/RenderTickCounter;)V", shift = At.Shift.AFTER))
+    @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         eventBus.post(new HudRenderEvent(context, this.getTextRenderer(), tickCounter));
     }

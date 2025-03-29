@@ -472,11 +472,12 @@ public class DungeonSolvers {
             for (Dragon drag : dragons) {
                 if (!isDragonSpawned(drag) && drag.area.contains(pos) && !isPurpleInArea(drag)) {
                     spawnedDragons.add(drag.copy());
-                    if (!dragonSplitDone && spawnedDragons.size() == 2) {
+                    List<Dragon> dragons = getSpawnedDragons();
+                    if (!dragonSplitDone && dragons.size() == 2) {
                         if (Config.dragAlert) {
                             double power = getPowerLevel();
-                            Dragon first = spawnedDragons.getFirst();
-                            Dragon second = spawnedDragons.getLast();
+                            Dragon first = dragons.getFirst();
+                            Dragon second = dragons.getLast();
                             boolean purple = first.name.equals("Purple") || second.name.equals("Purple");
                             if ((power >= Config.dragSkipEasy && purple) || power >= Config.dragSkip) {
                                 announceDragonSpawn(getHigherPriority(first, second, isArcherTeam()), true);

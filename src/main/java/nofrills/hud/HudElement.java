@@ -26,23 +26,11 @@ public class HudElement implements Drawable {
     }
 
     public void move(DrawContext context, int x, int y, boolean snap) {
-        double newX = snap && x != 0 ? minX + Math.clamp(x, -1, 1) : minX + x;
-        double newY = snap && y != 0 ? minY + Math.clamp(y, -1, 1) : minY + y;
-        if (isInBounds(context, newX, newY) && isInBounds(context, maxX + x, maxY + y)) {
-            double newPosX = getOffsetX(context, newX);
-            double newPosY = getOffsetY(context, newY);
-            if (snap) {
-                double differenceX = newPosX % 0.005;
-                double differenceY = newPosY % 0.005;
-                if (differenceX != 0) {
-                    newPosX = Math.min(newPosX, newPosX - differenceX);
-                }
-                if (differenceY != 0) {
-                    newPosY = Math.min(newPosY, newPosY - differenceY);
-                }
-            }
-            posX = newPosX;
-            posY = newPosY;
+        double newX = snap ? x - (x % 10) : x;
+        double newY = snap ? y - (y % 10) : y;
+        if (isInBounds(context, newX, newY) && isInBounds(context, newX + (maxX - minX), newY + (maxY - minY))) {
+            posX = getOffsetX(context, newX);
+            posY = getOffsetY(context, newY);
         }
     }
 

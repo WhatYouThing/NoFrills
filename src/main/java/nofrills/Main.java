@@ -14,6 +14,7 @@ import nofrills.commands.NoFrills;
 import nofrills.commands.Yeet;
 import nofrills.config.Config;
 import nofrills.features.*;
+import nofrills.hud.HudManager;
 import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -70,6 +71,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(NoFrillsAPI.class);
         eventBus.subscribe(LeapOverlay.class);
         eventBus.subscribe(EventFeatures.class);
+        eventBus.subscribe(HudManager.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

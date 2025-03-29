@@ -8,9 +8,7 @@ import org.lwjgl.glfw.GLFW;
 import static nofrills.Main.mc;
 
 public class HudEditorScreen extends Screen {
-    TestElement test = new TestElement(0.5, 0.5, 0.2, 0.1);
-    private int lastMouseX = 0;
-    private int lastMouseY = 0;
+    HudElement test = HudManager.testElement;
     private boolean lastClicked = false;
     private HudElement selected = null;
 
@@ -28,7 +26,7 @@ public class HudEditorScreen extends Screen {
         boolean clicked = isLeftClickPressed();
         if (selected != null) {
             if (clicked) {
-                selected.move(context, mouseX - lastMouseX, mouseY - lastMouseY, hasShiftDown());
+                selected.move(context, mouseX, mouseY, hasShiftDown());
             } else {
                 selected = null;
             }
@@ -37,8 +35,6 @@ public class HudEditorScreen extends Screen {
                 selected = test;
             }
         }
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
         lastClicked = clicked;
     }
 }

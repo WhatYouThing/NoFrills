@@ -72,6 +72,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(LeapOverlay.class);
         eventBus.subscribe(EventFeatures.class);
         eventBus.subscribe(HudManager.class);
+        eventBus.subscribe(DungeonDragons.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

@@ -10,7 +10,7 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class HudManager {
-    public static SimpleTextElement testElement = new SimpleTextElement(0.25, 0.25, 0.05, 0.05, Text.of("§9deez"), RenderColor.fromHex(0xffffff));
+    public static SimpleTextElement testElement = new SimpleTextElement(0.25, 0.25, Text.of("§9deez nuts"), RenderColor.fromHex(0xffffff));
     public static List<HudElement> elements = List.of(
             testElement
     );

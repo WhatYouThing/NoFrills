@@ -86,6 +86,8 @@ public class Config {
     @SerialEntry
     public static partyBehaviorList partyCmdQueue = partyBehaviorList.Disabled;
     @SerialEntry
+    public static partyBehaviorList partyCmdCoords = partyBehaviorList.Disabled;
+    @SerialEntry
     public static boolean noHaste = false;
     @SerialEntry
     public static int viewmodelSpeed = 0;

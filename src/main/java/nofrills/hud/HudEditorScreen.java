@@ -8,7 +8,6 @@ import org.lwjgl.glfw.GLFW;
 import static nofrills.Main.mc;
 
 public class HudEditorScreen extends Screen {
-    HudElement test = HudManager.testElement;
     private boolean lastClicked = false;
     private HudElement selected = null;
 
@@ -22,17 +21,18 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        test.render(context, mouseX, mouseY, delta);
         boolean clicked = isLeftClickPressed();
+        for (HudElement element : HudManager.elements) {
+            element.render(context, mouseX, mouseY, delta);
+            if (clicked && !lastClicked && element.isHovered(mouseX, mouseY)) {
+                selected = element;
+            }
+        }
         if (selected != null) {
             if (clicked) {
                 selected.move(context, mouseX, mouseY, hasShiftDown());
             } else {
                 selected = null;
-            }
-        } else {
-            if (clicked && !lastClicked && test.isHovered(mouseX, mouseY)) {
-                selected = test;
             }
         }
         lastClicked = clicked;

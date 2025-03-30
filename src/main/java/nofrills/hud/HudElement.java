@@ -12,6 +12,8 @@ public class HudElement implements Drawable {
     public double minY = 0;
     public double maxX = 0;
     public double maxY = 0;
+    public double snapX = 1;
+    public double snapY = 1;
 
     public HudElement(double posX, double posY, double sizeX, double sizeY) {
         this.posX = posX;
@@ -26,8 +28,8 @@ public class HudElement implements Drawable {
     }
 
     public void move(DrawContext context, int x, int y, boolean snap) {
-        double newX = snap ? x - (x % 10) : x;
-        double newY = snap ? y - (y % 10) : y;
+        double newX = snap ? x - (x % snapX) : x;
+        double newY = snap ? y - (y % snapY) : y;
         if (isInBounds(context, newX, newY) && isInBounds(context, newX + (maxX - minX), newY + (maxY - minY))) {
             posX = getOffsetX(context, newX);
             posY = getOffsetY(context, newY);
@@ -41,6 +43,8 @@ public class HudElement implements Drawable {
         maxX = resX * (posX + sizeX);
         minY = resY * posY;
         maxY = resY * (posY + sizeY);
+        snapX = resX * 0.01;
+        snapY = resY * 0.01;
     }
 
     public double getX(DrawContext context, double offset) {

@@ -172,6 +172,13 @@ public class ChatFeatures {
                             }
                         }
                     }
+                    if (Config.partyCmdCoords != disabled && command.startsWith("coords")) {
+                        if (whitelisted || Config.partyCmdCoords == auto) {
+                            Utils.sendMessage("/pc " + Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}"));
+                        } else if (Config.partyCmdCoords != ignore) {
+                            Utils.infoButton("§aClick here to send your coordinates.", "/pc " + Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}"));
+                        }
+                    }
                 }
             }
         }

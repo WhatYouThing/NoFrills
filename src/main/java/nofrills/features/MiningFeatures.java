@@ -4,14 +4,13 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.ServerTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.SkyblockData;
@@ -26,8 +25,8 @@ public class MiningFeatures {
     private static final RenderColor ghostColor = RenderColor.fromHex(0x00c8c8, 1.0f);
     private static final String uselessMessage1 = "New day! Your Sky Mall buff changed!";
     private static final String uselessMessage2 = "You can disable this messaging by toggling Sky Mall in your /hotm!";
-    private static String lastDay = "";
-    private static String lastBuff = "";
+    private static int skyMallTicks = 0;
+    private static String skyMallBuff = "";
 
     private static boolean isWearingMiningPiece() {
         for (ItemStack armor : mc.player.getArmorItems()) {
@@ -56,35 +55,37 @@ public class MiningFeatures {
     }
 
     private static String getSkyblockDay() {
-        return SkyblockData.getLines().stream().filter(MiningFeatures::isMonth).findFirst().orElse("Unknown").trim();
+        return SkyblockData.getLines().stream().filter(MiningFeatures::isMonth).findFirst().orElse("Unknown Day").trim();
     }
 
     @EventHandler
-    public static void tick(WorldTickEvent event) {
+    private static void onServerTick(ServerTickEvent event) {
         if (Config.ghostVision && SkyblockData.getLocation().equals(Utils.Symbols.zone + " The Mist")) {
             for (Entity ent : mc.world.getEntities()) {
-                if (ent.getType() == EntityType.CREEPER && !Rendering.Entities.isDrawingFilled(ent)) {
-                    CreeperEntity creeper = (CreeperEntity) ent;
-                    if (creeper.getMaxHealth() >= 1000.0f) {
-                        creeper.setInvisible(true);
-                        creeper.getDataTracker().set(CreeperEntityAccessor.getChargedFlag(), false);
-                        Rendering.Entities.drawFilled(ent, true, ghostColor);
+                if (ent instanceof CreeperEntity creeper) {
+                    if (!Rendering.Entities.isDrawingFilled(ent)) {
+                        if (creeper.getMaxHealth() >= 1000.0f) {
+                            creeper.setInvisible(true);
+                            creeper.getDataTracker().set(CreeperEntityAccessor.getChargedFlag(), false);
+                            Rendering.Entities.drawFilled(ent, true, ghostColor);
+                        }
                     }
                 }
             }
         }
-        if (Config.betterSkymall) { // send the message only after the day on the score board is updated
-            String currentDay = getSkyblockDay();
-            if (!currentDay.equals(lastDay) && !currentDay.equals("Unknown") && !lastBuff.isEmpty()) {
-                Utils.info("§bSky Mall Buff for Day " + currentDay + ": " + lastBuff);
-                lastBuff = "";
+        if (Config.betterSkymall) {
+            if (skyMallTicks > 0) {
+                skyMallTicks--;
+                if (skyMallTicks == 0) {
+                    Utils.info("§2Sky Mall §ebuff for §b" + getSkyblockDay() + "§e: " + skyMallBuff);
+                    skyMallBuff = "";
+                }
             }
-            lastDay = currentDay;
         }
     }
 
     @EventHandler
-    public static void onChat(ChatMsgEvent event) {
+    private static void onChat(ChatMsgEvent event) {
         if (Config.betterSkymall && Utils.isInSkyblock()) {
             if (event.messagePlain.equalsIgnoreCase(uselessMessage1) || event.messagePlain.equalsIgnoreCase(uselessMessage2)) {
                 event.cancel();
@@ -92,7 +93,8 @@ public class MiningFeatures {
             if (event.messagePlain.startsWith("New buff: ")) {
                 String message = event.messagePlain.replace("New buff:", "").trim();
                 if (isWearingMiningPiece() || isBuffWhitelisted(message)) {
-                    lastBuff = message;
+                    skyMallBuff = message;
+                    skyMallTicks = 50;
                 }
                 event.cancel();
             }

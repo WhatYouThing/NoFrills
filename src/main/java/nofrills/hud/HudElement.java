@@ -30,10 +30,18 @@ public class HudElement implements Drawable {
     public void move(DrawContext context, int x, int y, boolean snap) {
         double newX = snap ? x - (x % snapX) : x;
         double newY = snap ? y - (y % snapY) : y;
-        if (isInBounds(context, newX, newY) && isInBounds(context, newX + (maxX - minX), newY + (maxY - minY))) {
-            posX = getOffsetX(context, newX);
-            posY = getOffsetY(context, newY);
+        if (!isInBounds(context, newX, newY)) {
+            newX = Math.clamp(newX, 0, context.getScaledWindowWidth());
+            newY = Math.clamp(newY, 0, context.getScaledWindowHeight());
         }
+        double newMaxX = newX + (maxX - minX);
+        double newMaxY = newY + (maxY - minY);
+        if (!isInBounds(context, newMaxX, newMaxY)) {
+            newX -= newMaxX - Math.clamp(newMaxX, 0, context.getScaledWindowWidth());
+            newY -= newMaxY - Math.clamp(newMaxY, 0, context.getScaledWindowHeight());
+        }
+        posX = getOffsetX(context, newX);
+        posY = getOffsetY(context, newY);
     }
 
     public void calculateDimensions(DrawContext context) {

@@ -1,9 +1,9 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.FlowerPotBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
@@ -22,6 +22,7 @@ import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.text.DecimalFormat;
@@ -52,6 +53,7 @@ public class DungeonSolvers {
     private static final String campMsg = "[BOSS] The Watcher: Let's see how you can handle this.";
     private static final String ragAxeMsg = "[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.";
     private static final String sadanEnterMsg = "[BOSS] Sadan: So you made it all the way here... Now you wish to defy me? Sadan?!";
+    private static final String sadanTerraDoneMsg = "[BOSS] Sadan: ENOUGH!";
     private static final List<SpawningTerracotta> terracottas = new ArrayList<>();
     private static final BlockPos sadanPit = new BlockPos(-9, 67, 66);
     public static boolean isInTerminal = false;
@@ -248,13 +250,10 @@ public class DungeonSolvers {
 
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
-        if (Config.gyroTimer && Utils.isOnDungeonFloor("6")) {
-            Block newBlock = event.newState.getBlock();
-            if (event.oldState.isAir() && (newBlock.equals(Blocks.SKELETON_WALL_SKULL) || newBlock.equals(Blocks.PLAYER_HEAD))) {
-                if (mc.world.getBlockState(event.pos.down(1)).getBlock().equals(Blocks.BROWN_TERRACOTTA)) {
-                    if (terracottas.stream().noneMatch(terra -> terra.pos.equals(event.pos))) {
-                        terracottas.add(new SpawningTerracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 80 : 100));
-                    }
+        if (Config.gyroTimer && Utils.isOnDungeonFloor("6") && SkyblockData.getLines().stream().anyMatch(line -> line.endsWith("sadan"))) {
+            if (event.oldState.isAir() && event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
+                if (terracottas.stream().noneMatch(terra -> terra.pos.equals(event.pos))) {
+                    terracottas.add(new SpawningTerracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300));
                 }
             }
             if (event.pos.equals(sadanPit) && event.newState.isAir() && event.oldState.getBlock().equals(Blocks.GRAY_STAINED_GLASS)) {
@@ -294,8 +293,13 @@ public class DungeonSolvers {
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
             }
-            if (Config.gyroTimer && event.messagePlain.equals(sadanEnterMsg)) {
-                gyroTicks = 267;
+            if (Config.gyroTimer) {
+                if (event.messagePlain.equals(sadanEnterMsg)) {
+                    gyroTicks = 267;
+                }
+                if (event.messagePlain.equals(sadanTerraDoneMsg)) {
+                    terracottas.clear();
+                }
             }
         }
     }
@@ -376,12 +380,13 @@ public class DungeonSolvers {
             if (gyroTicks > 0) {
                 gyroTicks--;
             }
-            for (SpawningTerracotta terra : terracottas) {
-                if (terra.ticks > 0) {
-                    terra.ticks -= 1;
+            List<SpawningTerracotta> terras = new ArrayList<>(terracottas);
+            for (SpawningTerracotta terra : terras) {
+                terra.ticks -= 1;
+                if (terra.ticks <= 0) {
+                    terracottas.remove(terra);
                 }
             }
-            terracottas.removeIf(terra -> terra.ticks == 0);
         }
     }
 

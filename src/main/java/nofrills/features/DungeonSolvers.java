@@ -123,7 +123,7 @@ public class DungeonSolvers {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (Utils.isOnDungeonFloor("6")) {
-            if (gyroTicks > 0) {
+            if (Config.gyroTimer && gyroTicks > 0) {
                 Utils.showTitleCustom("GYRO: " + decimalFormat.format(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, 0xffff00);
             }
         }
@@ -251,7 +251,7 @@ public class DungeonSolvers {
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
         if (Config.gyroTimer && Utils.isOnDungeonFloor("6") && SkyblockData.getLines().stream().anyMatch(line -> line.endsWith("sadan"))) {
-            if (event.oldState.isAir() && event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
+            if (event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
                 if (terracottas.stream().noneMatch(terra -> terra.pos.equals(event.pos))) {
                     terracottas.add(new SpawningTerracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300));
                 }
@@ -356,7 +356,9 @@ public class DungeonSolvers {
         if (!terracottas.isEmpty()) {
             List<SpawningTerracotta> terras = new ArrayList<>(terracottas);
             for (SpawningTerracotta terra : terras) {
-                event.drawText(terra.pos.toCenterPos(), Text.of(decimalFormat.format(terra.ticks / 20.0f) + "s"), 0.03f, true, RenderColor.fromHex(0xffff00));
+                if (terra.pos != null) {
+                    event.drawText(terra.pos.toCenterPos(), Text.of(decimalFormat.format(terra.ticks / 20.0f) + "s"), 0.035f, true, RenderColor.fromHex(0xffff00));
+                }
             }
         }
     }
@@ -383,10 +385,8 @@ public class DungeonSolvers {
             List<SpawningTerracotta> terras = new ArrayList<>(terracottas);
             for (SpawningTerracotta terra : terras) {
                 terra.ticks -= 1;
-                if (terra.ticks <= 0) {
-                    terracottas.remove(terra);
-                }
             }
+            terracottas.removeIf(terra -> terra.ticks <= 0);
         }
     }
 

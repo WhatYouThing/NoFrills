@@ -9,6 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.OptionalDouble;
@@ -84,6 +85,22 @@ public final class Rendering {
      */
     public static void drawBeam(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, Vec3d pos, int height, boolean throughWalls, RenderColor color) {
         drawFilled(matrices, consumer, camera, Box.of(pos, 0.35, 0, 0.35).stretch(0, height, 0), throughWalls, color);
+    }
+
+    /**
+     * Draws a tracer going from the crosshair to the provided coordinate. Automatically performs the required matrix stack translation.
+     */
+    public static void drawTracer(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, Vec3d pos, RenderColor color) {
+        Vec3d camPos = camera.getPos();
+        matrices.push();
+        matrices.translate(pos.getX() - camPos.getX(), pos.getY() - camPos.getY(), pos.getZ() - camPos.getZ());
+        Vector3f planeH = camera.getHorizontalPlane();
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthFunc(GL11.GL_ALWAYS);
+        VertexRendering.drawVector(matrices, consumer.getBuffer(RenderLayer.getLines()), planeH, camera.getPos(), color.argb);
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthFunc(GL11.GL_LEQUAL);
+        matrices.pop();
     }
 
     public static class Entities {

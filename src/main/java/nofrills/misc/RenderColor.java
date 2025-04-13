@@ -1,5 +1,7 @@
 package nofrills.misc;
 
+import net.minecraft.util.math.ColorHelper;
+
 import java.awt.*;
 
 public class RenderColor {
@@ -8,6 +10,7 @@ public class RenderColor {
     public float b;
     public float a;
     public int hex;
+    public int argb;
 
     public RenderColor(int r, int g, int b, int a) {
         this.r = (float) Math.clamp(r, 0, 255) / 255;
@@ -15,6 +18,7 @@ public class RenderColor {
         this.b = (float) Math.clamp(b, 0, 255) / 255;
         this.a = (float) Math.clamp(a, 0, 255) / 255;
         this.hex = (Math.clamp(r, 0, 255) << 16) + (Math.clamp(g, 0, 255) << 8) + Math.clamp(b, 0, 255);
+        this.argb = ColorHelper.getArgb(Math.clamp(a, 0, 255), Math.clamp(r, 0, 255), Math.clamp(g, 0, 255), Math.clamp(b, 0, 255));
     }
 
     public static RenderColor fromHex(int hex) {

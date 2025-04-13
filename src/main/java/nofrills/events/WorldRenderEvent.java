@@ -44,4 +44,8 @@ public class WorldRenderEvent {
         Vec3d center = box.getCenter();
         Rendering.drawBeam(matrices, consumer, camera, center.add(0, box.maxY - center.getY(), 0), height, throughWalls, color);
     }
+
+    public void drawTracer(Vec3d pos, RenderColor color) {
+        Rendering.drawTracer(matrices, consumer, camera, pos, color);
+    }
 }

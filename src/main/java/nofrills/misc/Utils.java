@@ -272,6 +272,22 @@ public class Utils {
         return fix == Config.fixModes.Enabled || (fix == Config.fixModes.SkyblockOnly && SkyblockData.isInSkyblock());
     }
 
+    /**
+     * Returns the right click ability line if found in the item's lore, or else an empty string.
+     */
+    public static String getRightClickAbility(ItemStack stack) {
+        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+        if (lore != null) {
+            for (Text line : lore.lines()) {
+                String l = Formatting.strip(line.getString()).trim();
+                if (l.contains("Ability: ") && l.endsWith("RIGHT CLICK")) {
+                    return l;
+                }
+            }
+        }
+        return "";
+    }
+
     public static boolean hasRightClickAbility(ItemStack stack) {
         String id = getSkyblockId(stack);
         if (!id.isEmpty()) {
@@ -283,17 +299,8 @@ public class Utils {
                     return true;
                 }
             }
-            LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
-            if (lore != null) {
-                for (Text line : lore.lines()) {
-                    String l = Formatting.strip(line.getString()).trim();
-                    if (l.contains("Ability: ") && l.endsWith("RIGHT CLICK")) {
-                        return true;
-                    }
-                }
-            }
         }
-        return false;
+        return !getRightClickAbility(stack).isEmpty();
     }
 
     /**

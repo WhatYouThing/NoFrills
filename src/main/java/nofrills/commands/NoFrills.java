@@ -191,7 +191,7 @@ public class NoFrills {
                 SkyblockData.showPing();
                 return SINGLE_SUCCESS;
             })),
-            new ModCommand("test", "test command", literal("test").executes(context -> {
+            new ModCommand("hudEditor", "Opens the NoFrills hud editor.", literal("hudEditor").executes(context -> {
                 Utils.setScreen(new HudEditorScreen());
                 return SINGLE_SUCCESS;
             }))

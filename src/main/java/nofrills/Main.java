@@ -73,6 +73,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(EventFeatures.class);
         eventBus.subscribe(HudManager.class);
         eventBus.subscribe(DungeonDragons.class);
+        eventBus.subscribe(ScathaMining.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

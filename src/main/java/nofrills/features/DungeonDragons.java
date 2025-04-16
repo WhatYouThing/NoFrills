@@ -95,7 +95,7 @@ public class DungeonDragons {
 
     private static boolean doesDragonExist(Entity dragon) {
         for (SpawnedDragon drag : getSpawnedDragons()) {
-            if (drag.entity != null && drag.entity.getUuidAsString().equals(dragon.getUuidAsString())) {
+            if (drag.entity != null && drag.uuid.equals(dragon.getUuidAsString())) {
                 return true;
             }
         }
@@ -177,18 +177,24 @@ public class DungeonDragons {
     private static void onEntity(EntityUpdatedEvent event) {
         if (event.entity instanceof EnderDragonEntity dragonEntity && isDragonPhase()) {
             float health = dragonEntity.getHealth();
+            String uuid = dragonEntity.getUuidAsString();
             for (SpawnedDragon drag : getSpawnedDragons()) {
                 if (drag.spawning && !doesDragonExist(event.entity) && drag.data.area.contains(event.entity.getPos())) {
                     drag.entity = event.entity;
+                    drag.uuid = uuid;
                     drag.health = health;
                     drag.spawning = false;
                     drag.spawned = true;
                     if (Config.dragGlow) {
                         Rendering.Entities.drawGlow(event.entity, true, drag.data.color);
                     }
-                } else if (drag.spawned && event.entity.getUuidAsString().equals(drag.entity.getUuidAsString())) {
-                    if (health > 0.0f && !event.entity.isRemoved()) {
+                } else if (drag.spawned && uuid.equals(drag.uuid)) {
+                    if (health > 0.0f && !event.entity.isRemoved() && dragonEntity.ticksSinceDeath == 0) {
                         drag.health = health;
+                        drag.entity = event.entity;
+                        if (Config.dragGlow) {
+                            Rendering.Entities.drawGlow(event.entity, true, drag.data.color);
+                        }
                     } else {
                         spawnedDragons.removeIf(dragon -> dragon.data.name.equals(drag.data.name));
                     }
@@ -233,6 +239,7 @@ public class DungeonDragons {
     private static class SpawnedDragon {
         public Dragon data;
         public Entity entity = null;
+        public String uuid = "";
         public int spawnTicks = 100;
         public boolean spawned = false;
         public boolean spawning = true;

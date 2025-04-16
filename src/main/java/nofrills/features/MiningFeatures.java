@@ -1,11 +1,14 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import nofrills.config.Config;
@@ -56,6 +59,11 @@ public class MiningFeatures {
 
     private static String getSkyblockDay() {
         return SkyblockData.getLines().stream().filter(MiningFeatures::isMonth).findFirst().orElse("Unknown Day").trim();
+    }
+
+    private static boolean isChest(PlayerInteractBlockC2SPacket packet) {
+        Block block = mc.world.getBlockState(packet.getBlockHitResult().getBlockPos()).getBlock();
+        return block.equals(Blocks.CHEST) || block.equals(Blocks.TRAPPED_CHEST);
     }
 
     @EventHandler

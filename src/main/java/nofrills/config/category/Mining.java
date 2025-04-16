@@ -40,6 +40,27 @@ public class Mining {
                         .controller(StringControllerBuilder::create)
                         .build())
 
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Safe Pickobulus"))
+                        .description(OptionDescription.of(Text.of("Prevents you from being able to use the Pickobulus mining ability on your Private Island and Garden. Plays a note block sound effect once Pickobulus is prevented.")))
+                        .binding(false, () -> Config.safePickobulus, value -> Config.safePickobulus = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Worm Cooldown"))
+                        .description(OptionDescription.of(Text.of("Tracks the Worm/Scatha spawn cooldown for you while in the Crystal Hollows.")))
+                        .binding(false, () -> Config.wormCooldown, value -> Config.wormCooldown = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Worm Alert"))
+                        .description(OptionDescription.of(Text.of("Alerts you when your Worm/Scatha is spawned, similarly to the Scatha-Pro mod for 1.8.9.")))
+                        .binding(false, () -> Config.wormAlert, value -> Config.wormAlert = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .build();
     }
 }

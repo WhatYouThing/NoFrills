@@ -136,7 +136,7 @@ public class DungeonDragons {
                     }
                 }
                 if (Config.dragTimer && !drag.spawned) {
-                    event.drawText(drag.data.pos.getCenter().add(0, 4, 0), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.4f, true, drag.data.color);
+                    event.drawText(drag.data.pos.getCenter().add(0, 4, 0), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.3f, true, drag.data.color);
                 }
                 if (Config.dragHealth && drag.entity != null) {
                     Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickDelta(true)); // should make the text move smoothly with the dragons

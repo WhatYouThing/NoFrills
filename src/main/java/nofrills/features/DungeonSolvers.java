@@ -236,6 +236,10 @@ public class DungeonSolvers {
                 for (Slot slot : colorSlots) {
                     int index = colorsOrder.indexOf(slot.getStack().getItem());
                     int target = Math.negateExact(mostCommon - index);
+                    if (Math.abs(target) > 2) {
+                        int offset = Math.abs(target) == 4 ? 3 : 1;
+                        target = Math.negateExact(target) + (target > 0 ? offset : -offset);
+                    }
                     if (target == 0) {
                         Utils.setSpoofed(event.screen, slot, backgroundStack);
                         Utils.setDisabled(event.screen, slot, true);

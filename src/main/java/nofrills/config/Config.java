@@ -54,6 +54,8 @@ public class Config {
     @SerialEntry
     public static boolean noBreakParticles = false;
     @SerialEntry
+    public static boolean noBossBar = false;
+    @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry
     public static boolean partyFinderOptions = false;

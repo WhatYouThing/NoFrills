@@ -6,6 +6,7 @@
     "ArmorStandEntityMixin",
     "BlockItemMixin",
     "BossBarHudAccessor",
+    "BossBarHudMixin",
     "ChatHudMixin",
     "ClientConnectionMixin",
     "ClientPlayerEntityMixin",

@@ -102,6 +102,12 @@ public class General {
                                 .binding(false, () -> Config.noBreakParticles, value -> Config.noBreakParticles = value)
                                 .controller(Config::booleanController)
                                 .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.of("No Boss Bar"))
+                                .description(OptionDescription.of(Text.of("Prevents the bar at the top of the screen from rendering.")))
+                                .binding(false, () -> Config.noBossBar, value -> Config.noBossBar = value)
+                                .controller(Config::booleanController)
+                                .build())
                         .build())
 
                 .group(OptionGroup.createBuilder()

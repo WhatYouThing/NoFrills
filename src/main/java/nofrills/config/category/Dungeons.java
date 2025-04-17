@@ -263,8 +263,15 @@ public class Dungeons {
 
                 .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Dragon Stack"))
-                        .description(OptionDescription.of(Text.of("Renders spawn waypoints for every spawning M7 dragon, showing you where to stack your Last Breath arrows (or Terminator arrows as Archer).")))
+                        .description(OptionDescription.of(Text.of("Renders a waypoint for the exact spawn position of every spawning M7 dragon, showing you where to aim.")))
                         .binding(false, () -> Config.dragStack, value -> Config.dragStack = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Advanced Dragon Stack"))
+                        .description(OptionDescription.of(Text.of("Replaces the spawn position waypoint from the option above with a replica of the dragon's entire hitbox, in the exact position that it will have as soon as it spawns.")))
+                        .binding(false, () -> Config.dragStackAdvanced, value -> Config.dragStackAdvanced = value)
                         .controller(Config::booleanController)
                         .build())
 

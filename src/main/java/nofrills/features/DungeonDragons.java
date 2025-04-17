@@ -9,7 +9,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
@@ -27,11 +26,11 @@ import static nofrills.Main.mc;
 public class DungeonDragons {
     private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private static final List<Dragon> dragons = List.of( // box coordinates taken from odin's WitherDragonEnum xqcL
-            new Dragon("Red", 3, 3, RenderColor.fromHex(0xff0000), new BlockPos(27, 14, 59), new Box(14.5, 12, 45.5, 39.5, 28, 70.5)),
-            new Dragon("Orange", 1, 5, RenderColor.fromHex(0xffaa00), new BlockPos(85, 14, 56), new Box(72, 8, 47, 102, 28, 77)),
-            new Dragon("Blue", 4, 2, RenderColor.fromHex(0x55ffff), new BlockPos(84, 14, 94), new Box(71.5, 11, 82.5, 96.5, 26, 107.5)),
-            new Dragon("Purple", 5, 1, RenderColor.fromHex(0xaa00aa), new BlockPos(56, 14, 125), new Box(45.5, 12, 113.5, 68.5, 23, 136.5)),
-            new Dragon("Green", 2, 4, RenderColor.fromHex(0x00ff00), new BlockPos(27, 14, 94), new Box(7, 8, 80, 37, 28, 110))
+            new Dragon("Red", 3, 3, RenderColor.fromHex(0xff0000), SpawnBoxes.red, PartBoxes.red, new Box(14.5, 5, 45.5, 39.5, 28, 70.5)),
+            new Dragon("Orange", 1, 5, RenderColor.fromHex(0xffaa00), SpawnBoxes.orange, PartBoxes.orange, new Box(72, 5, 47, 102, 28, 77)),
+            new Dragon("Blue", 4, 2, RenderColor.fromHex(0x55ffff), SpawnBoxes.blue, PartBoxes.blue, new Box(71.5, 5, 82.5, 96.5, 26, 107.5)),
+            new Dragon("Purple", 5, 1, RenderColor.fromHex(0xaa00aa), SpawnBoxes.purple, PartBoxes.purple, new Box(45.5, 6, 113.5, 68.5, 23, 136.5)),
+            new Dragon("Green", 2, 4, RenderColor.fromHex(0x00ff00), SpawnBoxes.green, PartBoxes.green, new Box(7, 5, 80, 37, 28, 110))
     );
     private static final List<SpawnedDragon> spawnedDragons = new ArrayList<>();
     private static boolean dragonSplitDone = false;
@@ -125,13 +124,19 @@ public class DungeonDragons {
         if (!spawnedDragons.isEmpty()) {
             for (SpawnedDragon drag : getSpawnedDragons()) {
                 if (Config.dragBoxes) {
-                    event.drawOutline(drag.data.area, false, drag.data.color);
+                    event.drawOutline(drag.data.area, true, drag.data.color);
                 }
                 if (Config.dragStack && !drag.spawned) {
-                    event.drawFilled(Box.enclosing(drag.data.spawnPos, drag.data.spawnPos), true, RenderColor.fromHex(drag.data.color.hex, 0.67f));
+                    if (Config.dragStackAdvanced) {
+                        for (Box part : drag.data.parts) {
+                            event.drawOutline(part, true, drag.data.color);
+                        }
+                    } else {
+                        event.drawFilled(drag.data.pos, true, RenderColor.fromHex(drag.data.color.hex, 0.67f));
+                    }
                 }
                 if (Config.dragTimer && !drag.spawned) {
-                    event.drawText(drag.data.area.getCenter(), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.2f, true, drag.data.color);
+                    event.drawText(drag.data.pos.getCenter().add(0, 4, 0), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.4f, true, drag.data.color);
                 }
                 if (Config.dragHealth && drag.entity != null) {
                     Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickDelta(true)); // should make the text move smoothly with the dragons
@@ -223,15 +228,17 @@ public class DungeonDragons {
         public int archPriority;
         public int bersPriority;
         public RenderColor color;
-        public BlockPos spawnPos;
+        public Box pos;
+        public List<Box> parts;
         public Box area;
 
-        public Dragon(String name, int archPriority, int bersPriority, RenderColor color, BlockPos spawnPos, Box area) {
+        public Dragon(String name, int archPriority, int bersPriority, RenderColor color, Box pos, List<Box> parts, Box area) {
             this.name = name;
             this.archPriority = archPriority;
             this.bersPriority = bersPriority;
             this.color = color;
-            this.spawnPos = spawnPos;
+            this.pos = pos;
+            this.parts = parts;
             this.area = area;
         }
     }
@@ -248,5 +255,65 @@ public class DungeonDragons {
         public SpawnedDragon(Dragon data) {
             this.data = data;
         }
+    }
+
+    private static class SpawnBoxes {
+        public static Box red = Box.of(new Vec3d(27.0, 14.0, 59.0), 1, 1, 1);
+        public static Box orange = Box.of(new Vec3d(85.0, 14.0, 56.0), 1, 1, 1);
+        public static Box blue = Box.of(new Vec3d(84.0, 14.0, 94.0), 1, 1, 1);
+        public static Box purple = Box.of(new Vec3d(56.0, 14.0, 125.0), 1, 1, 1);
+        public static Box green = Box.of(new Vec3d(27.0, 14.0, 94.0), 1, 1, 1);
+    }
+
+    private static class PartBoxes {
+        public static List<Box> red = List.of(
+                new Box(26.5, 14.0, 52.0, 27.5, 15.0, 53.0),
+                new Box(25.5, 14.0, 52.0, 28.5, 17.0, 55.0),
+                new Box(24.5, 14.0, 56.0, 29.5, 17.0, 61.0),
+                new Box(26.0, 15.5, 61.5, 28.0, 17.5, 63.5),
+                new Box(26.0, 15.5, 63.5, 28.0, 17.5, 65.5),
+                new Box(26.0, 15.5, 65.5, 28.0, 17.5, 67.5),
+                new Box(29.5, 16.0, 57.0, 33.5, 18.0, 61.0),
+                new Box(20.5, 16.0, 57.0, 24.5, 18.0, 61.0)
+        );
+        public static List<Box> orange = List.of(
+                new Box(84.5, 14.0, 49.0, 85.5, 15.0, 50.0),
+                new Box(83.5, 14.0, 49.0, 86.5, 17.0, 52.0),
+                new Box(82.5, 14.0, 53.0, 87.5, 17.0, 58.0),
+                new Box(84.0, 15.5, 58.5, 86.0, 17.5, 60.5),
+                new Box(84.0, 15.5, 60.5, 86.0, 17.5, 62.5),
+                new Box(84.0, 15.5, 62.5, 86.0, 17.5, 64.5),
+                new Box(87.5, 16.0, 54.0, 91.5, 18.0, 58.0),
+                new Box(78.5, 16.0, 54.0, 82.5, 18.0, 58.0)
+        );
+        public static List<Box> blue = List.of(
+                new Box(83.5, 14.0, 87.0, 84.5, 15.0, 88.0),
+                new Box(82.5, 14.0, 87.0, 85.5, 17.0, 90.0),
+                new Box(81.5, 14.0, 91.0, 86.5, 17.0, 96.0),
+                new Box(83.0, 15.5, 96.5, 85.0, 17.5, 98.5),
+                new Box(83.0, 15.5, 98.5, 85.0, 17.5, 100.5),
+                new Box(83.0, 15.5, 100.5, 85.0, 17.5, 102.5),
+                new Box(86.5, 16.0, 92.0, 90.5, 18.0, 96.0),
+                new Box(77.5, 16.0, 92.0, 81.5, 18.0, 96.0));
+        public static List<Box> purple = List.of(
+                new Box(55.5, 14.0, 118.0, 56.5, 15.0, 119.0),
+                new Box(54.5, 14.0, 118.0, 57.5, 17.0, 121.0),
+                new Box(53.5, 14.0, 122.0, 58.5, 17.0, 127.0),
+                new Box(55.0, 15.5, 127.5, 57.0, 17.5, 129.5),
+                new Box(55.0, 15.5, 129.5, 57.0, 17.5, 131.5),
+                new Box(55.0, 15.5, 131.5, 57.0, 17.5, 133.5),
+                new Box(58.5, 16.0, 123.0, 62.5, 18.0, 127.0),
+                new Box(49.5, 16.0, 123.0, 53.5, 18.0, 127.0)
+        );
+        public static List<Box> green = List.of(
+                new Box(26.5, 14.0, 87.0, 27.5, 15.0, 88.0),
+                new Box(25.5, 14.0, 87.0, 28.5, 17.0, 90.0),
+                new Box(24.5, 14.0, 91.0, 29.5, 17.0, 96.0),
+                new Box(26.0, 15.5, 96.5, 28.0, 17.5, 98.5),
+                new Box(26.0, 15.5, 98.5, 28.0, 17.5, 100.5),
+                new Box(26.0, 15.5, 100.5, 28.0, 17.5, 102.5),
+                new Box(29.5, 16.0, 92.0, 33.5, 18.0, 96.0),
+                new Box(20.5, 16.0, 92.0, 24.5, 18.0, 96.0)
+        );
     }
 }

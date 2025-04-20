@@ -65,9 +65,19 @@ public class MiddleClickOverride {
         Iterator<String> iterator = lines.iterator();
         while (iterator.hasNext()) {
             String line = iterator.next();
-            if (line.equals("Cost") || line.equals("Sell Price") || line.equals("Bazaar Price")) {
-                if (iterator.hasNext() && iterator.next().endsWith("Coins")) {
+            if (iterator.hasNext() && (line.equals("Cost") || line.equals("Sell Price") || line.equals("Bazaar Price"))) {
+                String next = iterator.next();
+                if (next.endsWith("Coins") || next.endsWith(Utils.Symbols.check) || next.endsWith(Utils.Symbols.cross)) {
                     return true;
+                }
+                if (next.lastIndexOf("x") != -1) {
+                    String amount = next.substring(next.lastIndexOf("x") + 1);
+                    try {
+                        Integer.parseInt(amount);
+                        return true;
+                    } catch (NumberFormatException exception) {
+                        return false;
+                    }
                 }
             }
         }

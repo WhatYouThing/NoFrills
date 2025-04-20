@@ -540,6 +540,8 @@ public class Utils {
         public static String skull = "☠";
         public static String format = "§";
         public static String vampLow = "҉";
+        public static String check = "✔";
+        public static String cross = "✖";
     }
 
     public static class Keybinds {

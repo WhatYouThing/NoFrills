@@ -5,8 +5,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
@@ -36,6 +38,9 @@ public abstract class MinecraftClientMixin {
     @Nullable
     public HitResult crosshairTarget;
 
+    @Shadow
+    public abstract void setScreen(@Nullable Screen screen);
+
     @WrapWithCondition(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(ClientPlayerEntity instance, Hand hand) {
         return !Utils.isFixEnabled(Config.noDropSwing);
@@ -44,6 +49,9 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "setScreen", at = @At("TAIL"))
     private void onOpenScreen(Screen screen, CallbackInfo ci) {
         if (screen != null && world != null) {
+            if (Utils.isFixEnabled(Config.clearCursorStack) && screen instanceof HandledScreen<?> handledScreen) {
+                handledScreen.getScreenHandler().setCursorStack(ItemStack.EMPTY);
+            }
             eventBus.post(new ScreenOpenEvent(screen));
         }
     }

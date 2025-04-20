@@ -46,6 +46,8 @@ public class Config {
     @SerialEntry
     public static boolean ignoreBackground = false;
     @SerialEntry
+    public static boolean middleClickOverride = false;
+    @SerialEntry
     public static boolean hideDeadMobs = false;
     @SerialEntry
     public static boolean noExplosions = false;
@@ -55,6 +57,8 @@ public class Config {
     public static boolean noBreakParticles = false;
     @SerialEntry
     public static boolean noBossBar = false;
+    @SerialEntry
+    public static boolean noLoadingScreen = false;
     @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry
@@ -142,6 +146,8 @@ public class Config {
     public static fixModes abilityPlaceFix = fixModes.Disabled;
     @SerialEntry
     public static fixModes efficiencyFix = fixModes.Disabled;
+    @SerialEntry
+    public static fixModes clearCursorStack = fixModes.Disabled;
 
     // Events
 

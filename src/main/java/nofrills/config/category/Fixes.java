@@ -115,6 +115,14 @@ public class Fixes {
                                 .enumClass(Config.fixModes.class)
                                 .formatValue(value -> Text.of(value.name())))
                         .build())
+                .option(Option.<Config.fixModes>createBuilder()
+                        .name(Text.of("Clear Cursor Stack"))
+                        .description(OptionDescription.of(Text.of("Automatically clears your cursor from any ghost items that may appear between GUI changes.")))
+                        .binding(Config.fixModes.Disabled, () -> Config.clearCursorStack, value -> Config.clearCursorStack = value)
+                        .controller(option -> EnumControllerBuilder.create(option)
+                                .enumClass(Config.fixModes.class)
+                                .formatValue(value -> Text.of(value.name())))
+                        .build())
                 .build();
     }
 }

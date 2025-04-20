@@ -273,16 +273,26 @@ public class Utils {
     }
 
     /**
-     * Returns the right click ability line if found in the item's lore, or else an empty string.
+     * Returns every line of the stack's lore with no formatting, or else an empty list.
      */
-    public static String getRightClickAbility(ItemStack stack) {
+    public static List<String> getLoreLines(ItemStack stack) {
+        List<String> lines = new ArrayList<>();
         LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
         if (lore != null) {
             for (Text line : lore.lines()) {
-                String l = Formatting.strip(line.getString()).trim();
-                if (l.contains("Ability: ") && l.endsWith("RIGHT CLICK")) {
-                    return l;
-                }
+                lines.add(Formatting.strip(line.getString()).trim());
+            }
+        }
+        return lines;
+    }
+
+    /**
+     * Returns the right click ability line if found in the item's lore, or else an empty string.
+     */
+    public static String getRightClickAbility(ItemStack stack) {
+        for (String line : getLoreLines(stack)) {
+            if (line.contains("Ability: ") && line.endsWith("RIGHT CLICK")) {
+                return line;
             }
         }
         return "";

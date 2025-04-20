@@ -19,7 +19,6 @@ import static nofrills.Main.mc;
 public class MiddleClickOverride {
     private static final List<String> matchBlacklist = List.of(
             "Attribute Fusion",
-            "The Hex",
             "Beacon",
             "Chest",
             "Large Chest",
@@ -41,7 +40,8 @@ public class MiddleClickOverride {
     private static final List<String> containBlacklist = List.of(
             "Wardrobe",
             "Minion",
-            "Abiphone"
+            "Abiphone",
+            "The Hex"
     );
 
     private static final List<String> matchWhitelist = List.of(
@@ -65,7 +65,7 @@ public class MiddleClickOverride {
         Iterator<String> iterator = lines.iterator();
         while (iterator.hasNext()) {
             String line = iterator.next();
-            if (line.equals("Cost") || line.equals("Sell Price")) {
+            if (line.equals("Cost") || line.equals("Sell Price") || line.equals("Bazaar Price")) {
                 if (iterator.hasNext() && iterator.next().endsWith("Coins")) {
                     return true;
                 }

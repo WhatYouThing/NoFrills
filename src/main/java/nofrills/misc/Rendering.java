@@ -159,6 +159,7 @@ public final class Rendering {
                         .program(RenderPhase.POSITION_COLOR_PROGRAM)
                         .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
                         .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
+                        .depthTest(RenderPhase.LEQUAL_DEPTH_TEST)
                         .build(false));
         public static final RenderLayer.MultiPhase BoxFilledNoCull = RenderLayer.of(
                 "nofrills_box_filled_no_cull",
@@ -186,6 +187,7 @@ public final class Rendering {
                         .target(RenderPhase.ITEM_ENTITY_TARGET)
                         .writeMaskState(RenderPhase.ALL_MASK)
                         .cull(RenderPhase.DISABLE_CULLING)
+                        .depthTest(RenderPhase.LEQUAL_DEPTH_TEST)
                         .build(false)
         );
         public static final RenderLayer.MultiPhase BoxOutlineNoCull = RenderLayer.of(

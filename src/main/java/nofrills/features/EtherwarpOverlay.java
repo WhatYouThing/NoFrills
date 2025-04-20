@@ -2,9 +2,6 @@ package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.*;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.hit.BlockHitResult;
@@ -14,7 +11,6 @@ import net.minecraft.util.math.Box;
 import nofrills.config.Config;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.RenderColor;
-import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
 import static nofrills.Main.mc;
@@ -37,7 +33,7 @@ public class EtherwarpOverlay {
             case HopperBlock ignored -> !isAbove;
             case StainedGlassPaneBlock ignored -> !isAbove;
             case PaneBlock ignored -> !isAbove;
-            case CauldronBlock ignored -> !isAbove;
+            case CauldronBlock ignored -> isAbove;
             case WallBannerBlock ignored -> !isAbove;
             case BannerBlock ignored -> !isAbove;
             case SignBlock ignored -> !isAbove;
@@ -49,15 +45,12 @@ public class EtherwarpOverlay {
     }
 
     private static int getWarpDistance() {
-        ItemStack item = mc.player.getMainHandStack();
-        NbtComponent component = item.get(DataComponentTypes.CUSTOM_DATA);
-        if (!item.isEmpty() && component != null) {
-            NbtCompound data = component.copyNbt();
-            String itemId = data.getString("id");
-            if (itemId.equals("ASPECT_OF_THE_END") || itemId.equals("ASPECT_OF_THE_VOID")) {
-                if (data.contains("ethermerge") && data.getByte("ethermerge") == 1) {
-                    int extraDist = data.contains("tuned_transmission") ? data.getInt("tuned_transmission") : 0;
-                    return baseDistance + extraDist;
+        NbtCompound data = Utils.getCustomData(mc.player.getMainHandStack());
+        String itemId = Utils.getSkyblockId(data);
+        if (data != null && !itemId.isEmpty()) {
+            if (data.getByte("ethermerge") == 1 && mc.options.sneakKey.isPressed()) {
+                if (itemId.equals("ASPECT_OF_THE_END") || itemId.equals("ASPECT_OF_THE_VOID")) {
+                    return baseDistance + (data.contains("tuned_transmission") ? data.getInt("tuned_transmission") : 0);
                 }
             } else if (itemId.equals("ETHERWARP_CONDUIT")) {
                 return baseDistance;
@@ -68,18 +61,15 @@ public class EtherwarpOverlay {
 
     @EventHandler
     public static void onRender(WorldRenderEvent event) {
-        if (Config.overlayEtherwarp && mc.options.sneakKey.isPressed()) {
+        if (Config.overlayEtherwarp) {
             int dist = getWarpDistance();
             if (dist > 0) {
                 HitResult hitResult = Utils.raycastFullBlock(mc.player, dist, event.tickCounter.getTickDelta(true));
                 if (hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHitResult) {
                     BlockPos pos = blockHitResult.getBlockPos();
                     Box box = Box.enclosing(pos, pos);
-                    if (isBlockValid(pos, 0) && isBlockValid(pos, 1) && isBlockValid(pos, 2)) {
-                        Rendering.drawFilled(event.matrices, event.consumer, event.camera, box, true, colorCorrect);
-                    } else {
-                        Rendering.drawFilled(event.matrices, event.consumer, event.camera, box, true, colorWrong);
-                    }
+                    boolean valid = isBlockValid(pos, 0) && isBlockValid(pos, 1) && isBlockValid(pos, 2);
+                    event.drawFilled(box, true, valid ? colorCorrect : colorWrong);
                 }
             }
         }

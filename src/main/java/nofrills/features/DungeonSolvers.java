@@ -153,21 +153,21 @@ public class DungeonSolvers {
                 if (!stack.isEmpty()) {
                     if (event.title.startsWith("Correct all the panes!")) {
                         isInTerminal = true;
-                        if (stack.getItem() == Items.RED_STAINED_GLASS_PANE) {
-                            Utils.setSpoofed(event.screen, slot, firstStack);
-                            Utils.setDisabled(event.screen, slot, false);
+                        if (stack.getItem().equals(Items.RED_STAINED_GLASS_PANE)) {
+                            Utils.setSpoofed(slot, firstStack);
+                            Utils.setDisabled(slot, false);
                         } else {
-                            Utils.setSpoofed(event.screen, slot, backgroundStack);
-                            Utils.setDisabled(event.screen, slot, true);
+                            Utils.setSpoofed(slot, backgroundStack);
+                            Utils.setDisabled(slot, true);
                         }
                     }
                     if (event.title.startsWith("Click in order!")) {
                         isInTerminal = true;
-                        if (stack.getItem() == Items.RED_STAINED_GLASS_PANE && event.isFinal) {
+                        if (stack.getItem().equals(Items.RED_STAINED_GLASS_PANE) && event.isFinal) {
                             orderSlots.add(slot);
                         } else {
-                            Utils.setSpoofed(event.screen, slot, backgroundStack);
-                            Utils.setDisabled(event.screen, slot, true);
+                            Utils.setSpoofed(slot, backgroundStack);
+                            Utils.setDisabled(slot, true);
                         }
                     }
                     if (event.title.startsWith("What starts with:") && event.title.endsWith("?")) {
@@ -175,11 +175,11 @@ public class DungeonSolvers {
                         String character = String.valueOf(event.title.charAt(event.title.indexOf("'") + 1)).toLowerCase();
                         String name = Formatting.strip(stack.getName().getString()).toLowerCase().trim();
                         if (!name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(stack)) {
-                            Utils.setSpoofed(event.screen, slot, firstStack);
-                            Utils.setDisabled(event.screen, slot, false);
+                            Utils.setSpoofed(slot, firstStack);
+                            Utils.setDisabled(slot, false);
                         } else {
-                            Utils.setSpoofed(event.screen, slot, backgroundStack);
-                            Utils.setDisabled(event.screen, slot, true);
+                            Utils.setSpoofed(slot, backgroundStack);
+                            Utils.setDisabled(slot, true);
                         }
                     }
                     if (event.title.startsWith("Select all the") && event.title.endsWith("items!")) {
@@ -189,11 +189,11 @@ public class DungeonSolvers {
                         for (DyeColor dye : DyeColor.values()) {
                             if (dye.getName().equals(colorName)) {
                                 if (!Utils.hasGlint(stack) && checkStackColor(stack, dye, colorName)) {
-                                    Utils.setSpoofed(event.screen, slot, firstStack);
-                                    Utils.setDisabled(event.screen, slot, false);
+                                    Utils.setSpoofed(slot, firstStack);
+                                    Utils.setDisabled(slot, false);
                                 } else {
-                                    Utils.setSpoofed(event.screen, slot, backgroundStack);
-                                    Utils.setDisabled(event.screen, slot, true);
+                                    Utils.setSpoofed(slot, backgroundStack);
+                                    Utils.setDisabled(slot, true);
                                 }
                                 break;
                             }
@@ -204,20 +204,20 @@ public class DungeonSolvers {
                         if (colorsOrder.contains(stack.getItem()) && !colorSlots.contains(slot)) {
                             colorSlots.add(slot);
                         }
-                        Utils.setSpoofed(event.screen, slot, backgroundStack);
-                        Utils.setDisabled(event.screen, slot, true);
+                        Utils.setSpoofed(slot, backgroundStack);
+                        Utils.setDisabled(slot, true);
                     }
                 }
             }
             if (!orderSlots.isEmpty()) {
                 orderSlots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
                 Slot first = orderSlots.getFirst();
-                Utils.setSpoofed(event.screen, first, firstStack);
-                Utils.setDisabled(event.screen, first, false);
+                Utils.setSpoofed(first, firstStack);
+                Utils.setDisabled(first, false);
                 if (orderSlots.size() > 1) {
                     Slot second = orderSlots.get(1);
-                    Utils.setSpoofed(event.screen, second, secondStack);
-                    Utils.setDisabled(event.screen, second, true);
+                    Utils.setSpoofed(second, secondStack);
+                    Utils.setDisabled(second, true);
                 }
             }
             if (!colorSlots.isEmpty() && colorSlots.size() >= 9) {
@@ -241,11 +241,11 @@ public class DungeonSolvers {
                         target = Math.negateExact(target) + (target > 0 ? offset : -offset);
                     }
                     if (target == 0) {
-                        Utils.setSpoofed(event.screen, slot, backgroundStack);
-                        Utils.setDisabled(event.screen, slot, true);
+                        Utils.setSpoofed(slot, backgroundStack);
+                        Utils.setDisabled(slot, true);
                     } else {
-                        Utils.setSpoofed(event.screen, slot, stackWithCount(target));
-                        Utils.setDisabled(event.screen, slot, false);
+                        Utils.setSpoofed(slot, stackWithCount(target));
+                        Utils.setDisabled(slot, false);
                     }
                 }
             }

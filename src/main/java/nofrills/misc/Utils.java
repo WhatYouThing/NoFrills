@@ -35,6 +35,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
 import nofrills.config.Config;
 import nofrills.events.WorldTickEvent;
+import nofrills.features.LeapOverlay;
 import nofrills.mixin.PlayerListHudAccessor;
 import org.lwjgl.glfw.GLFW;
 
@@ -117,11 +118,10 @@ public class Utils {
     /**
      * Disables a specific slot in the provided screen, preventing it from being clicked and hiding its tooltip.
      *
-     * @param screen The current screen
-     * @param slot   The slot to disable
+     * @param slot The slot to disable
      */
-    public static void setDisabled(Screen screen, Slot slot, boolean disabled) {
-        ((ScreenOptions) screen).nofrills_mod$disableSlot(slot, disabled);
+    public static void setDisabled(Slot slot, boolean disabled) {
+        SlotOptions.disableSlot(slot, disabled);
     }
 
     public static ItemStack setStackName(ItemStack stack, String name) {
@@ -132,12 +132,11 @@ public class Utils {
     /**
      * Spoofs a slot to render a specific item stack, rather than the item that is actually in that slot.
      *
-     * @param screen      The current screen
      * @param slot        The slot to spoof
      * @param replacement The ItemStack to spoof as
      */
-    public static void setSpoofed(Screen screen, Slot slot, ItemStack replacement) {
-        ((ScreenOptions) screen).nofrills_mod$spoofSlot(slot, replacement);
+    public static void setSpoofed(Slot slot, ItemStack replacement) {
+        SlotOptions.spoofSlot(slot, replacement);
     }
 
     public static String getCoordsFormatted(String format) {
@@ -520,6 +519,10 @@ public class Utils {
         return (health - 1024.0f) * 10000.0f;
     }
 
+    public static boolean isLeapMenu(String title) {
+        return Config.leapOverlay && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
+    }
+
     public static void setScreen(Screen screen) {
         newScreen = screen;
     }
@@ -547,31 +550,5 @@ public class Utils {
     public static class Keybinds {
         public static final KeyBinding getPearls = new KeyBinding("key.nofrills.refillPearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
         public static final KeyBinding recipeLookup = new KeyBinding("key.nofrills.recipeLookup", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
-    }
-
-    public static class SpoofedSlot {
-        public int slotId;
-        public ItemStack replacementStack;
-
-        public SpoofedSlot(Slot slot, ItemStack replacementStack) {
-            this.slotId = slot.id;
-            this.replacementStack = replacementStack;
-        }
-
-        public boolean isSlot(Slot slot) {
-            return slot != null && slot.id == slotId;
-        }
-    }
-
-    public static class DisabledSlot {
-        public int slotId;
-
-        public DisabledSlot(Slot slot) {
-            this.slotId = slot.id;
-        }
-
-        public boolean isSlot(Slot slot) {
-            return slot != null && slot.id == slotId;
-        }
     }
 }

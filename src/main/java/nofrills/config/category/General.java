@@ -75,7 +75,7 @@ public class General {
                                 .build())
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Middle Click Override"))
-                                .description(OptionDescription.of(Text.of("Automatically replaces your left clicks with middle clicks in applicable Skyblock GUI's, making navigation smoother.\n\nNote: This option may possibly prevent you from clicking certain GUI buttons due to Hypixel not considering the middle click as a valid click. Make sure to report any bugs you find.")))
+                                .description(OptionDescription.of(Text.of("Automatically replaces your left clicks with middle clicks in applicable Skyblock GUI's, making navigation smoother.\n\nNote: This option may break certain GUI's due to Hypixel not counting the middle click as a valid click. Make sure to report any bugs you find.")))
                                 .binding(false, () -> Config.middleClickOverride, value -> Config.middleClickOverride = value)
                                 .controller(Config::booleanController)
                                 .build())

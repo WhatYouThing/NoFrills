@@ -17,6 +17,7 @@ import nofrills.features.*;
 import nofrills.hud.HudManager;
 import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.SkyblockData;
+import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ public class Main implements ModInitializer {
 
         eventBus.registerLambdaFactory("nofrills", (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
 
+        eventBus.subscribe(SlotOptions.class);
         eventBus.subscribe(DungeonHighlight.class);
         eventBus.subscribe(DungeonSolvers.class);
         eventBus.subscribe(FishingFeatures.class);

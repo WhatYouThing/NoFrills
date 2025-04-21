@@ -25,7 +25,6 @@ public class MiddleClickOverride {
             "Anvil",
             "Storage",
             "Drill Anvil",
-            "Enchant Item",
             "Runic Pedestal",
             "Rune Removal",
             "Reforge Anvil",
@@ -34,14 +33,16 @@ public class MiddleClickOverride {
             "Exp Sharing",
             "Convert to Dungeon Item",
             "Upgrade Item",
-            "Salvage Items"
+            "Salvage Items",
+            "Auctions Browser"
     );
 
     private static final List<String> containBlacklist = List.of(
             "Wardrobe",
             "Minion",
             "Abiphone",
-            "The Hex"
+            "The Hex",
+            "Enchant Item"
     );
 
     private static final List<String> matchWhitelist = List.of(

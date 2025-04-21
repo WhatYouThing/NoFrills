@@ -187,7 +187,7 @@ public class DungeonSolvers {
                         String color = event.title.replace("Select all the", "").replace("items!", "").trim();
                         String colorName = color.equals("SILVER") ? "light_gray" : color.toLowerCase().replace(" ", "_");
                         for (DyeColor dye : DyeColor.values()) {
-                            if (dye.getName().equals(colorName)) {
+                            if (dye.getId().equals(colorName)) {
                                 if (!Utils.hasGlint(stack) && checkStackColor(stack, dye, colorName)) {
                                     Utils.setSpoofed(slot, firstStack);
                                     Utils.setDisabled(slot, false);

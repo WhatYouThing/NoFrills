@@ -23,7 +23,7 @@ public class HudManager {
     private static void onRenderHud(HudRenderEvent event) {
         if (!isEditingHud()) {
             for (HudElement element : elements) {
-                element.render(event.context, 0, 0, event.tickCounter.getTickDelta(true));
+                element.render(event.context, 0, 0, event.tickCounter.getTickProgress(true));
             }
         }
     }

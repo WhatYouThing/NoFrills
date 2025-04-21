@@ -48,9 +48,9 @@ public class EtherwarpOverlay {
         NbtCompound data = Utils.getCustomData(mc.player.getMainHandStack());
         String itemId = Utils.getSkyblockId(data);
         if (data != null && !itemId.isEmpty()) {
-            if (data.getByte("ethermerge") == 1 && mc.options.sneakKey.isPressed()) {
+            if (data.getByte("ethermerge").orElse((byte) 0) == 1 && mc.options.sneakKey.isPressed()) {
                 if (itemId.equals("ASPECT_OF_THE_END") || itemId.equals("ASPECT_OF_THE_VOID")) {
-                    return baseDistance + (data.contains("tuned_transmission") ? data.getInt("tuned_transmission") : 0);
+                    return baseDistance + data.getInt("tuned_transmission").orElse(0);
                 }
             } else if (itemId.equals("ETHERWARP_CONDUIT")) {
                 return baseDistance;
@@ -64,7 +64,7 @@ public class EtherwarpOverlay {
         if (Config.overlayEtherwarp) {
             int dist = getWarpDistance();
             if (dist > 0) {
-                HitResult hitResult = Utils.raycastFullBlock(mc.player, dist, event.tickCounter.getTickDelta(true));
+                HitResult hitResult = Utils.raycastFullBlock(mc.player, dist, event.tickCounter.getTickProgress(true));
                 if (hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHitResult) {
                     BlockPos pos = blockHitResult.getBlockPos();
                     Box box = Box.enclosing(pos, pos);

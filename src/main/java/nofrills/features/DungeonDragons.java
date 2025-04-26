@@ -139,7 +139,7 @@ public class DungeonDragons {
                     event.drawText(drag.data.pos.getCenter().add(0, 4, 0), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.3f, true, drag.data.color);
                 }
                 if (Config.dragHealth && drag.entity != null) {
-                    Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickDelta(true)); // should make the text move smoothly with the dragons
+                    Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickProgress(true)); // should make the text move smoothly with the dragons
                     event.drawText(pos, Text.of(decimalFormat.format(drag.health * 0.000001) + "M"), 0.2f, true, drag.data.color);
                 }
             }

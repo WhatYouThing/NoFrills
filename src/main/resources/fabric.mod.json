@@ -3,7 +3,7 @@
   "id": "nofrills",
   "version": "${version}",
   "name": "NoFrills",
-  "description": "It's in the name. Simple and effective Hypixel Skyblock mod for modern versions of Minecraft. ",
+  "description": "It's in the name. Simple and effective Hypixel Skyblock mod for modern versions of Minecraft.",
   "authors": [
     "WhatYouThing"
   ],
@@ -25,9 +25,9 @@
     "nofrills.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.9",
+    "fabricloader": ">=0.16.14",
     "fabric-api": "*",
-	  "minecraft": "1.21.4",
+    "minecraft": "1.21.5",
     "java": ">=21",
     "yet_another_config_lib_v3": "*"
   }

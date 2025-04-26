@@ -13,7 +13,7 @@ import static nofrills.Main.eventBus;
 
 @Mixin(World.class)
 public abstract class WorldMixin {
-    @Inject(method = "onBlockChanged", at = @At(value = "TAIL"))
+    @Inject(method = "onBlockStateChanged", at = @At(value = "TAIL"))
     private void onBlockChanged(BlockPos pos, BlockState oldBlock, BlockState newBlock, CallbackInfo ci) {
         eventBus.post(new BlockUpdateEvent(pos, oldBlock, newBlock));
     }

@@ -18,7 +18,7 @@ public class TerrorFix {
 
     private static int countPieces() {
         int pieces = 0;
-        for (ItemStack piece : mc.player.getArmorItems()) {
+        for (ItemStack piece : Utils.getEntityArmor(mc.player)) {
             String pieceName = Formatting.strip(piece.getName().getString());
             if (pieceName.contains("Terror")) {
                 pieces++;

@@ -50,14 +50,14 @@ public class NoFrillsAPI {
     }
 
     private static String parseItemId(NbtCompound data) {
-        String itemId = data.getString("id");
-        if (itemId == null || itemId.isEmpty()) {
+        String itemId = data.getString("id").orElse("");
+        if (itemId.isEmpty()) {
             return "";
         }
         switch (itemId) {
             case "PET" -> {
                 if (data.contains("petInfo")) {
-                    JsonObject petData = JsonParser.parseString(data.getString("petInfo")).getAsJsonObject();
+                    JsonObject petData = JsonParser.parseString(data.getString("petInfo").orElse("")).getAsJsonObject();
                     return petData.get("type").getAsString() + "_PET_" + petData.get("tier").getAsString();
                 } else {
                     return "UNKNOWN_PET";
@@ -65,7 +65,7 @@ public class NoFrillsAPI {
             }
             case "RUNE" -> {
                 if (data.contains("runes")) {
-                    NbtCompound runeData = data.getCompound("runes");
+                    NbtCompound runeData = data.getCompound("runes").orElse(null);
                     String runeId = (String) runeData.getKeys().toArray()[0];
                     return runeId + "_" + runeData.getInt(runeId) + "_RUNE";
                 } else {
@@ -74,11 +74,11 @@ public class NoFrillsAPI {
             }
             case "ENCHANTED_BOOK" -> {
                 if (data.contains("enchantments")) {
-                    NbtCompound enchantData = data.getCompound("enchantments");
+                    NbtCompound enchantData = data.getCompound("enchantments").orElse(null);
                     Set<String> enchants = enchantData.getKeys();
                     if (enchants.size() == 1) {
                         String enchantId = (String) enchantData.getKeys().toArray()[0];
-                        int enchantLevel = enchantData.getInt(enchantId);
+                        int enchantLevel = enchantData.getInt(enchantId).orElse(0);
                         itemId = "ENCHANTMENT_" + enchantId.toUpperCase() + "_" + enchantLevel;
                     }
                 } else {
@@ -186,10 +186,10 @@ public class NoFrillsAPI {
                     event.addLine(Text.of(msg));
                 }
                 if (event.customData.contains("attributes") && attributePrices != null) {
-                    NbtCompound attributeData = event.customData.getCompound("attributes");
+                    NbtCompound attributeData = event.customData.getCompound("attributes").orElse(null);
                     Set<String> attributes = attributeData.getKeys();
                     for (String attribute : attributes) {
-                        int level = attributeData.getInt(attribute);
+                        int level = attributeData.getInt(attribute).orElse(0);
                         for (int i = level; i >= 1; i--) {
                             if (attributePrices.has(attribute + i)) {
                                 JsonObject prices = attributePrices.getAsJsonObject(attribute + i);

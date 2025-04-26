@@ -32,7 +32,7 @@ public class MiningFeatures {
     private static String skyMallBuff = "";
 
     private static boolean isWearingMiningPiece() {
-        for (ItemStack armor : mc.player.getArmorItems()) {
+        for (ItemStack armor : Utils.getEntityArmor(mc.player)) {
             LoreComponent lore = armor.getComponents().get(DataComponentTypes.LORE);
             if (lore != null) {
                 for (Text line : lore.lines()) {

@@ -58,7 +58,7 @@ public class ClientPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onPlaySound", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;playSound(Lnet/minecraft/entity/player/PlayerEntity;DDDLnet/minecraft/registry/entry/RegistryEntry;Lnet/minecraft/sound/SoundCategory;FFJ)V"), cancellable = true)
+    @Inject(method = "onPlaySound", at = @At("HEAD"), cancellable = true)
     private void onPlaySound(PlaySoundS2CPacket packet, CallbackInfo ci) {
         if (eventBus.post(new PlaySoundEvent(packet)).isCancelled()) {
             ci.cancel();

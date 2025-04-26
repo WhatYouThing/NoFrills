@@ -15,6 +15,7 @@ import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -102,12 +103,12 @@ public class Utils {
     }
 
     public static void infoButton(String message, String command) {
-        ClickEvent click = new ClickEvent(ClickEvent.Action.RUN_COMMAND, command);
+        ClickEvent click = new ClickEvent.RunCommand(command);
         mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r " + message + "§r").setStyle(Style.EMPTY.withClickEvent(click)), null, noFrillsIndicator);
     }
 
     public static void infoLink(String message, String url) {
-        ClickEvent click = new ClickEvent(ClickEvent.Action.OPEN_URL, url);
+        ClickEvent click = new ClickEvent.OpenUrl(URI.create(url));
         mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r " + message + "§r").setStyle(Style.EMPTY.withClickEvent(click)), null, noFrillsIndicator);
     }
 
@@ -238,6 +239,18 @@ public class Utils {
     }
 
     /**
+     * Returns the armor that the entity is wearing.
+     */
+    public static List<ItemStack> getEntityArmor(LivingEntity entity) {
+        return List.of(
+                entity.getEquippedStack(EquipmentSlot.HEAD),
+                entity.getEquippedStack(EquipmentSlot.CHEST),
+                entity.getEquippedStack(EquipmentSlot.LEGS),
+                entity.getEquippedStack(EquipmentSlot.FEET)
+        );
+    }
+
+    /**
      * Returns the custom data compound of the provided ItemStack, or else null.
      */
     public static NbtCompound getCustomData(ItemStack stack) {
@@ -255,7 +268,7 @@ public class Utils {
      */
     public static String getSkyblockId(NbtCompound customData) {
         if (customData != null && customData.contains("id")) {
-            return customData.getString("id");
+            return customData.getString("id").orElse("");
         }
         return "";
     }

@@ -54,6 +54,7 @@ public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0xff5555, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     public static final Pattern partyMessagePattern = Pattern.compile("Party > .*: .*");
     private static final Random soundRandom = Random.create(0);
+    private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private static final List<String> abilityWhitelist = List.of(
             "SUPERBOOM_TNT",
             "INFINITE_SUPERBOOM_TNT",
@@ -113,6 +114,10 @@ public class Utils {
 
     public static void infoRaw(Text message) {
         mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r ").append(message).append("§r"), null, noFrillsIndicator);
+    }
+
+    public static void infoFormat(String message, Object... values) {
+        mc.inGameHud.getChatHud().addMessage(Text.of("§c[NoFrills]§r " + format(message, values) + "§r"), null, noFrillsIndicator);
     }
 
     /**
@@ -475,6 +480,10 @@ public class Utils {
         return list;
     }
 
+    public static ItemStack getHeldItem() {
+        return mc.player != null ? mc.player.getMainHandStack() : ItemStack.EMPTY;
+    }
+
     private static int romanToInt(Character roman) {
         return switch (Character.toUpperCase(roman)) {
             case 'I' -> 1;
@@ -513,6 +522,31 @@ public class Utils {
     }
 
     /**
+     * Formats the string by replacing each set of curly brackets "{}" with one of the values in order, similarly to Rust's format macro.
+     */
+    public static String format(String string, Object... values) {
+        int lastIndex = 0;
+        Iterator<Object> iterator = Arrays.stream(values).iterator();
+        while (iterator.hasNext()) {
+            Object value = iterator.next();
+            int bracket = string.indexOf("{}", lastIndex);
+            if (bracket != -1) {
+                string = string.substring(0, bracket) + (value + "") + string.substring(bracket + 2);
+                lastIndex = bracket + 2;
+            }
+        }
+        return string;
+    }
+
+    public static String formatDecimal(double number) {
+        return decimalFormat.format(number);
+    }
+
+    public static String formatDecimal(float number) {
+        return decimalFormat.format(number);
+    }
+
+    /**
      * Attempts to calculate the actual health value from the provided Entity's (max) health. Mostly applies to bosses or anything that has millions of HP, because their actual health value is reduced.
      */
     public static float getTrueHealth(float health) {
@@ -545,6 +579,7 @@ public class Utils {
         public static String vampLow = "҉";
         public static String check = "✔";
         public static String cross = "✖";
+        public static String bingo = "Ⓑ";
     }
 
     public static class Keybinds {

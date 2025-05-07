@@ -2,17 +2,21 @@ package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.ChestBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.BlockPos;
 import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.InteractBlockEvent;
+import nofrills.events.InteractItemEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
@@ -61,9 +65,8 @@ public class MiningFeatures {
         return SkyblockData.getLines().stream().filter(MiningFeatures::isMonth).findFirst().orElse("Unknown Day").trim();
     }
 
-    private static boolean isChest(PlayerInteractBlockC2SPacket packet) {
-        Block block = mc.world.getBlockState(packet.getBlockHitResult().getBlockPos()).getBlock();
-        return block.equals(Blocks.CHEST) || block.equals(Blocks.TRAPPED_CHEST);
+    private static boolean pickobulusCheck() {
+        return Config.safePickobulus && (Utils.isOnPrivateIsland() || Utils.isInGarden()) && Utils.getRightClickAbility(Utils.getHeldItem()).contains("Pickobulus");
     }
 
     @EventHandler
@@ -104,6 +107,26 @@ public class MiningFeatures {
                     skyMallBuff = message;
                     skyMallTicks = 50;
                 }
+                event.cancel();
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onUseItem(InteractItemEvent event) {
+        if (pickobulusCheck()) {
+            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS.value(), SoundCategory.MASTER, 1.0f, 0.0f);
+            event.cancel();
+        }
+    }
+
+    @EventHandler
+    private static void onUseBlock(InteractBlockEvent event) {
+        if (pickobulusCheck()) {
+            BlockPos pos = event.blockHitResult.getBlockPos();
+            Block block = mc.world.getBlockState(pos).getBlock();
+            if (!(block instanceof ChestBlock)) {
+                Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS.value(), SoundCategory.MASTER, 1.0f, 0.0f);
                 event.cancel();
             }
         }

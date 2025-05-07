@@ -9,6 +9,7 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 import nofrills.config.Config;
 import nofrills.events.*;
+import nofrills.hud.HudManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,12 +53,16 @@ public class SkyblockData {
             "Tank"
     );
     private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
+    public static double dungeonPower = 0;
     private static String location = "";
     private static String area = "";
     private static boolean inSkyblock = false;
     private static boolean instanceOver = false;
     private static List<String> lines = new ArrayList<>();
     private static boolean showPing = false;
+    private static int pingTicks = 0;
+    private static int serverTicks = 0;
+    private static int serverTickTimer = 0;
 
     private static void updateDungeonClass(String msg) {
         if (mc.player != null) {
@@ -70,6 +75,19 @@ public class SkyblockData {
                 }
             }
         }
+    }
+
+    private static double updateDungeonPower() {
+        double total = 0;
+        for (String line : Utils.getFooterLines()) {
+            if (line.startsWith("Blessing of Power")) {
+                total += Utils.parseRoman(line.replace("Blessing of Power", "").trim());
+            }
+            if (line.startsWith("Blessing of Time")) {
+                total += 0.5 * Utils.parseRoman(line.replace("Blessing of Time", "").trim());
+            }
+        }
+        return total;
     }
 
     /**
@@ -101,13 +119,17 @@ public class SkyblockData {
         return new ArrayList<>(lines); // return a copy to avoid a potential concurrent modification exception
     }
 
-    public static void showPing() {
-        showPing = true;
+    public static void sendPing() {
         mc.getNetworkHandler().sendPacket(new QueryPingC2SPacket(Util.getMeasuringTimeMs()));
     }
 
+    public static void showPing() {
+        showPing = true;
+        sendPing();
+    }
+
     @EventHandler
-    public static void onTabList(TabListUpdateEvent event) {
+    private static void onTabList(TabListUpdateEvent event) {
         for (PlayerListS2CPacket.Entry entry : event.entries) {
             String name = Formatting.strip(entry.displayName().getString()).trim();
             if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
@@ -118,7 +140,7 @@ public class SkyblockData {
     }
 
     @EventHandler
-    public static void onObjective(ObjectiveUpdateEvent event) {
+    private static void onObjective(ObjectiveUpdateEvent event) {
         Scoreboard scoreboard = mc.player.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
         if (objective != null) {
@@ -127,7 +149,7 @@ public class SkyblockData {
     }
 
     @EventHandler
-    public static void onScoreboard(ScoreboardUpdateEvent event) {
+    private static void onScoreboard(ScoreboardUpdateEvent event) {
         List<String> currentLines = new ArrayList<>();
         Scoreboard scoreboard = mc.player.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
@@ -153,7 +175,7 @@ public class SkyblockData {
     }
 
     @EventHandler
-    public static void onChat(ChatMsgEvent event) {
+    private static void onChat(ChatMsgEvent event) {
         if (Utils.isInDungeons() && !instanceOver) {
             if (scoreRegex.matcher(event.messagePlain.trim()).matches()) {
                 instanceOver = true;
@@ -165,21 +187,70 @@ public class SkyblockData {
     }
 
     @EventHandler
-    public static void onJoinServer(ServerJoinEvent event) {
-        if (instanceOver) {
-            instanceOver = false;
-        }
+    private static void onJoinServer(ServerJoinEvent event) {
+        instanceOver = false;
         inSkyblock = false;
         location = "";
         area = "";
         lines.clear();
+        pingTicks = 0;
+        HudManager.lagMeterElement.setTickTime(0); // temporarily disables the element, as the server doesn't send tick packets for a few seconds after joining
+        serverTicks = 0;
+        serverTickTimer = 0;
+        HudManager.tpsElement.setTps(0);
     }
 
     @EventHandler
-    public static void onPing(ReceivePacketEvent event) {
-        if (showPing && event.packet instanceof PingResultS2CPacket pingPacket) {
-            Utils.info("§aPing: " + (Util.getMeasuringTimeMs() - pingPacket.startTime()) + "ms");
-            showPing = false;
+    private static void onPing(ReceivePacketEvent event) {
+        if (event.packet instanceof PingResultS2CPacket pingPacket) {
+            long ping = Util.getMeasuringTimeMs() - pingPacket.startTime();
+            if (showPing) {
+                Utils.infoFormat("§aPing: §f{}§7ms", ping);
+                showPing = false;
+            }
+            if (Config.pingEnabled) {
+                HudManager.pingElement.setPing(ping);
+            }
+            pingTicks = 0;
+        }
+    }
+
+    @EventHandler
+    private static void onWorldTick(WorldTickEvent event) {
+        if (Utils.isInDungeons()) {
+            dungeonPower = updateDungeonPower();
+        } else if (dungeonPower != 0) {
+            dungeonPower = 0;
+        }
+        if (Config.powerEnabled) {
+            HudManager.powerElement.setPower(dungeonPower);
+        }
+        if (Config.dayEnabled) {
+            HudManager.dayElement.setDay(mc.world.getTimeOfDay() / 24000L);
+        }
+        if (Config.pingEnabled && pingTicks <= 20) { // pings every second when element is enabled, waits until ping result is received
+            pingTicks++;
+            if (pingTicks == 20) {
+                sendPing();
+            }
+        }
+        if (Config.tpsEnabled) {
+            serverTickTimer++;
+            if (serverTickTimer == 20) {
+                HudManager.tpsElement.setTps(serverTicks);
+                serverTicks = 0;
+                serverTickTimer = 0;
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onServerTick(ServerTickEvent event) {
+        if (Config.lagMeterEnabled) {
+            HudManager.lagMeterElement.setTickTime(Util.getMeasuringTimeMs());
+        }
+        if (Config.tpsEnabled) {
+            serverTicks++;
         }
     }
 

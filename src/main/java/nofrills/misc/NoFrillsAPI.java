@@ -141,8 +141,8 @@ public class NoFrillsAPI {
             if (refreshTicks == 0) {
                 if (mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
                     refreshItemPricing();
+                    refreshTicks = 1200;
                 }
-                refreshTicks = 1200;
             } else {
                 refreshTicks--;
             }

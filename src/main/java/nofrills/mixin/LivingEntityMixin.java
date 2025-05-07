@@ -16,8 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import static nofrills.Main.mc;
-
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
     @ModifyExpressionValue(method = "travelInFluid", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
@@ -63,7 +61,7 @@ public abstract class LivingEntityMixin {
     @Inject(method = "getAttributeValue", at = @At(value = "HEAD"), cancellable = true)
     private void getBreakSpeed(RegistryEntry<EntityAttribute> attribute, CallbackInfoReturnable<Double> cir) {
         if (Utils.isFixEnabled(Config.efficiencyFix) && Utils.isSelf(this) && attribute.getIdAsString().equals("minecraft:mining_efficiency")) {
-            ItemStack stack = mc.player.getMainHandStack();
+            ItemStack stack = Utils.getHeldItem();
             ItemEnchantmentsComponent enchants = stack.getComponents().get(DataComponentTypes.ENCHANTMENTS);
             if (enchants != null) {
                 for (RegistryEntry<Enchantment> enchant : enchants.getEnchantments()) {

@@ -15,6 +15,7 @@ import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.text.DecimalFormat;
@@ -51,16 +52,7 @@ public class DungeonDragons {
     }
 
     private static double getPowerLevel() {
-        double total = 0;
-        for (String line : Utils.getFooterLines()) {
-            if (line.startsWith("Blessing of Power")) {
-                total += Utils.parseRoman(line.replace("Blessing of Power", "").trim());
-            }
-            if (line.startsWith("Blessing of Time")) {
-                total += 0.5 * Utils.parseRoman(line.replace("Blessing of Time", "").trim());
-            }
-        }
-        return total;
+        return SkyblockData.dungeonPower;
     }
 
     private static List<SpawnedDragon> getSpawnedDragons() {

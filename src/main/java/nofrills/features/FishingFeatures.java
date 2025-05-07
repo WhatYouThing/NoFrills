@@ -1,17 +1,13 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.entity.mob.GiantEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import nofrills.config.Config;
 import nofrills.events.*;
+import nofrills.hud.HudManager;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
@@ -89,28 +85,11 @@ public class FishingFeatures {
             SeaCreature.plain("Fireproof Witch"),
     };
     private static final RenderColor rareColor = new RenderColor(255, 170, 0, 0);
+    private static Entity bobberHologram = null;
     private static int notifyTicks = 0;
 
     private static boolean isValidMob(Entity ent) {
-        return !Rendering.Entities.isDrawingGlow(ent) && Utils.isMob(ent);
-    }
-
-    private static boolean isHoldingRod() {
-        if (mc.player != null) {
-            ItemStack stack = mc.player.getMainHandStack();
-            if (stack != null && !stack.isEmpty() && stack.getItem().equals(Items.FISHING_ROD)) {
-                LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
-                if (lore != null) {
-                    for (Text line : lore.lines()) {
-                        String lineClean = Formatting.strip(line.getString());
-                        if (lineClean.startsWith("Sea Creature Chance:")) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+        return !Rendering.Entities.isDrawingGlow(ent) && Utils.isMob(ent) && !(ent instanceof GiantEntity);
     }
 
     @EventHandler
@@ -123,6 +102,9 @@ public class FishingFeatures {
                 }
             }
             int count = seaCreatures.size();
+            if (Config.seaCreaturesEnabled) {
+                HudManager.seaCreaturesElement.setCount(count);
+            }
             if (count >= Config.capTarget && notifyTicks == 0) {
                 if (Config.capSendMsg && !Config.capMsg.isEmpty()) {
                     Utils.sendMessage(Config.capMsg);
@@ -139,8 +121,12 @@ public class FishingFeatures {
                 notifyTicks--;
             }
         }
-        if (Config.capRender && !seaCreatures.isEmpty() && isHoldingRod()) {
-            Utils.showTitleCustom(String.valueOf(seaCreatures.size()), 1, 5, 2.0f, 0x00aaaa);
+        if (Config.bobberEnabled) {
+            if (mc.player.fishHook != null && (bobberHologram == null || !bobberHologram.isAlive())) {
+                HudManager.bobberElement.setActive();
+            } else if (mc.player.fishHook == null) {
+                HudManager.bobberElement.setInactive();
+            }
         }
     }
 
@@ -165,6 +151,12 @@ public class FishingFeatures {
                         }
                     }
                 }
+            }
+        }
+        if (Config.bobberEnabled && event.namePlain.length() == 3) {
+            if (event.namePlain.equals("!!!") || event.namePlain.indexOf(".") == 1) {
+                bobberHologram = event.entity;
+                HudManager.bobberElement.setTimer(event.namePlain);
             }
         }
     }

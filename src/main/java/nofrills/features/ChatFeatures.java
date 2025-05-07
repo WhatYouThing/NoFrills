@@ -1,7 +1,6 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
@@ -37,47 +36,40 @@ public class ChatFeatures {
         }
     }
 
-    private static boolean isCharValid(String character) {
-        return Character.isDigit(character.charAt(0)) || character.equals("-") || character.equals(".");
+    private static boolean isPlayerValid(String name) {
+        if (mc.player != null && mc.player.getName().getString().equals(name)) {
+            return false;
+        }
+        if (mc.getNetworkHandler() != null) {
+            PlayerListEntry entry = mc.getNetworkHandler().getPlayerListEntry(name);
+            return entry != null;
+        }
+        return false;
     }
 
     private static void highlightCoords(String message, String sender, boolean party) {
-        StringBuilder lastCoord = new StringBuilder();
-        int lastCoordEnd = -1;
         List<Double> coords = new ArrayList<>();
-        for (int i = 0; i < message.length(); i++) {
-            if (lastCoordEnd != -1 && i > lastCoordEnd + 6) {
-                coords.clear();
-                lastCoordEnd = -1;
-                lastCoord = new StringBuilder();
+        boolean skipNextError = false;
+        for (String coord : message.split(" ")) {
+            if (coord.endsWith(",") && coord.indexOf(",") == coord.lastIndexOf(",")) { // remove comma from patcher format
+                coord = coord.replace(",", "");
+                skipNextError = true;
             }
-            char character = message.charAt(i);
-            String charString = Character.toString(character);
-            if (isCharValid(charString)) {
-                lastCoord.append(charString);
-                lastCoordEnd = -1;
-            }
-            if (i < message.length() - 1) {
-                if (isCharValid(Character.toString(message.charAt(i + 1)))) {
-                    continue;
-                }
-            }
-            if (!lastCoord.isEmpty()) {
-                try {
-                    double coord = Double.parseDouble(lastCoord.toString());
-                    coords.add(coord);
-                } catch (NumberFormatException e) {
+            try {
+                coords.add(Double.parseDouble(coord));
+            } catch (NumberFormatException e) {
+                if (!skipNextError) {
                     coords.clear();
                 }
-                lastCoordEnd = i;
-                lastCoord = new StringBuilder();
+                skipNextError = false;
             }
-        }
-        if (coords.size() == 3) {
-            int x = (int) Math.floor(coords.getFirst()), y = (int) Math.floor(coords.get(1)), z = (int) Math.floor(coords.get(2));
-            int duration = party ? Config.partyWaypointTime * 20 : Config.chatWaypointTime * 20;
-            waypointList.removeIf(waypoint -> waypoint.name.equals(sender));
-            waypointList.add(new PlayerWaypoint(sender, new BlockPos(x, y, z), duration, party));
+            if (coords.size() == 3) {
+                int x = (int) Math.floor(coords.getFirst()), y = (int) Math.floor(coords.get(1)), z = (int) Math.floor(coords.get(2));
+                int duration = party ? Config.partyWaypointTime * 20 : Config.chatWaypointTime * 20;
+                waypointList.removeIf(waypoint -> waypoint.name.equals(sender));
+                waypointList.add(new PlayerWaypoint(sender, new BlockPos(x, y, z), duration, party));
+                break;
+            }
         }
     }
 
@@ -85,19 +77,15 @@ public class ChatFeatures {
     private static void onMessage(ChatMsgEvent event) {
         String msg = event.getPlainMessage();
         if (Config.chatWaypoints) {
-            if (msg.startsWith("[NPC]") || msg.startsWith("[BOSS]") || msg.startsWith("Guild > ")) {
+            if (msg.startsWith("[NPC]") || msg.startsWith("[BOSS]") || msg.startsWith("Guild > ") || msg.startsWith("Party > ")) {
                 return;
             }
             int msgStart = msg.indexOf(":");
             if (msgStart != -1) {
                 String senderInfo = msg.substring(0, msgStart);
                 String sender = senderInfo.contains(" ") ? Arrays.stream(senderInfo.split(" ")).toList().getLast().trim() : senderInfo;
-                ClientPlayNetworkHandler handler = mc.getNetworkHandler();
-                if (handler != null && mc.player != null && !mc.player.getName().getString().equals(sender)) {
-                    PlayerListEntry entry = handler.getPlayerListEntry(sender);
-                    if (entry != null) {
-                        highlightCoords(msg.substring(msgStart), sender, false);
-                    }
+                if (isPlayerValid(sender)) {
+                    highlightCoords(msg.substring(msgStart), sender, false);
                 }
             }
         }

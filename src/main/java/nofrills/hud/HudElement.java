@@ -14,6 +14,8 @@ public class HudElement implements Drawable {
     public double maxY = 0;
     public double snapX = 1;
     public double snapY = 1;
+    public boolean enabled = false;
+    public boolean hidden = false;
 
     public HudElement(double posX, double posY, double sizeX, double sizeY) {
         this.posX = posX;
@@ -34,7 +36,7 @@ public class HudElement implements Drawable {
             newX = Math.clamp(newX, 0, context.getScaledWindowWidth());
             newY = Math.clamp(newY, 0, context.getScaledWindowHeight());
         }
-        double newMaxX = newX + (maxX - minX);
+        double newMaxX = this instanceof SimpleTextElement textElement && textElement.leftHand ? newX - (maxX - minX) : newX + (maxX - minX);
         double newMaxY = newY + (maxY - minY);
         if (!isInBounds(context, newMaxX, newMaxY)) {
             newX -= newMaxX - Math.clamp(newMaxX, 0, context.getScaledWindowWidth());
@@ -72,11 +74,15 @@ public class HudElement implements Drawable {
     }
 
     public boolean isHovered(double mouseX, double mouseY) {
-        return mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY;
+        return mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY && shouldRender();
     }
 
     public boolean isInBounds(DrawContext context, double x, double y) {
         return x >= 0 && x <= context.getScaledWindowWidth() && y >= 0 && y <= context.getScaledWindowHeight();
+    }
+
+    public boolean shouldRender() {
+        return this.enabled && (!this.hidden || HudManager.isEditingHud());
     }
 }
 

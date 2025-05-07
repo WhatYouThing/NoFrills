@@ -34,7 +34,8 @@ public class MiddleClickOverride {
             "Convert to Dungeon Item",
             "Upgrade Item",
             "Salvage Items",
-            "Auctions Browser"
+            "Auctions Browser",
+            Utils.format("A{}iphone", Utils.Symbols.bingo)
     );
 
     private static final List<String> containBlacklist = List.of(

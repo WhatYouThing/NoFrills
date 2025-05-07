@@ -45,7 +45,7 @@ public class EtherwarpOverlay {
     }
 
     private static int getWarpDistance() {
-        NbtCompound data = Utils.getCustomData(mc.player.getMainHandStack());
+        NbtCompound data = Utils.getCustomData(Utils.getHeldItem());
         String itemId = Utils.getSkyblockId(data);
         if (data != null && !itemId.isEmpty()) {
             if (data.getByte("ethermerge") == 1 && mc.options.sneakKey.isPressed()) {

@@ -21,6 +21,7 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        context.drawCenteredTextWithShadow(mc.textRenderer, "NoFrills HUD Editor", context.getScaledWindowWidth() / 2, 10, 0xffffff);
         boolean clicked = isLeftClickPressed();
         for (HudElement element : HudManager.elements) {
             element.render(context, mouseX, mouseY, delta);

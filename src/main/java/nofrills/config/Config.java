@@ -3,6 +3,7 @@ package nofrills.config;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
+import dev.isxander.yacl3.api.controller.DoubleSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.FloatSliderControllerBuilder;
 import dev.isxander.yacl3.api.controller.IntegerSliderControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
@@ -160,6 +161,69 @@ public class Config {
     @SerialEntry
     public static boolean calendarDate = false;
 
+    // HUD
+
+    @SerialEntry
+    public static boolean bobberEnabled = false;
+    @SerialEntry
+    public static boolean bobberLeftHand = false;
+    @SerialEntry
+    public static double bobberPosX = 0.01;
+    @SerialEntry
+    public static double bobberPosY = 0.1;
+    @SerialEntry
+    public static boolean seaCreaturesEnabled = false;
+    @SerialEntry
+    public static boolean seaCreaturesLeftHand = false;
+    @SerialEntry
+    public static double seaCreaturesPosX = 0.01;
+    @SerialEntry
+    public static double seaCreaturesPosY = 0.13;
+    @SerialEntry
+    public static boolean tpsEnabled = false;
+    @SerialEntry
+    public static boolean tpsLeftHand = false;
+    @SerialEntry
+    public static double tpsPosX = 0.01;
+    @SerialEntry
+    public static double tpsPosY = 0.04;
+    @SerialEntry
+    public static boolean lagMeterEnabled = false;
+    @SerialEntry
+    public static int lagMeterMinTime = 500;
+    @SerialEntry
+    public static boolean lagMeterLeftHand = false;
+    @SerialEntry
+    public static double lagMeterPosX = 0.01;
+    @SerialEntry
+    public static double lagMeterPosY = 0.19;
+    @SerialEntry
+    public static boolean powerEnabled = false;
+    @SerialEntry
+    public static boolean powerDungeonsOnly = false;
+    @SerialEntry
+    public static boolean powerLeftHand = false;
+    @SerialEntry
+    public static double powerPosX = 0.01;
+    @SerialEntry
+    public static double powerPosY = 0.16;
+    @SerialEntry
+    public static boolean dayEnabled = false;
+    @SerialEntry
+    public static boolean dayLeftHand = false;
+    @SerialEntry
+    public static double dayPosX = 0.01;
+    @SerialEntry
+    public static double dayPosY = 0.07;
+    @SerialEntry
+    public static boolean pingEnabled = false;
+    @SerialEntry
+    public static boolean pingLeftHand = false;
+    @SerialEntry
+    public static double pingPosX = 0.01;
+    @SerialEntry
+    public static double pingPosY = 0.01;
+
     // Fishing
 
     @SerialEntry
@@ -168,8 +232,6 @@ public class Config {
     public static int capTarget = 50;
     @SerialEntry
     public static int capDelay = 30;
-    @SerialEntry
-    public static boolean capRender = false;
     @SerialEntry
     public static boolean capSendMsg = false;
     @SerialEntry
@@ -360,12 +422,17 @@ public class Config {
         return FloatSliderControllerBuilder.create(option).range(min, max).step(step).formatValue(value -> Text.of(floatSliderFormat.format(value)));
     }
 
+    public static DoubleSliderControllerBuilder doubleSliderController(Option<Double> option, double min, double max, double step) {
+        return DoubleSliderControllerBuilder.create(option).range(min, max).step(step).formatValue(value -> Text.of(floatSliderFormat.format(value)));
+    }
+
     public static Screen getConfigScreen(Screen parent) {
         return YetAnotherConfigLib.create(configHandler, (defaults, config, builder) -> builder
                 .title(Text.of("NoFrills Config"))
                 .category(General.create(defaults, config))
                 .category(Fixes.create(defaults, config))
                 .category(Events.create(defaults, config))
+                .category(Hud.create(defaults, config))
                 .category(Fishing.create(defaults, config))
                 .category(Dungeons.create(defaults, config))
                 .category(Kuudra.create(defaults, config))

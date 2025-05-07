@@ -6,21 +6,18 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.WorldRenderEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 import nofrills.mixin.BossBarHudAccessor;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +25,6 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class KuudraFeatures {
-    private static final DecimalFormat kuudraHealthFormat = new DecimalFormat("0.00");
     private static final PickupSpot[] supplyPickupSpots = {
             // data borrowed from odin
             // originally i tried my own solution, but it was such voodoo that terry davis would resurrect himself to witness it
@@ -41,9 +37,10 @@ public class KuudraFeatures {
             new PickupSpot("Equals", new Vec3d(-65.5, 76.0, -87.5), 18.0f, 15.0f, null),
     };
     private static final List<Float> dpsData = new ArrayList<>();
-    private static final RenderColor kuudraColor = RenderColor.fromHex(0xffff00, 0.67f);
-    private static final BlockPos stunPos = new BlockPos(-169, 26, -167);
-    private static final Box stunBox = Box.enclosing(stunPos, stunPos);
+    private static final Box stunBox = Box.enclosing(new BlockPos(-169, 26, -167), new BlockPos(-169, 26, -167));
+    private static final List<Entity> supplies = new ArrayList<>();
+    private static final List<Entity> dropOffs = new ArrayList<>();
+    private static final List<Entity> buildPiles = new ArrayList<>();
     private static int freshTicks = 0;
     private static int missingTicks = 20;
     private static float previousHealth = 0.0f;
@@ -101,8 +98,9 @@ public class KuudraFeatures {
     }
 
     @EventHandler
-    public static void onTick(WorldTickEvent event) {
+    private static void onTick(WorldTickEvent event) {
         if (Utils.isInKuudra()) {
+            RenderColor color = RenderColor.fromColor(Config.kuudraColor);
             kuudraPhases phase = getCurrentPhase();
             if (phase == kuudraPhases.Starting) {
                 return;
@@ -147,9 +145,7 @@ public class KuudraFeatures {
                 }
             }
             if (freshTicks > 0 && phase == kuudraPhases.Build) {
-                int seconds = freshTicks / 20;
-                Utils.showTitleCustom("FRESH: " + seconds + "s", 1, 25, 2.5f, 0x55ff55);
-                freshTicks--;
+                Utils.showTitleCustom(Utils.format("FRESH: {}s", Utils.formatDecimal(freshTicks / 20f)), 1, 25, 2.5f, 0x55ff55);
             }
             if (Config.kuudraStunWaypoint) {
                 isStunning = phase == kuudraPhases.DPS && mc.player.getPos().getY() <= 60;
@@ -160,34 +156,27 @@ public class KuudraFeatures {
                     Collection<ClientBossBar> bossBars = ((BossBarHudAccessor) mc.inGameHud.getBossBarHud()).getBossBars().values();
                     if (!bossBars.isEmpty()) {
                         float health = ((ClientBossBar) bossBars.toArray()[0]).getPercent();
-                        Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health * 100) + "% HP", 1, 25, 2.5f, 0xffff00);
+                        Utils.showTitleCustom(Utils.format("KUUDRA: {}% HP", Utils.formatDecimal(health * 100)), 1, 25, 2.5f, color.hex);
                     }
                 }
                 updateKuudraEntity();
             } else {
                 if (Config.kuudraHitbox && !Rendering.Entities.isDrawingOutline(kuudraEntity)) {
-                    Rendering.Entities.drawOutline(kuudraEntity, true, new RenderColor(255, 255, 0, 255));
+                    Rendering.Entities.drawOutline(kuudraEntity, true, color);
                 }
                 if (Config.kuudraHealth && phase == kuudraPhases.DPS) {
                     float health = kuudraEntity.getHealth() / kuudraEntity.getMaxHealth();
-                    Utils.showTitleCustom("KUUDRA: " + kuudraHealthFormat.format(health) + "% HP", 1, 25, 2.5f, 0xffff00);
+                    Utils.showTitleCustom(Utils.format("KUUDRA: {}% HP", Utils.formatDecimal(health)), 1, 25, 2.5f, color.hex);
                 }
                 if (Config.kuudraDPS && phase == kuudraPhases.Lair && !Utils.isInstanceOver()) {
-                    float health = Utils.getTrueHealth(kuudraEntity.getHealth());
-                    float damage = Math.clamp(previousHealth - health, 0, 240_000_000);
-                    dpsData.add(damage);
-                    if (dpsData.size() > 100) {
-                        dpsData.removeFirst();
-                    }
-                    Utils.showTitleCustom("DPS: " + kuudraHealthFormat.format(calculateDPS() * 20 * 0.000001) + "M", 1, 25, 2.5f, 0xffff00);
-                    previousHealth = health;
+                    Utils.showTitleCustom(Utils.format("DPS: {}M", Utils.formatDecimal(calculateDPS() * 20 * 0.000001)), 1, 25, 2.5f, color.hex);
                 }
             }
         }
     }
 
     @EventHandler
-    public static void onChatMsg(ChatMsgEvent event) {
+    private static void onChatMsg(ChatMsgEvent event) {
         if (Utils.isInKuudra()) {
             String msg = event.getPlainMessage();
             if (msg.equals("Your Fresh Tools Perk bonus doubles your building speed for the next 10 seconds!")) {
@@ -226,7 +215,25 @@ public class KuudraFeatures {
     }
 
     @EventHandler
-    public static void onJoin(ServerJoinEvent event) {
+    private static void onServerTick(ServerTickEvent event) {
+        if (Utils.isInKuudra()) {
+            if (freshTicks > 0) {
+                freshTicks--;
+            }
+            if (Config.kuudraDPS && getCurrentPhase() == kuudraPhases.Lair && !Utils.isInstanceOver()) {
+                float health = Utils.getTrueHealth(kuudraEntity.getHealth());
+                float damage = Math.clamp(previousHealth - health, 0, 240_000_000);
+                dpsData.add(damage);
+                if (dpsData.size() > 20) {
+                    dpsData.removeFirst();
+                }
+                previousHealth = health;
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
         freshTicks = 0;
         kuudraEntity = null;
         missingTicks = 20;
@@ -234,10 +241,64 @@ public class KuudraFeatures {
     }
 
     @EventHandler
+    private static void onNamed(EntityNamedEvent event) {
+        if (Utils.isInKuudra()) {
+            if (Config.kuudraSupplyHighlight) {
+                if (event.namePlain.equals("SUPPLIES") && !supplies.contains(event.entity)) {
+                    supplies.add(event.entity);
+                }
+            }
+            if (Config.kuudraDropHighlight) {
+                if (event.namePlain.equals("BRING SUPPLY CHEST HERE") && !dropOffs.contains(event.entity)) {
+                    dropOffs.add(event.entity);
+                }
+            }
+            if (Config.kuudraBuildHighlight) {
+                if (event.namePlain.startsWith("PROGRESS: ") && event.namePlain.endsWith("%") && !buildPiles.contains(event.entity)) {
+                    buildPiles.add(event.entity);
+                }
+            }
+        }
+    }
+
+    @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (isStunning) {
-            event.drawFilled(stunBox, true, kuudraColor);
-            event.drawBeam(stunBox.getCenter().add(0, 0.5, 0), 64, true, kuudraColor);
+            event.drawFilled(stunBox, true, RenderColor.fromColor(Config.kuudraStunColor));
+            event.drawText(stunBox.getCenter().add(0, 2, 0), Text.of("Stun"), 0.1f, true, RenderColor.fromHex(0xffffff));
+        }
+        if (!supplies.isEmpty()) {
+            for (Entity supply : new ArrayList<>(supplies)) {
+                if (supply.isAlive()) {
+                    Vec3d pos = supply.getPos();
+                    BlockPos ground = Utils.findGround(supply.getBlockPos(), 4);
+                    event.drawBeam(new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ()), 256, true, RenderColor.fromColor(Config.kuudraSupplyColor));
+                } else {
+                    supplies.remove(supply);
+                }
+            }
+        }
+        if (!dropOffs.isEmpty()) {
+            for (Entity drop : new ArrayList<>(dropOffs)) {
+                if (drop.isAlive()) {
+                    Vec3d pos = drop.getPos();
+                    BlockPos ground = Utils.findGround(drop.getBlockPos(), 4);
+                    event.drawBeam(new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ()), 256, true, RenderColor.fromColor(Config.kuudraDropColor));
+                } else {
+                    dropOffs.remove(drop);
+                }
+            }
+        }
+        if (!buildPiles.isEmpty()) {
+            for (Entity pile : new ArrayList<>(buildPiles)) {
+                if (pile.isAlive()) {
+                    Vec3d pos = pile.getLerpedPos(event.tickCounter.getTickDelta(true));
+                    BlockPos ground = Utils.findGround(pile.getBlockPos(), 4);
+                    event.drawBeam(new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ()), 256, true, RenderColor.fromColor(Config.kuudraBuildColor));
+                } else {
+                    buildPiles.remove(pile);
+                }
+            }
         }
     }
 

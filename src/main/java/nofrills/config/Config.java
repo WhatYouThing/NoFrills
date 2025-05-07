@@ -333,6 +333,8 @@ public class Config {
     @SerialEntry
     public static boolean kuudraHitbox = false;
     @SerialEntry
+    public static Color kuudraColor = new Color(255, 255, 0, 255);
+    @SerialEntry
     public static boolean kuudraHealth = false;
     @SerialEntry
     public static boolean kuudraDPS = false;
@@ -350,6 +352,20 @@ public class Config {
     public static String kuudraDrainMsg = "/pc Used {mana} Mana on {players} players!";
     @SerialEntry
     public static boolean kuudraStunWaypoint = false;
+    @SerialEntry
+    public static Color kuudraStunColor = new Color(0, 255, 255, 170);
+    @SerialEntry
+    public static boolean kuudraSupplyHighlight = false;
+    @SerialEntry
+    public static Color kuudraSupplyColor = new Color(0, 255, 255, 170);
+    @SerialEntry
+    public static boolean kuudraDropHighlight = false;
+    @SerialEntry
+    public static Color kuudraDropColor = new Color(0, 255, 255, 170);
+    @SerialEntry
+    public static boolean kuudraBuildHighlight = false;
+    @SerialEntry
+    public static Color kuudraBuildColor = new Color(0, 255, 255, 170);
 
     // Mining
 

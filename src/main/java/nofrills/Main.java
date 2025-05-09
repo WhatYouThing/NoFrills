@@ -77,6 +77,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(DungeonDragons.class);
         eventBus.subscribe(ScathaMining.class);
         eventBus.subscribe(MiddleClickOverride.class);
+        eventBus.subscribe(EnchantingSolver.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

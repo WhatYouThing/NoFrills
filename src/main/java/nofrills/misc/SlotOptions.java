@@ -1,16 +1,27 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.text.Text;
 import nofrills.events.ScreenOpenEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SlotOptions {
+    public static final ItemStack background = stackWithName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
+    public static final ItemStack first = stackWithName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
+    public static final ItemStack second = stackWithName(Items.BLUE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
     private static final List<DisabledSlot> disabledSlots = new ArrayList<>();
     private static final List<SpoofedSlot> spoofedSlots = new ArrayList<>();
+
+    private static ItemStack stackWithName(ItemStack stack, String name) {
+        stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(name));
+        return stack;
+    }
 
     public static List<DisabledSlot> getDisabledSlots() {
         return new ArrayList<>(disabledSlots);

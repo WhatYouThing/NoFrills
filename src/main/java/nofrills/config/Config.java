@@ -161,6 +161,15 @@ public class Config {
     @SerialEntry
     public static boolean calendarDate = false;
 
+    // Solvers
+
+    @SerialEntry
+    public static boolean solveChronomatron = false;
+    @SerialEntry
+    public static boolean solveUltrasequencer = false;
+    @SerialEntry
+    public static boolean solveSuperpairs = false;
+
     // HUD
 
     @SerialEntry
@@ -448,6 +457,7 @@ public class Config {
                 .category(General.create(defaults, config))
                 .category(Fixes.create(defaults, config))
                 .category(Events.create(defaults, config))
+                .category(Solvers.create(defaults, config))
                 .category(Hud.create(defaults, config))
                 .category(Fishing.create(defaults, config))
                 .category(Dungeons.create(defaults, config))

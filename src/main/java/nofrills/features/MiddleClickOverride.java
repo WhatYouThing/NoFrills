@@ -35,7 +35,9 @@ public class MiddleClickOverride {
             "Upgrade Item",
             "Salvage Items",
             "Auctions Browser",
-            Utils.format("A{}iphone", Utils.Symbols.bingo)
+            Utils.format("A{}iphone", Utils.Symbols.bingo),
+            "Fishing Rod Parts",
+            "Stats Tuning"
     );
 
     private static final List<String> containBlacklist = List.of(
@@ -47,11 +49,14 @@ public class MiddleClickOverride {
     );
 
     private static final List<String> matchWhitelist = List.of(
-            "Your Equipment and Stats"
+            "Your Equipment and Stats",
+            "Accessory Bag Thaumaturgy",
+            "Community Shop"
     );
 
     private static final List<String> containWhitelist = List.of(
-            "Pets"
+            "Pets",
+            "Bits Shop"
     );
 
     private static boolean isBlacklisted(String title) {

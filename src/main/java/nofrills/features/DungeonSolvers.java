@@ -23,6 +23,7 @@ import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SkyblockData;
+import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 
 import java.text.DecimalFormat;
@@ -33,9 +34,6 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class DungeonSolvers {
-    private static final ItemStack backgroundStack = Utils.setStackName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
-    private static final ItemStack firstStack = Utils.setStackName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
-    private static final ItemStack secondStack = Utils.setStackName(Items.BLUE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
     private static final List<Item> colorsOrder = List.of(
             Items.GREEN_STAINED_GLASS_PANE,
             Items.YELLOW_STAINED_GLASS_PANE,
@@ -154,10 +152,10 @@ public class DungeonSolvers {
                     if (event.title.startsWith("Correct all the panes!")) {
                         isInTerminal = true;
                         if (stack.getItem().equals(Items.RED_STAINED_GLASS_PANE)) {
-                            Utils.setSpoofed(slot, firstStack);
+                            Utils.setSpoofed(slot, SlotOptions.first);
                             Utils.setDisabled(slot, false);
                         } else {
-                            Utils.setSpoofed(slot, backgroundStack);
+                            Utils.setSpoofed(slot, SlotOptions.background);
                             Utils.setDisabled(slot, true);
                         }
                     }
@@ -166,7 +164,7 @@ public class DungeonSolvers {
                         if (stack.getItem().equals(Items.RED_STAINED_GLASS_PANE) && event.isFinal) {
                             orderSlots.add(slot);
                         } else {
-                            Utils.setSpoofed(slot, backgroundStack);
+                            Utils.setSpoofed(slot, SlotOptions.background);
                             Utils.setDisabled(slot, true);
                         }
                     }
@@ -175,10 +173,10 @@ public class DungeonSolvers {
                         String character = String.valueOf(event.title.charAt(event.title.indexOf("'") + 1)).toLowerCase();
                         String name = Formatting.strip(stack.getName().getString()).toLowerCase().trim();
                         if (!name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(stack)) {
-                            Utils.setSpoofed(slot, firstStack);
+                            Utils.setSpoofed(slot, SlotOptions.first);
                             Utils.setDisabled(slot, false);
                         } else {
-                            Utils.setSpoofed(slot, backgroundStack);
+                            Utils.setSpoofed(slot, SlotOptions.background);
                             Utils.setDisabled(slot, true);
                         }
                     }
@@ -189,10 +187,10 @@ public class DungeonSolvers {
                         for (DyeColor dye : DyeColor.values()) {
                             if (dye.getName().equals(colorName)) {
                                 if (!Utils.hasGlint(stack) && checkStackColor(stack, dye, colorName)) {
-                                    Utils.setSpoofed(slot, firstStack);
+                                    Utils.setSpoofed(slot, SlotOptions.first);
                                     Utils.setDisabled(slot, false);
                                 } else {
-                                    Utils.setSpoofed(slot, backgroundStack);
+                                    Utils.setSpoofed(slot, SlotOptions.background);
                                     Utils.setDisabled(slot, true);
                                 }
                                 break;
@@ -204,7 +202,7 @@ public class DungeonSolvers {
                         if (colorsOrder.contains(stack.getItem()) && !colorSlots.contains(slot)) {
                             colorSlots.add(slot);
                         }
-                        Utils.setSpoofed(slot, backgroundStack);
+                        Utils.setSpoofed(slot, SlotOptions.background);
                         Utils.setDisabled(slot, true);
                     }
                 }
@@ -212,11 +210,11 @@ public class DungeonSolvers {
             if (!orderSlots.isEmpty()) {
                 orderSlots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
                 Slot first = orderSlots.getFirst();
-                Utils.setSpoofed(first, firstStack);
+                Utils.setSpoofed(first, SlotOptions.first);
                 Utils.setDisabled(first, false);
                 if (orderSlots.size() > 1) {
                     Slot second = orderSlots.get(1);
-                    Utils.setSpoofed(second, secondStack);
+                    Utils.setSpoofed(second, SlotOptions.second);
                     Utils.setDisabled(second, true);
                 }
             }
@@ -241,7 +239,7 @@ public class DungeonSolvers {
                         target = Math.negateExact(target) + (target > 0 ? offset : -offset);
                     }
                     if (target == 0) {
-                        Utils.setSpoofed(slot, backgroundStack);
+                        Utils.setSpoofed(slot, SlotOptions.background);
                         Utils.setDisabled(slot, true);
                     } else {
                         Utils.setSpoofed(slot, stackWithCount(target));

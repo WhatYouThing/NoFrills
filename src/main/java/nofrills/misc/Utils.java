@@ -129,11 +129,6 @@ public class Utils {
         SlotOptions.disableSlot(slot, disabled);
     }
 
-    public static ItemStack setStackName(ItemStack stack, String name) {
-        stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(name));
-        return stack;
-    }
-
     /**
      * Spoofs a slot to render a specific item stack, rather than the item that is actually in that slot.
      *

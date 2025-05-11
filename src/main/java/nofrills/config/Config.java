@@ -1,5 +1,6 @@
 package nofrills.config;
 
+import com.google.gson.JsonObject;
 import dev.isxander.yacl3.api.Option;
 import dev.isxander.yacl3.api.YetAnotherConfigLib;
 import dev.isxander.yacl3.api.controller.BooleanControllerBuilder;
@@ -48,6 +49,10 @@ public class Config {
     public static boolean ignoreBackground = false;
     @SerialEntry
     public static boolean middleClickOverride = false;
+    @SerialEntry
+    public static boolean slotBinding = false;
+    @SerialEntry
+    public static JsonObject slotBindData = new JsonObject();
     @SerialEntry
     public static boolean hideDeadMobs = false;
     @SerialEntry
@@ -366,15 +371,15 @@ public class Config {
     @SerialEntry
     public static boolean kuudraSupplyHighlight = false;
     @SerialEntry
-    public static Color kuudraSupplyColor = new Color(0, 255, 255, 170);
+    public static Color kuudraSupplyColor = new Color(0, 255, 255, 127);
     @SerialEntry
     public static boolean kuudraDropHighlight = false;
     @SerialEntry
-    public static Color kuudraDropColor = new Color(0, 255, 255, 170);
+    public static Color kuudraDropColor = new Color(255, 255, 0, 127);
     @SerialEntry
     public static boolean kuudraBuildHighlight = false;
     @SerialEntry
-    public static Color kuudraBuildColor = new Color(0, 255, 255, 170);
+    public static Color kuudraBuildColor = new Color(0, 255, 0, 127);
 
     // Mining
 

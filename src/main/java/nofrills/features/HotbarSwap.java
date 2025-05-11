@@ -6,7 +6,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import nofrills.config.Config;
 import nofrills.events.InputEvent;
-import nofrills.mixin.HandledScreenAccessor;
+import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
@@ -17,7 +17,7 @@ public class HotbarSwap {
         if (Config.hotbarSwap) {
             if (event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.action == GLFW.GLFW_PRESS && event.modifiers == 2) {
                 if (mc.currentScreen instanceof InventoryScreen screen) {
-                    Slot focusedSlot = ((HandledScreenAccessor) screen).getFocusedSlot();
+                    Slot focusedSlot = Utils.getFocusedSlot();
                     if (focusedSlot != null && !focusedSlot.getStack().isEmpty()) {
                         int focusedSlotId = focusedSlot.getIndex();
                         if (focusedSlotId >= 9 && focusedSlotId <= 35) {

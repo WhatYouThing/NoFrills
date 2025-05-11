@@ -113,7 +113,7 @@ public class Kuudra {
                 .option(Option.<Color>createBuilder()
                         .name(Text.of("Supply Beacon Color"))
                         .description(OptionDescription.of(Text.of("The color used for the supply beacons.")))
-                        .binding(new Color(0, 255, 255, 170),
+                        .binding(new Color(0, 255, 255, 127),
                                 () -> Config.kuudraSupplyColor,
                                 value -> Config.kuudraSupplyColor = value)
                         .controller(v -> ColorControllerBuilder.create(v).allowAlpha(true))
@@ -129,7 +129,7 @@ public class Kuudra {
                 .option(Option.<Color>createBuilder()
                         .name(Text.of("Drop Off Beacon Color"))
                         .description(OptionDescription.of(Text.of("The color used for the drop-off point beacons.")))
-                        .binding(new Color(0, 255, 255, 170),
+                        .binding(new Color(255, 255, 0, 127),
                                 () -> Config.kuudraDropColor,
                                 value -> Config.kuudraDropColor = value)
                         .controller(v -> ColorControllerBuilder.create(v).allowAlpha(true))
@@ -145,7 +145,7 @@ public class Kuudra {
                 .option(Option.<Color>createBuilder()
                         .name(Text.of("Build Beacon Color"))
                         .description(OptionDescription.of(Text.of("The color used for the build pile beacons.")))
-                        .binding(new Color(0, 255, 255, 170),
+                        .binding(new Color(0, 255, 0, 127),
                                 () -> Config.kuudraBuildColor,
                                 value -> Config.kuudraBuildColor = value)
                         .controller(v -> ColorControllerBuilder.create(v).allowAlpha(true))

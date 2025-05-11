@@ -79,6 +79,12 @@ public class General {
                                 .binding(false, () -> Config.middleClickOverride, value -> Config.middleClickOverride = value)
                                 .controller(Config::booleanController)
                                 .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.of("Slot Binding"))
+                                .description(OptionDescription.of(Text.of("Allows you to bind any inventory slot to any of your hotbar slots, which allows you to swap items between the bound slots.\n\nUsage: Shift + Left Click on either of the bound slots to swap items between them.\n\nTo bind slots together, you first must assign the \"Bind Slots\" key bind to any key. Open your inventory and start holding the key bind over any slot, and then move your cursor to the desired slot and release the key bind.")))
+                                .binding(false, () -> Config.slotBinding, value -> Config.slotBinding = value)
+                                .controller(Config::booleanController)
+                                .build())
                         .build())
 
                 .group(OptionGroup.createBuilder()

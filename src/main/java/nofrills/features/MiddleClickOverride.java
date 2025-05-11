@@ -9,7 +9,6 @@ import nofrills.config.Config;
 import nofrills.events.InputEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
-import nofrills.mixin.HandledScreenAccessor;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -76,7 +75,7 @@ public class MiddleClickOverride {
         if (Config.middleClickOverride && event.key == GLFW.GLFW_MOUSE_BUTTON_1 && event.modifiers == 0 && event.action == GLFW.GLFW_PRESS) {
             if (mc.currentScreen instanceof GenericContainerScreen container) {
                 String title = container.getTitle().getString();
-                Slot focusedSlot = ((HandledScreenAccessor) mc.currentScreen).getFocusedSlot();
+                Slot focusedSlot = Utils.getFocusedSlot();
                 if (focusedSlot != null && !isBlacklisted(title) && !Utils.isLeapMenu(title) && !SlotOptions.isSlotDisabled(focusedSlot)) {
                     ItemStack stack = focusedSlot.getStack();
                     if (!stack.isEmpty()) {

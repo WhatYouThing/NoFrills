@@ -1,9 +1,12 @@
 package nofrills.mixin;
 
+import com.google.gson.JsonElement;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.NbtComponent;
@@ -15,12 +18,11 @@ import net.minecraft.text.Text;
 import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
 import nofrills.features.DungeonSolvers;
+import nofrills.features.SlotBinding;
 import nofrills.hud.LeapMenuButton;
-import nofrills.misc.RenderColor;
-import nofrills.misc.ScreenOptions;
-import nofrills.misc.SlotOptions;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -73,6 +75,30 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Unique
     private boolean isLeapMenu() {
         return Utils.isLeapMenu(title.getString());
+    }
+
+    @Unique
+    private boolean isSlotBindingActive() {
+        return Config.slotBinding && mc.currentScreen instanceof InventoryScreen;
+    }
+
+    @Unique
+    private void drawLine(DrawContext context, int firstSlot, int secondSlot) {
+        RenderColor color = RenderColor.fromHex(0x00ffff);
+        context.draw(drawer -> {
+            VertexConsumer consumer = drawer.getBuffer(Rendering.Layers.GuiLine);
+            Slot slot1 = handler.getSlot(firstSlot);
+            Slot slot2 = handler.getSlot(secondSlot);
+            context.getMatrices().push();
+            context.getMatrices().translate(this.x, this.y, 0.0f);
+            context.getMatrices().push();
+            context.getMatrices().translate(0.0f, 0.0f, 100.0f);
+            Matrix4f mat = context.getMatrices().peek().getPositionMatrix();
+            consumer.vertex(mat, slot1.x + 8, slot1.y + 8, 1.0f).color(color.argb);
+            consumer.vertex(mat, slot2.x + 8, slot2.y + 8, 1.0f).color(color.argb);
+            context.getMatrices().pop();
+            context.getMatrices().pop();
+        });
     }
 
     @Override
@@ -160,6 +186,16 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 button.render(context, mouseX, mouseY, delta);
             }
             ci.cancel();
+        }
+        if (isSlotBindingActive()) {
+            for (int i = 36; i <= 43; i++) {
+                String name = "hotbar" + SlotBinding.toHotbarNumber(i);
+                if (Config.slotBindData.has(name)) {
+                    for (JsonElement element : Config.slotBindData.get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
+                        drawLine(context, i, element.getAsInt());
+                    }
+                }
+            }
         }
     }
 

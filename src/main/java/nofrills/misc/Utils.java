@@ -36,6 +36,7 @@ import net.minecraft.world.RaycastContext;
 import nofrills.config.Config;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.LeapOverlay;
+import nofrills.mixin.HandledScreenAccessor;
 import nofrills.mixin.PlayerListHudAccessor;
 import org.lwjgl.glfw.GLFW;
 
@@ -479,6 +480,10 @@ public class Utils {
         return mc.player != null ? mc.player.getMainHandStack() : ItemStack.EMPTY;
     }
 
+    public static Slot getFocusedSlot() {
+        return mc.currentScreen != null ? ((HandledScreenAccessor) mc.currentScreen).getFocusedSlot() : null;
+    }
+
     private static int romanToInt(Character roman) {
         return switch (Character.toUpperCase(roman)) {
             case 'I' -> 1;
@@ -580,5 +585,6 @@ public class Utils {
     public static class Keybinds {
         public static final KeyBinding getPearls = new KeyBinding("key.nofrills.refillPearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
         public static final KeyBinding recipeLookup = new KeyBinding("key.nofrills.recipeLookup", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
+        public static final KeyBinding bindSlots = new KeyBinding("key.nofrills.bindSlots", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
     }
 }

@@ -206,5 +206,16 @@ public final class Rendering {
                         .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
                         .build(false)
         );
+        public static final RenderLayer.MultiPhase GuiLine = RenderLayer.of(
+                "nofrills_gui_line",
+                VertexFormats.POSITION_COLOR,
+                VertexFormat.DrawMode.DEBUG_LINES,
+                262144,
+                RenderLayer.MultiPhaseParameters.builder()
+                        .program(RenderPhase.GUI_PROGRAM)
+                        .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
+                        .depthTest(RenderPhase.LEQUAL_DEPTH_TEST)
+                        .build(false)
+        );
     }
 }

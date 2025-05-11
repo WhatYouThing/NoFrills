@@ -78,11 +78,13 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ScathaMining.class);
         eventBus.subscribe(MiddleClickOverride.class);
         eventBus.subscribe(EnchantingSolver.class);
+        eventBus.subscribe(SlotBinding.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 
         KeyBindingHelper.registerKeyBinding(Keybinds.getPearls);
         KeyBindingHelper.registerKeyBinding(Keybinds.recipeLookup);
+        KeyBindingHelper.registerKeyBinding(Keybinds.bindSlots);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

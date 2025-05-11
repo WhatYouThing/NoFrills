@@ -7,6 +7,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -95,6 +96,12 @@ public class KuudraFeatures {
             total += damage;
         }
         return total / dpsData.size();
+    }
+
+    private static Vec3d getGround(Vec3d pos) {
+        BlockPos blockPos = BlockPos.ofFloored(pos.getX(), Math.max(pos.getY(), 75), pos.getZ());
+        BlockPos ground = Utils.findGround(blockPos, 4);
+        return new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ());
     }
 
     @EventHandler
@@ -238,23 +245,27 @@ public class KuudraFeatures {
         kuudraEntity = null;
         missingTicks = 20;
         previousHealth = 0.0f;
+        dpsData.clear();
+        supplies.clear();
+        dropOffs.clear();
+        buildPiles.clear();
     }
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (Utils.isInKuudra()) {
-            if (Config.kuudraSupplyHighlight) {
-                if (event.namePlain.equals("SUPPLIES") && !supplies.contains(event.entity)) {
+            if (Config.kuudraSupplyHighlight && event.namePlain.equals("SUPPLIES")) {
+                if (supplies.stream().noneMatch(ent -> ent.getUuidAsString().equals(event.entity.getUuidAsString()))) {
                     supplies.add(event.entity);
                 }
             }
-            if (Config.kuudraDropHighlight) {
-                if (event.namePlain.equals("BRING SUPPLY CHEST HERE") && !dropOffs.contains(event.entity)) {
+            if (Config.kuudraDropHighlight && event.namePlain.equals("BRING SUPPLY CHEST HERE")) {
+                if (dropOffs.stream().noneMatch(ent -> ent.getUuidAsString().equals(event.entity.getUuidAsString()))) {
                     dropOffs.add(event.entity);
                 }
             }
-            if (Config.kuudraBuildHighlight) {
-                if (event.namePlain.startsWith("PROGRESS: ") && event.namePlain.endsWith("%") && !buildPiles.contains(event.entity)) {
+            if (Config.kuudraBuildHighlight && event.namePlain.startsWith("PROGRESS: ") && event.namePlain.endsWith("%")) {
+                if (buildPiles.stream().noneMatch(ent -> ent.getUuidAsString().equals(event.entity.getUuidAsString()))) {
                     buildPiles.add(event.entity);
                 }
             }
@@ -270,33 +281,27 @@ public class KuudraFeatures {
         if (!supplies.isEmpty()) {
             for (Entity supply : new ArrayList<>(supplies)) {
                 if (supply.isAlive()) {
-                    Vec3d pos = supply.getPos();
-                    BlockPos ground = Utils.findGround(supply.getBlockPos(), 4);
-                    event.drawBeam(new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ()), 256, true, RenderColor.fromColor(Config.kuudraSupplyColor));
+                    event.drawBeam(getGround(supply.getPos()), 256, true, RenderColor.fromColor(Config.kuudraSupplyColor));
                 } else {
-                    supplies.remove(supply);
+                    supplies.removeIf(ent -> ent.getUuidAsString().equals(supply.getUuidAsString()));
                 }
             }
         }
         if (!dropOffs.isEmpty()) {
             for (Entity drop : new ArrayList<>(dropOffs)) {
-                if (drop.isAlive()) {
-                    Vec3d pos = drop.getPos();
-                    BlockPos ground = Utils.findGround(drop.getBlockPos(), 4);
-                    event.drawBeam(new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ()), 256, true, RenderColor.fromColor(Config.kuudraDropColor));
+                if (drop.isAlive() && drop.isCustomNameVisible() && drop.getCustomName() != null && Formatting.strip(drop.getCustomName().getString()).equals("BRING SUPPLY CHEST HERE")) {
+                    event.drawBeam(getGround(drop.getPos()), 256, true, RenderColor.fromColor(Config.kuudraDropColor));
                 } else {
-                    dropOffs.remove(drop);
+                    dropOffs.removeIf(ent -> ent.getUuidAsString().equals(drop.getUuidAsString()));
                 }
             }
         }
         if (!buildPiles.isEmpty()) {
             for (Entity pile : new ArrayList<>(buildPiles)) {
-                if (pile.isAlive()) {
-                    Vec3d pos = pile.getLerpedPos(event.tickCounter.getTickDelta(true));
-                    BlockPos ground = Utils.findGround(pile.getBlockPos(), 4);
-                    event.drawBeam(new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ()), 256, true, RenderColor.fromColor(Config.kuudraBuildColor));
+                if (pile.isAlive() && pile.isCustomNameVisible() && pile.getCustomName() != null && Formatting.strip(pile.getCustomName().getString()).endsWith("%")) {
+                    event.drawBeam(getGround(pile.getLerpedPos(event.tickCounter.getTickDelta(true))), 256, true, RenderColor.fromColor(Config.kuudraBuildColor));
                 } else {
-                    buildPiles.remove(pile);
+                    buildPiles.removeIf(ent -> ent.getUuidAsString().equals(pile.getUuidAsString()));
                 }
             }
         }

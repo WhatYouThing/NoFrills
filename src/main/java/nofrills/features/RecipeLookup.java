@@ -11,8 +11,9 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Formatting;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import nofrills.mixin.HandledScreenAccessor;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Arrays;
 
 import static nofrills.Main.mc;
 
@@ -21,7 +22,7 @@ public class RecipeLookup {
     public static void onKey(InputEvent event) {
         if (Utils.Keybinds.recipeLookup.matchesKey(event.key, 0) && event.action == GLFW.GLFW_PRESS) {
             if (mc.currentScreen instanceof InventoryScreen || mc.currentScreen instanceof GenericContainerScreen) {
-                Slot focused = ((HandledScreenAccessor) mc.currentScreen).getFocusedSlot();
+                Slot focused = Utils.getFocusedSlot();
                 if (focused != null) {
                     ItemStack stack = focused.getStack();
                     String itemId = Utils.getSkyblockId(stack);
@@ -39,7 +40,12 @@ public class RecipeLookup {
                         }
                         event.cancel();
                     } else if (!stack.isEmpty() && mc.currentScreen.getTitle().getString().startsWith("Museum")) {
-                        Utils.sendMessage("/recipe " + Formatting.strip(stack.getName().getString()));
+                        String entryName = Formatting.strip(stack.getName().getString());
+                        if (entryName.endsWith("Armor") || entryName.endsWith("Set") || entryName.endsWith("Equipment")) {
+                            String[] words = entryName.split(" ");
+                            entryName = String.join(" ", Arrays.copyOf(words, words.length - 1));
+                        }
+                        Utils.sendMessage("/recipe " + entryName);
                         event.cancel();
                     }
                 }

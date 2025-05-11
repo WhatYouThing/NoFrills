@@ -110,7 +110,7 @@ public class SlayerFeatures {
     }
 
     @EventHandler
-    public static void onNamed(EntityNamedEvent event) {
+    private static void onNamed(EntityNamedEvent event) {
         if (SkyblockData.getLines().contains("Slay the boss!")) {
             if (currentBoss == null) {
                 for (SlayerBoss boss : slayerBosses) {
@@ -163,7 +163,7 @@ public class SlayerFeatures {
     }
 
     @EventHandler
-    public static void onTick(WorldTickEvent event) {
+    private static void onTick(WorldTickEvent event) {
         if (currentBoss == null && currentBossPartial != null) {
             SlayerBoss boss = currentBossPartial.bossData;
             List<Entity> otherEntities = getNearby(currentBossPartial.spawnerEntity, boss.entityTypes);
@@ -268,7 +268,7 @@ public class SlayerFeatures {
     }
 
     @EventHandler
-    public static void onChat(ChatMsgEvent event) {
+    private static void onChat(ChatMsgEvent event) {
         if (Config.blazeNoSpam) {
             String msg = event.getPlainMessage();
             if (msg.equals("Your hit was reduced by Hellion Shield!")) {
@@ -323,7 +323,7 @@ public class SlayerFeatures {
     }
 
     @EventHandler
-    public static void onRender(WorldRenderEvent event) {
+    private static void onRender(WorldRenderEvent event) {
         if (currentBoss != null) {
             if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice) {
                 List<Entity> entities = new ArrayList<>(yanDevData);

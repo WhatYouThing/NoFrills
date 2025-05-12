@@ -83,8 +83,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     }
 
     @Unique
-    private void drawLine(DrawContext context, int firstSlot, int secondSlot) {
-        RenderColor color = RenderColor.fromHex(0x00ffff);
+    private void drawLine(DrawContext context, int firstSlot, int secondSlot, RenderColor color) {
         context.draw(drawer -> {
             VertexConsumer consumer = drawer.getBuffer(Rendering.Layers.GuiLine);
             Slot slot1 = handler.getSlot(firstSlot);
@@ -144,6 +143,9 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         if ((Config.solveTerminals && DungeonSolvers.isInTerminal) || (Config.ignoreBackground && isStackNameEmpty(focusedSlot)) || SlotOptions.isSlotDisabled(focusedSlot)) {
             ci.cancel();
         }
+        if (Config.slotBinding && SlotBinding.lastSlot != -1) {
+            ci.cancel();
+        }
     }
 
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;getTooltipFromItem(Lnet/minecraft/item/ItemStack;)Ljava/util/List;"))
@@ -187,12 +189,30 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             }
             ci.cancel();
         }
-        if (isSlotBindingActive()) {
-            for (int i = 36; i <= 43; i++) {
-                String name = "hotbar" + SlotBinding.toHotbarNumber(i);
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (isSlotBindingActive() && focusedSlot != null) {
+            if (SlotBinding.lastSlot != -1) {
+                drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.bindingColor);
+            }
+            if (SlotBinding.isHotbar(focusedSlot.id)) {
+                String name = "hotbar" + SlotBinding.toHotbarNumber(focusedSlot.id);
                 if (Config.slotBindData.has(name)) {
                     for (JsonElement element : Config.slotBindData.get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
-                        drawLine(context, i, element.getAsInt());
+                        drawLine(context, focusedSlot.id, element.getAsInt(), SlotBinding.boundColor);
+                    }
+                }
+            } else if (SlotBinding.isValid(focusedSlot.id)) {
+                for (int i = 1; i <= 8; i++) {
+                    String name = "hotbar" + i;
+                    if (Config.slotBindData.has(name)) {
+                        for (JsonElement element : Config.slotBindData.get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
+                            if (element.getAsInt() == focusedSlot.id) {
+                                drawLine(context, focusedSlot.id, i + 35, SlotBinding.boundColor);
+                            }
+                        }
                     }
                 }
             }

@@ -221,14 +221,14 @@ public class Dungeons {
 
                 .option(Option.<Float>createBuilder()
                         .name(Text.of("Split Power"))
-                        .description(OptionDescription.of(Text.of("The minimum total Blessing of Power level you must have in order to perform the split.")))
+                        .description(OptionDescription.of(Text.of("The minimum Power blessing level you must have in order to perform the split. Set to 0 if you wish to always attempt the split, which is ideal for party finder teams.")))
                         .binding(22.0f, () -> Config.dragSkip, value -> Config.dragSkip = value)
                         .controller(option -> Config.floatSliderController(option, 0.0f, 32.0f, 0.5f))
                         .build())
 
                 .option(Option.<Float>createBuilder()
                         .name(Text.of("Easy Split Power"))
-                        .description(OptionDescription.of(Text.of("The minimum total Blessing of Power level you must have in order to perform the split when one of the dragons is Purple.")))
+                        .description(OptionDescription.of(Text.of("The minimum Power blessing level you must have in order to perform the split when one of the dragons is Purple.")))
                         .binding(19.0f, () -> Config.dragSkipEasy, value -> Config.dragSkipEasy = value)
                         .controller(option -> Config.floatSliderController(option, 0.0f, 32.0f, 0.5f))
                         .build())

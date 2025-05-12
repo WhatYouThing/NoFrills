@@ -31,7 +31,7 @@ public class Slayers {
 
                 .group(OptionGroup.createBuilder()
                         .name(Text.of("Inferno Demonlord"))
-                        .collapsed(true)
+                        .collapsed(false)
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Hide Attunement Spam"))
                                 .description(OptionDescription.of(Text.of("Hides the chat messages warning you about using the wrong attunement.")))
@@ -48,7 +48,7 @@ public class Slayers {
 
                 .group(OptionGroup.createBuilder()
                         .name(Text.of("Riftstalker Bloodfiend"))
-                        .collapsed(true)
+                        .collapsed(false)
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Ice Indicator"))
                                 .description(OptionDescription.of(Text.of("Shows a timer on screen when your boss is about to use Twinclaws, so that you know when to use Holy Ice.")))
@@ -109,7 +109,7 @@ public class Slayers {
 
                 .group(OptionGroup.createBuilder()
                         .name(Text.of("Voidgloom Seraph"))
-                        .collapsed(true)
+                        .collapsed(false)
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Hits Display"))
                                 .description(OptionDescription.of(Text.of("Shows the amount of hits needed to break the hit shield of your boss.")))

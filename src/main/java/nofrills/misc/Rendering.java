@@ -214,7 +214,7 @@ public final class Rendering {
                 RenderLayer.MultiPhaseParameters.builder()
                         .program(RenderPhase.GUI_PROGRAM)
                         .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                        .depthTest(RenderPhase.LEQUAL_DEPTH_TEST)
+                        .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
                         .build(false)
         );
     }

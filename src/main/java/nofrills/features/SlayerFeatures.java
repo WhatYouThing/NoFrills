@@ -68,6 +68,7 @@ public class SlayerFeatures {
     private static CurrentBoss currentBossPartial = null;
     private static int bossAliveTicks = 0;
     private static boolean springsActive = false;
+    private static boolean blockNextUse = false;
 
     private static boolean isEntityValid(Entity entity, EntityType<?>[] validTypes) {
         if (entity.getType() == EntityType.ARMOR_STAND) {
@@ -338,6 +339,21 @@ public class SlayerFeatures {
                     }
                 }
             }
+        }
+    }
+
+    @EventHandler
+    private static void onUseBlock(InteractBlockEvent event) {
+        if (Config.blazeDaggerFix && Utils.getRightClickAbility(Utils.getHeldItem()).contains("Attunement")) {
+            blockNextUse = true;
+        }
+    }
+
+    @EventHandler
+    private static void onUseItem(InteractItemEvent event) {
+        if (blockNextUse) {
+            blockNextUse = false;
+            event.cancel();
         }
     }
 

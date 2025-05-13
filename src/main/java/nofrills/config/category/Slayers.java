@@ -44,6 +44,12 @@ public class Slayers {
                                 .binding(false, () -> Config.blazePillarWarn, value -> Config.blazePillarWarn = value)
                                 .controller(Config::booleanController)
                                 .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.of("Dagger Fix"))
+                                .description(OptionDescription.of(Text.of("Fixes the Blaze slayer daggers switching their attunement twice when clicking on any block with them.")))
+                                .binding(false, () -> Config.blazeDaggerFix, value -> Config.blazeDaggerFix = value)
+                                .controller(Config::booleanController)
+                                .build())
                         .build())
 
                 .group(OptionGroup.createBuilder()

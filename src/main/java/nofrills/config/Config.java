@@ -418,6 +418,8 @@ public class Config {
     @SerialEntry
     public static boolean blazePillarWarn = false;
     @SerialEntry
+    public static boolean blazeDaggerFix = false;
+    @SerialEntry
     public static boolean vampIce = false;
     @SerialEntry
     public static boolean vampSteak = false;

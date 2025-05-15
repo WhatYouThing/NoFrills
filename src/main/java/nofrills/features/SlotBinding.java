@@ -11,6 +11,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Config;
 import nofrills.events.InputEvent;
+import nofrills.events.ScreenOpenEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -18,8 +19,8 @@ import org.lwjgl.glfw.GLFW;
 import static nofrills.Main.mc;
 
 public class SlotBinding {
-    public static final RenderColor boundColor = RenderColor.fromHex(0x00ffff);
     public static final RenderColor bindingColor = RenderColor.fromHex(0x00ff00);
+    public static RenderColor boundColor = RenderColor.fromColor(Config.slotBindingColor);
     public static int lastSlot = -1;
 
     private static void success(String message) {
@@ -96,7 +97,7 @@ public class SlotBinding {
                 }
             }
             if (Utils.Keybinds.bindSlots.matchesKey(event.key, 0)) {
-                if (event.action == GLFW.GLFW_PRESS && focusedSlot != null && isValid(focusedSlot.id)) {
+                if (event.action == GLFW.GLFW_PRESS && focusedSlot != null) {
                     lastSlot = focusedSlot.id;
                 }
                 if (event.action == GLFW.GLFW_RELEASE) {
@@ -108,6 +109,7 @@ public class SlotBinding {
                                 Config.slotBindData.get(hotbarName).getAsJsonObject().addProperty("last", 0);
                             }
                             success(Utils.format("Successfully cleared every bound slot from hotbar slot {}.", toHotbarNumber(focusedSlot.id)));
+                            Config.configHandler.save();
                         } else if (isValid(focusedSlot.id)) {
                             for (int i = 1; i <= 8; i++) {
                                 String name = "hotbar" + i;
@@ -117,13 +119,15 @@ public class SlotBinding {
                                         if (element.getAsInt() == focusedSlot.id) {
                                             array.remove(element);
                                             success(Utils.format("Successfully unbound slot from hotbar slot {}.", i));
+                                            Config.configHandler.save();
+                                            break;
                                         }
                                     }
                                 }
                             }
                         }
-                    } else if (lastSlot != -1 && focusedSlot != null && isValid(focusedSlot.id)) {
-                        if (isBindValid(lastSlot, focusedSlot.id)) {
+                    } else if (lastSlot != -1 && focusedSlot != null) {
+                        if (isValid(lastSlot) && isValid(focusedSlot.id) && isBindValid(lastSlot, focusedSlot.id)) {
                             int hotbar = isHotbar(lastSlot) ? lastSlot : focusedSlot.id;
                             String hotbarName = "hotbar" + toHotbarNumber(hotbar);
                             int slot = isHotbar(lastSlot) ? focusedSlot.id : lastSlot;
@@ -149,14 +153,17 @@ public class SlotBinding {
                             Config.configHandler.save();
                             success("Slots bound successfully!");
                         } else {
-                            error("Impossible slot binding combination detected, doing nothing. Combinations with no hotbar slot are impossible, as the items cannot be swapped with a single input.");
+                            error("Invalid slot binding combination detected, doing nothing.");
                         }
-                    } else {
-                        error("Invalid slot binding combination, doing nothing.");
                     }
                     lastSlot = -1;
                 }
             }
         }
+    }
+
+    @EventHandler
+    private static void onScreen(ScreenOpenEvent event) {
+        boundColor = RenderColor.fromColor(Config.slotBindingColor);
     }
 }

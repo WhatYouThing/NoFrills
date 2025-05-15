@@ -85,19 +85,19 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Unique
     private void drawLine(DrawContext context, int firstSlot, int secondSlot, RenderColor color) {
         context.draw(drawer -> {
-            VertexConsumer consumer = drawer.getBuffer(Rendering.Layers.GuiLine);
             Slot slot1 = handler.getSlot(firstSlot);
             Slot slot2 = handler.getSlot(secondSlot);
-            context.getMatrices().push();
-            context.getMatrices().translate(this.x, this.y, 0.0f);
-            context.getMatrices().push();
-            context.getMatrices().translate(0.0f, 0.0f, 100.0f);
             Matrix4f mat = context.getMatrices().peek().getPositionMatrix();
+            VertexConsumer consumer = drawer.getBuffer(Rendering.Layers.GuiLine);
             consumer.vertex(mat, slot1.x + 8, slot1.y + 8, 1.0f).color(color.argb);
             consumer.vertex(mat, slot2.x + 8, slot2.y + 8, 1.0f).color(color.argb);
-            context.getMatrices().pop();
-            context.getMatrices().pop();
         });
+    }
+
+    @Unique
+    private void drawBorder(DrawContext context, int slotId, int offsetInner, int offsetOuter, RenderColor color) {
+        Slot slot = handler.getSlot(slotId);
+        context.drawBorder(slot.x + offsetInner, slot.y + offsetInner, 16 + offsetOuter, 16 + offsetOuter, color.argb);
     }
 
     @Override
@@ -194,14 +194,20 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Inject(method = "render", at = @At("TAIL"))
     private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (isSlotBindingActive() && focusedSlot != null) {
-            if (SlotBinding.lastSlot != -1) {
-                drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.bindingColor);
-            }
+            context.getMatrices().push();
+            context.getMatrices().translate(this.x, this.y, 0.0f);
+            context.getMatrices().push();
+            context.getMatrices().translate(0.0f, 0.0f, 100.0f);
             if (SlotBinding.isHotbar(focusedSlot.id)) {
                 String name = "hotbar" + SlotBinding.toHotbarNumber(focusedSlot.id);
                 if (Config.slotBindData.has(name)) {
                     for (JsonElement element : Config.slotBindData.get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
-                        drawLine(context, focusedSlot.id, element.getAsInt(), SlotBinding.boundColor);
+                        if (Config.slotBindingLines) {
+                            drawLine(context, focusedSlot.id, element.getAsInt(), SlotBinding.boundColor);
+                        }
+                        if (Config.slotBindingBorders) {
+                            drawBorder(context, element.getAsInt(), 0, 0, SlotBinding.boundColor);
+                        }
                     }
                 }
             } else if (SlotBinding.isValid(focusedSlot.id)) {
@@ -210,12 +216,24 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                     if (Config.slotBindData.has(name)) {
                         for (JsonElement element : Config.slotBindData.get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
                             if (element.getAsInt() == focusedSlot.id) {
-                                drawLine(context, focusedSlot.id, i + 35, SlotBinding.boundColor);
+                                if (Config.slotBindingLines) {
+                                    drawLine(context, focusedSlot.id, i + 35, SlotBinding.boundColor);
+                                }
+                                if (Config.slotBindingBorders) {
+                                    drawBorder(context, i + 35, 0, 0, SlotBinding.boundColor);
+                                }
                             }
                         }
                     }
                 }
             }
+            if (SlotBinding.lastSlot != -1) {
+                drawBorder(context, SlotBinding.lastSlot, 0, 0, SlotBinding.bindingColor);
+                drawBorder(context, focusedSlot.id, 0, 0, SlotBinding.bindingColor);
+                drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.bindingColor);
+            }
+            context.getMatrices().pop();
+            context.getMatrices().pop();
         }
     }
 

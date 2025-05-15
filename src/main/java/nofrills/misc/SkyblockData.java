@@ -62,7 +62,7 @@ public class SkyblockData {
     private static boolean showPing = false;
     private static int pingTicks = 0;
     private static int serverTicks = 0;
-    private static int serverTickTimer = 0;
+    private static int tpsTimer = 0;
 
     private static void updateDungeonClass(String msg) {
         if (mc.player != null) {
@@ -196,7 +196,7 @@ public class SkyblockData {
         pingTicks = 0;
         HudManager.lagMeterElement.setTickTime(0); // temporarily disables the element, as the server doesn't send tick packets for a few seconds after joining
         serverTicks = 0;
-        serverTickTimer = 0;
+        tpsTimer = 0;
         HudManager.tpsElement.setTps(0);
     }
 
@@ -235,11 +235,11 @@ public class SkyblockData {
             }
         }
         if (Config.tpsEnabled) {
-            serverTickTimer++;
-            if (serverTickTimer == 20) {
+            tpsTimer++;
+            if (tpsTimer == 20) {
                 HudManager.tpsElement.setTps(serverTicks);
                 serverTicks = 0;
-                serverTickTimer = 0;
+                tpsTimer = 0;
             }
         }
     }

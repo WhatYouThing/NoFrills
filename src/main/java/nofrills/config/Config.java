@@ -52,6 +52,12 @@ public class Config {
     @SerialEntry
     public static boolean slotBinding = false;
     @SerialEntry
+    public static boolean slotBindingLines = false;
+    @SerialEntry
+    public static boolean slotBindingBorders = false;
+    @SerialEntry
+    public static Color slotBindingColor = new Color(0, 255, 255, 255);
+    @SerialEntry
     public static JsonObject slotBindData = new JsonObject();
     @SerialEntry
     public static boolean hideDeadMobs = false;

@@ -1,16 +1,21 @@
 package nofrills.misc;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DepthTestFunction;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
+import nofrills.mixin.PhaseParameterBuilderAccessor;
+import nofrills.mixin.RenderPipelinesAccessor;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.opengl.GL11;
 
 import java.util.OptionalDouble;
 
@@ -24,16 +29,8 @@ public final class Rendering {
         matrices.push();
         Vec3d camPos = camera.getPos().negate();
         matrices.translate(camPos.x, camPos.y, camPos.z);
-        if (throughWalls) {
-            RenderSystem.enableDepthTest();
-            RenderSystem.depthFunc(GL11.GL_ALWAYS);
-        }
         VertexConsumer buffer = throughWalls ? consumer.getBuffer(Layers.BoxFilledNoCull) : consumer.getBuffer(Layers.BoxFilled);
         VertexRendering.drawFilledBox(matrices, buffer, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color.r, color.g, color.b, color.a);
-        if (throughWalls) {
-            RenderSystem.disableDepthTest();
-            RenderSystem.depthFunc(GL11.GL_LEQUAL);
-        }
         matrices.pop();
     }
 
@@ -44,16 +41,8 @@ public final class Rendering {
         matrices.push();
         Vec3d camPos = camera.getPos().negate();
         matrices.translate(camPos.x, camPos.y, camPos.z);
-        if (throughWalls) {
-            RenderSystem.enableDepthTest();
-            RenderSystem.depthFunc(GL11.GL_ALWAYS);
-        }
         VertexConsumer buffer = throughWalls ? consumer.getBuffer(Layers.BoxOutlineNoCull) : consumer.getBuffer(Layers.BoxOutline);
         VertexRendering.drawBox(matrices, buffer, box, color.r, color.g, color.b, color.a);
-        if (throughWalls) {
-            RenderSystem.disableDepthTest();
-            RenderSystem.depthFunc(GL11.GL_LEQUAL);
-        }
         matrices.pop();
     }
 
@@ -69,15 +58,7 @@ public final class Rendering {
         matrices.translate(textX, textY, textZ);
         matrices.rotate(camera.getRotation());
         matrices.scale(scale, -scale, scale);
-        if (throughWalls) {
-            RenderSystem.enableDepthTest();
-            RenderSystem.depthFunc(GL11.GL_ALWAYS);
-        }
         mc.textRenderer.draw(text, -mc.textRenderer.getWidth(text) / 2f, 1.0f, color.hex, true, matrices, consumer, throughWalls ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
-        if (throughWalls) {
-            RenderSystem.disableDepthTest();
-            RenderSystem.depthFunc(GL11.GL_LEQUAL);
-        }
     }
 
     /**
@@ -95,11 +76,7 @@ public final class Rendering {
         matrices.push();
         matrices.translate(pos.getX() - camPos.getX(), pos.getY() - camPos.getY(), pos.getZ() - camPos.getZ());
         Vector3f planeH = camera.getHorizontalPlane();
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthFunc(GL11.GL_ALWAYS);
         VertexRendering.drawVector(matrices, consumer.getBuffer(RenderLayer.getLines()), planeH, camera.getPos(), color.argb);
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthFunc(GL11.GL_LEQUAL);
         matrices.pop();
     }
 
@@ -147,75 +124,83 @@ public final class Rendering {
         }
     }
 
+    public static class Pipelines {
+        public static final RenderPipeline.Snippet filledSnippet = RenderPipelinesAccessor.positionColorSnippet();
+        public static final RenderPipeline.Snippet outlineSnippet = RenderPipelinesAccessor.rendertypeLinesSnippet();
+
+        public static final RenderPipeline filledNoCull = RenderPipelinesAccessor.registerPipeline(RenderPipeline.builder(filledSnippet)
+                .withLocation(Identifier.of("nofrills", "pipeline/nofrills_filled_no_cull"))
+                .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_STRIP)
+                .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                .build());
+        public static final RenderPipeline filledCull = RenderPipelinesAccessor.registerPipeline(RenderPipeline.builder(filledSnippet)
+                .withLocation(Identifier.of("nofrills", "pipeline/nofrills_filled_cull"))
+                .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_STRIP)
+                .build());
+        public static final RenderPipeline outlineNoCull = RenderPipelinesAccessor.registerPipeline(RenderPipeline.builder(outlineSnippet)
+                .withLocation(Identifier.of("nofrills", "pipeline/nofrills_outline_no_cull"))
+                .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                .build());
+        public static final RenderPipeline outlineCull = RenderPipelinesAccessor.registerPipeline(RenderPipeline.builder(outlineSnippet)
+                .withLocation(Identifier.of("nofrills", "pipeline/nofrills_outline_cull"))
+                .build());
+    }
+
+    public static class Parameters {
+        public static final RenderLayer.MultiPhaseParameters.Builder filled = RenderLayer.MultiPhaseParameters.builder();
+        public static final RenderLayer.MultiPhaseParameters.Builder lines = RenderLayer.MultiPhaseParameters.builder();
+
+        static {
+            PhaseParameterBuilderAccessor filledAccessor = (PhaseParameterBuilderAccessor) filled;
+            PhaseParameterBuilderAccessor linesAccessor = (PhaseParameterBuilderAccessor) lines;
+
+            filledAccessor.setLayering(RenderLayer.VIEW_OFFSET_Z_LAYERING);
+
+            linesAccessor.setLayering(RenderLayer.VIEW_OFFSET_Z_LAYERING);
+            linesAccessor.setLineWidth(new RenderPhase.LineWidth(OptionalDouble.of(3.0)));
+        }
+    }
+
     public static class Layers {
         public static final RenderLayer.MultiPhase BoxFilled = RenderLayer.of(
                 "nofrills_box_filled",
-                VertexFormats.POSITION_COLOR,
-                VertexFormat.DrawMode.TRIANGLE_STRIP,
-                1536,
+                RenderLayer.DEFAULT_BUFFER_SIZE,
                 false,
                 true,
-                RenderLayer.MultiPhaseParameters.builder()
-                        .program(RenderPhase.POSITION_COLOR_PROGRAM)
-                        .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                        .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                        .depthTest(RenderPhase.LEQUAL_DEPTH_TEST)
-                        .build(false));
+                Pipelines.filledCull,
+                ((PhaseParameterBuilderAccessor) Parameters.filled).buildParameters(false)
+        );
         public static final RenderLayer.MultiPhase BoxFilledNoCull = RenderLayer.of(
                 "nofrills_box_filled_no_cull",
-                VertexFormats.POSITION_COLOR,
-                VertexFormat.DrawMode.TRIANGLE_STRIP,
-                1536,
+                RenderLayer.DEFAULT_BUFFER_SIZE,
                 false,
                 true,
-                RenderLayer.MultiPhaseParameters.builder()
-                        .program(RenderPhase.POSITION_COLOR_PROGRAM)
-                        .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                        .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                        .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
-                        .build(false));
+                Pipelines.filledNoCull,
+                ((PhaseParameterBuilderAccessor) Parameters.filled).buildParameters(false)
+        );
         public static final RenderLayer.MultiPhase BoxOutline = RenderLayer.of(
                 "nofrills_box_outline",
-                VertexFormats.LINES,
-                VertexFormat.DrawMode.LINES,
-                1536,
-                RenderLayer.MultiPhaseParameters.builder()
-                        .program(RenderPhase.LINES_PROGRAM)
-                        .lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(3.0)))
-                        .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                        .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                        .target(RenderPhase.ITEM_ENTITY_TARGET)
-                        .writeMaskState(RenderPhase.ALL_MASK)
-                        .cull(RenderPhase.DISABLE_CULLING)
-                        .depthTest(RenderPhase.LEQUAL_DEPTH_TEST)
-                        .build(false)
+                RenderLayer.DEFAULT_BUFFER_SIZE,
+                false,
+                false,
+                Pipelines.outlineCull,
+                ((PhaseParameterBuilderAccessor) Parameters.lines).buildParameters(false)
         );
         public static final RenderLayer.MultiPhase BoxOutlineNoCull = RenderLayer.of(
                 "nofrills_box_outline_no_cull",
-                VertexFormats.LINES,
-                VertexFormat.DrawMode.LINES,
-                1536,
-                RenderLayer.MultiPhaseParameters.builder()
-                        .program(RenderPhase.LINES_PROGRAM)
-                        .lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(3.0)))
-                        .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-                        .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                        .target(RenderPhase.ITEM_ENTITY_TARGET)
-                        .writeMaskState(RenderPhase.ALL_MASK)
-                        .cull(RenderPhase.DISABLE_CULLING)
-                        .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
-                        .build(false)
+                RenderLayer.DEFAULT_BUFFER_SIZE,
+                false,
+                false,
+                Pipelines.outlineNoCull,
+                ((PhaseParameterBuilderAccessor) Parameters.lines).buildParameters(false)
         );
         public static final RenderLayer.MultiPhase GuiLine = RenderLayer.of(
                 "nofrills_gui_line",
-                VertexFormats.POSITION_COLOR,
-                VertexFormat.DrawMode.DEBUG_LINES,
                 262144,
-                RenderLayer.MultiPhaseParameters.builder()
-                        .program(RenderPhase.GUI_PROGRAM)
-                        .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-                        .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
-                        .build(false)
+                false,
+                false,
+                RenderPipelines.DEBUG_LINE_STRIP,
+                ((PhaseParameterBuilderAccessor) Parameters.lines).buildParameters(false)
         );
     }
 }

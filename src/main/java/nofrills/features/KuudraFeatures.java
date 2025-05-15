@@ -299,7 +299,7 @@ public class KuudraFeatures {
         if (!buildPiles.isEmpty()) {
             for (Entity pile : new ArrayList<>(buildPiles)) {
                 if (pile.isAlive() && pile.isCustomNameVisible() && pile.getCustomName() != null && Formatting.strip(pile.getCustomName().getString()).endsWith("%")) {
-                    event.drawBeam(getGround(pile.getLerpedPos(event.tickCounter.getTickDelta(true))), 256, true, RenderColor.fromColor(Config.kuudraBuildColor));
+                    event.drawBeam(getGround(pile.getLerpedPos(event.tickCounter.getTickProgress(true))), 256, true, RenderColor.fromColor(Config.kuudraBuildColor));
                 } else {
                     buildPiles.removeIf(ent -> ent.getUuidAsString().equals(pile.getUuidAsString()));
                 }

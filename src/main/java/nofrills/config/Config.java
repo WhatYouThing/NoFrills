@@ -108,6 +108,8 @@ public class Config {
     @SerialEntry
     public static boolean noHaste = false;
     @SerialEntry
+    public static boolean noEquipAnim = false;
+    @SerialEntry
     public static int viewmodelSpeed = 0;
     @SerialEntry
     public static boolean viewmodelEnable = false;

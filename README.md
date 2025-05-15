@@ -13,15 +13,21 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
     - **Auto Sprint**
     - **No Selfie Camera**: Prevents you from going into the front facing perspective when pressing F5.
-    - **Terror Fix**: Replicates the glorious sounds of pre-nerf Terror armor.
 
 - **Inventory**
 
-    - **Price Tooltips**: Adds the lowest available NPC, Motes, Auction House, Bazaar, and Attribute (separate
-      attributes + roll) prices to item tooltips.
+    - **Slot Binding**: Allows you to bind your inventory slots to your hotbar slots to swap items between them with
+      Shift + Left Click, similarly to NEU's slot binding on 1.8.9.
     - **Hotbar Swap**: Allows you to easily move items from your inventory to your hotbar by pressing Ctrl + Left Click.
       Essentially like pressing a number key, but much simpler.
     - **Ignore Background**: Prevents you from clicking on the glass panes which act as a background in Skyblock GUI's.
+    - **Middle Click Override**: Replaces your left clicks with middle clicks in any applicable GUI, similarly to the
+      Skytils feature.
+
+- **Tooltips**
+
+    - **Price Tooltips**: Adds the lowest available NPC, Motes, Auction House, Bazaar, and Attribute (separate
+      attributes + roll) prices to item tooltips.
 
 - **Visual**
 
@@ -31,15 +37,20 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
       Impact).
     - **No Fire Overlay**: Prevents the on fire overlay from rendering.
     - **No Break Particles**: Prevents any broken block particles from spawning.
+    - **No Boss Bar**: Prevents the bar at the top of the screen from rendering.
+    - **No Loading Screen**: Removes the world loading screen that appears when switching islands.
 
 - **Overlays**
+
     - **Etherwarp**: Highlights the block you're aiming at when trying to use the Ether Transmission ability.
 
 - **Wardrobe**
+
     - **Wardrobe Hotkeys**: Adds number hotkeys (1-9) to the Wardrobe, letting you easily switch your armor sets. Also
       has an option to play a sound effect when using the feature.
 
 - **Chat**
+
     - **Finder Options**: Adds various buttons in the chat when anyone joins your party through Party Finder, such as
       copy name and kick.
     - **Party Commands**: Adds a few commands that your party members can use, customizable.
@@ -47,9 +58,15 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Global Chat Waypoints**: Automatically creates temporary waypoints for coordinates sent in global chat.
 
 - **Viewmodel**
+
     - **No Haste**: Prevents Haste (and Mining Fatigue) from affecting your swing speed.
     - **Swing Speed**: Allows you to set a custom swing speed.
     - **Custom Viewmodel**: Allows you to change the position, scale and rotation of your hand.
+    - **No Equip Animation**: Disables the animation of your held item moving up after it's either changed or updated.
+
+- **Misc**
+
+    - **Terror Fix**: Replicates the glorious sounds of pre-nerf Terror armor.
 
 ### Fixes
 
@@ -73,6 +90,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
   ability, such as the Spirit Sceptre or the Egglocator.
 - **Efficiency Fix**: Fixes the efficiency enchant being lag and ping dependent, because Microsoft decided to no longer
   update your mining efficiency attribute client side.
+- **Clear Cursor Stack**: Automatically clears your cursor from any ghost items that may appear between GUI changes.
 
 ### Events
 
@@ -84,12 +102,27 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Calendar**
     - **Exact Date**: Calculates the exact start date for every event in the Skyblock calendar.
 
+### Solvers
+
+- **Experimentation Table**
+    - **Solve Chronomatron**
+    - **Solve Ultrasequencer**
+    - **Solve Superpairs**
+
+### HUD
+
+- **Fishing Bobber**: Element which displays the state of your fishing bobber.
+- **Sea Creatures**: Element which displays the amount of alive sea creatures.
+- **TPS**: Element which displays the amount of server ticks in the last second.
+- **Lag Meter**: Element which warns you if the server is lagging.
+- **Power**: Element which displays the Power blessing level in Dungeons.
+- **Day**: Element which displays the current Minecraft day of the server you're on.
+- **Ping**: Element which displays your ping, refreshing every second.
+
 ### Fishing
 
 - **Track Cap**: Keeps track of how many sea creatures are alive, and allows you to notify yourself (and your
   party) once the cap is reached. Customizable.
-- **Render Cap**: Shows the current amount of alive sea creatures as a small number on screen while you hold your
-  fishing rod.
 - **Rare Sea Creatures**: Notify yourself (and your party) when catching any rare/profitable sea creature.
 - **Apply Glow**: Applies a gold-colored glow to any nearby rare sea creature.
 - **Mute Drake**: Prevents the Reindrake from blowing up your ears, because he's very loud on 1.20+.
@@ -132,6 +165,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Fresh Timer**: Shows a timer for Fresh Tools.
 - **Announce Drain**: Send a message when you drain your mana with an End Stone Sword.
 - **Stun Waypoint**: Renders a waypoint for the easiest to break pod while you are stunning Kuudra.
+- **Supply Beacons**: Renders beacons for any nearby supply crates.
+- **Drop Off Beacons**: Renders beacons for every available supply drop-off point.
+- **Build Beacons**: Renders beacons for every supply pile that is not built yet.
 
 ### Slayers
 
@@ -140,6 +176,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Inferno Demonlord**
     - **Hide Attunement Spam**: Hides the chat messages warning you about using the wrong attunement.
     - **Pillar Warning**: Displays the status (countdown, hits) of your fire pillars.
+    - **Dagger Fix**: Fixes the Blaze slayer daggers switching their attunement twice when clicking on any block with
+      them.
 - **Riftstalker Bloodfiend**
     - **Ice Indicator**: Displays a timer on screen when the boss is about to use Twinclaws, so that you know when to
       use Holy Ice.
@@ -158,6 +196,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Ghost Vision**: Makes Ghosts way easier to see in the Dwarven Mines.
 - **Better Sky Mall**: Get Sky Mall buff messages only when you're mining. Also compacts the buff message, and mentions
   the day which the buff is for, e.g. "Sky Mall Buff for Day Summer 1st"
+- **Safe Pickobulus**: Prevents you from being able to use the Pickobulus mining ability on your Private Island and
+  Garden.
+- **Scatha Features**: Track the worm spawn cooldown, and get alerts whenever a worm spawns.
 
 ### Farming
 

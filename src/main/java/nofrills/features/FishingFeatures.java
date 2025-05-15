@@ -20,24 +20,24 @@ import static nofrills.Main.mc;
 public class FishingFeatures {
     private static final List<Entity> seaCreatures = new ArrayList<>();
     private static final SeaCreature[] seaCreatureData = {
-            new SeaCreature("Plhlegblast", "WOAH! A Plhlegblast appeared.", "§9", true),
-            new SeaCreature("Thunder", "You hear a massive rumble as Thunder emerges.", "§b", true),
-            new SeaCreature("Lord Jawbus", "You have angered a legendary creature... Lord Jawbus has arrived.", "§d", true),
-            new SeaCreature("Great White Shark", "Hide no longer, a Great White Shark has tracked your scent and thirsts for your blood!", "§9", true),
-            new SeaCreature("Yeti", "What is this creature!?", "§3", true),
-            new SeaCreature("Reindrake", "A Reindrake forms from the depths.", "§c", true),
-            new SeaCreature("Phantom Fisher", "The spirit of a long lost Phantom Fisher has come to haunt you.", "§3", true),
-            new SeaCreature("Grim Reaper", "This can't be! The manifestation of death himself!", "§5", true),
-            new SeaCreature("Carrot King", "Is this even a fish? It's the Carrot King!", "§a", true),
-            new SeaCreature("Water Hydra", "The Water Hydra has come to test your strength.", "§1", true),
-            new SeaCreature("Sea Emperor", "The Sea Emperor arises from the depths.", "§4", true),
-            new SeaCreature("Abyssal Miner", "An Abyssal Miner breaks out of the water!", "§2", true),
-            new SeaCreature("Alligator", "A long snout breaks the surface of the water. It's an Alligator!", "§2", true),
-            new SeaCreature("Titanoboa", "A massive Titanoboa surfaces. It's body stretches as far as the eye can see.", "§e", true),
-            new SeaCreature("Blue Ringed Octopus", "A garish set of tentacles arise. It's a Blue Ringed Octopus!", "§9", true),
-            new SeaCreature("Fiery Scuttler", "A Fiery Scuttler inconspicuously waddles up to you, friends in tow.", "§6", true),
-            new SeaCreature("Wiki Tiki", "The water bubbles and froths. A massive form emerges- you have disturbed the Wiki Tiki! You shall pay the price.", "§d", true),
-            new SeaCreature("Ragnarok", "The sky darkens and the air thickens. The end times are upon us: Ragnarok is here.", "§c", true),
+            new SeaCreature("Plhlegblast", "WOAH! A Plhlegblast appeared.", "§9", true, true),
+            new SeaCreature("Thunder", "You hear a massive rumble as Thunder emerges.", "§b", true, true),
+            new SeaCreature("Lord Jawbus", "You have angered a legendary creature... Lord Jawbus has arrived.", "§d", true, true),
+            new SeaCreature("Great White Shark", "Hide no longer, a Great White Shark has tracked your scent and thirsts for your blood!", "§9", true, true),
+            new SeaCreature("Yeti", "What is this creature!?", "§3", true, true),
+            new SeaCreature("Reindrake", "A Reindrake forms from the depths.", "§c", true, true),
+            new SeaCreature("Phantom Fisher", "The spirit of a long lost Phantom Fisher has come to haunt you.", "§3", true, true),
+            new SeaCreature("Grim Reaper", "This can't be! The manifestation of death himself!", "§5", true, true),
+            new SeaCreature("Carrot King", "Is this even a fish? It's the Carrot King!", "§a", true, true),
+            new SeaCreature("Water Hydra", "The Water Hydra has come to test your strength.", "§1", true, true),
+            new SeaCreature("Sea Emperor", "The Sea Emperor arises from the depths.", "§4", true, true),
+            new SeaCreature("Abyssal Miner", "An Abyssal Miner breaks out of the water!", "§2", true, true),
+            new SeaCreature("Alligator", "A long snout breaks the surface of the water. It's an Alligator!", "§2", true, true),
+            new SeaCreature("Titanoboa", "A massive Titanoboa surfaces. It's body stretches as far as the eye can see.", "§e", true, false),
+            new SeaCreature("Blue Ringed Octopus", "A garish set of tentacles arise. It's a Blue Ringed Octopus!", "§9", true, false),
+            new SeaCreature("Fiery Scuttler", "A Fiery Scuttler inconspicuously waddles up to you, friends in tow.", "§6", true, false),
+            new SeaCreature("Wiki Tiki", "The water bubbles and froths. A massive form emerges- you have disturbed the Wiki Tiki! You shall pay the price.", "§d", true, false),
+            new SeaCreature("Ragnarok", "The sky darkens and the air thickens. The end times are upon us: Ragnarok is here.", "§c", true, true),
             SeaCreature.plain("Squid"),
             SeaCreature.plain("Sea Walker"),
             SeaCreature.plain("Night Squid"),
@@ -140,9 +140,9 @@ public class FishingFeatures {
                         seaCreatures.add(event.entity);
                     }
                 }
-                if (Config.rareGlow && creature.rare && event.entity.age <= 20 && name.contains(creature.name.toLowerCase())) {
+                if (Config.rareGlow && creature.rare && creature.glow && event.entity.age <= 20 && name.contains(creature.name.toLowerCase())) {
                     Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, FishingFeatures::isValidMob));
-                    if (owner != null) {
+                    if (owner != null && !(owner instanceof GiantEntity)) {
                         Rendering.Entities.drawGlow(owner, true, rareColor);
                         if (owner.hasVehicle()) {
                             Rendering.Entities.drawGlow(owner.getVehicle(), true, rareColor);
@@ -205,16 +205,18 @@ public class FishingFeatures {
         public String spawnMsg;
         public String color;
         public boolean rare;
+        public boolean glow;
 
-        public SeaCreature(String name, String spawnMsg, String color, boolean rare) {
+        public SeaCreature(String name, String spawnMsg, String color, boolean rare, boolean glow) {
             this.name = name;
             this.spawnMsg = spawnMsg;
             this.color = color;
             this.rare = rare;
+            this.glow = glow;
         }
 
         public static SeaCreature plain(String name) {
-            return new SeaCreature(name, "", "", false);
+            return new SeaCreature(name, "", "", false, false);
         }
     }
 }

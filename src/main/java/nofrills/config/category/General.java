@@ -10,7 +10,7 @@ import nofrills.config.Config;
 import java.awt.*;
 
 public class General {
-    private static final String commandInfo = "\n\n\"Automatic\" - Process the command automatically from anyone.\n\"Manual\" - Add a button in the chat which you must click to process the command.\n\"Ignore\"- Process the command only if the player is whitelisted.\n\"Disabled\" - Fully disable the specific command.\n\nTip: You can manage the whitelist and blacklist with the \"/nf party\" command. Whitelisted players always have their commands processed automatically (if not disabled), and blacklisted players always have their commands ignored.";
+    private static final String commandInfo = "\n\nAutomatic: Process the command automatically from anyone.\nManual: Add a button in the chat which you must click to process the command.\nIgnore: Process the command only if the player is whitelisted.\nDisabled: Fully disable the specific command.\n\nTip: You can manage the whitelist and blacklist with the \"/nf party\" command. Whitelisted players always have their commands processed automatically (if not disabled), and blacklisted players always have their commands ignored.";
 
     public static ConfigCategory create(Config defaults, Config config) {
         return ConfigCategory.createBuilder()
@@ -36,12 +36,6 @@ public class General {
                                 .name(Text.of("No Selfie Camera"))
                                 .description(OptionDescription.of(Text.of("Removes the front facing camera perspective.")))
                                 .binding(false, () -> Config.noSelfieCam, value -> Config.noSelfieCam = value)
-                                .controller(Config::booleanController)
-                                .build())
-                        .option(Option.<Boolean>createBuilder()
-                                .name(Text.of("Terror Fix"))
-                                .description(OptionDescription.of(Text.of("Replicates the behavior of old Terror armor by playing the piston sound effect on each arrow hit.")))
-                                .binding(false, () -> Config.terrorFix, value -> Config.terrorFix = value)
                                 .controller(Config::booleanController)
                                 .build())
                         .build())
@@ -108,7 +102,7 @@ public class General {
                         .collapsed(false)
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Price Tooltips"))
-                                .description(OptionDescription.of(Text.of("Adds the lowest auction house, bazaar, and attribute prices to item tooltips.\n\nLowest BIN: - The lowest available Buy It Now price for the specific item.\nBazaar Buy: - The lowest instant buy Bazaar price for the specific item.\nBazaar Sell: - The lowest instant sell Bazaar price for the specific item.\nPrice for Attribute <Name> <Level>: - The lowest price for the exact attribute on the item. If the specific level is not available, the price is calculated from any level below.\nPrice for Roll: - The lowest available price for the exact item + attribute combo, regardless of attribute levels.\nNPC Price: - The base price of the item in NPC sell shops.\nMotes Price: - The base motes price of the item, Rift only.")))
+                                .description(OptionDescription.of(Text.of("Adds the lowest auction house, bazaar, and attribute prices to item tooltips.\n\nLowest BIN: The lowest available Buy It Now price for the specific item.\nBazaar Buy: The lowest instant buy Bazaar price for the specific item.\nBazaar Sell: The lowest instant sell Bazaar price for the specific item.\nPrice for Attribute <Name> <Level>: The lowest price for the exact attribute on the item. If the specific level is not available, the price is calculated from any level below.\nPrice for Roll: The lowest available price for the exact item + attribute combo, regardless of attribute levels.\nNPC Price: The base price of the item in NPC sell shops.\nMotes Price: The base motes price of the item, Rift only.")))
                                 .binding(false, () -> Config.priceTooltips, value -> Config.priceTooltips = value)
                                 .controller(Config::booleanController)
                                 .build())
@@ -299,6 +293,12 @@ public class General {
                                 .binding(false, () -> Config.noHaste, value -> Config.noHaste = value)
                                 .controller(Config::booleanController)
                                 .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.of("No Equip Animation"))
+                                .description(OptionDescription.of(Text.of("Disables the animation of your held item moving up after it's either changed or updated.")))
+                                .binding(false, () -> Config.noEquipAnim, value -> Config.noEquipAnim = value)
+                                .controller(Config::booleanController)
+                                .build())
                         .option(Option.<Integer>createBuilder()
                                 .name(Text.of("Swing Speed"))
                                 .description(OptionDescription.of(Text.of("Allows you to set a custom hand swing speed. Set to 0 to not override.")))
@@ -369,6 +369,18 @@ public class General {
                                 .controller(option -> Config.floatSliderController(option, -360.0f, 360.0f, 0.5f))
                                 .build())
                         .build())
+
+                .group(OptionGroup.createBuilder()
+                        .name(Text.of("Misc"))
+                        .collapsed(true)
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.of("Terror Fix"))
+                                .description(OptionDescription.of(Text.of("Replicates the behavior of old Terror armor by playing the piston sound effect on each arrow hit.")))
+                                .binding(false, () -> Config.terrorFix, value -> Config.terrorFix = value)
+                                .controller(Config::booleanController)
+                                .build())
+                        .build())
+
 
                 .build();
     }

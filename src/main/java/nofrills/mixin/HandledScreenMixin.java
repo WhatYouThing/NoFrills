@@ -95,9 +95,9 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     }
 
     @Unique
-    private void drawBorder(DrawContext context, int slotId, int offsetInner, int offsetOuter, RenderColor color) {
+    private void drawBorder(DrawContext context, int slotId, RenderColor color) {
         Slot slot = handler.getSlot(slotId);
-        context.drawBorder(slot.x + offsetInner, slot.y + offsetInner, 16 + offsetOuter, 16 + offsetOuter, color.argb);
+        context.drawBorder(slot.x, slot.y, 16, 16, color.argb);
     }
 
     @Override
@@ -206,7 +206,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                             drawLine(context, focusedSlot.id, element.getAsInt(), SlotBinding.boundColor);
                         }
                         if (Config.slotBindingBorders) {
-                            drawBorder(context, element.getAsInt(), 0, 0, SlotBinding.boundColor);
+                            drawBorder(context, element.getAsInt(), SlotBinding.boundColor);
                         }
                     }
                 }
@@ -220,7 +220,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                                     drawLine(context, focusedSlot.id, i + 35, SlotBinding.boundColor);
                                 }
                                 if (Config.slotBindingBorders) {
-                                    drawBorder(context, i + 35, 0, 0, SlotBinding.boundColor);
+                                    drawBorder(context, i + 35, SlotBinding.boundColor);
                                 }
                             }
                         }
@@ -228,8 +228,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 }
             }
             if (SlotBinding.lastSlot != -1) {
-                drawBorder(context, SlotBinding.lastSlot, 0, 0, SlotBinding.bindingColor);
-                drawBorder(context, focusedSlot.id, 0, 0, SlotBinding.bindingColor);
+                drawBorder(context, SlotBinding.lastSlot, SlotBinding.bindingColor);
+                drawBorder(context, focusedSlot.id, SlotBinding.bindingColor);
                 drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.bindingColor);
             }
             context.getMatrices().pop();
@@ -255,7 +255,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
-    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;hasCreativeInventory()Z"))
+    @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isInCreativeMode()Z"))
     private boolean onMiddleClick(boolean original) {
         if (Utils.isFixEnabled(Config.middleClickFix)) {
             return true;

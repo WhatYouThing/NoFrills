@@ -32,7 +32,7 @@ public class RecipeLookup {
                             Utils.sendMessage("/recipe " + itemId.substring(0, index));
                         } else if (itemId.equals("PET")) {
                             NbtCompound data = Utils.getCustomData(stack);
-                            JsonObject petData = JsonParser.parseString(data.getString("petInfo")).getAsJsonObject();
+                            JsonObject petData = JsonParser.parseString(data.getString("petInfo").orElse("")).getAsJsonObject();
                             String petName = petData.get("type").getAsString().replaceAll("_", " ");
                             Utils.sendMessage("/recipe " + petName + " PET");
                         } else {

@@ -161,7 +161,7 @@ public class EnchantingSolver {
     private static void onSendPacket(SendPacketEvent event) {
         if (Config.solveChronomatron && event.packet instanceof ClickSlotC2SPacket clickPacket) {
             if (getExperimentType().equals(ExperimentType.Chronomatron) && !rememberPhase) {
-                int slotId = clickPacket.getSlot();
+                int slotId = clickPacket.slot();
                 if (!chronomatronSolution.isEmpty()) {
                     Solution first = chronomatronSolution.getFirst();
                     if (first.slots.stream().anyMatch(slot -> slot.id == slotId)) {

@@ -94,9 +94,9 @@ public class ChatFeatures {
             if (name.equalsIgnoreCase(mc.getSession().getUsername())) {
                 return;
             }
-            ClickEvent copyName = new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, name);
-            ClickEvent kick = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/party kick " + name);
-            ClickEvent ignoreAdd = new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/ignore add " + name);
+            ClickEvent copyName = new ClickEvent.CopyToClipboard(name);
+            ClickEvent kick = new ClickEvent.CopyToClipboard("/party kick " + name);
+            ClickEvent ignoreAdd = new ClickEvent.CopyToClipboard("/ignore add " + name);
             Text message = Text.literal("§aOptions for §6" + name + "§a: ")
                     .append(Text.literal("§b§l[COPY NAME]").setStyle(Style.EMPTY.withClickEvent(copyName)))
                     .append(Text.literal(" "))

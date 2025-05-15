@@ -2,13 +2,18 @@ package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Hand;
+import net.minecraft.world.World;
 import nofrills.config.Config;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +22,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin {
+public abstract class LivingEntityMixin extends Entity {
+    public LivingEntityMixin(EntityType<?> type, World world) {
+        super(type, world);
+    }
+
     @ModifyExpressionValue(method = "travelInFluid", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
     private boolean onTravel(boolean original) {
         if (Utils.isFixEnabled(Config.antiSwim)) {
@@ -71,5 +80,13 @@ public abstract class LivingEntityMixin {
                 }
             }
         }
+    }
+
+    @WrapWithCondition(method = "dropItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
+    private boolean onDropSwing(LivingEntity instance, Hand hand) {
+        if (Utils.isFixEnabled(Config.noDropSwing)) {
+            return false;
+        }
+        return this.getWorld().isClient;
     }
 }

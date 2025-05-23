@@ -27,6 +27,8 @@ public class LagMeter extends SimpleTextElement {
             } else {
                 this.hidden = true;
             }
+        } else {
+            this.hidden = true;
         }
         super.render(context, mouseX, mouseY, delta);
         Config.lagMeterPosX = this.posX;

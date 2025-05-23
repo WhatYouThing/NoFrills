@@ -4,6 +4,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ProfileComponent;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.PlayerHeadItem;
 import nofrills.config.Config;
 import nofrills.features.PearlRefill;
 import nofrills.hud.HudEditorScreen;
@@ -194,7 +201,21 @@ public class NoFrills {
             new ModCommand("hudEditor", "Opens the NoFrills hud editor.", literal("hudEditor").executes(context -> {
                 Utils.setScreen(new HudEditorScreen());
                 return SINGLE_SUCCESS;
-            }))
+            })),
+            new ModCommand("debug", "Random commands for logging, debugging, or testing.", literal("debug").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(literal("dumpHeadTextures").executes(context -> {
+                for (Entity ent : mc.world.getEntities()) {
+                    if (ent instanceof LivingEntity livingEntity) {
+                        ItemStack helmet = livingEntity.getEquippedStack(EquipmentSlot.HEAD);
+                        ProfileComponent profile = helmet.getComponents().get(DataComponentTypes.PROFILE);
+                        if (!helmet.isEmpty() && profile != null && helmet.getItem() instanceof PlayerHeadItem) {
+                            Utils.infoFormat("entity name: {}\nhelmet name: {}\ntexture url: {}", ent.getName().getString(), helmet.getName().getString(), mc.getSkinProvider().getSkinTextures(profile.gameProfile()).textureUrl());
+                        }
+                    }
+                }
+                return SINGLE_SUCCESS;
+            }))),
     };
 
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {

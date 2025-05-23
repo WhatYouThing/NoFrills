@@ -1,7 +1,10 @@
 package nofrills.features;
 
+import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.GiantEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -33,10 +36,50 @@ public class FishingFeatures {
             new SeaCreature("Sea Emperor", "The Sea Emperor arises from the depths.", "§4", true, true),
             new SeaCreature("Abyssal Miner", "An Abyssal Miner breaks out of the water!", "§2", true, true),
             new SeaCreature("Alligator", "A long snout breaks the surface of the water. It's an Alligator!", "§2", true, true),
-            new SeaCreature("Titanoboa", "A massive Titanoboa surfaces. It's body stretches as far as the eye can see.", "§e", true, false),
-            new SeaCreature("Blue Ringed Octopus", "A garish set of tentacles arise. It's a Blue Ringed Octopus!", "§9", true, false),
-            new SeaCreature("Fiery Scuttler", "A Fiery Scuttler inconspicuously waddles up to you, friends in tow.", "§6", true, false),
-            new SeaCreature("Wiki Tiki", "The water bubbles and froths. A massive form emerges- you have disturbed the Wiki Tiki! You shall pay the price.", "§d", true, false),
+            new SeaCreature(
+                    "Titanoboa",
+                    "A massive Titanoboa surfaces. It's body stretches as far as the eye can see.",
+                    "§e",
+                    true,
+                    false)
+                    .withTextures(List.of(
+                            "b82086882b25e9e914362f2048c285c18c8d698a336f7e83f0a1964c760b11",
+                            "645f2c0bbfe3b8b19b7452072db69a5f59da38ff61415545156e5701e1be756d"
+                    )
+            ),
+            new SeaCreature(
+                    "Blue Ringed Octopus",
+                    "A garish set of tentacles arise. It's a Blue Ringed Octopus!",
+                    "§9",
+                    true,
+                    false)
+                    .withTextures(List.of(
+                            "b2b6074d0c9d6b89a494cf4f74158282a64ee23ba8a0725633ad70932ada1a8f"
+                    )
+            ),
+            new SeaCreature(
+                    "Fiery Scuttler",
+                    "A Fiery Scuttler inconspicuously waddles up to you, friends in tow.",
+                    "§6",
+                    true,
+                    false)
+                    .withTextures(List.of(
+                            "55b194025806687642e2bc239895d646a6d8c193d9253b61bfce908f6ce1b84a"
+                    )
+            ),
+            new SeaCreature(
+                    "Wiki Tiki",
+                    "The water bubbles and froths. A massive form emerges- you have disturbed the Wiki Tiki! You shall pay the price.",
+                    "§d",
+                    true,
+                    false)
+                    .withTextures(List.of(
+                            "f3c802e580bfefc18c4af94cceb82968b5b4aeab0d832346a633a7473a41dfac",
+                            "e64331c8fb750f9043334320c94580e7896955695156d80689e5d0a6c60a10e7",
+                            "9122f7a19b3197766b381fb36bfeb6f442d62509e44cc7847c75c8e8c387225a",
+                            "c5fd6b9a59ec5b97db8bdc158fbd5f91ef7b317b859fcebe6d09e7bd80eaca9d"
+                    )
+            ),
             new SeaCreature("Ragnarok", "The sky darkens and the air thickens. The end times are upon us: Ragnarok is here.", "§c", true, true),
             SeaCreature.plain("Squid"),
             SeaCreature.plain("Sea Walker"),
@@ -131,6 +174,23 @@ public class FishingFeatures {
     }
 
     @EventHandler
+    private static void onUpdated(EntityUpdatedEvent event) {
+        if (Config.rareGlow && !Utils.isInDungeons() && event.entity.age <= 10 && event.entity instanceof ArmorStandEntity armorStand) {
+            GameProfile textures = Utils.getTextures(armorStand.getEquippedStack(EquipmentSlot.HEAD));
+            if (textures != null) {
+                for (SeaCreature creature : seaCreatureData) {
+                    for (String texture : creature.textures) {
+                        if (Utils.isTextureEqual(textures, texture)) {
+                            Rendering.Entities.drawGlow(event.entity, true, rareColor);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (!Utils.isInDungeons() && event.namePlain.contains(Utils.Symbols.heart)) {
             for (SeaCreature creature : seaCreatureData) {
@@ -140,7 +200,7 @@ public class FishingFeatures {
                         seaCreatures.add(event.entity);
                     }
                 }
-                if (Config.rareGlow && creature.rare && creature.glow && event.entity.age <= 20 && name.contains(creature.name.toLowerCase())) {
+                if (Config.rareGlow && creature.rare && creature.glow && event.entity.age <= 10 && name.contains(creature.name.toLowerCase())) {
                     Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, FishingFeatures::isValidMob));
                     if (owner != null && !(owner instanceof GiantEntity)) {
                         Rendering.Entities.drawGlow(owner, true, rareColor);
@@ -206,6 +266,7 @@ public class FishingFeatures {
         public String color;
         public boolean rare;
         public boolean glow;
+        public List<String> textures = List.of();
 
         public SeaCreature(String name, String spawnMsg, String color, boolean rare, boolean glow) {
             this.name = name;
@@ -217,6 +278,11 @@ public class FishingFeatures {
 
         public static SeaCreature plain(String name) {
             return new SeaCreature(name, "", "", false, false);
+        }
+
+        public SeaCreature withTextures(List<String> textures) {
+            this.textures = textures;
+            return this;
         }
     }
 }

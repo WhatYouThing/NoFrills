@@ -35,15 +35,16 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V", shift = At.Shift.AFTER))
     private void onPostTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
-        if (ent instanceof ArmorStandEntity) {
-            TrackedDataHandler<?> textComponent = TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT;
-            for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
-                if (entry.handler().equals(textComponent) && entry.value() != null && ent.getCustomName() != null) {
-                    eventBus.post(new EntityNamedEvent(ent, Formatting.strip(ent.getCustomName().getString())));
-                    break;
+        if (ent instanceof LivingEntity) {
+            if (ent instanceof ArmorStandEntity) {
+                TrackedDataHandler<?> textComponent = TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT;
+                for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
+                    if (entry.handler().equals(textComponent) && entry.value() != null && ent.getCustomName() != null) {
+                        eventBus.post(new EntityNamedEvent(ent, Formatting.strip(ent.getCustomName().getString())));
+                        break;
+                    }
                 }
             }
-        } else if (ent instanceof LivingEntity) {
             eventBus.post(new EntityUpdatedEvent(ent));
         }
     }

@@ -1,5 +1,6 @@
 package nofrills.misc;
 
+import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -13,6 +14,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -279,6 +281,22 @@ public class Utils {
      */
     public static String getSkyblockId(ItemStack stack) {
         return getSkyblockId(getCustomData(stack));
+    }
+
+    public static GameProfile getTextures(ItemStack stack) {
+        ProfileComponent profile = stack.getComponents().get(DataComponentTypes.PROFILE);
+        if (!stack.isEmpty() && profile != null) {
+            return profile.gameProfile();
+        }
+        return null;
+    }
+
+    public static boolean isTextureEqual(GameProfile profile, String textureId) {
+        String url = mc.getSkinProvider().getSkinTextures(profile).textureUrl();
+        if (url != null) {
+            return url.endsWith("texture/" + textureId);
+        }
+        return false;
     }
 
     public static boolean isFixEnabled(Config.fixModes fix) {

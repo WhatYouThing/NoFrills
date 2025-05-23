@@ -62,6 +62,8 @@ public class Config {
     @SerialEntry
     public static boolean hideDeadMobs = false;
     @SerialEntry
+    public static boolean keepNametags = false;
+    @SerialEntry
     public static boolean noExplosions = false;
     @SerialEntry
     public static boolean noFireOverlay = false;

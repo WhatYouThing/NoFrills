@@ -1,6 +1,9 @@
 package nofrills.misc;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftProfileTextures;
+import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.properties.Property;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -204,6 +207,13 @@ public class Utils {
         return isInZone(Symbols.zone + " The Garden", true) || isOnGardenPlot();
     }
 
+    /**
+     * Returns true if the player is currently on a 1.21+ Skyblock island (currently only Park and Galatea)
+     */
+    public static boolean isOnModernIsland() {
+        return isInArea("The Park") || isInArea("Galatea");
+    }
+
     public static boolean isInstanceOver() {
         return SkyblockData.isInstanceOver();
     }
@@ -291,8 +301,20 @@ public class Utils {
         return null;
     }
 
+    public static String getTextureUrl(GameProfile profile) {
+        if (profile != null) {
+            MinecraftSessionService service = mc.getSessionService();
+            Property property = service.getPackedTextures(profile);
+            MinecraftProfileTextures textures = service.unpackTextures(property);
+            if (textures.skin() != null) {
+                return textures.skin().getUrl();
+            }
+        }
+        return "";
+    }
+
     public static boolean isTextureEqual(GameProfile profile, String textureId) {
-        String url = mc.getSkinProvider().getSkinTextures(profile).textureUrl();
+        String url = getTextureUrl(profile);
         if (url != null) {
             return url.endsWith("texture/" + textureId);
         }

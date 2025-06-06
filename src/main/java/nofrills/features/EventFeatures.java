@@ -13,20 +13,19 @@ import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldRenderEvent;
+import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
 import static nofrills.Main.mc;
 
 public class EventFeatures {
-    private static final List<Entity> chestList = new ArrayList<>();
+    private static final EntityCache chestList = new EntityCache();
 
     private static boolean isSpooky() {
         for (String line : SkyblockData.getLines()) {
@@ -51,7 +50,7 @@ public class EventFeatures {
         if (isSpooky() && (Config.spookyChestAlert || Config.spookyChestHighlight)) {
             String name = event.namePlain.toLowerCase();
             if (name.equals("trick or treat?") || name.equals("party chest")) {
-                if (!chestList.contains(event.entity) && event.entity.distanceTo(mc.player) <= 16.0f) {
+                if (event.entity.distanceTo(mc.player) <= 16.0f) {
                     if (Config.spookyChestAlert) {
                         Utils.showTitle("§6§lCHEST SPAWNED!", "", 5, 20, 5);
                         Utils.playSound(SoundEvents.BLOCK_VAULT_ACTIVATE, SoundCategory.MASTER, 1.0f, 1.0f);
@@ -66,15 +65,10 @@ public class EventFeatures {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (Config.spookyChestHighlight && !chestList.isEmpty()) {
-            List<Entity> chests = new ArrayList<>(chestList);
-            for (Entity chest : chests) {
-                if (chest.isRemoved()) {
-                    chestList.remove(chest);
-                } else {
-                    BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);
-                    event.drawFilledWithBeam(Box.enclosing(pos, pos), 128, true, RenderColor.fromColor(Config.spookyChestHighlightColor));
-                }
+        if (Config.spookyChestHighlight && !chestList.empty()) {
+            for (Entity chest : chestList.get()) {
+                BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);
+                event.drawFilledWithBeam(Box.enclosing(pos, pos), 256, true, RenderColor.fromColor(Config.spookyChestHighlightColor));
             }
         }
     }

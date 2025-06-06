@@ -29,7 +29,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @ModifyExpressionValue(method = "travelInFluid", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
     private boolean onTravel(boolean original) {
-        if (Utils.isFixEnabled(Config.antiSwim)) {
+        if (Utils.isFixEnabled(Config.antiSwim) && Utils.isOnModernIsland()) {
             return false;
         }
         return original;
@@ -37,7 +37,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @ModifyExpressionValue(method = "applyFluidMovingSpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
     private boolean onApplyFluidSpeed(boolean original) {
-        if (Utils.isFixEnabled(Config.antiSwim)) {
+        if (Utils.isFixEnabled(Config.antiSwim) && Utils.isOnModernIsland()) {
             return false;
         }
         return original;

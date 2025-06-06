@@ -21,12 +21,8 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.*;
-import nofrills.misc.RenderColor;
-import nofrills.misc.SkyblockData;
-import nofrills.misc.SlotOptions;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -44,14 +40,8 @@ public class DungeonSolvers {
     private static final List<BlockPos> sharpshooterList = new ArrayList<>();
     private static final Box sharpshooterTarget = Box.enclosing(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
     private static final Box sharpshooterArea = new Box(63.2, 127, 35.8, 63.8, 128, 35.2);
-    private static final List<Entity> dungeonKeys = new ArrayList<>();
-    private static final List<Entity> spiritBows = new ArrayList<>();
-    private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
-    private static final String wishMsg = "⚠ Maxor is enraged! ⚠";
-    private static final String campMsg = "[BOSS] The Watcher: Let's see how you can handle this.";
-    private static final String ragAxeMsg = "[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.";
-    private static final String sadanEnterMsg = "[BOSS] Sadan: So you made it all the way here... Now you wish to defy me? Sadan?!";
-    private static final String sadanTerraDoneMsg = "[BOSS] Sadan: ENOUGH!";
+    private static final EntityCache dungeonKeys = new EntityCache();
+    private static final EntityCache spiritBows = new EntityCache();
     private static final List<SpawningTerracotta> terracottas = new ArrayList<>();
     private static final BlockPos sadanPit = new BlockPos(-9, 67, 66);
     public static boolean isInTerminal = false;
@@ -122,7 +112,7 @@ public class DungeonSolvers {
     private static void onTick(WorldTickEvent event) {
         if (Utils.isOnDungeonFloor("6")) {
             if (Config.gyroTimer && gyroTicks > 0) {
-                Utils.showTitleCustom("GYRO: " + decimalFormat.format(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, 0xffff00);
+                Utils.showTitleCustom("GYRO: " + Utils.formatDecimal(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, 0xffff00);
             }
         }
         if (Utils.isOnDungeonFloor("7")) {
@@ -281,25 +271,25 @@ public class DungeonSolvers {
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
         if (Utils.isInDungeons()) {
-            if (Config.wishReminder && Config.dungeonClass.equals("Healer") && event.messagePlain.equals(wishMsg)) {
+            if (Config.wishReminder && Config.dungeonClass.equals("Healer") && event.messagePlain.equals("⚠ Maxor is enraged! ⚠")) {
                 Utils.showTitleCustom("WISH!", 40, -20, 4.0f, 0x00ff00);
                 Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
             }
             if (Config.dungeonClass.equals("Mage")) {
-                if (Config.campReminder && event.messagePlain.equals(campMsg)) {
+                if (Config.campReminder && event.messagePlain.equals("[BOSS] The Watcher: Let's see how you can handle this.")) {
                     Utils.showTitleCustom("CAMP BLOOD!", 40, -20, 4.0f, 0xff4646);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
-                if (Config.ragAxeReminder && Utils.isOnDungeonFloor("M5") && event.messagePlain.equals(ragAxeMsg)) {
+                if (Config.ragAxeReminder && Utils.isOnDungeonFloor("M5") && event.messagePlain.equals("[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.")) {
                     Utils.showTitleCustom("RAG AXE!", 40, -20, 4.0f, 0xffff00);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
             }
             if (Config.gyroTimer) {
-                if (event.messagePlain.equals(sadanEnterMsg)) {
+                if (event.messagePlain.equals("[BOSS] Sadan: So you made it all the way here... Now you wish to defy me? Sadan?!")) {
                     gyroTicks = 267;
                 }
-                if (event.messagePlain.equals(sadanTerraDoneMsg)) {
+                if (event.messagePlain.equals("[BOSS] Sadan: ENOUGH!")) {
                     terracottas.clear();
                 }
             }
@@ -309,12 +299,12 @@ public class DungeonSolvers {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (Utils.isInDungeons()) {
-            if (Config.keyHighlight && !dungeonKeys.contains(event.entity)) {
+            if (Config.keyHighlight) {
                 if (event.namePlain.equals("Wither Key") || event.namePlain.equals("Blood Key")) {
                     dungeonKeys.add(event.entity);
                 }
             }
-            if (Config.spiritHighlight && !spiritBows.contains(event.entity)) {
+            if (Config.spiritHighlight) {
                 if (event.namePlain.equals("Spirit Bow")) {
                     spiritBows.add(event.entity);
                 }
@@ -332,34 +322,24 @@ public class DungeonSolvers {
         if (sharpshooterNext != null) {
             event.drawFilled(Box.enclosing(sharpshooterNext, sharpshooterNext), true, RenderColor.fromHex(0x00ff00, 1.0f));
         }
-        if (!dungeonKeys.isEmpty()) {
-            List<Entity> keys = new ArrayList<>(dungeonKeys);
-            for (Entity ent : keys) {
-                if (ent.isAlive()) {
-                    event.drawFilledWithBeam(Box.of(ent.getPos().add(0, 1.5, 0), 1, 1, 1), 64, true, RenderColor.fromColor(Config.keyColor));
-                } else {
-                    dungeonKeys.remove(ent);
-                }
+        if (!dungeonKeys.empty()) {
+            for (Entity ent : dungeonKeys.get()) {
+                event.drawFilledWithBeam(Box.of(ent.getPos().add(0, 1.5, 0), 1, 1, 1), 256, true, RenderColor.fromColor(Config.keyColor));
             }
         }
-        if (!spiritBows.isEmpty()) {
-            List<Entity> bows = new ArrayList<>(spiritBows);
-            for (Entity ent : bows) {
-                if (ent.isAlive()) {
-                    BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
-                    Vec3d pos = ent.getPos();
-                    Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
-                    event.drawFilled(Box.of(posAdjust, 0.8, 1.75, 0.8), true, RenderColor.fromColor(Config.spiritColor));
-                } else {
-                    spiritBows.remove(ent);
-                }
+        if (!spiritBows.empty()) {
+            for (Entity ent : spiritBows.get()) {
+                BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
+                Vec3d pos = ent.getPos();
+                Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
+                event.drawFilled(Box.of(posAdjust, 0.8, 1.75, 0.8), true, RenderColor.fromColor(Config.spiritColor));
             }
         }
         if (!terracottas.isEmpty()) {
             List<SpawningTerracotta> terras = new ArrayList<>(terracottas);
             for (SpawningTerracotta terra : terras) {
                 if (terra.pos != null) {
-                    event.drawText(terra.pos.toCenterPos(), Text.of(decimalFormat.format(terra.ticks / 20.0f) + "s"), 0.035f, true, RenderColor.fromHex(0xffff00));
+                    event.drawText(terra.pos.toCenterPos(), Text.of(Utils.formatDecimal(terra.ticks / 20.0f) + "s"), 0.035f, true, RenderColor.fromHex(0xffff00));
                 }
             }
         }

@@ -11,12 +11,8 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.*;
-import nofrills.misc.RenderColor;
-import nofrills.misc.Rendering;
-import nofrills.misc.SkyblockData;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -26,7 +22,7 @@ import static nofrills.Main.mc;
 public class SlayerFeatures {
     private static final Pattern firePillarRegex = Pattern.compile("[0-9]s [0-9] hits");
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
-    private static final Pattern yanDevChaliceRegex = Pattern.compile("[0-9]*\\.[0-9]*s");
+    private static final Pattern chaliceRegex = Pattern.compile("[0-9]*\\.[0-9]*s");
     private static final SlayerBoss[] slayerBosses = {
             new SlayerBoss("Revenant Horror",
                     new String[]{"Revenant Horror", "Atoned Horror"},
@@ -60,8 +56,7 @@ public class SlayerFeatures {
     private static final RenderColor defaultColor = RenderColor.fromHex(0x00ffff);
     private static final RenderColor hitsColor = RenderColor.fromHex(0xff55ff);
     private static final RenderColor steakColor = RenderColor.fromHex(0xaf00ff);
-    private static final DecimalFormat killTimeFormat = new DecimalFormat("0.##");
-    private static final List<Entity> yanDevData = new ArrayList<>();
+    private static final EntityCache chaliceData = new EntityCache();
     private static final List<Vec3d> pillarData = new ArrayList<>();
     private static int pillarClearTicks = -1;
     private static CurrentBoss currentBoss = null;
@@ -153,9 +148,9 @@ public class SlayerFeatures {
                     }
                 }
                 if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice) {
-                    if (yanDevChaliceRegex.matcher(event.namePlain).matches() && !yanDevData.contains(event.entity)) {
+                    if (chaliceRegex.matcher(event.namePlain).matches()) {
                         if (event.entity.distanceTo(mc.player) <= 24) {
-                            yanDevData.add(event.entity);
+                            chaliceData.add(event.entity);
                         }
                     }
                 }
@@ -202,11 +197,11 @@ public class SlayerFeatures {
         }
         if (!SkyblockData.getLines().contains("Slay the boss!") && currentBoss != null) { // runs when boss is killed or if we fail the slayer quest
             currentBoss = null;
-            yanDevData.clear();
+            chaliceData.clear();
             pillarData.clear();
             pillarClearTicks = -1;
             if (Config.slayerKillTime && bossAliveTicks > 0) {
-                Utils.info(Utils.Symbols.format + "aSlayer boss took " + killTimeFormat.format(bossAliveTicks / 20.0f) + "s to kill.");
+                Utils.info(Utils.Symbols.format + "aSlayer boss took " + Utils.formatDecimal(bossAliveTicks / 20.0f) + "s to kill.");
                 bossAliveTicks = 0;
             }
             if (Utils.isRenderingCustomTitle()) {
@@ -327,16 +322,11 @@ public class SlayerFeatures {
     private static void onRender(WorldRenderEvent event) {
         if (currentBoss != null) {
             if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice) {
-                List<Entity> entities = new ArrayList<>(yanDevData);
-                for (Entity ent : entities) {
-                    if (ent.isAlive()) {
-                        BlockPos blockPos = Utils.findGround(ent.getBlockPos(), 4);
-                        Vec3d pos = ent.getPos();
-                        Vec3d posAdjust = new Vec3d(pos.x, blockPos.up(1).getY() + 0.5, pos.z);
-                        Rendering.drawFilled(event.matrices, event.consumer, event.camera, Box.of(posAdjust, 1, 1.25, 1), true, RenderColor.fromColor(Config.vampChaliceColor));
-                    } else {
-                        yanDevData.remove(ent);
-                    }
+                for (Entity ent : chaliceData.get()) {
+                    BlockPos blockPos = Utils.findGround(ent.getBlockPos(), 4);
+                    Vec3d pos = ent.getPos();
+                    Vec3d posAdjust = new Vec3d(pos.x, blockPos.up(1).getY() + 0.5, pos.z);
+                    event.drawFilledWithBeam(Box.of(posAdjust, 1, 1.25, 1), 256, true, RenderColor.fromColor(Config.vampChaliceColor));
                 }
             }
         }

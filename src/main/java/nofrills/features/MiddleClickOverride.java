@@ -36,7 +36,11 @@ public class MiddleClickOverride {
             "Auctions Browser",
             Utils.format("A{}iphone", Utils.Symbols.bingo),
             "Fishing Rod Parts",
-            "Stats Tuning"
+            "Stats Tuning",
+            "Pet Sitter",
+            "Transfer to Profile",
+            "Attribute Transfer",
+            "Hunting Box"
     );
 
     private static final List<String> containBlacklist = List.of(

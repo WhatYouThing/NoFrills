@@ -11,17 +11,17 @@ import net.minecraft.sound.SoundEvents;
 import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.hud.HudManager;
+import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static nofrills.Main.mc;
 
 public class FishingFeatures {
-    private static final List<Entity> seaCreatures = new ArrayList<>();
+    private static final EntityCache seaCreatures = new EntityCache();
     private static final SeaCreature[] seaCreatureData = {
             new SeaCreature("Plhlegblast", "WOAH! A Plhlegblast appeared.", "§9", true, true),
             new SeaCreature("Thunder", "You hear a massive rumble as Thunder emerges.", "§b", true, true),
@@ -138,12 +138,7 @@ public class FishingFeatures {
     @EventHandler
     public static void tick(WorldTickEvent event) {
         if (Config.capEnabled) {
-            List<Entity> creatures = new ArrayList<>(seaCreatures);
-            for (Entity ent : creatures) {
-                if (ent == null || ent.isRemoved()) {
-                    seaCreatures.remove(ent);
-                }
-            }
+            seaCreatures.clearDropped();
             int count = seaCreatures.size();
             if (Config.seaCreaturesEnabled) {
                 HudManager.seaCreaturesElement.setCount(count);
@@ -196,9 +191,7 @@ public class FishingFeatures {
             for (SeaCreature creature : seaCreatureData) {
                 String name = event.namePlain.toLowerCase();
                 if (Config.capEnabled && name.contains(creature.name.toLowerCase())) {
-                    if (!seaCreatures.contains(event.entity)) {
-                        seaCreatures.add(event.entity);
-                    }
+                    seaCreatures.add(event.entity);
                 }
                 if (Config.rareGlow && creature.rare && creature.glow && event.entity.age <= 10 && name.contains(creature.name.toLowerCase())) {
                     Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, FishingFeatures::isValidMob));

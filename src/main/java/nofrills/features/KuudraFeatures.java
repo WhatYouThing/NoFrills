@@ -13,10 +13,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.events.*;
-import nofrills.misc.RenderColor;
-import nofrills.misc.Rendering;
-import nofrills.misc.SkyblockData;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 import nofrills.mixin.BossBarHudAccessor;
 
 import java.util.ArrayList;
@@ -39,9 +36,9 @@ public class KuudraFeatures {
     };
     private static final List<Float> dpsData = new ArrayList<>();
     private static final Box stunBox = Box.enclosing(new BlockPos(-169, 26, -167), new BlockPos(-169, 26, -167));
-    private static final List<Entity> supplies = new ArrayList<>();
-    private static final List<Entity> dropOffs = new ArrayList<>();
-    private static final List<Entity> buildPiles = new ArrayList<>();
+    private static final EntityCache supplies = new EntityCache();
+    private static final EntityCache dropOffs = new EntityCache();
+    private static final EntityCache buildPiles = new EntityCache();
     private static int freshTicks = 0;
     private static int missingTicks = 20;
     private static float previousHealth = 0.0f;
@@ -102,6 +99,10 @@ public class KuudraFeatures {
         BlockPos blockPos = BlockPos.ofFloored(pos.getX(), Math.max(pos.getY(), 75), pos.getZ());
         BlockPos ground = Utils.findGround(blockPos, 4);
         return new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ());
+    }
+
+    private static boolean hasName(Entity ent, String name) {
+        return ent.isCustomNameVisible() && ent.getCustomName() != null && Formatting.strip(ent.getCustomName().getString()).endsWith(name);
     }
 
     @EventHandler
@@ -255,19 +256,14 @@ public class KuudraFeatures {
     private static void onNamed(EntityNamedEvent event) {
         if (Utils.isInKuudra()) {
             if (Config.kuudraSupplyHighlight && event.namePlain.equals("SUPPLIES")) {
-                if (supplies.stream().noneMatch(ent -> ent.getUuidAsString().equals(event.entity.getUuidAsString()))) {
-                    supplies.add(event.entity);
-                }
+                supplies.add(event.entity);
             }
             if (Config.kuudraDropHighlight && event.namePlain.equals("BRING SUPPLY CHEST HERE")) {
-                if (dropOffs.stream().noneMatch(ent -> ent.getUuidAsString().equals(event.entity.getUuidAsString()))) {
-                    dropOffs.add(event.entity);
-                }
+                dropOffs.add(event.entity);
+
             }
             if (Config.kuudraBuildHighlight && event.namePlain.startsWith("PROGRESS: ") && event.namePlain.endsWith("%")) {
-                if (buildPiles.stream().noneMatch(ent -> ent.getUuidAsString().equals(event.entity.getUuidAsString()))) {
-                    buildPiles.add(event.entity);
-                }
+                buildPiles.add(event.entity);
             }
         }
     }
@@ -278,30 +274,26 @@ public class KuudraFeatures {
             event.drawFilled(stunBox, true, RenderColor.fromColor(Config.kuudraStunColor));
             event.drawText(stunBox.getCenter().add(0, 2, 0), Text.of("Stun"), 0.1f, true, RenderColor.fromHex(0xffffff));
         }
-        if (!supplies.isEmpty()) {
-            for (Entity supply : new ArrayList<>(supplies)) {
-                if (supply.isAlive()) {
-                    event.drawBeam(getGround(supply.getPos()), 256, true, RenderColor.fromColor(Config.kuudraSupplyColor));
-                } else {
-                    supplies.removeIf(ent -> ent.getUuidAsString().equals(supply.getUuidAsString()));
-                }
+        if (!supplies.empty()) {
+            for (Entity supply : supplies.get()) {
+                event.drawBeam(getGround(supply.getPos()), 256, true, RenderColor.fromColor(Config.kuudraSupplyColor));
             }
         }
-        if (!dropOffs.isEmpty()) {
-            for (Entity drop : new ArrayList<>(dropOffs)) {
-                if (drop.isAlive() && drop.isCustomNameVisible() && drop.getCustomName() != null && Formatting.strip(drop.getCustomName().getString()).equals("BRING SUPPLY CHEST HERE")) {
+        if (!dropOffs.empty()) {
+            for (Entity drop : dropOffs.get()) {
+                if (hasName(drop, "BRING SUPPLY CHEST HERE")) {
                     event.drawBeam(getGround(drop.getPos()), 256, true, RenderColor.fromColor(Config.kuudraDropColor));
                 } else {
-                    dropOffs.removeIf(ent -> ent.getUuidAsString().equals(drop.getUuidAsString()));
+                    dropOffs.remove(drop);
                 }
             }
         }
-        if (!buildPiles.isEmpty()) {
-            for (Entity pile : new ArrayList<>(buildPiles)) {
-                if (pile.isAlive() && pile.isCustomNameVisible() && pile.getCustomName() != null && Formatting.strip(pile.getCustomName().getString()).endsWith("%")) {
+        if (!buildPiles.empty()) {
+            for (Entity pile : buildPiles.get()) {
+                if (hasName(pile, "%")) {
                     event.drawBeam(getGround(pile.getLerpedPos(event.tickCounter.getTickProgress(true))), 256, true, RenderColor.fromColor(Config.kuudraBuildColor));
                 } else {
-                    buildPiles.removeIf(ent -> ent.getUuidAsString().equals(pile.getUuidAsString()));
+                    buildPiles.remove(pile);
                 }
             }
         }

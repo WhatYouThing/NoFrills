@@ -1,11 +1,10 @@
 package nofrills.commands;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -208,9 +207,9 @@ public class NoFrills {
                 for (Entity ent : mc.world.getEntities()) {
                     if (ent instanceof LivingEntity livingEntity) {
                         ItemStack helmet = livingEntity.getEquippedStack(EquipmentSlot.HEAD);
-                        ProfileComponent profile = helmet.getComponents().get(DataComponentTypes.PROFILE);
-                        if (!helmet.isEmpty() && profile != null && helmet.getItem() instanceof PlayerHeadItem) {
-                            Utils.infoFormat("entity name: {}\nhelmet name: {}\ntexture url: {}", ent.getName().getString(), helmet.getName().getString(), mc.getSkinProvider().getSkinTextures(profile.gameProfile()).textureUrl());
+                        GameProfile textures = Utils.getTextures(helmet);
+                        if (textures != null && helmet.getItem() instanceof PlayerHeadItem) {
+                            Utils.infoFormat("entity name: {}\nhelmet name: {}\ntexture url: {}", ent.getName().getString(), helmet.getName().getString(), Utils.getTextureUrl(textures));
                         }
                     }
                 }

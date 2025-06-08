@@ -96,17 +96,17 @@ public class Config {
     @SerialEntry
     public static List<String> partyBlacklist = new ArrayList<>();
     @SerialEntry
-    public static partyBehaviorList partyCmdWarp = partyBehaviorList.Disabled;
+    public static partyBehavior partyCmdWarp = partyBehavior.Disabled;
     @SerialEntry
-    public static partyBehaviorList partyCmdTransfer = partyBehaviorList.Disabled;
+    public static partyBehavior partyCmdTransfer = partyBehavior.Disabled;
     @SerialEntry
-    public static partyBehaviorList partyCmdAllInvite = partyBehaviorList.Disabled;
+    public static partyBehavior partyCmdAllInvite = partyBehavior.Disabled;
     @SerialEntry
-    public static partyBehaviorList partyCmdDowntime = partyBehaviorList.Disabled;
+    public static partyBehavior partyCmdDowntime = partyBehavior.Disabled;
     @SerialEntry
-    public static partyBehaviorList partyCmdQueue = partyBehaviorList.Disabled;
+    public static partyBehavior partyCmdQueue = partyBehavior.Disabled;
     @SerialEntry
-    public static partyBehaviorList partyCmdCoords = partyBehaviorList.Disabled;
+    public static partyBehavior partyCmdCoords = partyBehavior.Disabled;
     @SerialEntry
     public static boolean noHaste = false;
     @SerialEntry
@@ -137,33 +137,31 @@ public class Config {
     // Fixes
 
     @SerialEntry
-    public static fixModes stonkFix = fixModes.Disabled;
+    public static fixMode stonkFix = fixMode.Disabled;
     @SerialEntry
-    public static fixModes oldSneak = fixModes.Disabled;
+    public static fixMode oldSneak = fixMode.Disabled;
     @SerialEntry
-    public static fixModes antiSwim = fixModes.Disabled;
+    public static fixMode antiSwim = fixMode.Disabled;
     @SerialEntry
-    public static fixModes noPearlCooldown = fixModes.Disabled;
+    public static fixMode noPearlCooldown = fixMode.Disabled;
     @SerialEntry
-    public static fixModes snowFix = fixModes.Disabled;
+    public static fixMode snowFix = fixMode.Disabled;
     @SerialEntry
-    public static fixModes noDropSwing = fixModes.Disabled;
+    public static fixMode noDropSwing = fixMode.Disabled;
     @SerialEntry
-    public static fixModes itemCountFix = fixModes.Disabled;
+    public static fixMode itemCountFix = fixMode.Disabled;
     @SerialEntry
-    public static fixModes ridingCamFix = fixModes.Disabled;
+    public static fixMode ridingCamFix = fixMode.Disabled;
     @SerialEntry
-    public static fixModes sneakFix = fixModes.Disabled;
+    public static fixMode middleClickFix = fixMode.Disabled;
     @SerialEntry
-    public static fixModes middleClickFix = fixModes.Disabled;
+    public static fixMode armorStandFix = fixMode.Disabled;
     @SerialEntry
-    public static fixModes armorStandFix = fixModes.Disabled;
+    public static fixMode abilityPlaceFix = fixMode.Disabled;
     @SerialEntry
-    public static fixModes abilityPlaceFix = fixModes.Disabled;
+    public static fixMode efficiencyFix = fixMode.Disabled;
     @SerialEntry
-    public static fixModes efficiencyFix = fixModes.Disabled;
-    @SerialEntry
-    public static fixModes clearCursorStack = fixModes.Disabled;
+    public static fixMode clearCursorStack = fixMode.Disabled;
 
     // Events
 
@@ -485,16 +483,17 @@ public class Config {
         ).generateScreen(parent);
     }
 
-    public enum partyBehaviorList {
+    public enum partyBehavior {
         Automatic,
         Manual,
         Ignore,
         Disabled
     }
 
-    public enum fixModes {
+    public enum fixMode {
         Disabled,
         SkyblockOnly,
-        Enabled
+        SkyblockLegacyOnly,
+        AlwaysOn
     }
 }

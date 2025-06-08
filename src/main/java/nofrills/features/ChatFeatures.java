@@ -20,9 +20,9 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class ChatFeatures {
-    private static final Config.partyBehaviorList auto = Config.partyBehaviorList.Automatic;
-    private static final Config.partyBehaviorList ignore = Config.partyBehaviorList.Ignore;
-    private static final Config.partyBehaviorList disabled = Config.partyBehaviorList.Disabled;
+    private static final Config.partyBehavior auto = Config.partyBehavior.Automatic;
+    private static final Config.partyBehavior ignore = Config.partyBehavior.Ignore;
+    private static final Config.partyBehavior disabled = Config.partyBehavior.Disabled;
     private static final List<PlayerWaypoint> waypointList = new ArrayList<>();
     private static final RenderColor textColor = RenderColor.fromHex(0xffffff);
     private static boolean downtimeNeeded = false;

@@ -27,22 +27,6 @@ public abstract class LivingEntityMixin extends Entity {
         super(type, world);
     }
 
-    @ModifyExpressionValue(method = "travelInFluid", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
-    private boolean onTravel(boolean original) {
-        if (Utils.isFixEnabled(Config.antiSwim) && Utils.isOnModernIsland()) {
-            return false;
-        }
-        return original;
-    }
-
-    @ModifyExpressionValue(method = "applyFluidMovingSpeed", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSprinting()Z"))
-    private boolean onApplyFluidSpeed(boolean original) {
-        if (Utils.isFixEnabled(Config.antiSwim) && Utils.isOnModernIsland()) {
-            return false;
-        }
-        return original;
-    }
-
     @ModifyExpressionValue(method = "getHandSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/effect/StatusEffectUtil;hasHaste(Lnet/minecraft/entity/LivingEntity;)Z"))
     private boolean hasHaste(boolean original) {
         if (Config.noHaste && Utils.isSelf(this)) {

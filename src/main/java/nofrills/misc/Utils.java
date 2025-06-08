@@ -321,8 +321,9 @@ public class Utils {
         return false;
     }
 
-    public static boolean isFixEnabled(Config.fixModes fix) {
-        return fix == Config.fixModes.Enabled || (fix == Config.fixModes.SkyblockOnly && SkyblockData.isInSkyblock());
+    public static boolean isFixEnabled(Config.fixMode mode) {
+        return mode == Config.fixMode.AlwaysOn || SkyblockData.isInSkyblock() &&
+                ((mode == Config.fixMode.SkyblockLegacyOnly && !Utils.isOnModernIsland()) || mode == Config.fixMode.SkyblockOnly);
     }
 
     /**

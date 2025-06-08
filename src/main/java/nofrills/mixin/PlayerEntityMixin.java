@@ -21,11 +21,8 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @ModifyReturnValue(method = "getBaseDimensions", at = @At("RETURN"))
     private EntityDimensions getDimensions(EntityDimensions original, EntityPose pose) {
-        if (Utils.isFixEnabled(Config.oldSneak) && Utils.isOnModernIsland() && pose == EntityPose.CROUCHING) {
+        if (Utils.isFixEnabled(Config.oldSneak) && pose == EntityPose.CROUCHING) {
             return EntityDimensions.changing(0.6F, 1.8F).withEyeHeight(1.54F);
-        }
-        if (Utils.isFixEnabled(Config.antiSwim) && Utils.isOnModernIsland() && pose == EntityPose.SWIMMING) {
-            return EntityDimensions.changing(0.6F, 1.8F).withEyeHeight(1.62F);
         }
         return original;
     }

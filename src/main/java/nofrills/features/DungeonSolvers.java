@@ -281,7 +281,7 @@ public class DungeonSolvers {
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
                 if (Config.ragAxeReminder && Utils.isOnDungeonFloor("M5") && event.messagePlain.equals("[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.")) {
-                    Utils.showTitleCustom("RAG AXE!", 40, -20, 4.0f, 0xffff00);
+                    Utils.showTitleCustom("RAG!", 40, -20, 4.0f, 0xffff00);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
             }

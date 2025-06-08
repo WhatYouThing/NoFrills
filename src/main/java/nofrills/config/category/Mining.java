@@ -61,6 +61,13 @@ public class Mining {
                         .controller(Config::booleanController)
                         .build())
 
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Ability Alert"))
+                        .description(OptionDescription.of(Text.of("Alerts you when your Pickaxe Ability is ready to be used.")))
+                        .binding(false, () -> Config.pickAbilityAlert, value -> Config.pickAbilityAlert = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .build();
     }
 }

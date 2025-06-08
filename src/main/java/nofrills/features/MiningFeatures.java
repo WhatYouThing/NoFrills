@@ -7,6 +7,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.CreeperEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -35,16 +36,25 @@ public class MiningFeatures {
     private static int skyMallTicks = 0;
     private static String skyMallBuff = "";
 
-    private static boolean isWearingMiningPiece() {
-        for (ItemStack armor : Utils.getEntityArmor(mc.player)) {
-            LoreComponent lore = armor.getComponents().get(DataComponentTypes.LORE);
-            if (lore != null) {
-                for (Text line : lore.lines()) {
-                    String lineClean = Formatting.strip(line.getString());
-                    if (lineClean.startsWith("Mining Speed:") || lineClean.startsWith("Mining Fortune:") || lineClean.startsWith("Block Fortune:")) {
+    private static boolean hasStats(ItemStack stack, String... stats) {
+        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+        if (lore != null) {
+            for (Text l : lore.lines()) {
+                String line = Formatting.strip(l.getString());
+                for (String stat : stats) {
+                    if (line.startsWith(stat + ":")) {
                         return true;
                     }
                 }
+            }
+        }
+        return false;
+    }
+
+    private static boolean isWearingMiningPiece() {
+        for (ItemStack armor : Utils.getEntityArmor(mc.player)) {
+            if (hasStats(armor, "Mining Speed", "Mining Fortune", "Block Fortune")) {
+                return true;
             }
         }
         return false;
@@ -89,7 +99,6 @@ public class MiningFeatures {
                 skyMallTicks--;
                 if (skyMallTicks == 0) {
                     Utils.info("§2Sky Mall §ebuff for §b" + getSkyblockDay() + "§e: " + skyMallBuff);
-                    skyMallBuff = "";
                 }
             }
         }
@@ -97,17 +106,31 @@ public class MiningFeatures {
 
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
-        if (Config.betterSkymall && Utils.isInSkyblock()) {
-            if (event.messagePlain.equalsIgnoreCase(uselessMessage1) || event.messagePlain.equalsIgnoreCase(uselessMessage2)) {
-                event.cancel();
-            }
-            if (event.messagePlain.startsWith("New buff: ")) {
-                String message = event.messagePlain.replace("New buff:", "").trim();
-                if (isWearingMiningPiece() || isBuffWhitelisted(message)) {
-                    skyMallBuff = message;
-                    skyMallTicks = 50;
+        if (mc.player != null) {
+            if (Config.betterSkymall) {
+                if (event.messagePlain.equalsIgnoreCase(uselessMessage1) || event.messagePlain.equalsIgnoreCase(uselessMessage2)) {
+                    event.cancel();
                 }
-                event.cancel();
+                if (event.messagePlain.startsWith("New buff: ")) {
+                    String message = event.messagePlain.replace("New buff:", "").trim();
+                    if (isWearingMiningPiece() || isBuffWhitelisted(message)) {
+                        skyMallBuff = message;
+                        skyMallTicks = 50;
+                    }
+                    event.cancel();
+                }
+            }
+            if (Config.pickAbilityAlert && event.messagePlain.endsWith("is now available!")) {
+                String ability = event.messagePlain.replace("is now available!", "").trim();
+                PlayerInventory inv = mc.player.getInventory();
+                for (int i = 0; i <= 35; i++) {
+                    ItemStack stack = inv.getStack(i);
+                    if (hasStats(stack, "Mining Speed") && Utils.getRightClickAbility(stack).contains(ability)) {
+                        Utils.showTitleCustom(ability.toUpperCase() + "!", 60, -20, 4.0f, 0xffaa00);
+                        Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+                        break;
+                    }
+                }
             }
         }
     }

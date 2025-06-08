@@ -405,6 +405,8 @@ public class Config {
     public static boolean wormCooldown = false;
     @SerialEntry
     public static boolean wormAlert = false;
+    @SerialEntry
+    public static boolean pickAbilityAlert = false;
 
     // Farming
 

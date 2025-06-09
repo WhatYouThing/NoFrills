@@ -47,17 +47,15 @@ public class EventFeatures {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (isSpooky() && (Config.spookyChestAlert || Config.spookyChestHighlight)) {
+        if (isSpooky()) {
             String name = event.namePlain.toLowerCase();
             if (name.equals("trick or treat?") || name.equals("party chest")) {
-                if (event.entity.distanceTo(mc.player) <= 16.0f) {
+                if (event.entity.distanceTo(mc.player) <= 16.0f && !chestList.has(event.entity)) {
                     if (Config.spookyChestAlert) {
                         Utils.showTitle("§6§lCHEST SPAWNED!", "", 5, 20, 5);
                         Utils.playSound(SoundEvents.BLOCK_VAULT_ACTIVATE, SoundCategory.MASTER, 1.0f, 1.0f);
                     }
-                    if (Config.spookyChestHighlight) {
-                        chestList.add(event.entity);
-                    }
+                    chestList.add(event.entity);
                 }
             }
         }
@@ -65,8 +63,8 @@ public class EventFeatures {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (Config.spookyChestHighlight && !chestList.empty()) {
-            for (Entity chest : chestList.get()) {
+        for (Entity chest : chestList.get()) {
+            if (Config.spookyChestHighlight) {
                 BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);
                 event.drawFilledWithBeam(Box.enclosing(pos, pos), 256, true, RenderColor.fromColor(Config.spookyChestHighlightColor));
             }

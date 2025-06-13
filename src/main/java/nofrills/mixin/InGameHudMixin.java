@@ -74,6 +74,8 @@ public abstract class InGameHudMixin implements TitleRendering {
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        eventBus.post(new HudRenderEvent(context, this.getTextRenderer(), tickCounter));
+        if (!mc.options.hudHidden) {
+            eventBus.post(new HudRenderEvent(context, this.getTextRenderer(), tickCounter));
+        }
     }
 }

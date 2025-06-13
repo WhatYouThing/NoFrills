@@ -40,7 +40,19 @@ public class Config {
     @SerialEntry
     public static boolean wardrobeHotkeysSound = false;
     @SerialEntry
-    public static boolean priceTooltips = false;
+    public static boolean fetchPricing = false;
+    @SerialEntry
+    public static boolean pricingAuction = false;
+    @SerialEntry
+    public static boolean pricingBazaar = false;
+    @SerialEntry
+    public static boolean pricingAttribute = false;
+    @SerialEntry
+    public static boolean pricingNPC = false;
+    @SerialEntry
+    public static boolean pricingMote = false;
+    @SerialEntry
+    public static int pricingMoteStacks = 0;
     @SerialEntry
     public static boolean hotbarSwap = false;
     @SerialEntry

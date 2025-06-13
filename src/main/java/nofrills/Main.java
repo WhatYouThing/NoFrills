@@ -15,7 +15,6 @@ import nofrills.commands.Yeet;
 import nofrills.config.Config;
 import nofrills.features.*;
 import nofrills.hud.HudManager;
-import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
@@ -70,7 +69,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SkyblockData.class);
         eventBus.subscribe(RecipeLookup.class);
         eventBus.subscribe(MiningFeatures.class);
-        eventBus.subscribe(NoFrillsAPI.class);
+        eventBus.subscribe(PriceTooltips.class);
         eventBus.subscribe(LeapOverlay.class);
         eventBus.subscribe(EventFeatures.class);
         eventBus.subscribe(HudManager.class);

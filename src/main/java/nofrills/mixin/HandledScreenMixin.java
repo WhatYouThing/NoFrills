@@ -154,7 +154,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             ItemStack stack = focusedSlot.getStack();
             NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
             if (!stack.isEmpty()) {
-                eventBus.post(new DrawItemTooltip(original, stack, component != null ? component.copyNbt() : null));
+                eventBus.post(new DrawItemTooltip(original, stack, component));
             }
         }
         return original;

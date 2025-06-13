@@ -33,7 +33,6 @@ public class MiddleClickOverride {
             "Convert to Dungeon Item",
             "Upgrade Item",
             "Salvage Items",
-            "Auctions Browser",
             Utils.format("A{}iphone", Utils.Symbols.bingo),
             "Fishing Rod Parts",
             "Stats Tuning",
@@ -48,7 +47,9 @@ public class MiddleClickOverride {
             "Minion",
             "Abiphone",
             "The Hex",
-            "Enchant Item"
+            "Enchant Item",
+            "Auction",
+            "Trap"
     );
 
     private static final List<String> matchWhitelist = List.of(

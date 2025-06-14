@@ -1,6 +1,5 @@
 package nofrills.features;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
@@ -10,79 +9,18 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
-import nofrills.events.WorldTickEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
-import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
+import static nofrills.misc.NFAPI.*;
 
 public class PriceTooltips {
     private static final List<String> kuudraPieceTypes = List.of("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS");
     private static final List<String> kuudraPieceNames = List.of("CRIMSON", "TERROR", "AURORA", "HOLLOW", "FERVOR");
     private static final List<String> kuudraPieceTiers = List.of("HOT", "BURNING", "FIERY", "INFERNAL");
-    private static final ConcurrentHashMap<String, Long> auctionPricing = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, HashMap<String, Double>> bazaarPricing = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, HashMap<String, Long>> attributePricing = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, HashMap<String, Double>> npcPricing = new ConcurrentHashMap<>();
-    private static int refreshTicks = 0;
-
-    private static void refreshItemPricing() {
-        new Thread(() -> {
-            try {
-                InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v2/economy/get-item-pricing/").toURL().openStream();
-                JsonObject json = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonObject();
-                auctionPricing.clear();
-                for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("auction").asMap().entrySet()) {
-                    auctionPricing.put(entry.getKey(), entry.getValue().getAsLong());
-                }
-                bazaarPricing.clear();
-                for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("bazaar").asMap().entrySet()) {
-                    JsonObject object = entry.getValue().getAsJsonObject();
-                    HashMap<String, Double> pricing = new HashMap<>();
-                    pricing.put("buy", object.get("buy").getAsDouble());
-                    pricing.put("sell", object.get("sell").getAsDouble());
-                    bazaarPricing.put(entry.getKey(), pricing);
-                }
-                attributePricing.clear();
-                for (Map.Entry<String, JsonElement> entry : json.has("attribute") ? json.getAsJsonObject("attribute").asMap().entrySet() : new JsonObject().asMap().entrySet()) {
-                    JsonObject object = entry.getValue().getAsJsonObject();
-                    HashMap<String, Long> pricing = new HashMap<>();
-                    for (Map.Entry<String, JsonElement> entryPrices : object.asMap().entrySet()) {
-                        pricing.put(entryPrices.getKey(), entryPrices.getValue().getAsLong());
-                    }
-                    attributePricing.put(entry.getKey(), pricing);
-                }
-                npcPricing.clear();
-                for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("npc").asMap().entrySet()) {
-                    JsonObject object = entry.getValue().getAsJsonObject();
-                    HashMap<String, Double> pricing = new HashMap<>();
-                    if (object.has("coin")) {
-                        pricing.put("coin", object.get("coin").getAsDouble());
-                    }
-                    if (object.has("mote")) {
-                        pricing.put("mote", object.get("mote").getAsDouble());
-                    }
-                    if (!pricing.isEmpty()) {
-                        npcPricing.put(entry.getKey(), pricing);
-                    }
-                }
-            } catch (IOException exception) {
-                StringBuilder trace = new StringBuilder();
-                for (StackTraceElement element : exception.getStackTrace()) {
-                    trace.append("\n\tat ").append(element.toString());
-                }
-                LOGGER.error("{}{}", exception.getMessage(), trace);
-            }
-        }).start();
-    }
 
     private static String getKuudraPieceType(String itemId) {
         for (String type : kuudraPieceTypes) {
@@ -155,7 +93,7 @@ public class PriceTooltips {
                 "§c[NF] {}: §6{} {}",
                 name,
                 String.format("%,.1f", price * quantity),
-                quantity > 1 ? Utils.format(extra, String.format("%,d", quantity), price) : ""
+                quantity > 1 ? Utils.format(extra, String.format("%,d", quantity), String.format("%,.1f", price)) : ""
         ).trim();
         return Text.of(line);
     }
@@ -165,23 +103,9 @@ public class PriceTooltips {
                 "§c[NF] {}: §6{} {}",
                 name,
                 String.format("%,d", price * quantity),
-                quantity > 1 ? Utils.format(extra, String.format("%,d", quantity), price) : ""
+                quantity > 1 ? Utils.format(extra, String.format("%,d", quantity), String.format("%,d", price)) : ""
         ).trim();
         return Text.of(line);
-    }
-
-    @EventHandler
-    public static void onTick(WorldTickEvent event) {
-        if (Config.fetchPricing && Utils.isInSkyblock()) {
-            if (refreshTicks == 0) {
-                if (mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
-                    refreshItemPricing();
-                    refreshTicks = 1200;
-                }
-            } else {
-                refreshTicks--;
-            }
-        }
     }
 
     @EventHandler

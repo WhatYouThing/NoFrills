@@ -15,7 +15,7 @@ import nofrills.commands.Yeet;
 import nofrills.config.Config;
 import nofrills.features.*;
 import nofrills.hud.HudManager;
-import nofrills.misc.NFAPI;
+import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
@@ -79,7 +79,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(MiddleClickOverride.class);
         eventBus.subscribe(EnchantingSolver.class);
         eventBus.subscribe(SlotBinding.class);
-        eventBus.subscribe(NFAPI.class);
+        eventBus.subscribe(NoFrillsAPI.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

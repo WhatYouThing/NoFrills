@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
-public class NFAPI {
+public class NoFrillsAPI {
     public static final ConcurrentHashMap<String, Long> auctionPricing = new ConcurrentHashMap<>();
     public static final ConcurrentHashMap<String, HashMap<String, Double>> bazaarPricing = new ConcurrentHashMap<>();
     public static final ConcurrentHashMap<String, HashMap<String, Long>> attributePricing = new ConcurrentHashMap<>();

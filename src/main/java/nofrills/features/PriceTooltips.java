@@ -15,7 +15,7 @@ import nofrills.misc.Utils;
 import java.util.*;
 
 import static nofrills.Main.mc;
-import static nofrills.misc.NFAPI.*;
+import static nofrills.misc.NoFrillsAPI.*;
 
 public class PriceTooltips {
     private static final List<String> kuudraPieceTypes = List.of("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS");

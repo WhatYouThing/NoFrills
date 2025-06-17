@@ -81,8 +81,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Item Count Fix**: Prevents the game from hiding item counts for unstackable items. Mostly noticeable in the Bazaar
   and the Experimentation Table.
 - **Riding Camera Fix**: Gets rid of the delayed/floaty camera movement while riding any entity.
-- **Sneak Fix**: Fixes the ancient bug where the un-sneak animation plays twice if you do it too quickly, and fixes
-  sneaking not slowing you down while inside a block.
 - **Middle Click Fix**: Allows Pick Block (the middle mouse button) to work just as it does in 1.8.9.
 - **Armor Stand Fix**: Prevents the game from unnecessarily ticking entity cramming on armor stand entities, which can
   improve performance.
@@ -199,6 +197,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Safe Pickobulus**: Prevents you from being able to use the Pickobulus mining ability on your Private Island and
   Garden.
 - **Scatha Features**: Track the worm spawn cooldown, and get alerts whenever a worm spawns.
+- **Ability Alert**: Alerts you when your Pickaxe Ability is ready to be used, works with every ability.
 
 ### Farming
 

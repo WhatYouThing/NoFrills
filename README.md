@@ -33,6 +33,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
     - **Hide Dead Mobs**: Prevents the game from rendering dead mobs, and also hides the Skyblock name tags of dead
       mobs.
+    - **Keep Nametags**: Prevents the game from hiding the nametag of any sneaking/invisible player.
     - **No Explosions**: Block explosion particles spawned by the server (such as the large explosion from Wither
       Impact).
     - **No Fire Overlay**: Prevents the on fire overlay from rendering.

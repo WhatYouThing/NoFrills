@@ -3,6 +3,7 @@ package nofrills.mixin;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -27,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static nofrills.Main.eventBus;
+import static nofrills.Main.mc;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
@@ -45,6 +47,14 @@ public abstract class MinecraftClientMixin {
     @WrapWithCondition(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(ClientPlayerEntity instance, Hand hand) {
         return !Utils.isFixEnabled(Config.noDropSwing);
+    }
+
+    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
+    private void onBeforeOpenScreen(Screen screen, CallbackInfo ci) {
+        if (Config.noLoadingScreen && screen instanceof DownloadingTerrainScreen) {
+            mc.setScreen(null);
+            ci.cancel();
+        }
     }
 
     @Inject(method = "setScreen", at = @At("TAIL"))

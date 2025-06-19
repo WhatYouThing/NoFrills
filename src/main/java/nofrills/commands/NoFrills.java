@@ -13,6 +13,7 @@ import net.minecraft.item.PlayerHeadItem;
 import nofrills.config.Config;
 import nofrills.features.PearlRefill;
 import nofrills.hud.HudEditorScreen;
+import nofrills.hud.clickgui.ClickGuiScreen;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -213,6 +214,9 @@ public class NoFrills {
                         }
                     }
                 }
+                return SINGLE_SUCCESS;
+            })).then(literal("clickGui").executes(context -> {
+                Utils.setScreen(new ClickGuiScreen());
                 return SINGLE_SUCCESS;
             }))),
     };

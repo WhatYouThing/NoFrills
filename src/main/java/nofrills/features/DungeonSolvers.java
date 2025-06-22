@@ -19,7 +19,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.*;
 
@@ -27,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class DungeonSolvers {
@@ -99,9 +99,9 @@ public class DungeonSolvers {
 
         if (Utils.isInDungeons() && event.screen.getTitle().getString().equals("Click the button on time!")) {
             isInTerminal = true;
-            if (Config.melodyAnnounce) {
-                if (melodyTicks == 0 && !Config.melodyMessage.isEmpty()) {
-                    Utils.sendMessage(Config.melodyMessage);
+            if (Config.melodyAnnounce()) {
+                if (melodyTicks == 0 && !Config.melodyMessage().isEmpty()) {
+                    Utils.sendMessage(Config.melodyMessage());
                     melodyTicks = 100;
                 }
             }
@@ -111,7 +111,7 @@ public class DungeonSolvers {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (Utils.isOnDungeonFloor("6")) {
-            if (Config.gyroTimer && gyroTicks > 0) {
+            if (Config.gyroTimer() && gyroTicks > 0) {
                 Utils.showTitleCustom("GYRO: " + Utils.formatDecimal(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, 0xffff00);
             }
         }
@@ -119,7 +119,7 @@ public class DungeonSolvers {
             if (melodyTicks > 0) {
                 melodyTicks--;
             }
-            if (Config.solveDevices) {
+            if (Config.solveDevices()) {
                 if (isSharpshooterActive()) {
                     sharpshooterNext = findSharpshooterTarget();
                 } else if (!sharpshooterList.isEmpty() || sharpshooterNext != null) {
@@ -132,7 +132,7 @@ public class DungeonSolvers {
 
     @EventHandler
     private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
-        if (Config.solveTerminals && Utils.isInDungeons() && !isTerminalBuilt) {
+        if (Config.solveTerminals() && Utils.isInDungeons() && !isTerminalBuilt) {
             isTerminalBuilt = event.isFinal;
             List<Slot> orderSlots = new ArrayList<>();
             List<Slot> colorSlots = new ArrayList<>();
@@ -242,7 +242,7 @@ public class DungeonSolvers {
 
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
-        if (Config.gyroTimer && Utils.isOnDungeonFloor("6") && SkyblockData.getLines().stream().anyMatch(line -> line.endsWith("sadan"))) {
+        if (Config.gyroTimer() && Utils.isOnDungeonFloor("6") && SkyblockData.getLines().stream().anyMatch(line -> line.endsWith("sadan"))) {
             if (event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
                 if (terracottas.stream().noneMatch(terra -> terra.pos.equals(event.pos))) {
                     terracottas.add(new SpawningTerracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300));
@@ -252,7 +252,7 @@ public class DungeonSolvers {
                 gyroTicks = 195;
             }
         }
-        if (Config.solveDevices && Utils.isOnDungeonFloor("7")) {
+        if (Config.solveDevices() && Utils.isOnDungeonFloor("7")) {
             if (sharpshooterTarget.contains(event.pos.toCenterPos()) && isSharpshooterActive()) {
                 BlockState terracotta = Blocks.BLUE_TERRACOTTA.getDefaultState();
                 BlockState emerald = Blocks.EMERALD_BLOCK.getDefaultState();
@@ -271,21 +271,21 @@ public class DungeonSolvers {
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
         if (Utils.isInDungeons()) {
-            if (Config.wishReminder && Config.dungeonClass.equals("Healer") && event.messagePlain.equals("⚠ Maxor is enraged! ⚠")) {
+            if (Config.wishReminder() && Config.dungeonClass().equals("Healer") && event.messagePlain.equals("⚠ Maxor is enraged! ⚠")) {
                 Utils.showTitleCustom("WISH!", 40, -20, 4.0f, 0x00ff00);
                 Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
             }
-            if (Config.dungeonClass.equals("Mage")) {
-                if (Config.campReminder && event.messagePlain.equals("[BOSS] The Watcher: Let's see how you can handle this.")) {
+            if (Config.dungeonClass().equals("Mage")) {
+                if (Config.campReminder() && event.messagePlain.equals("[BOSS] The Watcher: Let's see how you can handle this.")) {
                     Utils.showTitleCustom("CAMP BLOOD!", 40, -20, 4.0f, 0xff4646);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
-                if (Config.ragAxeReminder && Utils.isOnDungeonFloor("M5") && event.messagePlain.equals("[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.")) {
+                if (Config.ragAxeReminder() && Utils.isOnDungeonFloor("M5") && event.messagePlain.equals("[BOSS] Livid: I can now turn those Spirits into shadows of myself, identical to their creator.")) {
                     Utils.showTitleCustom("RAG!", 40, -20, 4.0f, 0xffff00);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
                 }
             }
-            if (Config.gyroTimer) {
+            if (Config.gyroTimer()) {
                 if (event.messagePlain.equals("[BOSS] Sadan: So you made it all the way here... Now you wish to defy me? Sadan?!")) {
                     gyroTicks = 267;
                 }
@@ -299,12 +299,12 @@ public class DungeonSolvers {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (Utils.isInDungeons()) {
-            if (Config.keyHighlight) {
+            if (Config.keyHighlight()) {
                 if (event.namePlain.equals("Wither Key") || event.namePlain.equals("Blood Key")) {
                     dungeonKeys.add(event.entity);
                 }
             }
-            if (Config.spiritHighlight) {
+            if (Config.spiritHighlight()) {
                 if (event.namePlain.equals("Spirit Bow")) {
                     spiritBows.add(event.entity);
                 }
@@ -324,7 +324,7 @@ public class DungeonSolvers {
         }
         if (!dungeonKeys.empty()) {
             for (Entity ent : dungeonKeys.get()) {
-                event.drawFilledWithBeam(Box.of(ent.getPos().add(0, 1.5, 0), 1, 1, 1), 256, true, RenderColor.fromColor(Config.keyColor));
+                event.drawFilledWithBeam(Box.of(ent.getPos().add(0, 1.5, 0), 1, 1, 1), 256, true, RenderColor.fromColor(Config.keyColor()));
             }
         }
         if (!spiritBows.empty()) {
@@ -332,7 +332,7 @@ public class DungeonSolvers {
                 BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
                 Vec3d pos = ent.getPos();
                 Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
-                event.drawFilled(Box.of(posAdjust, 0.8, 1.75, 0.8), true, RenderColor.fromColor(Config.spiritColor));
+                event.drawFilled(Box.of(posAdjust, 0.8, 1.75, 0.8), true, RenderColor.fromColor(Config.spiritColor()));
             }
         }
         if (!terracottas.isEmpty()) {
@@ -347,7 +347,7 @@ public class DungeonSolvers {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (Config.hideMageBeam && Utils.isInDungeons() && event.type.equals(ParticleTypes.FIREWORK)) {
+        if (Config.hideMageBeam() && Utils.isInDungeons() && event.type.equals(ParticleTypes.FIREWORK)) {
             event.cancel();
         }
     }
@@ -360,7 +360,7 @@ public class DungeonSolvers {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (Config.gyroTimer && Utils.isOnDungeonFloor("6")) {
+        if (Config.gyroTimer() && Utils.isOnDungeonFloor("6")) {
             if (gyroTicks > 0) {
                 gyroTicks--;
             }

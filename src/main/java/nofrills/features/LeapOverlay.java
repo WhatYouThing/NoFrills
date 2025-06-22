@@ -9,7 +9,6 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import nofrills.config.Config;
 import nofrills.events.ScreenSlotUpdateEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.ScreenOptions;
@@ -20,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class LeapOverlay {
@@ -29,11 +29,11 @@ public class LeapOverlay {
 
     private static RenderColor getColor(String className) {
         return switch (className) {
-            case "Healer" -> RenderColor.fromColor(Config.leapColorHealer);
-            case "Mage" -> RenderColor.fromColor(Config.leapColorMage);
-            case "Berserk" -> RenderColor.fromColor(Config.leapColorBers);
-            case "Archer" -> RenderColor.fromColor(Config.leapColorArch);
-            case "Tank" -> RenderColor.fromColor(Config.leapColorTank);
+            case "Healer" -> RenderColor.fromColor(Config.leapColorHealer());
+            case "Mage" -> RenderColor.fromColor(Config.leapColorMage());
+            case "Berserk" -> RenderColor.fromColor(Config.leapColorBers());
+            case "Archer" -> RenderColor.fromColor(Config.leapColorArch());
+            case "Tank" -> RenderColor.fromColor(Config.leapColorTank());
             case "DEAD" -> deadColor;
             default -> nameColor;
         };
@@ -41,7 +41,7 @@ public class LeapOverlay {
 
     @EventHandler
     private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
-        if (Config.leapOverlay && event.isFinal && event.title.equals(leapMenuName) && Utils.isInDungeons()) {
+        if (Config.leapOverlay() && event.isFinal && event.title.equals(leapMenuName) && Utils.isInDungeons()) {
             List<LeapTarget> validTargets = new ArrayList<>();
             List<LeapTarget> deadTargets = new ArrayList<>();
             for (Slot slot : event.handler.slots) {

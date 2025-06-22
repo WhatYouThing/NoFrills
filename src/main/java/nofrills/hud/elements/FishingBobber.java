@@ -2,10 +2,11 @@ package nofrills.hud.elements;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
+
+import static nofrills.Main.Config;
 
 public class FishingBobber extends SimpleTextElement {
 
@@ -15,10 +16,10 @@ public class FishingBobber extends SimpleTextElement {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.setProperties(Config.bobberEnabled, false, Config.bobberLeftHand, Config.bobberPosX, Config.bobberPosY);
+        this.setProperties(Config.bobberEnabled(), false, Config.bobberLeftHand(), Config.bobberPosX(), Config.bobberPosY());
         super.render(context, mouseX, mouseY, delta);
-        Config.bobberPosX = this.posX;
-        Config.bobberPosY = this.posY;
+        Config.bobberPosX(this.posX);
+        Config.bobberPosY(this.posY);
     }
 
     public void setActive() {

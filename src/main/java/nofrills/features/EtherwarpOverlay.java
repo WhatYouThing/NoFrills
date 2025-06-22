@@ -8,11 +8,11 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import nofrills.config.Config;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class EtherwarpOverlay {
@@ -33,7 +33,7 @@ public class EtherwarpOverlay {
             case HopperBlock ignored -> !isAbove;
             case StainedGlassPaneBlock ignored -> !isAbove;
             case PaneBlock ignored -> !isAbove;
-            case CauldronBlock ignored -> isAbove;
+            case CauldronBlock ignored -> !isAbove;
             case WallBannerBlock ignored -> !isAbove;
             case BannerBlock ignored -> !isAbove;
             case SignBlock ignored -> !isAbove;
@@ -61,7 +61,7 @@ public class EtherwarpOverlay {
 
     @EventHandler
     public static void onRender(WorldRenderEvent event) {
-        if (Config.overlayEtherwarp) {
+        if (Config.overlayEtherwarp()) {
             int dist = getWarpDistance();
             if (dist > 0) {
                 HitResult hitResult = Utils.raycastFullBlock(mc.player, dist, event.tickCounter.getTickProgress(true));

@@ -9,7 +9,6 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.*;
 
@@ -17,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class SlayerFeatures {
@@ -124,7 +124,7 @@ public class SlayerFeatures {
                     if (event.namePlain.equals("Spawned by: " + mc.player.getName().getString())) {
                         currentBoss.spawnerEntity = event.entity;
                     }
-                    if (Config.slayerHitboxes) {
+                    if (Config.slayerHitboxes()) {
                         if (bossTimerRegex.matcher(event.namePlain).matches() && event.entity.distanceTo(mc.player) <= 16) {
                             List<Entity> otherEntities = getNearby(event.entity, currentBoss.bossData.entityTypes);
                             for (Entity ent : otherEntities) {
@@ -139,7 +139,7 @@ public class SlayerFeatures {
                             }
                         }
                     }
-                    if (Config.blazePillarWarn && !pillarData.isEmpty() && firePillarRegex.matcher(event.namePlain).matches()) {
+                    if (Config.blazePillarWarn() && !pillarData.isEmpty() && firePillarRegex.matcher(event.namePlain).matches()) {
                         double dist = Utils.horizontalDistance(event.entity.getPos(), pillarData.getLast());
                         if (dist <= 3) {
                             Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, 0xffff00);
@@ -147,7 +147,7 @@ public class SlayerFeatures {
                         }
                     }
                 }
-                if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice) {
+                if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice()) {
                     if (chaliceRegex.matcher(event.namePlain).matches()) {
                         if (event.entity.distanceTo(mc.player) <= 24) {
                             chaliceData.add(event.entity);
@@ -200,7 +200,7 @@ public class SlayerFeatures {
             chaliceData.clear();
             pillarData.clear();
             pillarClearTicks = -1;
-            if (Config.slayerKillTime && bossAliveTicks > 0) {
+            if (Config.slayerKillTime() && bossAliveTicks > 0) {
                 Utils.info(Utils.Symbols.format + "aSlayer boss took " + Utils.formatDecimal(bossAliveTicks / 20.0f) + "s to kill.");
                 bossAliveTicks = 0;
             }
@@ -216,24 +216,24 @@ public class SlayerFeatures {
                 pillarData.clear();
                 pillarClearTicks = -1;
             }
-            if (Config.slayerHitboxes) {
+            if (Config.slayerHitboxes()) {
                 if (!currentBoss.bossData.scoreboardName.equals("Inferno Demonlord") && !Rendering.Entities.isDrawingOutline(currentBoss.bossEntity)) {
                     render(currentBoss.bossEntity, true, defaultColor);
                 }
             }
-            if (Config.emanHitDisplay && currentBoss.bossData.scoreboardName.equals("Voidgloom Seraph")) {
+            if (Config.emanHitDisplay() && currentBoss.bossData.scoreboardName.equals("Voidgloom Seraph")) {
                 String name = Formatting.strip(currentBoss.nameEntity.getCustomName().getString());
                 if (name.endsWith("Hits")) {
                     String[] parts = name.split(" ");
                     Utils.showTitleCustom("Shield: " + parts[parts.length - 2] + " hits", 100, 25, 4.0f, 0xff55ff);
-                    if (Config.slayerHitboxes) {
+                    if (Config.slayerHitboxes()) {
                         render(currentBoss.bossEntity, true, hitsColor);
                     }
                 } else {
                     if (Utils.isRenderingCustomTitle()) {
                         Utils.showTitleCustom("", 0, 0, 0, 0);
                     }
-                    if (Config.slayerHitboxes) {
+                    if (Config.slayerHitboxes()) {
                         render(currentBoss.bossEntity, true, defaultColor);
                     }
                 }
@@ -244,20 +244,20 @@ public class SlayerFeatures {
                 if (springsActive && !statusName.contains("KILLER SPRING")) {
                     springsActive = false;
                 }
-                if (Config.vampIce && statusName.contains("TWINCLAWS")) {
+                if (Config.vampIce() && statusName.contains("TWINCLAWS")) {
                     String time = statusName.split("TWINCLAWS")[1].trim().split(" ")[0];
                     Utils.showTitleCustom("Ice: " + time, 1, 25, 4.0f, 0x00ffff);
                 }
                 if (bossName.contains(Utils.Symbols.vampLow)) {
-                    if (Config.vampSteak && !statusName.contains("TWINCLAWS")) {
+                    if (Config.vampSteak() && !statusName.contains("TWINCLAWS")) {
                         Utils.showTitleCustom("Steak!", 1, 25, 4.0f, 0xff0000);
                     }
-                    if (Config.vampSteakHighlight) {
+                    if (Config.vampSteakHighlight()) {
                         render(currentBoss.bossEntity, true, steakColor);
                     }
                 }
             }
-            if (Config.slayerKillTime) {
+            if (Config.slayerKillTime()) {
                 bossAliveTicks++;
             }
         }
@@ -265,7 +265,7 @@ public class SlayerFeatures {
 
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
-        if (Config.blazeNoSpam) {
+        if (Config.blazeNoSpam()) {
             String msg = event.getPlainMessage();
             if (msg.equals("Your hit was reduced by Hellion Shield!")) {
                 event.cancel();
@@ -279,16 +279,16 @@ public class SlayerFeatures {
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
         if (Utils.isInChateau()) {
-            if (Config.vampManiaSilence && event.isSound(SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE)) {
-                if (Config.vampManiaReplace && currentBoss != null && currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend")) {
+            if (Config.vampManiaSilence() && event.isSound(SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE)) {
+                if (Config.vampManiaReplace() && currentBoss != null && currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend")) {
                     Utils.playSound(SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.MASTER, 1, 0);
                 }
                 event.cancel();
             }
-            if (Config.vampSpringSilence && event.isSound(SoundEvents.ENTITY_WITHER_SPAWN) && currentBoss != null) {
+            if (Config.vampSpringSilence() && event.isSound(SoundEvents.ENTITY_WITHER_SPAWN) && currentBoss != null) {
                 String statusName = Formatting.strip(currentBoss.statusEntity.getCustomName().getString());
                 if (statusName.contains("KILLER SPRING")) {
-                    if (Config.vampSpringReplace && !springsActive) {
+                    if (Config.vampSpringReplace() && !springsActive) {
                         Utils.playSound(SoundEvents.ENTITY_WITHER_SPAWN, SoundCategory.MASTER, 1, -1);
                         springsActive = true;
                     }
@@ -297,7 +297,7 @@ public class SlayerFeatures {
             }
         }
         if (currentBoss != null) {
-            if (Config.blazePillarWarn && currentBoss.bossData.scoreboardName.equals("Inferno Demonlord")) {
+            if (Config.blazePillarWarn() && currentBoss.bossData.scoreboardName.equals("Inferno Demonlord")) {
                 if (event.isSound(SoundEvents.ENTITY_CHICKEN_EGG)) {
                     Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
                     if (pillarData.isEmpty()) {
@@ -321,12 +321,12 @@ public class SlayerFeatures {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (currentBoss != null) {
-            if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice) {
+            if (currentBoss.bossData.scoreboardName.equals("Riftstalker Bloodfiend") && Config.vampChalice()) {
                 for (Entity ent : chaliceData.get()) {
                     BlockPos blockPos = Utils.findGround(ent.getBlockPos(), 4);
                     Vec3d pos = ent.getPos();
                     Vec3d posAdjust = new Vec3d(pos.x, blockPos.up(1).getY() + 0.5, pos.z);
-                    event.drawFilledWithBeam(Box.of(posAdjust, 1, 1.25, 1), 256, true, RenderColor.fromColor(Config.vampChaliceColor));
+                    event.drawFilledWithBeam(Box.of(posAdjust, 1, 1.25, 1), 256, true, RenderColor.fromColor(Config.vampChaliceColor()));
                 }
             }
         }
@@ -334,7 +334,7 @@ public class SlayerFeatures {
 
     @EventHandler
     private static void onUseBlock(InteractBlockEvent event) {
-        if (Config.blazeDaggerFix && Utils.getRightClickAbility(Utils.getHeldItem()).contains("Attunement")) {
+        if (Config.blazeDaggerFix() && Utils.getRightClickAbility(Utils.getHeldItem()).contains("Attunement")) {
             blockNextUse = true;
         }
     }

@@ -10,7 +10,6 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import nofrills.config.Config;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenSlotUpdateEvent;
 import nofrills.events.SendPacketEvent;
@@ -21,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class EnchantingSolver {
@@ -93,7 +93,7 @@ public class EnchantingSolver {
         Item item = event.stack.getItem();
         Slot eventSlot = event.handler.getSlot(event.slotId);
         updatePhase(item);
-        if (Config.solveChronomatron && experimentType.equals(ExperimentType.Chronomatron)) {
+        if (Config.solveChronomatron() && experimentType.equals(ExperimentType.Chronomatron)) {
             if (rememberPhase) {
                 for (Slot slot : getContainerSlots(event.handler)) {
                     SlotOptions.disableSlot(slot, true);
@@ -129,7 +129,7 @@ public class EnchantingSolver {
                 }
             }
         }
-        if (Config.solveUltrasequencer && experimentType.equals(ExperimentType.Ultrasequencer)) {
+        if (Config.solveUltrasequencer() && experimentType.equals(ExperimentType.Ultrasequencer)) {
             if (item.equals(Items.CLOCK)) {
                 ultraSolution.sort(Comparator.comparingInt(s -> s.stack.getCount()));
                 if (!ultraSolution.isEmpty()) {
@@ -156,7 +156,7 @@ public class EnchantingSolver {
                 ultraSolution.addAll(solution);
             }
         }
-        if (Config.solveSuperpairs && experimentType.equals(ExperimentType.Superpairs)) {
+        if (Config.solveSuperpairs() && experimentType.equals(ExperimentType.Superpairs)) {
             if (!isStainedGlass(item)) {
                 superSolution.removeIf(s -> s.slot.id == event.slotId);
                 superSolution.add(new Solution(event.stack, eventSlot));
@@ -183,7 +183,7 @@ public class EnchantingSolver {
         if (event.packet instanceof ClickSlotC2SPacket clickPacket) {
             ExperimentType type = getExperimentType();
             int slotId = clickPacket.slot();
-            if (Config.solveChronomatron && type.equals(ExperimentType.Chronomatron) && !rememberPhase) {
+            if (Config.solveChronomatron() && type.equals(ExperimentType.Chronomatron) && !rememberPhase) {
                 if (!chronoSolution.isEmpty()) {
                     Solution first = chronoSolution.getFirst();
                     if (first.slots.stream().anyMatch(slot -> slot.id == slotId)) {
@@ -210,7 +210,7 @@ public class EnchantingSolver {
                     }
                 }
             }
-            if (Config.solveUltrasequencer && type.equals(ExperimentType.Ultrasequencer) && !rememberPhase) {
+            if (Config.solveUltrasequencer() && type.equals(ExperimentType.Ultrasequencer) && !rememberPhase) {
                 if (!ultraSolution.isEmpty()) {
                     if (ultraSolution.getFirst().slot.id == slotId) {
                         Solution first = ultraSolution.getFirst();

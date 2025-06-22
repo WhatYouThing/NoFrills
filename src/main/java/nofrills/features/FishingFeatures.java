@@ -8,7 +8,6 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.GiantEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.hud.HudManager;
 import nofrills.misc.EntityCache;
@@ -18,6 +17,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class FishingFeatures {
@@ -137,29 +137,29 @@ public class FishingFeatures {
 
     @EventHandler
     public static void tick(WorldTickEvent event) {
-        if (Config.capEnabled) {
+        if (Config.capEnabled()) {
             seaCreatures.clearDropped();
             int count = seaCreatures.size();
-            if (Config.seaCreaturesEnabled) {
+            if (Config.seaCreaturesEnabled()) {
                 HudManager.seaCreaturesElement.setCount(count);
             }
-            if (count >= Config.capTarget && notifyTicks == 0) {
-                if (Config.capSendMsg && !Config.capMsg.isEmpty()) {
-                    Utils.sendMessage(Config.capMsg);
+            if (count >= Config.capTarget() && notifyTicks == 0) {
+                if (Config.capSendMsg() && !Config.capMsg().isEmpty()) {
+                    Utils.sendMessage(Config.capMsg());
                 }
-                if (Config.capSound) {
+                if (Config.capSound()) {
                     Utils.playSound(SoundEvents.ITEM_TRIDENT_RETURN, SoundCategory.MASTER, 3, 1);
                 }
-                if (Config.capTitle) {
+                if (Config.capTitle()) {
                     Utils.showTitle("§4§lCAP REACHED!", "§8§l" + count + " SEA CREATURES", 5, 20, 5);
                 }
-                notifyTicks = Config.capDelay * 20;
+                notifyTicks = Config.capDelay() * 20;
             }
             if (notifyTicks > 0) {
                 notifyTicks--;
             }
         }
-        if (Config.bobberEnabled) {
+        if (Config.bobberEnabled()) {
             if (mc.player.fishHook != null && (bobberHologram == null || !bobberHologram.isAlive())) {
                 HudManager.bobberElement.setActive();
             } else if (mc.player.fishHook == null) {
@@ -170,7 +170,7 @@ public class FishingFeatures {
 
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
-        if (Config.rareGlow && !Utils.isInDungeons() && event.entity.age <= 10 && event.entity instanceof ArmorStandEntity armorStand) {
+        if (Config.rareGlow() && !Utils.isInDungeons() && event.entity.age <= 10 && event.entity instanceof ArmorStandEntity armorStand) {
             GameProfile textures = Utils.getTextures(armorStand.getEquippedStack(EquipmentSlot.HEAD));
             if (textures != null) {
                 for (SeaCreature creature : seaCreatureData) {
@@ -190,10 +190,10 @@ public class FishingFeatures {
         if (!Utils.isInDungeons() && event.namePlain.contains(Utils.Symbols.heart)) {
             for (SeaCreature creature : seaCreatureData) {
                 String name = event.namePlain.toLowerCase();
-                if (Config.capEnabled && name.contains(creature.name.toLowerCase())) {
+                if (Config.capEnabled() && name.contains(creature.name.toLowerCase())) {
                     seaCreatures.add(event.entity);
                 }
-                if (Config.rareGlow && creature.rare && creature.glow && event.entity.age <= 10 && name.contains(creature.name.toLowerCase())) {
+                if (Config.rareGlow() && creature.rare && creature.glow && event.entity.age <= 10 && name.contains(creature.name.toLowerCase())) {
                     Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, FishingFeatures::isValidMob));
                     if (owner != null && !(owner instanceof GiantEntity)) {
                         Rendering.Entities.drawGlow(owner, true, rareColor);
@@ -206,7 +206,7 @@ public class FishingFeatures {
                 }
             }
         }
-        if (Config.bobberEnabled && event.namePlain.length() == 3) {
+        if (Config.bobberEnabled() && event.namePlain.length() == 3) {
             if (event.namePlain.equals("!!!") || event.namePlain.indexOf(".") == 1) {
                 bobberHologram = event.entity;
                 HudManager.bobberElement.setTimer(event.namePlain);
@@ -216,20 +216,20 @@ public class FishingFeatures {
 
     @EventHandler
     private static void onChatMsg(ChatMsgEvent event) {
-        if (Config.rareSound || Config.rareTitle) {
+        if (Config.rareSound() || Config.rareTitle()) {
             for (SeaCreature creature : seaCreatureData) {
                 if (creature.rare && event.messagePlain.equals(creature.spawnMsg)) {
-                    if (Config.rareTitle) {
+                    if (Config.rareTitle()) {
                         Utils.showTitle(creature.color + "§l" + creature.name.toUpperCase(), "", 5, 20, 5);
                     }
-                    if (Config.rareSound) {
+                    if (Config.rareSound()) {
                         Utils.playSound(SoundEvents.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED,
                                 SoundCategory.MASTER, 1, 1);
                     }
-                    if (Config.rareSendMsg && !Config.rareMsg.isEmpty()) {
-                        Utils.sendMessage(Config.rareMsg.replace("{name}", creature.name).replace("{spawnmsg}", creature.spawnMsg));
+                    if (Config.rareSendMsg() && !Config.rareMsg().isEmpty()) {
+                        Utils.sendMessage(Config.rareMsg().replace("{name}", creature.name).replace("{spawnmsg}", creature.spawnMsg));
                     }
-                    if (Config.rareReplace) {
+                    if (Config.rareReplace()) {
                         Utils.infoNoPrefix(creature.color + "§l" + creature.spawnMsg + "§r");
                         event.cancel();
                     }
@@ -241,7 +241,7 @@ public class FishingFeatures {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (Config.muteDrake && Utils.isInArea("Jerry's Workshop")) {
+        if (Config.muteDrake() && Utils.isInArea("Jerry's Workshop")) {
             if (event.isSound(SoundEvents.ITEM_TOTEM_USE)) {
                 event.cancel();
             }

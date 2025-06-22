@@ -2,10 +2,11 @@ package nofrills.hud.elements;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
+
+import static nofrills.Main.Config;
 
 public class Power extends SimpleTextElement {
 
@@ -15,10 +16,10 @@ public class Power extends SimpleTextElement {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.setProperties(Config.powerEnabled, Config.powerDungeonsOnly && !Utils.isInDungeons(), Config.powerLeftHand, Config.powerPosX, Config.powerPosY);
+        this.setProperties(Config.powerEnabled(), Config.powerDungeonsOnly() && !Utils.isInDungeons(), Config.powerLeftHand(), Config.powerPosX(), Config.powerPosY());
         super.render(context, mouseX, mouseY, delta);
-        Config.powerPosX = this.posX;
-        Config.powerPosY = this.posY;
+        Config.powerPosX(this.posX);
+        Config.powerPosY(this.posY);
     }
 
     public void setPower(double power) {

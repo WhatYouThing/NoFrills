@@ -12,13 +12,8 @@ base {
 
 repositories {
     maven {
-        name = 'Xander Maven'
-        url = 'https://maven.isxander.dev/releases'
-    }
-
-    maven {
-        name = "Terraformers"
-        url = "https://maven.terraformersmc.com/"
+        name = "wispforest-maven"
+        url = 'https://maven.wispforest.io/releases/'
     }
 
     maven {
@@ -31,11 +26,11 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-    modImplementation "dev.isxander:yet-another-config-lib:${project.yacl_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricapi_version}"
     modImplementation "meteordevelopment:orbit:${project.orbit_version}"
     include "meteordevelopment:orbit:${project.orbit_version}"
+    annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owolib_version}")
+    include "io.wispforest:owo-lib:${project.owolib_version}"
 }
 
 processResources {

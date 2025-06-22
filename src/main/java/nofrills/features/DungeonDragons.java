@@ -11,7 +11,6 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
@@ -22,6 +21,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class DungeonDragons {
@@ -45,7 +45,7 @@ public class DungeonDragons {
     }
 
     private static boolean isArcherTeam() {
-        return switch (Config.dungeonClass) {
+        return switch (Config.dungeonClass()) {
             case "Archer", "Tank" -> true;
             default -> false;
         };
@@ -115,11 +115,11 @@ public class DungeonDragons {
     private static void onRender(WorldRenderEvent event) {
         if (!spawnedDragons.isEmpty()) {
             for (SpawnedDragon drag : getSpawnedDragons()) {
-                if (Config.dragBoxes) {
+                if (Config.dragBoxes()) {
                     event.drawOutline(drag.data.area, true, drag.data.color);
                 }
-                if (Config.dragStack && !drag.spawned) {
-                    if (Config.dragStackAdvanced) {
+                if (Config.dragStack() && !drag.spawned) {
+                    if (Config.dragStackAdvanced()) {
                         for (Box part : drag.data.parts) {
                             event.drawOutline(part, true, drag.data.color);
                         }
@@ -127,10 +127,10 @@ public class DungeonDragons {
                         event.drawFilled(drag.data.pos, true, RenderColor.fromHex(drag.data.color.hex, 0.67f));
                     }
                 }
-                if (Config.dragTimer && !drag.spawned) {
+                if (Config.dragTimer() && !drag.spawned) {
                     event.drawText(drag.data.pos.getCenter().add(0, 4, 0), Text.of(decimalFormat.format(drag.spawnTicks / 20.0f) + "s"), 0.3f, true, drag.data.color);
                 }
-                if (Config.dragHealth && drag.entity != null) {
+                if (Config.dragHealth() && drag.entity != null) {
                     Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickProgress(true)); // should make the text move smoothly with the dragons
                     event.drawText(pos, Text.of(decimalFormat.format(drag.health * 0.000001) + "M"), 0.2f, true, drag.data.color);
                 }
@@ -148,12 +148,12 @@ public class DungeonDragons {
                     spawnedDragons.add(spawnedDragon);
                     List<SpawnedDragon> dragons = getSpawnedDragons();
                     if (!dragonSplitDone && dragons.size() == 2) {
-                        if (Config.dragAlert) {
+                        if (Config.dragAlert()) {
                             double power = getPowerLevel();
                             SpawnedDragon first = dragons.getFirst();
                             SpawnedDragon second = dragons.getLast();
                             boolean purple = first.data.name.equals("Purple") || second.data.name.equals("Purple");
-                            if ((power >= Config.dragSkipEasy && purple) || power >= Config.dragSkip) {
+                            if ((power >= Config.dragSkipEasy() && purple) || power >= Config.dragSkip()) {
                                 announceDragonSpawn(getHigherPriority(first, second, isArcherTeam()), true);
                             } else { // no split
                                 announceDragonSpawn(getHigherPriority(first, second, true), true);
@@ -161,7 +161,7 @@ public class DungeonDragons {
                             dragonSplitDone = true;
                         }
                     } else if (dragonSplitDone) {
-                        if (Config.dragAlert) {
+                        if (Config.dragAlert()) {
                             announceDragonSpawn(spawnedDragon, false);
                         }
                     }
@@ -182,14 +182,14 @@ public class DungeonDragons {
                     drag.health = health;
                     drag.spawning = false;
                     drag.spawned = true;
-                    if (Config.dragGlow) {
+                    if (Config.dragGlow()) {
                         Rendering.Entities.drawGlow(event.entity, true, drag.data.color);
                     }
                 } else if (drag.spawned && uuid.equals(drag.uuid)) {
                     if (health > 0.0f && !event.entity.isRemoved() && dragonEntity.ticksSinceDeath == 0) {
                         drag.health = health;
                         drag.entity = event.entity;
-                        if (Config.dragGlow) {
+                        if (Config.dragGlow()) {
                             Rendering.Entities.drawGlow(event.entity, true, drag.data.color);
                         }
                     } else {

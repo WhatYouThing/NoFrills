@@ -12,7 +12,7 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.util.Util;
 import nofrills.commands.NoFrills;
 import nofrills.commands.Yeet;
-import nofrills.config.Config;
+import nofrills.config.NoFrillsConfigWrapper;
 import nofrills.features.*;
 import nofrills.hud.HudManager;
 import nofrills.misc.NoFrillsAPI;
@@ -31,6 +31,8 @@ public class Main implements ModInitializer {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final IEventBus eventBus = new EventBus();
+    public static final NoFrillsConfigWrapper Config = NoFrillsConfigWrapper.createAndLoad();
+
     public static MinecraftClient mc;
 
     public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess access) {
@@ -43,8 +45,6 @@ public class Main implements ModInitializer {
         long start = Util.getMeasuringTimeMs();
 
         mc = MinecraftClient.getInstance();
-
-        Config.configHandler.load();
 
         eventBus.registerLambdaFactory("nofrills", (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
 

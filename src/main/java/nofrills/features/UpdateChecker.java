@@ -1,10 +1,10 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
-import nofrills.config.Config;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.Utils;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.eventBus;
 
 public class UpdateChecker {
@@ -16,7 +16,7 @@ public class UpdateChecker {
             ticksInSkyblock++;
         }
         if (ticksInSkyblock >= 60) {
-            if (Config.updateChecker) {
+            if (Config.updateChecker()) {
                 Utils.checkUpdate(false);
             }
             eventBus.unsubscribe(UpdateChecker.class);

@@ -16,9 +16,6 @@
   "entrypoints": {
     "main": [
       "nofrills.Main"
-    ],
-    "modmenu": [
-      "nofrills.misc.ModMenuIntegration"
     ]
   },
   "mixins": [
@@ -28,7 +25,6 @@
     "fabricloader": ">=0.16.14",
     "fabric-api": "*",
     "minecraft": "1.21.5",
-    "java": ">=21",
-    "yet_another_config_lib_v3": "*"
+    "java": ">=21"
   }
 }

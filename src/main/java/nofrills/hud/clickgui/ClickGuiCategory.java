@@ -1,28 +1,38 @@
 package nofrills.hud.clickgui;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
+import io.wispforest.owo.ui.base.BaseComponent;
+import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.ScrollContainer;
+import io.wispforest.owo.ui.core.*;
 import net.minecraft.text.Text;
 
-import static nofrills.Main.mc;
+import java.util.List;
 
-public class ClickGuiCategory implements Drawable {
-    public Text title;
-    public int posX;
-    public int posY;
-
-    public ClickGuiCategory(Text title, int posX, int posY) {
-        this.title = title;
-        this.posX = posX;
-        this.posY = posY;
-    }
-
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        int height = mc.textRenderer.fontHeight;
-        int width = mc.textRenderer.getWidth(title);
-        context.fill(posX, posY, posX + width + 20, posY + height + 2, 0xff000000);
-        context.drawCenteredTextWithShadow(mc.textRenderer, title, posX + (width + 20) / 2, posY + 1, 0xffffff);
+public class ClickGuiCategory extends FlowLayout {
+    protected ClickGuiCategory(String title, List<ClickGuiModule> children) {
+        super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
+        Color color = new Color(0.25f, 0.25f, 0.52f, 0.67f);
+        BaseComponent label = Components.label(Text.literal(title))
+                .color(color)
+                .horizontalTextAlignment(HorizontalAlignment.CENTER)
+                .verticalTextAlignment(VerticalAlignment.CENTER)
+                .margins(Insets.of(10));
+        this.child(label);
+        this.margins(Insets.of(5));
+        this.padding(Insets.of(3));
+        ParentComponent scroll = Containers.verticalScroll(Sizing.content(), Sizing.fill(), Containers.verticalFlow(Sizing.content(), Sizing.content())
+                        .child(Components.label(Text.literal("Item 1")))
+                        .child(Components.label(Text.literal("Item 2")))
+                        .child(Components.label(Text.literal("Item 2.1")))
+                        .child(Components.label(Text.literal("Item 2.2")))
+                        .child(Components.label(Text.literal("Item 2.3")))
+                        .child(Components.label(Text.literal("Item 2.4")))
+                        .child(Components.label(Text.literal("Item 3"))))
+                .scrollbarThiccness(3)
+                .scrollbar(ScrollContainer.Scrollbar.flat(color))
+                .padding(Insets.of(10))
+                .surface(Surface.flat(0xaa000000));
     }
 }
-

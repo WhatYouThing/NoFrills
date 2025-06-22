@@ -3,12 +3,12 @@ package nofrills.features;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.EntityType;
 import net.minecraft.particle.ParticleTypes;
-import nofrills.config.Config;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.SpawnParticleEvent;
 
 import java.util.regex.Pattern;
 
+import static nofrills.Main.Config;
 import static nofrills.misc.Utils.Symbols;
 
 public class NoRender {
@@ -20,7 +20,7 @@ public class NoRender {
 
     @EventHandler
     public static void onNamed(EntityNamedEvent event) {
-        if (Config.hideDeadMobs && event.entity.getType() == EntityType.ARMOR_STAND) {
+        if (Config.hideDeadMobs() && event.entity.getType() == EntityType.ARMOR_STAND) {
             for (Pattern pattern : deadPatterns) {
                 if (pattern.matcher(event.namePlain).matches()) {
                     event.entity.setCustomNameVisible(false);
@@ -32,7 +32,7 @@ public class NoRender {
 
     @EventHandler
     public static void onParticle(SpawnParticleEvent event) {
-        if (Config.noExplosions && (event.type.equals(ParticleTypes.EXPLOSION) || event.type.equals(ParticleTypes.EXPLOSION_EMITTER))) {
+        if (Config.noExplosions() && (event.type.equals(ParticleTypes.EXPLOSION) || event.type.equals(ParticleTypes.EXPLOSION_EMITTER))) {
             event.cancel();
         }
     }

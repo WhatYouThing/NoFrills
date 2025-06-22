@@ -14,7 +14,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
-import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.InteractBlockEvent;
 import nofrills.events.InteractItemEvent;
@@ -27,6 +26,7 @@ import nofrills.mixin.CreeperEntityAccessor;
 
 import java.util.Arrays;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class MiningFeatures {
@@ -61,8 +61,8 @@ public class MiningFeatures {
     }
 
     private static boolean isBuffWhitelisted(String buff) {
-        if (!Config.skymallWhitelist.isEmpty()) {
-            return Arrays.stream(Config.skymallWhitelist.split(",")).anyMatch(keyword -> buff.toLowerCase().contains(keyword.toLowerCase().trim()));
+        if (!Config.skymallWhitelist().isEmpty()) {
+            return Arrays.stream(Config.skymallWhitelist().split(",")).anyMatch(keyword -> buff.toLowerCase().contains(keyword.toLowerCase().trim()));
         }
         return false;
     }
@@ -76,12 +76,12 @@ public class MiningFeatures {
     }
 
     private static boolean pickobulusCheck() {
-        return Config.safePickobulus && (Utils.isOnPrivateIsland() || Utils.isInGarden()) && Utils.getRightClickAbility(Utils.getHeldItem()).contains("Pickobulus");
+        return Config.safePickobulus() && (Utils.isOnPrivateIsland() || Utils.isInGarden()) && Utils.getRightClickAbility(Utils.getHeldItem()).contains("Pickobulus");
     }
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (Config.ghostVision && SkyblockData.getLocation().equals(Utils.Symbols.zone + " The Mist")) {
+        if (Config.ghostVision() && SkyblockData.getLocation().equals(Utils.Symbols.zone + " The Mist")) {
             for (Entity ent : mc.world.getEntities()) {
                 if (ent instanceof CreeperEntity creeper) {
                     if (!Rendering.Entities.isDrawingFilled(ent)) {
@@ -94,7 +94,7 @@ public class MiningFeatures {
                 }
             }
         }
-        if (Config.betterSkymall) {
+        if (Config.betterSkymall()) {
             if (skyMallTicks > 0) {
                 skyMallTicks--;
                 if (skyMallTicks == 0) {
@@ -107,7 +107,7 @@ public class MiningFeatures {
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
         if (mc.player != null) {
-            if (Config.betterSkymall) {
+            if (Config.betterSkymall()) {
                 if (event.messagePlain.equalsIgnoreCase(uselessMessage1) || event.messagePlain.equalsIgnoreCase(uselessMessage2)) {
                     event.cancel();
                 }
@@ -120,7 +120,7 @@ public class MiningFeatures {
                     event.cancel();
                 }
             }
-            if (Config.pickAbilityAlert && event.messagePlain.endsWith("is now available!")) {
+            if (Config.pickAbilityAlert() && event.messagePlain.endsWith("is now available!")) {
                 String ability = event.messagePlain.replace("is now available!", "").trim();
                 PlayerInventory inv = mc.player.getInventory();
                 for (int i = 0; i <= 35; i++) {

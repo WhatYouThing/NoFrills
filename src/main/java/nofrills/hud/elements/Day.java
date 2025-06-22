@@ -2,10 +2,11 @@ package nofrills.hud.elements;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
+
+import static nofrills.Main.Config;
 
 public class Day extends SimpleTextElement {
 
@@ -15,10 +16,10 @@ public class Day extends SimpleTextElement {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.setProperties(Config.dayEnabled, false, Config.dayLeftHand, Config.dayPosX, Config.dayPosY);
+        this.setProperties(Config.dayEnabled(), false, Config.dayLeftHand(), Config.dayPosX(), Config.dayPosY());
         super.render(context, mouseX, mouseY, delta);
-        Config.dayPosX = this.posX;
-        Config.dayPosY = this.posY;
+        Config.dayPosX(this.posX);
+        Config.dayPosY(this.posY);
     }
 
     public void setDay(long day) {

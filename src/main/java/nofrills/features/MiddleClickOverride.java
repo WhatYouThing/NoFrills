@@ -5,7 +5,6 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import nofrills.config.Config;
 import nofrills.events.InputEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
@@ -13,6 +12,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class MiddleClickOverride {
@@ -77,7 +77,7 @@ public class MiddleClickOverride {
 
     @EventHandler
     private static void onClick(InputEvent event) {
-        if (Config.middleClickOverride && event.key == GLFW.GLFW_MOUSE_BUTTON_1 && event.modifiers == 0 && event.action == GLFW.GLFW_PRESS) {
+        if (Config.middleClickOverride() && event.key == GLFW.GLFW_MOUSE_BUTTON_1 && event.modifiers == 0 && event.action == GLFW.GLFW_PRESS) {
             if (mc.currentScreen instanceof GenericContainerScreen container) {
                 String title = container.getTitle().getString();
                 Slot focusedSlot = Utils.getFocusedSlot();

@@ -3,13 +3,14 @@ package nofrills.features;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
+
+import static nofrills.Main.Config;
 
 public class ScathaMining {
     private static final String spawnMsg = "You hear the sound of something approaching...";
@@ -21,7 +22,7 @@ public class ScathaMining {
     }
 
     private static void alertSpawn(boolean scatha) {
-        if (Config.wormAlert) {
+        if (Config.wormAlert()) {
             if (scatha) {
                 Utils.showTitle("§cScatha", "§7GOLD GOLD GOLD!", 5, 20, 5);
                 Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), SoundCategory.MASTER, 1.0f, 1.0f);
@@ -57,7 +58,7 @@ public class ScathaMining {
         }
         if (spawnCooldown > 0) {
             spawnCooldown--;
-            if (spawnCooldown == 0 && Config.wormCooldown) {
+            if (spawnCooldown == 0 && Config.wormCooldown()) {
                 Utils.showTitle("§aSpawn Cooldown Ended", "", 5, 20, 5);
                 Utils.info("§a§lWorm spawn cooldown ended!");
                 Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), SoundCategory.MASTER, 1.0f, 0.0f);

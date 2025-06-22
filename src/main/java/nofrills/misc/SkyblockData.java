@@ -7,7 +7,6 @@ import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.hud.HudManager;
 
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class SkyblockData {
@@ -70,7 +70,7 @@ public class SkyblockData {
                 if ((msg.startsWith("[" + dungeonClass + "]") && msg.contains("->")) ||
                         msg.equals(mc.player.getName().getString() + " selected the " + dungeonClass + " Class!") ||
                         msg.equals("You have selected the " + dungeonClass + " Dungeon Class!")) {
-                    Config.dungeonClass = dungeonClass;
+                    Config.dungeonClass(dungeonClass);
                     return;
                 }
             }
@@ -208,7 +208,7 @@ public class SkyblockData {
                 Utils.infoFormat("§aPing: §f{}§7ms", ping);
                 showPing = false;
             }
-            if (Config.pingEnabled) {
+            if (Config.pingEnabled()) {
                 HudManager.pingElement.setPing(ping);
             }
             pingTicks = 0;
@@ -222,19 +222,19 @@ public class SkyblockData {
         } else if (dungeonPower != 0) {
             dungeonPower = 0;
         }
-        if (Config.powerEnabled) {
+        if (Config.powerEnabled()) {
             HudManager.powerElement.setPower(dungeonPower);
         }
-        if (Config.dayEnabled) {
+        if (Config.dayEnabled()) {
             HudManager.dayElement.setDay(mc.world.getTimeOfDay() / 24000L);
         }
-        if (Config.pingEnabled && pingTicks <= 20) { // pings every second when element is enabled, waits until ping result is received
+        if (Config.pingEnabled() && pingTicks <= 20) { // pings every second when element is enabled, waits until ping result is received
             pingTicks++;
             if (pingTicks == 20) {
                 sendPing();
             }
         }
-        if (Config.tpsEnabled) {
+        if (Config.tpsEnabled()) {
             tpsTimer++;
             if (tpsTimer == 20) {
                 HudManager.tpsElement.setTps(serverTicks);
@@ -246,10 +246,10 @@ public class SkyblockData {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (Config.lagMeterEnabled) {
+        if (Config.lagMeterEnabled()) {
             HudManager.lagMeterElement.setTickTime(Util.getMeasuringTimeMs());
         }
-        if (Config.tpsEnabled) {
+        if (Config.tpsEnabled()) {
             serverTicks++;
         }
     }

@@ -3,7 +3,6 @@ package nofrills.hud;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
@@ -42,7 +41,7 @@ public class HudEditorScreen extends Screen {
 
     @Override
     public void close() {
-        Config.configHandler.save();
+        // Config.configHandler.save();
         super.close();
     }
 }

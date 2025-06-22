@@ -1,12 +1,12 @@
 package nofrills.features;
 
 import meteordevelopment.orbit.EventHandler;
-import nofrills.config.Config;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class SpaceFarmer {
@@ -14,7 +14,7 @@ public class SpaceFarmer {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (Config.spaceFarmer && event.key == GLFW.GLFW_KEY_SPACE) {
+        if (Config.spaceFarmer() && event.key == GLFW.GLFW_KEY_SPACE) {
             if (mc.currentScreen != null && spaceHeld) {
                 spaceHeld = false;
                 mc.options.attackKey.setPressed(false);

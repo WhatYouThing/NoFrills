@@ -7,13 +7,13 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.*;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.*;
 
@@ -110,33 +110,33 @@ public class PriceTooltips {
 
     @EventHandler
     public static void onTooltip(DrawItemTooltip event) {
-        if (Config.fetchPricing && event.customData != null) {
+        if (Config.fetchPricing() && event.customData != null) {
             NbtCompound customData = event.customData.copyNbt();
             String itemId = parseItemId(customData);
             int quantity = getStackQuantity(event.stack);
             if (itemId.isEmpty()) {
                 return;
             }
-            if (Config.pricingMote && npcPricing.containsKey(itemId) && SkyblockData.getArea().equals("The Rift")) {
+            if (Config.pricingMote() && npcPricing.containsKey(itemId) && SkyblockData.getArea().equals("The Rift")) {
                 HashMap<String, Double> prices = npcPricing.get(itemId);
                 if (prices.containsKey("mote")) {
-                    double burgerBonus = 1 + 0.05 * Config.pricingMoteStacks;
+                    double burgerBonus = 1 + 0.05 * Config.pricingMoteStacks();
                     event.addLine(buildLine("§dMotes Price", prices.get("mote") * burgerBonus, quantity, "§8({}x {})"));
                 }
             }
-            if (Config.pricingNPC && npcPricing.containsKey(itemId)) {
+            if (Config.pricingNPC() && npcPricing.containsKey(itemId)) {
                 HashMap<String, Double> prices = npcPricing.get(itemId);
                 if (prices.containsKey("coin")) {
                     event.addLine(buildLine("§eNPC Price", prices.get("coin"), quantity, "§8({}x {})"));
                 }
             }
-            if (Config.pricingAuction && auctionPricing.containsKey(itemId)) {
+            if (Config.pricingAuction() && auctionPricing.containsKey(itemId)) {
                 long lbin = auctionPricing.get(itemId);
                 if (!itemId.equals("ATTRIBUTE_SHARD")) {
                     event.addLine(buildLine("§eLowest BIN", lbin, quantity, "§8({}x {})"));
                 }
             }
-            if (Config.pricingAttribute && !attributePricing.isEmpty() && event.customData.contains("attributes")) {
+            if (Config.pricingAttribute() && !attributePricing.isEmpty() && event.customData.contains("attributes")) {
                 NbtCompound attributeData = customData.getCompound("attributes").orElse(null);
                 Set<String> attributes = attributeData.getKeys();
                 for (String attribute : attributes) {
@@ -204,7 +204,7 @@ public class PriceTooltips {
                     event.addLine(Text.of(rollMsg));
                 }
             }
-            if (Config.pricingBazaar && bazaarPricing.containsKey(itemId)) {
+            if (Config.pricingBazaar() && bazaarPricing.containsKey(itemId)) {
                 HashMap<String, Double> prices = bazaarPricing.get(itemId);
                 event.addLine(buildLine("§eBazaar Buy", prices.get("buy"), quantity, "§8({}x {})"));
                 event.addLine(buildLine("§eBazaar Sell", prices.get("sell"), quantity, "§8({}x {})"));

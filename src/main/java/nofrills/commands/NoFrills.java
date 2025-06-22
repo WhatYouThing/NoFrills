@@ -10,7 +10,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
-import nofrills.config.Config;
 import nofrills.features.PearlRefill;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGuiScreen;
@@ -20,6 +19,7 @@ import nofrills.misc.Utils;
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 import static nofrills.misc.SkyblockData.instances;
 
@@ -28,7 +28,7 @@ public class NoFrills {
 
     public static final ModCommand[] commands = {
             new ModCommand("settings", "Opens the settings GUI.", literal("settings").executes(context -> {
-                Utils.setScreen(Config.getConfigScreen(null));
+                //Utils.setScreen(Config.getConfigScreen(null));
                 return SINGLE_SUCCESS;
             })),
             new ModCommand("party", "Allows you to manage the player whitelist and blacklist for the Party Commands feature.", literal("party").executes(context -> {
@@ -42,14 +42,14 @@ public class NoFrills {
                 return SINGLE_SUCCESS;
             }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
                 String name = StringArgumentType.getString(context, "playerName").toLowerCase();
-                if (Config.partyWhitelist.contains(name)) {
+                if (Config.partyWhitelist().contains(name)) {
                     Utils.info("§7" + name + " is already in the party whitelist.");
-                } else if (Config.partyBlacklist.contains(name)) {
+                } else if (Config.partyBlacklist().contains(name)) {
                     Utils.info("§7" + name + " is already in the party blacklist.");
                 } else {
                     Utils.info("§aSuccessfully added \"" + name + "\" to the party commands whitelist.");
-                    Config.partyWhitelist.add(name);
-                    Config.configHandler.save();
+                    Config.partyWhitelist().add(name);
+                    //Config.configHandler.save();
                 }
                 return SINGLE_SUCCESS;
             }))).then(literal("remove").executes(context -> {
@@ -57,34 +57,34 @@ public class NoFrills {
                 return SINGLE_SUCCESS;
             }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
                 String name = StringArgumentType.getString(context, "playerName").toLowerCase();
-                if (!Config.partyWhitelist.contains(name)) {
+                if (!Config.partyWhitelist().contains(name)) {
                     Utils.info("§7" + name + " is not in the party whitelist.");
-                } else if (Config.partyBlacklist.contains(name)) {
+                } else if (Config.partyBlacklist().contains(name)) {
                     Utils.info("§7" + name + " is in the party blacklist, not whitelist.");
                 } else {
                     Utils.info("§aSuccessfully removed " + name + " from the party commands whitelist.");
-                    Config.partyWhitelist.remove(name);
-                    Config.configHandler.save();
+                    Config.partyWhitelist().remove(name);
+                    //Config.configHandler.save();
                 }
                 return SINGLE_SUCCESS;
             }))).then(literal("get").executes(context -> {
-                if (Config.partyWhitelist.isEmpty()) {
+                if (Config.partyWhitelist().isEmpty()) {
                     Utils.info("§7Your party whitelist is currently empty.");
                 } else {
                     StringBuilder players = new StringBuilder();
-                    for (String player : Config.partyWhitelist) {
+                    for (String player : Config.partyWhitelist()) {
                         players.append(player).append(" ");
                     }
                     Utils.info("§aList of all whitelisted players:\n\n§7" + players.toString().trim().replaceAll(" ", ", ") + "\n");
                 }
                 return SINGLE_SUCCESS;
             })).then(literal("clear").executes(context -> {
-                if (Config.partyWhitelist.isEmpty()) {
+                if (Config.partyWhitelist().isEmpty()) {
                     Utils.info("§7Your party whitelist is currently empty.");
                 } else {
                     Utils.info("§aSuccessfully cleared the party commands whitelist.");
-                    Config.partyWhitelist.clear();
-                    Config.configHandler.save();
+                    Config.partyWhitelist().clear();
+                    //Config.configHandler.save();
                 }
                 return SINGLE_SUCCESS;
             }))).then(literal("blacklist").executes(context -> {
@@ -95,14 +95,14 @@ public class NoFrills {
                 return SINGLE_SUCCESS;
             }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
                 String name = StringArgumentType.getString(context, "playerName").toLowerCase();
-                if (Config.partyBlacklist.contains(name)) {
+                if (Config.partyBlacklist().contains(name)) {
                     Utils.info("§7" + name + " is already in the party blacklist.");
-                } else if (Config.partyWhitelist.contains(name)) {
+                } else if (Config.partyWhitelist().contains(name)) {
                     Utils.info("§7" + name + " is already in the party whitelist.");
                 } else {
                     Utils.info("§aSuccessfully added " + name + " to the party commands blacklist.");
-                    Config.partyBlacklist.add(name);
-                    Config.configHandler.save();
+                    Config.partyBlacklist().add(name);
+                    //Config.configHandler.save();
                 }
                 return SINGLE_SUCCESS;
             }))).then(literal("remove").executes(context -> {
@@ -110,34 +110,34 @@ public class NoFrills {
                 return SINGLE_SUCCESS;
             }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
                 String name = StringArgumentType.getString(context, "playerName").toLowerCase();
-                if (!Config.partyBlacklist.contains(name)) {
+                if (!Config.partyBlacklist().contains(name)) {
                     Utils.info("§7" + name + " is not in the party blacklist.");
-                } else if (Config.partyWhitelist.contains(name)) {
+                } else if (Config.partyWhitelist().contains(name)) {
                     Utils.info("§7" + name + " is in the party whitelist, not blacklist.");
                 } else {
                     Utils.info("§aSuccessfully removed " + name + " from the party commands blacklist.");
-                    Config.partyBlacklist.remove(name);
-                    Config.configHandler.save();
+                    Config.partyBlacklist().remove(name);
+                    //Config.configHandler.save();
                 }
                 return SINGLE_SUCCESS;
             }))).then(literal("get").executes(context -> {
-                if (Config.partyBlacklist.isEmpty()) {
+                if (Config.partyBlacklist().isEmpty()) {
                     Utils.info("§7Your party blacklist is currently empty.");
                 } else {
                     StringBuilder players = new StringBuilder();
-                    for (String player : Config.partyBlacklist) {
+                    for (String player : Config.partyBlacklist()) {
                         players.append(player).append(" ");
                     }
                     Utils.info("§aList of all blacklisted players:\n\n" + players.toString().trim().replaceAll(" ", ", ") + "\n");
                 }
                 return SINGLE_SUCCESS;
             })).then(literal("clear").executes(context -> {
-                if (Config.partyBlacklist.isEmpty()) {
+                if (Config.partyBlacklist().isEmpty()) {
                     Utils.info("§7Your party blacklist is currently empty.");
                 } else {
                     Utils.info("§aSuccessfully cleared the party commands blacklist.");
-                    Config.partyBlacklist.clear();
-                    Config.configHandler.save();
+                    Config.partyBlacklist().clear();
+                    //Config.configHandler.save();
                 }
                 return SINGLE_SUCCESS;
             })))),
@@ -215,9 +215,6 @@ public class NoFrills {
                     }
                 }
                 return SINGLE_SUCCESS;
-            })).then(literal("clickGui").executes(context -> {
-                Utils.setScreen(new ClickGuiScreen());
-                return SINGLE_SUCCESS;
             }))),
     };
 
@@ -236,11 +233,11 @@ public class NoFrills {
             }));
         }
         LiteralArgumentBuilder<FabricClientCommandSource> commandMain = literal("nofrills").executes(context -> {
-            Utils.setScreen(Config.getConfigScreen(null));
+            //Utils.setScreen(Config.getConfigScreen(null));
             return SINGLE_SUCCESS;
         });
         LiteralArgumentBuilder<FabricClientCommandSource> commandShort = literal("nf").executes(context -> {
-            Utils.setScreen(Config.getConfigScreen(null));
+            Utils.setScreen(new ClickGuiScreen());
             return SINGLE_SUCCESS;
         });
         commandMain.then(helpArg);

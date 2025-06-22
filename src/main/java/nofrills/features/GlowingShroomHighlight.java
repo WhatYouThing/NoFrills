@@ -6,7 +6,6 @@ import net.minecraft.block.Blocks;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import nofrills.config.Config;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
@@ -18,6 +17,7 @@ import nofrills.misc.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class GlowingShroomHighlight {
@@ -32,7 +32,7 @@ public class GlowingShroomHighlight {
 
     @EventHandler
     public static void onParticle(SpawnParticleEvent event) {
-        if (Config.shroomHighlight && isInCave && event.type.equals(ParticleTypes.ENTITY_EFFECT)) {
+        if (Config.shroomHighlight() && isInCave && event.type.equals(ParticleTypes.ENTITY_EFFECT)) {
             BlockPos pos = BlockPos.ofFloored(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             if (!shroomData.contains(pos) && isShroom(pos)) {
                 shroomData.add(pos);
@@ -50,7 +50,7 @@ public class GlowingShroomHighlight {
 
     @EventHandler
     public static void onRender(WorldRenderEvent event) {
-        if (Config.shroomHighlight && isInCave && !shroomData.isEmpty()) {
+        if (Config.shroomHighlight() && isInCave && !shroomData.isEmpty()) {
             List<BlockPos> shrooms = new ArrayList<>(shroomData);
             for (BlockPos pos : shrooms) {
                 if (isShroom(pos)) {

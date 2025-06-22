@@ -9,7 +9,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
-import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldRenderEvent;
@@ -22,6 +21,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class EventFeatures {
@@ -51,7 +51,7 @@ public class EventFeatures {
             String name = event.namePlain.toLowerCase();
             if (name.equals("trick or treat?") || name.equals("party chest")) {
                 if (event.entity.distanceTo(mc.player) <= 16.0f && !chestList.has(event.entity)) {
-                    if (Config.spookyChestAlert) {
+                    if (Config.spookyChestAlert()) {
                         Utils.showTitle("§6§lCHEST SPAWNED!", "", 5, 20, 5);
                         Utils.playSound(SoundEvents.BLOCK_VAULT_ACTIVATE, SoundCategory.MASTER, 1.0f, 1.0f);
                     }
@@ -64,16 +64,16 @@ public class EventFeatures {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         for (Entity chest : chestList.get()) {
-            if (Config.spookyChestHighlight) {
+            if (Config.spookyChestHighlight()) {
                 BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);
-                event.drawFilledWithBeam(Box.enclosing(pos, pos), 256, true, RenderColor.fromColor(Config.spookyChestHighlightColor));
+                event.drawFilledWithBeam(Box.enclosing(pos, pos), 256, true, RenderColor.fromColor(Config.spookyChestHighlightColor()));
             }
         }
     }
 
     @EventHandler
     private static void onTooltip(DrawItemTooltip event) {
-        if (Config.calendarDate && mc.currentScreen instanceof GenericContainerScreen container) {
+        if (Config.calendarDate() && mc.currentScreen instanceof GenericContainerScreen container) {
             if (container.getTitle().getString().equals("Calendar and Events")) {
                 for (Text line : event.lines) {
                     String l = Formatting.strip(line.getString());

@@ -5,18 +5,18 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Formatting;
-import nofrills.config.Config;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class CorpseHighlight {
     @EventHandler
     public static void tick(WorldTickEvent event) {
-        if (Config.miningCorpseGlow && Utils.isInZone(Utils.Symbols.zone + " Glacite Mineshafts", false)) {
+        if (Config.miningCorpseGlow() && Utils.isInZone(Utils.Symbols.zone + " Glacite Mineshafts", false)) {
             for (Entity ent : mc.world.getEntities()) {
                 if (ent instanceof ArmorStandEntity armorStand && !ent.isInvisible() && !Rendering.Entities.isDrawingGlow(ent)) {
                     Iterable<ItemStack> armor = Utils.getEntityArmor(armorStand);

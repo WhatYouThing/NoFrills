@@ -8,11 +8,11 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import nofrills.config.Config;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
+import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class WardrobeHotkeys {
@@ -24,7 +24,7 @@ public class WardrobeHotkeys {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (Config.wardrobeHotkeys && event.action == GLFW.GLFW_PRESS) {
+        if (Config.wardrobeHotkeys() && event.action == GLFW.GLFW_PRESS) {
             if (event.key >= GLFW.GLFW_KEY_1 && event.key <= GLFW.GLFW_KEY_9) {
                 if (mc.currentScreen instanceof GenericContainerScreen container) {
                     String containerTitle = container.getTitle().getString();
@@ -37,7 +37,7 @@ public class WardrobeHotkeys {
                                 for (Item slotItem : validButtons) {
                                     if (slot.getStack().getItem() == slotItem) {
                                         mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, 0, SlotActionType.PICKUP, mc.player);
-                                        if (Config.wardrobeHotkeysSound) {
+                                        if (Config.wardrobeHotkeysSound()) {
                                             Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR.value(), SoundCategory.MASTER, 0.65f, 1.0f);
                                         }
                                         event.cancel();

@@ -13,8 +13,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import nofrills.config.Config;
 import nofrills.events.InteractBlockEvent;
 import nofrills.events.InteractEntityEvent;
 import nofrills.events.InteractItemEvent;
@@ -27,8 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static nofrills.Main.eventBus;
-import static nofrills.Main.mc;
+import static nofrills.Main.*;
 
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
@@ -38,20 +35,16 @@ public abstract class MinecraftClientMixin {
     public ClientWorld world;
 
     @Shadow
-    @Nullable
-    public HitResult crosshairTarget;
-
-    @Shadow
     public abstract void setScreen(@Nullable Screen screen);
 
     @WrapWithCondition(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(ClientPlayerEntity instance, Hand hand) {
-        return !Utils.isFixEnabled(Config.noDropSwing);
+        return !Utils.isFixEnabled(Config.noDropSwing());
     }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void onBeforeOpenScreen(Screen screen, CallbackInfo ci) {
-        if (Config.noLoadingScreen && screen instanceof DownloadingTerrainScreen) {
+        if (Config.noLoadingScreen() && screen instanceof DownloadingTerrainScreen) {
             mc.setScreen(null);
             ci.cancel();
         }
@@ -60,7 +53,7 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "setScreen", at = @At("TAIL"))
     private void onOpenScreen(Screen screen, CallbackInfo ci) {
         if (screen != null && world != null) {
-            if (Utils.isFixEnabled(Config.clearCursorStack) && screen instanceof HandledScreen<?> handledScreen) {
+            if (Utils.isFixEnabled(Config.clearCursorStack()) && screen instanceof HandledScreen<?> handledScreen) {
                 handledScreen.getScreenHandler().setCursorStack(ItemStack.EMPTY);
             }
             eventBus.post(new ScreenOpenEvent(screen));

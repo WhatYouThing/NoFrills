@@ -39,7 +39,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
-import nofrills.config.Config;
+import nofrills.config.NoFrillsConfig;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.LeapOverlay;
 import nofrills.mixin.HandledScreenAccessor;
@@ -321,9 +321,9 @@ public class Utils {
         return false;
     }
 
-    public static boolean isFixEnabled(Config.fixMode mode) {
-        return mode == Config.fixMode.AlwaysOn || SkyblockData.isInSkyblock() &&
-                ((mode == Config.fixMode.SkyblockLegacyOnly && !Utils.isOnModernIsland()) || mode == Config.fixMode.SkyblockOnly);
+    public static boolean isFixEnabled(NoFrillsConfig.fixMode mode) {
+        return mode == NoFrillsConfig.fixMode.AlwaysOn || SkyblockData.isInSkyblock() &&
+                ((mode == NoFrillsConfig.fixMode.SkyblockLegacyOnly && !Utils.isOnModernIsland()) || mode == NoFrillsConfig.fixMode.SkyblockOnly);
     }
 
     /**
@@ -610,7 +610,7 @@ public class Utils {
     }
 
     public static boolean isLeapMenu(String title) {
-        return Config.leapOverlay && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
+        return Config.leapOverlay() && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
     }
 
     public static void setScreen(Screen screen) {

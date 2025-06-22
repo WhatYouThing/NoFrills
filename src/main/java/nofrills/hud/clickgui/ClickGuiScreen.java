@@ -1,39 +1,34 @@
 package nofrills.hud.clickgui;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
+import io.wispforest.owo.ui.base.BaseOwoScreen;
+import io.wispforest.owo.ui.component.ButtonComponent;
+import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.core.*;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
-import org.lwjgl.glfw.GLFW;
+import org.jetbrains.annotations.NotNull;
 
-import static nofrills.Main.mc;
+public class ClickGuiScreen extends BaseOwoScreen<FlowLayout> {
+    private static final ButtonComponent.Renderer buttonOn = ButtonComponent.Renderer.flat(0xaaaaaa, 0x3e3ea9, 0x000000);
+    private static final ButtonComponent.Renderer buttonOff = ButtonComponent.Renderer.flat(0x7a7a7a, 0x3e3ea9, 0x000000);
 
-public class ClickGuiScreen extends Screen {
-    private final ClickGuiCategory deez = new ClickGuiCategory(Text.of("nuts"), 100, 100);
-    private boolean lastClicked = false;
-
-    public ClickGuiScreen() {
-        super(Text.of(""));
-    }
-
-    private boolean isLeftClickPressed() {
-        return GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_1) == 1;
+    @Override
+    protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
+        return OwoUIAdapter.create(this, Containers::verticalFlow);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.getMatrices().push();
-        float scale = 2f / mc.options.getGuiScale().getValue();
-        context.getMatrices().scale(scale, scale, scale);
-        deez.render(context, mouseX, mouseY, delta);
-        boolean clicked = isLeftClickPressed();
-        lastClicked = clicked;
-        context.getMatrices().pop();
+    protected void build(FlowLayout root) {
+        root.surface(Surface.VANILLA_TRANSLUCENT);
+        FlowLayout parent = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+        ParentComponent playerCategory = Containers.collapsible(Sizing.content(), Sizing.content(), Text.literal("Player"), true)
+                .margins(Insets.of(5))
+                .padding(Insets.of(2))
+                .surface(Surface.flat(0xaa000000));
+        parent.child(playerCategory);
+        root.child(Containers.horizontalScroll(Sizing.fill(100), Sizing.content(), parent));
     }
 
-    @Override
-    public void close() {
-        Config.configHandler.save();
-        super.close();
+    private static class Toggles {
     }
 }

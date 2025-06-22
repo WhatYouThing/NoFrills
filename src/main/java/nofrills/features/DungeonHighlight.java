@@ -8,7 +8,6 @@ import net.minecraft.entity.mob.SkeletonEntity;
 import net.minecraft.entity.mob.WitherSkeletonEntity;
 import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import nofrills.config.Config;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.misc.RenderColor;
@@ -16,6 +15,8 @@ import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
 import java.util.List;
+
+import static nofrills.Main.Config;
 
 public class DungeonHighlight {
     private static final String[] minibossList = {
@@ -53,18 +54,18 @@ public class DungeonHighlight {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (Config.starredMobHighlight && Utils.isInDungeons() && event.entity instanceof ArmorStandEntity && isStarred(event.namePlain)) {
-            renderOutline(event.entity, RenderColor.fromColor(Config.starredMobColor));
+        if (Config.starredMobHighlight() && Utils.isInDungeons() && event.entity instanceof ArmorStandEntity && isStarred(event.namePlain)) {
+            renderOutline(event.entity, RenderColor.fromColor(Config.starredMobColor()));
         }
     }
 
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
-        if (Config.miniHighlight && Utils.isInDungeons() && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
+        if (Config.miniHighlight() && Utils.isInDungeons() && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
             String name = player.getName().getString();
             for (String mini : minibossList) {
                 if (name.equals(mini)) {
-                    Rendering.Entities.drawOutline(event.entity, true, RenderColor.fromColor(Config.miniColor));
+                    Rendering.Entities.drawOutline(event.entity, true, RenderColor.fromColor(Config.miniColor()));
                     break;
                 }
             }

@@ -2,12 +2,12 @@ package nofrills.config;
 
 import com.google.gson.JsonObject;
 import io.wispforest.owo.config.annotation.Config;
+import io.wispforest.owo.ui.core.Color;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Config(name = "NoFrillsConfig", wrapperName = "NoFrillsConfigWrapper", saveOnModification = false)
+@Config(name = "NoFrillsConfig", wrapperName = "NoFrillsConfigWrapper")
 public class NoFrillsConfig {
 
     // General
@@ -32,7 +32,7 @@ public class NoFrillsConfig {
     public boolean slotBinding = false;
     public boolean slotBindingLines = false;
     public boolean slotBindingBorders = false;
-    public Color slotBindingColor = new Color(0, 255, 255, 255);
+    public Color slotBindingColor = new Color(0.0f, 1.0f, 1.0f, 1.0f);
     public JsonObject slotBindData = new JsonObject();
     public boolean hideDeadMobs = false;
     public boolean keepNametags = false;
@@ -44,10 +44,10 @@ public class NoFrillsConfig {
     public boolean overlayEtherwarp = false;
     public boolean partyFinderOptions = false;
     public boolean partyWaypoints = false;
-    public Color partyWaypointColor = new Color(85, 85, 255, 170);
+    public Color partyWaypointColor = new Color(0.34f, 0.34f, 1.0f, 0.67f);
     public int partyWaypointTime = 60;
     public boolean chatWaypoints = false;
-    public Color chatWaypointColor = new Color(85, 255, 255, 170);
+    public Color chatWaypointColor = new Color(0.34f, 1.0f, 1.0f, 0.67f);
     public int chatWaypointTime = 30;
     public String partyPrefixes = "! ?";
     public List<String> partyWhitelist = new ArrayList<>();
@@ -91,7 +91,7 @@ public class NoFrillsConfig {
 
     public boolean spookyChestAlert = false;
     public boolean spookyChestHighlight = false;
-    public Color spookyChestHighlightColor = new Color(255, 170, 0, 170);
+    public Color spookyChestHighlightColor = new Color(1.0f, 0.67f, 0.0f, 0.67f);
     public boolean calendarDate = false;
 
     // Solvers
@@ -154,13 +154,13 @@ public class NoFrillsConfig {
 
     public String dungeonClass = "Berserk"; // this stores the user's last selected/known Dungeon class, not for use with config screens
     public boolean starredMobHighlight = false;
-    public Color starredMobColor = new Color(0, 255, 255, 255);
+    public Color starredMobColor = new Color(0.0f, 1.0f, 1.0f, 1.0f);
     public boolean miniHighlight = false;
-    public Color miniColor = new Color(255, 255, 0, 255);
+    public Color miniColor = new Color(1.0f, 1.0f, 0.0f, 1.0f);
     public boolean keyHighlight = false;
-    public Color keyColor = new Color(0, 255, 0, 128);
+    public Color keyColor = new Color(0.0f, 1.0f, 0.0f, 0.5f);
     public boolean spiritHighlight = false;
-    public Color spiritColor = new Color(175, 0, 255, 170);
+    public Color spiritColor = new Color(0.67f, 0.0f, 1.0f, 0.67f);
     public boolean solveTerminals = false;
     public boolean fastTerminals = false;
     public boolean solveDevices = false;
@@ -178,11 +178,11 @@ public class NoFrillsConfig {
     public boolean wishReminder = false;
     public boolean leapOverlay = false;
     public boolean leapOverlayMsg = false;
-    public Color leapColorHealer = new Color(0xecb50c);
-    public Color leapColorMage = new Color(0x1793c4);
-    public Color leapColorBers = new Color(0xe7413c);
-    public Color leapColorArch = new Color(0x4a14b7);
-    public Color leapColorTank = new Color(0x768f46);
+    public Color leapColorHealer = Color.ofRgb(0xecb50c);
+    public Color leapColorMage = Color.ofRgb(0x1793c4);
+    public Color leapColorBers = Color.ofRgb(0xe7413c);
+    public Color leapColorArch = Color.ofRgb(0x4a14b7);
+    public Color leapColorTank = Color.ofRgb(0x768f46);
     public boolean gyroTimer = false;
     public boolean campReminder = false;
     public boolean ragAxeReminder = false;
@@ -191,7 +191,7 @@ public class NoFrillsConfig {
     // Kuudra
 
     public boolean kuudraHitbox = false;
-    public Color kuudraColor = new Color(255, 255, 0, 255);
+    public Color kuudraColor = new Color(1.0f, 1.0f, 0.0f, 1.0f);
     public boolean kuudraHealth = false;
     public boolean kuudraDPS = false;
     public boolean kuudraMissing = false;
@@ -201,13 +201,13 @@ public class NoFrillsConfig {
     public boolean kuudraDrain = false;
     public String kuudraDrainMsg = "/pc Used {mana} Mana on {players} players!";
     public boolean kuudraStunWaypoint = false;
-    public Color kuudraStunColor = new Color(0, 255, 255, 170);
+    public Color kuudraStunColor = new Color(0.0f, 1.0f, 1.0f, 0.67f);
     public boolean kuudraSupplyHighlight = false;
-    public Color kuudraSupplyColor = new Color(0, 255, 255, 127);
+    public Color kuudraSupplyColor = new Color(0.0f, 1.0f, 1.0f, 0.5f);
     public boolean kuudraDropHighlight = false;
-    public Color kuudraDropColor = new Color(255, 255, 0, 127);
+    public Color kuudraDropColor = new Color(1.0f, 1.0f, 0.0f, 0.5f);
     public boolean kuudraBuildHighlight = false;
-    public Color kuudraBuildColor = new Color(0, 255, 0, 127);
+    public Color kuudraBuildColor = new Color(0.0f, 1.0f, 0.0f, 0.5f);
 
     // Mining
 
@@ -237,7 +237,7 @@ public class NoFrillsConfig {
     public boolean vampSteak = false;
     public boolean vampSteakHighlight = false;
     public boolean vampChalice = false;
-    public Color vampChaliceColor = new Color(175, 0, 255, 170);
+    public Color vampChaliceColor = new Color(0.67f, 0.0f, 1.0f, 0.67f);
     public boolean vampManiaSilence = false;
     public boolean vampManiaReplace = false;
     public boolean vampSpringSilence = false;

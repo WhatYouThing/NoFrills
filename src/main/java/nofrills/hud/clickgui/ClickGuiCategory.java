@@ -8,31 +8,41 @@ import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.text.Text;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+
+import static nofrills.Main.mc;
 
 public class ClickGuiCategory extends FlowLayout {
     protected ClickGuiCategory(String title, List<ClickGuiModule> children) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
-        Color color = new Color(0.25f, 0.25f, 0.52f, 0.67f);
-        BaseComponent label = Components.label(Text.literal(title))
-                .color(color)
-                .horizontalTextAlignment(HorizontalAlignment.CENTER)
-                .verticalTextAlignment(VerticalAlignment.CENTER)
-                .margins(Insets.of(10));
-        this.child(label);
-        this.margins(Insets.of(5));
-        this.padding(Insets.of(3));
-        ParentComponent scroll = Containers.verticalScroll(Sizing.content(), Sizing.fill(), Containers.verticalFlow(Sizing.content(), Sizing.content())
-                        .child(Components.label(Text.literal("Item 1")))
-                        .child(Components.label(Text.literal("Item 2")))
-                        .child(Components.label(Text.literal("Item 2.1")))
-                        .child(Components.label(Text.literal("Item 2.2")))
-                        .child(Components.label(Text.literal("Item 2.3")))
-                        .child(Components.label(Text.literal("Item 2.4")))
-                        .child(Components.label(Text.literal("Item 3"))))
+        this.margins(Insets.of(5, 0, 5, 0));
+        Color color = Color.ofArgb(0xff5ca0bf);
+        Color textColor = Color.ofArgb(0xffffffff);
+        FlowLayout modules = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        int categoryWidth = 0;
+        List<ClickGuiModule> childrenMutable = new ArrayList<>(children);
+        for (ClickGuiModule module : childrenMutable) {
+            categoryWidth = Math.max(categoryWidth, mc.textRenderer.getWidth(module.activeText.getString()) + 10);
+        }
+        childrenMutable.sort(Comparator.comparing(module -> module.activeText.getString()));
+        for (ClickGuiModule module : childrenMutable) {
+            module.horizontalSizing(Sizing.fixed(categoryWidth));
+            modules.child(module);
+        }
+        ParentComponent scroll = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), modules)
                 .scrollbarThiccness(3)
-                .scrollbar(ScrollContainer.Scrollbar.flat(color))
-                .padding(Insets.of(10))
-                .surface(Surface.flat(0xaa000000));
+                .scrollbar(ScrollContainer.Scrollbar.flat(color));
+        BaseComponent label = Components.label(Text.literal(title))
+                .color(textColor)
+                .horizontalTextAlignment(HorizontalAlignment.CENTER)
+                .verticalTextAlignment(VerticalAlignment.CENTER);
+        ParentComponent header = Containers.verticalFlow(Sizing.fixed(categoryWidth), Sizing.content())
+                .child(label)
+                .padding(Insets.of(3))
+                .surface(Surface.flat(0xff5ca0bf));
+        modules.child(0, header);
+        this.child(scroll);
     }
 }

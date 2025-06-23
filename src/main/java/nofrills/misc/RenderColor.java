@@ -33,6 +33,10 @@ public class RenderColor {
         return new RenderColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
     }
 
+    public static RenderColor fromColor(io.wispforest.owo.ui.core.Color color) {
+        return RenderColor.fromHex(color.rgb(), color.alpha());
+    }
+
     public static RenderColor fromFloat(float r, float g, float b, float a) {
         return new RenderColor((int) (255 * r), (int) (255 * g), (int) (255 * b), (int) (255 * a));
     }

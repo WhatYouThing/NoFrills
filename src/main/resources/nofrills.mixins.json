@@ -24,6 +24,7 @@
     "InGameOverlayRendererMixin",
     "ItemStackMixin",
     "KeyboardMixin",
+    "LightmapTextureManagerMixin",
     "LivingEntityMixin",
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",

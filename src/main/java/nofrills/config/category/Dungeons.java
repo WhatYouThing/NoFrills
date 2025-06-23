@@ -99,8 +99,8 @@ public class Dungeons {
                         .build())
 
                 .option(Option.<Boolean>createBuilder()
-                        .name(Text.of("M5 Rag Axe Reminder"))
-                        .description(OptionDescription.of(Text.of("Get notified when its time to use your Rag Axe in M5 as Mage. This option is useless if you are (somehow) not playing LCM.")))
+                        .name(Text.of("M5 Ragnarock Reminder"))
+                        .description(OptionDescription.of(Text.of("Get notified when its time to use your Ragnarock in M5 as Mage. This option is useless if you are (somehow) not playing LCM.")))
                         .binding(false, () -> Config.ragAxeReminder, value -> Config.ragAxeReminder = value)
                         .controller(Config::booleanController)
                         .build())

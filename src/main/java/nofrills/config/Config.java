@@ -46,8 +46,6 @@ public class Config {
     @SerialEntry
     public static boolean pricingBazaar = false;
     @SerialEntry
-    public static boolean pricingAttribute = false;
-    @SerialEntry
     public static boolean pricingNPC = false;
     @SerialEntry
     public static boolean pricingMote = false;

@@ -4,36 +4,25 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Set;
 
 import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.*;
 
 public class PriceTooltips {
-    private static final List<String> kuudraPieceTypes = List.of("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS");
-    private static final List<String> kuudraPieceNames = List.of("CRIMSON", "TERROR", "AURORA", "HOLLOW", "FERVOR");
-    private static final List<String> kuudraPieceTiers = List.of("HOT", "BURNING", "FIERY", "INFERNAL");
-
-    private static String getKuudraPieceType(String itemId) {
-        for (String type : kuudraPieceTypes) {
-            for (String name : kuudraPieceNames) {
-                if (itemId.endsWith(name + "_" + type)) {
-                    return type;
-                }
-            }
-        }
-        return "";
-    }
-
-    private static String parseItemId(NbtCompound data) {
+    private static String parseItemId(ItemStack stack) {
+        NbtCompound data = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt();
         String id = Utils.getSkyblockId(data);
         switch (id) {
             case "PET" -> {
@@ -65,6 +54,9 @@ public class PriceTooltips {
                 } else {
                     return "ENCHANTMENT_UNKNOWN";
                 }
+            }
+            case "ATTRIBUTE_SHARD" -> {
+                return Utils.format("SHARD_{}", Formatting.strip(stack.getName().getString()).replaceAll(" ", "_").toUpperCase());
             }
         }
         return id;
@@ -111,8 +103,7 @@ public class PriceTooltips {
     @EventHandler
     public static void onTooltip(DrawItemTooltip event) {
         if (Config.fetchPricing && event.customData != null) {
-            NbtCompound customData = event.customData.copyNbt();
-            String itemId = parseItemId(customData);
+            String itemId = parseItemId(event.stack);
             int quantity = getStackQuantity(event.stack);
             if (itemId.isEmpty()) {
                 return;
@@ -131,78 +122,7 @@ public class PriceTooltips {
                 }
             }
             if (Config.pricingAuction && auctionPricing.containsKey(itemId)) {
-                long lbin = auctionPricing.get(itemId);
-                if (!itemId.equals("ATTRIBUTE_SHARD")) {
-                    event.addLine(buildLine("§eLowest BIN", lbin, quantity, "§8({}x {})"));
-                }
-            }
-            if (Config.pricingAttribute && !attributePricing.isEmpty() && event.customData.contains("attributes")) {
-                NbtCompound attributeData = customData.getCompound("attributes").orElse(null);
-                Set<String> attributes = attributeData.getKeys();
-                for (String attribute : attributes) {
-                    int level = attributeData.getInt(attribute).orElse(0);
-                    for (int i = level; i >= 1; i--) {
-                        if (attributePricing.containsKey(attribute + i)) {
-                            HashMap<String, Long> prices = attributePricing.get(attribute + i);
-                            List<Long> foundPrices = new ArrayList<>();
-                            String pieceType = getKuudraPieceType(itemId);
-                            if (!pieceType.isEmpty()) {
-                                for (String name : kuudraPieceNames) {
-                                    if (prices.containsKey(name + "_" + pieceType)) {
-                                        foundPrices.add(prices.get(name + "_" + pieceType));
-                                    }
-                                }
-                            } else {
-                                if (prices.containsKey(itemId)) {
-                                    foundPrices.add(prices.get(itemId));
-                                }
-                            }
-                            foundPrices.sort(Comparator.comparingLong(price -> price));
-                            String attributeLabel = Utils.uppercaseFirst(attribute.startsWith("mending") ? "vitality" : attribute, true);
-                            String attributeMsg = "§c[NF] §ePrice for §b" + attributeLabel + " " + level + "§e: ";
-                            if (!foundPrices.isEmpty()) {
-                                if (i == level) {
-                                    attributeMsg += "§6" + String.format("%,d", foundPrices.getFirst());
-                                } else {
-                                    int difference = (int) Math.pow(2, level - i);
-                                    attributeMsg += "§6" + String.format("%,d", foundPrices.getFirst() * difference) + " §8(" + difference + "x Level " + i + ")";
-                                }
-                            } else { // not rewriting this spaghetti since its getting deleted sooner or later
-                                if (i > 1) {
-                                    continue;
-                                } else {
-                                    attributeMsg += "§cUnknown";
-                                }
-                            }
-                            event.addLine(Text.of(attributeMsg));
-                            break;
-                        }
-                    }
-                }
-                if (attributes.size() == 2) {
-                    String first = (String) attributes.toArray()[0];
-                    String second = (String) attributes.toArray()[1];
-                    String rollMsg = "§c[NF] §ePrice for §aRoll§e: ";
-                    for (String combo : new String[]{first + " " + second, second + " " + first}) {
-                        if (attributePricing.containsKey(combo)) {
-                            HashMap<String, Long> comboPrices = attributePricing.get(combo);
-                            String id = itemId;
-                            for (String tier : kuudraPieceTiers) {
-                                if (id.startsWith(tier)) {
-                                    id = id.replace(tier + "_", "");
-                                    break;
-                                }
-                            }
-                            if (comboPrices.containsKey(id)) {
-                                rollMsg += "§6" + String.format("%,d", comboPrices.get(id));
-                            } else {
-                                rollMsg += "§cUnknown";
-                            }
-                            break;
-                        }
-                    }
-                    event.addLine(Text.of(rollMsg));
-                }
+                event.addLine(buildLine("§eLowest BIN", auctionPricing.get(itemId), quantity, "§8({}x {})"));
             }
             if (Config.pricingBazaar && bazaarPricing.containsKey(itemId)) {
                 HashMap<String, Double> prices = bazaarPricing.get(itemId);

@@ -36,6 +36,7 @@
     "RaycastContextMixin",
     "RenderPipelinesAccessor",
     "SnowBlockMixin",
+    "StatusEffectsDisplayMixin",
     "WorldMixin",
     "WorldRendererMixin"
   ],

@@ -189,6 +189,12 @@ public class General {
                                 .binding(false, () -> Config.noLoadingScreen, value -> Config.noLoadingScreen = value)
                                 .controller(Config::booleanController)
                                 .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.of("No Effect Display"))
+                                .description(OptionDescription.of(Text.of("Removes the potion effect displays from the HUD and the inventory.")))
+                                .binding(false, () -> Config.noEffectDisplay, value -> Config.noEffectDisplay = value)
+                                .controller(Config::booleanController)
+                                .build())
                         .build())
 
                 .group(OptionGroup.createBuilder()

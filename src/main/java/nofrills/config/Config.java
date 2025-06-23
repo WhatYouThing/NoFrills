@@ -86,6 +86,8 @@ public class Config {
     @SerialEntry
     public static boolean noLoadingScreen = false;
     @SerialEntry
+    public static boolean noEffectDisplay = false;
+    @SerialEntry
     public static boolean overlayEtherwarp = false;
     @SerialEntry
     public static boolean partyFinderOptions = false;

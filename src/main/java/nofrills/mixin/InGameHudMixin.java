@@ -6,6 +6,7 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
+import nofrills.config.Config;
 import nofrills.events.HudRenderEvent;
 import nofrills.misc.TitleRendering;
 import org.spongepowered.asm.mixin.Mixin;
@@ -76,6 +77,13 @@ public abstract class InGameHudMixin implements TitleRendering {
     private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (!mc.options.hudHidden) {
             eventBus.post(new HudRenderEvent(context, this.getTextRenderer(), tickCounter));
+        }
+    }
+
+    @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
+    private void onRenderEffectOverlay(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
+        if (Config.noEffectDisplay) {
+            ci.cancel();
         }
     }
 }

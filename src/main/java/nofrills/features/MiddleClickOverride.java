@@ -39,7 +39,9 @@ public class MiddleClickOverride {
             "Pet Sitter",
             "Transfer to Profile",
             "Attribute Transfer",
-            "Hunting Box"
+            "Hunting Box", 
+            "Heart of the Mountain", 
+            "Heart of the Forest"
     );
 
     private static final List<String> containBlacklist = List.of(
@@ -49,7 +51,10 @@ public class MiddleClickOverride {
             "The Hex",
             "Enchant Item",
             "Auction",
-            "Trap"
+            "Trap", 
+            "Superpairs", 
+            "Chronomatron", 
+            "Ultrasequencer"
     );
 
     private static final List<String> matchWhitelist = List.of(

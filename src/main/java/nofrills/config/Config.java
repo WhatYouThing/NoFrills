@@ -295,6 +295,8 @@ public class Config {
 
     @SerialEntry
     public static boolean hideFlyingLogs = false;
+    @SerialEntry
+    public static boolean invisibugHighlight = false;
 
     // Dungeons
 

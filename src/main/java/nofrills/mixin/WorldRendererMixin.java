@@ -9,10 +9,10 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Box;
 import nofrills.config.Config;
 import nofrills.events.WorldRenderEvent;
+import nofrills.features.ForagingFeatures;
 import nofrills.misc.EntityRendering;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
-import nofrills.misc.Utils;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,7 +45,7 @@ public abstract class WorldRendererMixin {
                 ci.cancel();
             }
         }
-        if (Config.hideFlyingLogs && Utils.isTreeBlock(entity)) {
+        if (Config.hideFlyingLogs && ForagingFeatures.isTreeBlock(entity)) {
             ci.cancel();
         }
     }

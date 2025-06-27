@@ -7,8 +7,6 @@ import com.mojang.authlib.properties.Property;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -24,7 +22,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -517,23 +514,6 @@ public class Utils {
         return component != null && component.isPresent();
     }
 
-    public static boolean isTreeBlock(Entity entity) {
-        if (entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
-            Block block = blockDisplay.getBlockState().getBlock();
-            List<Block> blacklist = List.of(
-                    Blocks.MANGROVE_WOOD,
-                    Blocks.MANGROVE_LEAVES,
-                    Blocks.STRIPPED_SPRUCE_WOOD,
-                    Blocks.AZALEA_LEAVES
-            );
-            for (Block blacklisted : blacklist) {
-                if (block.equals(blacklisted)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * Returns every line of text from the tab list footer, otherwise an empty list.

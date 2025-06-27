@@ -18,6 +18,13 @@ public class Foraging {
                         .controller(Config::booleanController)
                         .build())
 
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Invisibug Highlight"))
+                        .description(OptionDescription.of(Text.of("Attempts to locate nearby Invisibugs on the Galatea, and renders red highlights over them.")))
+                        .binding(false, () -> Config.invisibugHighlight, value -> Config.invisibugHighlight = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .build();
     }
 }

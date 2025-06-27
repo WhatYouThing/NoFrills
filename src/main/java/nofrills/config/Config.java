@@ -291,6 +291,11 @@ public class Config {
     @SerialEntry
     public static boolean muteDrake = false;
 
+    // Foraging
+
+    @SerialEntry
+    public static boolean hideFlyingLogs = false;
+
     // Dungeons
 
     @SerialEntry
@@ -491,6 +496,7 @@ public class Config {
                 .category(Solvers.create(defaults, config))
                 .category(Hud.create(defaults, config))
                 .category(Fishing.create(defaults, config))
+                .category(Foraging.create(defaults, config))
                 .category(Dungeons.create(defaults, config))
                 .category(Kuudra.create(defaults, config))
                 .category(Slayers.create(defaults, config))

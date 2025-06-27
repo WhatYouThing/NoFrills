@@ -12,6 +12,7 @@ import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityRendering;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
+import nofrills.misc.Utils;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,10 +40,13 @@ public abstract class WorldRendererMixin {
 
     @Inject(method = "renderEntity", at = @At("HEAD"), cancellable = true)
     private void onBeforeRenderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (Config.hideDeadMobs) {
-            if (entity instanceof LivingEntity && !entity.isAlive()) {
+        if (Config.hideDeadMobs && entity instanceof LivingEntity) {
+            if (!entity.isAlive()) {
                 ci.cancel();
             }
+        }
+        if (Config.hideFlyingLogs && Utils.isTreeBlock(entity)) {
+            ci.cancel();
         }
     }
 

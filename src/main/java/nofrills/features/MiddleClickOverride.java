@@ -49,7 +49,8 @@ public class MiddleClickOverride {
             "The Hex",
             "Enchant Item",
             "Auction",
-            "Trap"
+            "Trap",
+            "Gemstone"
     );
 
     private static final List<String> matchWhitelist = List.of(

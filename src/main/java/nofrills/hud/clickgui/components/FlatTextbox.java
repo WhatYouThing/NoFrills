@@ -1,27 +1,32 @@
 package nofrills.hud.clickgui.components;
 
-import io.wispforest.owo.ui.component.TextAreaComponent;
+import io.wispforest.owo.ui.component.TextBoxComponent;
+import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.client.gui.DrawContext;
 
-import static nofrills.Main.mc;
+public class FlatTextbox extends TextBoxComponent {
 
-public class FlatTextbox extends TextAreaComponent {
-    public FlatTextbox(Sizing horizontalSizing, Sizing verticalSizing) {
-        super(horizontalSizing, verticalSizing);
+    public FlatTextbox(Sizing horizontalSizing) {
+        super(horizontalSizing);
+        this.verticalSizing(Sizing.fixed(18));
+        this.margins(Insets.of(0, 0, 0, 8));
     }
 
     @Override
-    protected void draw(DrawContext context, int x, int y, int width, int height) {
-        context.fill(x, y, x + width, y + height, 0xaaffffff);
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        context.fill(this.x(), this.y(), this.getX() + this.width() + 4, this.y() + this.height(), 0xff101010);
+        context.drawBorder(this.x(), this.y(), this.width() + 4, this.height(), 0xff5ca0bf);
+        super.renderWidget(context, mouseX, mouseY, deltaTicks);
     }
 
     @Override
-    protected void drawScrollbar(DrawContext context) {
+    public boolean drawsBackground() {
+        return false;
     }
 
     @Override
-    public int getContentsHeight() {
-        return mc.textRenderer.fontHeight;
+    public int getInnerWidth() {
+        return this.width - 8;
     }
 }

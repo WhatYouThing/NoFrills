@@ -40,6 +40,7 @@ public class ClickGuiCategory extends FlowLayout {
                 .verticalTextAlignment(VerticalAlignment.CENTER);
         ParentComponent header = Containers.verticalFlow(Sizing.fixed(categoryWidth), Sizing.content())
                 .child(label)
+                .alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
                 .padding(Insets.of(3))
                 .surface(Surface.flat(0xff5ca0bf));
         this.child(header);

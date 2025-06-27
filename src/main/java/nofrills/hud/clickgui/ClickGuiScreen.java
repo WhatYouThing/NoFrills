@@ -28,14 +28,11 @@ public class ClickGuiScreen extends BaseOwoScreen<FlowLayout> {
                 new ClickGuiModule("Epic Amogus Long Module", Config.keys.autoSprint)
         ));
         ClickGuiCategory inventoryCategory = new ClickGuiCategory("Inventory", List.of(
-                new ClickGuiModule("Slot Binding", Config.keys.slotBinding,
-                        Containers.verticalFlow(Sizing.content(), Sizing.content())
-                                .child(new ClickGuiModule("test 123", Config.keys.slotBindingBorders))
-                ),
+                new ClickGuiModule("Slot Binding", Config.keys.slotBinding),
                 new ClickGuiModule("Sample Text", Config.keys.autoSprint)
         ));
         parent.child(playerCategory);
         parent.child(inventoryCategory);
-        root.child(Containers.horizontalScroll(Sizing.fill(100), Sizing.content(), parent));
+        root.child(Containers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent));
     }
 }

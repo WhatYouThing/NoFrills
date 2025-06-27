@@ -42,7 +42,7 @@ public class ClickGuiCategory extends FlowLayout {
                 .child(label)
                 .padding(Insets.of(3))
                 .surface(Surface.flat(0xff5ca0bf));
-        modules.child(0, header);
+        this.child(header);
         this.child(scroll);
     }
 }

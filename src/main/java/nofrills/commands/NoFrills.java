@@ -13,8 +13,11 @@ import net.minecraft.item.PlayerHeadItem;
 import nofrills.features.PearlRefill;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGuiScreen;
+import nofrills.hud.clickgui.ClickGuiSettings;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
+
+import java.util.List;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
@@ -233,7 +236,7 @@ public class NoFrills {
             }));
         }
         LiteralArgumentBuilder<FabricClientCommandSource> commandMain = literal("nofrills").executes(context -> {
-            //Utils.setScreen(Config.getConfigScreen(null));
+            Utils.setScreen(new ClickGuiSettings(List.of(new ClickGuiSettings.Slider("deez", 0, 1, 0.1, Config.keys.dayPosY))));
             return SINGLE_SUCCESS;
         });
         LiteralArgumentBuilder<FabricClientCommandSource> commandShort = literal("nf").executes(context -> {

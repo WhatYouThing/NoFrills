@@ -56,7 +56,17 @@ public class PriceTooltips {
                 }
             }
             case "ATTRIBUTE_SHARD" -> {
-                return Utils.format("SHARD_{}", Formatting.strip(stack.getName().getString()).replaceAll(" ", "_").toUpperCase());
+                String shardId = Formatting.strip(stack.getName().getString()).replaceAll(" ", "_").toUpperCase();
+                if (shardId.equals("CINDERBAT")) {
+                    shardId = "CINDER_BAT";
+                }
+                if (shardId.equals("ABYSSAL_LANTERNFISH")) {
+                    shardId = "ABYSSAL_LANTERN";
+                }
+                if (shardId.equals("STRIDERSURFER")) {
+                    shardId = "STRIDER_SURFER";
+                }
+                return Utils.format("SHARD_{}", shardId);
             }
         }
         return id;

@@ -34,6 +34,7 @@ public class MiningFeatures {
     private static final String uselessMessage1 = "New day! Your Sky Mall buff changed!";
     private static final String uselessMessage2 = "You can disable this messaging by toggling Sky Mall in your /hotm!";
     private static int skyMallTicks = 0;
+    private static boolean skyMallInbound = false;
     private static String skyMallBuff = "";
 
     private static boolean hasStats(ItemStack stack, String... stats) {
@@ -108,15 +109,20 @@ public class MiningFeatures {
     private static void onChat(ChatMsgEvent event) {
         if (mc.player != null) {
             if (Config.betterSkymall) {
-                if (event.messagePlain.equalsIgnoreCase(uselessMessage1) || event.messagePlain.equalsIgnoreCase(uselessMessage2)) {
+                if (event.messagePlain.equalsIgnoreCase(uselessMessage1)) {
+                    skyMallInbound = true;
                     event.cancel();
                 }
-                if (event.messagePlain.startsWith("New buff: ")) {
+                if (event.messagePlain.equalsIgnoreCase(uselessMessage2)) {
+                    event.cancel();
+                }
+                if (event.messagePlain.startsWith("New buff: ") && skyMallInbound) {
                     String message = event.messagePlain.replace("New buff:", "").trim();
                     if (isWearingMiningPiece() || isBuffWhitelisted(message)) {
                         skyMallBuff = message;
                         skyMallTicks = 50;
                     }
+                    skyMallInbound = false;
                     event.cancel();
                 }
             }

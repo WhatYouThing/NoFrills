@@ -234,14 +234,14 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.bindingColor);
             }
         }
-        if (AttributeDebug.isEnabled) {
+        if (AttributeDebug.isEnabled && this.title.getString().equals("Shard Fusion")) {
             for (Slot slot : new ArrayList<>(AttributeDebug.highlightedSlots)) {
                 context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, RenderColor.fromHex(0xff0000).argb);
             }
         }
         context.getMatrices().pop();
         context.getMatrices().pop();
-        if (AttributeDebug.isEnabled && AttributeDebug.data.has("recipes")) {
+        if (AttributeDebug.isEnabled && this.title.getString().equals("Shard Fusion") && AttributeDebug.data.has("recipes")) {
             context.drawText(this.textRenderer, Utils.format("Input Combinations Found: {}", AttributeDebug.data.getAsJsonObject("recipes").size()), 50, 50, 0xffffff, true);
         }
     }

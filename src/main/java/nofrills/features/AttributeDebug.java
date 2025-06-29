@@ -89,6 +89,13 @@ public class AttributeDebug {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (isEnabled && mc.currentScreen instanceof GenericContainerScreen container) {
+            if (container.getTitle().getString().equals("Fusion Box")) {
+                for (Slot slot : container.getScreenHandler().slots) {
+                    if (isMassSyphon(slot) && !SlotOptions.isSlotDisabled(slot)) {
+                        SlotOptions.disableSlot(slot, true);
+                    }
+                }
+            }
             if (container.getTitle().getString().equals("Shard Fusion")) {
                 String firstID = "";
                 String secondID = "";
@@ -108,9 +115,6 @@ public class AttributeDebug {
                     }
                     if (isSelection(slot)) {
                         selectionSlots.add(slot);
-                    }
-                    if (isMassSyphon(slot) && !SlotOptions.isSlotDisabled(slot)) {
-                        SlotOptions.disableSlot(slot, true);
                     }
                 }
                 if (!data.has("recipes")) {
@@ -149,6 +153,9 @@ public class AttributeDebug {
                     }
                 }
                 highlightedSlots = unknownRecipes;
+            }
+            else {
+                highlightedSlots.clear();
             }
         }
     }

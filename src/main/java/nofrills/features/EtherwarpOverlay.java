@@ -38,6 +38,9 @@ public class EtherwarpOverlay {
             case BannerBlock ignored -> !isAbove;
             case SignBlock ignored -> !isAbove;
             case WallSignBlock ignored -> !isAbove;
+            case LilyPadBlock ignored -> !isAbove;
+            case AzaleaBlock ignored -> !isAbove;
+            case LanternBlock ignored -> !isAbove;
             case SnowBlock ignored -> isAbove ? state.get(Properties.LAYERS) < 8 : state.get(Properties.LAYERS) == 8;
             default ->
                     isAbove ? !state.isOpaque() && !state.isFullCube(mc.world, pos) : state.isOpaque() || state.isFullCube(mc.world, pos);

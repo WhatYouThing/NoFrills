@@ -81,6 +81,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SlotBinding.class);
         eventBus.subscribe(NoFrillsAPI.class);
         eventBus.subscribe(ForagingFeatures.class);
+        eventBus.subscribe(AttributeDebug.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

@@ -11,6 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
 import nofrills.config.Config;
+import nofrills.features.AttributeDebug;
 import nofrills.features.PearlRefill;
 import nofrills.hud.HudEditorScreen;
 import nofrills.misc.SkyblockData;
@@ -212,6 +213,15 @@ public class NoFrills {
                             Utils.infoFormat("entity name: {}\nhelmet name: {}\ntexture url: {}", ent.getName().getString(), helmet.getName().getString(), Utils.getTextureUrl(textures));
                         }
                     }
+                }
+                return SINGLE_SUCCESS;
+            })).then(literal("toggleFusionDebug").executes(context -> {
+                AttributeDebug.isEnabled = !AttributeDebug.isEnabled;
+                if (AttributeDebug.isEnabled) {
+                    Utils.info("Attribute Fusion debug enabled.");
+                } else {
+                    AttributeDebug.saveData();
+                    Utils.info("Attribute Fusion debug disabled, saved information to \".minecraft/config/NoFrills/fusion_data.json\".");
                 }
                 return SINGLE_SUCCESS;
             }))),

@@ -13,12 +13,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
 import nofrills.config.Config;
 import nofrills.events.InteractBlockEvent;
 import nofrills.events.InteractEntityEvent;
 import nofrills.events.InteractItemEvent;
 import nofrills.events.ScreenOpenEvent;
+import nofrills.features.AttributeDebug;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,10 +36,6 @@ public abstract class MinecraftClientMixin {
     @Shadow
     @Nullable
     public ClientWorld world;
-
-    @Shadow
-    @Nullable
-    public HitResult crosshairTarget;
 
     @Shadow
     public abstract void setScreen(@Nullable Screen screen);
@@ -86,5 +82,10 @@ public abstract class MinecraftClientMixin {
         if (eventBus.post(new InteractItemEvent()).isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "stop", at = @At("HEAD"))
+    private void onBeforeStop(CallbackInfo ci) {
+        AttributeDebug.saveData();
     }
 }

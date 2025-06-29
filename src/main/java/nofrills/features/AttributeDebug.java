@@ -7,12 +7,17 @@ import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import nofrills.events.DrawItemTooltip;
+import nofrills.events.InputEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
+import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -153,8 +158,7 @@ public class AttributeDebug {
                     }
                 }
                 highlightedSlots = unknownRecipes;
-            }
-            else {
+            } else {
                 highlightedSlots.clear();
             }
         }
@@ -168,6 +172,22 @@ public class AttributeDebug {
                 event.addLine(Text.of(Utils.format("Slot ID: {}", slot.id)));
                 event.addLine(Text.of(Utils.format("Shard ID: {}", getShardID(slot.getStack()))));
                 event.addLine(Text.of(Utils.format("Fuse Amount: {}", getShardFuseAmount(slot.getStack()))));
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onInput(InputEvent event) {
+        if (isEnabled && mc.currentScreen instanceof GenericContainerScreen container) {
+            if (container.getTitle().getString().equals("Shard Fusion")) {
+                for (Slot slot : container.getScreenHandler().slots) {
+                    if (slot.getStack().getItem().equals(Items.ARROW)) {
+                        String name = Formatting.strip(slot.getStack().getName().getString());
+                        if ((event.key == GLFW.GLFW_KEY_RIGHT && name.equals("Next Page")) || (event.key == GLFW.GLFW_KEY_LEFT && name.equals("Previous Page"))) {
+                            mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
+                        }
+                    }
+                }
             }
         }
     }

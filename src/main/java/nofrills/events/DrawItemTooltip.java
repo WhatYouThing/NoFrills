@@ -20,7 +20,7 @@ public class DrawItemTooltip {
     public void addLine(Text line) {
         try {
             lines.add(line);
+        } catch (UnsupportedOperationException ignored) {
         }
-        catch (UnsupportedOperationException ignored) {}
     }
 }

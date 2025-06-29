@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
@@ -20,6 +21,8 @@ import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static nofrills.Main.mc;
 
 public class ForagingFeatures {
     private static final List<Block> treeBlockList = List.of(
@@ -52,7 +55,7 @@ public class ForagingFeatures {
         if (Config.invisibugHighlight && Utils.isInArea("Galatea") && event.type == ParticleTypes.CRIT && isInvisibugParticle(event.packet)) {
             Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             for (Invisibug bug : new ArrayList<>(invisibugList)) {
-                if (!bug.positions.isEmpty() && pos.distanceTo(bug.positions.getLast()) <= 0.2) {
+                if (bug.isNear(pos) && bug.hasMarker(pos)) {
                     bug.addPos(pos);
                     return;
                 }
@@ -102,6 +105,20 @@ public class ForagingFeatures {
             if (this.updateTicks > 0) {
                 this.updateTicks -= 1;
             }
+        }
+
+        public boolean isNear(Vec3d pos) {
+            return !this.positions.isEmpty() && pos.distanceTo(this.positions.getLast()) <= 0.2;
+        }
+
+        public boolean hasMarker(Vec3d pos) {
+            if (mc.world != null) {
+                List<Entity> other = mc.world.getOtherEntities(null, Box.of(pos, 0.5, 2, 0.5));
+                if (other.size() == 1 && other.getFirst() instanceof ArmorStandEntity marker) {
+                    return marker.isMarker() && marker.getCustomName() == null;
+                }
+            }
+            return false;
         }
 
         public void addPos(Vec3d pos) {

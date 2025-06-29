@@ -113,7 +113,7 @@ public class ForagingFeatures {
 
         public boolean hasMarker(Vec3d pos) {
             if (mc.world != null) {
-                List<Entity> other = mc.world.getOtherEntities(null, Box.of(pos, 0.5, 2, 0.5));
+                List<Entity> other = mc.world.getOtherEntities(null, Box.of(pos, 1, 2, 1));
                 if (other.size() == 1 && other.getFirst() instanceof ArmorStandEntity marker) {
                     return marker.isMarker() && marker.getCustomName() == null;
                 }

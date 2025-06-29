@@ -18,6 +18,9 @@ public class DrawItemTooltip {
     }
 
     public void addLine(Text line) {
-        lines.add(line);
+        try {
+            lines.add(line);
+        }
+        catch (UnsupportedOperationException ignored) {}
     }
 }

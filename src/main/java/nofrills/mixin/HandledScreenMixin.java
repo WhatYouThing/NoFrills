@@ -17,6 +17,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import nofrills.config.Config;
 import nofrills.events.DrawItemTooltip;
+import nofrills.features.AttributeDebug;
 import nofrills.features.DungeonSolvers;
 import nofrills.features.SlotBinding;
 import nofrills.hud.LeapMenuButton;
@@ -193,11 +194,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        context.getMatrices().push();
+        context.getMatrices().translate(this.x, this.y, 0.0f);
+        context.getMatrices().push();
+        context.getMatrices().translate(0.0f, 0.0f, 100.0f);
         if (isSlotBindingActive() && focusedSlot != null) {
-            context.getMatrices().push();
-            context.getMatrices().translate(this.x, this.y, 0.0f);
-            context.getMatrices().push();
-            context.getMatrices().translate(0.0f, 0.0f, 100.0f);
             if (SlotBinding.isHotbar(focusedSlot.id)) {
                 String name = "hotbar" + SlotBinding.toHotbarNumber(focusedSlot.id);
                 if (Config.slotBindData.has(name)) {
@@ -232,8 +233,16 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 drawBorder(context, focusedSlot.id, SlotBinding.bindingColor);
                 drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.bindingColor);
             }
-            context.getMatrices().pop();
-            context.getMatrices().pop();
+        }
+        if (AttributeDebug.isEnabled) {
+            for (Slot slot : new ArrayList<>(AttributeDebug.highlightedSlots)) {
+                context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, RenderColor.fromHex(0xff0000).argb);
+            }
+        }
+        context.getMatrices().pop();
+        context.getMatrices().pop();
+        if (AttributeDebug.isEnabled && AttributeDebug.data.has("recipes")) {
+            context.drawText(this.textRenderer, Utils.format("Input Combinations Found: {}", AttributeDebug.data.getAsJsonObject("recipes").size()), 50, 50, 0xffffff, true);
         }
     }
 

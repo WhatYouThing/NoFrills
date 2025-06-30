@@ -8,8 +8,6 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -152,9 +150,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private List<Text> onGetTooltipFromItem(List<Text> original) {
         if (focusedSlot != null) {
             ItemStack stack = focusedSlot.getStack();
-            NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
             if (!stack.isEmpty()) {
-                eventBus.post(new DrawItemTooltip(original, stack, component));
+                eventBus.post(new DrawItemTooltip(original, stack, Utils.getCustomData(stack), this.getTitle().getString()));
             }
         }
         return original;

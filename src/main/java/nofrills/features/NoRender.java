@@ -33,7 +33,7 @@ public class NoRender {
             for (Pattern pattern : deadPatterns) {
                 if (pattern.matcher(event.namePlain).matches()) {
                     event.entity.setCustomNameVisible(false);
-                    return;
+                    break;
                 }
             }
         }

@@ -64,7 +64,7 @@ public class ForagingFeatures {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (Config.invisibugHighlight && Utils.isInArea("Galatea") && event.type == ParticleTypes.CRIT && isInvisibugParticle(event.packet)) {
+        if (Config.invisibugHighlight && Utils.isInArea("Galatea") && event.type.equals(ParticleTypes.CRIT) && isInvisibugParticle(event.packet)) {
             if (hasInvisibugMarker(event.pos)) {
                 for (Invisibug bug : new ArrayList<>(invisibugList)) {
                     if (bug.isNear(event.pos)) {

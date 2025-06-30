@@ -29,6 +29,7 @@
     "LivingEntityRendererMixin",
     "MinecraftClientMixin",
     "MouseMixin",
+    "NbtComponentAccessor",
     "ParticleManagerMixin",
     "PhaseParameterBuilderAccessor",
     "PlayerEntityMixin",

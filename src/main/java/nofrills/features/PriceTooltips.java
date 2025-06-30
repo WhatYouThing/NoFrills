@@ -4,7 +4,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -22,7 +21,7 @@ import static nofrills.misc.NoFrillsAPI.*;
 
 public class PriceTooltips {
     private static String parseItemId(ItemStack stack) {
-        NbtCompound data = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt();
+        NbtCompound data = Utils.getCustomData(stack);
         String id = Utils.getSkyblockId(data);
         switch (id) {
             case "PET" -> {

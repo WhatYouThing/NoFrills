@@ -47,20 +47,33 @@ public class ForagingFeatures {
     }
 
     private static boolean isInvisibugParticle(ParticleS2CPacket packet) {
-        return packet.getCount() == 1 && packet.getSpeed() == 0.0f && packet.getOffsetX() == 0.0f && packet.getOffsetY() == 0.0f && packet.getOffsetZ() == 0.0f;
+        return packet.getCount() == 1 && packet.getSpeed() == 0.0f && packet.getOffsetX() == 0.0f
+                && packet.getOffsetY() == 0.0f && packet.getOffsetZ() == 0.0f
+                && packet.isImportant() && packet.shouldForceSpawn();
+    }
+
+    private static boolean hasInvisibugMarker(Vec3d pos) {
+        if (mc.world != null) {
+            List<Entity> other = mc.world.getOtherEntities(null, Box.of(pos, 1, 2, 1));
+            if (other.size() == 1 && other.getFirst() instanceof ArmorStandEntity marker) {
+                return marker.isMarker() && marker.getCustomName() == null && marker.getMainHandStack().isEmpty();
+            }
+        }
+        return false;
     }
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (Config.invisibugHighlight && Utils.isInArea("Galatea") && event.type == ParticleTypes.CRIT && isInvisibugParticle(event.packet)) {
-            Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
-            for (Invisibug bug : new ArrayList<>(invisibugList)) {
-                if (bug.isNear(pos) && bug.hasMarker(pos)) {
-                    bug.addPos(pos);
-                    return;
+            if (hasInvisibugMarker(event.pos)) {
+                for (Invisibug bug : new ArrayList<>(invisibugList)) {
+                    if (bug.isNear(event.pos)) {
+                        bug.add(event.pos);
+                        return;
+                    }
                 }
+                invisibugList.add(new Invisibug(event.pos));
             }
-            invisibugList.add(new Invisibug(pos));
         }
     }
 
@@ -111,17 +124,7 @@ public class ForagingFeatures {
             return !this.positions.isEmpty() && pos.distanceTo(this.positions.getLast()) <= 0.2;
         }
 
-        public boolean hasMarker(Vec3d pos) {
-            if (mc.world != null) {
-                List<Entity> other = mc.world.getOtherEntities(null, Box.of(pos, 1, 2, 1));
-                if (other.size() == 1 && other.getFirst() instanceof ArmorStandEntity marker) {
-                    return marker.isMarker() && marker.getCustomName() == null;
-                }
-            }
-            return false;
-        }
-
-        public void addPos(Vec3d pos) {
+        public void add(Vec3d pos) {
             if (this.positions.size() == 4) {
                 this.positions.removeFirst();
             }

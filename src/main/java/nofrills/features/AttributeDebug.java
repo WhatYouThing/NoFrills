@@ -62,6 +62,55 @@ public class AttributeDebug {
         return "";
     }
 
+    private static String getShardRarity(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            if (line.contains("SHARD (ID ")) {
+                return line.substring(0, line.indexOf(" ")).trim().toLowerCase();
+            }
+        }
+        return "";
+    }
+
+    private static String getShardName(ItemStack stack) {
+        String name = Formatting.strip(stack.getName().getString());
+        if (name.endsWith("NEW SHARD")) {
+            return name.replace("NEW SHARD", "").trim();
+        }
+        return name;
+    }
+
+    private static String getShardInternal(ItemStack stack) {
+        String shardId = getShardName(stack).replaceAll(" ", "_").toUpperCase();
+        if (shardId.equals("CINDERBAT")) {
+            shardId = "CINDER_BAT";
+        }
+        if (shardId.equals("ABYSSAL_LANTERNFISH")) {
+            shardId = "ABYSSAL_LANTERN";
+        }
+        if (shardId.equals("STRIDERSURFER")) {
+            shardId = "STRIDER_SURFER";
+        }
+        return Utils.format("SHARD_{}", shardId);
+    }
+
+    private static String getShardType(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            if (line.endsWith(")") && line.contains("(") && !line.startsWith("(")) {
+                return line.substring(line.indexOf("(") + 1).replace(")", "").trim();
+            }
+        }
+        return "";
+    }
+
+    private static String getShardFamily(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            if (line.endsWith("Family")) {
+                return line;
+            }
+        }
+        return "Unknown Family";
+    }
+
     private static int getShardFuseAmount(ItemStack stack) {
         for (String line : Utils.getLoreLines(stack)) {
             if (line.startsWith("Required to fuse:")) {
@@ -102,6 +151,14 @@ public class AttributeDebug {
                 }
             }
             if (container.getTitle().getString().equals("Shard Fusion")) {
+                if (!data.has("recipes")) {
+                    data.add("recipes", new JsonObject());
+                }
+                JsonObject recipes = data.getAsJsonObject("recipes");
+                if (!data.has("shards")) {
+                    data.add("shards", new JsonObject());
+                }
+                JsonObject shards = data.getAsJsonObject("shards");
                 String firstID = "";
                 String secondID = "";
                 List<Slot> outputSlots = new ArrayList<>();
@@ -121,11 +178,19 @@ public class AttributeDebug {
                     if (isSelection(slot)) {
                         selectionSlots.add(slot);
                     }
+                    if (!id.isEmpty()) {
+                        if (!shards.has(id)) {
+                            JsonObject object = new JsonObject();
+                            object.addProperty("name", getShardName(stack));
+                            object.addProperty("family", getShardFamily(stack));
+                            object.addProperty("type", getShardType(stack));
+                            object.addProperty("rarity", getShardRarity(stack));
+                            object.addProperty("fuse_amount", getShardFuseAmount(stack));
+                            object.addProperty("internal_id", getShardInternal(stack));
+                            shards.add(id, object);
+                        }
+                    }
                 }
-                if (!data.has("recipes")) {
-                    data.add("recipes", new JsonObject());
-                }
-                JsonObject recipes = data.getAsJsonObject("recipes");
                 if (!firstID.isEmpty() && !secondID.isEmpty()) {
                     String fusionKey = Utils.format("{}+{}", firstID, secondID);
                     if (!recipes.has(fusionKey)) {
@@ -184,7 +249,11 @@ public class AttributeDebug {
                     if (slot.getStack().getItem().equals(Items.ARROW)) {
                         String name = Formatting.strip(slot.getStack().getName().getString());
                         if ((event.key == GLFW.GLFW_KEY_RIGHT && name.equals("Next Page")) || (event.key == GLFW.GLFW_KEY_LEFT && name.equals("Previous Page"))) {
-                            mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
+                            if (event.action == GLFW.GLFW_PRESS) {
+                                mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
+                            }
+                            event.cancel();
+                            return;
                         }
                     }
                 }

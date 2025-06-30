@@ -241,8 +241,13 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
         context.getMatrices().pop();
         context.getMatrices().pop();
-        if (AttributeDebug.isEnabled && this.title.getString().equals("Shard Fusion") && AttributeDebug.data.has("recipes")) {
-            context.drawText(this.textRenderer, Utils.format("Input Combinations Found: {}", AttributeDebug.data.getAsJsonObject("recipes").size()), 50, 50, 0xffffff, true);
+        if (AttributeDebug.isEnabled && this.title.getString().equals("Shard Fusion")) {
+            if (AttributeDebug.data.has("recipes")) {
+                context.drawText(this.textRenderer, Utils.format("Input Combinations Found: {}", AttributeDebug.data.getAsJsonObject("recipes").size()), 50, 50, 0xffffff, true);
+            }
+            if (AttributeDebug.data.has("shards")) {
+                context.drawText(this.textRenderer, Utils.format("Shard Details Found: {}", AttributeDebug.data.getAsJsonObject("shards").size()), 50, 60, 0xffffff, true);
+            }
         }
     }
 

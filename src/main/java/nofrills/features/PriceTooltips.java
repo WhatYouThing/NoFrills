@@ -3,8 +3,6 @@ package nofrills.features;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -17,13 +15,23 @@ import nofrills.misc.Utils;
 import java.util.HashMap;
 import java.util.Set;
 
-import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.*;
 
 public class PriceTooltips {
-    private static String parseItemId(ItemStack stack) {
-        NbtCompound data = stack.get(DataComponentTypes.CUSTOM_DATA).getNbt();
+    private static String parseItemId(ItemStack stack, NbtCompound data, String title) {
         String id = Utils.getSkyblockId(data);
+        if (id.isEmpty()) {
+            if (title.equals("Hunting Box")) {
+                return correctShardId(getShardId(stack));
+            }
+            if (title.equals("Attribute Menu")) {
+                for (String line : Utils.getLoreLines(stack)) {
+                    if (line.startsWith("Source: ")) {
+                        return correctShardId(line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1).toUpperCase().replaceAll(" ", "_"));
+                    }
+                }
+            }
+        }
         switch (id) {
             case "PET" -> {
                 if (data.contains("petInfo")) {
@@ -56,33 +64,47 @@ public class PriceTooltips {
                 }
             }
             case "ATTRIBUTE_SHARD" -> {
-                String shardId = Formatting.strip(stack.getName().getString()).replaceAll(" ", "_").toUpperCase();
-                if (shardId.equals("CINDERBAT")) {
-                    shardId = "CINDER_BAT";
-                }
-                if (shardId.equals("ABYSSAL_LANTERNFISH")) {
-                    shardId = "ABYSSAL_LANTERN";
-                }
-                if (shardId.equals("STRIDERSURFER")) {
-                    shardId = "STRIDER_SURFER";
-                }
-                return Utils.format("SHARD_{}", shardId);
+                return correctShardId(getShardId(stack));
             }
         }
         return id;
     }
 
-    private static int getStackQuantity(ItemStack stack) {
-        if (mc.currentScreen instanceof GenericContainerScreen container) {
-            if (container.getTitle().getString().endsWith("Sack")) {
-                for (String line : Utils.getLoreLines(stack)) {
-                    if (line.startsWith("Stored: ") && line.contains("/")) {
-                        String count = line.substring(line.indexOf(":") + 1, line.indexOf("/")).trim();
-                        try {
-                            int countInt = Integer.parseInt(count.replaceAll(",", ""));
-                            return countInt > 0 ? countInt : 1;
-                        } catch (NumberFormatException ignored) {
-                        }
+    private static String getShardId(ItemStack stack) {
+        return Formatting.strip(stack.getName().getString()).replaceAll(" ", "_").toUpperCase();
+    }
+
+    private static String correctShardId(String id) {
+        return switch (id) {
+            case "CINDERBAT" -> "SHARD_CINDER_BAT";
+            case "ABYSSAL_LANTERNFISH" -> "SHARD_ABYSSAL_LANTERN";
+            case "STRIDERSURFER" -> "SHARD_STRIDER_SURFER";
+            default -> Utils.format("SHARD_{}", id);
+        };
+    }
+
+    private static int getStackQuantity(ItemStack stack, String title) {
+        if (title.endsWith("Sack")) {
+            for (String line : Utils.getLoreLines(stack)) {
+                if (line.startsWith("Stored: ") && line.contains("/")) {
+                    String count = line.substring(line.indexOf(":") + 1, line.indexOf("/")).trim();
+                    try {
+                        int countInt = Integer.parseInt(count.replaceAll(",", ""));
+                        return countInt > 0 ? countInt : 1;
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+        }
+        if (title.equals("Hunting Box")) {
+            for (String line : Utils.getLoreLines(stack)) {
+                if (line.startsWith("Owned: ")) {
+                    int start = line.indexOf(":") + 2;
+                    int end = line.indexOf(" ", start);
+                    try {
+                        int countInt = Integer.parseInt(line.substring(start, end).replaceAll(",", ""));
+                        return countInt > 0 ? countInt : 1;
+                    } catch (NumberFormatException ignored) {
                     }
                 }
             }
@@ -112,9 +134,9 @@ public class PriceTooltips {
 
     @EventHandler
     public static void onTooltip(DrawItemTooltip event) {
-        if (Config.fetchPricing && event.customData != null) {
-            String itemId = parseItemId(event.stack);
-            int quantity = getStackQuantity(event.stack);
+        if (Config.fetchPricing) {
+            String itemId = parseItemId(event.stack, event.customData, event.title);
+            int quantity = getStackQuantity(event.stack, event.title);
             if (itemId.isEmpty()) {
                 return;
             }

@@ -33,7 +33,7 @@ public class GlowingShroomHighlight {
     @EventHandler
     public static void onParticle(SpawnParticleEvent event) {
         if (Config.shroomHighlight && isInCave && event.type.equals(ParticleTypes.ENTITY_EFFECT)) {
-            BlockPos pos = BlockPos.ofFloored(event.packet.getX(), event.packet.getY(), event.packet.getZ());
+            BlockPos pos = BlockPos.ofFloored(event.pos);
             if (!shroomData.contains(pos) && isShroom(pos)) {
                 shroomData.add(pos);
             }

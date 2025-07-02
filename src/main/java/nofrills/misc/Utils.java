@@ -43,6 +43,7 @@ import nofrills.config.Config;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.LeapOverlay;
 import nofrills.mixin.HandledScreenAccessor;
+import nofrills.mixin.NbtComponentAccessor;
 import nofrills.mixin.PlayerListHudAccessor;
 import org.lwjgl.glfw.GLFW;
 
@@ -270,7 +271,7 @@ public class Utils {
         if (stack != null && !stack.isEmpty()) {
             NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
             if (data != null) {
-                return data.copyNbt();
+                return ((NbtComponentAccessor) (Object) data).get(); // casting a spell
             }
         }
         return null;

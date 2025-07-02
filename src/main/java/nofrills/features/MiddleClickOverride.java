@@ -40,7 +40,6 @@ public class MiddleClickOverride {
             "Transfer to Profile",
             "Attribute Transfer",
             "Hunting Box"
-
     );
 
     private static final List<String> containBlacklist = List.of(

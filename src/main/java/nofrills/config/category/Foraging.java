@@ -12,8 +12,8 @@ public class Foraging {
                 .name(Text.of("Foraging"))
 
                 .option(Option.<Boolean>createBuilder()
-                        .name(Text.of("Hide Flying Logs"))
-                        .description(OptionDescription.of(Text.of("Hides the flying log and leaves blocks that appear when chopping trees down on Galatea.")))
+                        .name(Text.of("Hide Tree Bits"))
+                        .description(OptionDescription.of(Text.of("Hides the flying wood and leaves blocks that appear when chopping trees down on Galatea.")))
                         .binding(false, () -> Config.hideFlyingLogs, value -> Config.hideFlyingLogs = value)
                         .controller(Config::booleanController)
                         .build())

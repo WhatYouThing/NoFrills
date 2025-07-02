@@ -28,9 +28,11 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class AttributeDebug {
+    public static final JsonObject textures = new JsonObject();
     private static final Path filePath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills/fusion_data.json");
     public static final JsonObject data = loadData();
     public static boolean isEnabled = false;
+    public static boolean saveTextures = false;
     public static List<Slot> highlightedSlots = new ArrayList<>();
 
     private static boolean isFirstInput(Slot slot) {
@@ -142,89 +144,102 @@ public class AttributeDebug {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (isEnabled && mc.currentScreen instanceof GenericContainerScreen container) {
-            if (container.getTitle().getString().equals("Fusion Box")) {
-                for (Slot slot : container.getScreenHandler().slots) {
-                    if (isMassSyphon(slot) && !SlotOptions.isSlotDisabled(slot)) {
-                        SlotOptions.disableSlot(slot, true);
+        if (mc.currentScreen instanceof GenericContainerScreen container) {
+            String title = container.getTitle().getString();
+            if (saveTextures) {
+                if (title.contains("Oddities") && title.contains("Shards")) {
+                    for (Slot slot : container.getScreenHandler().slots) {
+                        ItemStack stack = slot.getStack();
+                        if (Utils.getSkyblockId(stack).equals("ATTRIBUTE_SHARD")) {
+                            textures.addProperty(Formatting.strip(stack.getName().getString()), Utils.getTextureUrl(Utils.getTextures(stack)));
+                        }
                     }
                 }
             }
-            if (container.getTitle().getString().equals("Shard Fusion")) {
-                if (!data.has("recipes")) {
-                    data.add("recipes", new JsonObject());
-                }
-                JsonObject recipes = data.getAsJsonObject("recipes");
-                if (!data.has("shards")) {
-                    data.add("shards", new JsonObject());
-                }
-                JsonObject shards = data.getAsJsonObject("shards");
-                String firstID = "";
-                String secondID = "";
-                List<Slot> outputSlots = new ArrayList<>();
-                List<Slot> selectionSlots = new ArrayList<>();
-                for (Slot slot : container.getScreenHandler().slots) {
-                    ItemStack stack = slot.getStack();
-                    String id = getShardID(stack);
-                    if (isFirstInput(slot)) {
-                        firstID = id;
-                    }
-                    if (isSecondInput(slot)) {
-                        secondID = id;
-                    }
-                    if (isOutput(slot)) {
-                        outputSlots.add(slot);
-                    }
-                    if (isSelection(slot)) {
-                        selectionSlots.add(slot);
-                    }
-                    if (!id.isEmpty()) {
-                        if (!shards.has(id)) {
-                            JsonObject object = new JsonObject();
-                            object.addProperty("name", getShardName(stack));
-                            object.addProperty("family", getShardFamily(stack));
-                            object.addProperty("type", getShardType(stack));
-                            object.addProperty("rarity", getShardRarity(stack));
-                            object.addProperty("fuse_amount", getShardFuseAmount(stack));
-                            object.addProperty("internal_id", getShardInternal(stack));
-                            shards.add(id, object);
+            if (isEnabled) {
+                if (title.equals("Fusion Box")) {
+                    for (Slot slot : container.getScreenHandler().slots) {
+                        if (isMassSyphon(slot) && !SlotOptions.isSlotDisabled(slot)) {
+                            SlotOptions.disableSlot(slot, true);
                         }
                     }
                 }
-                if (!firstID.isEmpty() && !secondID.isEmpty()) {
-                    String fusionKey = Utils.format("{}+{}", firstID, secondID);
-                    if (!recipes.has(fusionKey)) {
-                        recipes.add(fusionKey, new JsonArray());
+                if (title.equals("Shard Fusion")) {
+                    if (!data.has("recipes")) {
+                        data.add("recipes", new JsonObject());
                     }
-                    for (Slot slot : outputSlots) {
+                    JsonObject recipes = data.getAsJsonObject("recipes");
+                    if (!data.has("shards")) {
+                        data.add("shards", new JsonObject());
+                    }
+                    JsonObject shards = data.getAsJsonObject("shards");
+                    String firstID = "";
+                    String secondID = "";
+                    List<Slot> outputSlots = new ArrayList<>();
+                    List<Slot> selectionSlots = new ArrayList<>();
+                    for (Slot slot : container.getScreenHandler().slots) {
                         ItemStack stack = slot.getStack();
                         String id = getShardID(stack);
-                        int required = getShardFuseAmount(stack);
-                        if (!id.isEmpty() && required != -1) {
-                            if (recipes.getAsJsonArray(fusionKey).asList().stream().noneMatch(element -> element.getAsJsonObject().get("id").getAsString().equals(id))) {
-                                JsonObject object = new JsonObject();
-                                object.addProperty("id", id);
-                                object.addProperty("count", stack.getCount());
-                                recipes.getAsJsonArray(fusionKey).add(object);
-                            }
+                        if (isFirstInput(slot)) {
+                            firstID = id;
                         }
-                    }
-                }
-                List<Slot> unknownRecipes = new ArrayList<>();
-                if (!firstID.isEmpty()) {
-                    for (Slot slot : selectionSlots) {
-                        String id = getShardID(slot.getStack());
+                        if (isSecondInput(slot)) {
+                            secondID = id;
+                        }
+                        if (isOutput(slot)) {
+                            outputSlots.add(slot);
+                        }
+                        if (isSelection(slot)) {
+                            selectionSlots.add(slot);
+                        }
                         if (!id.isEmpty()) {
-                            String fusionKey = Utils.format("{}+{}", firstID, id);
-                            if (!recipes.has(fusionKey)) {
-                                unknownRecipes.add(slot);
+                            if (!shards.has(id)) {
+                                JsonObject object = new JsonObject();
+                                object.addProperty("name", getShardName(stack));
+                                object.addProperty("family", getShardFamily(stack));
+                                object.addProperty("type", getShardType(stack));
+                                object.addProperty("rarity", getShardRarity(stack));
+                                object.addProperty("fuse_amount", getShardFuseAmount(stack));
+                                object.addProperty("internal_id", getShardInternal(stack));
+                                shards.add(id, object);
                             }
                         }
                     }
+                    if (!firstID.isEmpty() && !secondID.isEmpty()) {
+                        String fusionKey = Utils.format("{}+{}", firstID, secondID);
+                        if (!recipes.has(fusionKey)) {
+                            recipes.add(fusionKey, new JsonArray());
+                        }
+                        for (Slot slot : outputSlots) {
+                            ItemStack stack = slot.getStack();
+                            String id = getShardID(stack);
+                            int required = getShardFuseAmount(stack);
+                            if (!id.isEmpty() && required != -1) {
+                                if (recipes.getAsJsonArray(fusionKey).asList().stream().noneMatch(element -> element.getAsJsonObject().get("id").getAsString().equals(id))) {
+                                    JsonObject object = new JsonObject();
+                                    object.addProperty("id", id);
+                                    object.addProperty("count", stack.getCount());
+                                    recipes.getAsJsonArray(fusionKey).add(object);
+                                }
+                            }
+                        }
+                    }
+                    List<Slot> unknownRecipes = new ArrayList<>();
+                    if (!firstID.isEmpty()) {
+                        for (Slot slot : selectionSlots) {
+                            String id = getShardID(slot.getStack());
+                            if (!id.isEmpty()) {
+                                String fusionKey = Utils.format("{}+{}", firstID, id);
+                                if (!recipes.has(fusionKey)) {
+                                    unknownRecipes.add(slot);
+                                }
+                            }
+                        }
+                    }
+                    highlightedSlots = unknownRecipes;
+                } else {
+                    highlightedSlots.clear();
                 }
-                highlightedSlots = unknownRecipes;
-            } else {
-                highlightedSlots.clear();
             }
         }
     }

@@ -224,6 +224,15 @@ public class NoFrills {
                     Utils.info("Attribute Fusion debug disabled, saved information to \".minecraft/config/NoFrills/fusion_data.json\".");
                 }
                 return SINGLE_SUCCESS;
+            })).then(literal("saveShardTextures").executes(context -> {
+                AttributeDebug.saveTextures = !AttributeDebug.saveTextures;
+                if (AttributeDebug.saveTextures) {
+                    Utils.info("Started saving shard texture URL's in the Bazaar.");
+                } else {
+                    mc.keyboard.setClipboard(AttributeDebug.textures.toString());
+                    Utils.info("Stopped saving shard texture URL's, copied JSON data to clipboard.");
+                }
+                return SINGLE_SUCCESS;
             }))),
     };
 

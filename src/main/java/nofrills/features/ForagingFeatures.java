@@ -53,11 +53,9 @@ public class ForagingFeatures {
     }
 
     private static boolean hasInvisibugMarker(Vec3d pos) {
-        if (mc.world != null) {
-            List<Entity> other = mc.world.getOtherEntities(null, Box.of(pos, 1, 2, 1));
-            if (other.size() == 1 && other.getFirst() instanceof ArmorStandEntity marker) {
-                return marker.isMarker() && marker.getCustomName() == null && marker.getMainHandStack().isEmpty();
-            }
+        List<Entity> other = Utils.getOtherEntities(mc.player, Box.of(pos, 1, 2, 1), null);
+        if (other.size() == 1 && other.getFirst() instanceof ArmorStandEntity marker) {
+            return marker.isMarker() && marker.getCustomName() == null && marker.getMainHandStack().isEmpty();
         }
         return false;
     }

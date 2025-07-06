@@ -10,7 +10,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Config;
 import nofrills.events.*;
-import nofrills.hud.HudManager;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
@@ -18,10 +17,8 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
-import static nofrills.Main.mc;
-
 public class FishingFeatures {
-    private static final EntityCache seaCreatures = new EntityCache();
+    public static final EntityCache seaCreatures = new EntityCache();
     private static final SeaCreature[] seaCreatureData = {
             new SeaCreature("Plhlegblast", "WOAH! A Plhlegblast appeared.", "§9", true, true),
             new SeaCreature("Thunder", "You hear a massive rumble as Thunder emerges.", "§b", true, true),
@@ -128,7 +125,6 @@ public class FishingFeatures {
             SeaCreature.plain("Fireproof Witch"),
     };
     private static final RenderColor rareColor = new RenderColor(255, 170, 0, 0);
-    private static Entity bobberHologram = null;
     private static int notifyTicks = 0;
 
     private static boolean isValidMob(Entity ent) {
@@ -140,9 +136,6 @@ public class FishingFeatures {
         if (Config.capEnabled) {
             seaCreatures.clearDropped();
             int count = seaCreatures.size();
-            if (Config.seaCreaturesEnabled) {
-                HudManager.seaCreaturesElement.setCount(count);
-            }
             if (count >= Config.capTarget && notifyTicks == 0) {
                 if (Config.capSendMsg && !Config.capMsg.isEmpty()) {
                     Utils.sendMessage(Config.capMsg);
@@ -157,13 +150,6 @@ public class FishingFeatures {
             }
             if (notifyTicks > 0) {
                 notifyTicks--;
-            }
-        }
-        if (Config.bobberEnabled) {
-            if (mc.player.fishHook != null && (bobberHologram == null || !bobberHologram.isAlive())) {
-                HudManager.bobberElement.setActive();
-            } else if (mc.player.fishHook == null) {
-                HudManager.bobberElement.setInactive();
             }
         }
     }
@@ -194,7 +180,7 @@ public class FishingFeatures {
                     seaCreatures.add(event.entity);
                 }
                 if (Config.rareGlow && creature.rare && creature.glow && event.entity.age <= 10 && name.contains(creature.name.toLowerCase())) {
-                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getNearbyEntities(event.entity, 0.5, 2, 0.5, FishingFeatures::isValidMob));
+                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, FishingFeatures::isValidMob));
                     if (owner != null && !(owner instanceof GiantEntity)) {
                         Rendering.Entities.drawGlow(owner, true, rareColor);
                         if (owner.hasVehicle()) {
@@ -204,12 +190,6 @@ public class FishingFeatures {
                         }
                     }
                 }
-            }
-        }
-        if (Config.bobberEnabled && event.namePlain.length() == 3) {
-            if (event.namePlain.equals("!!!") || event.namePlain.indexOf(".") == 1) {
-                bobberHologram = event.entity;
-                HudManager.bobberElement.setTimer(event.namePlain);
             }
         }
     }

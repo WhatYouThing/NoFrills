@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ChestBlock;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.CreeperEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -15,10 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import nofrills.config.Config;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.InteractBlockEvent;
-import nofrills.events.InteractItemEvent;
-import nofrills.events.ServerTickEvent;
+import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.SkyblockData;
@@ -30,7 +26,8 @@ import java.util.Arrays;
 import static nofrills.Main.mc;
 
 public class MiningFeatures {
-    private static final RenderColor ghostColor = RenderColor.fromHex(0x00c8c8, 1.0f);
+    private static final RenderColor ghostColor = RenderColor.fromHex(0x00c8c8, 0.5f);
+    private static final RenderColor ghostColorOutline = RenderColor.fromHex(0x00c8c8, 1.0f);
     private static final String uselessMessage1 = "New day! Your Sky Mall buff changed!";
     private static final String uselessMessage2 = "You can disable this messaging by toggling Sky Mall in your /hotm!";
     private static int skyMallTicks = 0;
@@ -82,25 +79,23 @@ public class MiningFeatures {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (Config.ghostVision && SkyblockData.getLocation().equals(Utils.Symbols.zone + " The Mist")) {
-            for (Entity ent : mc.world.getEntities()) {
-                if (ent instanceof CreeperEntity creeper) {
-                    if (!Rendering.Entities.isDrawingFilled(ent)) {
-                        if (creeper.getMaxHealth() >= 1000.0f) {
-                            creeper.setInvisible(true);
-                            creeper.getDataTracker().set(CreeperEntityAccessor.getChargedFlag(), false);
-                            Rendering.Entities.drawFilled(ent, true, ghostColor);
-                        }
-                    }
-                }
-            }
-        }
         if (Config.betterSkymall) {
             if (skyMallTicks > 0) {
                 skyMallTicks--;
                 if (skyMallTicks == 0) {
                     Utils.info("§2Sky Mall §ebuff for §b" + getSkyblockDay() + "§e: " + skyMallBuff);
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onEntity(EntityUpdatedEvent event) {
+        if (Config.ghostVision && event.entity instanceof CreeperEntity creeper && SkyblockData.getArea().equals("Dwarven Mines")) {
+            if (creeper.getPos().getY() < 100 && creeper.isCharged()) {
+                creeper.getDataTracker().set(CreeperEntityAccessor.getChargedFlag(), false);
+                Rendering.Entities.drawFilled(creeper, true, ghostColor);
+                Rendering.Entities.drawOutline(creeper, true, ghostColorOutline);
             }
         }
     }

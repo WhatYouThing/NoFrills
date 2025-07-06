@@ -11,13 +11,11 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
-import static nofrills.Main.mc;
-
 public class CorpseHighlight {
     @EventHandler
     public static void tick(WorldTickEvent event) {
         if (Config.miningCorpseGlow && Utils.isInZone(Utils.Symbols.zone + " Glacite Mineshafts", false)) {
-            for (Entity ent : mc.world.getEntities()) {
+            for (Entity ent : Utils.getEntities()) {
                 if (ent instanceof ArmorStandEntity armorStand && !ent.isInvisible() && !Rendering.Entities.isDrawingGlow(ent)) {
                     Iterable<ItemStack> armor = Utils.getEntityArmor(armorStand);
                     for (ItemStack piece : armor) {

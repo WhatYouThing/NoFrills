@@ -3,7 +3,7 @@ package nofrills.features;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.GiantEntity;
 import net.minecraft.entity.mob.MagmaCubeEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
@@ -66,15 +66,15 @@ public class KuudraFeatures {
     }
 
     private static void updateKuudraEntity() {
-        Entity kuudra = null;
+        MagmaCubeEntity kuudra = null;
         double maxY = 0;
         int cubesFound = 0;
-        for (Entity ent : mc.world.getEntities()) {
-            if (ent.getType() == EntityType.MAGMA_CUBE && ((MagmaCubeEntity) ent).getSize() == 30) {
+        for (Entity ent : Utils.getEntities()) {
+            if (ent instanceof MagmaCubeEntity cube && cube.getSize() == 30) {
                 double y = ent.getPos().getY();
                 cubesFound++;
                 if (y > maxY) {
-                    kuudra = ent;
+                    kuudra = cube;
                     maxY = y;
                 }
             }
@@ -82,7 +82,7 @@ public class KuudraFeatures {
         if (kuudra != null) {
             if (cubesFound == 2 || getCurrentPhase() == kuudraPhases.Lair) {
                 // scuffed, but needed, because the average tps in kuudra is too low even for dr. disrespect
-                kuudraEntity = (MagmaCubeEntity) kuudra;
+                kuudraEntity = kuudra;
             }
         }
     }
@@ -125,8 +125,8 @@ public class KuudraFeatures {
                     }
                     if (preSpot != null) {
                         boolean preFound = false, secondaryFound = false;
-                        for (Entity ent : mc.world.getEntities()) {
-                            if (ent.getType() == EntityType.GIANT) {
+                        for (Entity ent : Utils.getEntities()) {
+                            if (ent instanceof GiantEntity) {
                                 Vec3d entPos = ent.getPos();
                                 Vec3d supplyPos = new Vec3d(entPos.getX(), 76, entPos.getZ());
                                 if (preSpot.spot.distanceTo(supplyPos) < preSpot.maxSupplyDist) {
@@ -199,7 +199,7 @@ public class KuudraFeatures {
                 if (msg.startsWith("Used Extreme Focus!")) {
                     String mana = msg.replace("Used Extreme Focus! (", "").replace(" Mana)", "");
                     int players = 0;
-                    for (Entity ent : mc.world.getEntities()) {
+                    for (Entity ent : Utils.getEntities()) {
                         if (ent instanceof PlayerEntity player && player != mc.player) {
                             if (Utils.isPlayer(player) && !player.isInvisible() && player.distanceTo(mc.player) <= 5) {
                                 players++;

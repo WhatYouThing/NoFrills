@@ -204,7 +204,7 @@ public class NoFrills {
             new ModCommand("debug", "Random commands for logging, debugging, or testing.", literal("debug").executes(context -> {
                 return SINGLE_SUCCESS;
             }).then(literal("dumpHeadTextures").executes(context -> {
-                for (Entity ent : mc.world.getEntities()) {
+                for (Entity ent : Utils.getEntities()) {
                     if (ent instanceof LivingEntity livingEntity) {
                         ItemStack helmet = livingEntity.getEquippedStack(EquipmentSlot.HEAD);
                         GameProfile textures = Utils.getTextures(helmet);

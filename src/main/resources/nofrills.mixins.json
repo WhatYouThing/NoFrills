@@ -35,7 +35,8 @@
     "RenderPipelinesAccessor",
     "SnowBlockMixin",
     "WorldMixin",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "external.ConfigWrapperMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -11,6 +11,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.text.Text;
+import nofrills.config.NoFrillsConfig;
 import nofrills.features.PearlRefill;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGuiScreen;
@@ -239,7 +240,10 @@ public class NoFrills {
         LiteralArgumentBuilder<FabricClientCommandSource> commandMain = literal("nofrills").executes(context -> {
             Utils.setScreen(new ClickGuiSettings(List.of(
                     new ClickGuiSettings.Slider("deez", 0, 1, 0.05, Config.keys.dayPosY),
-                    new ClickGuiSettings.Toggle("tuah-ggle", Config.keys.vampManiaSilence)
+                    new ClickGuiSettings.Toggle("tuah-ggle", Config.keys.vampManiaSilence),
+                    new ClickGuiSettings.Dropdown("dropdown", NoFrillsConfig.partyBehavior.class, Config.keys.partyCmdWarp),
+                    new ClickGuiSettings.ColorPicker("color picker", true, Config.keys.chatWaypointColor)
+
             )).setTitle(Text.literal("testing testing 123")));
             return SINGLE_SUCCESS;
         });

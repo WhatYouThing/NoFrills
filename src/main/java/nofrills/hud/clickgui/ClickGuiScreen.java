@@ -6,13 +6,11 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.OwoUIAdapter;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.Surface;
-import net.minecraft.client.gui.DrawContext;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 import static nofrills.Main.Config;
-import static nofrills.Main.mc;
 
 public class ClickGuiScreen extends BaseOwoScreen<FlowLayout> {
     @Override

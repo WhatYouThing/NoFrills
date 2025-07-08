@@ -21,8 +21,8 @@ public class ResetButton extends ButtonComponent {
     }
 
     public Object resetValue() {
-       Object defaultValue = Config.optionForKey(this.optionKey).defaultValue();
-       Config.optionForKey(this.optionKey).set(defaultValue);
-       return defaultValue;
+        Object defaultValue = Config.optionForKey(this.optionKey).defaultValue();
+        Config.optionForKey(this.optionKey).set(defaultValue);
+        return defaultValue;
     }
 }

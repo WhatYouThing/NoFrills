@@ -14,6 +14,7 @@ public class NoFrillsConfig {
 
     public boolean updateChecker = false;
     public boolean autoSprint = false;
+    public boolean autoSprintWater = false;
     public boolean noSelfieCam = false;
     public boolean terrorFix = false;
     public boolean wardrobeHotkeys = false;

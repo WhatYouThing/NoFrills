@@ -14,20 +14,20 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class ClickGuiCategory extends FlowLayout {
-    protected ClickGuiCategory(String title, List<ClickGuiModule> children) {
+public class Category extends FlowLayout {
+    protected Category(String title, List<Feature> children) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
         this.margins(Insets.of(5, 0, 5, 0));
         Color color = Color.ofArgb(0xff5ca0bf);
         Color textColor = Color.ofArgb(0xffffffff);
         FlowLayout modules = Containers.verticalFlow(Sizing.content(), Sizing.content());
         int categoryWidth = 0;
-        List<ClickGuiModule> childrenMutable = new ArrayList<>(children);
-        for (ClickGuiModule module : childrenMutable) {
+        List<Feature> childrenMutable = new ArrayList<>(children);
+        for (Feature module : childrenMutable) {
             categoryWidth = Math.max(categoryWidth, mc.textRenderer.getWidth(module.activeText.getString()) + 10);
         }
         childrenMutable.sort(Comparator.comparing(module -> module.activeText.getString()));
-        for (ClickGuiModule module : childrenMutable) {
+        for (Feature module : childrenMutable) {
             module.horizontalSizing(Sizing.fixed(categoryWidth));
             modules.child(module);
         }

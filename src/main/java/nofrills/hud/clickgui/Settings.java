@@ -10,6 +10,7 @@ import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.hud.clickgui.components.EnumCollapsible;
 import nofrills.hud.clickgui.components.FlatSlider;
@@ -25,11 +26,11 @@ import java.util.function.Consumer;
 import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
-public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
+public class Settings extends BaseOwoScreen<FlowLayout> {
     public List<FlowLayout> settings;
     public Text title = Text.empty();
 
-    public ClickGuiSettings(List<FlowLayout> settings) {
+    public Settings(List<FlowLayout> settings) {
         this.settings = settings;
     }
 
@@ -59,6 +60,22 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
         return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
+    private static long getSettingsHeight(List<Component> children) {
+        long height = 0L;
+        for (Component child : children) {
+            if (child instanceof ColorPicker picker) {
+                if (picker.sliderList.size() == 4) {
+                    height += 90L;
+                } else {
+                    height += 70L;
+                }
+                continue;
+            }
+            height += 30L;
+        }
+        return height;
+    }
+
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
         return OwoUIAdapter.create(this, Containers::verticalFlow);
@@ -80,7 +97,7 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
             option.horizontalSizing(Sizing.fixed(width));
             settings.child(option);
         }
-        ParentComponent scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(Math.clamp(30L * settings.children().size(), 30, 400)), settings)
+        ParentComponent scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(Math.clamp(getSettingsHeight(settings.children()), 30, 400)), settings)
                 .scrollbarThiccness(3)
                 .scrollbar(ScrollContainer.Scrollbar.flat(color));
         BaseComponent label = Components.label(this.title)
@@ -99,10 +116,10 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void close() {
-        mc.setScreen(new ClickGuiScreen());
+        mc.setScreen(new ClickGui());
     }
 
-    public BaseOwoScreen<FlowLayout> setTitle(Text title) {
+    public Settings setTitle(Text title) {
         this.title = title;
         return this;
     }
@@ -114,7 +131,7 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
         public Text disabledText;
         public ButtonComponent toggle;
 
-        public Toggle(String name, Option.Key optionKey) {
+        public Toggle(String name, Option.Key optionKey, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
@@ -122,6 +139,7 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
             this.enabledText = Text.literal("Enabled").withColor(0x55ff55);
             this.disabledText = Text.literal("Disabled").withColor(0xff5555);
             LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            label.tooltip(Text.literal(tooltip));
             this.toggle = Components.button(Text.empty(), button -> {
                 boolean value = (boolean) getKeyValue(this.optionKey);
                 active(!value);
@@ -151,8 +169,8 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class Slider extends FlowLayout {
-        public Slider(String name, double min, double max, double step, Option.Key optionKey) {
+    public static class SliderDouble extends FlowLayout {
+        public SliderDouble(String name, double min, double max, double step, Option.Key optionKey, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
@@ -161,6 +179,7 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
             FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
             slider.min(min).max(max).stepSize(step).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            label.tooltip(Text.literal(tooltip));
             text.onChanged().subscribe(change -> {
                 try {
                     double value = Double.parseDouble(text.getText());
@@ -185,14 +204,50 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
+    public static class SliderInt extends FlowLayout {
+        public SliderInt(String name, int min, int max, int step, Option.Key optionKey, String tooltip) {
+            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            this.padding(Insets.of(5));
+            this.horizontalAlignment(HorizontalAlignment.LEFT);
+            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
+            FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
+            slider.min(min).max(max).stepSize(step).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            label.tooltip(Text.literal(tooltip));
+            text.onChanged().subscribe(change -> {
+                try {
+                    int value = Integer.parseInt(text.getText());
+                    setKeyValue(optionKey, value);
+                    slider.value(value);
+                } catch (NumberFormatException ignored) {
+                }
+            });
+            text.text(String.valueOf((int) getKeyValue(optionKey)));
+            slider.onChanged().subscribe(change -> {
+                int value = (int) slider.value();
+                setKeyValue(optionKey, value);
+                text.setText(String.valueOf(value));
+            });
+            this.child(label);
+            this.child(text);
+            this.child(slider);
+            this.child(buildResetButton(btn -> {
+                setKeyDefault(optionKey);
+                text.setText(String.valueOf((int) getKeyValue(optionKey)));
+            }));
+        }
+    }
+
     public static class Dropdown extends FlowLayout {
-        public <T extends Enum<T>> Dropdown(String name, Class<T> values, Option.Key optionKey) {
+        public <T extends Enum<T>> Dropdown(String name, Class<T> values, Option.Key optionKey, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
             EnumCollapsible dropdown = new EnumCollapsible(((T) getKeyValue(optionKey)).name());
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            label.tooltip(Text.literal(tooltip));
             dropdown.surface(Surface.flat(0xff101010).and(Surface.outline(0xff5ca0bf)));
             for (T value : values.getEnumConstants()) {
                 ButtonComponent button = Components.button(Text.of(value.name()), btn -> {
@@ -218,7 +273,7 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
         public Option.Key key;
         public List<FlatSlider> sliderList = new ArrayList<>();
 
-        public ColorPicker(String name, boolean showAlpha, Option.Key optionKey) {
+        public ColorPicker(String name, boolean showAlpha, Option.Key optionKey, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.key = optionKey;
             this.padding(Insets.of(5));
@@ -226,6 +281,7 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
             this.verticalAlignment(VerticalAlignment.CENTER);
             LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
+            label.tooltip(Text.literal(tooltip));
             Color currentColor = (Color) getKeyValue(optionKey);
             FlowLayout colorDisplay = Containers.verticalFlow(Sizing.fixed(20), Sizing.fixed(20));
             colorDisplay.surface(Surface.flat(currentColor.argb())).margins(Insets.right(10));
@@ -308,6 +364,27 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
                 default -> color;
             };
             setKeyValue(this.key, newColor);
+        }
+    }
+
+    public static class Separator extends FlowLayout {
+        public Separator(String name) {
+            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            this.padding(Insets.of(5));
+            this.horizontalAlignment(HorizontalAlignment.CENTER);
+            this.verticalAlignment(VerticalAlignment.CENTER);
+            this.verticalSizing(Sizing.fixed(30));
+            MutableText text = Text.literal(name);
+            int textWidth = mc.textRenderer.getWidth(text) / 2;
+            LabelComponent label = Components.label(text.withColor(0xffffff));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).verticalSizing(Sizing.fixed(30));
+            this.surface((context, component) -> {
+                int centerX = component.x() + component.width() / 2;
+                int centerY = component.y() + component.height() / 2;
+                context.fill(component.x(), centerY - 1, centerX - textWidth - 5, centerY + 1, 0xffffffff);
+                context.fill(centerX + textWidth + 5, centerY - 1, component.x() + component.width(), centerY + 1, 0xffffffff);
+            });
+            this.child(label);
         }
     }
 }

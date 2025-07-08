@@ -10,16 +10,11 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
-import net.minecraft.text.Text;
-import nofrills.config.NoFrillsConfig;
 import nofrills.features.PearlRefill;
 import nofrills.hud.HudEditorScreen;
-import nofrills.hud.clickgui.ClickGuiScreen;
-import nofrills.hud.clickgui.ClickGuiSettings;
+import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
-
-import java.util.List;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
@@ -238,17 +233,10 @@ public class NoFrills {
             }));
         }
         LiteralArgumentBuilder<FabricClientCommandSource> commandMain = literal("nofrills").executes(context -> {
-            Utils.setScreen(new ClickGuiSettings(List.of(
-                    new ClickGuiSettings.Slider("deez", 0, 1, 0.01, Config.keys.dayPosY),
-                    new ClickGuiSettings.Toggle("tuah-ggle", Config.keys.vampManiaSilence),
-                    new ClickGuiSettings.Dropdown("dropdown", NoFrillsConfig.partyBehavior.class, Config.keys.partyCmdWarp),
-                    new ClickGuiSettings.ColorPicker("color picker", true, Config.keys.chatWaypointColor)
-
-            )).setTitle(Text.literal("testing testing 123")));
             return SINGLE_SUCCESS;
         });
         LiteralArgumentBuilder<FabricClientCommandSource> commandShort = literal("nf").executes(context -> {
-            Utils.setScreen(new ClickGuiScreen());
+            Utils.setScreen(new ClickGui());
             return SINGLE_SUCCESS;
         });
         commandMain.then(helpArg);

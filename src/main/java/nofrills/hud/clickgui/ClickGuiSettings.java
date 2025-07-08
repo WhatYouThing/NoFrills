@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static nofrills.Main.Config;
 import static nofrills.Main.mc;
@@ -44,10 +45,8 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
         Config.optionForKey(optionKey).set(Config.optionForKey(optionKey).defaultValue());
     }
 
-    private static ButtonComponent buildResetButton(Option.Key optionKey) {
-        ButtonComponent button = Components.button(Text.literal("Reset").withColor(0xffffff), btn -> {
-            setKeyValue(optionKey, Config.optionForKey(optionKey).defaultValue());
-        });
+    private static ButtonComponent buildResetButton(Consumer<ButtonComponent> onPress) {
+        ButtonComponent button = Components.button(Text.literal("Reset").withColor(0xffffff), onPress);
         button.positioning(Positioning.relative(100, 0));
         button.renderer((context, btn, delta) -> {
             context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
@@ -57,7 +56,7 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
     }
 
     private static double roundDouble(double value) {
-        return BigDecimal.valueOf(value).setScale(3, RoundingMode.HALF_EVEN).doubleValue();
+        return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     @Override
@@ -135,7 +134,10 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
             this.active((boolean) getKeyValue(this.optionKey));
             this.child(label);
             this.child(this.toggle);
-            this.child(buildResetButton(optionKey));
+            this.child(buildResetButton(btn -> {
+                setKeyDefault(this.optionKey);
+                this.active((boolean) getKeyValue(this.optionKey));
+            }));
         }
 
         private void active(boolean active) {
@@ -157,6 +159,7 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
             LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
             FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
+            slider.min(min).max(max).stepSize(step).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             text.onChanged().subscribe(change -> {
                 try {
@@ -167,7 +170,6 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
                 }
             });
             text.text(String.valueOf((double) getKeyValue(optionKey)));
-            slider.min(min).max(max).stepSize(step).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
             slider.onChanged().subscribe(change -> {
                 double value = roundDouble(slider.value());
                 setKeyValue(optionKey, value);
@@ -176,7 +178,10 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
             this.child(label);
             this.child(text);
             this.child(slider);
-            this.child(buildResetButton(optionKey));
+            this.child(buildResetButton(btn -> {
+                setKeyDefault(optionKey);
+                text.setText(String.valueOf(roundDouble((double) getKeyValue(optionKey))));
+            }));
         }
     }
 
@@ -202,12 +207,16 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
             }
             this.child(label);
             this.child(dropdown);
-            this.child(buildResetButton(optionKey));
+            this.child(buildResetButton(btn -> {
+                setKeyDefault(optionKey);
+                dropdown.setLabel(((T) getKeyValue(optionKey)).name());
+            }));
         }
     }
 
     public static class ColorPicker extends FlowLayout {
         public Option.Key key;
+        public List<FlatSlider> sliderList = new ArrayList<>();
 
         public ColorPicker(String name, boolean showAlpha, Option.Key optionKey) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
@@ -231,6 +240,8 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
                 colorLabel.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
                 FlatTextbox text = new FlatTextbox(Sizing.fixed(30));
                 FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
+                slider.min(0).max(255).stepSize(1).horizontalSizing(Sizing.fixed(60)).verticalSizing(Sizing.fixed(20));
+                sliderList.add(slider);
                 text.onChanged().subscribe(change -> {
                     try {
                         int value = Integer.parseInt(text.getText());
@@ -241,7 +252,6 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
                     }
                 });
                 text.text(String.valueOf((int) (getColorValue(id) * 255.0f)));
-                slider.min(0).max(255).stepSize(1).horizontalSizing(Sizing.fixed(50)).verticalSizing(Sizing.fixed(20));
                 slider.onChanged().subscribe(change -> {
                     int value = (int) slider.value();
                     setColorValue(id, value / 255.0f);
@@ -256,7 +266,15 @@ public class ClickGuiSettings extends BaseOwoScreen<FlowLayout> {
             this.child(label);
             this.child(colorDisplay);
             this.child(colorSliders);
-            this.child(buildResetButton(optionKey).positioning(Positioning.relative(100, 50)));
+            this.child(buildResetButton(btn -> {
+                setKeyDefault(this.key);
+                for (int i = 0; i <= 3; i++) {
+                    if (i == 3 && !showAlpha) {
+                        continue;
+                    }
+                    sliderList.get(i).value((int) (getColorValue(i) * 255.0f));
+                }
+            }).positioning(Positioning.relative(100, 50)));
         }
 
         private String getColorLabel(int id) {

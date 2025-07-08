@@ -239,7 +239,7 @@ public class NoFrills {
         }
         LiteralArgumentBuilder<FabricClientCommandSource> commandMain = literal("nofrills").executes(context -> {
             Utils.setScreen(new ClickGuiSettings(List.of(
-                    new ClickGuiSettings.Slider("deez", 0, 1, 0.05, Config.keys.dayPosY),
+                    new ClickGuiSettings.Slider("deez", 0, 1, 0.01, Config.keys.dayPosY),
                     new ClickGuiSettings.Toggle("tuah-ggle", Config.keys.vampManiaSilence),
                     new ClickGuiSettings.Dropdown("dropdown", NoFrillsConfig.partyBehavior.class, Config.keys.partyCmdWarp),
                     new ClickGuiSettings.ColorPicker("color picker", true, Config.keys.chatWaypointColor)

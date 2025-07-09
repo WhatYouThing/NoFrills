@@ -46,6 +46,8 @@ public class Main implements ModInitializer {
 
         mc = MinecraftClient.getInstance();
 
+        nofrills.config.Config.load();
+
         eventBus.registerLambdaFactory("nofrills", (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
 
         eventBus.subscribe(SlotOptions.class);

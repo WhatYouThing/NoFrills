@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW;
 import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
-public class Feature extends FlowLayout {
+public class Module extends FlowLayout {
     public boolean active = false;
     public Option.Key optionKey;
     public Text activeText;
@@ -19,11 +19,11 @@ public class Feature extends FlowLayout {
     public LabelComponent label;
     public Settings options;
 
-    protected Feature(String name, Option.Key optionKey, String tooltip) {
+    protected Module(String name, Option.Key optionKey, String tooltip) {
         this(name, optionKey, tooltip, null);
     }
 
-    protected Feature(String name, Option.Key optionKey, String tooltip, Settings options) {
+    protected Module(String name, Option.Key optionKey, String tooltip, Settings options) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
         this.activeText = Text.literal(name).withColor(0x5ca0bf);
         this.inactiveText = Text.literal(name).withColor(0xdddddd);

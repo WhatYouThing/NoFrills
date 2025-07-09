@@ -19,9 +19,23 @@ public class Foraging {
                         .build())
 
                 .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Lasso Alert"))
+                        .description(OptionDescription.of(Text.of("Plays a sound effect when you can reel in with your lasso.")))
+                        .binding(false, () -> Config.lassoAlert, value -> Config.lassoAlert = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Invisibug Highlight"))
                         .description(OptionDescription.of(Text.of("Attempts to locate nearby Invisibugs on the Galatea, and renders red highlights over them.")))
                         .binding(false, () -> Config.invisibugHighlight, value -> Config.invisibugHighlight = value)
+                        .controller(Config::booleanController)
+                        .build())
+
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Cinderbat Highlight"))
+                        .description(OptionDescription.of(Text.of("Attempts to locate nearby Cinderbats on the Crimson Isle, and renders highlights and health bars for them.")))
+                        .binding(false, () -> Config.cinderbatHighlight, value -> Config.cinderbatHighlight = value)
                         .controller(Config::booleanController)
                         .build())
 

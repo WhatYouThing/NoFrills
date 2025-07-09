@@ -6,16 +6,18 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.entity.passive.BatEntity;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.ServerTickEvent;
-import nofrills.events.SpawnParticleEvent;
-import nofrills.events.WorldRenderEvent;
+import nofrills.events.*;
+import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -33,6 +35,8 @@ public class ForagingFeatures {
     );
     private static final List<Invisibug> invisibugList = new ArrayList<>();
     private static final RenderColor invisibugColor = RenderColor.fromHex(0xff0000, 0.5f);
+    private static final EntityCache cinderbatList = new EntityCache();
+    private static final RenderColor cinderbatColor = RenderColor.fromHex(0x00ff00, 1.0f);
 
     public static boolean isTreeBlock(Entity entity) {
         if (Utils.isInArea("Galatea") && entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
@@ -95,6 +99,31 @@ public class ForagingFeatures {
                     event.drawFilled(Box.of(bug.positions.getLast(), 1, 1, 1), false, invisibugColor);
                     event.drawText(bug.positions.getLast().add(0, 1, 0), Text.of("Invisibug"), 0.035f, false, RenderColor.fromHex(0xffffff));
                 }
+            }
+        }
+        if (Config.cinderbatHighlight && Utils.isInArea("Crimson Isle")) {
+            for (Entity bat : cinderbatList.get()) {
+                Vec3d pos = bat.getLerpedPos(event.tickCounter.getTickProgress(true)).add(0, 0.45, 0);
+                event.drawOutline(Box.of(pos, 3, 3, 3), false, cinderbatColor);
+                float health = ((BatEntity) bat).getHealth();
+                Text text = Text.of(Utils.format("Cinderbat: {} HP", String.format("%,.1f", health)));
+                event.drawText(pos.add(0, 2.5, 0), text, 0.035f, false, RenderColor.fromHex(0xffffff));
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onNamed(EntityNamedEvent event) {
+        if (Config.lassoAlert && event.namePlain.equals("REEL") && Utils.getHeldItem().getItem().equals(Items.LEAD)) {
+            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), SoundCategory.MASTER, 1.0f, 1.0f);
+        }
+    }
+
+    @EventHandler
+    private static void onUpdated(EntityUpdatedEvent event) {
+        if (Config.cinderbatHighlight && Utils.isInArea("Crimson Isle") && event.entity instanceof BatEntity bat) {
+            if (bat.getHealth() > 6.0f && !cinderbatList.has(event.entity)) {
+                cinderbatList.add(event.entity);
             }
         }
     }

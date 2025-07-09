@@ -40,6 +40,11 @@ public class ClientPlayNetworkHandlerMixin {
         }
     }
 
+    @Inject(method = "onEntitySpawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;playSpawnSound(Lnet/minecraft/entity/Entity;)V"))
+    private void onEntitySpawn(EntitySpawnS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
+        eventBus.post(new EntityUpdatedEvent(ent));
+    }
+
     @Inject(method = "onScreenHandlerSlotUpdate", at = @At("TAIL"))
     private void onUpdateInventory(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
         if (mc.currentScreen instanceof GenericContainerScreen containerScreen) {

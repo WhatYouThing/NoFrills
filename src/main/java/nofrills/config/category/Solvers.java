@@ -23,14 +23,14 @@ public class Solvers {
 
                 .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Solve Ultrasequencer"))
-                        .description(OptionDescription.of(Text.of("Reveals the solution and prevents the glass panes from being clicked in the Ultrasequencer add-on experiment.")))
+                        .description(OptionDescription.of(Text.of("Highlights correct clicks and prevents wrong clicks in the Ultrasequencer add-on experiment.")))
                         .binding(false, () -> Config.solveUltrasequencer, value -> Config.solveUltrasequencer = value)
                         .controller(Config::booleanController)
                         .build())
 
                 .option(Option.<Boolean>createBuilder()
                         .name(Text.of("Solve Superpairs"))
-                        .description(OptionDescription.of(Text.of("Reveals every uncovered reward in the Superpairs experiment.")))
+                        .description(OptionDescription.of(Text.of("Reveals every uncovered reward in the Superpairs experiment, and highlights every possible/matched pair as yellow/green.")))
                         .binding(false, () -> Config.solveSuperpairs, value -> Config.solveSuperpairs = value)
                         .controller(Config::booleanController)
                         .build())

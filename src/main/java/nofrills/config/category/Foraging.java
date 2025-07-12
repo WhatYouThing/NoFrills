@@ -39,6 +39,13 @@ public class Foraging {
                         .controller(Config::booleanController)
                         .build())
 
+                .option(Option.<Boolean>createBuilder()
+                        .name(Text.of("Fusion Keybinds"))
+                        .description(OptionDescription.of(Text.of("Adds handy keybinds to the Fusion Machine.\n\nSpace: Repeat the previous fusion\nEnter: Confirm the previous fusion\nBackspace: Cancel the previous fusion.")))
+                        .binding(false, () -> Config.fusionKeybinds, value -> Config.fusionKeybinds = value)
+                        .controller(Config::booleanController)
+                        .build())
+
                 .build();
     }
 }

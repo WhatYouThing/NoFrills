@@ -3,16 +3,21 @@ package nofrills.features;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.entity.passive.BatEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
@@ -20,6 +25,7 @@ import nofrills.events.*;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +70,16 @@ public class ForagingFeatures {
         return false;
     }
 
+    private static boolean isValidBind(ItemStack stack, int key) {
+        if (stack != null && !stack.isEmpty()) {
+            String name = Formatting.strip(stack.getName().getString());
+            return (name.equals("Repeat Previous Fusion") && key == GLFW.GLFW_KEY_SPACE) ||
+                    (name.equals("Fusion") && stack.getItem().equals(Items.LIME_TERRACOTTA) && key == GLFW.GLFW_KEY_ENTER) ||
+                    (name.equals("Cancel") && stack.getItem().equals(Items.RED_TERRACOTTA) && key == GLFW.GLFW_KEY_BACKSPACE);
+        }
+        return false;
+    }
+
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (Config.invisibugHighlight && Utils.isInArea("Galatea") && event.type.equals(ParticleTypes.CRIT) && isInvisibugParticle(event.packet)) {
@@ -104,10 +120,7 @@ public class ForagingFeatures {
         if (Config.cinderbatHighlight && Utils.isInArea("Crimson Isle")) {
             for (Entity bat : cinderbatList.get()) {
                 Vec3d pos = bat.getLerpedPos(event.tickCounter.getTickProgress(true)).add(0, 0.45, 0);
-                event.drawOutline(Box.of(pos, 3, 3, 3), false, cinderbatColor);
-                float health = ((BatEntity) bat).getHealth();
-                Text text = Text.of(Utils.format("Cinderbat: {} HP", String.format("%,.1f", health)));
-                event.drawText(pos.add(0, 2.5, 0), text, 0.035f, false, RenderColor.fromHex(0xffffff));
+                event.drawOutline(Box.of(pos, 2.5, 2.5, 2.5), false, cinderbatColor);
             }
         }
     }
@@ -124,6 +137,22 @@ public class ForagingFeatures {
         if (Config.cinderbatHighlight && Utils.isInArea("Crimson Isle") && event.entity instanceof BatEntity bat) {
             if (bat.getHealth() > 6.0f && !cinderbatList.has(event.entity)) {
                 cinderbatList.add(event.entity);
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onKey(InputEvent event) {
+        if (Config.fusionKeybinds && event.action == GLFW.GLFW_PRESS && mc.currentScreen instanceof GenericContainerScreen container) {
+            String title = container.getTitle().getString();
+            if (title.equals("Fusion Box") || title.equals("Confirm Fusion")) {
+                for (Slot slot : container.getScreenHandler().slots) {
+                    if (isValidBind(slot.getStack(), event.key)) {
+                        mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
+                        event.cancel();
+                        return;
+                    }
+                }
             }
         }
     }
@@ -148,7 +177,7 @@ public class ForagingFeatures {
         }
 
         public boolean isNear(Vec3d pos) {
-            return !this.positions.isEmpty() && pos.distanceTo(this.positions.getLast()) <= 0.2;
+            return !this.positions.isEmpty() && pos.distanceTo(this.positions.getLast()) <= 0.3;
         }
 
         public void add(Vec3d pos) {

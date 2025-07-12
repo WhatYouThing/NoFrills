@@ -301,6 +301,8 @@ public class Config {
     public static boolean invisibugHighlight = false;
     @SerialEntry
     public static boolean cinderbatHighlight = false;
+    @SerialEntry
+    public static boolean fusionKeybinds = false;
 
     // Dungeons
 

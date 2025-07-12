@@ -28,7 +28,7 @@ public class General {
                         .collapsed(false)
                         .option(Option.<Boolean>createBuilder()
                                 .name(Text.of("Auto Sprint"))
-                                .description(OptionDescription.of(Text.of("Keeps your sprint key held at all times.")))
+                                .description(OptionDescription.of(Text.of("Keeps your sprint key held at all times, except for when you are submerged in water.")))
                                 .binding(false, () -> Config.autoSprint, value -> Config.autoSprint = value)
                                 .controller(Config::booleanController)
                                 .build())

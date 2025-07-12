@@ -9,7 +9,7 @@ import static nofrills.Main.mc;
 public class AutoSprint {
     @EventHandler
     public static void tick(WorldTickEvent event) {
-        if (Config.autoSprint) {
+        if (Config.autoSprint && mc.player != null && !mc.player.isSubmergedInWater()) {
             mc.options.sprintKey.setPressed(true);
         }
     }

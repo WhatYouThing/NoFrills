@@ -160,6 +160,7 @@ public class ForagingFeatures {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         invisibugList.clear();
+        cinderbatList.clear();
     }
 
     private static class Invisibug {

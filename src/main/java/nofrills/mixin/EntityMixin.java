@@ -115,13 +115,15 @@ public abstract class EntityMixin implements EntityRendering {
 
     @ModifyReturnValue(method = "getFlag", at = @At("RETURN"))
     private boolean getFlag(boolean original, int index) {
-        if (Utils.isFixEnabled(Config.antiSwim) && index == SWIMMING_FLAG_INDEX) {
-            return false;
-        }
-        if (Utils.isFixEnabled(Config.antiSwim) && index == SPRINTING_FLAG_INDEX && Utils.isSelf(this)) {
-            if (original && isTouchingWater()) {
-                setSprinting(false);
+        if (Utils.isFixEnabled(Config.antiSwim)) {
+            if (index == SWIMMING_FLAG_INDEX) {
                 return false;
+            }
+            if (index == SPRINTING_FLAG_INDEX && Utils.isSelf(this)) {
+                if (original && isTouchingWater()) {
+                    setSprinting(false);
+                    return false;
+                }
             }
         }
         return original;

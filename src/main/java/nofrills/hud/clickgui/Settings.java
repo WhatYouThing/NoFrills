@@ -1,6 +1,5 @@
 package nofrills.hud.clickgui;
 
-import io.wispforest.owo.config.Option;
 import io.wispforest.owo.ui.base.BaseComponent;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
@@ -12,9 +11,11 @@ import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import nofrills.config.*;
 import nofrills.hud.clickgui.components.EnumCollapsible;
 import nofrills.hud.clickgui.components.FlatSlider;
 import nofrills.hud.clickgui.components.FlatTextbox;
+import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
@@ -23,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class Settings extends BaseOwoScreen<FlowLayout> {
@@ -32,18 +32,6 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     public Settings(List<FlowLayout> settings) {
         this.settings = settings;
-    }
-
-    public static Object getKeyValue(Option.Key optionKey) {
-        return Config.optionForKey(optionKey).value();
-    }
-
-    public static void setKeyValue(Option.Key optionKey, Object value) {
-        Config.optionForKey(optionKey).set(value);
-    }
-
-    public static void setKeyDefault(Option.Key optionKey) {
-        Config.optionForKey(optionKey).set(Config.optionForKey(optionKey).defaultValue());
     }
 
     private static ButtonComponent buildResetButton(Consumer<ButtonComponent> onPress) {
@@ -126,22 +114,22 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     public static class Toggle extends FlowLayout {
         public boolean active = false;
-        public Option.Key optionKey;
+        public SettingBool setting;
         public Text enabledText;
         public Text disabledText;
         public ButtonComponent toggle;
 
-        public Toggle(String name, Option.Key optionKey, String tooltip) {
+        public Toggle(String name, SettingBool setting, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
-            this.optionKey = optionKey;
+            this.setting = setting;
             this.enabledText = Text.literal("Enabled").withColor(0x55ff55);
             this.disabledText = Text.literal("Disabled").withColor(0xff5555);
             LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
             label.tooltip(Text.literal(tooltip));
             this.toggle = Components.button(Text.empty(), button -> {
-                boolean value = (boolean) getKeyValue(this.optionKey);
+                boolean value = this.setting.value();
                 active(!value);
             });
             this.toggle.renderer((context, button, delta) -> {
@@ -149,12 +137,12 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
             });
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            this.active((boolean) getKeyValue(this.optionKey));
+            this.active(this.setting.value());
             this.child(label);
             this.child(this.toggle);
             this.child(buildResetButton(btn -> {
-                setKeyDefault(this.optionKey);
-                this.active((boolean) getKeyValue(this.optionKey));
+                this.setting.reset();
+                this.active(this.setting.value());
             }));
         }
 
@@ -164,16 +152,19 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             } else {
                 this.toggle.setMessage(this.disabledText);
             }
-            setKeyValue(this.optionKey, active);
+            this.setting.set(active);
             this.active = active;
         }
     }
 
     public static class SliderDouble extends FlowLayout {
-        public SliderDouble(String name, double min, double max, double step, Option.Key optionKey, String tooltip) {
+        public SettingDouble setting;
+
+        public SliderDouble(String name, double min, double max, double step, SettingDouble setting, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
+            this.setting = setting;
             LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
             FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
@@ -183,32 +174,35 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             text.onChanged().subscribe(change -> {
                 try {
                     double value = Double.parseDouble(text.getText());
-                    setKeyValue(optionKey, value);
+                    this.setting.set(value);
                     slider.value(value);
                 } catch (NumberFormatException ignored) {
                 }
             });
-            text.text(String.valueOf((double) getKeyValue(optionKey)));
+            text.text(String.valueOf(this.setting.value()));
             slider.onChanged().subscribe(change -> {
                 double value = roundDouble(slider.value());
-                setKeyValue(optionKey, value);
+                this.setting.set(value);
                 text.setText(String.valueOf(value));
             });
             this.child(label);
             this.child(text);
             this.child(slider);
             this.child(buildResetButton(btn -> {
-                setKeyDefault(optionKey);
-                text.setText(String.valueOf(roundDouble((double) getKeyValue(optionKey))));
+                this.setting.reset();
+                text.setText(String.valueOf(roundDouble(this.setting.value())));
             }));
         }
     }
 
     public static class SliderInt extends FlowLayout {
-        public SliderInt(String name, int min, int max, int step, Option.Key optionKey, String tooltip) {
+        public SettingInt setting;
+
+        public SliderInt(String name, int min, int max, int step, SettingInt setting, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
+            this.setting = setting;
             LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
             FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
@@ -218,41 +212,44 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             text.onChanged().subscribe(change -> {
                 try {
                     int value = Integer.parseInt(text.getText());
-                    setKeyValue(optionKey, value);
+                    this.setting.set(value);
                     slider.value(value);
                 } catch (NumberFormatException ignored) {
                 }
             });
-            text.text(String.valueOf((int) getKeyValue(optionKey)));
+            text.text(String.valueOf(this.setting.value()));
             slider.onChanged().subscribe(change -> {
                 int value = (int) slider.value();
-                setKeyValue(optionKey, value);
+                this.setting.set(value);
                 text.setText(String.valueOf(value));
             });
             this.child(label);
             this.child(text);
             this.child(slider);
             this.child(buildResetButton(btn -> {
-                setKeyDefault(optionKey);
-                text.setText(String.valueOf((int) getKeyValue(optionKey)));
+                this.setting.reset();
+                text.setText(String.valueOf(this.setting.value()));
             }));
         }
     }
 
-    public static class Dropdown extends FlowLayout {
-        public <T extends Enum<T>> Dropdown(String name, Class<T> values, Option.Key optionKey, String tooltip) {
+    public static class Dropdown<T extends Enum<T>> extends FlowLayout {
+        public SettingEnum<T> setting;
+
+        public Dropdown(String name, SettingEnum<T> setting, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
+            this.setting = setting;
             LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
-            EnumCollapsible dropdown = new EnumCollapsible(((T) getKeyValue(optionKey)).name());
+            EnumCollapsible dropdown = new EnumCollapsible(this.setting.value().name());
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
             dropdown.surface(Surface.flat(0xff101010).and(Surface.outline(0xff5ca0bf)));
-            for (T value : values.getEnumConstants()) {
+            for (T value : this.setting.values) {
                 ButtonComponent button = Components.button(Text.of(value.name()), btn -> {
                     dropdown.setLabel(value.name());
-                    setKeyValue(optionKey, value);
+                    this.setting.set(value);
                     dropdown.toggleExpansion();
                 });
                 button.sizing(Sizing.content(), Sizing.fixed(12));
@@ -263,31 +260,30 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.child(label);
             this.child(dropdown);
             this.child(buildResetButton(btn -> {
-                setKeyDefault(optionKey);
-                dropdown.setLabel(((T) getKeyValue(optionKey)).name());
+                this.setting.reset();
+                dropdown.setLabel(this.setting.value().name());
             }));
         }
     }
 
     public static class ColorPicker extends FlowLayout {
-        public Option.Key key;
+        public SettingColor setting;
         public List<FlatSlider> sliderList = new ArrayList<>();
 
-        public ColorPicker(String name, boolean showAlpha, Option.Key optionKey, String tooltip) {
+        public ColorPicker(String name, boolean alpha, SettingColor setting, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
-            this.key = optionKey;
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.verticalAlignment(VerticalAlignment.CENTER);
+            this.setting = setting;
             LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
-            Color currentColor = (Color) getKeyValue(optionKey);
             FlowLayout colorDisplay = Containers.verticalFlow(Sizing.fixed(20), Sizing.fixed(20));
-            colorDisplay.surface(Surface.flat(currentColor.argb())).margins(Insets.right(10));
+            colorDisplay.surface(Surface.flat(this.setting.value().argb)).margins(Insets.right(10));
             FlowLayout colorSliders = Containers.verticalFlow(Sizing.content(), Sizing.content());
             for (int i = 0; i <= 3; i++) {
-                if (i == 3 && !showAlpha) {
+                if (i == 3 && !alpha) {
                     continue;
                 }
                 int id = i;
@@ -303,7 +299,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                         int value = Integer.parseInt(text.getText());
                         setColorValue(id, value / 255.0f);
                         slider.value(value);
-                        colorDisplay.surface(Surface.flat(((Color) getKeyValue(this.key)).argb()));
+                        colorDisplay.surface(Surface.flat(this.setting.value().argb));
                     } catch (NumberFormatException ignored) {
                     }
                 });
@@ -312,7 +308,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                     int value = (int) slider.value();
                     setColorValue(id, value / 255.0f);
                     text.setText(String.valueOf(value));
-                    colorDisplay.surface(Surface.flat(((Color) getKeyValue(this.key)).argb()));
+                    colorDisplay.surface(Surface.flat(this.setting.value().argb));
                 });
                 row.child(colorLabel);
                 row.child(text);
@@ -323,9 +319,9 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.child(colorDisplay);
             this.child(colorSliders);
             this.child(buildResetButton(btn -> {
-                setKeyDefault(this.key);
+                this.setting.reset();
                 for (int i = 0; i <= 3; i++) {
-                    if (i == 3 && !showAlpha) {
+                    if (i == 3 && !alpha) {
                         continue;
                     }
                     sliderList.get(i).value((int) (getColorValue(i) * 255.0f));
@@ -344,26 +340,26 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
 
         private double getColorValue(int id) {
-            Color color = (Color) getKeyValue(this.key);
+            RenderColor color = this.setting.value();
             return switch (id) {
-                case 0 -> color.red();
-                case 1 -> color.green();
-                case 2 -> color.blue();
-                case 3 -> color.alpha();
+                case 0 -> color.r;
+                case 1 -> color.g;
+                case 2 -> color.b;
+                case 3 -> color.a;
                 default -> 0;
             };
         }
 
         private void setColorValue(int id, double value) {
-            Color color = (Color) getKeyValue(this.key);
-            Color newColor = switch (id) { // quite scuffed but its either this or pasting the same code 4 times to build the color picker
-                case 0 -> new Color((float) value, color.green(), color.blue(), color.alpha());
-                case 1 -> new Color(color.red(), (float) value, color.blue(), color.alpha());
-                case 2 -> new Color(color.red(), color.green(), (float) value, color.alpha());
-                case 3 -> new Color(color.red(), color.green(), color.blue(), (float) value);
+            RenderColor color = this.setting.value();
+            RenderColor newColor = switch (id) { // quite scuffed but its either this or pasting the same code 4 times to build the color picker
+                case 0 -> RenderColor.fromFloat((float) value, color.g, color.b, color.a);
+                case 1 -> RenderColor.fromFloat(color.r, (float) value, color.b, color.a);
+                case 2 -> RenderColor.fromFloat(color.r, color.g, (float) value, color.a);
+                case 3 -> RenderColor.fromFloat(color.r, color.g, color.b, (float) value);
                 default -> color;
             };
-            setKeyValue(this.key, newColor);
+            this.setting.set(newColor);
         }
     }
 

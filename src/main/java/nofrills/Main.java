@@ -14,6 +14,7 @@ import nofrills.commands.NoFrills;
 import nofrills.commands.Yeet;
 import nofrills.config.NoFrillsConfigWrapper;
 import nofrills.features.*;
+import nofrills.features.general.AutoSprint;
 import nofrills.hud.HudManager;
 import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.SkyblockData;

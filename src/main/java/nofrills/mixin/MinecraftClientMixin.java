@@ -80,4 +80,9 @@ public abstract class MinecraftClientMixin {
             ci.cancel();
         }
     }
+
+    @Inject(method = "stop", at = @At("HEAD"))
+    private void beforeStop(CallbackInfo ci) {
+        nofrills.config.Config.save();
+    }
 }

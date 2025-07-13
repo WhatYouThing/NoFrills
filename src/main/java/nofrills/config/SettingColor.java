@@ -1,33 +1,34 @@
 package nofrills.config;
 
 import com.google.gson.JsonObject;
+import nofrills.misc.RenderColor;
 
-public class SettingBool {
+public class SettingColor {
     private final String key;
     private final String parent;
-    private final boolean defaultValue;
+    private final RenderColor defaultValue;
 
-    public SettingBool(boolean defaultValue, String key, String parentKey) {
+    public SettingColor(RenderColor defaultValue, String key, String parentKey) {
         this.defaultValue = defaultValue;
         this.key = key;
         this.parent = parentKey;
     }
 
-    public boolean value() {
+    public RenderColor value() {
         if (Config.get().has(this.parent)) {
             JsonObject data = Config.get().getAsJsonObject(this.parent);
             if (data.has(this.key)) {
-                return data.get(this.key).getAsBoolean();
+                return RenderColor.fromArgb(data.get(this.key).getAsInt());
             }
         }
         return this.defaultValue;
     }
 
-    public void set(boolean value) {
+    public void set(RenderColor value) {
         if (!Config.get().has(this.parent)) {
             Config.get().add(this.parent, new JsonObject());
         }
-        Config.get().get(this.parent).getAsJsonObject().addProperty(this.key, value);
+        Config.get().get(this.parent).getAsJsonObject().addProperty(this.key, value.argb);
     }
 
     public void reset() {

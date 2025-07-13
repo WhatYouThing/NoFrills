@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import static nofrills.Main.LOGGER;
 
 public class Config {
-    public static final Path filePath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills/Config.json");
+    public static final Path filePath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills/ModConfig.json");
     private static JsonObject data = new JsonObject();
 
     public static void load() {

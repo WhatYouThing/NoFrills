@@ -6,11 +6,10 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.OwoUIAdapter;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.Surface;
+import nofrills.features.general.AutoSprint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-
-import static nofrills.Main.Config;
 
 public class ClickGui extends BaseOwoScreen<FlowLayout> {
     @Override
@@ -23,9 +22,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         root.surface(Surface.VANILLA_TRANSLUCENT);
         FlowLayout parent = Containers.horizontalFlow(Sizing.content(), Sizing.content());
         Category generalCategory = new Category("General", List.of(
-                new Module("Auto Sprint", Config.keys.autoSprint, "Essentially just Toggle Sprint, but always active.", new Settings(List.of(
-                        new Settings.Toggle("Submerged Check", Config.keys.autoSprintWater, "Prevents Auto Sprint from working while you are underwater.")
-                ))),
+                new Module("Auto Sprint", AutoSprint.instance, "Essentially Toggle Sprint, but always active.", new Settings(List.of(
+                        new Settings.Toggle("Submerged Check", AutoSprint.waterCheck, "Prevents Auto Sprint from working while you are underwater.")
+                )))
+                /*
                 new Module("Update Checker", Config.keys.updateChecker, "Automatically checks if a new NoFrills release is available when joining Skyblock."),
                 new Module("No Selfie Camera", Config.keys.noSelfieCam, "Removes the front facing camera perspective."),
                 new Module("Slot Binding", Config.keys.slotBinding, "Bind your hotbar slots to your inventory slots, similarly to NEU's slot binding.", new Settings(List.of(
@@ -52,6 +52,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Settings.Separator("Big Separator 123 123"),
                         new Settings.ColorPicker("Color", true, Config.keys.partyWaypointColor, "The color used for the party waypoints.")
                 )))
+                 */
         ));
         parent.child(generalCategory);
         root.child(Containers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent));

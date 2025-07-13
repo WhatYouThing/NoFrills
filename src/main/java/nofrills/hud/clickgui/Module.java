@@ -1,29 +1,28 @@
 package nofrills.hud.clickgui;
 
-import io.wispforest.owo.config.Option;
 import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.text.Text;
+import nofrills.config.Feature;
 import org.lwjgl.glfw.GLFW;
 
-import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class Module extends FlowLayout {
     public boolean active = false;
-    public Option.Key optionKey;
+    public Feature feature;
     public Text activeText;
     public Text inactiveText;
     public LabelComponent label;
     public Settings options;
 
-    protected Module(String name, Option.Key optionKey, String tooltip) {
-        this(name, optionKey, tooltip, null);
+    public Module(String name, Feature feature, String tooltip) {
+        this(name, feature, tooltip, null);
     }
 
-    protected Module(String name, Option.Key optionKey, String tooltip, Settings options) {
+    public Module(String name, Feature feature, String tooltip, Settings options) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
         this.activeText = Text.literal(name).withColor(0x5ca0bf);
         this.inactiveText = Text.literal(name).withColor(0xdddddd);
@@ -35,29 +34,21 @@ public class Module extends FlowLayout {
         if (this.options != null) {
             this.options.setTitle(Text.literal(name).withColor(0xffffff));
         }
-        this.optionKey = optionKey;
-        this.active(this.getKeyValue());
+        this.feature = feature;
+        this.active(this.feature.isActive());
     }
 
     @Override
     public boolean onMouseDown(double mouseX, double mouseY, int button) {
         if (mouseY <= (double) this.label.fullSize().height()) {
             if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
-                this.active(!this.getKeyValue());
+                this.active(!this.feature.isActive());
             } else if (button == GLFW.GLFW_MOUSE_BUTTON_2 && this.options != null) {
                 mc.setScreen(this.options);
             }
             return true;
         }
         return false;
-    }
-
-    private boolean getKeyValue() {
-        return (Boolean) Config.optionForKey(this.optionKey).value();
-    }
-
-    private void setKeyValue(boolean value) {
-        Config.optionForKey(this.optionKey).set(value);
     }
 
     private void active(boolean active) {
@@ -70,7 +61,7 @@ public class Module extends FlowLayout {
             this.surface(Surface.flat(0xaa000000));
             this.label.text(this.inactiveText);
         }
-        setKeyValue(active);
+        this.feature.setActive(active);
         this.active = active;
     }
 }

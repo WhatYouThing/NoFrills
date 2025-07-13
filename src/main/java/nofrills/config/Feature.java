@@ -2,28 +2,22 @@ package nofrills.config;
 
 import com.google.gson.JsonObject;
 
-public class Feature {
-    public static boolean isActive() {
-        if (Config.get().has(getKey())) {
-            JsonObject data = Config.get().getAsJsonObject(getKey());
-            return data.has("enabled") && data.get("enabled").getAsBoolean();
+public record Feature(String key) {
+
+    public boolean isActive() {
+        if (Config.get().has(this.key)) {
+            JsonObject data = Config.get().get(this.key).getAsJsonObject();
+            if (data.has("enabled")) {
+                return data.get("enabled").getAsBoolean();
+            }
         }
         return false;
     }
 
-    public static void setActive(boolean toggle) {
-        if (!Config.get().has(getKey())) {
-            Config.get().add(getKey(), new JsonObject());
+    public void setActive(boolean toggle) {
+        if (!Config.get().has(this.key)) {
+            Config.get().add(this.key, new JsonObject());
         }
-        Config.get().get(getKey()).getAsJsonObject().addProperty("enabled", toggle);
-    }
-
-    public static void toggle() {
-        setActive(!isActive());
-    }
-
-    // override with the feature's config key
-    public static String getKey() {
-        return "";
+        Config.get().get(this.key).getAsJsonObject().addProperty("enabled", toggle);
     }
 }

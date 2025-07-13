@@ -19,7 +19,6 @@ import static nofrills.Main.*;
 public class NoFrillsAPI {
     public static final ConcurrentHashMap<String, Long> auctionPricing = new ConcurrentHashMap<>();
     public static final ConcurrentHashMap<String, HashMap<String, Double>> bazaarPricing = new ConcurrentHashMap<>();
-    public static final ConcurrentHashMap<String, HashMap<String, Long>> attributePricing = new ConcurrentHashMap<>();
     public static final ConcurrentHashMap<String, HashMap<String, Double>> npcPricing = new ConcurrentHashMap<>();
     private static int refreshTicks = 0;
 
@@ -37,16 +36,6 @@ public class NoFrillsAPI {
                     pricing.put("buy", object.get("buy").getAsDouble());
                     pricing.put("sell", object.get("sell").getAsDouble());
                     bazaarPricing.put(entry.getKey(), pricing);
-                }
-                if (json.has("attribute")) {
-                    for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("attribute").asMap().entrySet()) {
-                        JsonObject object = entry.getValue().getAsJsonObject();
-                        HashMap<String, Long> pricing = new HashMap<>();
-                        for (Map.Entry<String, JsonElement> entryPrices : object.asMap().entrySet()) {
-                            pricing.put(entryPrices.getKey(), entryPrices.getValue().getAsLong());
-                        }
-                        attributePricing.put(entry.getKey(), pricing);
-                    }
                 }
                 for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("npc").asMap().entrySet()) {
                     JsonObject object = entry.getValue().getAsJsonObject();

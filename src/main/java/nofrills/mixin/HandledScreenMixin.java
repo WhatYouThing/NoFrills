@@ -8,8 +8,6 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -150,9 +148,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private List<Text> onGetTooltipFromItem(List<Text> original) {
         if (focusedSlot != null) {
             ItemStack stack = focusedSlot.getStack();
-            NbtComponent component = stack.get(DataComponentTypes.CUSTOM_DATA);
             if (!stack.isEmpty()) {
-                eventBus.post(new DrawItemTooltip(original, stack, component));
+                eventBus.post(new DrawItemTooltip(original, stack, Utils.getCustomData(stack), this.getTitle().getString()));
             }
         }
         return original;
@@ -160,18 +157,16 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @ModifyExpressionValue(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
     private ItemStack onDrawStack(ItemStack original, DrawContext context, Slot slot) {
-        ItemStack stack = SlotOptions.getSpoofedStack(slot);
-        if (stack != null) {
-            return stack;
+        if (SlotOptions.isSlotSpoofed(slot)) {
+            return SlotOptions.getSpoofedStack(slot);
         }
         return original;
     }
 
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
     private ItemStack onDrawSpoofedTooltip(ItemStack original) {
-        ItemStack stack = SlotOptions.getSpoofedStack(focusedSlot);
-        if (stack != null) {
-            return stack;
+        if (SlotOptions.isSlotSpoofed(focusedSlot)) {
+            return SlotOptions.getSpoofedStack(focusedSlot);
         }
         return original;
     }
@@ -191,11 +186,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        context.getMatrices().push();
+        context.getMatrices().translate(this.x, this.y, 0.0f);
+        context.getMatrices().push();
+        context.getMatrices().translate(0.0f, 0.0f, 100.0f);
         if (isSlotBindingActive() && focusedSlot != null) {
-            context.getMatrices().push();
-            context.getMatrices().translate(this.x, this.y, 0.0f);
-            context.getMatrices().push();
-            context.getMatrices().translate(0.0f, 0.0f, 100.0f);
             if (SlotBinding.isHotbar(focusedSlot.id)) {
                 String name = "hotbar" + SlotBinding.toHotbarNumber(focusedSlot.id);
                 if (Config.slotBindData().has(name)) {
@@ -230,9 +225,14 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 drawBorder(context, focusedSlot.id, SlotBinding.bindingColor);
                 drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.bindingColor);
             }
-            context.getMatrices().pop();
-            context.getMatrices().pop();
         }
+        for (Slot slot : this.handler.slots) {
+            if (SlotOptions.hasBackground(slot)) {
+                context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackgroundColor(slot).argb);
+            }
+        }
+        context.getMatrices().pop();
+        context.getMatrices().pop();
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)

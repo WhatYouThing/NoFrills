@@ -10,26 +10,33 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Formatting;
+import nofrills.config.Config;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenSlotUpdateEvent;
 import nofrills.events.SendPacketEvent;
+import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class EnchantingSolver {
     private static final List<Solution> chronoSolution = new ArrayList<>();
     private static final List<Solution> ultraSolution = new ArrayList<>();
-    private static final List<Solution> superSolution = new ArrayList<>();
+    private static final RenderColor superColorFound = RenderColor.fromHex(0x00ff00, 0.5f);
+    private static final RenderColor superColorPotential = RenderColor.fromHex(0xffff00, 0.5f);
+    private static Solution superSolution = new Solution();
     private static boolean rememberPhase = true;
 
-    private static void updatePhase(Item item) {
+    private static void updatePhase(ItemStack stack) {
+        Item item = stack.getItem();
         if (!rememberPhase && item.equals(Items.GLOWSTONE)) {
             rememberPhase = true;
         }
@@ -54,11 +61,14 @@ public class EnchantingSolver {
         return ExperimentType.None;
     }
 
-    private static boolean isStatus(Item item) {
-        return item.equals(Items.CLOCK) || item.equals(Items.BOOKSHELF) || item.equals(Items.GLOWSTONE);
+    private static boolean isStatus(ItemStack stack) {
+        Item item = stack.getItem();
+        String name = Formatting.strip(stack.getName().getString());
+        return item.equals(Items.CLOCK) || item.equals(Items.BOOKSHELF) || (item.equals(Items.GLOWSTONE) && !name.equals("Enchanted Book"));
     }
 
-    private static boolean isDye(Item item) {
+    private static boolean isDye(ItemStack stack) {
+        Item item = stack.getItem();
         return item instanceof DyeItem
                 || item.equals(Items.INK_SAC)
                 || item.equals(Items.BONE_MEAL)
@@ -66,12 +76,25 @@ public class EnchantingSolver {
                 || item.equals(Items.COCOA_BEANS);
     }
 
-    private static boolean isTerracotta(Item item) {
-        return item.toString().endsWith("terracotta");
+    private static boolean isPowerup(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            if (line.toLowerCase().contains("powerup")) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private static boolean isStainedGlass(Item item) {
-        return item.toString().endsWith("stained_glass");
+    private static boolean isTerracotta(ItemStack stack) {
+        return stack.getItem().toString().endsWith("terracotta");
+    }
+
+    private static boolean isStainedGlass(ItemStack stack) {
+        return stack.getItem().toString().endsWith("stained_glass");
+    }
+
+    private static boolean isStainedGlassPane(ItemStack stack) {
+        return stack.getItem().toString().endsWith("stained_glass_pane");
     }
 
     private static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
@@ -79,6 +102,45 @@ public class EnchantingSolver {
         List<Slot> slots = new ArrayList<>(handler.slots);
         slots.removeIf(slot -> inventory.getStack(slot.id).isEmpty());
         return slots;
+    }
+
+    private static void showChronoSolution() {
+        if (!chronoSolution.isEmpty()) {
+            for (Slot solution : chronoSolution.getFirst().slots) {
+                SlotOptions.spoofSlot(solution, SlotOptions.first);
+                SlotOptions.disableSlot(solution, false);
+            }
+        }
+        if (chronoSolution.size() > 1) {
+            Solution first = chronoSolution.getFirst();
+            for (Slot solution : chronoSolution.get(1).slots) {
+                if (first.slots.stream().noneMatch(slot -> slot.id == solution.id)) {
+                    SlotOptions.spoofSlot(solution, SlotOptions.second);
+                    SlotOptions.disableSlot(solution, true);
+                }
+            }
+        }
+    }
+
+    private static void showUltraSolution() {
+        if (!ultraSolution.isEmpty()) {
+            Solution first = ultraSolution.getFirst();
+            SlotOptions.spoofSlot(first.slot, SlotOptions.stackWithQuantity(SlotOptions.first, first.stack.getCount()));
+            SlotOptions.disableSlot(first.slot, false);
+        }
+        if (ultraSolution.size() > 1) {
+            Solution second = ultraSolution.get(1);
+            SlotOptions.spoofSlot(second.slot, SlotOptions.stackWithQuantity(SlotOptions.second, second.stack.getCount()));
+            SlotOptions.disableSlot(second.slot, true);
+        }
+    }
+
+    private static boolean matchSuperStacks(ItemStack first, ItemStack second) {
+        String nameFirst = Formatting.strip(first.getName().getString());
+        String nameSecond = Formatting.strip(second.getName().getString());
+        List<String> loreFirst = Utils.getLoreLines(first);
+        List<String> loreSecond = Utils.getLoreLines(second);
+        return first.getItem().equals(second.getItem()) && nameFirst.equals(nameSecond) && loreFirst.equals(loreSecond);
     }
 
     @EventHandler
@@ -92,63 +154,40 @@ public class EnchantingSolver {
         }
         Item item = event.stack.getItem();
         Slot eventSlot = event.handler.getSlot(event.slotId);
-        updatePhase(item);
-        if (Config.solveChronomatron() && experimentType.equals(ExperimentType.Chronomatron)) {
+        updatePhase(event.stack);
+        if (Config.solveChronomatron && experimentType.equals(ExperimentType.Chronomatron)) {
             if (rememberPhase) {
                 for (Slot slot : getContainerSlots(event.handler)) {
                     SlotOptions.disableSlot(slot, true);
                 }
-                if (isTerracotta(item)) {
+                if (isTerracotta(event.stack)) {
                     if (chronoSolution.isEmpty()) {
                         chronoSolution.add(new Solution(new ArrayList<>()));
                     }
                     chronoSolution.getLast().slots.add(eventSlot);
-                } else if (isStainedGlass(item)) {
+                } else if (isStainedGlass(event.stack)) {
                     if (!chronoSolution.isEmpty() && chronoSolution.getLast().slots.stream().anyMatch(slot -> slot.id == event.slotId)) {
                         chronoSolution.add(new Solution(new ArrayList<>()));
                     }
                 }
             } else {
-                if (isStatus(item)) {
+                if (isStatus(event.stack)) {
                     return;
                 }
-                if (!chronoSolution.isEmpty()) {
-                    for (Slot solution : chronoSolution.getFirst().slots) {
-                        SlotOptions.spoofSlot(solution, SlotOptions.first);
-                        SlotOptions.disableSlot(solution, false);
-                    }
-                }
-                if (chronoSolution.size() > 1) {
-                    Solution first = chronoSolution.getFirst();
-                    for (Slot solution : chronoSolution.get(1).slots) {
-                        if (first.slots.stream().noneMatch(slot -> slot.id == solution.id)) {
-                            SlotOptions.spoofSlot(solution, SlotOptions.second);
-                            SlotOptions.disableSlot(solution, true);
-                        }
-                    }
-                }
+                showChronoSolution();
             }
         }
-        if (Config.solveUltrasequencer() && experimentType.equals(ExperimentType.Ultrasequencer)) {
+        if (Config.solveUltrasequencer && experimentType.equals(ExperimentType.Ultrasequencer)) {
             if (item.equals(Items.CLOCK)) {
                 ultraSolution.sort(Comparator.comparingInt(s -> s.stack.getCount()));
-                if (!ultraSolution.isEmpty()) {
-                    Solution first = ultraSolution.getFirst();
-                    SlotOptions.spoofSlot(first.slot, SlotOptions.first);
-                    SlotOptions.disableSlot(first.slot, false);
-                }
-                if (ultraSolution.size() > 1) {
-                    Solution second = ultraSolution.get(1);
-                    SlotOptions.spoofSlot(second.slot, SlotOptions.second);
-                    SlotOptions.disableSlot(second.slot, true);
-                }
+                showUltraSolution();
             } else if (item.equals(Items.GLOWSTONE)) {
                 List<Solution> solution = new ArrayList<>();
                 SlotOptions.clearSpoofedSlots();
                 SlotOptions.clearDisabledSlots();
                 for (Slot slot : getContainerSlots(event.handler)) {
                     SlotOptions.disableSlot(slot, true);
-                    if (isDye(slot.getStack().getItem())) {
+                    if (isDye(slot.getStack())) {
                         solution.add(new Solution(slot.getStack(), slot));
                     }
                 }
@@ -156,16 +195,23 @@ public class EnchantingSolver {
                 ultraSolution.addAll(solution);
             }
         }
-        if (Config.solveSuperpairs() && experimentType.equals(ExperimentType.Superpairs)) {
-            if (!isStainedGlass(item)) {
-                superSolution.removeIf(s -> s.slot.id == event.slotId);
-                superSolution.add(new Solution(event.stack, eventSlot));
-            }
-            SlotOptions.clearSpoofedSlots();
-            SlotOptions.clearDisabledSlots();
-            for (Solution solution : superSolution) {
-                SlotOptions.spoofSlot(solution.slot, solution.stack);
-                SlotOptions.disableSlot(solution.slot, false);
+        if (Config.solveSuperpairs && experimentType.equals(ExperimentType.Superpairs) && !isStatus(event.stack) && !isPowerup(event.stack)) {
+            if (!isStainedGlass(event.stack) && !isStainedGlassPane(event.stack)) {
+                if (superSolution.slot != null) {
+                    if (matchSuperStacks(event.stack, superSolution.slot.getStack())) {
+                        SlotOptions.setBackground(eventSlot, superColorFound);
+                        SlotOptions.setBackground(superSolution.slot, superColorFound);
+                    }
+                }
+                for (Map.Entry<Slot, ItemStack> solution : superSolution.rewards.entrySet()) {
+                    if (!SlotOptions.hasBackground(eventSlot) && !eventSlot.equals(solution.getKey()) && matchSuperStacks(event.stack, solution.getValue())) {
+                        SlotOptions.setBackground(eventSlot, superColorPotential);
+                        SlotOptions.setBackground(solution.getKey(), superColorPotential);
+                    }
+                }
+                superSolution.rewards.put(eventSlot, event.stack);
+                superSolution.slot = eventSlot;
+                SlotOptions.spoofSlot(eventSlot, event.stack);
             }
         }
     }
@@ -175,7 +221,7 @@ public class EnchantingSolver {
         rememberPhase = true;
         chronoSolution.clear();
         ultraSolution.clear();
-        superSolution.clear();
+        superSolution = new Solution();
     }
 
     @EventHandler
@@ -183,7 +229,7 @@ public class EnchantingSolver {
         if (event.packet instanceof ClickSlotC2SPacket clickPacket) {
             ExperimentType type = getExperimentType();
             int slotId = clickPacket.slot();
-            if (Config.solveChronomatron() && type.equals(ExperimentType.Chronomatron) && !rememberPhase) {
+            if (Config.solveChronomatron && type.equals(ExperimentType.Chronomatron) && !rememberPhase) {
                 if (!chronoSolution.isEmpty()) {
                     Solution first = chronoSolution.getFirst();
                     if (first.slots.stream().anyMatch(slot -> slot.id == slotId)) {
@@ -194,41 +240,18 @@ public class EnchantingSolver {
                         chronoSolution.removeFirst();
                     }
                 }
-                if (!chronoSolution.isEmpty()) {
-                    for (Slot solution : chronoSolution.getFirst().slots) {
-                        SlotOptions.spoofSlot(solution, SlotOptions.first);
-                        SlotOptions.disableSlot(solution, false);
-                    }
-                }
-                if (chronoSolution.size() > 1) {
-                    Solution first = chronoSolution.getFirst();
-                    for (Slot solution : chronoSolution.get(1).slots) {
-                        if (first.slots.stream().noneMatch(slot -> slot.id == solution.id)) {
-                            SlotOptions.spoofSlot(solution, SlotOptions.second);
-                            SlotOptions.disableSlot(solution, true);
-                        }
-                    }
-                }
+                showChronoSolution();
             }
-            if (Config.solveUltrasequencer() && type.equals(ExperimentType.Ultrasequencer) && !rememberPhase) {
+            if (Config.solveUltrasequencer && type.equals(ExperimentType.Ultrasequencer) && !rememberPhase) {
                 if (!ultraSolution.isEmpty()) {
                     if (ultraSolution.getFirst().slot.id == slotId) {
                         Solution first = ultraSolution.getFirst();
-                        SlotOptions.spoofSlot(first.slot, SlotOptions.background);
+                        SlotOptions.spoofSlot(first.slot, SlotOptions.stackWithQuantity(Items.GRAY_CONCRETE.getDefaultStack(), first.stack.getCount()));
                         SlotOptions.disableSlot(first.slot, true);
                         ultraSolution.removeFirst();
                     }
                 }
-                if (!ultraSolution.isEmpty()) {
-                    Solution first = ultraSolution.getFirst();
-                    SlotOptions.spoofSlot(first.slot, SlotOptions.first);
-                    SlotOptions.disableSlot(first.slot, false);
-                }
-                if (ultraSolution.size() > 1) {
-                    Solution second = ultraSolution.get(1);
-                    SlotOptions.spoofSlot(second.slot, SlotOptions.second);
-                    SlotOptions.disableSlot(second.slot, true);
-                }
+                showUltraSolution();
             }
         }
     }
@@ -245,6 +268,7 @@ public class EnchantingSolver {
         public ItemStack stack;
         public Slot slot;
         public List<Slot> slots;
+        public ConcurrentHashMap<Slot, ItemStack> rewards;
 
         public Solution(ItemStack stack, Slot slot) {
             this.type = ExperimentType.Ultrasequencer;
@@ -255,6 +279,12 @@ public class EnchantingSolver {
         public Solution(List<Slot> slots) {
             this.type = ExperimentType.Chronomatron;
             this.slots = slots;
+        }
+
+        public Solution() {
+            this.type = ExperimentType.Ultrasequencer;
+            this.rewards = new ConcurrentHashMap<>();
+            this.slot = null;
         }
     }
 }

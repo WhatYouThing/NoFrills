@@ -19,12 +19,13 @@ import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -32,6 +33,7 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Util;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -43,7 +45,9 @@ import nofrills.config.NoFrillsConfig;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.LeapOverlay;
 import nofrills.mixin.HandledScreenAccessor;
+import nofrills.mixin.NbtComponentAccessor;
 import nofrills.mixin.PlayerListHudAccessor;
+import org.apache.commons.compress.utils.Lists;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
@@ -251,6 +255,34 @@ public class Utils {
         }
     }
 
+    public static List<Entity> getEntities() {
+        if (mc.world != null) {
+            return Lists.newArrayList(mc.world.getEntities().iterator());
+        }
+        return new ArrayList<>();
+    }
+
+    public static List<Entity> getOtherEntities(Entity except, Box box, Predicate<? super Entity> filter) {
+        List<Entity> entities = new ArrayList<>();
+        for (Entity ent : getEntities()) {
+            if (ent != except && (filter == null || filter.test(ent)) && ent.getBoundingBox().intersects(box)) {
+                entities.add(ent);
+            }
+        }
+        return entities;
+    }
+
+    public static List<Entity> getOtherEntities(Entity from, double distX, double distY, double distZ, Predicate<? super Entity> filter) {
+        return getOtherEntities(from, Box.of(from.getPos(), distX, distY, distZ), filter);
+    }
+
+    public static void sendPingPacket() {
+        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+        if (handler != null) {
+            handler.sendPacket(new QueryPingC2SPacket(Util.getMeasuringTimeMs()));
+        }
+    }
+
     /**
      * Returns the armor that the entity is wearing.
      */
@@ -270,7 +302,7 @@ public class Utils {
         if (stack != null && !stack.isEmpty()) {
             NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
             if (data != null) {
-                return data.copyNbt();
+                return ((NbtComponentAccessor) (Object) data).get(); // casting a spell
             }
         }
         return null;
@@ -468,7 +500,7 @@ public class Utils {
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
     public static HitResult raycastFullBlock(Entity entity, double maxDistance, float tickDelta) {
-        Vec3d height = entity.getLerpedPos(tickDelta).add(0, 1.62, 0); // this is the standing eye height, hoping that is a bug
+        Vec3d height = entity.getLerpedPos(tickDelta).add(0, isOnModernIsland() ? 1.27 : 1.54, 0);
         Vec3d camPos = entity.getCameraPosVec(tickDelta);
         Vec3d rot = entity.getRotationVec(tickDelta);
         Vec3d pos = new Vec3d(camPos.getX(), height.getY(), camPos.getZ());
@@ -476,17 +508,6 @@ public class Utils {
         RaycastContext context = new RaycastContext(pos, end, RaycastContext.ShapeType.OUTLINE, net.minecraft.world.RaycastContext.FluidHandling.ANY, entity);
         ((RaycastOptions) context).nofrills_mod$setConsiderAllFull(true);
         return entity.getWorld().raycast(context);
-    }
-
-    /**
-     * Wrapper for the getOtherEntities function.
-     */
-    public static List<Entity> getNearbyEntities(Entity entity, double distX, double distY, double distZ, Predicate<? super Entity> predicate) {
-        return entity.getWorld().getOtherEntities(
-                entity,
-                Box.of(entity.getPos(), distX, distY, distZ),
-                predicate
-        );
     }
 
     /**
@@ -498,7 +519,7 @@ public class Utils {
         double maxY = armorStand.getPos().getY();
         for (Entity ent : otherEntities) {
             float dist = horizontalDistance(ent.getPos(), armorStand.getPos());
-            if (ent.getType() != EntityType.ARMOR_STAND && ent.getPos().getY() < maxY && dist < lowestDist) {
+            if (!(ent instanceof ArmorStandEntity) && ent.getPos().getY() < maxY && dist < lowestDist) {
                 entity = ent;
                 lowestDist = dist;
             }
@@ -513,6 +534,7 @@ public class Utils {
         Optional<? extends Boolean> component = stack.getComponentChanges().get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE);
         return component != null && component.isPresent();
     }
+
 
     /**
      * Returns every line of text from the tab list footer, otherwise an empty list.

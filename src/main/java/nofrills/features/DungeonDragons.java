@@ -141,9 +141,8 @@ public class DungeonDragons {
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (isDragonPhase() && isDragonParticle(event.packet)) {
-            Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             for (Dragon drag : dragons) {
-                if (!isDragonSpawned(drag) && drag.area.contains(pos) && !isPurpleInArea(drag)) {
+                if (!isDragonSpawned(drag) && drag.area.contains(event.pos) && !isPurpleInArea(drag)) {
                     SpawnedDragon spawnedDragon = new SpawnedDragon(drag);
                     spawnedDragons.add(spawnedDragon);
                     List<SpawnedDragon> dragons = getSpawnedDragons();

@@ -26,8 +26,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Tooltips**
 
-    - **Price Tooltips**: Adds the lowest available NPC, Motes, Auction House, Bazaar, and Attribute (separate
-      attributes + roll) prices to item tooltips.
+    - **Price Tooltips**: Adds the lowest available NPC, Motes, Auction House, and Bazaar pricing to item tooltips.
 
 - **Visual**
 
@@ -104,9 +103,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 ### Solvers
 
 - **Experimentation Table**
-    - **Solve Chronomatron**
-    - **Solve Ultrasequencer**
-    - **Solve Superpairs**
+    - **Solve Chronomatron**: Highlights correct clicks and blocks wrong clicks in Chronomatron.
+    - **Solve Ultrasequencer**: Highlights the solution in order and blocks wrong clicks in Ultrasequencer.
+    - **Solve Superpairs**: Permanently reveals every uncovered reward in Superpairs.
 
 ### HUD
 
@@ -125,6 +124,11 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **Rare Sea Creatures**: Notify yourself (and your party) when catching any rare/profitable sea creature.
 - **Apply Glow**: Applies a gold-colored glow to any nearby rare sea creature.
 - **Mute Drake**: Prevents the Reindrake from blowing up your ears, because he's very loud on 1.20+.
+
+### Foraging
+
+- **Hide Tree Bits**: Hides the flying wood and leaves that appear when chopping down trees on the Galatea.
+- **Invisibug Highlight**: Tries to locate Invisibugs on the Galatea and draws red highlights over them.
 
 ### Dungeons
 
@@ -242,14 +246,14 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 ## Incompatibilities
 
-- The mod currently has no known incompatibilities, but some features might collide with other mods. Make sure that
-  you configure your mods properly.
+- Some highlight features might not render correctly with Iris shaders active, this might be fixed once the mod is
+  updated to 1.21.7.
 
 ## Credits
 
 - [Orbit](https://github.com/MeteorDevelopment/orbit): Event system which keeps the mod blazing fast.
-- [Skyblocker](https://github.com/SkyblockerMod/Skyblocker): Has more info on how YACL works than its wiki. Also
-  borrowed a tiny bit of code I guess.
+- [Skyblocker](https://github.com/SkyblockerMod/Skyblocker): Has more info on how YACL works than its own wiki, and
+  allowed me to borrow some obscure functions like reading the scoreboard text.
 - [clientcommands](https://github.com/Earthcomputer/clientcommands): Taught me rendering magic with mixins.
-- [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus): Borrowed some mixins for features like Old Sneak and
-  Anti Swim.
+- [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus): Allowed me to borrow the mixin targets for Anti Swim and
+  Old Sneak.

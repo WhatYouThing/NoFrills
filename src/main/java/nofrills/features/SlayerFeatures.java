@@ -79,7 +79,7 @@ public class SlayerFeatures {
     }
 
     private static List<Entity> getNearby(Entity ent, EntityType<?>[] validTypes) {
-        return Utils.getNearbyEntities(ent, 0.6, 2, 0.6, entity -> isEntityValid(entity, validTypes));
+        return Utils.getOtherEntities(ent, 0.6, 2, 0.6, entity -> isEntityValid(entity, validTypes));
     }
 
     private static void render(Entity ent, boolean render, RenderColor color) {

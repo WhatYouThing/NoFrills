@@ -8,11 +8,11 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import nofrills.config.Config;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
-import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class EtherwarpOverlay {
@@ -33,11 +33,14 @@ public class EtherwarpOverlay {
             case HopperBlock ignored -> !isAbove;
             case StainedGlassPaneBlock ignored -> !isAbove;
             case PaneBlock ignored -> !isAbove;
-            case CauldronBlock ignored -> !isAbove;
+            case CauldronBlock ignored -> isAbove;
             case WallBannerBlock ignored -> !isAbove;
             case BannerBlock ignored -> !isAbove;
             case SignBlock ignored -> !isAbove;
             case WallSignBlock ignored -> !isAbove;
+            case LilyPadBlock ignored -> !isAbove;
+            case AzaleaBlock ignored -> !isAbove;
+            case LanternBlock ignored -> !isAbove;
             case SnowBlock ignored -> isAbove ? state.get(Properties.LAYERS) < 8 : state.get(Properties.LAYERS) == 8;
             default ->
                     isAbove ? !state.isOpaque() && !state.isFullCube(mc.world, pos) : state.isOpaque() || state.isFullCube(mc.world, pos);
@@ -61,15 +64,14 @@ public class EtherwarpOverlay {
 
     @EventHandler
     public static void onRender(WorldRenderEvent event) {
-        if (Config.overlayEtherwarp()) {
+        if (Config.overlayEtherwarp && mc.player != null && !mc.player.isSubmergedInWater()) {
             int dist = getWarpDistance();
             if (dist > 0) {
                 HitResult hitResult = Utils.raycastFullBlock(mc.player, dist, event.tickCounter.getTickProgress(true));
                 if (hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHitResult) {
                     BlockPos pos = blockHitResult.getBlockPos();
-                    Box box = Box.enclosing(pos, pos);
                     boolean valid = isBlockValid(pos, 0) && isBlockValid(pos, 1) && isBlockValid(pos, 2);
-                    event.drawFilled(box, true, valid ? colorCorrect : colorWrong);
+                    event.drawFilled(Box.enclosing(pos, pos), true, valid ? colorCorrect : colorWrong);
                 }
             }
         }

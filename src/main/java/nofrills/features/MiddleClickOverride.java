@@ -49,7 +49,9 @@ public class MiddleClickOverride {
             "The Hex",
             "Enchant Item",
             "Auction",
-            "Trap"
+            "Trap",
+            "Gemstone",
+            "Heart of the "
     );
 
     private static final List<String> matchWhitelist = List.of(
@@ -75,13 +77,22 @@ public class MiddleClickOverride {
         return Utils.getLoreLines(stack).stream().anyMatch(line -> line.equals("Cost") || line.equals("Sell Price") || line.equals("Bazaar Price"));
     }
 
+    private static boolean experimentCheck() {
+        return switch (EnchantingSolver.getExperimentType()) {
+            case Chronomatron -> Config.solveChronomatron;
+            case Ultrasequencer -> Config.solveUltrasequencer;
+            case Superpairs -> Config.solveSuperpairs;
+            default -> true;
+        };
+    }
+
     @EventHandler
     private static void onClick(InputEvent event) {
         if (Config.middleClickOverride() && event.key == GLFW.GLFW_MOUSE_BUTTON_1 && event.modifiers == 0 && event.action == GLFW.GLFW_PRESS) {
             if (mc.currentScreen instanceof GenericContainerScreen container) {
                 String title = container.getTitle().getString();
                 Slot focusedSlot = Utils.getFocusedSlot();
-                if (focusedSlot != null && !isBlacklisted(title) && !Utils.isLeapMenu(title) && !SlotOptions.isSlotDisabled(focusedSlot)) {
+                if (focusedSlot != null && !isBlacklisted(title) && !Utils.isLeapMenu(title) && !SlotOptions.isSlotDisabled(focusedSlot) && experimentCheck()) {
                     ItemStack stack = focusedSlot.getStack();
                     if (!stack.isEmpty()) {
                         if (Utils.getSkyblockId(stack).isEmpty() || isTransaction(stack) || isWhitelisted(container.getTitle().getString())) {

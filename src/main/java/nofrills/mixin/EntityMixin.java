@@ -3,6 +3,7 @@ package nofrills.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
+import nofrills.config.Config;
 import nofrills.misc.EntityRendering;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -13,8 +14,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import static nofrills.Main.Config;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements EntityRendering {
@@ -108,7 +107,7 @@ public abstract class EntityMixin implements EntityRendering {
 
     @ModifyReturnValue(method = "getPose", at = @At("RETURN"))
     private EntityPose getPose(EntityPose original) {
-        if (Utils.isFixEnabled(Config.antiSwim()) && original == EntityPose.SWIMMING) {
+        if (Utils.isFixEnabled(Config.antiSwim) && original == EntityPose.SWIMMING) {
             return EntityPose.STANDING;
         }
         return original;
@@ -116,13 +115,15 @@ public abstract class EntityMixin implements EntityRendering {
 
     @ModifyReturnValue(method = "getFlag", at = @At("RETURN"))
     private boolean getFlag(boolean original, int index) {
-        if (Utils.isFixEnabled(Config.antiSwim()) && index == SWIMMING_FLAG_INDEX) {
-            return false;
-        }
-        if (Utils.isFixEnabled(Config.antiSwim()) && index == SPRINTING_FLAG_INDEX && Utils.isSelf(this)) {
-            if (original && isTouchingWater()) {
-                setSprinting(false);
+        if (Utils.isFixEnabled(Config.antiSwim)) {
+            if (index == SWIMMING_FLAG_INDEX) {
                 return false;
+            }
+            if (index == SPRINTING_FLAG_INDEX && Utils.isSelf(this)) {
+                if (original && isTouchingWater()) {
+                    setSprinting(false);
+                    return false;
+                }
             }
         }
         return original;
@@ -130,7 +131,7 @@ public abstract class EntityMixin implements EntityRendering {
 
     @Inject(method = "setFlag", at = @At("HEAD"), cancellable = true)
     private void setFlag(int index, boolean value, CallbackInfo ci) {
-        if (Utils.isFixEnabled(Config.antiSwim()) && index == SWIMMING_FLAG_INDEX && value) {
+        if (Utils.isFixEnabled(Config.antiSwim) && index == SWIMMING_FLAG_INDEX && value) {
             ci.cancel();
         }
     }

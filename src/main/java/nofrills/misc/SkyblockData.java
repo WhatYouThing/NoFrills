@@ -1,20 +1,18 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
+import nofrills.config.Config;
 import nofrills.events.*;
-import nofrills.hud.HudManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static nofrills.Main.Config;
 import static nofrills.Main.mc;
 
 public class SkyblockData {
@@ -60,18 +58,18 @@ public class SkyblockData {
     private static boolean instanceOver = false;
     private static List<String> lines = new ArrayList<>();
     private static boolean showPing = false;
-    private static int pingTicks = 0;
-    private static int serverTicks = 0;
-    private static int tpsTimer = 0;
 
     private static void updateDungeonClass(String msg) {
         if (mc.player != null) {
-            for (String dungeonClass : dungeonClasses) {
-                if ((msg.startsWith("[" + dungeonClass + "]") && msg.contains("->")) ||
-                        msg.equals(mc.player.getName().getString() + " selected the " + dungeonClass + " Class!") ||
-                        msg.equals("You have selected the " + dungeonClass + " Dungeon Class!")) {
-                    Config.dungeonClass(dungeonClass);
-                    return;
+            String playerName = mc.player.getName().getString();
+            for (String name : dungeonClasses) {
+                String tag = Utils.format("[{}]", name);
+                String selected = Utils.format("{} selected the {} Class!", playerName, name);
+                String selectedHub = Utils.format("You have selected the {} Dungeon Class!", name);
+                String milestone = Utils.format("{} Milestone", name);
+                if (msg.startsWith(tag) || msg.equals(selectedHub) || msg.equals(selected) || msg.startsWith(milestone)) {
+                    Config.dungeonClass = name;
+                    break;
                 }
             }
         }
@@ -119,13 +117,9 @@ public class SkyblockData {
         return new ArrayList<>(lines); // return a copy to avoid a potential concurrent modification exception
     }
 
-    public static void sendPing() {
-        mc.getNetworkHandler().sendPacket(new QueryPingC2SPacket(Util.getMeasuringTimeMs()));
-    }
-
     public static void showPing() {
         showPing = true;
-        sendPing();
+        Utils.sendPingPacket();
     }
 
     @EventHandler
@@ -193,25 +187,13 @@ public class SkyblockData {
         location = "";
         area = "";
         lines.clear();
-        pingTicks = 0;
-        HudManager.lagMeterElement.setTickTime(0); // temporarily disables the element, as the server doesn't send tick packets for a few seconds after joining
-        serverTicks = 0;
-        tpsTimer = 0;
-        HudManager.tpsElement.setTps(0);
     }
 
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
-        if (event.packet instanceof PingResultS2CPacket pingPacket) {
-            long ping = Util.getMeasuringTimeMs() - pingPacket.startTime();
-            if (showPing) {
-                Utils.infoFormat("§aPing: §f{}§7ms", ping);
-                showPing = false;
-            }
-            if (Config.pingEnabled()) {
-                HudManager.pingElement.setPing(ping);
-            }
-            pingTicks = 0;
+        if (showPing && event.packet instanceof PingResultS2CPacket pingPacket) {
+            Utils.infoFormat("§aPing: §f{}§7ms", Util.getMeasuringTimeMs() - pingPacket.startTime());
+            showPing = false;
         }
     }
 
@@ -221,36 +203,6 @@ public class SkyblockData {
             dungeonPower = updateDungeonPower();
         } else if (dungeonPower != 0) {
             dungeonPower = 0;
-        }
-        if (Config.powerEnabled()) {
-            HudManager.powerElement.setPower(dungeonPower);
-        }
-        if (Config.dayEnabled()) {
-            HudManager.dayElement.setDay(mc.world.getTimeOfDay() / 24000L);
-        }
-        if (Config.pingEnabled() && pingTicks <= 20) { // pings every second when element is enabled, waits until ping result is received
-            pingTicks++;
-            if (pingTicks == 20) {
-                sendPing();
-            }
-        }
-        if (Config.tpsEnabled()) {
-            tpsTimer++;
-            if (tpsTimer == 20) {
-                HudManager.tpsElement.setTps(serverTicks);
-                serverTicks = 0;
-                tpsTimer = 0;
-            }
-        }
-    }
-
-    @EventHandler
-    private static void onServerTick(ServerTickEvent event) {
-        if (Config.lagMeterEnabled()) {
-            HudManager.lagMeterElement.setTickTime(Util.getMeasuringTimeMs());
-        }
-        if (Config.tpsEnabled()) {
-            serverTicks++;
         }
     }
 

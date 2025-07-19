@@ -9,6 +9,7 @@ import static nofrills.Main.mc;
 
 public class AutoSprint {
     public static final Feature instance = new Feature("autoSprint");
+
     public static final SettingBool waterCheck = new SettingBool(false, "waterCheck", instance.key());
 
     @EventHandler

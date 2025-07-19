@@ -8,11 +8,14 @@
     "BossBarHudMixin",
     "ChatHudMixin",
     "ClientConnectionMixin",
+    "ClientEntityManagerAccessor",
     "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
+    "ClientWorldAccessor",
     "ClientWorldMixin",
     "CreeperEntityAccessor",
+    "EntityIndexAccessor",
     "EntityMixin",
     "EntityRendererMixin",
     "GameOptionsMixin",
@@ -35,11 +38,11 @@
     "PlayerListHudAccessor",
     "RaycastContextMixin",
     "RenderPipelinesAccessor",
+    "SimpleEntityLookupAccessor",
     "SnowBlockMixin",
     "StatusEffectsDisplayMixin",
     "WorldMixin",
-    "WorldRendererMixin",
-    "external.ConfigWrapperMixin"
+    "WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

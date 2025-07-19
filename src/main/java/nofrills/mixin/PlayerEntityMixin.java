@@ -8,11 +8,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
-import nofrills.misc.Utils;
+import nofrills.features.fixes.OldSneak;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-
-import static nofrills.Main.Config;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
@@ -22,7 +20,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
 
     @ModifyReturnValue(method = "getBaseDimensions", at = @At("RETURN"))
     private EntityDimensions getDimensions(EntityDimensions original, EntityPose pose) {
-        if (Utils.isFixEnabled(Config.oldSneak()) && pose == EntityPose.CROUCHING) {
+        if (OldSneak.active() && pose == EntityPose.CROUCHING) {
             return EntityDimensions.changing(0.6F, 1.8F).withEyeHeight(1.54F);
         }
         return original;

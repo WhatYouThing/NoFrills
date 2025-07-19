@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.events.WorldTickEvent;
+import nofrills.features.general.PriceTooltips;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static nofrills.Main.*;
+import static nofrills.Main.LOGGER;
+import static nofrills.Main.mc;
 
 public class NoFrillsAPI {
     public static final ConcurrentHashMap<String, Long> auctionPricing = new ConcurrentHashMap<>();
@@ -62,7 +64,7 @@ public class NoFrillsAPI {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (Config.fetchPricing() && Utils.isInSkyblock()) {
+        if (PriceTooltips.instance.isActive() && Utils.isInSkyblock()) {
             if (refreshTicks == 0) {
                 if (mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
                     refreshItemPricing();

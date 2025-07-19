@@ -25,7 +25,6 @@ public class ChatWaypoints {
     public static final SettingInt partyDuration = new SettingInt(60, "partyDuration", instance.key());
     public static final SettingBool partyClear = new SettingBool(false, "partyClearOnArrive", instance.key());
     public static final SettingColor partyColor = new SettingColor(RenderColor.fromArgb(0x5555ffaa), "partyColor", instance.key());
-
     public static final SettingBool allWaypoints = new SettingBool(false, "allEnabled", instance.key());
     public static final SettingInt allDuration = new SettingInt(30, "allDuration", instance.key());
     public static final SettingBool allClear = new SettingBool(false, "allClearOnArrive", instance.key());

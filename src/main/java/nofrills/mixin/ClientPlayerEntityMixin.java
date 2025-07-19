@@ -5,12 +5,10 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import nofrills.misc.Utils;
+import nofrills.features.fixes.RidingCameraFix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-
-import static nofrills.Main.Config;
 
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
@@ -26,7 +24,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
 
     @ModifyReturnValue(method = "getYaw", at = @At("RETURN"))
     private float onGetYaw(float original) {
-        if (Utils.isFixEnabled(Config.ridingCamFix())) {
+        if (RidingCameraFix.active()) {
             return getYaw();
         }
         return original;

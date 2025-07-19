@@ -65,15 +65,14 @@ public class EtherwarpOverlay {
 
     @EventHandler
     public static void onRender(WorldRenderEvent event) {
-        if (instance.isActive()) {
+        if (instance.isActive() && mc.player != null && !mc.player.isSubmergedInWater()) {
             int dist = getWarpDistance();
             if (dist > 0) {
                 HitResult hitResult = Utils.raycastFullBlock(mc.player, dist, event.tickCounter.getTickProgress(true));
                 if (hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHitResult) {
                     BlockPos pos = blockHitResult.getBlockPos();
-                    Box box = Box.enclosing(pos, pos);
                     boolean valid = isBlockValid(pos, 0) && isBlockValid(pos, 1) && isBlockValid(pos, 2);
-                    event.drawFilled(box, true, valid ? colorCorrect.value() : colorWrong.value());
+                    event.drawFilled(Box.enclosing(pos, pos), true, valid ? colorCorrect.value() : colorWrong.value());
                 }
             }
         }

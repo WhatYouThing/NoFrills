@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -11,9 +12,7 @@ import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
@@ -41,14 +40,12 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
-import nofrills.config.NoFrillsConfig;
+import net.minecraft.world.entity.ClientEntityManager;
+import net.minecraft.world.entity.EntityIndex;
+import net.minecraft.world.entity.EntityLookup;
 import nofrills.events.WorldTickEvent;
-import nofrills.features.LeapOverlay;
-import nofrills.mixin.HandledScreenAccessor;
-import nofrills.mixin.NbtComponentAccessor;
-import nofrills.mixin.PlayerListHudAccessor;
-import org.apache.commons.compress.utils.Lists;
-import org.lwjgl.glfw.GLFW;
+import nofrills.features.dungeons.LeapOverlay;
+import nofrills.mixin.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -152,7 +149,7 @@ public class Utils {
 
     public static String getCoordsFormatted(String format) {
         Vec3d pos = mc.player.getPos();
-        DecimalFormat decimalFormat = new DecimalFormat("#");
+        DecimalFormat decimalFormat = new DecimalFormat("0");
         return format
                 .replace("{x}", decimalFormat.format(Math.ceil(pos.x)))
                 .replace("{y}", decimalFormat.format(Math.floor(pos.y)))
@@ -255,9 +252,14 @@ public class Utils {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Entity> getEntities() {
-        if (mc.world != null) {
-            return Lists.newArrayList(mc.world.getEntities().iterator());
+        if (mc.world != null) { // only powerful wizards may cast such obscene spells
+            ClientEntityManager<Entity> manager = ((ClientWorldAccessor) mc.world).getManager();
+            EntityLookup<?> lookup = ((ClientEntityManagerAccessor<?>) manager).getLookup();
+            EntityIndex<?> index = ((SimpleEntityLookupAccessor<?>) lookup).getIndex();
+            Int2ObjectMap<?> map = ((EntityIndexAccessor<?>) index).getEntityMap();
+            return (List<Entity>) new ArrayList<>(map.values());
         }
         return new ArrayList<>();
     }
@@ -353,11 +355,6 @@ public class Utils {
         return false;
     }
 
-    public static boolean isFixEnabled(NoFrillsConfig.fixMode mode) {
-        return mode == NoFrillsConfig.fixMode.AlwaysOn || SkyblockData.isInSkyblock() &&
-                ((mode == NoFrillsConfig.fixMode.SkyblockLegacyOnly && !Utils.isOnModernIsland()) || mode == NoFrillsConfig.fixMode.SkyblockOnly);
-    }
-
     /**
      * Returns every line of the stack's lore with no formatting, or else an empty list.
      */
@@ -397,6 +394,20 @@ public class Utils {
             }
         }
         return !getRightClickAbility(stack).isEmpty();
+    }
+
+    public static boolean hasEitherStat(ItemStack stack, String... stats) {
+        List<String> lines = getLoreLines(stack);
+        Iterator<String> iterator = Arrays.stream(stats).iterator();
+        while (iterator.hasNext()) {
+            String stat = iterator.next();
+            for (String line : lines) {
+                if (line.startsWith(stat + ":")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -632,7 +643,7 @@ public class Utils {
     }
 
     public static boolean isLeapMenu(String title) {
-        return Config.leapOverlay() && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
+        return LeapOverlay.instance.isActive() && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
     }
 
     public static void setScreen(Screen screen) {
@@ -658,11 +669,5 @@ public class Utils {
         public static String check = "✔";
         public static String cross = "✖";
         public static String bingo = "Ⓑ";
-    }
-
-    public static class Keybinds {
-        public static final KeyBinding getPearls = new KeyBinding("key.nofrills.refillPearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
-        public static final KeyBinding recipeLookup = new KeyBinding("key.nofrills.recipeLookup", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
-        public static final KeyBinding bindSlots = new KeyBinding("key.nofrills.bindSlots", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
     }
 }

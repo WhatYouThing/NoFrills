@@ -7,9 +7,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Box;
-import nofrills.config.Config;
 import nofrills.events.WorldRenderEvent;
-import nofrills.features.ForagingFeatures;
+import nofrills.features.general.NoRender;
 import nofrills.misc.EntityRendering;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
@@ -40,12 +39,12 @@ public abstract class WorldRendererMixin {
 
     @Inject(method = "renderEntity", at = @At("HEAD"), cancellable = true)
     private void onBeforeRenderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (Config.hideDeadMobs && entity instanceof LivingEntity) {
+        if (NoRender.instance.isActive() && NoRender.deadEntities.value() && entity instanceof LivingEntity) {
             if (!entity.isAlive()) {
                 ci.cancel();
             }
         }
-        if (Config.hideFlyingLogs && ForagingFeatures.isTreeBlock(entity)) {
+        if (NoRender.instance.isActive() && NoRender.treeBits.value() && NoRender.isTreeBlock(entity)) {
             ci.cancel();
         }
     }

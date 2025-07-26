@@ -20,10 +20,7 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
@@ -146,11 +143,10 @@ public class ExperimentSolver {
     }
 
     private static boolean matchSuperStacks(ItemStack first, ItemStack second) {
-        String nameFirst = Formatting.strip(first.getName().getString());
-        String nameSecond = Formatting.strip(second.getName().getString());
-        String loreFirst = String.join(" ", Utils.getLoreLines(first)).trim();
-        String loreSecond = String.join(" ", Utils.getLoreLines(second)).trim();
-        return first.getItem().equals(second.getItem()) && nameFirst.equals(nameSecond) && loreFirst.equals(loreSecond);
+        return first.getItem().equals(second.getItem())
+                && first.getName().getString().equals(second.getName().getString())
+                && first.getCount() == second.getCount()
+                && Objects.equals(Utils.getTextureUrl(first), Utils.getTextureUrl(second));
     }
 
     @EventHandler

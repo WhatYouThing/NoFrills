@@ -22,13 +22,13 @@ public class ChatWaypoints {
     public static final Feature instance = new Feature("chatWaypoints");
 
     public static final SettingBool partyWaypoints = new SettingBool(false, "partyEnabled", instance.key());
-    public static final SettingInt partyDuration = new SettingInt(60, "partyDuration", instance.key());
+    public static final SettingInt partyDuration = new SettingInt(120, "partyDuration", instance.key());
     public static final SettingBool partyClear = new SettingBool(false, "partyClearOnArrive", instance.key());
-    public static final SettingColor partyColor = new SettingColor(RenderColor.fromArgb(0x5555ffaa), "partyColor", instance.key());
+    public static final SettingColor partyColor = new SettingColor(RenderColor.fromArgb(0xaa5555ff), "partyColor", instance.key());
     public static final SettingBool allWaypoints = new SettingBool(false, "allEnabled", instance.key());
-    public static final SettingInt allDuration = new SettingInt(30, "allDuration", instance.key());
+    public static final SettingInt allDuration = new SettingInt(60, "allDuration", instance.key());
     public static final SettingBool allClear = new SettingBool(false, "allClearOnArrive", instance.key());
-    public static final SettingColor allColor = new SettingColor(RenderColor.fromArgb(0x55ffffaa), "allColor", instance.key());
+    public static final SettingColor allColor = new SettingColor(RenderColor.fromArgb(0xaa55ffff), "allColor", instance.key());
 
     private static final List<PlayerWaypoint> waypointList = new ArrayList<>();
     private static final RenderColor textColor = RenderColor.fromHex(0xffffff);

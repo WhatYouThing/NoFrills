@@ -5,12 +5,12 @@ import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Formatting;
+import nofrills.config.Feature;
+import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -20,11 +20,13 @@ import java.util.Arrays;
 import static nofrills.Main.mc;
 
 public class RecipeLookup {
-    public static final KeyBinding bind = new KeyBinding("key.nofrills.recipeLookup", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
+    public static final Feature instance = new Feature("recipeLookup");
+
+    public static final SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "bind", instance.key());
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (bind.matchesKey(event.key, 0) && event.action == GLFW.GLFW_PRESS) {
+        if (keybind.value() == event.key && event.action == GLFW.GLFW_PRESS) {
             if (mc.currentScreen instanceof InventoryScreen || mc.currentScreen instanceof GenericContainerScreen) {
                 Slot focused = Utils.getFocusedSlot();
                 if (focused != null) {

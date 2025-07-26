@@ -68,7 +68,7 @@ public class BossHighlight {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && SlayerUtil.currentBoss != null) {
+        if (instance.isActive() && SlayerUtil.bossAlive && SlayerUtil.currentBoss != null) {
             if (SlayerUtil.currentBoss.equals(SlayerUtil.blaze)) {
                 if (SlayerUtil.isTimer(event.namePlain)) {
                     highlightBlaze(event.entity, event.namePlain);

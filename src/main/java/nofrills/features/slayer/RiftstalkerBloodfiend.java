@@ -37,7 +37,7 @@ public class RiftstalkerBloodfiend {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && SlayerUtil.currentBoss != null && SlayerUtil.currentBoss.equals(SlayerUtil.vampire) && Utils.isInChateau()) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.vampire) && Utils.isInChateau()) {
             if (ice.value() && SlayerUtil.isTimer(event.namePlain) && SlayerUtil.isNearSpawner(event.entity)) {
                 if (event.namePlain.contains("TWINCLAWS")) {
                     iceText = Utils.format("Ice: {}", event.namePlain.split("TWINCLAWS")[1].trim().split(" ")[0]);
@@ -57,7 +57,7 @@ public class RiftstalkerBloodfiend {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInChateau()) {
-            if (SlayerUtil.currentBoss != null && SlayerUtil.currentBoss.equals(SlayerUtil.vampire)) {
+            if (SlayerUtil.isFightingBoss(SlayerUtil.vampire)) {
                 if (ice.value() && !iceText.isEmpty()) {
                     Utils.showTitleCustom(iceText, 1, 25, 4.0f, 0x00ffff);
                 }
@@ -65,15 +65,9 @@ public class RiftstalkerBloodfiend {
                     Utils.showTitleCustom("Steak!", 1, 25, 4.0f, 0xff0000);
                 }
             } else {
-                if (!iceText.isEmpty()) {
-                    iceText = "";
-                }
-                if (shouldSteak) {
-                    shouldSteak = false;
-                }
-                if (!chaliceData.empty()) {
-                    chaliceData.clear();
-                }
+                iceText = "";
+                shouldSteak = false;
+                chaliceData.clear();
             }
         }
     }
@@ -89,7 +83,7 @@ public class RiftstalkerBloodfiend {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && ichor.value() && SlayerUtil.currentBoss != null && SlayerUtil.currentBoss.equals(SlayerUtil.vampire)) {
+        if (instance.isActive() && ichor.value() && SlayerUtil.isFightingBoss(SlayerUtil.vampire)) {
             for (Entity ent : chaliceData.get()) {
                 BlockPos blockPos = Utils.findGround(ent.getBlockPos(), 4);
                 Vec3d pos = ent.getPos();

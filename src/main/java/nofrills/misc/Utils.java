@@ -347,6 +347,10 @@ public class Utils {
         return "";
     }
 
+    public static String getTextureUrl(ItemStack stack) {
+        return getTextureUrl(getTextures(stack));
+    }
+
     public static boolean isTextureEqual(GameProfile profile, String textureId) {
         String url = getTextureUrl(profile);
         if (url != null) {

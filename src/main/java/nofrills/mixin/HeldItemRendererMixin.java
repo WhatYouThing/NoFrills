@@ -32,7 +32,7 @@ public class HeldItemRendererMixin {
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;push()V", shift = At.Shift.AFTER))
     private void onBeforeRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if (Viewmodel.instance.isActive() && Viewmodel.custom.value()) {
+        if (Viewmodel.instance.isActive()) {
             if (hand == Hand.MAIN_HAND) {
                 matrices.translate(Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             } else {
@@ -43,7 +43,7 @@ public class HeldItemRendererMixin {
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemDisplayContext;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"))
     private void onRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if (Viewmodel.instance.isActive() && Viewmodel.custom.value()) {
+        if (Viewmodel.instance.isActive()) {
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Viewmodel.rotX.value()));
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Viewmodel.rotY.value()));
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Viewmodel.rotZ.value()));
@@ -53,7 +53,7 @@ public class HeldItemRendererMixin {
 
     @Inject(method = "renderArmHoldingItem", at = @At("HEAD"))
     private void onBeforeRenderHand(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
-        if (Viewmodel.instance.isActive() && Viewmodel.custom.value()) {
+        if (Viewmodel.instance.isActive()) {
             if (arm == Arm.RIGHT) {
                 matrices.translate(Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             } else {
@@ -64,7 +64,7 @@ public class HeldItemRendererMixin {
 
     @Inject(method = "renderArmHoldingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getRenderer(Lnet/minecraft/entity/Entity;)Lnet/minecraft/client/render/entity/EntityRenderer;"))
     private void onRenderHand(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
-        if (Viewmodel.instance.isActive() && Viewmodel.custom.value()) {
+        if (Viewmodel.instance.isActive()) {
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Viewmodel.rotX.value()));
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Viewmodel.rotY.value()));
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Viewmodel.rotZ.value()));

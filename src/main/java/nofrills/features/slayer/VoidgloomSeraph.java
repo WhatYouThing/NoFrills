@@ -14,7 +14,7 @@ public class VoidgloomSeraph {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && SlayerUtil.currentBoss != null && SlayerUtil.currentBoss.equals(SlayerUtil.voidgloom)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.voidgloom)) {
             if (hits.value() && SlayerUtil.isName(event.namePlain) && SlayerUtil.isNearSpawner(event.entity)) {
                 if (event.namePlain.endsWith("Hits")) {
                     String[] parts = event.namePlain.split(" ");

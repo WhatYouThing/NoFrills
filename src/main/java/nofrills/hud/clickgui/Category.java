@@ -15,6 +15,9 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class Category extends FlowLayout {
+    public List<Module> features;
+    public ScrollContainer<FlowLayout> scroll;
+
     protected Category(String title, List<Module> children) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
         this.margins(Insets.of(5, 0, 5, 0));
@@ -22,16 +25,16 @@ public class Category extends FlowLayout {
         Color textColor = Color.ofArgb(0xffffffff);
         FlowLayout modules = Containers.verticalFlow(Sizing.content(), Sizing.content());
         int categoryWidth = 0;
-        List<Module> childrenMutable = new ArrayList<>(children);
-        for (Module module : childrenMutable) {
+        this.features = new ArrayList<>(children);
+        for (Module module : this.features) {
             categoryWidth = Math.max(categoryWidth, mc.textRenderer.getWidth(module.activeText.getString()) + 10);
         }
-        childrenMutable.sort(Comparator.comparing(module -> module.activeText.getString()));
-        for (Module module : childrenMutable) {
+        this.features.sort(Comparator.comparing(module -> module.activeText.getString()));
+        for (Module module : this.features) {
             module.horizontalSizing(Sizing.fixed(categoryWidth));
             modules.child(module);
         }
-        ParentComponent scroll = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), modules)
+        ScrollContainer<FlowLayout> scroll = Containers.verticalScroll(Sizing.content(), Sizing.fill(80), modules)
                 .scrollbarThiccness(3)
                 .scrollbar(ScrollContainer.Scrollbar.flat(color));
         BaseComponent label = Components.label(Text.literal(title))
@@ -43,6 +46,7 @@ public class Category extends FlowLayout {
                 .alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
                 .padding(Insets.of(3))
                 .surface(Surface.flat(0xff5ca0bf));
+        this.scroll = scroll;
         this.child(header);
         this.child(scroll);
     }

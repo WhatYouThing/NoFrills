@@ -1,10 +1,10 @@
 package nofrills.features.keybinds;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import nofrills.config.Feature;
+import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -12,7 +12,9 @@ import org.lwjgl.glfw.GLFW;
 import static nofrills.Main.mc;
 
 public class PearlRefill {
-    public static final KeyBinding bind = new KeyBinding("key.nofrills.refillPearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
+    public static final Feature instance = new Feature("pearlRefill");
+
+    public static final SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "bind", instance.key());
 
     public static void getPearls() {
         int totalPearls = 0;
@@ -30,7 +32,7 @@ public class PearlRefill {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (bind.matchesKey(event.key, 0) && event.action == GLFW.GLFW_PRESS && mc.currentScreen == null) {
+        if (instance.isActive() && keybind.value() == event.key && event.action == GLFW.GLFW_PRESS && mc.currentScreen == null) {
             getPearls();
             event.cancel();
         }

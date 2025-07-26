@@ -9,8 +9,8 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.util.Util;
-import nofrills.commands.NoFrills;
-import nofrills.commands.Yeet;
+import nofrills.commands.NoFrillsCommand;
+import nofrills.commands.YeetCommand;
 import nofrills.config.Config;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
@@ -48,8 +48,8 @@ public class Main implements ModInitializer {
     public static MinecraftClient mc;
 
     public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess access) {
-        Yeet.init(dispatcher);
-        NoFrills.init(dispatcher);
+        YeetCommand.init(dispatcher);
+        NoFrillsCommand.init(dispatcher);
     }
 
     @Override
@@ -118,6 +118,9 @@ public class Main implements ModInitializer {
         eventBus.subscribe(DungeonReminders.class);
         eventBus.subscribe(DungeonHighlight.class);
         eventBus.subscribe(DeviceSolvers.class);
+        eventBus.subscribe(Fullbright.class);
+        eventBus.subscribe(NoFrillsCommand.class);
+        eventBus.subscribe(YeetCommand.class);
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

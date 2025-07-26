@@ -14,7 +14,7 @@ import static nofrills.Main.mc;
 public class DrainMessage {
     public static final Feature instance = new Feature("drainMessage");
 
-    public static final SettingString message = new SettingString("/pc Used {mana} mana on {players} players.", "message", instance.key());
+    public static final SettingString message = new SettingString("/pc Used {mana} mana on {players} players!", "message", instance.key());
     public static final SettingBool hide = new SettingBool(false, "hide", instance.key());
 
     @EventHandler

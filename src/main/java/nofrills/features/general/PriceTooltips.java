@@ -143,7 +143,7 @@ public class PriceTooltips {
     }
 
     @EventHandler
-    public static void onTooltip(DrawItemTooltip event) {
+    private static void onTooltip(DrawItemTooltip event) {
         if (instance.isActive()) {
             String itemId = parseItemId(event.stack, event.customData, event.title);
             int quantity = getStackQuantity(event.stack, event.title);

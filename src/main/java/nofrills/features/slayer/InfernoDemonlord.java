@@ -41,7 +41,7 @@ public class InfernoDemonlord {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && SlayerUtil.currentBoss == null && pillarClearTicks > 0) {
+        if (instance.isActive() && !SlayerUtil.bossAlive && pillarClearTicks > 0) {
             pillarData.clear();
             pillarClearTicks = 0;
         }
@@ -49,7 +49,7 @@ public class InfernoDemonlord {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (instance.isActive() && SlayerUtil.currentBoss != null && SlayerUtil.currentBoss.equals(SlayerUtil.blaze)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze)) {
             if (pillarClearTicks > 0) {
                 pillarClearTicks--;
                 if (pillarClearTicks == 0) {
@@ -74,7 +74,7 @@ public class InfernoDemonlord {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && pillarAlert.value() && SlayerUtil.currentBoss != null && SlayerUtil.currentBoss.equals(SlayerUtil.blaze)) {
+        if (instance.isActive() && pillarAlert.value() && SlayerUtil.isFightingBoss(SlayerUtil.blaze)) {
             if (event.isSound(SoundEvents.ENTITY_CHICKEN_EGG)) {
                 Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
                 if (pillarData.isEmpty()) {

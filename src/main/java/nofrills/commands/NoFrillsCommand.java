@@ -25,7 +25,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.lit
 import static nofrills.Main.mc;
 import static nofrills.misc.SkyblockData.instances;
 
-public class NoFrills {
+public class NoFrillsCommand {
     private static final LiteralArgumentBuilder<FabricClientCommandSource> queueCommandBuilder = literal("queue").executes(context -> SINGLE_SUCCESS);
 
     public static final ModCommand[] commands = {
@@ -33,8 +33,8 @@ public class NoFrills {
                 Utils.setScreen(new ClickGui());
                 return SINGLE_SUCCESS;
             })),
-            new ModCommand("party", "Allows you to manage the player whitelist and blacklist for the Party Commands feature.", literal("party").executes(context -> {
-                Utils.info("§7List of options: whitelist, blacklist");
+            new ModCommand("partyCommands", "Allows you to manage the player whitelist and blacklist for the Party Commands feature.", literal("partyCommands").executes(context -> {
+                Utils.info("§f§lWhitelist and blacklist§7: You can manage either list with the §f\"/nf partyCommands whitelist/blacklist\" §7command. Whitelisted players always have their commands processed automatically (unless disabled), and blacklisted players always have their commands rejected.\n\n§f§lHow each command mode works§7:\n- Automatic: Automatically process the command.\n- Manual: Adds a button in chat which must be clicked to process the command.\n- Ignore: Rejects the command from any non-whitelisted players.\n- Disabled: The command is fully disabled.");
                 return SINGLE_SUCCESS;
             }).then(literal("whitelist").executes(context -> {
                 Utils.info("§7List of options: add, remove, get, clear");

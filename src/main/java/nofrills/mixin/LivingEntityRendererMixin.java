@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
     @ModifyExpressionValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSneaky()Z"))
     private boolean isSneaking(boolean original, T livingEntity) {
-        if (NoRender.instance.isActive() && NoRender.nametagInvisibility.value() && livingEntity instanceof PlayerEntity) {
+        if (NoRender.instance.isActive() && NoRender.nametagInvisibility.value() && Utils.isInSkyblock() && livingEntity instanceof PlayerEntity) {
             return false;
         }
         return original;
@@ -21,7 +21,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
 
     @ModifyExpressionValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z"))
     private boolean isInvisible(boolean original, T livingEntity) {
-        if (NoRender.instance.isActive() && NoRender.nametagInvisibility.value() && livingEntity instanceof PlayerEntity player && Utils.isPlayer(player)) {
+        if (NoRender.instance.isActive() && NoRender.nametagInvisibility.value() && Utils.isInSkyblock() && livingEntity instanceof PlayerEntity player && Utils.isPlayer(player)) {
             return false;
         }
         return original;

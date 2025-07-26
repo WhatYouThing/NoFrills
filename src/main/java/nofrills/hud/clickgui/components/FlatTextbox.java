@@ -11,6 +11,7 @@ public class FlatTextbox extends TextBoxComponent {
         super(horizontalSizing);
         this.verticalSizing(Sizing.fixed(18));
         this.margins(Insets.of(0, 0, 0, 8));
+        this.setMaxLength(256);
     }
 
     @Override

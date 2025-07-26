@@ -1,12 +1,13 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.inventory.Inventory;
@@ -14,23 +15,41 @@ import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.util.Formatting;
 import nofrills.events.*;
+import nofrills.features.fixes.AnimationFix;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.ArrayList;
 
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
+    @Shadow
+    private CommandDispatcher<CommandSource> commandDispatcher;
+
+    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"))
+    private void onPreTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
+        if (ent.equals(mc.player) && AnimationFix.active()) {
+            for (DataTracker.SerializedEntry<?> entry : new ArrayList<>(packet.trackedValues())) {
+                if (entry.handler().equals(TrackedDataHandlerRegistry.ENTITY_POSE)) {
+                    packet.trackedValues().remove(entry);
+                    break;
+                }
+            }
+        }
+    }
+
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V", shift = At.Shift.AFTER))
     private void onPostTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
         if (ent instanceof LivingEntity) {
             if (ent instanceof ArmorStandEntity) {
-                TrackedDataHandler<?> textComponent = TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT;
                 for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
-                    if (entry.handler().equals(textComponent) && entry.value() != null && ent.getCustomName() != null) {
+                    if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) && entry.value() != null && ent.getCustomName() != null) {
                         eventBus.post(new EntityNamedEvent(ent, Formatting.strip(ent.getCustomName().getString())));
                         break;
                     }

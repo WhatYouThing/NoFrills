@@ -46,6 +46,10 @@ public class SlayerUtil {
         return false;
     }
 
+    public static boolean isFightingBoss(SlayerBoss boss) {
+        return bossAlive && currentBoss != null && currentBoss.equals(boss);
+    }
+
     public static boolean isNearSpawner(Entity entity) {
         for (Entity ent : Utils.getOtherEntities(entity, 1, 3, 1, Utils::isMob)) {
             if (ent instanceof ArmorStandEntity && ent.getCustomName() != null && isSpawner(Formatting.strip(ent.getCustomName().getString()))) {

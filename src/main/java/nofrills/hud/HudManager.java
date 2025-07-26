@@ -1,9 +1,11 @@
 package nofrills.hud;
 
+import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import nofrills.events.*;
 import nofrills.features.fishing.CapTracker;
@@ -43,17 +45,34 @@ public class HudManager {
         return mc.currentScreen instanceof HudEditorScreen;
     }
 
-    @EventHandler
-    private static void onRenderHud(HudRenderEvent event) {
-        if (!isEditingHud()) {
-            for (HudElement element : elements) {
-                element.render(event.context, 0, 0, event.tickCounter.getTickProgress(true));
+    public static void registerAll() {
+        for (HudElement element : elements) {
+            Identifier identifier = element.getIdentifier();
+            if (identifier != null && !Hud.hasComponent(identifier)) {
+                Hud.add(identifier, () -> element);
+            }
+        }
+    }
+
+    public static void unregisterAll() {
+        for (HudElement element : elements) {
+            Identifier identifier = element.getIdentifier();
+            if (identifier != null && Hud.hasComponent(identifier)) {
+                Hud.remove(identifier);
             }
         }
     }
 
     @EventHandler
+    private static void onRenderHud(HudRenderEvent event) {
+        for (HudElement element : HudManager.elements) {
+            element.updatePosition();
+        }
+    }
+
+    @EventHandler
     private static void onJoinServer(ServerJoinEvent event) {
+        registerAll();
         pingTicks = 0;
         lagMeterElement.setTickTime(0); // temporarily disables the element, as the server doesn't send tick packets for a few seconds after joining
         serverTicks = 0;

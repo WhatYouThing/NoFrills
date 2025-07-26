@@ -7,7 +7,7 @@ import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 import static nofrills.Main.mc;
 
-public class Yeet {
+public class YeetCommand {
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {
         dispatcher.register(literal("yeet").executes(context -> {
             mc.stop();

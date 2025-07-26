@@ -18,7 +18,7 @@ import nofrills.misc.Utils;
 public class RareGlow {
     public static final Feature instance = new Feature("rareGlow");
 
-    public static final SettingColor color = new SettingColor(new RenderColor(255, 170, 0, 0), "color", instance.key());
+    public static final SettingColor color = new SettingColor(new RenderColor(255, 170, 0, 255), "color", instance.key());
 
     private static boolean isValidMob(Entity ent) {
         return !Rendering.Entities.isDrawingGlow(ent) && Utils.isMob(ent) && !(ent instanceof GiantEntity);

@@ -3,6 +3,7 @@ package nofrills.hud.clickgui.components;
 import io.wispforest.owo.ui.component.SlimSliderComponent;
 import io.wispforest.owo.ui.core.CursorStyle;
 import io.wispforest.owo.ui.core.OwoUIDrawContext;
+import org.lwjgl.glfw.GLFW;
 
 public class FlatSlider extends SlimSliderComponent {
     public int trackColor;
@@ -13,6 +14,17 @@ public class FlatSlider extends SlimSliderComponent {
         this.trackColor = trackColor;
         this.sliderColor = sliderColor;
         this.cursorStyle(CursorStyle.POINTER);
+        this.keyPress().subscribe((keyCode, scanCode, modifiers) -> {
+            if (keyCode == GLFW.GLFW_KEY_LEFT) {
+                this.value(this.value() - this.stepSize);
+                return true;
+            }
+            if (keyCode == GLFW.GLFW_KEY_RIGHT) {
+                this.value(this.value() + this.stepSize);
+                return true;
+            }
+            return false;
+        });
     }
 
     @Override

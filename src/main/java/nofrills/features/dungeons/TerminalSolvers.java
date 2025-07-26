@@ -26,7 +26,7 @@ public class TerminalSolvers {
     public static final Feature instance = new Feature("terminalSolvers");
 
     public static final SettingBool melody = new SettingBool(false, "melody", instance.key());
-    public static final SettingString melodyMsg = new SettingString("/pc Melody", "melodyMsg", instance.key());
+    public static final SettingString melodyMsg = new SettingString("/pc MELODY", "melodyMsg", instance.key());
 
     private static final List<Item> colorsOrder = List.of(
             Items.GREEN_STAINED_GLASS_PANE,
@@ -38,6 +38,10 @@ public class TerminalSolvers {
     public static boolean isInTerminal = false;
     private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
+
+    public static boolean shouldHideTooltips() {
+        return instance.isActive() && isInTerminal;
+    }
 
     private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
         Item item = stack.getItem();

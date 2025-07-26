@@ -2,6 +2,7 @@ package nofrills.mixin;
 
 import com.google.gson.JsonElement;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -19,6 +20,7 @@ import nofrills.features.dungeons.TerminalSolvers;
 import nofrills.features.fixes.MiddleClickFix;
 import nofrills.features.general.NoRender;
 import nofrills.features.general.SlotBinding;
+import nofrills.features.general.TooltipScale;
 import nofrills.hud.LeapMenuButton;
 import nofrills.misc.*;
 import org.jetbrains.annotations.Nullable;
@@ -138,23 +140,35 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
-    @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), cancellable = true)
     private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if ((TerminalSolvers.instance.isActive() && TerminalSolvers.isInTerminal) || shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot)) {
+        if (TerminalSolvers.shouldHideTooltips() || shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot)) {
             ci.cancel();
+            return;
         }
         if (SlotBinding.instance.isActive() && SlotBinding.lastSlot != -1) {
             ci.cancel();
+            return;
+        }
+        if (TooltipScale.instance.isActive()) {
+            context.getMatrices().push();
+            float scale = (float) TooltipScale.scale.value();
+            context.getMatrices().translate(x - x * scale, y - y * scale, 0);
+            context.getMatrices().scale(scale, scale, 1);
+        }
+    }
+
+    @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V", shift = At.Shift.AFTER))
+    private void onAfterDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
+        if (TooltipScale.instance.isActive()) {
+            context.getMatrices().pop();
         }
     }
 
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;getTooltipFromItem(Lnet/minecraft/item/ItemStack;)Ljava/util/List;"))
-    private List<Text> onGetTooltipFromItem(List<Text> original) {
-        if (focusedSlot != null) {
-            ItemStack stack = focusedSlot.getStack();
-            if (!stack.isEmpty()) {
-                eventBus.post(new DrawItemTooltip(original, stack, Utils.getCustomData(stack), this.getTitle().getString()));
-            }
+    private List<Text> onGetTooltipFromItem(List<Text> original, @Local ItemStack itemStack) {
+        if (!itemStack.isEmpty()) {
+            eventBus.post(new DrawItemTooltip(original, itemStack, Utils.getCustomData(itemStack), this.getTitle().getString()));
         }
         return original;
     }

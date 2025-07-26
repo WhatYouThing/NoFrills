@@ -5,6 +5,7 @@ import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.Box;
 import nofrills.events.WorldRenderEvent;
@@ -39,13 +40,16 @@ public abstract class WorldRendererMixin {
 
     @Inject(method = "renderEntity", at = @At("HEAD"), cancellable = true)
     private void onBeforeRenderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (NoRender.instance.isActive() && NoRender.deadEntities.value() && entity instanceof LivingEntity) {
-            if (!entity.isAlive()) {
+        if (NoRender.instance.isActive()) {
+            if (NoRender.deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()) {
                 ci.cancel();
             }
-        }
-        if (NoRender.instance.isActive() && NoRender.treeBits.value() && NoRender.isTreeBlock(entity)) {
-            ci.cancel();
+            if (NoRender.treeBits.value() && NoRender.isTreeBlock(entity)) {
+                ci.cancel();
+            }
+            if (NoRender.lightning.value() && entity instanceof LightningEntity) {
+                ci.cancel();
+            }
         }
     }
 

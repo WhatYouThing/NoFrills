@@ -2,6 +2,7 @@ package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.mob.GiantEntity;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -11,7 +12,9 @@ import nofrills.config.SettingColor;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldRenderEvent;
+import nofrills.events.WorldTickEvent;
 import nofrills.misc.EntityCache;
+import nofrills.misc.KuudraUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -42,12 +45,8 @@ public class KuudraWaypoints {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && Utils.isInKuudra()) {
-            if (supply.value() && event.namePlain.equals("SUPPLIES")) {
-                supplies.add(event.entity);
-            }
             if (drop.value() && event.namePlain.equals("BRING SUPPLY CHEST HERE")) {
                 dropOffs.add(event.entity);
-
             }
             if (build.value() && event.namePlain.startsWith("PROGRESS: ") && event.namePlain.endsWith("%")) {
                 buildPiles.add(event.entity);
@@ -56,11 +55,30 @@ public class KuudraWaypoints {
     }
 
     @EventHandler
+    private static void onTick(WorldTickEvent event) {
+        if (instance.isActive() && Utils.isInKuudra() && supply.value() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.phase.Collect)) {
+            for (Entity ent : Utils.getEntities()) {
+                if (ent instanceof GiantEntity) {
+                    supplies.add(ent);
+                }
+            }
+        }
+    }
+
+    @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInKuudra()) {
-            if (!supplies.empty()) {
+            if (!supplies.empty() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.phase.Collect)) {
                 for (Entity supply : supplies.get()) {
-                    event.drawBeam(getGround(supply.getPos()), 256, true, supplyColor.value());
+                    float delta = event.tickCounter.getTickProgress(true);
+                    Vec3d pos = supply.getLerpedPos(delta);
+                    float yaw = supply.getYaw(delta);
+                    Vec3d supplyPos = new Vec3d(
+                            pos.getX() + (3.7 * Math.cos((yaw + 130) * (Math.PI / 180))),
+                            73,
+                            pos.getZ() + (3.7 * Math.sin((yaw + 130) * (Math.PI / 180)))
+                    );
+                    event.drawBeam(supplyPos, 256, true, supplyColor.value());
                 }
             }
             if (!dropOffs.empty()) {

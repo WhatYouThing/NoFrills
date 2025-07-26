@@ -5,16 +5,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingColor;
-import nofrills.config.SettingJson;
+import nofrills.config.*;
 import nofrills.events.InputEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -25,13 +20,13 @@ import static nofrills.Main.mc;
 public class SlotBinding {
     public static final Feature instance = new Feature("slotBinding");
 
+    public final static SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "keybind", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
     public static final SettingBool lines = new SettingBool(false, "lines", instance.key());
     public static final SettingBool borders = new SettingBool(false, "borders", instance.key());
     public static final SettingColor binding = new SettingColor(RenderColor.fromHex(0x00ff00), "bindingColor", instance.key());
     public static final SettingColor bound = new SettingColor(RenderColor.fromHex(0x00ffff), "boundColor", instance.key());
 
-    public static final KeyBinding bind = new KeyBinding("key.nofrills.bindSlots", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
     public static int lastSlot = -1;
 
     private static void success(String message) {
@@ -107,7 +102,7 @@ public class SlotBinding {
                     }
                 }
             }
-            if (bind.matchesKey(event.key, 0)) {
+            if (keybind.value() == event.key) {
                 if (event.action == GLFW.GLFW_PRESS && focusedSlot != null) {
                     lastSlot = focusedSlot.id;
                 }
@@ -119,7 +114,7 @@ public class SlotBinding {
                                 data.value().get(hotbarName).getAsJsonObject().add("binds", new JsonArray());
                                 data.value().get(hotbarName).getAsJsonObject().addProperty("last", 0);
                             }
-                            success(Utils.format("Successfully cleared every bound slot from hotbar slot {}.", toHotbarNumber(focusedSlot.id)));
+                            success(Utils.format("Cleared every bind from hotbar slot {}.", toHotbarNumber(focusedSlot.id)));
                         } else if (isValid(focusedSlot.id)) {
                             for (int i = 1; i <= 8; i++) {
                                 String name = "hotbar" + i;
@@ -147,7 +142,7 @@ public class SlotBinding {
                                     for (JsonElement element : array.deepCopy()) {
                                         if (element.getAsInt() == slot) {
                                             array.remove(element);
-                                            alert(Utils.format("The target slot is already bound to hotbar slot {}, replacing with the new bind.", i));
+                                            alert(Utils.format("The target is already bound to hotbar slot {}, replacing the bind.", i));
                                         }
                                     }
                                 }

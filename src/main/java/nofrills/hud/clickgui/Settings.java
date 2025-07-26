@@ -9,6 +9,7 @@ import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.*;
@@ -17,6 +18,7 @@ import nofrills.hud.clickgui.components.FlatSlider;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -27,6 +29,13 @@ import java.util.function.Consumer;
 import static nofrills.Main.mc;
 
 public class Settings extends BaseOwoScreen<FlowLayout> {
+    public static final List<Integer> keybindBlacklist = List.of(
+            GLFW.GLFW_KEY_UNKNOWN,
+            GLFW.GLFW_MOUSE_BUTTON_LEFT,
+            GLFW.GLFW_MOUSE_BUTTON_RIGHT,
+            GLFW.GLFW_MOUSE_BUTTON_MIDDLE,
+            GLFW.GLFW_KEY_ESCAPE
+    );
     public List<FlowLayout> settings;
     public Text title = Text.empty();
 
@@ -59,9 +68,39 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 }
                 continue;
             }
+            if (child instanceof Dropdown<?> dropdown) {
+                height += 30L + 12L * dropdown.setting.values.length;
+                continue;
+            }
             height += 30L;
         }
         return height;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        for (FlowLayout setting : this.settings) {
+            if (setting instanceof Keybind keybind) {
+                if (keybind.isBinding) {
+                    keybind.bind(keyCode);
+                    return true;
+                }
+            }
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        for (FlowLayout setting : this.settings) {
+            if (setting instanceof Keybind keybind) {
+                if (keybind.isBinding) {
+                    keybind.bind(button);
+                    return true;
+                }
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -85,7 +124,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             option.horizontalSizing(Sizing.fixed(width));
             settings.child(option);
         }
-        ParentComponent scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(Math.clamp(getSettingsHeight(settings.children()), 30, 400)), settings)
+        ParentComponent scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(Math.clamp(getSettingsHeight(settings.children()), 30, 800 / mc.options.getGuiScale().getValue())), settings)
                 .scrollbarThiccness(3)
                 .scrollbar(ScrollContainer.Scrollbar.flat(color));
         BaseComponent label = Components.label(this.title)
@@ -381,6 +420,108 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 context.fill(centerX + textWidth + 5, centerY - 1, component.x() + component.width(), centerY + 1, 0xffffffff);
             });
             this.child(label);
+        }
+    }
+
+    public static class Description extends FlowLayout {
+
+        public Description(String name, String description) {
+            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            this.padding(Insets.of(5));
+            this.horizontalAlignment(HorizontalAlignment.LEFT);
+            this.verticalAlignment(VerticalAlignment.CENTER);
+            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            LabelComponent desc = Components.label(Text.literal(description).withColor(0xffffff));
+            desc.verticalTextAlignment(VerticalAlignment.CENTER).verticalSizing(Sizing.content()).horizontalSizing(Sizing.fixed(200));
+            this.child(label);
+            this.child(desc);
+        }
+    }
+
+    public static class TextInput extends FlowLayout {
+        public SettingString setting;
+
+        public TextInput(String name, SettingString setting, String tooltip) {
+            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            this.padding(Insets.of(5));
+            this.horizontalAlignment(HorizontalAlignment.LEFT);
+            this.setting = setting;
+            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            FlatTextbox text = new FlatTextbox(Sizing.fixed(150));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            label.tooltip(Text.literal(tooltip));
+            text.onChanged().subscribe(change -> this.setting.set(text.getText()));
+            text.text(String.valueOf(this.setting.value()));
+            this.child(label);
+            this.child(text);
+            this.child(buildResetButton(btn -> {
+                this.setting.reset();
+                text.setText(String.valueOf(this.setting.value()));
+            }));
+        }
+    }
+
+    public static class Keybind extends FlowLayout {
+        public SettingKeybind setting;
+        public Text unbound = Text.literal("Not Bound").withColor(0xffffff);
+        public Text binding = Text.literal("Press Any Key...").withColor(0xffffff);
+        public boolean isBinding = false;
+        public ButtonComponent button;
+
+        public Keybind(String name, SettingKeybind setting, String tooltip) {
+            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            this.padding(Insets.of(5));
+            this.horizontalAlignment(HorizontalAlignment.LEFT);
+            this.setting = setting;
+            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            label.tooltip(Text.literal(tooltip));
+            this.button = Components.button(Text.empty(), button -> {
+                if (this.isBinding) {
+                    this.bind(GLFW.GLFW_KEY_UNKNOWN);
+                } else {
+                    this.button.setMessage(this.binding);
+                    this.isBinding = true;
+                }
+            });
+            this.button.renderer((context, btn, delta) -> {
+                context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
+                context.drawBorder(btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xff5ca0bf);
+            });
+            this.button.horizontalSizing(Sizing.fixed(100));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            this.bind(this.setting.value());
+            this.child(label);
+            this.child(this.button);
+            this.child(buildResetButton(btn -> {
+                this.setting.reset();
+                this.bind(this.setting.value());
+            }));
+        }
+
+        private void bind(int key) {
+            if (!this.valid(key)) {
+                this.button.setMessage(this.unbound);
+                this.setting.set(GLFW.GLFW_KEY_UNKNOWN);
+            } else {
+                InputUtil.Key input = InputUtil.Type.KEYSYM.createFromCode(key);
+                if (input.getLocalizedText().getString().equals(input.getTranslationKey())) { // fall back to a mouse key if the keyboard key has no translation
+                    this.button.setMessage(InputUtil.Type.MOUSE.createFromCode(key).getLocalizedText());
+                } else {
+                    this.button.setMessage(input.getLocalizedText());
+                }
+                this.setting.set(key);
+            }
+            this.isBinding = false;
+        }
+
+        private boolean valid(int key) {
+            for (int blacklisted : keybindBlacklist) {
+                if (key == blacklisted) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

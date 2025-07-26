@@ -4,8 +4,8 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.misc.Utils;
 
-public class AbilityPlaceFix {
-    public static final Feature instance = new Feature("abilityPlaceFix");
+public class NoAbilityPlace {
+    public static final Feature instance = new Feature("noAbilityPlace");
 
     public static final SettingBool skyblockCheck = new SettingBool(false, "skyblockCheck", instance.key());
     public static final SettingBool modernCheck = new SettingBool(true, "modernCheck", instance.key());

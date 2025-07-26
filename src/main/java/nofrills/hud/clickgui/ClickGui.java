@@ -194,9 +194,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),
                         new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUI's, making navigation smoother."),
                         new Module("No Front Perspective", NoFrontPerspective.instance, "Removes the front facing camera perspective."),
-                        new Module("No Ability Place", AbilityPlaceFix.instance, "Prevents block items with abilities from being placeable client side, such as the Egglocator.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", AbilityPlaceFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", AbilityPlaceFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        new Module("No Ability Place", NoAbilityPlace.instance, "Prevents block items with abilities from being placeable client side, such as the Egglocator.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", NoAbilityPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", NoAbilityPlace.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Anti Swim", AntiSwim.instance, "Prevents the crawling and the swimming animations from activating.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", AntiSwim.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),

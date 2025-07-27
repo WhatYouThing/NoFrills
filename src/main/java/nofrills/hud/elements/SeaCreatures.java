@@ -24,6 +24,7 @@ public class SeaCreatures extends SimpleTextElement {
     public final SettingDouble y = new SettingDouble(0.21, "y", instance.key());
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
+    public final SettingBool zero = new SettingBool(false, "zero", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "sea-creatures-element");
 
@@ -31,7 +32,8 @@ public class SeaCreatures extends SimpleTextElement {
         super(text);
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
-                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text.")
+                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
+                new Settings.Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
         ));
         this.options.setTitle(Text.of("Sea Creatures Element"));
     }
@@ -40,8 +42,13 @@ public class SeaCreatures extends SimpleTextElement {
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (HudManager.isEditingHud()) {
             super.layout.surface(instance.isActive() ? Surface.BLANK : this.disabledSurface);
-        } else if (!instance.isActive()) {
-            return;
+        } else {
+            if (!instance.isActive()) {
+                return;
+            }
+            if (zero.value() && this.text.getString().equals("Sea Creatures: 0")) {
+                return;
+            }
         }
         this.updateShadow(shadow);
         this.updateAlignment(align);

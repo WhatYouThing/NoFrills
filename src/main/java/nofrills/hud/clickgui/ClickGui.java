@@ -22,6 +22,7 @@ import nofrills.features.hunting.CinderbatHighlight;
 import nofrills.features.hunting.FusionKeybinds;
 import nofrills.features.hunting.InvisibugHighlight;
 import nofrills.features.hunting.LassoAlert;
+import nofrills.features.keybinds.CustomKeybinds;
 import nofrills.features.keybinds.PearlRefill;
 import nofrills.features.keybinds.RecipeLookup;
 import nofrills.features.kuudra.*;
@@ -94,7 +95,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Auto Sprint", AutoSprint.instance, "Essentially Toggle Sprint, but always active.", new Settings(List.of(
                                 new Settings.Toggle("Submerged Check", AutoSprint.waterCheck, "Prevents Auto Sprint from working while you are underwater.")
                         ))),
-                        new Module("Update Checker", UpdateChecker.instance, "Automatically checks if a new NoFrills release is available when joining Skyblock."),
+                        new Module("Update Checker", UpdateChecker.instance, "Checks if a NoFrills update is available the first time you join any world/server."),
                         new Module("Slot Binding", SlotBinding.instance, "Bind your hotbar slots to your inventory slots, similarly to NEU's slot binding.", new Settings(List.of(
                                 new Settings.Description("Using Binds", "Shift + Left click on either of the bound slots to swap items between them."),
                                 new Settings.Description("Adding Binds", "Hover over a slot, press the keybind, move your cursor to another slot, and release the keybind."),
@@ -188,7 +189,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of item tooltips.", new Settings(List.of(
                                 new Settings.SliderDouble("Scale", 0.0, 4.0, 0.01, TooltipScale.scale, "The scale multiplier.")
-                        )))
+                        ))),
+                        new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings())
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),

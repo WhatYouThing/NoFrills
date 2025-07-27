@@ -24,6 +24,7 @@ import nofrills.features.hunting.CinderbatHighlight;
 import nofrills.features.hunting.FusionKeybinds;
 import nofrills.features.hunting.InvisibugHighlight;
 import nofrills.features.hunting.LassoAlert;
+import nofrills.features.keybinds.CustomKeybinds;
 import nofrills.features.keybinds.PearlRefill;
 import nofrills.features.keybinds.RecipeLookup;
 import nofrills.features.kuudra.*;
@@ -119,6 +120,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(DungeonHighlight.class);
         eventBus.subscribe(DeviceSolvers.class);
         eventBus.subscribe(Fullbright.class);
+        eventBus.subscribe(CustomKeybinds.class);
         eventBus.subscribe(NoFrillsCommand.class);
         eventBus.subscribe(YeetCommand.class);
 

@@ -23,6 +23,7 @@ public class FishingBobber extends SimpleTextElement {
     public final SettingDouble y = new SettingDouble(0.16, "y", instance.key());
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
+    public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "bobber-element");
 
@@ -30,7 +31,8 @@ public class FishingBobber extends SimpleTextElement {
         super(text);
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
-                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text.")
+                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
+                new Settings.Toggle("Hide If Inactive", inactive, "Hides the element if your fishing bobber is inactive.")
         ));
         this.options.setTitle(Text.of("Bobber Element"));
     }
@@ -39,8 +41,13 @@ public class FishingBobber extends SimpleTextElement {
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (HudManager.isEditingHud()) {
             super.layout.surface(instance.isActive() ? Surface.BLANK : this.disabledSurface);
-        } else if (!instance.isActive()) {
-            return;
+        } else {
+            if (!instance.isActive()) {
+                return;
+            }
+            if (inactive.value() && this.text.getString().equals("Bobber: Inactive")) {
+                return;
+            }
         }
         this.updateShadow(shadow);
         this.updateAlignment(align);

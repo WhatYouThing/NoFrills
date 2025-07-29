@@ -121,6 +121,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(DeviceSolvers.class);
         eventBus.subscribe(Fullbright.class);
         eventBus.subscribe(CustomKeybinds.class);
+        eventBus.subscribe(EndNodeHighlight.class);
         eventBus.subscribe(NoFrillsCommand.class);
         eventBus.subscribe(YeetCommand.class);
 

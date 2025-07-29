@@ -27,6 +27,7 @@ public class SeaCreatures extends SimpleTextElement {
     public final SettingBool zero = new SettingBool(false, "zero", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "sea-creatures-element");
+    private boolean active = false;
 
     public SeaCreatures(Text text) {
         super(text);
@@ -46,7 +47,7 @@ public class SeaCreatures extends SimpleTextElement {
             if (!instance.isActive()) {
                 return;
             }
-            if (zero.value() && this.text.getString().equals("Sea Creatures: 0")) {
+            if (zero.value() && !this.active) {
                 return;
             }
         }
@@ -58,8 +59,10 @@ public class SeaCreatures extends SimpleTextElement {
     public void setCount(int count) {
         if (count > 0) {
             this.setText(Utils.format("§3Sea Creatures: §f{}", count));
+            this.active = true;
         } else {
             this.setText("§3Sea Creatures: §70");
+            this.active = false;
         }
     }
 

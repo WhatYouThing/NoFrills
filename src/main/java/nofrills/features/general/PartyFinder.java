@@ -2,6 +2,7 @@ package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.text.ClickEvent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
@@ -23,18 +24,14 @@ public class PartyFinder {
             if (name.equalsIgnoreCase(mc.getSession().getUsername())) {
                 return;
             }
-            ClickEvent copyName = new ClickEvent.CopyToClipboard(name);
-            ClickEvent profileViewer = new ClickEvent.RunCommand("/pv " + name);
-            ClickEvent kick = new ClickEvent.RunCommand("/party kick " + name);
-            ClickEvent ignoreAdd = new ClickEvent.RunCommand("/ignore add " + name);
-            Text message = Text.literal("§aOptions for §6" + name + "§a: ")
-                    .append(Text.literal("§b§l[COPY NAME]").setStyle(Style.EMPTY.withClickEvent(copyName)))
+            MutableText message = Text.literal("§aOptions for §6" + name + "§a: ")
+                    .append(Text.literal("§b§l[COPY NAME]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.CopyToClipboard(name))))
                     .append(Text.literal(" "))
-                    .append(Text.literal("§a§l[PROFILE VIEWER]").setStyle(Style.EMPTY.withClickEvent(profileViewer)))
+                    .append(Text.literal("§a§l[PROFILE VIEWER]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/pv " + name))))
                     .append(Text.literal(" "))
-                    .append(Text.literal("§c§l[KICK]").setStyle(Style.EMPTY.withClickEvent(kick)))
+                    .append(Text.literal("§c§l[KICK]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/party kick " + name))))
                     .append(Text.literal(" "))
-                    .append(Text.literal("§e§l[BLOCK]").setStyle(Style.EMPTY.withClickEvent(ignoreAdd)));
+                    .append(Text.literal("§e§l[BLOCK]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/ignore add " + name))));
             Utils.infoRaw(message);
         }
     }

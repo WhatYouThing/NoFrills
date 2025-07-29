@@ -26,6 +26,7 @@ public class FishingBobber extends SimpleTextElement {
     public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "bobber-element");
+    private boolean active = false;
 
     public FishingBobber(Text text) {
         super(text);
@@ -45,7 +46,7 @@ public class FishingBobber extends SimpleTextElement {
             if (!instance.isActive()) {
                 return;
             }
-            if (inactive.value() && this.text.getString().equals("Bobber: Inactive")) {
+            if (inactive.value() && !this.active) {
                 return;
             }
         }
@@ -56,10 +57,12 @@ public class FishingBobber extends SimpleTextElement {
 
     public void setActive() {
         this.setText("§cBobber: §aActive");
+        this.active = true;
     }
 
     public void setInactive() {
         this.setText("§cBobber: §7Inactive");
+        this.active = false;
     }
 
     public void setTimer(String timer) {
@@ -68,6 +71,7 @@ public class FishingBobber extends SimpleTextElement {
         } else {
             this.setText(Utils.format("§cBobber: §e§l{}", timer));
         }
+        this.active = true;
     }
 
     @Override

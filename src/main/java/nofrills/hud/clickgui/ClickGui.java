@@ -55,11 +55,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
             for (Category category : this.categories) {
                 for (Module module : category.features) {
                     if (module.isInBoundingBox(this.mouseX, this.mouseY)) {
-                        return category.scroll.onKeyPress(keyCode, scanCode, modifiers);
+                        return category.scroll.onMouseScroll(0, 0, keyCode == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
                     }
                 }
             }
-            return this.mainScroll.onKeyPress(keyCode, scanCode, modifiers);
+            return this.mainScroll.onMouseScroll(0, 0, keyCode == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
         }
     }
 
@@ -68,11 +68,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         for (Category category : this.categories) {
             for (Module module : category.features) {
                 if (module.isInBoundingBox(this.mouseX, this.mouseY)) {
-                    return category.scroll.onKeyPress(verticalAmount > 0 ? GLFW.GLFW_KEY_PAGE_UP : GLFW.GLFW_KEY_PAGE_DOWN, 0, 0);
-                } // normal scrolling is kinda jank, replaced with page up/page down
+                    return category.scroll.onMouseScroll(0, 0, verticalAmount * 2);
+                }
             }
         }
-        return this.mainScroll.onKeyPress(verticalAmount > 0 ? GLFW.GLFW_KEY_PAGE_UP : GLFW.GLFW_KEY_PAGE_DOWN, 0, 0);
+        return this.mainScroll.onMouseScroll(0, 0, verticalAmount * 2);
     }
 
     @Override
@@ -406,6 +406,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Scatha Mining", ScathaMining.instance, "Scatha mining features.", new Settings(List.of(
                                 new Settings.Toggle("Spawn Alert", ScathaMining.alert, "Alerts you when a Worm/Scatha spawns nearby."),
                                 new Settings.Toggle("Cooldown", ScathaMining.cooldown, "Tracks the Worm spawn cooldown for you.")
+                        ))),
+                        new Module("End Node Highlight", EndNodeHighlight.instance, "Highlights Ender Nodes.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, EndNodeHighlight.color, "The color of the node highlight.")
                         )))
                 )),
                 new Category("Farming", List.of(

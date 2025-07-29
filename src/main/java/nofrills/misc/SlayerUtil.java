@@ -15,7 +15,7 @@ import static nofrills.Main.mc;
 
 public class SlayerUtil {
     public static final SlayerBoss revenant = new SlayerBoss("Revenant Horror", List.of("Revenant Horror", "Atoned Horror"), ent -> ent instanceof ZombieEntity);
-    public static final SlayerBoss tarantula = new SlayerBoss("Tarantula Broodfather", List.of("Tarantula Broodfather"), ent -> ent instanceof SpiderEntity);
+    public static final SlayerBoss tarantula = new SlayerBoss("Tarantula Broodfather", List.of("Tarantula Broodfather"), ent -> ent instanceof SpiderEntity && !(ent instanceof CaveSpiderEntity));
     public static final SlayerBoss sven = new SlayerBoss("Sven Packmaster", List.of("Sven Packmaster"), ent -> ent instanceof WolfEntity);
     public static final SlayerBoss voidgloom = new SlayerBoss("Voidgloom Seraph", List.of("Voidgloom Seraph"), ent -> ent instanceof EndermanEntity);
     public static final SlayerBoss vampire = new SlayerBoss("Riftstalker Bloodfiend", List.of("Bloodfiend"), ent -> ent instanceof PlayerEntity player && !Utils.isPlayer(player));
@@ -37,13 +37,6 @@ public class SlayerUtil {
 
     public static boolean isName(String name) {
         return currentBoss != null && currentBoss.entityNames.stream().anyMatch(name::contains);
-    }
-
-    public static boolean isBoss(Entity entity) {
-        if (currentBoss != null) {
-            return currentBoss.predicate.test(entity);
-        }
-        return false;
     }
 
     public static boolean isFightingBoss(SlayerBoss boss) {

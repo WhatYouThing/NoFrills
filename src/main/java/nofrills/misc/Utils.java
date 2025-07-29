@@ -29,6 +29,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.ClickEvent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -59,7 +60,7 @@ import java.util.stream.Collectors;
 import static nofrills.Main.*;
 
 public class Utils {
-    public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0xff5555, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
+    public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     public static final Pattern partyMessagePattern = Pattern.compile("Party > .*: .*");
     private static final Random soundRandom = Random.create(0);
     private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
@@ -95,15 +96,17 @@ public class Utils {
     }
 
     public static void sendMessage(String message) {
-        if (message.startsWith("/")) {
-            mc.player.networkHandler.sendChatCommand(message.substring(1));
-        } else {
-            mc.player.networkHandler.sendChatMessage(message);
+        if (mc.player != null) {
+            if (message.startsWith("/")) {
+                mc.player.networkHandler.sendChatCommand(message.substring(1));
+            } else {
+                mc.player.networkHandler.sendChatMessage(message);
+            }
         }
     }
 
     public static void info(String message) {
-        mc.inGameHud.getChatHud().addMessage(Text.of("§c[NoFrills]§r " + message + "§r"), null, noFrillsIndicator);
+        infoRaw(Text.literal(message));
     }
 
     public static void infoNoPrefix(String message) {
@@ -112,20 +115,23 @@ public class Utils {
 
     public static void infoButton(String message, String command) {
         ClickEvent click = new ClickEvent.RunCommand(command);
-        mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r " + message + "§r").setStyle(Style.EMPTY.withClickEvent(click)), null, noFrillsIndicator);
+        MutableText text = Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click));
+        infoRaw(text);
     }
 
     public static void infoLink(String message, String url) {
         ClickEvent click = new ClickEvent.OpenUrl(URI.create(url));
-        mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r " + message + "§r").setStyle(Style.EMPTY.withClickEvent(click)), null, noFrillsIndicator);
+        MutableText text = Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click));
+        infoRaw(text);
     }
 
-    public static void infoRaw(Text message) {
-        mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r ").append(message).append("§r"), null, noFrillsIndicator);
+    public static void infoRaw(MutableText message) {
+        MutableText tag = Text.literal("[NoFrills] ").withColor(0x5ca0bf);
+        mc.inGameHud.getChatHud().addMessage(tag.append(message.withColor(0xffffff)).append("§r"), null, noFrillsIndicator);
     }
 
     public static void infoFormat(String message, Object... values) {
-        mc.inGameHud.getChatHud().addMessage(Text.of("§c[NoFrills]§r " + format(message, values) + "§r"), null, noFrillsIndicator);
+        infoRaw(Text.literal(format(message, values)));
     }
 
     /**

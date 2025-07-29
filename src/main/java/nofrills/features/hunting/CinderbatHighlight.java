@@ -34,7 +34,7 @@ public class CinderbatHighlight {
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInArea("Crimson Isle") && event.entity instanceof BatEntity bat) {
-            if (bat.getHealth() > 6.0f && !cinderbatList.has(event.entity)) {
+            if (bat.getHealth() > 20.0f && bat.getMaxHealth() == 6.0f && !cinderbatList.has(event.entity)) {
                 cinderbatList.add(event.entity);
             }
         }

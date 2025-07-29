@@ -18,6 +18,7 @@ import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.KeybindButton;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.glfw.GLFW;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -30,6 +31,7 @@ import static nofrills.Main.mc;
 public class Settings extends BaseOwoScreen<FlowLayout> {
     public List<FlowLayout> settings;
     public Text title = Text.empty();
+    public ScrollContainer<FlowLayout> scroll;
 
     public Settings(List<FlowLayout> settings) {
         this.settings = settings;
@@ -81,7 +83,17 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 }
             }
         }
+        if (keyCode == GLFW.GLFW_KEY_PAGE_UP || keyCode == GLFW.GLFW_KEY_PAGE_DOWN) {
+            this.scroll.onMouseScroll(0, 0, keyCode == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+            return true;
+        }
         return super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        this.scroll.onMouseScroll(0, 0, verticalAmount * 2);
+        return true;
     }
 
     @Override
@@ -110,7 +122,6 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         root.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         FlowLayout parent = Containers.verticalFlow(Sizing.content(), Sizing.content());
         parent.padding(Insets.of(5));
-        Color color = Color.ofArgb(0xff5ca0bf);
         Color textColor = Color.ofArgb(0xffffffff);
         FlowLayout settings = Containers.verticalFlow(Sizing.content(), Sizing.content());
         settings.surface(Surface.flat(0xaa000000)).alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER);
@@ -120,9 +131,9 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             option.horizontalSizing(Sizing.fixed(width));
             settings.child(option);
         }
-        ParentComponent scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(getSettingsHeight(settings.children())), settings)
-                .scrollbarThiccness(3)
-                .scrollbar(ScrollContainer.Scrollbar.flat(color));
+        this.scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(getSettingsHeight(settings.children())), settings)
+                .scrollbarThiccness(5)
+                .scrollbar(ScrollContainer.Scrollbar.flat(textColor));
         BaseComponent label = Components.label(this.title)
                 .color(textColor)
                 .horizontalTextAlignment(HorizontalAlignment.CENTER)
@@ -133,7 +144,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 .padding(Insets.of(3))
                 .surface(Surface.flat(0xff5ca0bf));
         parent.child(header);
-        parent.child(scroll);
+        parent.child(this.scroll);
         root.child(parent);
     }
 

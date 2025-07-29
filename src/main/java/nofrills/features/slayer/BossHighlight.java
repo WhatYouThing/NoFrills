@@ -33,14 +33,7 @@ public class BossHighlight {
         List<Entity> other = Utils.getOtherEntities(ent, 1, 3, 1, SlayerUtil.currentBoss.predicate);
         Entity owner = Utils.findNametagOwner(ent, other);
         if (owner != null) {
-            RenderColor fill = getBlazeFillColor(attunement);
-            RenderColor outline = getBlazeOutlineColor(attunement);
-            if (!highlightStyle.value().equals(style.Outline)) {
-                Rendering.Entities.drawFilled(owner, fill != null, fill);
-            }
-            if (!highlightStyle.value().equals(style.Filled)) {
-                Rendering.Entities.drawOutline(owner, outline != null, outline);
-            }
+            applyHighlight(owner, getBlazeFillColor(attunement), getBlazeOutlineColor(attunement));
         }
     }
 
@@ -66,6 +59,15 @@ public class BossHighlight {
         };
     }
 
+    private static void applyHighlight(Entity ent, RenderColor fillColor, RenderColor outlineColor) {
+        if (!highlightStyle.value().equals(style.Outline)) {
+            Rendering.Entities.drawFilled(ent, fillColor != null, fillColor);
+        }
+        if (!highlightStyle.value().equals(style.Filled)) {
+            Rendering.Entities.drawOutline(ent, outlineColor != null, outlineColor);
+        }
+    }
+
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && SlayerUtil.bossAlive && SlayerUtil.currentBoss != null) {
@@ -77,11 +79,11 @@ public class BossHighlight {
                 List<Entity> other = Utils.getOtherEntities(event.entity, 1, 3, 1, SlayerUtil.currentBoss.predicate);
                 Entity owner = Utils.findNametagOwner(event.entity, other);
                 if (owner != null) {
-                    if (!highlightStyle.value().equals(style.Outline)) {
-                        Rendering.Entities.drawFilled(owner, true, fillColor.value());
-                    }
-                    if (!highlightStyle.value().equals(style.Filled)) {
-                        Rendering.Entities.drawOutline(owner, true, outlineColor.value());
+                    applyHighlight(owner, fillColor.value(), outlineColor.value());
+                    if (owner.hasVehicle()) {
+                        applyHighlight(owner.getVehicle(), fillColor.value(), outlineColor.value());
+                    } else if (owner.hasPassengers()) {
+                        applyHighlight(owner.getFirstPassenger(), fillColor.value(), outlineColor.value());
                     }
                 }
             }

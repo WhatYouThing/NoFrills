@@ -1,6 +1,7 @@
 package nofrills;
 
 import com.mojang.brigadier.CommandDispatcher;
+import io.wispforest.owo.config.ui.ConfigScreenProviders;
 import meteordevelopment.orbit.EventBus;
 import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ModInitializer;
@@ -34,6 +35,7 @@ import nofrills.features.solvers.CalendarDate;
 import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
 import nofrills.hud.HudManager;
+import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +63,11 @@ public class Main implements ModInitializer {
 
         Config.load();
 
-        eventBus.registerLambdaFactory("nofrills", (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
+        ConfigScreenProviders.register(MOD_ID, screen -> new ClickGui());
+
+        ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
+
+        eventBus.registerLambdaFactory(MOD_ID, (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
 
         eventBus.subscribe(SkyblockData.class);
         eventBus.subscribe(SlotOptions.class);
@@ -122,10 +128,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(Fullbright.class);
         eventBus.subscribe(CustomKeybinds.class);
         eventBus.subscribe(EndNodeHighlight.class);
-        eventBus.subscribe(NoFrillsCommand.class);
-        eventBus.subscribe(YeetCommand.class);
-
-        ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

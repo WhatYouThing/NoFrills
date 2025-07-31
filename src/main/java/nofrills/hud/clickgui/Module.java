@@ -1,11 +1,10 @@
 package nofrills.hud.clickgui;
 
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
+import nofrills.hud.clickgui.components.PlainLabel;
 import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
@@ -15,7 +14,7 @@ public class Module extends FlowLayout {
     public Feature feature;
     public Text activeText;
     public Text inactiveText;
-    public LabelComponent label;
+    public PlainLabel label;
     public Settings options;
 
     public Module(String name, Feature feature, String tooltip) {
@@ -26,7 +25,7 @@ public class Module extends FlowLayout {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
         this.activeText = Text.literal(name).withColor(0x5ca0bf);
         this.inactiveText = Text.literal(name).withColor(0xdddddd);
-        this.label = Components.label(Text.literal(name));
+        this.label = new PlainLabel(Text.literal(name));
         this.label.horizontalTextAlignment(HorizontalAlignment.LEFT).verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(5));
         this.label.tooltip(Text.literal(tooltip));
         this.child(label);

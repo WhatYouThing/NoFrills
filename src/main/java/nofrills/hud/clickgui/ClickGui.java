@@ -5,6 +5,7 @@ import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
+import io.wispforest.owo.ui.core.Component;
 import io.wispforest.owo.ui.core.OwoUIAdapter;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.Surface;
@@ -31,9 +32,11 @@ import nofrills.features.slayer.*;
 import nofrills.features.solvers.CalendarDate;
 import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
+import nofrills.hud.clickgui.components.PlainLabel;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClickGui extends BaseOwoScreen<FlowLayout> {
@@ -41,6 +44,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     public ScrollContainer<FlowLayout> mainScroll;
     public int mouseX = 0;
     public int mouseY = 0;
+
+    private boolean matchSearch(String text, String search) {
+        return text.toLowerCase().replaceAll(" ", "").contains(search.toLowerCase().replaceAll(" ", ""));
+    }
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
@@ -163,6 +170,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Party Commands", PartyCommands.instance, "Provide various commands to your party members.", new Settings(List.of(
                                 new Settings.Description("Usage", "Run the \"/nf partyCommands\" command to see more information."),
                                 new Settings.TextInput("Prefixes", PartyCommands.prefixes, "List of valid prefixes for these commands, separated by space."),
+                                new Settings.Toggle("Self Commands", PartyCommands.self, "Allows you to trigger your own party commands and grants you whitelisted status, not recommended."),
                                 new Settings.Dropdown<>("!warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand."),
                                 new Settings.Dropdown<>("!pt", PartyCommands.transfer, "Allows party members to promote themselves to party leader on demand."),
                                 new Settings.Dropdown<>("!allinv", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand."),
@@ -421,6 +429,52 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         for (Category category : this.categories) {
             parent.child(category);
         }
+        SearchBox search = new SearchBox();
+        search.input.onChanged().subscribe(value -> {
+            if (value.isEmpty()) {
+                for (Category category : this.categories) {
+                    category.scroll.child().clearChildren();
+                    for (Module module : category.features) {
+                        module.horizontalSizing(Sizing.fixed(category.categoryWidth));
+                        category.scroll.child().child(module);
+                    }
+                }
+            } else {
+                for (Category category : this.categories) {
+                    List<Module> features = new ArrayList<>(category.features);
+                    features.removeIf(feature -> {
+                        if (matchSearch(feature.label.getText(), value) || matchSearch(feature.label.getTooltip(), value)) {
+                            return false;
+                        }
+                        for (Component child : feature.children()) {
+                            if (child instanceof PlainLabel label) {
+                                if (matchSearch(label.getText(), value) || matchSearch(label.getTooltip(), value)) {
+                                    return false;
+                                }
+                            }
+                        }
+                        if (feature.options != null) {
+                            for (FlowLayout setting : feature.options.settings) {
+                                for (Component child : setting.children()) {
+                                    if (child instanceof PlainLabel label) {
+                                        if (matchSearch(label.getText(), value) || matchSearch(label.getTooltip(), value)) {
+                                            return false;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        return true;
+                    });
+                    category.scroll.child().clearChildren();
+                    for (Module module : features) {
+                        module.horizontalSizing(Sizing.fixed(category.categoryWidth));
+                        category.scroll.child().child(module);
+                    }
+                }
+            }
+        });
+        parent.child(search);
         ScrollContainer<FlowLayout> scroll = Containers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
         this.mainScroll = scroll;
         root.child(scroll);

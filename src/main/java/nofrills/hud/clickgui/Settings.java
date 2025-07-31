@@ -12,10 +12,7 @@ import io.wispforest.owo.ui.core.*;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.*;
-import nofrills.hud.clickgui.components.EnumCollapsible;
-import nofrills.hud.clickgui.components.FlatSlider;
-import nofrills.hud.clickgui.components.FlatTextbox;
-import nofrills.hud.clickgui.components.KeybindButton;
+import nofrills.hud.clickgui.components.*;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -60,10 +57,6 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 } else {
                     height += 70;
                 }
-                continue;
-            }
-            if (child instanceof Dropdown<?> dropdown) {
-                height += 30 + (12 * dropdown.setting.values.length);
                 continue;
             }
             height += 30;
@@ -134,7 +127,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         this.scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(getSettingsHeight(settings.children())), settings)
                 .scrollbarThiccness(5)
                 .scrollbar(ScrollContainer.Scrollbar.flat(textColor));
-        BaseComponent label = Components.label(this.title)
+        BaseComponent label = new PlainLabel(this.title)
                 .color(textColor)
                 .horizontalTextAlignment(HorizontalAlignment.CENTER)
                 .verticalTextAlignment(VerticalAlignment.CENTER);
@@ -172,7 +165,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.setting = setting;
             this.enabledText = Text.literal("Enabled").withColor(0x55ff55);
             this.disabledText = Text.literal("Disabled").withColor(0xff5555);
-            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            LabelComponent label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             label.tooltip(Text.literal(tooltip));
             this.toggle = Components.button(Text.empty(), button -> {
                 boolean value = this.setting.value();
@@ -211,7 +204,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.setting = setting;
-            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            LabelComponent label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
             FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
             slider.min(min).max(max).stepSize(step).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
@@ -249,7 +242,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.setting = setting;
-            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            LabelComponent label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
             FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
             slider.min(min).max(max).stepSize(step).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
@@ -287,7 +280,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.setting = setting;
-            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            LabelComponent label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             EnumCollapsible dropdown = new EnumCollapsible(this.setting.value().name());
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
@@ -322,7 +315,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.verticalAlignment(VerticalAlignment.CENTER);
             this.setting = setting;
-            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            LabelComponent label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
             FlowLayout colorDisplay = Containers.verticalFlow(Sizing.fixed(20), Sizing.fixed(20));
@@ -334,7 +327,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 }
                 int id = i;
                 FlowLayout row = Containers.horizontalFlow(Sizing.content(), Sizing.content());
-                LabelComponent colorLabel = Components.label(Text.literal(getColorLabel(id)).withColor(0xffffff));
+                LabelComponent colorLabel = new PlainLabel(Text.literal(getColorLabel(id)).withColor(0xffffff));
                 colorLabel.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
                 FlatTextbox text = new FlatTextbox(Sizing.fixed(30));
                 FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
@@ -418,7 +411,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.verticalSizing(Sizing.fixed(30));
             MutableText text = Text.literal(name);
             int textWidth = mc.textRenderer.getWidth(text) / 2;
-            LabelComponent label = Components.label(text.withColor(0xffffff));
+            LabelComponent label = new PlainLabel(text.withColor(0xffffff));
             label.verticalTextAlignment(VerticalAlignment.CENTER).verticalSizing(Sizing.fixed(30));
             this.surface((context, component) -> {
                 int centerX = component.x() + component.width() / 2;
@@ -437,9 +430,9 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.verticalAlignment(VerticalAlignment.CENTER);
-            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            LabelComponent label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            LabelComponent desc = Components.label(Text.literal(description).withColor(0xffffff));
+            LabelComponent desc = new PlainLabel(Text.literal(description).withColor(0xffffff));
             desc.verticalTextAlignment(VerticalAlignment.CENTER).verticalSizing(Sizing.content()).horizontalSizing(Sizing.fixed(200));
             this.child(label);
             this.child(desc);
@@ -454,7 +447,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.setting = setting;
-            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            LabelComponent label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(150));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
@@ -478,7 +471,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.setting = setting;
-            LabelComponent label = Components.label(Text.literal(name).withColor(0xffffff));
+            LabelComponent label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             label.tooltip(Text.literal(tooltip));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             this.button = new KeybindButton();

@@ -6,10 +6,7 @@ import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import nofrills.config.Feature;
-import nofrills.config.SettingEnum;
-import nofrills.config.SettingJson;
-import nofrills.config.SettingString;
+import nofrills.config.*;
 import nofrills.events.PartyChatMsgEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SkyblockData;
@@ -19,6 +16,7 @@ public class PartyCommands {
     public static final Feature instance = new Feature("partyCommands");
 
     public static final SettingString prefixes = new SettingString("! ?", "prefixes", instance.key());
+    public static final SettingBool self = new SettingBool(false, "self", instance.key());
     public static final SettingJson lists = new SettingJson(new JsonObject(), "lists", instance.key());
     public static final SettingEnum<behavior> warp = new SettingEnum<>(behavior.Disabled, behavior.class, "warp", instance.key());
     public static final SettingEnum<behavior> transfer = new SettingEnum<>(behavior.Disabled, behavior.class, "transfer", instance.key());
@@ -73,7 +71,10 @@ public class PartyCommands {
 
     @EventHandler
     private static void onPartyMessage(PartyChatMsgEvent event) {
-        if (instance.isActive() && !prefixes.value().isEmpty() && !event.self) {
+        if (instance.isActive() && !prefixes.value().isEmpty()) {
+            if (!self.value() && event.self) {
+                return;
+            }
             String msg = event.message.toLowerCase();
             String author = event.sender.toLowerCase();
             for (String prefix : prefixes.value().split(" ")) {
@@ -81,7 +82,7 @@ public class PartyCommands {
                     if (isOnList(author, "blacklist")) {
                         return;
                     }
-                    boolean whitelisted = isOnList(author, "whitelist");
+                    boolean whitelisted = event.self || isOnList(author, "whitelist");
                     String command = msg.replace(prefix, "");
                     if (!warp.value().equals(behavior.Disabled) && command.startsWith("warp")) {
                         if (whitelisted || warp.value().equals(behavior.Automatic)) {

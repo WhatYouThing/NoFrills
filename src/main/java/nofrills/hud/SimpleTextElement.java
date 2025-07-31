@@ -1,6 +1,5 @@
 package nofrills.hud;
 
-import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
@@ -9,6 +8,7 @@ import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.text.Text;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
+import nofrills.hud.clickgui.components.PlainLabel;
 
 public class SimpleTextElement extends HudElement {
     public Text text;
@@ -19,7 +19,7 @@ public class SimpleTextElement extends HudElement {
         super(Containers.verticalFlow(Sizing.content(), Sizing.content()));
         this.text = text;
         this.defaultText = text;
-        this.label = Components.label(text);
+        this.label = new PlainLabel(text);
         this.label.margins(Insets.of(2));
         this.layout.child(this.label);
     }

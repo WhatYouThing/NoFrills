@@ -11,7 +11,8 @@ import java.nio.file.Path;
 import static nofrills.Main.LOGGER;
 
 public class Config {
-    private static final Path filePath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills/Configuration.json");
+    private static final Path folderPath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills");
+    private static final Path filePath = folderPath.resolve("Configuration.json");
     private static JsonObject data = new JsonObject();
 
     public static void load() {
@@ -28,6 +29,9 @@ public class Config {
 
     public static void save() {
         try {
+            if (!Files.exists(folderPath)) {
+                Files.createDirectory(folderPath);
+            }
             Files.writeString(filePath, data.toString());
         } catch (IOException exception) {
             LOGGER.error("Unable to save config file!", exception);

@@ -265,7 +265,7 @@ public class Utils {
     public static List<Entity> getOtherEntities(Entity except, Box box, Predicate<? super Entity> filter) {
         List<Entity> entities = new ArrayList<>();
         for (Entity ent : getEntities()) {
-            if (ent != except && (filter == null || filter.test(ent)) && ent.getBoundingBox().intersects(box)) {
+            if (ent != null && ent != except && (filter == null || filter.test(ent)) && ent.getBoundingBox().intersects(box)) {
                 entities.add(ent);
             }
         }

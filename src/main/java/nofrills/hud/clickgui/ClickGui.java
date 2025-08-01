@@ -33,6 +33,7 @@ import nofrills.features.solvers.CalendarDate;
 import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
 import nofrills.hud.clickgui.components.PlainLabel;
+import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -171,12 +172,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Description("Usage", "Run the \"/nf partyCommands\" command to see more information."),
                                 new Settings.TextInput("Prefixes", PartyCommands.prefixes, "List of valid prefixes for these commands, separated by space."),
                                 new Settings.Toggle("Self Commands", PartyCommands.self, "Allows you to trigger your own party commands and grants you whitelisted status, not recommended."),
-                                new Settings.Dropdown<>("!warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand."),
-                                new Settings.Dropdown<>("!pt", PartyCommands.transfer, "Allows party members to promote themselves to party leader on demand."),
-                                new Settings.Dropdown<>("!allinv", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand."),
-                                new Settings.Dropdown<>("!dt", PartyCommands.downtime, "Allows party members to schedule downtime reminders for the end of your Kuudra/Dungeons run."),
-                                new Settings.Dropdown<>("!f7", PartyCommands.queue, "Enables a full set of instance queue commands. The list can be found under the \"/nf queue\" command."),
-                                new Settings.Dropdown<>("!coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.")
+                                new Settings.Dropdown<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommand: !warp"),
+                                new Settings.Dropdown<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves to party leader on demand.\n\nCommand: !pt"),
+                                new Settings.Dropdown<>("All Invite", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand.\n\nCommand: !allinv"),
+                                new Settings.Dropdown<>("Downtime", PartyCommands.downtime, "Allows party members to schedule a downtime reminder for the end of your Kuudra/Dungeons run.\n\nCommand: !dt"),
+                                new Settings.Dropdown<>("Instance Queue", PartyCommands.queue, Utils.format("Allows party members to queue for any instance on demand.\n\nCommand List: {}", PartyCommands.listInstancesFormatted())),
+                                new Settings.Dropdown<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords")
                         ))),
                         new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(
                                 new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
@@ -445,13 +446,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                     features.removeIf(feature -> {
                         if (matchSearch(feature.label.getText(), value) || matchSearch(feature.label.getTooltip(), value)) {
                             return false;
-                        }
-                        for (Component child : feature.children()) {
-                            if (child instanceof PlainLabel label) {
-                                if (matchSearch(label.getText(), value) || matchSearch(label.getTooltip(), value)) {
-                                    return false;
-                                }
-                            }
                         }
                         if (feature.options != null) {
                             for (FlowLayout setting : feature.options.settings) {

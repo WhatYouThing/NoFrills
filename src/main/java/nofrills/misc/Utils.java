@@ -7,7 +7,6 @@ import com.mojang.authlib.properties.Property;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -47,10 +46,12 @@ import net.minecraft.world.entity.EntityLookup;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.dungeons.LeapOverlay;
 import nofrills.mixin.*;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
@@ -447,32 +448,26 @@ public class Utils {
                 .collect(Collectors.joining(" ")).trim();
     }
 
-    private static String[] getVersionNumber(String version) {
-        if (version.startsWith("mod_version=")) {
-            return version.replace("mod_version=", "").split("\\.");
+    private static int getVersionNumber(String version) {
+        try {
+            String[] numbers = version.split("\\.");
+            return Integer.parseInt(numbers[0]) * 1000 + Integer.parseInt(numbers[1]) * 100 + Integer.parseInt(numbers[2]);
+        } catch (RuntimeException ignored) {
+            return 0;
         }
-        return null;
     }
 
     public static void checkUpdate(boolean notifyIfMatch) {
         new Thread(() -> {
-            String propertiesURL = "https://raw.githubusercontent.com/WhatYouThing/NoFrills/refs/heads/main/gradle.properties";
             try {
-                ModMetadata metadata = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata();
-                String version = metadata.getVersion().getFriendlyString();
-                if (version.equals("${version}")) {
-                    version = "0.0.0";
-                }
-                String[] versionLocal = version.split("\\.");
-                InputStream connection = URI.create(propertiesURL).toURL().openStream();
-                for (Scanner iteratorNewest = new Scanner(connection); iteratorNewest.hasNext(); ) {
-                    String[] versionNewest = getVersionNumber(iteratorNewest.next());
-                    if (versionNewest != null) {
-                        for (int i = 0; i <= versionLocal.length - 1; i++) {
-                            if (Integer.parseInt(versionLocal[i]) < Integer.parseInt(versionNewest[i])) {
-                                infoLink("§a§lNew version available! §aClick here to open the Modrinth releases page. §7Current: " + String.join(".", versionLocal) + ", Newest: " + String.join(".", versionNewest), "https://modrinth.com/mod/nofrills/versions");
-                                return;
-                            }
+                String version = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata().getVersion().getFriendlyString();
+                InputStream connection = URI.create("https://raw.githubusercontent.com/WhatYouThing/NoFrills/refs/heads/main/gradle.properties").toURL().openStream();
+                for (String line : IOUtils.toString(connection, StandardCharsets.UTF_8).split("\n")) {
+                    if (line.startsWith("mod_version=")) {
+                        String newest = line.replace("mod_version=", "");
+                        if (getVersionNumber(newest) > getVersionNumber(version)) {
+                            infoLink(Utils.format("§a§lNew version available! §aClick here to open the Modrinth releases page. §7Current: {}, Newest: {}", version, newest), "https://modrinth.com/mod/nofrills/versions");
+                            return;
                         }
                     }
                 }

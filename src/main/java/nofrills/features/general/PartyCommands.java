@@ -42,6 +42,14 @@ public class PartyCommands {
         downtimeNeeded = false;
     }
 
+    public static String listInstancesFormatted() {
+        StringBuilder builder = new StringBuilder();
+        for (SkyblockData.InstanceType instanceType : SkyblockData.instances) {
+            builder.append(Utils.format("\n!{} - {}", instanceType.name, Utils.uppercaseFirst(instanceType.type.toLowerCase(), true)));
+        }
+        return builder.toString();
+    }
+
     public static boolean isOnList(String sender, String list) {
         if (lists.value().has(list)) {
             return lists.value().getAsJsonArray(list).contains(new JsonPrimitive(sender));

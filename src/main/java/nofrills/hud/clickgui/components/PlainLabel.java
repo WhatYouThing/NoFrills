@@ -6,10 +6,11 @@ import net.minecraft.text.Text;
 
 public class PlainLabel extends LabelComponent {
     public String plainTooltip = "";
-    public String plainText = "";
+    public String plainText;
 
     public PlainLabel(Text text) {
         super(text);
+        this.plainText = text.getString();
     }
 
     @Override

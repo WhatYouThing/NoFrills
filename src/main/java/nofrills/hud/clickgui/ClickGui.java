@@ -473,4 +473,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.mainScroll = scroll;
         root.child(scroll);
     }
+
+    @Override
+    public void close() {
+        if (this.uiAdapter != null) {
+            this.uiAdapter.dispose();
+        }
+        super.close();
+    }
 }

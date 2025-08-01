@@ -58,7 +58,8 @@ public class DungeonHighlight {
     }
 
     private static boolean isStarred(String name) {
-        return name.startsWith(Utils.Symbols.star) && name.indexOf(Utils.Symbols.star) == name.lastIndexOf(Utils.Symbols.star);
+        int index = name.indexOf(Utils.Symbols.star);
+        return index != -1 && index == name.lastIndexOf(Utils.Symbols.star);
     }
 
     private static void renderOutline(Entity entity, RenderColor color) {

@@ -12,6 +12,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
+import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.keybinds.PearlRefill;
 import nofrills.hud.HudEditorScreen;
@@ -32,7 +33,15 @@ public class NoFrillsCommand {
             new ModCommand("settings", "Opens the settings GUI.", literal("settings").executes(context -> {
                 Utils.setScreen(new ClickGui());
                 return SINGLE_SUCCESS;
-            })),
+            }).then(literal("load").executes(context -> {
+                Config.load();
+                Utils.info("§aLoaded the settings file.");
+                return SINGLE_SUCCESS;
+            })).then(literal("save").executes(context -> {
+                Config.save();
+                Utils.info("§aSaved the settings file.");
+                return SINGLE_SUCCESS;
+            }))),
             new ModCommand("partyCommands", "Allows you to manage the player whitelist and blacklist for the Party Commands feature.", literal("partyCommands").executes(context -> {
                 Utils.info("§f§lWhitelist and blacklist§7: You can manage either list with the §f\"/nf partyCommands whitelist/blacklist\" §7command. Whitelisted players always have their commands processed automatically (unless disabled), and blacklisted players always have their commands rejected.\n\n§f§lHow each command mode works§7:\n- Automatic: Automatically process the command.\n- Manual: Adds a button in chat which must be clicked to process the command.\n- Ignore: Rejects the command from any non-whitelisted players.\n- Disabled: The command is fully disabled.");
                 return SINGLE_SUCCESS;
@@ -211,7 +220,7 @@ public class NoFrillsCommand {
                     }
                 }
                 return SINGLE_SUCCESS;
-            }))),
+            })))
     };
 
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {

@@ -28,6 +28,7 @@ public class NoRender {
     public static final SettingBool effectDisplay = new SettingBool(false, "effectDisplay", instance.key());
     public static final SettingBool deadEntities = new SettingBool(false, "deadEntities", instance.key());
     public static final SettingBool lightning = new SettingBool(false, "lightning", instance.key());
+    public static final SettingBool fallingBlocks = new SettingBool(false, "fallingBlocks", instance.key());
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
     public static final SettingBool nametagInvisibility = new SettingBool(false, "nametagInvisibility", instance.key());

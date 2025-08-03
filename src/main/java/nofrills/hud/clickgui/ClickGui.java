@@ -158,6 +158,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Effect Display", NoRender.effectDisplay, "Removes the potion effect display from the inventory and the top right of the screen."),
                                 new Settings.Toggle("Dead Entities", NoRender.deadEntities, "Hides entities that are in their death animation, and their health bars (if applicable)."),
                                 new Settings.Toggle("Lightning", NoRender.lightning, "Hides lightning strikes."),
+                                new Settings.Toggle("Falling Blocks", NoRender.fallingBlocks, "Hides falling block entities such as sand."),
                                 new Settings.Toggle("Mage Beam", NoRender.mageBeam, "Prevents the server from spawning the Mage Beam particles in Dungeons."),
                                 new Settings.Toggle("Tree Bits", NoRender.treeBits, "Hides the flying wood and leaves blocks that appear when chopping trees on the Galatea."),
                                 new Settings.Toggle("Nametag Invisibility", NoRender.nametagInvisibility, "Keeps player nametags visible, even if they are sneaking or have the invisibility effect.")

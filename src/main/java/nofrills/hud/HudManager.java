@@ -2,7 +2,6 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -36,31 +35,8 @@ public class HudManager {
             pingElement
     );
 
-    private static int pingTicks = 0;
-    private static int serverTicks = 0;
-    private static int tpsTimer = 0;
-    private static Entity bobberHologram = null;
-
     public static boolean isEditingHud() {
         return mc.currentScreen instanceof HudEditorScreen;
-    }
-
-    public static void registerAll() {
-        for (HudElement element : elements) {
-            Identifier identifier = element.getIdentifier();
-            if (identifier != null && !Hud.hasComponent(identifier)) {
-                Hud.add(identifier, () -> element);
-            }
-        }
-    }
-
-    public static void unregisterAll() {
-        for (HudElement element : elements) {
-            Identifier identifier = element.getIdentifier();
-            if (identifier != null && Hud.hasComponent(identifier)) {
-                Hud.remove(identifier);
-            }
-        }
     }
 
     @EventHandler
@@ -72,12 +48,16 @@ public class HudManager {
 
     @EventHandler
     private static void onJoinServer(ServerJoinEvent event) {
-        registerAll();
-        pingTicks = 0;
+        for (HudElement element : elements) {
+            Identifier identifier = element.getIdentifier();
+            if (identifier != null && !Hud.hasComponent(identifier)) {
+                Hud.add(identifier, () -> element);
+            }
+        }
+        pingElement.reset();
+        tpsElement.reset();
         lagMeterElement.setTickTime(0); // temporarily disables the element, as the server doesn't send tick packets for a few seconds after joining
-        serverTicks = 0;
-        tpsTimer = 0;
-        tpsElement.setTps(0);
+        bobberElement.hologram = null;
     }
 
     @EventHandler
@@ -85,8 +65,8 @@ public class HudManager {
         if (event.packet instanceof PingResultS2CPacket pingPacket) {
             if (pingElement.instance.isActive()) {
                 pingElement.setPing(Util.getMeasuringTimeMs() - pingPacket.startTime());
+                pingElement.ticks = 20;
             }
-            pingTicks = 0;
         }
     }
 
@@ -98,25 +78,29 @@ public class HudManager {
         if (dayElement.instance.isActive()) {
             dayElement.setDay(mc.world.getTimeOfDay() / 24000L);
         }
-        if (pingElement.instance.isActive() && pingTicks <= 20) { // pings every second when element is enabled, waits until ping result is received
-            pingTicks++;
-            if (pingTicks == 20) {
-                Utils.sendPingPacket();
+        if (pingElement.instance.isActive()) { // pings every second when element is enabled, waits until ping result is received
+            if (pingElement.ticks > 0) {
+                pingElement.ticks -= 1;
+                if (pingElement.ticks == 0) {
+                    Utils.sendPingPacket();
+                }
             }
         }
         if (tpsElement.instance.isActive()) {
-            tpsTimer++;
-            if (tpsTimer == 20) {
-                tpsElement.setTps(serverTicks);
-                serverTicks = 0;
-                tpsTimer = 0;
+            if (tpsElement.clientTicks > 0) {
+                tpsElement.clientTicks -= 1;
+                if (tpsElement.clientTicks == 0) {
+                    tpsElement.setTps(tpsElement.serverTicks);
+                    tpsElement.clientTicks = 20;
+                    tpsElement.serverTicks = 0;
+                }
             }
         }
         if (seaCreaturesElement.instance.isActive()) {
             seaCreaturesElement.setCount(CapTracker.seaCreatures.size());
         }
         if (bobberElement.instance.isActive() && mc.player != null) {
-            if (mc.player.fishHook != null && (bobberHologram == null || !bobberHologram.isAlive())) {
+            if (mc.player.fishHook != null && (bobberElement.hologram == null || !bobberElement.hologram.isAlive())) {
                 bobberElement.setActive();
             } else if (mc.player.fishHook == null) {
                 bobberElement.setInactive();
@@ -130,7 +114,7 @@ public class HudManager {
             lagMeterElement.setTickTime(Util.getMeasuringTimeMs());
         }
         if (tpsElement.instance.isActive()) {
-            serverTicks++;
+            tpsElement.serverTicks += 1;
         }
     }
 
@@ -138,7 +122,7 @@ public class HudManager {
     private static void onNamed(EntityNamedEvent event) {
         if (bobberElement.instance.isActive() && event.namePlain.length() == 3) {
             if (event.namePlain.equals("!!!") || event.namePlain.indexOf(".") == 1) {
-                bobberHologram = event.entity;
+                bobberElement.hologram = event.entity;
                 bobberElement.setTimer(event.namePlain);
             }
         }

@@ -14,6 +14,7 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Ping extends SimpleTextElement {
@@ -23,14 +24,19 @@ public class Ping extends SimpleTextElement {
     public final SettingDouble y = new SettingDouble(0.01, "y", instance.key());
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
+    public final SettingBool average = new SettingBool(false, "average", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "ping-element");
+
+    public int ticks = 20;
+    public List<Long> pingList = new ArrayList<>();
 
     public Ping(Text text) {
         super(text);
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
-                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text.")
+                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
+                new Settings.Toggle("Average", average, "Tracks and adds your average ping to the element.")
         ));
         this.options.setTitle(Text.of("Ping Element"));
     }
@@ -48,7 +54,25 @@ public class Ping extends SimpleTextElement {
     }
 
     public void setPing(long ping) {
-        this.setText(Utils.format("§bPing: §f{}ms", ping));
+        if (average.value()) {
+            if (this.pingList.size() > 25) {
+                this.pingList.removeFirst();
+            }
+            this.pingList.add(ping);
+            long avg = 0;
+            for (long previous : this.pingList) {
+                avg += previous;
+            }
+            this.setText(Utils.format("§bPing: §f{}ms §7[{}ms]", ping, avg / pingList.size()));
+        } else {
+            this.setText(Utils.format("§bPing: §f{}ms", ping));
+        }
+    }
+
+    public void reset() {
+        this.ticks = 20;
+        this.pingList.clear();
+        this.setText("§bPing: §f0ms");
     }
 
     @Override

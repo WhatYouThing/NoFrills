@@ -2,6 +2,7 @@ package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIDrawContext;
 import io.wispforest.owo.ui.core.Surface;
+import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import nofrills.config.Feature;
@@ -26,6 +27,7 @@ public class FishingBobber extends SimpleTextElement {
     public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "bobber-element");
+    public Entity hologram = null;
     private boolean active = false;
 
     public FishingBobber(Text text) {

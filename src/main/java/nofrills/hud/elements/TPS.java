@@ -14,6 +14,7 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -24,14 +25,20 @@ public class TPS extends SimpleTextElement {
     public final SettingDouble y = new SettingDouble(0.06, "y", instance.key());
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
+    public final SettingBool average = new SettingBool(false, "average", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "tps-element");
+
+    public int clientTicks = 20;
+    public int serverTicks = 0;
+    public List<Integer> tpsList = new ArrayList<>();
 
     public TPS(Text text) {
         super(text);
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
-                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text.")
+                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
+                new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
         this.options.setTitle(Text.of("TPS Element"));
     }
@@ -49,7 +56,26 @@ public class TPS extends SimpleTextElement {
     }
 
     public void setTps(int tps) {
-        this.setText(Utils.format("§bTPS: §f{}", tps));
+        if (average.value()) {
+            if (this.tpsList.size() > 10) {
+                this.tpsList.removeFirst();
+            }
+            this.tpsList.add(Math.clamp(tps, 0, 20));
+            int avg = 0;
+            for (int previous : this.tpsList) {
+                avg += previous;
+            }
+            this.setText(Utils.format("§bTPS: §f{} §7[{}]", tps, Utils.formatDecimal(avg / (double) tpsList.size())));
+        } else {
+            this.setText(Utils.format("§bTPS: §f{}", tps));
+        }
+    }
+
+    public void reset() {
+        this.clientTicks = 20;
+        this.serverTicks = 0;
+        this.tpsList.clear();
+        this.setText("§bTPS: §f0");
     }
 
     @Override

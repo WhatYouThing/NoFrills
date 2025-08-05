@@ -304,15 +304,17 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(
                                 new Settings.Toggle("Sharpshooter", DeviceSolvers.sharpshooter, "Highlights hit targets as red while doing the 4th device.")
                         ))),
-                        new Module("Highlights", DungeonHighlight.instance, "Highlights various things in Dungeons.", new Settings(List.of(
-                                new Settings.Toggle("Starred Mobs", DungeonHighlight.starred, "Highlights starred mobs."),
-                                new Settings.Toggle("Minibosses", DungeonHighlight.miniboss, "Highlights minibosses."),
-                                new Settings.Toggle("Wither Keys", DungeonHighlight.witherKey, "Highlights wither and blood keys."),
-                                new Settings.Toggle("Spirit Bows", DungeonHighlight.spiritBow, "Highlights the Spirit Bow in the F4/M4 boss fight."),
-                                new Settings.ColorPicker("Starred Color", true, DungeonHighlight.starredColor, "The color of starred mob highlight."),
-                                new Settings.ColorPicker("Miniboss Color", true, DungeonHighlight.minibossColor, "The color of the miniboss highlight."),
-                                new Settings.ColorPicker("Key Color", true, DungeonHighlight.witherKeyColor, "The color of the key highlight."),
-                                new Settings.ColorPicker("Spirit Bow Color", true, DungeonHighlight.spiritBowColor, "The color of the Spirit Bow highlight.")
+                        new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, StarredMobHighlight.color, "The color of starred mob highlight.")
+                        ))),
+                        new Module("Miniboss Highlight", MinibossHighlight.instance, "Highlights minibosses.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, MinibossHighlight.color, "The color of miniboss highlight.")
+                        ))),
+                        new Module("Key Highlight", KeyHighlight.instance, "Highlights nearby Wither and Blood keys.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, KeyHighlight.color, "The color of key highlight.")
+                        ))),
+                        new Module("Spirit Bow Highlight", SpiritBowHighlight.instance, "Highlights the Spirit Bow in the F4/M4 boss fight.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, SpiritBowHighlight.color, "The color of Spirit Bow highlight.")
                         ))),
                         new Module("Reminders", DungeonReminders.instance, "Various class specific Dungeons reminders.", new Settings(List.of(
                                 new Settings.Toggle("Wish", DungeonReminders.wish, "Reminds you to wish as Healer when Maxor enrages in F7/M7."),

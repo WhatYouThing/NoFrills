@@ -123,7 +123,10 @@ public class Main implements ModInitializer {
         eventBus.subscribe(TerminalSolvers.class);
         eventBus.subscribe(LeapOverlay.class);
         eventBus.subscribe(DungeonReminders.class);
-        eventBus.subscribe(DungeonHighlight.class);
+        eventBus.subscribe(StarredMobHighlight.class);
+        eventBus.subscribe(MinibossHighlight.class);
+        eventBus.subscribe(KeyHighlight.class);
+        eventBus.subscribe(SpiritBowHighlight.class);
         eventBus.subscribe(DeviceSolvers.class);
         eventBus.subscribe(Fullbright.class);
         eventBus.subscribe(CustomKeybinds.class);

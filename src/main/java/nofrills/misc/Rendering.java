@@ -75,8 +75,8 @@ public final class Rendering {
         Vec3d camPos = camera.getPos();
         matrices.push();
         matrices.translate(pos.getX() - camPos.getX(), pos.getY() - camPos.getY(), pos.getZ() - camPos.getZ());
-        Vector3f planeH = camera.getHorizontalPlane();
-        VertexRendering.drawVector(matrices, consumer.getBuffer(RenderLayer.getLines()), planeH, camera.getPos(), color.argb);
+        Vector3f plane = camera.getHorizontalPlane().normalize(camera.getVerticalPlane());
+        VertexRendering.drawVector(matrices, consumer.getBuffer(Layers.BoxOutlineNoCull), plane, camPos, color.argb);
         matrices.pop();
     }
 

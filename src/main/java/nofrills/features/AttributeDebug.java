@@ -15,6 +15,7 @@ import net.minecraft.util.Formatting;
 import nofrills.events.DrawItemTooltip;
 import nofrills.events.InputEvent;
 import nofrills.events.WorldTickEvent;
+import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -33,7 +34,6 @@ public class AttributeDebug {
     public static final JsonObject data = loadData();
     public static boolean isEnabled = false;
     public static boolean saveTextures = false;
-    public static List<Slot> highlightedSlots = new ArrayList<>();
 
     private static boolean isFirstInput(Slot slot) {
         return slot != null && slot.id == 10;
@@ -151,7 +151,7 @@ public class AttributeDebug {
                     for (Slot slot : container.getScreenHandler().slots) {
                         ItemStack stack = slot.getStack();
                         if (Utils.getSkyblockId(stack).equals("ATTRIBUTE_SHARD")) {
-                            textures.addProperty(Formatting.strip(stack.getName().getString()), Utils.getTextureUrl(Utils.getTextures(stack)));
+                            textures.addProperty(Formatting.strip(stack.getName().getString()).replace("Shard", "").trim(), Utils.getTextureUrl(Utils.getTextures(stack)));
                         }
                     }
                 }
@@ -224,21 +224,17 @@ public class AttributeDebug {
                             }
                         }
                     }
-                    List<Slot> unknownRecipes = new ArrayList<>();
                     if (!firstID.isEmpty()) {
                         for (Slot slot : selectionSlots) {
                             String id = getShardID(slot.getStack());
                             if (!id.isEmpty()) {
                                 String fusionKey = Utils.format("{}+{}", firstID, id);
                                 if (!recipes.has(fusionKey)) {
-                                    unknownRecipes.add(slot);
+                                    SlotOptions.setBackground(slot, RenderColor.fromHex(0xff0000));
                                 }
                             }
                         }
                     }
-                    highlightedSlots = unknownRecipes;
-                } else {
-                    highlightedSlots.clear();
                 }
             }
         }

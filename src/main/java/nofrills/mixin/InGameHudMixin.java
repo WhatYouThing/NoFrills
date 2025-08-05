@@ -6,8 +6,8 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import nofrills.events.HudRenderEvent;
+import nofrills.features.general.NoRender;
 import nofrills.misc.TitleRendering;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -82,7 +82,7 @@ public abstract class InGameHudMixin implements TitleRendering {
 
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderEffectOverlay(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (Config.noEffectDisplay) {
+        if (NoRender.instance.isActive() && NoRender.effectDisplay.value()) {
             ci.cancel();
         }
     }

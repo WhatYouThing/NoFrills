@@ -28,13 +28,13 @@ public abstract class ClientConnectionMixin {
         if (packet instanceof CommonPingS2CPacket) {
             eventBus.post(new ServerTickEvent());
         }
-        if (eventBus.post(new ReceivePacketEvent(packet)).isCancelled()) {
-            ci.cancel();
-        }
         if (packet instanceof PlayerListS2CPacket listPacket) {
             List<PlayerListS2CPacket.Entry> entries = new ArrayList<>(listPacket.getEntries());
             entries.removeIf(entry -> entry.displayName() == null);
             eventBus.post(new TabListUpdateEvent(listPacket, entries));
+        }
+        if (eventBus.post(new ReceivePacketEvent(packet)).isCancelled()) {
+            ci.cancel();
         }
     }
 

@@ -1,66 +1,50 @@
 package nofrills.hud;
 
-import net.minecraft.client.gui.DrawContext;
+import io.wispforest.owo.ui.component.LabelComponent;
+import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.core.HorizontalAlignment;
+import io.wispforest.owo.ui.core.Insets;
+import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.text.Text;
-import nofrills.misc.RenderColor;
-
-import static nofrills.Main.mc;
+import nofrills.config.SettingBool;
+import nofrills.config.SettingEnum;
+import nofrills.hud.clickgui.components.PlainLabel;
 
 public class SimpleTextElement extends HudElement {
     public Text text;
     public Text defaultText;
-    public boolean leftHand;
-    public RenderColor color;
+    public LabelComponent label;
 
-    public SimpleTextElement(double posX, double posY, Text text, RenderColor color) {
-        super(posX, posY, 0, 0);
+    public SimpleTextElement(Text text) {
+        super(Containers.verticalFlow(Sizing.content(), Sizing.content()));
         this.text = text;
         this.defaultText = text;
-        this.color = color;
+        this.label = new PlainLabel(text);
+        this.label.margins(Insets.of(2));
+        this.layout.child(this.label);
     }
 
-    @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        if (this.shouldRender()) {
-            calculateDimensions(context);
-            int centerX = (int) minX;
-            int centerY = (int) (minY - mc.textRenderer.fontHeight * 0.5 + (maxY - minY) * 0.5);
-            context.drawTextWithShadow(mc.textRenderer, text, centerX, centerY, color.hex);
-        }
+    public void setText(String text) {
+        this.label.text(Text.of(text));
     }
 
-    @Override
-    public void calculateDimensions(DrawContext context) {
-        int resX = context.getScaledWindowWidth();
-        int resY = context.getScaledWindowHeight();
-        int width = mc.textRenderer.getWidth(text);
-        int height = mc.textRenderer.fontHeight;
-        double currentPosX = leftHand ? getOffsetX(context, getX(context, posX) - width) : posX;
-        sizeX = getOffsetX(context, width);
-        sizeY = getOffsetY(context, height);
-        minX = resX * currentPosX;
-        maxX = resX * (currentPosX + sizeX);
-        minY = resY * posY;
-        maxY = resY * (posY + sizeY);
-        snapX = resX * 0.01;
-        snapY = resY * 0.01;
+    public void updateAlignment(SettingEnum<alignment> setting) {
+        HorizontalAlignment alignment = switch (setting.value()) {
+            case Left -> HorizontalAlignment.LEFT;
+            case Center -> HorizontalAlignment.CENTER;
+            case Right -> HorizontalAlignment.RIGHT;
+        };
+        this.label.horizontalTextAlignment(alignment);
+        this.layout.horizontalAlignment(alignment);
     }
 
-    public void setText(String newText) {
-        text = Text.of(newText);
+    public void updateShadow(SettingBool setting) {
+        this.label.shadow(setting.value());
     }
 
-    public void resetText() {
-        text = defaultText;
-    }
-
-    public void setProperties(boolean enabled, boolean hidden, boolean leftHand, double x, double y) {
-        this.enabled = enabled;
-        this.hidden = hidden;
-        this.leftHand = leftHand;
-        if (!HudManager.isEditingHud()) {
-            this.posX = x;
-            this.posY = y;
-        }
+    public enum alignment {
+        Left,
+        Center,
+        Right
     }
 }

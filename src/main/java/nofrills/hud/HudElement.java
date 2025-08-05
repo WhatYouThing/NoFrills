@@ -1,88 +1,86 @@
 package nofrills.hud;
 
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
+import io.wispforest.owo.ui.container.DraggableContainer;
+import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.core.Component;
+import io.wispforest.owo.ui.core.Positioning;
+import io.wispforest.owo.ui.core.Sizing;
+import io.wispforest.owo.ui.core.Surface;
+import net.minecraft.client.util.Window;
+import net.minecraft.util.Identifier;
+import nofrills.config.SettingDouble;
+import org.lwjgl.glfw.GLFW;
 
-public class HudElement implements Drawable {
-    public double posX;
-    public double posY;
-    public double sizeX;
-    public double sizeY;
-    public double minX = 0;
-    public double minY = 0;
-    public double maxX = 0;
-    public double maxY = 0;
-    public double snapX = 1;
-    public double snapY = 1;
-    public boolean enabled = false;
-    public boolean hidden = false;
+import static nofrills.Main.mc;
 
-    public HudElement(double posX, double posY, double sizeX, double sizeY) {
-        this.posX = posX;
-        this.posY = posY;
-        this.sizeX = sizeX;
-        this.sizeY = sizeY;
+public class HudElement extends DraggableContainer<FlowLayout> {
+    public FlowLayout layout;
+    public HudSettings options;
+    public boolean toggling = false;
+    public Surface disabledSurface = Surface.flat(0x55ff0000);
+
+    public HudElement(FlowLayout layout) {
+        super(Sizing.content(), Sizing.content(), layout);
+        this.positioning(Positioning.absolute(0, 0));
+        this.layout = layout;
+        this.layout.sizing(Sizing.content(), Sizing.content());
+        this.foreheadSize(0);
+        this.child(this.layout);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        calculateDimensions(context);
-    }
-
-    public void move(DrawContext context, int x, int y, boolean snap) {
-        double newX = snap ? x - (x % snapX) : x;
-        double newY = snap ? y - (y % snapY) : y;
-        if (!isInBounds(context, newX, newY)) {
-            newX = Math.clamp(newX, 0, context.getScaledWindowWidth());
-            newY = Math.clamp(newY, 0, context.getScaledWindowHeight());
+    public boolean onMouseDown(double mouseX, double mouseY, int button) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            this.toggling = true;
         }
-        double newMaxX = this instanceof SimpleTextElement textElement && textElement.leftHand ? newX - (maxX - minX) : newX + (maxX - minX);
-        double newMaxY = newY + (maxY - minY);
-        if (!isInBounds(context, newMaxX, newMaxY)) {
-            newX -= newMaxX - Math.clamp(newMaxX, 0, context.getScaledWindowWidth());
-            newY -= newMaxY - Math.clamp(newMaxY, 0, context.getScaledWindowHeight());
+        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+            mc.setScreen(this.options);
+            return true;
         }
-        posX = getOffsetX(context, newX);
-        posY = getOffsetY(context, newY);
+        return super.onMouseDown(mouseX, mouseY, button);
     }
 
-    public void calculateDimensions(DrawContext context) {
-        int resX = context.getScaledWindowWidth();
-        int resY = context.getScaledWindowHeight();
-        minX = resX * posX;
-        maxX = resX * (posX + sizeX);
-        minY = resY * posY;
-        maxY = resY * (posY + sizeY);
-        snapX = resX * 0.01;
-        snapY = resY * 0.01;
+    @Override
+    public boolean onMouseDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
+        boolean result = super.onMouseDrag(mouseX, mouseY, deltaX, deltaY, button);
+        Window window = mc.getWindow();
+        this.savePosition(this.xOffset / window.getScaledWidth(), this.yOffset / window.getScaledHeight());
+        return result;
     }
 
-    public double getX(DrawContext context, double offset) {
-        return context.getScaledWindowWidth() * offset;
+    @Override
+    public Component childAt(int x, int y) {
+        if (this.isInBoundingBox(x, y)) { // gets rid of the forehead
+            return this;
+        }
+        return super.childAt(x, y);
     }
 
-    public double getY(DrawContext context, double offset) {
-        return context.getScaledWindowHeight() * offset;
+    public void updateSurface(boolean active) {
+        this.layout.surface(active ? Surface.BLANK : this.disabledSurface);
     }
 
-    public double getOffsetX(DrawContext context, double x) {
-        return x / context.getScaledWindowWidth();
+    public void updatePosition(SettingDouble x, SettingDouble y) {
+        Window window = mc.getWindow();
+        this.xOffset = Math.clamp(x.value() * window.getScaledWidth(), 0, window.getScaledWidth() - this.width);
+        this.yOffset = Math.clamp(y.value() * window.getScaledHeight(), 0, window.getScaledHeight() - this.height);
+        this.updateX(0);
+        this.updateY(0);
     }
 
-    public double getOffsetY(DrawContext context, double y) {
-        return y / context.getScaledWindowHeight();
+    public void toggle() {
+
     }
 
-    public boolean isHovered(double mouseX, double mouseY) {
-        return mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY && shouldRender();
+    public void updatePosition() {
+
     }
 
-    public boolean isInBounds(DrawContext context, double x, double y) {
-        return x >= 0 && x <= context.getScaledWindowWidth() && y >= 0 && y <= context.getScaledWindowHeight();
+    public void savePosition(double x, double y) {
+
     }
 
-    public boolean shouldRender() {
-        return this.enabled && (!this.hidden || HudManager.isEditingHud());
+    public Identifier getIdentifier() {
+        return null;
     }
 }
-

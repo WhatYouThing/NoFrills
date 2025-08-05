@@ -1,48 +1,71 @@
 package nofrills.hud;
 
+import io.wispforest.owo.ui.base.BaseOwoScreen;
+import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.core.OwoUIAdapter;
+import io.wispforest.owo.ui.core.Surface;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
-public class HudEditorScreen extends Screen {
-    private boolean lastClicked = false;
-    private HudElement selected = null;
-
+public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     public HudEditorScreen() {
         super(Text.of(""));
     }
 
-    private boolean isLeftClickPressed() {
-        return GLFW.glfwGetMouseButton(mc.getWindow().getHandle(), GLFW.GLFW_MOUSE_BUTTON_1) == 1;
+    @Override
+    protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
+        return OwoUIAdapter.create(this, Containers::verticalFlow);
+    }
+
+    @Override
+    protected void build(FlowLayout root) {
+        root.surface(Surface.VANILLA_TRANSLUCENT);
+        root.allowOverflow(false);
+        for (HudElement element : HudManager.elements) {
+            root.child(element);
+        }
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        context.drawCenteredTextWithShadow(mc.textRenderer, "NoFrills HUD Editor", context.getScaledWindowWidth() / 2, 10, 0xffffff);
-        boolean clicked = isLeftClickPressed();
+        super.render(context, mouseX, mouseY, delta);
+        int center = context.getScaledWindowWidth() / 2;
+        context.drawCenteredTextWithShadow(mc.textRenderer, "NoFrills HUD Editor", center, 10, 0xffffff);
+        context.drawCenteredTextWithShadow(mc.textRenderer, "Left click element to toggle", center, 20, 0xffffff);
+        context.drawCenteredTextWithShadow(mc.textRenderer, "Right click element to view its settings", center, 30, 0xffffff);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            for (HudElement element : HudManager.elements) {
+                if (element.toggling) {
+                    element.toggling = false;
+                    element.toggle();
+                    return true;
+                }
+            }
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         for (HudElement element : HudManager.elements) {
-            element.render(context, mouseX, mouseY, delta);
-            if (clicked && !lastClicked && element.isHovered(mouseX, mouseY)) {
-                selected = element;
+            if (element.toggling) {
+                element.toggling = false;
             }
         }
-        if (selected != null) {
-            if (clicked) {
-                selected.move(context, mouseX, mouseY, hasShiftDown());
-            } else {
-                selected = null;
-            }
-        }
-        lastClicked = clicked;
+        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
     }
 
     @Override
     public void close() {
-        Config.configHandler.save();
         super.close();
     }
 }

@@ -4,7 +4,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ColorHelper;
-import nofrills.features.LeapOverlay;
+import nofrills.features.dungeons.LeapOverlay;
 import nofrills.misc.RenderColor;
 
 import static nofrills.Main.mc;

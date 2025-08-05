@@ -5,7 +5,8 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.state.EntityRenderState;
 import net.minecraft.client.render.entity.state.PlayerEntityRenderState;
 import net.minecraft.entity.Entity;
-import nofrills.config.Config;
+import nofrills.features.general.NoRender;
+import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -13,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class EntityRendererMixin<T extends Entity, S extends EntityRenderState> {
     @ModifyExpressionValue(method = "renderLabelIfPresent", at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/entity/state/EntityRenderState;sneaking:Z"))
     private boolean isSneaking(boolean original, S state) {
-        if (Config.keepNametags && state instanceof PlayerEntityRenderState) {
+        if (NoRender.instance.isActive() && NoRender.nametagInvisibility.value() && Utils.isInSkyblock() && state instanceof PlayerEntityRenderState) {
             return false;
         }
         return original;

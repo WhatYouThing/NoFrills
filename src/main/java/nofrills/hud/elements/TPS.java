@@ -1,27 +1,101 @@
 package nofrills.hud.elements;
 
-import net.minecraft.client.gui.DrawContext;
+import io.wispforest.owo.ui.core.OwoUIDrawContext;
+import io.wispforest.owo.ui.core.Surface;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
+import net.minecraft.util.Identifier;
+import nofrills.config.Feature;
+import nofrills.config.SettingBool;
+import nofrills.config.SettingDouble;
+import nofrills.config.SettingEnum;
+import nofrills.hud.HudManager;
+import nofrills.hud.HudSettings;
 import nofrills.hud.SimpleTextElement;
-import nofrills.misc.RenderColor;
+import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
-public class TPS extends SimpleTextElement {
+import java.util.ArrayList;
+import java.util.List;
 
-    public TPS(Text text, RenderColor color) {
-        super(0, 0, text, color);
+
+public class TPS extends SimpleTextElement {
+    public final Feature instance = new Feature("tpsElement");
+
+    public final SettingDouble x = new SettingDouble(0.01, "x", instance.key());
+    public final SettingDouble y = new SettingDouble(0.06, "y", instance.key());
+    public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
+    public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
+    public final SettingBool average = new SettingBool(false, "average", instance.key());
+
+    private final Identifier identifier = Identifier.of("nofrills", "tps-element");
+
+    public int clientTicks = 20;
+    public int serverTicks = 0;
+    public List<Integer> tpsList = new ArrayList<>();
+
+    public TPS(Text text) {
+        super(text);
+        this.options = new HudSettings(List.of(
+                new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
+                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
+                new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
+        ));
+        this.options.setTitle(Text.of("TPS Element"));
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.setProperties(Config.tpsEnabled, false, Config.tpsLeftHand, Config.tpsPosX, Config.tpsPosY);
-        super.render(context, mouseX, mouseY, delta);
-        Config.tpsPosX = this.posX;
-        Config.tpsPosY = this.posY;
+    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+        if (HudManager.isEditingHud()) {
+            super.layout.surface(instance.isActive() ? Surface.BLANK : this.disabledSurface);
+        } else if (!instance.isActive()) {
+            return;
+        }
+        this.updateShadow(shadow);
+        this.updateAlignment(align);
+        super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
     public void setTps(int tps) {
-        this.setText(Utils.format("§bTPS: §f{}", tps));
+        if (average.value()) {
+            if (this.tpsList.size() > 20) {
+                this.tpsList.removeFirst();
+            }
+            this.tpsList.add(Math.clamp(tps, 0, 20));
+            int avg = 0;
+            for (int previous : this.tpsList) {
+                avg += previous;
+            }
+            this.setText(Utils.format("§bTPS: §f{} §7[{}]", tps, Utils.formatDecimal(avg / (double) tpsList.size())));
+        } else {
+            this.setText(Utils.format("§bTPS: §f{}", tps));
+        }
+    }
+
+    public void reset() {
+        this.clientTicks = 20;
+        this.serverTicks = 0;
+        this.tpsList.clear();
+        this.setText("§bTPS: §f0");
+    }
+
+    @Override
+    public void updatePosition() {
+        this.updatePosition(x, y);
+    }
+
+    @Override
+    public void toggle() {
+        instance.setActive(!instance.isActive());
+    }
+
+    @Override
+    public void savePosition(double x, double y) {
+        this.x.set(x);
+        this.y.set(y);
+    }
+
+    @Override
+    public Identifier getIdentifier() {
+        return this.identifier;
     }
 }

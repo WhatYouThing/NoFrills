@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.RotationAxis;
-import nofrills.config.Config;
+import nofrills.features.general.Viewmodel;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -32,56 +32,56 @@ public class HeldItemRendererMixin {
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;push()V", shift = At.Shift.AFTER))
     private void onBeforeRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if (Config.viewmodelEnable) {
+        if (Viewmodel.instance.isActive()) {
             if (hand == Hand.MAIN_HAND) {
-                matrices.translate(Config.viewmodelOffsetX, Config.viewmodelOffsetY, Config.viewmodelOffsetZ);
+                matrices.translate(Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             } else {
-                matrices.translate(-Config.viewmodelOffsetX, Config.viewmodelOffsetY, Config.viewmodelOffsetZ);
+                matrices.translate(-Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             }
         }
     }
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemDisplayContext;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"))
     private void onRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        if (Config.viewmodelEnable) {
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Config.viewmodelRotX));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(Config.viewmodelRotY));
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(Config.viewmodelRotZ));
-            matrices.scale(Config.viewmodelScaleX, Config.viewmodelScaleY, Config.viewmodelScaleZ);
+        if (Viewmodel.instance.isActive()) {
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Viewmodel.rotX.value()));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Viewmodel.rotY.value()));
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Viewmodel.rotZ.value()));
+            matrices.scale((float) Viewmodel.scaleX.value(), (float) Viewmodel.scaleY.value(), (float) Viewmodel.scaleZ.value());
         }
     }
 
     @Inject(method = "renderArmHoldingItem", at = @At("HEAD"))
     private void onBeforeRenderHand(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
-        if (Config.viewmodelEnable) {
+        if (Viewmodel.instance.isActive()) {
             if (arm == Arm.RIGHT) {
-                matrices.translate(Config.viewmodelOffsetX, Config.viewmodelOffsetY, Config.viewmodelOffsetZ);
+                matrices.translate(Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             } else {
-                matrices.translate(-Config.viewmodelOffsetX, Config.viewmodelOffsetY, Config.viewmodelOffsetZ);
+                matrices.translate(-Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             }
         }
     }
 
     @Inject(method = "renderArmHoldingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getRenderer(Lnet/minecraft/entity/Entity;)Lnet/minecraft/client/render/entity/EntityRenderer;"))
     private void onRenderHand(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
-        if (Config.viewmodelEnable) {
-            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(Config.viewmodelRotX));
-            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(Config.viewmodelRotY));
-            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(Config.viewmodelRotZ));
-            matrices.scale(Config.viewmodelScaleX, Config.viewmodelScaleY, Config.viewmodelScaleZ);
+        if (Viewmodel.instance.isActive()) {
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Viewmodel.rotX.value()));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Viewmodel.rotY.value()));
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Viewmodel.rotZ.value()));
+            matrices.scale((float) Viewmodel.scaleX.value(), (float) Viewmodel.scaleY.value(), (float) Viewmodel.scaleZ.value());
         }
     }
 
     @Inject(method = "shouldSkipHandAnimationOnSwap", at = @At("HEAD"), cancellable = true)
     private void onShouldSkipAnimation(ItemStack from, ItemStack _to, CallbackInfoReturnable<Boolean> cir) {
-        if (Config.noEquipAnim) {
+        if (Viewmodel.instance.isActive() && Viewmodel.noEquip.value()) {
             cir.setReturnValue(true);
         }
     }
 
     @Inject(method = "updateHeldItems", at = @At("TAIL"))
     private void onUpdateHeldItems(CallbackInfo ci) {
-        if (Config.noEquipAnim) {
+        if (Viewmodel.instance.isActive() && Viewmodel.noEquip.value()) {
             this.equipProgressMainHand = 1.0f;
             this.equipProgressOffHand = 1.0f;
             this.lastEquipProgressMainHand = 1.0f;

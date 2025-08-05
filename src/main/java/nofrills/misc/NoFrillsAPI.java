@@ -4,8 +4,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
-import nofrills.config.Config;
 import nofrills.events.WorldTickEvent;
+import nofrills.features.general.PriceTooltips;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,7 +64,7 @@ public class NoFrillsAPI {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (Config.fetchPricing && Utils.isInSkyblock()) {
+        if (PriceTooltips.instance.isActive() && Utils.isInSkyblock()) {
             if (refreshTicks == 0) {
                 if (mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
                     refreshItemPricing();

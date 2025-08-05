@@ -55,7 +55,7 @@ public class Ping extends SimpleTextElement {
 
     public void setPing(long ping) {
         if (average.value()) {
-            if (this.pingList.size() > 25) {
+            if (this.pingList.size() > 40) {
                 this.pingList.removeFirst();
             }
             this.pingList.add(ping);

@@ -24,9 +24,17 @@ import static nofrills.Main.mc;
 public class EndNodeHighlight {
     public static final Feature instance = new Feature("endNodeHighlight");
 
-    public static final SettingColor color = new SettingColor(RenderColor.fromArgb(0xff00ff00), "color", instance.key());
+    public static final SettingColor color = new SettingColor(new RenderColor(0, 255, 0, 255), "color", instance.key());
 
     private static final List<BlockPos> nodes = new ArrayList<>();
+    private static final List<Vec3i> offsets = List.of(
+            new Vec3i(1, 0, 0),
+            new Vec3i(-1, 0, 0),
+            new Vec3i(0, 1, 0),
+            new Vec3i(0, -1, 0),
+            new Vec3i(0, 0, 1),
+            new Vec3i(0, 0, -1)
+    );
 
     private static boolean isNodeBlock(BlockState state) {
         return state.getBlock().equals(Blocks.PURPLE_TERRACOTTA);
@@ -42,14 +50,6 @@ public class EndNodeHighlight {
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive() && Utils.isInArea("The End") && event.type.equals(ParticleTypes.WITCH) && isNodeParticle(event.packet)) {
             BlockPos blockPos = BlockPos.ofFloored(event.pos);
-            List<Vec3i> offsets = List.of(
-                    new Vec3i(1, 0, 0),
-                    new Vec3i(-1, 0, 0),
-                    new Vec3i(0, 1, 0),
-                    new Vec3i(0, -1, 0),
-                    new Vec3i(0, 0, 1),
-                    new Vec3i(0, 0, -1)
-            );
             for (Vec3i offset : offsets) {
                 BlockPos pos = blockPos.add(offset);
                 if (isNodeBlock(mc.world.getBlockState(pos)) && !nodes.contains(pos)) {

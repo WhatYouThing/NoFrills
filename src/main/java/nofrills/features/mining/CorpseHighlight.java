@@ -17,7 +17,7 @@ public class CorpseHighlight {
     public static final SettingColor lapisColor = new SettingColor(new RenderColor(85, 85, 255, 255), "lapis", instance.key());
     public static final SettingColor mineralColor = new SettingColor(new RenderColor(170, 170, 170, 255), "mineral", instance.key());
     public static final SettingColor yogColor = new SettingColor(new RenderColor(255, 170, 0, 255), "yog", instance.key());
-    public static final SettingColor vanguardColor = new SettingColor(new RenderColor(255, 255, 255, 255), "vanguard", instance.key());
+    public static final SettingColor vanguardColor = new SettingColor(new RenderColor(255, 63, 255, 255), "vanguard", instance.key());
 
     @EventHandler
     private static void onTick(EntityUpdatedEvent event) {

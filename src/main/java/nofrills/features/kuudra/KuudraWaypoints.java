@@ -75,7 +75,7 @@ public class KuudraWaypoints {
                     float yaw = supply.getYaw(delta);
                     Vec3d supplyPos = new Vec3d(
                             pos.getX() + (3.7 * Math.cos((yaw + 130) * (Math.PI / 180))),
-                            73,
+                            75,
                             pos.getZ() + (3.7 * Math.sin((yaw + 130) * (Math.PI / 180)))
                     );
                     event.drawBeam(supplyPos, 256, true, supplyColor.value());

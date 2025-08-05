@@ -105,9 +105,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Update Checker", UpdateChecker.instance, "Checks if a NoFrills update is available the first time you join any world/server."),
                         new Module("Slot Binding", SlotBinding.instance, "Bind your hotbar slots to your inventory slots, similarly to NEU's slot binding.", new Settings(List.of(
+                                new Settings.Separator("Usage"),
                                 new Settings.Description("Using Binds", "Shift + Left click on either of the bound slots to swap items between them."),
                                 new Settings.Description("Adding Binds", "Hover over a slot, press the keybind, move your cursor to another slot, and release the keybind."),
                                 new Settings.Description("Deleting Binds", "Pressing and releasing the keybind over a slot will clear any binds that it has."),
+                                new Settings.Separator("Settings"),
                                 new Settings.Keybind("Keybind", SlotBinding.keybind, "The keybind used for creating and removing slot binding combinations."),
                                 new Settings.Toggle("Show Lines", SlotBinding.lines, "Draw lines between the slot you're hovering over, and any slots bound to it."),
                                 new Settings.Toggle("Show Borders", SlotBinding.borders, "Draw borders around any slot that is bound to the slot you're hovering over."),

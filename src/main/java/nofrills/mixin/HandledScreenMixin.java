@@ -206,7 +206,6 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         context.getMatrices().push();
         context.getMatrices().translate(this.x, this.y, 0.0f);
-        context.getMatrices().push();
         context.getMatrices().translate(0.0f, 0.0f, 100.0f);
         if (isSlotBindingActive() && focusedSlot != null) {
             if (SlotBinding.isHotbar(focusedSlot.id)) {
@@ -249,7 +248,6 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackgroundColor(slot).argb);
             }
         }
-        context.getMatrices().pop();
         context.getMatrices().pop();
     }
 

@@ -57,7 +57,7 @@ public class TPS extends SimpleTextElement {
 
     public void setTps(int tps) {
         if (average.value()) {
-            if (this.tpsList.size() > 10) {
+            if (this.tpsList.size() > 20) {
                 this.tpsList.removeFirst();
             }
             this.tpsList.add(Math.clamp(tps, 0, 20));

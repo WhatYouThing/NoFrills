@@ -202,7 +202,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of item tooltips.", new Settings(List.of(
                                 new Settings.SliderDouble("Scale", 0.0, 4.0, 0.01, TooltipScale.scale, "The scale multiplier.")
                         ))),
-                        new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings())
+                        new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings()),
+                        new Module("Hotbar Swap", HotbarSwap.instance, "A simple alternative to slot binding with no configuration needed.", new Settings(List.of(
+                                new Settings.Separator("Usage"),
+                                new Settings.Description("Swapping", "Left ctrl + Left click on an item in your inventory to swap it with the hotbar slot directly below it."),
+                                new Settings.Separator("Settings"),
+                                new Settings.SliderInt("Last Override", 1, 9, 1, HotbarSwap.override, "Specify a replacement hotbar slot in cases where you swap with the 9th (unused) hotbar slot.")
+                        )))
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),

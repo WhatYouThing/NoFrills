@@ -128,6 +128,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(Fullbright.class);
         eventBus.subscribe(CustomKeybinds.class);
         eventBus.subscribe(EndNodeHighlight.class);
+        eventBus.subscribe(HotbarSwap.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

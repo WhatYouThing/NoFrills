@@ -19,7 +19,7 @@ public class SeaCreatureData {
             new SeaCreature("Alligator", "A long snout breaks the surface of the water. It's an Alligator!", "§2", true, true),
             new SeaCreature(
                     "Titanoboa",
-                    "A massive Titanoboa surfaces. It's body stretches as far as the eye can see.",
+                    "A massive Titanoboa surfaces. Its body stretches as far as the eye can see.",
                     "§e",
                     true,
                     false)
@@ -106,7 +106,12 @@ public class SeaCreatureData {
             SeaCreature.plain("Snapping Turtle"),
             SeaCreature.plain("Fried Chicken"),
             SeaCreature.plain("Bayou Sludge"),
-            SeaCreature.plain("Fireproof Witch")
+            SeaCreature.plain("Fireproof Witch"),
+            SeaCreature.plain("Tadgang"),
+            SeaCreature.plain("Ent"),
+            SeaCreature.plain("Bogged"),
+            SeaCreature.plain("Wetwing"),
+            SeaCreature.plain("Stridersurfer")
     );
 
     public static class SeaCreature {

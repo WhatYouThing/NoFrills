@@ -3,6 +3,7 @@ package nofrills.misc;
 import net.minecraft.util.math.ColorHelper;
 
 public class RenderColor {
+    public static final RenderColor white = RenderColor.fromHex(0xffffff);
     public float r;
     public float g;
     public float b;

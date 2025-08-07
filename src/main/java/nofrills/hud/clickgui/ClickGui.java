@@ -429,6 +429,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("End Node Highlight", EndNodeHighlight.instance, "Highlights Ender Nodes.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, EndNodeHighlight.color, "The color of the node highlight.")
+                        ))),
+                        new Module("Temple Skip", TempleSkip.instance, "Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, TempleSkip.color, "The color of the skip highlight.")
                         )))
                 )),
                 new Category("Farming", List.of(

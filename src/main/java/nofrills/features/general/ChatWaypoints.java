@@ -1,7 +1,6 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -31,17 +30,12 @@ public class ChatWaypoints {
     public static final SettingColor allColor = new SettingColor(RenderColor.fromArgb(0xaa55ffff), "allColor", instance.key());
 
     private static final List<PlayerWaypoint> waypointList = new ArrayList<>();
-    private static final RenderColor textColor = RenderColor.fromHex(0xffffff);
 
     private static boolean isPlayerValid(String name) {
         if (mc.player != null && mc.player.getName().getString().equals(name)) {
             return false;
         }
-        if (mc.getNetworkHandler() != null) {
-            PlayerListEntry entry = mc.getNetworkHandler().getPlayerListEntry(name);
-            return entry != null;
-        }
-        return false;
+        return mc.getNetworkHandler() != null && mc.getNetworkHandler().getPlayerListEntry(name) != null;
     }
 
     private static void highlightCoords(String message, String sender, boolean party) {
@@ -99,12 +93,6 @@ public class ChatWaypoints {
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && !waypointList.isEmpty()) {
             for (PlayerWaypoint waypoint : new ArrayList<>(waypointList)) {
-                if ((partyClear.value() && waypoint.party) || (allClear.value() && !waypoint.party)) {
-                    if (waypoint.box.getCenter().distanceTo(mc.player.getPos()) <= 8.0) {
-                        waypointList.remove(waypoint);
-                        continue;
-                    }
-                }
                 if (waypoint.duration > 0) {
                     waypoint.duration--;
                 }
@@ -117,10 +105,17 @@ public class ChatWaypoints {
         if (instance.isActive() && !waypointList.isEmpty()) {
             List<PlayerWaypoint> waypoints = new ArrayList<>(waypointList);
             for (PlayerWaypoint waypoint : waypoints) {
+                if (waypoint.duration == 0) {
+                    waypointList.remove(waypoint);
+                    continue;
+                }
+                if (waypoint.shouldClear() && waypoint.box.getCenter().distanceTo(mc.player.getPos()) <= 8.0) {
+                    waypointList.remove(waypoint);
+                    continue;
+                }
                 RenderColor color = waypoint.party ? partyColor.value() : allColor.value();
-                event.drawFilled(waypoint.box, true, color);
-                event.drawBeam(waypoint.box.getCenter().add(0, 0.5, 0), 256, true, color);
-                event.drawText(waypoint.box.getCenter().add(0, 1, 0), Text.of(waypoint.name), 0.05f, true, textColor);
+                event.drawFilledWithBeam(waypoint.box, 256, true, color);
+                event.drawText(waypoint.box.getCenter().add(0, 1, 0), waypoint.name, 0.05f, true, RenderColor.white);
             }
         }
     }
@@ -133,16 +128,20 @@ public class ChatWaypoints {
     }
 
     private static class PlayerWaypoint {
-        public String name;
+        public Text name;
         public Box box;
         public int duration;
         public boolean party;
 
         public PlayerWaypoint(String name, BlockPos pos, int duration, boolean party) {
-            this.name = name;
+            this.name = Text.literal(name);
             this.box = Box.enclosing(pos, pos);
             this.duration = duration;
             this.party = party;
+        }
+
+        public boolean shouldClear() {
+            return this.party ? partyClear.value() : allClear.value();
         }
     }
 }

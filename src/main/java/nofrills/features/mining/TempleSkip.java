@@ -19,6 +19,7 @@ public class TempleSkip {
     public static final Feature instance = new Feature("templeSkip");
 
     public static final SettingColor color = new SettingColor(new RenderColor(127, 0, 255, 255), "color", instance.key());
+
     private static final Text text = Text.literal("Stand Below, Double Pearl, Jump");
     private static BlockPos spot = null;
 

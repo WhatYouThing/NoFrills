@@ -240,7 +240,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", OldSneak.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", OldSneak.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Riding Camera Fix", RidingCameraFix.instance, "Removes the floaty camera movement effect while riding entities."),
+                        new Module("Riding Camera Fix", RidingCameraFix.instance, "Removes the floaty camera movement effect while riding entities.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", RidingCameraFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", RidingCameraFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        ))),
                         new Module("Snow Fix", SnowFix.instance, "Adjusts snow layer collision to reduce lagbacks.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", SnowFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", SnowFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")

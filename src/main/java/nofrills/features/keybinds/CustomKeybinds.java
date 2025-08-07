@@ -43,6 +43,7 @@ public class CustomKeybinds {
             data.value().get("binds").getAsJsonArray().add(object);
             mc.setScreen(buildSettings());
         });
+        button.button.verticalSizing(Sizing.fixed(18));
         list.add(button);
         if (data.value().has("binds")) {
             JsonArray binds = data.value().get("binds").getAsJsonArray();
@@ -86,11 +87,11 @@ public class CustomKeybinds {
 
         public Setting(int index) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
-            this.padding(Insets.of(5));
+            this.padding(Insets.of(5, 5, 4, 5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.index = index;
             this.input = new FlatTextbox(Sizing.fixed(160));
-            this.input.margins(Insets.of(0, 0, 0, 5));
+            this.input.margins(Insets.of(0, 0, 0, 6));
             this.input.text(getData().get("command").getAsString());
             this.input.onChanged().subscribe(value -> getData().addProperty("command", value));
             this.keybind = new KeybindButton();

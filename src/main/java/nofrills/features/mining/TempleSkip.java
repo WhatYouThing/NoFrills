@@ -19,7 +19,7 @@ public class TempleSkip {
     public static final Feature instance = new Feature("templeSkip");
 
     public static final SettingColor color = new SettingColor(new RenderColor(127, 0, 255, 255), "color", instance.key());
-
+    private static final Text text = Text.literal("Stand Below, Double Pearl, Jump");
     private static BlockPos spot = null;
 
     @EventHandler
@@ -37,7 +37,7 @@ public class TempleSkip {
         if (instance.isActive() && spot != null && Utils.isInArea("Crystal Hollows")) {
             Box box = Box.enclosing(spot, spot);
             event.drawOutline(box, true, color.value());
-            event.drawText(box.getCenter().add(0, -1, 0), Text.literal("Double Pearl + Jump"), 0.035f, true, RenderColor.white);
+            event.drawText(box.getCenter().add(0, -1, 0), text, 0.035f, true, RenderColor.white);
         }
     }
 

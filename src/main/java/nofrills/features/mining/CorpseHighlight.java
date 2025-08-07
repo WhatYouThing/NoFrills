@@ -1,12 +1,13 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
-import nofrills.events.EntityUpdatedEvent;
+import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
@@ -20,21 +21,23 @@ public class CorpseHighlight {
     public static final SettingColor vanguardColor = new SettingColor(new RenderColor(255, 63, 255, 255), "vanguard", instance.key());
 
     @EventHandler
-    private static void onTick(EntityUpdatedEvent event) {
-        if (instance.isActive() && Utils.isInZone(Utils.Symbols.zone + " Glacite Mineshafts", false)) {
-            if (event.entity instanceof ArmorStandEntity armorStand && !armorStand.isInvisible() && !Rendering.Entities.isDrawingGlow(armorStand)) {
-                ItemStack helmet = Utils.getEntityArmor(armorStand).getFirst();
-                if (!helmet.isEmpty()) {
-                    String pieceName = Formatting.strip(helmet.getName().getString());
-                    RenderColor color = switch (pieceName) {
-                        case "Lapis Armor Helmet" -> lapisColor.value();
-                        case "Mineral Helmet" -> mineralColor.value();
-                        case "Yog Helmet" -> yogColor.value();
-                        case "Vanguard Helmet" -> vanguardColor.value();
-                        default -> null;
-                    };
-                    if (color != null) {
-                        Rendering.Entities.drawGlow(armorStand, true, color);
+    private static void onTick(WorldTickEvent event) {
+        if (instance.isActive() && Utils.isInArea("Mineshaft")) {
+            for (Entity ent : Utils.getEntities()) {
+                if (ent instanceof ArmorStandEntity stand && !stand.isInvisible() && !Rendering.Entities.isDrawingGlow(stand)) {
+                    ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
+                    if (!helmet.isEmpty()) {
+                        String pieceName = Formatting.strip(helmet.getName().getString());
+                        RenderColor color = switch (pieceName) {
+                            case "Lapis Armor Helmet" -> lapisColor.value();
+                            case "Mineral Helmet" -> mineralColor.value();
+                            case "Yog Helmet" -> yogColor.value();
+                            case "Vanguard Helmet" -> vanguardColor.value();
+                            default -> null;
+                        };
+                        if (color != null) {
+                            Rendering.Entities.drawGlow(stand, true, color);
+                        }
                     }
                 }
             }

@@ -133,6 +133,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(EndNodeHighlight.class);
         eventBus.subscribe(HotbarSwap.class);
         eventBus.subscribe(TempleSkip.class);
+        eventBus.subscribe(SecretBatHighlight.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

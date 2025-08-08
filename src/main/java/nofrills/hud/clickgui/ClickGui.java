@@ -308,16 +308,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Sharpshooter", DeviceSolvers.sharpshooter, "Highlights hit targets as red while doing the 4th device.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, StarredMobHighlight.color, "The color of starred mob highlight.")
+                                new Settings.ColorPicker("Color", true, StarredMobHighlight.color, "The color of the starred mob highlight.")
                         ))),
                         new Module("Miniboss Highlight", MinibossHighlight.instance, "Highlights minibosses.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, MinibossHighlight.color, "The color of miniboss highlight.")
+                                new Settings.ColorPicker("Color", true, MinibossHighlight.color, "The color of the miniboss highlight.")
                         ))),
                         new Module("Key Highlight", KeyHighlight.instance, "Highlights nearby Wither and Blood keys.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, KeyHighlight.color, "The color of key highlight.")
+                                new Settings.ColorPicker("Color", true, KeyHighlight.color, "The color of the key highlight.")
                         ))),
                         new Module("Spirit Bow Highlight", SpiritBowHighlight.instance, "Highlights the Spirit Bow in the F4/M4 boss fight.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, SpiritBowHighlight.color, "The color of Spirit Bow highlight.")
+                                new Settings.ColorPicker("Color", true, SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")
                         ))),
                         new Module("Reminders", DungeonReminders.instance, "Various class specific Dungeons reminders.", new Settings(List.of(
                                 new Settings.Toggle("Wish", DungeonReminders.wish, "Reminds you to wish as Healer when Maxor enrages in F7/M7."),
@@ -348,6 +348,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Dropdown<>("Waypoint Type", WitherDragons.stackType, "The type of the arrow stack waypoints."),
                                 new Settings.Toggle("Spawn Timer", WitherDragons.timer, "Renders timers for exactly when a dragon should finish spawning."),
                                 new Settings.Toggle("Dragon Health", WitherDragons.health, "Renders the exact health of the dragons.")
+                        ))),
+                        new Module("Secret Bat Highlight", SecretBatHighlight.instance, "Applies a glow effect to secret bats.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", false, SecretBatHighlight.color, "The color of the secret bat glow.")
                         )))
                 )),
                 new Category("Kuudra", List.of(

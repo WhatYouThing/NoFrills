@@ -27,15 +27,6 @@ public class PartyCommands {
 
     private static boolean downtimeNeeded = false;
 
-    private static void setDowntimeReminder(String sender) {
-        if (!Utils.isInstanceOver() && (Utils.isInDungeons() || Utils.isInKuudra())) {
-            Utils.info("§aScheduled downtime reminder for §6" + sender + "§a.");
-            downtimeNeeded = true;
-        } else {
-            showDowntimeReminder();
-        }
-    }
-
     private static void showDowntimeReminder() {
         Utils.showTitle("§6§lDOWNTIME", "", 5, 60, 5);
         Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS.value(), SoundCategory.MASTER, 1.0f, 0.0f);
@@ -115,7 +106,18 @@ public class PartyCommands {
                     }
                     if (!downtime.value().equals(behavior.Disabled) && command.startsWith("dt")) {
                         if (whitelisted || downtime.value().equals(behavior.Automatic)) {
-                            setDowntimeReminder(event.sender);
+                            if (SkyblockData.isInInstance()) {
+                                if (!Utils.isInstanceOver() && !downtimeNeeded) {
+                                    Utils.info("§aScheduled downtime reminder.");
+                                    downtimeNeeded = true;
+                                }
+                                if (AutoRequeue.instance.isActive() && !AutoRequeue.paused) {
+                                    Utils.info("§aAuto Requeue paused with the downtime command.");
+                                    AutoRequeue.paused = true;
+                                }
+                            } else {
+                                showDowntimeReminder();
+                            }
                         }
                     }
                     if (!queue.value().equals(behavior.Disabled)) {
@@ -144,14 +146,8 @@ public class PartyCommands {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && downtimeNeeded) {
-            if (Utils.isInDungeons() || Utils.isInKuudra()) {
-                if (Utils.isInstanceOver()) {
-                    showDowntimeReminder();
-                }
-            } else {
-                downtimeNeeded = false;
-            }
+        if (instance.isActive() && downtimeNeeded && Utils.isInstanceOver()) {
+            showDowntimeReminder();
         }
     }
 

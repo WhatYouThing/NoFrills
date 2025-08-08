@@ -9,7 +9,7 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.events.SendPacketEvent;
 import nofrills.events.ServerTickEvent;
-import nofrills.events.TabListUpdateEvent;
+import nofrills.misc.SkyblockData;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,7 +31,7 @@ public abstract class ClientConnectionMixin {
         if (packet instanceof PlayerListS2CPacket listPacket) {
             List<PlayerListS2CPacket.Entry> entries = new ArrayList<>(listPacket.getEntries());
             entries.removeIf(entry -> entry.displayName() == null);
-            eventBus.post(new TabListUpdateEvent(listPacket, entries));
+            SkyblockData.updateTabList(listPacket, entries);
         }
         if (eventBus.post(new ReceivePacketEvent(packet)).isCancelled()) {
             ci.cancel();

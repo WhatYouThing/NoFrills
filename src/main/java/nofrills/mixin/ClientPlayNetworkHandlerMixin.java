@@ -16,6 +16,7 @@ import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.util.Formatting;
 import nofrills.events.*;
 import nofrills.features.fixes.AnimationFix;
+import nofrills.misc.SkyblockData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -90,12 +91,12 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onScoreboardObjectiveUpdate", at = @At("TAIL"))
     private void onObjectiveUpdate(ScoreboardObjectiveUpdateS2CPacket packet, CallbackInfo ci) {
-        eventBus.post(new ObjectiveUpdateEvent(packet));
+        SkyblockData.updateObjective(packet);
     }
 
     @Inject(method = "onTeam", at = @At("TAIL"))
     private void onScoreUpdate(TeamS2CPacket packet, CallbackInfo ci) {
-        eventBus.post(new ScoreboardUpdateEvent(packet));
+        SkyblockData.updateScoreboard(packet);
     }
 
     @Inject(method = "onGameJoin", at = @At("TAIL"))

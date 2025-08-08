@@ -205,6 +205,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Description("Swapping", "Left ctrl + Left click on an item in your inventory to swap it with the hotbar slot directly below it."),
                                 new Settings.Separator("Settings"),
                                 new Settings.SliderInt("Last Override", 1, 9, 1, HotbarSwap.override, "Specify a replacement hotbar slot in cases where you swap with the 9th (unused) hotbar slot.")
+                        ))),
+                        new Module("Auto Requeue", AutoRequeue.instance, "Automatically starts a new Dungeons/Kuudra run once finished.", new Settings(List.of(
+                                new Settings.SliderInt("Delay", 20, 400, 5, AutoRequeue.delay, "The delay (in ticks) until the new run is started."),
+                                new Settings.Toggle("Terror Check", AutoRequeue.terrorCheck, "Waits until everyone has switched off their Terror armor to start requeuing. Only applies in Kuudra."),
+                                new Settings.Keybind("Pause Keybind", AutoRequeue.pauseBind, "A keybind that allows you to manually pause Auto Requeue on demand.")
                         )))
                 )),
                 new Category("Tweaks", List.of(

@@ -19,10 +19,7 @@ import nofrills.features.fishing.RareAnnounce;
 import nofrills.features.fishing.RareGlow;
 import nofrills.features.fixes.*;
 import nofrills.features.general.*;
-import nofrills.features.hunting.CinderbatHighlight;
-import nofrills.features.hunting.FusionKeybinds;
-import nofrills.features.hunting.InvisibugHighlight;
-import nofrills.features.hunting.LassoAlert;
+import nofrills.features.hunting.*;
 import nofrills.features.keybinds.CustomKeybinds;
 import nofrills.features.keybinds.PearlRefill;
 import nofrills.features.keybinds.RecipeLookup;
@@ -301,7 +298,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Keybind("Confirm Previous", FusionKeybinds.confirm, "The keybind to confirm the previous fusion."),
                                 new Settings.Keybind("Cancel Previous", FusionKeybinds.cancel, "The keybind to cancel the previous fusion.")
                         ))),
-                        new Module("Lasso Alert", LassoAlert.instance, "Plays a sound effect once you can reel in with your lasso.")
+                        new Module("Lasso Alert", LassoAlert.instance, "Plays a sound effect once you can reel in with your lasso."),
+                        new Module("Instant Fog", InstantFog.instance, "Makes the thick underwater fog disappear instantly.")
                 )),
                 new Category("Dungeons", List.of(
                         new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(

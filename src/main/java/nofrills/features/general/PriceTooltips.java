@@ -81,7 +81,7 @@ public class PriceTooltips {
     }
 
     private static String getShardId(ItemStack stack) {
-        return Formatting.strip(stack.getName().getString()).replaceAll(" ", "_").toUpperCase();
+        return Formatting.strip(stack.getName().getString()).replaceAll(" Shard", "").replaceAll(" ", "_").toUpperCase();
     }
 
     private static String correctShardId(String id) {
@@ -89,6 +89,8 @@ public class PriceTooltips {
             case "CINDERBAT" -> "SHARD_CINDER_BAT";
             case "ABYSSAL_LANTERNFISH" -> "SHARD_ABYSSAL_LANTERN";
             case "STRIDERSURFER" -> "SHARD_STRIDER_SURFER";
+            case "BOGGED" -> "SHARD_SEA_ARCHER";
+            case "LOCH_EMPEROR" -> "SHARD_SEA_EMPEROR";
             default -> Utils.format("SHARD_{}", id);
         };
     }
@@ -113,6 +115,18 @@ public class PriceTooltips {
                     int end = line.indexOf(" ", start);
                     try {
                         int countInt = Integer.parseInt(line.substring(start, end).replaceAll(",", ""));
+                        return countInt > 0 ? countInt : 1;
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+        }
+        if (title.equals("Attribute Menu")) {
+            for (String line : Utils.getLoreLines(stack)) {
+                if (line.startsWith("Syphon") && line.endsWith("more to level up!")) {
+                    String replaced = line.replace("Syphon", "").trim();
+                    try {
+                        int countInt = Integer.parseInt(replaced.substring(0, replaced.indexOf(" ")).replaceAll(",", ""));
                         return countInt > 0 ? countInt : 1;
                     } catch (NumberFormatException ignored) {
                     }

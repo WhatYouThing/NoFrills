@@ -135,6 +135,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(TempleSkip.class);
         eventBus.subscribe(SecretBatHighlight.class);
         eventBus.subscribe(AutoRequeue.class);
+        eventBus.subscribe(ShopCleaner.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

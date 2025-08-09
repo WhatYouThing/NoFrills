@@ -22,11 +22,11 @@ public class KuudraWaypoints {
     public static final Feature instance = new Feature("kuudraWaypoints");
 
     public static final SettingBool supply = new SettingBool(false, "supply", instance.key());
-    public static final SettingColor supplyColor = new SettingColor(RenderColor.fromHex(0x00ff00, 0.5f), "supplyColor", instance.key());
+    public static final SettingColor supplyColor = new SettingColor(new RenderColor(0, 255, 255, 170), "supplyColor", instance.key());
     public static final SettingBool drop = new SettingBool(false, "drop", instance.key());
-    public static final SettingColor dropColor = new SettingColor(RenderColor.fromHex(0x00ff00, 0.5f), "dropColor", instance.key());
+    public static final SettingColor dropColor = new SettingColor(new RenderColor(255, 255, 0, 170), "dropColor", instance.key());
     public static final SettingBool build = new SettingBool(false, "build", instance.key());
-    public static final SettingColor buildColor = new SettingColor(RenderColor.fromHex(0x00ff00, 0.5f), "buildColor", instance.key());
+    public static final SettingColor buildColor = new SettingColor(new RenderColor(255, 0, 0, 170), "buildColor", instance.key());
 
     private static final EntityCache supplies = new EntityCache();
     private static final EntityCache dropOffs = new EntityCache();

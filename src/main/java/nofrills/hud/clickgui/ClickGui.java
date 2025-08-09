@@ -365,23 +365,24 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Send Message", FreshTimer.send, "Send a message once Fresh Tools activates."),
                                 new Settings.TextInput("Message", FreshTimer.message, "The message to send.")
                         ))),
-                        new Module("Show Health", KuudraHealth.instance, "Shows Kuudra's exact health on screen.", new Settings(List.of(
+                        new Module("Kuudra Health", KuudraHealth.instance, "Shows Kuudra's exact health on screen.", new Settings(List.of(
                                 new Settings.Toggle("Show DPS", KuudraHealth.dps, "Calculates your team's DPS. Only applies in the last phase of Infernal tier."),
                                 new Settings.ColorPicker("Color", false, KuudraHealth.color, "The color of the text.")
                         ))),
-                        new Module("Show Hitbox", KuudraHitbox.instance, "Renders a hitbox for Kuudra.", new Settings(List.of(
-                                new Settings.Toggle("Through Walls", KuudraHitbox.walls, "Allows the hitbox to render through walls, because even YouTube ranks can get away with ESP in Kuudra."),
+                        new Module("Kuudra Hitbox", KuudraHitbox.instance, "Renders a hitbox for Kuudra.", new Settings(List.of(
+                                new Settings.Toggle("Through Walls", KuudraHitbox.walls, "Makes the hitbox render through walls, because even YouTube ranks can get away with ESP in Kuudra."),
                                 new Settings.ColorPicker("Color", true, KuudraHitbox.color, "The color of the hitbox.")
                         ))),
                         new Module("Waypoints", KuudraWaypoints.instance, "Renders various waypoints in Kuudra.", new Settings(List.of(
                                 new Settings.Toggle("Supplies", KuudraWaypoints.supply, "Renders beacons for every supply crate."),
-                                new Settings.Toggle("Drop-offs", KuudraWaypoints.drop, "Renders beacons for every available supply drop-off point."),
-                                new Settings.Toggle("Build Piles", KuudraWaypoints.build, "Renders beacons for every unfinished Ballista build pile."),
                                 new Settings.ColorPicker("Supply Color", true, KuudraWaypoints.supplyColor, "The color of the supply crate beacons."),
+                                new Settings.Toggle("Drop-offs", KuudraWaypoints.drop, "Renders beacons for every available supply drop-off point."),
                                 new Settings.ColorPicker("Drop-off Color", true, KuudraWaypoints.dropColor, "The color of the drop-off beacons."),
+                                new Settings.Toggle("Build Piles", KuudraWaypoints.build, "Renders beacons for every unfinished Ballista build pile."),
                                 new Settings.ColorPicker("Piles Color", true, KuudraWaypoints.buildColor, "The color of the build pile beacons.")
                         ))),
-                        new Module("Pre Message", PreMessage.instance, "Announces if no supply spawns at your pre spot (or your next pickup spot).")
+                        new Module("Pre Message", PreMessage.instance, "Announces if no supply spawns at your pre spot (or your next pickup spot)."),
+                        new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop.")
                 )),
                 new Category("Slayer", List.of(
                         new Module("Boss Highlight", BossHighlight.instance, "Highlights your slayer boss.", new Settings(List.of(

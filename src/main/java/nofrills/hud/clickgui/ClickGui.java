@@ -257,6 +257,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Animation Fix", AnimationFix.instance, "Fixes the ancient bug where certain animations can play twice, such as unsneaking.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", AnimationFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", AnimationFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        ))),
+                        new Module("Sneak Lag Fix", SneakLagFix.instance, "Fixes lag backs that occur when you sneak while walking.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", SneakLagFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", SneakLagFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        ))),
+                        new Module("Double Use Fix", DoubleUseFix.instance, "Fixes Blaze Daggers and Fishing Rods being able to activate twice at once.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", DoubleUseFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", DoubleUseFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         )))
                 )),
                 new Category("Solvers", List.of(
@@ -402,7 +410,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Inferno Demonlord", InfernoDemonlord.instance, "Various features for Blaze slayer.", new Settings(List.of(
                                 new Settings.Toggle("Pillar Alert", InfernoDemonlord.pillarAlert, "Displays information about your fire pillars.\nThis feature tries to ensure that you only get alerted for your own pillars, no false flags."),
-                                new Settings.Toggle("Attunement Swap Fix", InfernoDemonlord.attunementFix, "Fixes your attunement changing twice after right clicking on a block."),
                                 new Settings.Toggle("No Spam", InfernoDemonlord.noSpam, "Hides the chat messages about using the wrong attunement.")
                         ))),
                         new Module("Kill Timer", KillTimer.instance, "Tracks how long your slayer boss took to kill."),

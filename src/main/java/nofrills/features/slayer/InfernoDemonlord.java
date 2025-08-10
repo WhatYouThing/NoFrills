@@ -20,13 +20,11 @@ public class InfernoDemonlord {
     public static final Feature instance = new Feature("infernoDemonlord");
 
     public static final SettingBool pillarAlert = new SettingBool(false, "pillarAlert", instance.key());
-    public static final SettingBool attunementFix = new SettingBool(false, "attunementFix", instance.key());
     public static final SettingBool noSpam = new SettingBool(false, "noSpam", instance.key());
 
     private static final Pattern firePillarRegex = Pattern.compile("[0-9]s [0-9] hits");
     private static final List<Vec3d> pillarData = new ArrayList<>();
     private static int pillarClearTicks = 0;
-    private static boolean blockNextUse = false;
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
@@ -98,21 +96,6 @@ public class InfernoDemonlord {
                     }
                 }
             }
-        }
-    }
-
-    @EventHandler
-    private static void onUseBlock(InteractBlockEvent event) {
-        if (instance.isActive() && attunementFix.value() && Utils.getRightClickAbility(Utils.getHeldItem()).contains("Attunement")) {
-            blockNextUse = true;
-        }
-    }
-
-    @EventHandler
-    private static void onUseItem(InteractItemEvent event) {
-        if (blockNextUse) {
-            blockNextUse = false;
-            event.cancel();
         }
     }
 }

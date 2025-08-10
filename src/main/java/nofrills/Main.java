@@ -20,6 +20,7 @@ import nofrills.features.fishing.CapTracker;
 import nofrills.features.fishing.MuteDrake;
 import nofrills.features.fishing.RareAnnounce;
 import nofrills.features.fishing.RareGlow;
+import nofrills.features.fixes.DoubleUseFix;
 import nofrills.features.general.*;
 import nofrills.features.hunting.CinderbatHighlight;
 import nofrills.features.hunting.FusionKeybinds;
@@ -137,6 +138,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(AutoRequeue.class);
         eventBus.subscribe(ShopCleaner.class);
         eventBus.subscribe(KuudraChestValue.class);
+        eventBus.subscribe(DoubleUseFix.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

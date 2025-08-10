@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.general.PriceTooltips;
+import nofrills.features.kuudra.KuudraChestValue;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +24,10 @@ public class NoFrillsAPI {
     public static final ConcurrentHashMap<String, HashMap<String, Double>> bazaarPricing = new ConcurrentHashMap<>();
     public static final ConcurrentHashMap<String, HashMap<String, Double>> npcPricing = new ConcurrentHashMap<>();
     private static int refreshTicks = 0;
+
+    private static boolean shouldRefresh() {
+        return PriceTooltips.instance.isActive() || KuudraChestValue.instance.isActive();
+    }
 
     private static void refreshItemPricing() {
         new Thread(() -> {
@@ -64,7 +69,7 @@ public class NoFrillsAPI {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (PriceTooltips.instance.isActive() && Utils.isInSkyblock()) {
+        if (shouldRefresh() && Utils.isInSkyblock()) {
             if (refreshTicks == 0) {
                 if (mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
                     refreshItemPricing();

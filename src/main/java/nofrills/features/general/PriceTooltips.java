@@ -28,7 +28,7 @@ public class PriceTooltips {
     public static final SettingBool mote = new SettingBool(false, "mote", instance.key());
     public static final SettingInt burgers = new SettingInt(0, "burgers", instance.key());
 
-    private static String parseItemId(ItemStack stack, NbtCompound data, String title) {
+    public static String parseItemId(ItemStack stack, NbtCompound data, String title) {
         String id = Utils.getSkyblockId(data);
         if (id.isEmpty()) {
             if (title.equals("Hunting Box")) {
@@ -80,11 +80,11 @@ public class PriceTooltips {
         return id;
     }
 
-    private static String getShardId(ItemStack stack) {
+    public static String getShardId(ItemStack stack) {
         return Formatting.strip(stack.getName().getString()).replaceAll(" Shard", "").replaceAll(" ", "_").toUpperCase();
     }
 
-    private static String correctShardId(String id) {
+    public static String correctShardId(String id) {
         return switch (id) {
             case "CINDERBAT" -> "SHARD_CINDER_BAT";
             case "ABYSSAL_LANTERNFISH" -> "SHARD_ABYSSAL_LANTERN";
@@ -95,7 +95,7 @@ public class PriceTooltips {
         };
     }
 
-    private static int getStackQuantity(ItemStack stack, String title) {
+    public static int getStackQuantity(ItemStack stack, String title) {
         if (title.endsWith("Sack")) {
             for (String line : Utils.getLoreLines(stack)) {
                 if (line.startsWith("Stored: ") && line.contains("/")) {

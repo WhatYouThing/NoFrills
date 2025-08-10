@@ -382,7 +382,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Piles Color", true, KuudraWaypoints.buildColor, "The color of the build pile beacons.")
                         ))),
                         new Module("Pre Message", PreMessage.instance, "Announces if no supply spawns at your pre spot (or your next pickup spot)."),
-                        new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop.")
+                        new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop."),
+                        new Module("Chest Value", KuudraChestValue.instance, "Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.")
                 )),
                 new Category("Slayer", List.of(
                         new Module("Boss Highlight", BossHighlight.instance, "Highlights your slayer boss.", new Settings(List.of(
@@ -421,8 +422,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your mining ability is ready to be used again."),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
                                 new Settings.ColorPicker("Lapis Color", false, CorpseHighlight.lapisColor, "The color of the Lapis corpse."),
-                                new Settings.ColorPicker("Mineral Color", false, CorpseHighlight.mineralColor, "The color of the Mineral corpse."),
-                                new Settings.ColorPicker("Yog Color", false, CorpseHighlight.yogColor, "The color of the Yog corpse."),
+                                new Settings.ColorPicker("Mineral Color", false, CorpseHighlight.mineralColor, "The color of the Tungsten corpse."),
+                                new Settings.ColorPicker("Yog Color", false, CorpseHighlight.yogColor, "The color of the Umber corpse."),
                                 new Settings.ColorPicker("Vanguard Color", false, CorpseHighlight.vanguardColor, "The color of the Vanguard corpse.")
                         ))),
                         new Module("Better Sky Mall", BetterSkyMall.instance, "Compacts Sky Mall messages, and fully hides them if you are not mining.", new Settings(List.of(

@@ -21,6 +21,7 @@ import nofrills.features.fixes.MiddleClickFix;
 import nofrills.features.general.NoRender;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.general.TooltipScale;
+import nofrills.features.kuudra.KuudraChestValue;
 import nofrills.hud.LeapMenuButton;
 import nofrills.misc.*;
 import org.jetbrains.annotations.Nullable;
@@ -242,6 +243,18 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 drawBorder(context, focusedSlot.id, SlotBinding.binding.value());
                 drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.binding.value());
             }
+        }
+        if (KuudraChestValue.instance.isActive() && KuudraChestValue.currentValue > 0.0) {
+            Slot targetSlot = this.handler.getSlot(4);
+            String value = Utils.format("Chest Value: {}", String.format("%,.1f", KuudraChestValue.currentValue));
+            int width = mc.textRenderer.getWidth(value);
+            int baseX = targetSlot.x + 8;
+            int baseY = targetSlot.y + 8;
+            context.getMatrices().push();
+            context.getMatrices().translate(0, 0, 420);
+            context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, RenderColor.green.hex);
+            context.fill((int) (baseX - 2 - width * 0.5), baseY - 6, (int) (baseX + 2 + width * 0.5), baseY + 6, RenderColor.darkGray.argb);
+            context.getMatrices().pop();
         }
         for (Slot slot : this.handler.slots) {
             if (SlotOptions.hasBackground(slot)) {

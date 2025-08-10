@@ -6,9 +6,9 @@ import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
 import nofrills.features.fixes.RidingCameraFix;
+import nofrills.features.fixes.SneakLagFix;
 import nofrills.features.hunting.InstantFog;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -18,12 +18,6 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
         super(world, profile);
     }
-
-    @Shadow
-    public abstract boolean isSneaking();
-
-    @Shadow
-    public abstract boolean isInSneakingPose();
 
     @ModifyReturnValue(method = "getYaw", at = @At("RETURN"))
     private float onGetYaw(float original) {
@@ -38,5 +32,13 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         if (InstantFog.instance.isActive()) {
             cir.setReturnValue(1.0f);
         }
+    }
+
+    @ModifyReturnValue(method = "shouldSlowDown", at = @At("RETURN"))
+    private boolean onShouldSlowDown(boolean original) {
+        if (SneakLagFix.active()) {
+            return this.isSneaking();
+        }
+        return original;
     }
 }

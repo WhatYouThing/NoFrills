@@ -253,7 +253,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             context.getMatrices().push();
             context.getMatrices().translate(0, 0, 420);
             context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, RenderColor.green.hex);
-            context.fill((int) (baseX - 2 - width * 0.5), baseY - 6, (int) (baseX + 2 + width * 0.5), baseY + 6, RenderColor.darkGray.argb);
+            context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, RenderColor.darkGray.argb);
             context.getMatrices().pop();
         }
         for (Slot slot : this.handler.slots) {

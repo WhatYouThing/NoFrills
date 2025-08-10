@@ -107,13 +107,12 @@ public class PartyCommands {
                     if (!downtime.value().equals(behavior.Disabled) && command.startsWith("dt")) {
                         if (whitelisted || downtime.value().equals(behavior.Automatic)) {
                             if (SkyblockData.isInInstance()) {
-                                if (!Utils.isInstanceOver() && !downtimeNeeded) {
+                                if (!Utils.isInstanceOver()) {
                                     Utils.info("§aScheduled downtime reminder.");
                                     downtimeNeeded = true;
                                 }
-                                if (AutoRequeue.instance.isActive() && !AutoRequeue.paused) {
-                                    Utils.info("§aAuto Requeue paused with the downtime command.");
-                                    AutoRequeue.paused = true;
+                                if (AutoRequeue.instance.isActive()) {
+                                    AutoRequeue.setPaused();
                                 }
                             } else {
                                 showDowntimeReminder();

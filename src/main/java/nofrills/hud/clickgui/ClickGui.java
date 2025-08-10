@@ -100,7 +100,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Auto Sprint", AutoSprint.instance, "Essentially Toggle Sprint, but always active.", new Settings(List.of(
                                 new Settings.Toggle("Submerged Check", AutoSprint.waterCheck, "Prevents Auto Sprint from working while you are underwater.")
                         ))),
-                        new Module("Update Checker", UpdateChecker.instance, "Checks if a NoFrills update is available the first time you join any world/server."),
                         new Module("Slot Binding", SlotBinding.instance, "Bind your hotbar slots to your inventory slots, similarly to NEU's slot binding.", new Settings(List.of(
                                 new Settings.Separator("Usage"),
                                 new Settings.Description("Using Binds", "Shift + Left click on either of the bound slots to swap items between them."),
@@ -165,9 +164,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Pearl Refill", PearlRefill.instance, "Easily refill your Ender Pearls from your sacks with a keybind.", new Settings(List.of(
                                 new Settings.Keybind("Keybind", PearlRefill.keybind, "The key that activates the feature.")
                         ))),
-                        new Module("Recipe Lookup", RecipeLookup.instance, "Search up recipes for the hovered item with a keybind.", new Settings(List.of(
-                                new Settings.Keybind("Keybind", RecipeLookup.keybind, "The key that activates the feature.")
-                        ))),
                         new Module("Party Commands", PartyCommands.instance, "Provide various commands to your party members.", new Settings(List.of(
                                 new Settings.Description("Usage", "Run the \"/nf partyCommands\" command to see more information."),
                                 new Settings.TextInput("Prefixes", PartyCommands.prefixes, "List of valid prefixes for these commands, separated by space."),
@@ -178,9 +174,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Dropdown<>("Downtime", PartyCommands.downtime, "Allows party members to schedule a downtime reminder for the end of your Kuudra/Dungeons run.\n\nCommand: !dt"),
                                 new Settings.Dropdown<>("Instance Queue", PartyCommands.queue, Utils.format("Allows party members to queue for any instance on demand.\n\nCommand List: {}", PartyCommands.listInstancesFormatted())),
                                 new Settings.Dropdown<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords")
-                        ))),
-                        new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(
-                                new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
                         ))),
                         new Module("Viewmodel", Viewmodel.instance, "Easily customize the appearance of your held item.", new Settings(List.of(
                                 new Settings.Toggle("No Haste", Viewmodel.noHaste, "Prevents Haste and Mining Fatigue from affecting your swing speed."),
@@ -196,21 +189,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Rotation Y", -180, 180, 0.5, Viewmodel.rotY, "The Y axis rotation of your held item."),
                                 new Settings.SliderDouble("Rotation Z", -180, 180, 0.5, Viewmodel.rotZ, "The Z axis rotation of your held item.")
                         ))),
-                        new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of item tooltips.", new Settings(List.of(
-                                new Settings.SliderDouble("Scale", 0.0, 4.0, 0.01, TooltipScale.scale, "The scale multiplier.")
-                        ))),
-                        new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings()),
-                        new Module("Hotbar Swap", HotbarSwap.instance, "A simple alternative to slot binding with no configuration needed.", new Settings(List.of(
-                                new Settings.Separator("Usage"),
-                                new Settings.Description("Swapping", "Left ctrl + Left click on an item in your inventory to swap it with the hotbar slot directly below it."),
-                                new Settings.Separator("Settings"),
-                                new Settings.SliderInt("Last Override", 1, 9, 1, HotbarSwap.override, "Specify a replacement hotbar slot in cases where you swap with the 9th (unused) hotbar slot.")
-                        ))),
-                        new Module("Auto Requeue", AutoRequeue.instance, "Automatically starts a new Dungeons/Kuudra run once finished.", new Settings(List.of(
-                                new Settings.SliderInt("Delay", 20, 400, 5, AutoRequeue.delay, "The delay (in ticks) until the new run is started."),
-                                new Settings.Toggle("Terror Check", AutoRequeue.terrorCheck, "Waits until everyone has switched off their Terror armor to start requeuing. Only applies in Kuudra."),
-                                new Settings.Keybind("Pause Keybind", AutoRequeue.pauseBind, "A keybind that allows you to manually pause Auto Requeue on demand.")
-                        )))
+                        new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings())
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),
@@ -265,6 +244,29 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Double Use Fix", DoubleUseFix.instance, "Fixes Blaze Daggers and Fishing Rods being able to activate twice at once.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", DoubleUseFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", DoubleUseFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        )))
+                )),
+                new Category("Misc", List.of(
+                        new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of item tooltips.", new Settings(List.of(
+                                new Settings.SliderDouble("Scale", 0.0, 4.0, 0.01, TooltipScale.scale, "The scale multiplier.")
+                        ))),
+                        new Module("Recipe Lookup", RecipeLookup.instance, "Search up recipes for the hovered item with a keybind.", new Settings(List.of(
+                                new Settings.Keybind("Keybind", RecipeLookup.keybind, "The key that activates the feature.")
+                        ))),
+                        new Module("Update Checker", UpdateChecker.instance, "Checks if a NoFrills update is available the first time you join any world/server."),
+                        new Module("Hotbar Swap", HotbarSwap.instance, "A simple alternative to slot binding with no configuration needed.", new Settings(List.of(
+                                new Settings.Separator("Usage"),
+                                new Settings.Description("Swapping", "Left ctrl + Left click on an item in your inventory to swap it with the hotbar slot directly below it."),
+                                new Settings.Separator("Settings"),
+                                new Settings.SliderInt("Last Override", 1, 9, 1, HotbarSwap.override, "Specify a replacement hotbar slot in cases where you swap with the 9th (unused) hotbar slot.")
+                        ))),
+                        new Module("Auto Requeue", AutoRequeue.instance, "Automatically starts a new Dungeons/Kuudra run once finished.", new Settings(List.of(
+                                new Settings.SliderInt("Delay", 20, 400, 5, AutoRequeue.delay, "The delay (in ticks) until the new run is started."),
+                                new Settings.Toggle("Terror Check", AutoRequeue.terrorCheck, "Waits until everyone has switched off their Terror armor to start requeuing. Only applies in Kuudra."),
+                                new Settings.Keybind("Pause Keybind", AutoRequeue.pauseBind, "A keybind that allows you to manually pause Auto Requeue on demand.")
+                        ))),
+                        new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(
+                                new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
                         )))
                 )),
                 new Category("Solvers", List.of(

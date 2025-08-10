@@ -21,7 +21,7 @@ public class Category extends FlowLayout {
 
     protected Category(String title, List<Module> children) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
-        this.margins(Insets.of(5, 0, 5, 0));
+        this.margins(Insets.of(5, 0, 3, 0));
         Color color = Color.ofArgb(0xff5ca0bf);
         Color textColor = Color.ofArgb(0xffffffff);
         FlowLayout modules = Containers.verticalFlow(Sizing.content(), Sizing.content());

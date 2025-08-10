@@ -25,12 +25,14 @@ public class AutoRequeue {
     public static boolean paused = false;
     public static int ticks = 0;
 
-    private static boolean checkTerror() {
-        for (Entity ent : Utils.getEntities()) {
-            if (ent instanceof PlayerEntity player && Utils.isPlayer(player)) {
-                for (ItemStack stack : Utils.getEntityArmor(player)) {
-                    if (Utils.getSkyblockId(stack).contains("TERROR")) {
-                        return true;
+    private static boolean isAnyoneInTerror() {
+        if (Utils.isInKuudra()) {
+            for (Entity ent : Utils.getEntities()) {
+                if (ent instanceof PlayerEntity player && Utils.isPlayer(player)) {
+                    for (ItemStack stack : Utils.getEntityArmor(player)) {
+                        if (Utils.getSkyblockId(stack).contains("TERROR")) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -38,10 +40,17 @@ public class AutoRequeue {
         return false;
     }
 
+    public static void setPaused() {
+        if (!paused) {
+            Utils.info("§aAuto Requeue paused for the current instance.");
+            paused = true;
+        }
+    }
+
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && !paused && SkyblockData.isInstanceOver()) {
-            if (terrorCheck.value() && Utils.isInKuudra() && checkTerror()) {
+            if (terrorCheck.value() && isAnyoneInTerror()) {
                 return;
             }
             if (ticks != -1) {
@@ -60,9 +69,8 @@ public class AutoRequeue {
     @EventHandler
     private static void onInput(InputEvent event) {
         if (instance.isActive() && event.key == pauseBind.value() && event.modifiers == 0 && SkyblockData.isInInstance()) {
-            if (event.action == GLFW.GLFW_PRESS && !paused) {
-                Utils.info("§aAuto Requeue paused using the pause keybind.");
-                paused = true;
+            if (event.action == GLFW.GLFW_PRESS) {
+                setPaused();
             }
             event.cancel();
         }

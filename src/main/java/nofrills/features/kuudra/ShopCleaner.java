@@ -1,6 +1,7 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
@@ -26,7 +27,10 @@ public class ShopCleaner {
 
     @EventHandler
     private static void onSlot(ScreenSlotUpdateEvent event) {
-        if (instance.isActive() && Utils.isInKuudra() && !event.inventory.getStack(event.slotId).isEmpty()) {
+        if (instance.isActive() && Utils.isInKuudra() && event.title.equals("Perk Menu")) {
+            if (event.inventory.getStack(event.slotId).isEmpty() || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
+                return;
+            }
             String name = Formatting.strip(event.stack.getName().getString());
             for (String garbage : garbageList) {
                 if (name.startsWith(garbage)) {

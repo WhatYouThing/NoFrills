@@ -6,6 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
+import nofrills.config.SettingInt;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenSlotUpdateEvent;
 import nofrills.features.general.PriceTooltips;
@@ -17,6 +18,8 @@ import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 public class KuudraChestValue {
     public static final Feature instance = new Feature("kuudraChestValue");
 
+    public static final SettingInt petBonus = new SettingInt(0, "petBonus", instance.key());
+
     public static double currentValue = 0.0;
 
     private static int getLootQuantity(ItemStack stack, String name) {
@@ -24,7 +27,11 @@ public class KuudraChestValue {
         String last = parts[parts.length - 1];
         if (last.startsWith("x")) {
             try {
-                return Integer.parseInt(last.replaceAll("x", "").replaceAll(",", ""));
+                int quantity = Integer.parseInt(last.replaceAll("x", "").replaceAll(",", ""));
+                if (name.startsWith("Crimson Essence")) {
+                    quantity = (int) Math.floor(quantity * (1 + petBonus.value() * 0.01));
+                }
+                return quantity;
             } catch (NumberFormatException ignored) {
             }
         }

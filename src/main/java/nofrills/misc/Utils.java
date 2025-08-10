@@ -190,7 +190,7 @@ public class Utils {
     }
 
     public static boolean isInKuudra() {
-        return isInZone(Symbols.zone + " Kuudra's Hollow", false);
+        return SkyblockData.getArea().equals("Kuudra");
     }
 
     public static boolean isInChateau() {

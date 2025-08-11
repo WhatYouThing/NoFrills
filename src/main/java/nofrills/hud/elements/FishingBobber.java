@@ -15,6 +15,7 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class FishingBobber extends SimpleTextElement {
@@ -25,17 +26,22 @@ public class FishingBobber extends SimpleTextElement {
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
+    public final SettingBool timer = new SettingBool(false, "timer", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "bobber-element");
+    private final DecimalFormat format = new DecimalFormat("0.0");
     public Entity hologram = null;
-    private boolean active = false;
+    public int timerTicks = 0;
+    public boolean active = false;
+    public String currentText = "§cBobber: §7Inactive";
 
     public FishingBobber(Text text) {
         super(text);
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
-                new Settings.Toggle("Hide If Inactive", inactive, "Hides the element if your fishing bobber is inactive.")
+                new Settings.Toggle("Hide If Inactive", inactive, "Hides the element if your fishing bobber is inactive."),
+                new Settings.Toggle("Bobber Timer", timer, "Tracks how long your fishing bobber has existed for, useful for Slugfish.")
         ));
         this.options.setTitle(Text.of("Bobber Element"));
     }
@@ -52,26 +58,36 @@ public class FishingBobber extends SimpleTextElement {
                 return;
             }
         }
+        if (timer.value()) {
+            this.setText(Utils.format("{} §7[{}s]", this.currentText, format.format(this.timerTicks / 20.0)));
+        } else {
+            this.setText(this.currentText);
+        }
         this.updateShadow(shadow);
         this.updateAlignment(align);
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
+    private void updateText(String text) {
+        this.currentText = text;
+    }
+
     public void setActive() {
-        this.setText("§cBobber: §aActive");
+        this.updateText("§cBobber: §aActive");
         this.active = true;
     }
 
     public void setInactive() {
-        this.setText("§cBobber: §7Inactive");
+        this.updateText("§cBobber: §7Inactive");
+        this.timerTicks = 0;
         this.active = false;
     }
 
     public void setTimer(String timer) {
         if (timer.equals("!!!")) {
-            this.setText("§cBobber: §c§lReel!");
+            this.updateText("§cBobber: §c§lReel!");
         } else {
-            this.setText(Utils.format("§cBobber: §e§l{}", timer));
+            this.updateText(Utils.format("§cBobber: §e§l{}", timer));
         }
         this.active = true;
     }

@@ -119,6 +119,9 @@ public class HudManager {
         if (tpsElement.instance.isActive()) {
             tpsElement.serverTicks += 1;
         }
+        if (bobberElement.instance.isActive() && bobberElement.timer.value() && bobberElement.active) {
+            bobberElement.timerTicks += 1;
+        }
     }
 
     @EventHandler

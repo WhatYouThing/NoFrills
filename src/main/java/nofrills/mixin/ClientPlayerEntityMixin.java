@@ -37,7 +37,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @ModifyReturnValue(method = "shouldSlowDown", at = @At("RETURN"))
     private boolean onShouldSlowDown(boolean original) {
         if (SneakLagFix.active()) {
-            return this.isSneaking();
+            return this.isSneaking() && !this.getAbilities().flying;
         }
         return original;
     }

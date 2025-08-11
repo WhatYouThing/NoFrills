@@ -12,6 +12,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
+import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.keybinds.PearlRefill;
@@ -20,9 +21,12 @@ import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
+import java.util.List;
+
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 import static nofrills.misc.SkyblockData.instances;
 
@@ -210,15 +214,32 @@ public class NoFrillsCommand {
             new ModCommand("debug", "Random commands for logging, debugging, or testing.", literal("debug").executes(context -> {
                 return SINGLE_SUCCESS;
             }).then(literal("dumpHeadTextures").executes(context -> {
+                List<EquipmentSlot> searchedSlots = List.of(
+                        EquipmentSlot.HEAD,
+                        EquipmentSlot.MAINHAND,
+                        EquipmentSlot.OFFHAND
+                );
                 for (Entity ent : Utils.getEntities()) {
-                    if (ent instanceof LivingEntity livingEntity) {
-                        ItemStack helmet = livingEntity.getEquippedStack(EquipmentSlot.HEAD);
-                        GameProfile textures = Utils.getTextures(helmet);
-                        if (textures != null && helmet.getItem() instanceof PlayerHeadItem) {
-                            Utils.infoFormat("entity name: {}\nhelmet name: {}\ntexture url: {}", ent.getName().getString(), helmet.getName().getString(), Utils.getTextureUrl(textures));
+                    if (ent instanceof LivingEntity living) {
+                        for (EquipmentSlot slot : searchedSlots) {
+                            ItemStack stack = living.getEquippedStack(slot);
+                            GameProfile textures = Utils.getTextures(stack);
+                            if (textures != null && stack.getItem() instanceof PlayerHeadItem) {
+                                Vec3d pos = living.getPos();
+                                LOGGER.info(Utils.format("\n\tURL - {}\n\tSlot - {}\n\tEntity Name - {}\n\tHead Name - {}\n\tPosition - {} {} {}",
+                                        Utils.getTextureUrl(textures),
+                                        slot.name().toUpperCase(),
+                                        living.getName().getString(),
+                                        stack.getName().getString(),
+                                        pos.getX(),
+                                        pos.getY(),
+                                        pos.getZ()
+                                ));
+                            }
                         }
                     }
                 }
+                Utils.info("Dumped head texture URL's to latest.log.");
                 return SINGLE_SUCCESS;
             })))
     };

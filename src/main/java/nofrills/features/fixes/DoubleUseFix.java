@@ -7,6 +7,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.HitResult;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.events.InteractBlockEvent;
 import nofrills.events.InteractItemEvent;
 import nofrills.misc.Utils;
 
@@ -44,14 +45,17 @@ public class DoubleUseFix {
 
     @EventHandler
     private static void onUseItem(InteractItemEvent event) {
-        if (active() && mc.crosshairTarget != null && mc.crosshairTarget.getType().equals(HitResult.Type.BLOCK)) {
-            type disableType = getDisableType();
-            if (!disableType.equals(type.None)) {
-                if (disableType.equals(type.Rod)) {
-                    mc.player.swingHand(Hand.MAIN_HAND);
-                }
-                event.cancel();
-            }
+        if (active() && mc.crosshairTarget != null && mc.crosshairTarget.getType().equals(HitResult.Type.BLOCK) && getDisableType().equals(type.Dagger)) {
+            event.cancel();
+        }
+    }
+
+    @EventHandler
+    private static void onUseBlock(InteractBlockEvent event) {
+        if (active() && getDisableType().equals(type.Rod)) {
+            mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+            mc.player.swingHand(Hand.MAIN_HAND);
+            event.cancel();
         }
     }
 

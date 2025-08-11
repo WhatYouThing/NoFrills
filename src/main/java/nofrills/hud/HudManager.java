@@ -39,6 +39,15 @@ public class HudManager {
         return mc.currentScreen instanceof HudEditorScreen;
     }
 
+    public static void registerElements() {
+        for (HudElement element : elements) {
+            Identifier identifier = element.getIdentifier();
+            if (identifier != null && !Hud.hasComponent(identifier)) {
+                Hud.add(identifier, () -> element);
+            }
+        }
+    }
+
     @EventHandler
     private static void onRenderHud(HudRenderEvent event) {
         for (HudElement element : HudManager.elements) {
@@ -48,12 +57,6 @@ public class HudManager {
 
     @EventHandler
     private static void onJoinServer(ServerJoinEvent event) {
-        for (HudElement element : elements) {
-            Identifier identifier = element.getIdentifier();
-            if (identifier != null && !Hud.hasComponent(identifier)) {
-                Hud.add(identifier, () -> element);
-            }
-        }
         pingElement.reset();
         tpsElement.reset();
         lagMeterElement.setTickTime(0); // temporarily disables the element, as the server doesn't send tick packets for a few seconds after joining

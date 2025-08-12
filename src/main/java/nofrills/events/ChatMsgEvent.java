@@ -7,6 +7,7 @@ import net.minecraft.text.Text;
 public class ChatMsgEvent extends Cancellable {
     public Text message;
     public String messagePlain;
+    public boolean replaced = false;
     public MessageSignatureData signatureData;
     public MessageIndicator messageIndicator;
 
@@ -16,6 +17,15 @@ public class ChatMsgEvent extends Cancellable {
         this.messagePlain = messagePlain;
         this.signatureData = signatureData;
         this.messageIndicator = messageIndicator;
+    }
+
+    public boolean isReplaced() {
+        return this.replaced;
+    }
+
+    public void replaceMessage(Text msg) {
+        this.message = msg;
+        this.replaced = true;
     }
 
     public Text getMessage() {

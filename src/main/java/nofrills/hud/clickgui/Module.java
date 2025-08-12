@@ -52,7 +52,7 @@ public class Module extends FlowLayout {
 
     private void active(boolean active) {
         if (active) {
-            this.surface(Surface.flat(0xaa1a1a1a).and((context, component) -> {
+            this.surface(Surface.flat(0xaa101010).and((context, component) -> {
                 context.fill(component.x(), component.y(), component.x() + 2, component.y() + component.height(), 0xffffffff);
             }));
             this.label.text(this.activeText);

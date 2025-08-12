@@ -3,6 +3,7 @@ package nofrills.features.fishing;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
@@ -21,7 +22,7 @@ public class RareAnnounce {
 
     @EventHandler
     private static void onChatMsg(ChatMsgEvent event) {
-        if (instance.isActive()) {
+        if (instance.isActive() && !event.messagePlain.isEmpty() && Utils.isInSkyblock()) {
             for (SeaCreatureData.SeaCreature creature : SeaCreatureData.list) {
                 if (creature.rare && event.messagePlain.equals(creature.spawnMsg)) {
                     if (title.value()) {
@@ -34,8 +35,7 @@ public class RareAnnounce {
                         Utils.sendMessage(msg.value().replace("{name}", creature.name).replace("{spawnmsg}", creature.spawnMsg));
                     }
                     if (replace.value()) {
-                        Utils.infoNoPrefix(creature.color + "§l" + creature.spawnMsg + "§r");
-                        event.cancel();
+                        event.replaceMessage(Text.literal(creature.color + "§l" + creature.spawnMsg + "§r"));
                     }
                     return;
                 }

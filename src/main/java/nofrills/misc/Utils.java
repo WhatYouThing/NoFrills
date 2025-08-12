@@ -110,10 +110,6 @@ public class Utils {
         infoRaw(Text.literal(message));
     }
 
-    public static void infoNoPrefix(String message) {
-        mc.inGameHud.getChatHud().addMessage(Text.of(message), null, noFrillsIndicator);
-    }
-
     public static void infoButton(String message, String command) {
         ClickEvent click = new ClickEvent.RunCommand(command);
         MutableText text = Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click));

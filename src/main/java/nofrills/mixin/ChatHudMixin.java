@@ -1,5 +1,7 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.network.message.MessageSignatureData;
@@ -20,10 +22,14 @@ import static nofrills.misc.Utils.partyMessagePattern;
 @Mixin(ChatHud.class)
 public abstract class ChatHudMixin {
     @Inject(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V", at = @At("HEAD"), cancellable = true)
-    private void onMessage(Text message, MessageSignatureData signatureData, MessageIndicator indicator, CallbackInfo ci) {
+    private void onMessage(Text ignored, MessageSignatureData signatureData, MessageIndicator indicator, CallbackInfo ci, @Local(argsOnly = true) LocalRef<Text> message) {
         if (indicator != Utils.noFrillsIndicator) {
-            String msg = Formatting.strip(message.getString());
-            if (eventBus.post(new ChatMsgEvent(message, msg, signatureData, indicator)).isCancelled()) {
+            String msg = Formatting.strip(message.get().getString());
+            ChatMsgEvent event = eventBus.post(new ChatMsgEvent(message.get(), msg, signatureData, indicator));
+            if (event.isReplaced()) {
+                message.set(event.getMessage());
+            }
+            if (event.isCancelled()) {
                 ci.cancel();
             }
             if (partyMessagePattern.matcher(msg).matches()) {

@@ -133,9 +133,9 @@ public class PartyCommands {
                     }
                     if (!coords.value().equals(behavior.Disabled) && command.startsWith("coords")) {
                         if (whitelisted || coords.value().equals(behavior.Automatic)) {
-                            Utils.sendMessage("/pc " + Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}"));
+                            Utils.sendMessage("/pc " + Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
                         } else if (!coords.value().equals(behavior.Ignore)) {
-                            Utils.infoButton("§aClick here to send your coordinates.", "/pc " + Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}"));
+                            Utils.infoButton("§aClick here to send your coordinates.", "/pc " + Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
                         }
                     }
                 }

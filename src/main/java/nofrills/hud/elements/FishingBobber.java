@@ -59,7 +59,7 @@ public class FishingBobber extends SimpleTextElement {
             }
         }
         if (timer.value()) {
-            this.setText(Utils.format("{} §7[{}s]", this.currentText, format.format(this.timerTicks / 20.0)));
+            this.setText(Utils.format("{} §7{}s", this.currentText, format.format(this.timerTicks / 20.0)));
         } else {
             this.setText(this.currentText);
         }

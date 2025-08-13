@@ -63,22 +63,22 @@ public abstract class WorldRendererMixin {
             return;
         }
         EntityRendering rendering = (EntityRendering) entity;
+        if (!rendering.nofrills_mod$getRenderingOutline() && !rendering.nofrills_mod$getRenderingFilled()) {
+            return;
+        }
         Box box = entity.getDimensions(entity.getPose()).getBoxAt(entity.getLerpedPos(tickProgress));
+        matrices.push();
+        matrices.translate(-cameraX, -cameraY, -cameraZ);
         if (rendering.nofrills_mod$getRenderingOutline()) {
             RenderColor color = rendering.nofrills_mod$getOutlineColors();
             VertexConsumer buffer = vertexConsumers.getBuffer(Rendering.Layers.BoxOutline);
-            matrices.push();
-            matrices.translate(-cameraX, -cameraY, -cameraZ);
             VertexRendering.drawBox(matrices, buffer, box, color.r, color.g, color.b, color.a);
-            matrices.pop();
         }
         if (rendering.nofrills_mod$getRenderingFilled()) {
             RenderColor color = rendering.nofrills_mod$getFilledColors();
             VertexConsumer buffer = vertexConsumers.getBuffer(Rendering.Layers.BoxFilled);
-            matrices.push();
-            matrices.translate(-cameraX, -cameraY, -cameraZ);
             VertexRendering.drawFilledBox(matrices, buffer, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color.r, color.g, color.b, color.a);
-            matrices.pop();
         }
+        matrices.pop();
     }
 }

@@ -156,45 +156,29 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             })),
             new ModCommand("sendCoords", "Easily send your coordinates in the chat, with the option to choose the format. Uses Patcher format by default.", literal("sendCoords").executes(context -> {
-                String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
-                Utils.sendMessage(coords);
+                Utils.sendMessage(Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
                 return SINGLE_SUCCESS;
             }).then(literal("patcher").executes(context -> {
-                String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
-                Utils.sendMessage(coords);
+                Utils.sendMessage(Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
                 return SINGLE_SUCCESS;
             })).then(literal("simple").executes(context -> {
-                String coords = Utils.getCoordsFormatted("{x} {y} {z}");
-                Utils.sendMessage(coords);
+                Utils.sendMessage(Utils.getCoordsFormatted("{} {} {}"));
                 return SINGLE_SUCCESS;
             })).then(literal("location").executes(context -> {
-                String location = SkyblockData.getLocation();
-                String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
-                if (!location.isEmpty()) {
-                    coords += " [ " + location + " ]";
-                }
-                Utils.sendMessage(coords);
+                Utils.sendMessage(Utils.format("{} [ {} ]", Utils.getCoordsFormatted("x: {}, y: {}, z: {}"), SkyblockData.getLocation()));
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("copyCoords", "Alternative to the sendCoords command, which copies your coordinates to your clipboard instead of sending them in the chat.", literal("copyCoords").executes(context -> {
-                String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
-                mc.keyboard.setClipboard(coords);
+                mc.keyboard.setClipboard(Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
                 return SINGLE_SUCCESS;
             }).then(literal("patcher").executes(context -> {
-                String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
-                mc.keyboard.setClipboard(coords);
+                mc.keyboard.setClipboard(Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
                 return SINGLE_SUCCESS;
             })).then(literal("simple").executes(context -> {
-                String coords = Utils.getCoordsFormatted("{x} {y} {z}");
-                mc.keyboard.setClipboard(coords);
+                mc.keyboard.setClipboard(Utils.getCoordsFormatted("{} {} {}"));
                 return SINGLE_SUCCESS;
             })).then(literal("location").executes(context -> {
-                String location = SkyblockData.getLocation();
-                String coords = Utils.getCoordsFormatted("x: {x}, y: {y}, z: {z}");
-                if (!location.isEmpty()) {
-                    coords += " [ " + location + " ]";
-                }
-                mc.keyboard.setClipboard(coords);
+                mc.keyboard.setClipboard(Utils.format("{} [ {} ]", Utils.getCoordsFormatted("x: {}, y: {}, z: {}"), SkyblockData.getLocation()));
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("queue", "Command that lets you queue for any Dungeon floor/Kuudra tier.", queueCommandBuilder),

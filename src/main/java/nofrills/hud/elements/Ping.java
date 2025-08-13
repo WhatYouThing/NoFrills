@@ -55,7 +55,7 @@ public class Ping extends SimpleTextElement {
 
     public void setPing(long ping) {
         if (average.value()) {
-            if (this.pingList.size() > 40) {
+            if (this.pingList.size() > 30) {
                 this.pingList.removeFirst();
             }
             this.pingList.add(ping);
@@ -63,7 +63,7 @@ public class Ping extends SimpleTextElement {
             for (long previous : this.pingList) {
                 avg += previous;
             }
-            this.setText(Utils.format("§bPing: §f{}ms §7[{}ms]", ping, avg / pingList.size()));
+            this.setText(Utils.format("§bPing: §f{}ms §7{}ms", ping, avg / pingList.size()));
         } else {
             this.setText(Utils.format("§bPing: §f{}ms", ping));
         }

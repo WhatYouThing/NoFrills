@@ -151,12 +151,8 @@ public class Utils {
     }
 
     public static String getCoordsFormatted(String format) {
-        Vec3d pos = mc.player.getPos();
-        DecimalFormat decimalFormat = new DecimalFormat("0");
-        return format
-                .replace("{x}", decimalFormat.format(Math.ceil(pos.x)))
-                .replace("{y}", decimalFormat.format(Math.floor(pos.y)))
-                .replace("{z}", decimalFormat.format(Math.ceil(pos.z)));
+        BlockPos pos = mc.player.getBlockPos();
+        return Utils.format(format, pos.getX(), pos.getY(), pos.getZ());
 
     }
 

@@ -57,7 +57,7 @@ public class TPS extends SimpleTextElement {
 
     public void setTps(int tps) {
         if (average.value()) {
-            if (this.tpsList.size() > 20) {
+            if (this.tpsList.size() > 30) {
                 this.tpsList.removeFirst();
             }
             this.tpsList.add(Math.clamp(tps, 0, 20));
@@ -65,7 +65,7 @@ public class TPS extends SimpleTextElement {
             for (int previous : this.tpsList) {
                 avg += previous;
             }
-            this.setText(Utils.format("§bTPS: §f{} §7[{}]", tps, Utils.formatDecimal(avg / (double) tpsList.size())));
+            this.setText(Utils.format("§bTPS: §f{} §7{}", tps, Utils.formatDecimal(avg / (double) tpsList.size())));
         } else {
             this.setText(Utils.format("§bTPS: §f{}", tps));
         }

@@ -15,6 +15,8 @@ import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
+import static nofrills.Main.mc;
+
 public class AutoRequeue {
     public static final Feature instance = new Feature("autoRequeue");
 
@@ -68,7 +70,7 @@ public class AutoRequeue {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && event.key == pauseBind.value() && event.modifiers == 0 && SkyblockData.isInInstance()) {
+        if (instance.isActive() && mc.currentScreen == null && event.key == pauseBind.value() && event.modifiers == 0 && SkyblockData.isInInstance()) {
             if (event.action == GLFW.GLFW_PRESS) {
                 setPaused();
             }

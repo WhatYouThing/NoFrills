@@ -9,6 +9,7 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
+import nofrills.misc.EntityCache;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -19,6 +20,7 @@ public class ScathaMining {
     public static final SettingBool alert = new SettingBool(false, "alert", instance.key());
     public static final SettingBool cooldown = new SettingBool(false, "cooldown", instance.key());
 
+    private static final EntityCache wormsCache = new EntityCache();
     private static int spawnCooldown = 0;
 
     private static boolean active() {
@@ -51,8 +53,11 @@ public class ScathaMining {
     private static void onNamed(EntityNamedEvent event) {
         if (active()) {
             wormType type = getWormType(event.namePlain);
-            if (!type.equals(wormType.None) && alert.value()) {
-                alertSpawn(type.equals(wormType.Scatha));
+            if (!type.equals(wormType.None) && !wormsCache.has(event.entity)) {
+                if (alert.value()) {
+                    alertSpawn(type.equals(wormType.Scatha));
+                }
+                wormsCache.add(event.entity);
             }
         }
     }
@@ -68,10 +73,13 @@ public class ScathaMining {
     private static void onServerTick(ServerTickEvent event) {
         if (spawnCooldown > 0) {
             spawnCooldown--;
-            if (spawnCooldown == 0 && cooldown.value()) {
-                Utils.showTitle("§aWORM COOLDOWN ENDED", "", 5, 20, 5);
-                Utils.info("§a§lWorm spawn cooldown ended!");
-                Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), SoundCategory.MASTER, 1.0f, 0.0f);
+            if (spawnCooldown == 0) {
+                if (cooldown.value()) {
+                    Utils.showTitle("§aWORM COOLDOWN ENDED", "", 5, 20, 5);
+                    Utils.info("§a§lWorm spawn cooldown ended!");
+                    Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), SoundCategory.MASTER, 1.0f, 0.0f);
+                }
+                wormsCache.clearDropped();
             }
         }
     }
@@ -79,6 +87,7 @@ public class ScathaMining {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         spawnCooldown = 0;
+        wormsCache.clear();
     }
 
     private enum wormType {

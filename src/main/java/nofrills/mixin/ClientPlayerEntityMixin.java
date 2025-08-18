@@ -5,11 +5,13 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import nofrills.config.Config;
-import nofrills.misc.Utils;
+import nofrills.features.fixes.RidingCameraFix;
+import nofrills.features.fixes.SneakLagFix;
+import nofrills.features.hunting.InstantFog;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ClientPlayerEntity.class)
 public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
@@ -17,16 +19,25 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         super(world, profile);
     }
 
-    @Shadow
-    public abstract boolean isSneaking();
-
-    @Shadow
-    public abstract boolean isInSneakingPose();
-
     @ModifyReturnValue(method = "getYaw", at = @At("RETURN"))
     private float onGetYaw(float original) {
-        if (Utils.isFixEnabled(Config.ridingCamFix)) {
+        if (RidingCameraFix.active()) {
             return getYaw();
+        }
+        return original;
+    }
+
+    @Inject(method = "getUnderwaterVisibility", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F"), cancellable = true)
+    private void onGetWaterVisibility(CallbackInfoReturnable<Float> cir) {
+        if (InstantFog.instance.isActive()) {
+            cir.setReturnValue(1.0f);
+        }
+    }
+
+    @ModifyReturnValue(method = "shouldSlowDown", at = @At("RETURN"))
+    private boolean onShouldSlowDown(boolean original) {
+        if (SneakLagFix.active()) {
+            return this.isSneaking() && !this.getAbilities().flying;
         }
         return original;
     }

@@ -2,12 +2,17 @@ package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.network.packet.s2c.play.ScoreboardObjectiveUpdateS2CPacket;
+import net.minecraft.network.packet.s2c.play.TeamS2CPacket;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import nofrills.config.Config;
-import nofrills.events.*;
+import nofrills.config.SettingString;
+import nofrills.events.ChatMsgEvent;
+import nofrills.events.ReceivePacketEvent;
+import nofrills.events.ServerJoinEvent;
+import nofrills.events.WorldTickEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +55,7 @@ public class SkyblockData {
             "Archer",
             "Tank"
     );
+    public static final SettingString dungeonClass = new SettingString("Berserker", "dungeonClass", "misc");
     private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
     public static double dungeonPower = 0;
     private static String location = "";
@@ -68,7 +74,7 @@ public class SkyblockData {
                 String selectedHub = Utils.format("You have selected the {} Dungeon Class!", name);
                 String milestone = Utils.format("{} Milestone", name);
                 if (msg.startsWith(tag) || msg.equals(selectedHub) || msg.equals(selected) || msg.startsWith(milestone)) {
-                    Config.dungeonClass = name;
+                    dungeonClass.set(name);
                     break;
                 }
             }
@@ -106,6 +112,10 @@ public class SkyblockData {
         return inSkyblock;
     }
 
+    public static boolean isInInstance() {
+        return Utils.isInDungeons() || Utils.isInKuudra();
+    }
+
     public static boolean isInstanceOver() {
         return instanceOver;
     }
@@ -122,9 +132,8 @@ public class SkyblockData {
         Utils.sendPingPacket();
     }
 
-    @EventHandler
-    private static void onTabList(TabListUpdateEvent event) {
-        for (PlayerListS2CPacket.Entry entry : event.entries) {
+    public static void updateTabList(PlayerListS2CPacket packet, List<PlayerListS2CPacket.Entry> entries) {
+        for (PlayerListS2CPacket.Entry entry : entries) {
             String name = Formatting.strip(entry.displayName().getString()).trim();
             if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
                 area = name.split(":", 2)[1].trim();
@@ -133,8 +142,7 @@ public class SkyblockData {
         }
     }
 
-    @EventHandler
-    private static void onObjective(ObjectiveUpdateEvent event) {
+    public static void updateObjective(ScoreboardObjectiveUpdateS2CPacket packet) {
         Scoreboard scoreboard = mc.player.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
         if (objective != null) {
@@ -142,8 +150,7 @@ public class SkyblockData {
         }
     }
 
-    @EventHandler
-    private static void onScoreboard(ScoreboardUpdateEvent event) {
+    public static void updateScoreboard(TeamS2CPacket packet) {
         List<String> currentLines = new ArrayList<>();
         Scoreboard scoreboard = mc.player.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
@@ -157,25 +164,27 @@ public class SkyblockData {
                         if (cleanLine.startsWith(Utils.Symbols.zone) || cleanLine.startsWith(Utils.Symbols.zoneRift)) {
                             location = cleanLine;
                         }
+                        if (Utils.isInKuudra() && !instanceOver) {
+                            instanceOver = cleanLine.startsWith("Instance Shutdown");
+                        }
                         currentLines.add(cleanLine);
                     }
                 }
             }
         }
         lines = currentLines;
-        if (Utils.isInKuudra() && !instanceOver) {
-            instanceOver = getLines().stream().anyMatch(line -> line.startsWith("Instance Shutdown"));
-        }
+        SlayerUtil.updateQuestState(currentLines);
     }
 
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
-        if (Utils.isInDungeons() && !instanceOver) {
-            if (scoreRegex.matcher(event.messagePlain.trim()).matches()) {
+        if (Utils.isInDungeons()) {
+            if (!instanceOver && scoreRegex.matcher(event.messagePlain.trim()).matches()) {
                 instanceOver = true;
             }
+            updateDungeonClass(event.messagePlain);
         }
-        if (Utils.isInDungeons() || getArea().equals("Dungeon Hub")) {
+        if (getArea().equals("Dungeon Hub")) {
             updateDungeonClass(event.messagePlain);
         }
     }

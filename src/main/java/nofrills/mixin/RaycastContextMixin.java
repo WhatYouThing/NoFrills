@@ -1,8 +1,9 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.*;
 import net.minecraft.fluid.FluidState;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
@@ -25,16 +26,30 @@ public class RaycastContextMixin implements RaycastOptions {
 
     @ModifyReturnValue(method = "getBlockShape", at = @At("RETURN"))
     private VoxelShape getBlockShape(VoxelShape original, BlockState state, BlockView world, BlockPos pos) {
-        if (onlyFull && !original.isEmpty()) {
-            return VoxelShapes.fullCube();
+        if (onlyFull) {
+            return switch (state.getBlock()) {
+                case DyedCarpetBlock ignored -> VoxelShapes.empty();
+                case PlayerSkullBlock ignored -> VoxelShapes.empty();
+                case SkullBlock ignored -> VoxelShapes.empty();
+                case WallSkullBlock ignored -> VoxelShapes.empty();
+                case CarpetBlock ignored -> VoxelShapes.empty();
+                case CocoaBlock ignored -> VoxelShapes.empty();
+                case FlowerPotBlock ignored -> VoxelShapes.empty();
+                case LadderBlock ignored -> VoxelShapes.empty();
+                case SignBlock ignored -> VoxelShapes.fullCube();
+                case WallSignBlock ignored -> VoxelShapes.fullCube();
+                case SnowBlock ignored ->
+                        state.get(Properties.LAYERS) < 8 ? VoxelShapes.empty() : VoxelShapes.fullCube();
+                default -> state.getCollisionShape(world, pos).isEmpty() ? VoxelShapes.empty() : VoxelShapes.fullCube();
+            };
         }
         return original;
     }
 
     @ModifyReturnValue(method = "getFluidShape", at = @At("RETURN"))
     private VoxelShape getFluidShape(VoxelShape original, FluidState state, BlockView world, BlockPos pos) {
-        if (onlyFull && !original.isEmpty()) {
-            return VoxelShapes.fullCube();
+        if (onlyFull) {
+            return VoxelShapes.empty();
         }
         return original;
     }

@@ -3,7 +3,7 @@ package nofrills.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
-import nofrills.config.Config;
+import nofrills.features.fixes.AntiSwim;
 import nofrills.misc.EntityRendering;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -107,7 +107,7 @@ public abstract class EntityMixin implements EntityRendering {
 
     @ModifyReturnValue(method = "getPose", at = @At("RETURN"))
     private EntityPose getPose(EntityPose original) {
-        if (Utils.isFixEnabled(Config.antiSwim) && original == EntityPose.SWIMMING) {
+        if (original == EntityPose.SWIMMING && AntiSwim.active()) {
             return EntityPose.STANDING;
         }
         return original;
@@ -115,15 +115,13 @@ public abstract class EntityMixin implements EntityRendering {
 
     @ModifyReturnValue(method = "getFlag", at = @At("RETURN"))
     private boolean getFlag(boolean original, int index) {
-        if (Utils.isFixEnabled(Config.antiSwim)) {
-            if (index == SWIMMING_FLAG_INDEX) {
+        if (index == SWIMMING_FLAG_INDEX && AntiSwim.active()) {
+            return false;
+        }
+        if (index == SPRINTING_FLAG_INDEX && Utils.isSelf(this) && AntiSwim.active()) {
+            if (original && isTouchingWater()) {
+                setSprinting(false);
                 return false;
-            }
-            if (index == SPRINTING_FLAG_INDEX && Utils.isSelf(this)) {
-                if (original && isTouchingWater()) {
-                    setSprinting(false);
-                    return false;
-                }
             }
         }
         return original;
@@ -131,7 +129,7 @@ public abstract class EntityMixin implements EntityRendering {
 
     @Inject(method = "setFlag", at = @At("HEAD"), cancellable = true)
     private void setFlag(int index, boolean value, CallbackInfo ci) {
-        if (Utils.isFixEnabled(Config.antiSwim) && index == SWIMMING_FLAG_INDEX && value) {
+        if (index == SWIMMING_FLAG_INDEX && value && AntiSwim.active()) {
             ci.cancel();
         }
     }

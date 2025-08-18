@@ -1,13 +1,15 @@
 package nofrills.mixin;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import nofrills.events.HudRenderEvent;
+import nofrills.features.general.NoRender;
+import nofrills.hud.HudManager;
 import nofrills.misc.TitleRendering;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -82,8 +84,13 @@ public abstract class InGameHudMixin implements TitleRendering {
 
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderEffectOverlay(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (Config.noEffectDisplay) {
+        if (NoRender.instance.isActive() && NoRender.effectDisplay.value()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "<init>", at = @At("TAIL"))
+    private void onInit(MinecraftClient client, CallbackInfo ci) {
+        HudManager.registerElements();
     }
 }

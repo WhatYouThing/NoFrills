@@ -10,16 +10,23 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.effect.StatusEffect;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import nofrills.config.Config;
+import nofrills.features.fixes.EfficiencyFix;
+import nofrills.features.fixes.NoDropSwing;
+import nofrills.features.general.Fullbright;
+import nofrills.features.general.Viewmodel;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import static nofrills.Main.mc;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -29,7 +36,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @ModifyExpressionValue(method = "getHandSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/effect/StatusEffectUtil;hasHaste(Lnet/minecraft/entity/LivingEntity;)Z"))
     private boolean hasHaste(boolean original) {
-        if (Config.noHaste && Utils.isSelf(this)) {
+        if (Viewmodel.instance.isActive() && Viewmodel.noHaste.value() && Utils.isSelf(this)) {
             return false;
         }
         return original;
@@ -37,7 +44,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @ModifyExpressionValue(method = "getHandSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/registry/entry/RegistryEntry;)Z"))
     private boolean hasMiningFatigue(boolean original) {
-        if (Config.noHaste && Utils.isSelf(this)) {
+        if (Viewmodel.instance.isActive() && Viewmodel.noHaste.value() && Utils.isSelf(this)) {
             return false;
         }
         return original;
@@ -45,15 +52,15 @@ public abstract class LivingEntityMixin extends Entity {
 
     @ModifyReturnValue(method = "getHandSwingDuration", at = @At("RETURN"))
     private int getSwingSpeed(int original) {
-        if (Config.viewmodelSpeed != 0 && Utils.isSelf(this)) {
-            return Config.viewmodelSpeed;
+        if (Viewmodel.instance.isActive() && Viewmodel.speed.value() > 0 && Utils.isSelf(this)) {
+            return Viewmodel.speed.value();
         }
         return original;
     }
 
     @Inject(method = "getAttributeValue", at = @At(value = "HEAD"), cancellable = true)
     private void getBreakSpeed(RegistryEntry<EntityAttribute> attribute, CallbackInfoReturnable<Double> cir) {
-        if (Utils.isFixEnabled(Config.efficiencyFix) && Utils.isSelf(this) && attribute.getIdAsString().equals("minecraft:mining_efficiency")) {
+        if (EfficiencyFix.active() && Utils.isSelf(this) && attribute.getIdAsString().equals("minecraft:mining_efficiency")) {
             ItemStack stack = Utils.getHeldItem();
             ItemEnchantmentsComponent enchants = stack.getComponents().get(DataComponentTypes.ENCHANTMENTS);
             if (enchants != null) {
@@ -68,9 +75,19 @@ public abstract class LivingEntityMixin extends Entity {
 
     @WrapWithCondition(method = "dropItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(LivingEntity instance, Hand hand) {
-        if (Utils.isFixEnabled(Config.noDropSwing)) {
+        if (NoDropSwing.active() && instance == mc.player) {
             return false;
         }
         return this.getWorld().isClient;
+    }
+
+    @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
+    private boolean hasNightVision(boolean original, RegistryEntry<StatusEffect> effect) {
+        if (Fullbright.instance.isActive() && Utils.isSelf(this) && effect == StatusEffects.NIGHT_VISION) {
+            if (Fullbright.noEffect.value() && !Fullbright.mode.value().equals(Fullbright.modes.Potion)) {
+                return false;
+            }
+        }
+        return original;
     }
 }

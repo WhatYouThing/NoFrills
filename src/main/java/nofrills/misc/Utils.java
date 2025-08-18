@@ -4,16 +4,14 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
@@ -30,6 +28,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.ClickEvent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -41,29 +40,27 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
-import nofrills.config.Config;
+import net.minecraft.world.entity.ClientEntityManager;
+import net.minecraft.world.entity.EntityIndex;
+import net.minecraft.world.entity.EntityLookup;
 import nofrills.events.WorldTickEvent;
-import nofrills.features.LeapOverlay;
-import nofrills.mixin.HandledScreenAccessor;
-import nofrills.mixin.NbtComponentAccessor;
-import nofrills.mixin.PlayerListHudAccessor;
-import org.apache.commons.compress.utils.Lists;
-import org.lwjgl.glfw.GLFW;
+import nofrills.features.dungeons.LeapOverlay;
+import nofrills.mixin.*;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static nofrills.Main.*;
 
 public class Utils {
-    public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0xff5555, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
-    public static final Pattern partyMessagePattern = Pattern.compile("Party > .*: .*");
+    public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     private static final Random soundRandom = Random.create(0);
     private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private static final List<String> abilityWhitelist = List.of(
@@ -98,37 +95,38 @@ public class Utils {
     }
 
     public static void sendMessage(String message) {
-        if (message.startsWith("/")) {
-            mc.player.networkHandler.sendChatCommand(message.substring(1));
-        } else {
-            mc.player.networkHandler.sendChatMessage(message);
+        if (mc.player != null) {
+            if (message.startsWith("/")) {
+                mc.player.networkHandler.sendChatCommand(message.substring(1));
+            } else {
+                mc.player.networkHandler.sendChatMessage(message);
+            }
         }
     }
 
     public static void info(String message) {
-        mc.inGameHud.getChatHud().addMessage(Text.of("§c[NoFrills]§r " + message + "§r"), null, noFrillsIndicator);
-    }
-
-    public static void infoNoPrefix(String message) {
-        mc.inGameHud.getChatHud().addMessage(Text.of(message), null, noFrillsIndicator);
+        infoRaw(Text.literal(message));
     }
 
     public static void infoButton(String message, String command) {
         ClickEvent click = new ClickEvent.RunCommand(command);
-        mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r " + message + "§r").setStyle(Style.EMPTY.withClickEvent(click)), null, noFrillsIndicator);
+        MutableText text = Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click));
+        infoRaw(text);
     }
 
     public static void infoLink(String message, String url) {
         ClickEvent click = new ClickEvent.OpenUrl(URI.create(url));
-        mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r " + message + "§r").setStyle(Style.EMPTY.withClickEvent(click)), null, noFrillsIndicator);
+        MutableText text = Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click));
+        infoRaw(text);
     }
 
-    public static void infoRaw(Text message) {
-        mc.inGameHud.getChatHud().addMessage(Text.literal("§c[NoFrills]§r ").append(message).append("§r"), null, noFrillsIndicator);
+    public static void infoRaw(MutableText message) {
+        MutableText tag = Text.literal("[NoFrills] ").withColor(0x5ca0bf);
+        mc.inGameHud.getChatHud().addMessage(tag.append(message.withColor(0xffffff)).append("§r"), null, noFrillsIndicator);
     }
 
     public static void infoFormat(String message, Object... values) {
-        mc.inGameHud.getChatHud().addMessage(Text.of("§c[NoFrills]§r " + format(message, values) + "§r"), null, noFrillsIndicator);
+        infoRaw(Text.literal(format(message, values)));
     }
 
     /**
@@ -151,12 +149,8 @@ public class Utils {
     }
 
     public static String getCoordsFormatted(String format) {
-        Vec3d pos = mc.player.getPos();
-        DecimalFormat decimalFormat = new DecimalFormat("#");
-        return format
-                .replace("{x}", decimalFormat.format(Math.ceil(pos.x)))
-                .replace("{y}", decimalFormat.format(Math.floor(pos.y)))
-                .replace("{z}", decimalFormat.format(Math.ceil(pos.z)));
+        BlockPos pos = mc.player.getBlockPos();
+        return Utils.format(format, pos.getX(), pos.getY(), pos.getZ());
 
     }
 
@@ -186,7 +180,7 @@ public class Utils {
     }
 
     public static boolean isInKuudra() {
-        return isInZone(Symbols.zone + " Kuudra's Hollow", false);
+        return SkyblockData.getArea().equals("Kuudra");
     }
 
     public static boolean isInChateau() {
@@ -255,9 +249,14 @@ public class Utils {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Entity> getEntities() {
-        if (mc.world != null) {
-            return Lists.newArrayList(mc.world.getEntities().iterator());
+        if (mc.world != null) { // only powerful wizards may cast such obscene spells
+            ClientEntityManager<Entity> manager = ((ClientWorldAccessor) mc.world).getManager();
+            EntityLookup<?> lookup = ((ClientEntityManagerAccessor<?>) manager).getLookup();
+            EntityIndex<?> index = ((SimpleEntityLookupAccessor<?>) lookup).getIndex();
+            Int2ObjectMap<?> map = ((EntityIndexAccessor<?>) index).getEntityMap();
+            return (List<Entity>) new ArrayList<>(map.values());
         }
         return new ArrayList<>();
     }
@@ -345,17 +344,16 @@ public class Utils {
         return "";
     }
 
+    public static String getTextureUrl(ItemStack stack) {
+        return getTextureUrl(getTextures(stack));
+    }
+
     public static boolean isTextureEqual(GameProfile profile, String textureId) {
         String url = getTextureUrl(profile);
         if (url != null) {
             return url.endsWith("texture/" + textureId);
         }
         return false;
-    }
-
-    public static boolean isFixEnabled(Config.fixMode mode) {
-        return mode == Config.fixMode.AlwaysOn || SkyblockData.isInSkyblock() &&
-                ((mode == Config.fixMode.SkyblockLegacyOnly && !Utils.isOnModernIsland()) || mode == Config.fixMode.SkyblockOnly);
     }
 
     /**
@@ -399,6 +397,20 @@ public class Utils {
         return !getRightClickAbility(stack).isEmpty();
     }
 
+    public static boolean hasEitherStat(ItemStack stack, String... stats) {
+        List<String> lines = getLoreLines(stack);
+        Iterator<String> iterator = Arrays.stream(stats).iterator();
+        while (iterator.hasNext()) {
+            String stat = iterator.next();
+            for (String line : lines) {
+                if (line.startsWith(stat + ":")) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Tries to find ground (any block that isn't air) below the specified BlockPos, and returns the BlockPos of that block if found. Otherwise, returns the same BlockPos.
      *
@@ -426,32 +438,26 @@ public class Utils {
                 .collect(Collectors.joining(" ")).trim();
     }
 
-    private static String[] getVersionNumber(String version) {
-        if (version.startsWith("mod_version=")) {
-            return version.replace("mod_version=", "").split("\\.");
+    private static int getVersionNumber(String version) {
+        try {
+            String[] numbers = version.split("\\.");
+            return Integer.parseInt(numbers[0]) * 1000 + Integer.parseInt(numbers[1]) * 100 + Integer.parseInt(numbers[2]);
+        } catch (RuntimeException ignored) {
+            return 0;
         }
-        return null;
     }
 
     public static void checkUpdate(boolean notifyIfMatch) {
         new Thread(() -> {
-            String propertiesURL = "https://raw.githubusercontent.com/WhatYouThing/NoFrills/refs/heads/main/gradle.properties";
             try {
-                ModMetadata metadata = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata();
-                String version = metadata.getVersion().getFriendlyString();
-                if (version.equals("${version}")) {
-                    version = "0.0.0";
-                }
-                String[] versionLocal = version.split("\\.");
-                InputStream connection = URI.create(propertiesURL).toURL().openStream();
-                for (Scanner iteratorNewest = new Scanner(connection); iteratorNewest.hasNext(); ) {
-                    String[] versionNewest = getVersionNumber(iteratorNewest.next());
-                    if (versionNewest != null) {
-                        for (int i = 0; i <= versionLocal.length - 1; i++) {
-                            if (Integer.parseInt(versionLocal[i]) < Integer.parseInt(versionNewest[i])) {
-                                infoLink("§a§lNew version available! §aClick here to open the Modrinth releases page. §7Current: " + String.join(".", versionLocal) + ", Newest: " + String.join(".", versionNewest), "https://modrinth.com/mod/nofrills/versions");
-                                return;
-                            }
+                String version = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata().getVersion().getFriendlyString();
+                InputStream connection = URI.create("https://raw.githubusercontent.com/WhatYouThing/NoFrills/refs/heads/main/gradle.properties").toURL().openStream();
+                for (String line : IOUtils.toString(connection, StandardCharsets.UTF_8).split("\n")) {
+                    if (line.startsWith("mod_version=")) {
+                        String newest = line.replace("mod_version=", "");
+                        if (getVersionNumber(newest) > getVersionNumber(version)) {
+                            infoLink(Utils.format("§a§lNew version available! §aClick here to open the Modrinth releases page. §7Current: {}, Newest: {}", version, newest), "https://modrinth.com/mod/nofrills/versions");
+                            return;
                         }
                     }
                 }
@@ -624,6 +630,22 @@ public class Utils {
         return decimalFormat.format(number);
     }
 
+    public static String formatSeparator(int number) {
+        return String.format("%,d", number);
+    }
+
+    public static String formatSeparator(long number) {
+        return String.format("%,d", number);
+    }
+
+    public static String formatSeparator(double number) {
+        return String.format("%,.1f", number);
+    }
+
+    public static String formatSeparator(float number) {
+        return String.format("%,.1f", number);
+    }
+
     /**
      * Attempts to calculate the actual health value from the provided Entity's (max) health. Mostly applies to bosses or anything that has millions of HP, because their actual health value is reduced.
      */
@@ -632,7 +654,7 @@ public class Utils {
     }
 
     public static boolean isLeapMenu(String title) {
-        return Config.leapOverlay && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
+        return LeapOverlay.instance.isActive() && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
     }
 
     public static void setScreen(Screen screen) {
@@ -658,11 +680,5 @@ public class Utils {
         public static String check = "✔";
         public static String cross = "✖";
         public static String bingo = "Ⓑ";
-    }
-
-    public static class Keybinds {
-        public static final KeyBinding getPearls = new KeyBinding("key.nofrills.refillPearls", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
-        public static final KeyBinding recipeLookup = new KeyBinding("key.nofrills.recipeLookup", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
-        public static final KeyBinding bindSlots = new KeyBinding("key.nofrills.bindSlots", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, "key.categories.nofrills");
     }
 }

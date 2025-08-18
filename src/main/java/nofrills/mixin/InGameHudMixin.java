@@ -5,7 +5,6 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import nofrills.events.HudRenderEvent;
 import nofrills.features.general.NoRender;
@@ -54,17 +53,14 @@ public abstract class InGameHudMixin implements TitleRendering {
     @Inject(method = "renderTitleAndSubtitle", at = @At("HEAD"))
     private void onRenderTitle(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (titleTicks > 0) {
-            MatrixStack matrices = context.getMatrices();
-            matrices.push();
-            matrices.translate((float) (context.getScaledWindowWidth() / 2), (float) (context.getScaledWindowHeight() / 2), 0.0F);
-            matrices.push();
-            matrices.scale(titleScale, titleScale, titleScale);
+            context.push();
+            context.translate((float) (context.getScaledWindowWidth() / 2), (float) (context.getScaledWindowHeight() / 2));
+            context.scale(titleScale, titleScale);
             TextRenderer textRenderer = mc.inGameHud.getTextRenderer();
             Text title = Text.of(titleString);
             int width = textRenderer.getWidth(title);
             context.drawTextWithBackground(textRenderer, title, -width / 2, titleOffset, width, titleColor);
-            matrices.pop();
-            matrices.pop();
+            context.pop();
         }
     }
 

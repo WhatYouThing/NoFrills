@@ -3,11 +3,11 @@ package nofrills.mixin;
 import com.google.gson.JsonElement;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -23,9 +23,11 @@ import nofrills.features.general.SlotBinding;
 import nofrills.features.general.TooltipScale;
 import nofrills.features.kuudra.KuudraChestValue;
 import nofrills.hud.LeapMenuButton;
-import nofrills.misc.*;
+import nofrills.misc.RenderColor;
+import nofrills.misc.ScreenOptions;
+import nofrills.misc.SlotOptions;
+import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -92,14 +94,9 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Unique
     private void drawLine(DrawContext context, int firstSlot, int secondSlot, RenderColor color) {
-        context.draw(drawer -> {
-            Slot slot1 = handler.getSlot(firstSlot);
-            Slot slot2 = handler.getSlot(secondSlot);
-            Matrix4f mat = context.getMatrices().peek().getPositionMatrix();
-            VertexConsumer consumer = drawer.getBuffer(Rendering.Layers.GuiLine);
-            consumer.vertex(mat, slot1.x + 8, slot1.y + 8, 1.0f).color(color.argb);
-            consumer.vertex(mat, slot2.x + 8, slot2.y + 8, 1.0f).color(color.argb);
-        });
+        Slot slot1 = handler.getSlot(firstSlot);
+        Slot slot2 = handler.getSlot(secondSlot);
+        context.fill(RenderPipelines.LINES, slot1.x + 8, slot1.y + 8, slot2.x + 8, slot2.y + 8, color.argb);
     }
 
     @Unique
@@ -152,17 +149,17 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             return;
         }
         if (TooltipScale.instance.isActive()) {
-            context.getMatrices().push();
+            context.push();
             float scale = (float) TooltipScale.scale.value();
-            context.getMatrices().translate(x - x * scale, y - y * scale, 0);
-            context.getMatrices().scale(scale, scale, 1);
+            context.translate(x - x * scale, y - y * scale);
+            context.scale(scale, scale);
         }
     }
 
     @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V", shift = At.Shift.AFTER))
     private void onAfterDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
         if (TooltipScale.instance.isActive()) {
-            context.getMatrices().pop();
+            context.pop();
         }
     }
 
@@ -205,9 +202,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        context.getMatrices().push();
-        context.getMatrices().translate(this.x, this.y, 0.0f);
-        context.getMatrices().translate(0.0f, 0.0f, 100.0f);
+        context.push();
+        context.translate(this.x, this.y);
         if (isSlotBindingActive() && focusedSlot != null) {
             if (SlotBinding.isHotbar(focusedSlot.id)) {
                 String name = "hotbar" + SlotBinding.toHotbarNumber(focusedSlot.id);
@@ -246,22 +242,22 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
         if (KuudraChestValue.instance.isActive() && KuudraChestValue.currentValue > 0.0) {
             Slot targetSlot = this.handler.getSlot(4);
-            String value = Utils.format("Chest Value: {}", String.format("%,.1f", KuudraChestValue.currentValue));
+            String value = Utils.format("Chest Value: {}", Utils.formatSeparator(KuudraChestValue.currentValue));
             int width = mc.textRenderer.getWidth(value);
             int baseX = targetSlot.x + 8;
             int baseY = targetSlot.y + 8;
-            context.getMatrices().push();
-            context.getMatrices().translate(0, 0, 420);
+            context.push();
+            context.translate(0, 0);
             context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, RenderColor.green.hex);
             context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, RenderColor.darkGray.argb);
-            context.getMatrices().pop();
+            context.pop();
         }
         for (Slot slot : this.handler.slots) {
             if (SlotOptions.hasBackground(slot)) {
                 context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackgroundColor(slot).argb);
             }
         }
-        context.getMatrices().pop();
+        context.pop();
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)

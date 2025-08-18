@@ -140,8 +140,8 @@ public class PriceTooltips {
         String line = Utils.format(
                 "§c[NF] {}: §6{} {}",
                 name,
-                String.format("%,.1f", price * quantity),
-                quantity > 1 ? Utils.format(extra, String.format("%,d", quantity), String.format("%,.1f", price)) : ""
+                Utils.formatSeparator(price * quantity),
+                quantity > 1 ? Utils.format(extra, Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
         return Text.of(line);
     }
@@ -150,8 +150,8 @@ public class PriceTooltips {
         String line = Utils.format(
                 "§c[NF] {}: §6{} {}",
                 name,
-                String.format("%,d", price * quantity),
-                quantity > 1 ? Utils.format(extra, String.format("%,d", quantity), String.format("%,d", price)) : ""
+                Utils.formatSeparator(price * quantity),
+                quantity > 1 ? Utils.format(extra, Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
         return Text.of(line);
     }

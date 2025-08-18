@@ -11,6 +11,9 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.misc.SeaCreatureData;
 import nofrills.misc.Utils;
 
+import static nofrills.Main.mc;
+import static nofrills.misc.Utils.noFrillsIndicator;
+
 public class RareAnnounce {
     public static final Feature instance = new Feature("rareAnnounce");
 
@@ -35,7 +38,8 @@ public class RareAnnounce {
                         Utils.sendMessage(msg.value().replace("{name}", creature.name).replace("{spawnmsg}", creature.spawnMsg));
                     }
                     if (replace.value()) {
-                        event.replaceMessage(Text.literal(creature.color + "§l" + creature.spawnMsg + "§r"));
+                        mc.inGameHud.getChatHud().addMessage(Text.literal(creature.color + "§l" + creature.spawnMsg + "§r"), null, noFrillsIndicator);
+                        event.cancel();
                     }
                     return;
                 }

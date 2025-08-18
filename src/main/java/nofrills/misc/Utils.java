@@ -55,14 +55,12 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static nofrills.Main.*;
 
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
-    public static final Pattern partyMessagePattern = Pattern.compile("Party > .*: .*");
     private static final Random soundRandom = Random.create(0);
     private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
     private static final List<String> abilityWhitelist = List.of(
@@ -630,6 +628,22 @@ public class Utils {
 
     public static String formatDecimal(float number) {
         return decimalFormat.format(number);
+    }
+
+    public static String formatSeparator(int number) {
+        return String.format("%,d", number);
+    }
+
+    public static String formatSeparator(long number) {
+        return String.format("%,d", number);
+    }
+
+    public static String formatSeparator(double number) {
+        return String.format("%,.1f", number);
+    }
+
+    public static String formatSeparator(float number) {
+        return String.format("%,.1f", number);
     }
 
     /**

@@ -6,7 +6,6 @@
     "BlockItemMixin",
     "BossBarHudAccessor",
     "BossBarHudMixin",
-    "ChatHudMixin",
     "ClientConnectionMixin",
     "ClientEntityManagerAccessor",
     "ClientPlayerEntityMixin",

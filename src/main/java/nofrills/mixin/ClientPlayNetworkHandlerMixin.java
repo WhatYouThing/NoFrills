@@ -1,10 +1,8 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.command.CommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
@@ -18,7 +16,6 @@ import nofrills.events.*;
 import nofrills.features.fixes.AnimationFix;
 import nofrills.misc.SkyblockData;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,9 +27,6 @@ import static nofrills.Main.mc;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
-    @Shadow
-    private CommandDispatcher<CommandSource> commandDispatcher;
-
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"))
     private void onPreTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
         if (ent.equals(mc.player) && AnimationFix.active()) {
@@ -102,5 +96,25 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onGameJoin", at = @At("TAIL"))
     private void onJoinGame(GameJoinS2CPacket packet, CallbackInfo ci) {
         eventBus.post(new ServerJoinEvent());
+    }
+
+    @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/message/MessageHandler;onGameMessage(Lnet/minecraft/text/Text;Z)V"), cancellable = true)
+    private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
+        if (!packet.overlay()) {
+            String msg = Formatting.strip(packet.content().getString());
+            ChatMsgEvent event = eventBus.post(new ChatMsgEvent(packet.content(), msg));
+            if (event.isCancelled()) {
+                ci.cancel();
+            }
+            if (msg.startsWith("Party > ") && msg.contains(": ")) {
+                int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");
+                String[] clean = msg.replace(msg.substring(0, nameStart + 1), "").split(":", 2);
+                String author = clean[0].trim(), content = clean[1].trim();
+                boolean self = author.equalsIgnoreCase(mc.getSession().getUsername());
+                if (eventBus.post(new PartyChatMsgEvent(content, author, self)).isCancelled() && !ci.isCancelled()) {
+                    ci.cancel();
+                }
+            }
+        }
     }
 }

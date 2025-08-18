@@ -202,7 +202,7 @@ public class ExperimentSolver {
             }
         }
         if (superpairs.value() && experimentType.equals(ExperimentType.Superpairs) && !isStatus(event.stack) && !isPowerup(event.stack)) {
-            if (!isStainedGlass(event.stack) && !isStainedGlassPane(event.stack)) {
+            if (!isStainedGlass(event.stack) && !isStainedGlassPane(event.stack) && !item.equals(Items.AIR)) {
                 if (superSolution.slot != null && superSolution.slot != eventSlot) {
                     if (matchSuperStacks(event.stack, superSolution.slot.getStack())) {
                         SlotOptions.setBackground(eventSlot, superColorFound);

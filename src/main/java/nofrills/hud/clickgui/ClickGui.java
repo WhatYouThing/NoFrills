@@ -2,14 +2,14 @@ package nofrills.hud.clickgui;
 
 import com.google.common.collect.Lists;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
+import io.wispforest.owo.ui.component.ButtonComponent;
+import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
-import io.wispforest.owo.ui.core.Component;
-import io.wispforest.owo.ui.core.OwoUIAdapter;
-import io.wispforest.owo.ui.core.Sizing;
-import io.wispforest.owo.ui.core.Surface;
+import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
 import nofrills.features.farming.SpaceFarmer;
@@ -29,6 +29,7 @@ import nofrills.features.slayer.*;
 import nofrills.features.solvers.CalendarDate;
 import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
+import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,8 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static nofrills.Main.mc;
 
 public class ClickGui extends BaseOwoScreen<FlowLayout> {
     public List<Category> categories;
@@ -171,7 +174,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Dropdown<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommand: !warp"),
                                 new Settings.Dropdown<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves to party leader on demand.\n\nCommand: !pt"),
                                 new Settings.Dropdown<>("All Invite", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand.\n\nCommand: !allinv"),
-                                new Settings.Dropdown<>("Downtime", PartyCommands.downtime, "Allows party members to schedule a downtime reminder for the end of your Kuudra/Dungeons run.\n\nCommand: !dt"),
+                                new Settings.Dropdown<>("Downtime", PartyCommands.downtime, "Allows party members to schedule a downtime reminder for the end of your Kuudra/Dungeons run.\nThis command will also pause Auto Requeue if you have it enabled.\n\nCommand: !dt"),
                                 new Settings.Dropdown<>("Instance Queue", PartyCommands.queue, Utils.format("Allows party members to queue for any instance on demand.\n\nCommand List: {}", PartyCommands.listInstancesFormatted())),
                                 new Settings.Dropdown<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords")
                         ))),
@@ -310,11 +313,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Fusion Keybinds", FusionKeybinds.instance, "Adds handy keybinds to the Fusion Machine.", new Settings(List.of(
                                 new Settings.Keybind("Repeat Previous", FusionKeybinds.repeat, "The keybind to repeat the previous fusion."),
-                                new Settings.Keybind("Confirm Previous", FusionKeybinds.confirm, "The keybind to confirm the previous fusion."),
-                                new Settings.Keybind("Cancel Previous", FusionKeybinds.cancel, "The keybind to cancel the previous fusion.")
+                                new Settings.Keybind("Confirm Fusion", FusionKeybinds.confirm, "The keybind to confirm a fusion."),
+                                new Settings.Keybind("Cancel Fusion", FusionKeybinds.cancel, "The keybind to cancel a fusion.")
                         ))),
                         new Module("Lasso Alert", LassoAlert.instance, "Plays a sound effect once you can reel in with your lasso."),
-                        new Module("Instant Fog", InstantFog.instance, "Makes the thick underwater fog disappear instantly.")
+                        new Module("Instant Fog", InstantFog.instance, "Makes the thick underwater fog disappear instantly."),
+                        new Module("Shard Tracker", ShardTracker.instance, "Tracks obtained shards for you and displays information with a HUD element.", ShardTracker.buildSettings())
                 )),
                 new Category("Dungeons", List.of(
                         new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(
@@ -508,6 +512,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         ScrollContainer<FlowLayout> scroll = Containers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
         this.mainScroll = scroll;
         root.child(scroll);
+        ButtonComponent hudEditorButton = Components.button(Text.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
+        hudEditorButton.margins(Insets.of(0, 3, 0, 3));
+        hudEditorButton.positioning(Positioning.relative(100, 100));
+        hudEditorButton.renderer((context, button, delta) -> {
+            context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
+            context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
+        });
+        root.child(hudEditorButton);
     }
 
     @Override

@@ -14,7 +14,7 @@ public class SeaCreatureData {
             new SeaCreature("Grim Reaper", "This can't be! The manifestation of death himself!", "§5", true, true),
             new SeaCreature("Carrot King", "Is this even a fish? It's the Carrot King!", "§a", true, true),
             new SeaCreature("Water Hydra", "The Water Hydra has come to test your strength.", "§1", true, true),
-            new SeaCreature("Sea Emperor", "The Sea Emperor arises from the depths.", "§4", true, true),
+            new SeaCreature("Loch Emperor", "The Loch Emperor arises from the depths.", "§4", true, true),
             new SeaCreature("Abyssal Miner", "An Abyssal Miner breaks out of the water!", "§2", true, true),
             new SeaCreature("Alligator", "A long snout breaks the surface of the water. It's an Alligator!", "§2", true, true),
             new SeaCreature(

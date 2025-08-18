@@ -22,10 +22,7 @@ import nofrills.features.fishing.RareAnnounce;
 import nofrills.features.fishing.RareGlow;
 import nofrills.features.fixes.DoubleUseFix;
 import nofrills.features.general.*;
-import nofrills.features.hunting.CinderbatHighlight;
-import nofrills.features.hunting.FusionKeybinds;
-import nofrills.features.hunting.InvisibugHighlight;
-import nofrills.features.hunting.LassoAlert;
+import nofrills.features.hunting.*;
 import nofrills.features.keybinds.CustomKeybinds;
 import nofrills.features.keybinds.PearlRefill;
 import nofrills.features.keybinds.RecipeLookup;
@@ -139,6 +136,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ShopCleaner.class);
         eventBus.subscribe(KuudraChestValue.class);
         eventBus.subscribe(DoubleUseFix.class);
+        eventBus.subscribe(ShardTracker.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

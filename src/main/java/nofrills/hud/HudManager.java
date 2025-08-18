@@ -24,6 +24,7 @@ public class HudManager {
     public static Power powerElement = new Power(Text.of("§bPower: §f0"));
     public static Day dayElement = new Day(Text.of("§bDay: §f0"));
     public static Ping pingElement = new Ping(Text.of("§bPing: §f0ms"));
+    public static ShardTrackerDisplay shardTrackerElement = new ShardTrackerDisplay();
 
     public static List<HudElement> elements = List.of(
             bobberElement,
@@ -32,7 +33,8 @@ public class HudManager {
             lagMeterElement,
             powerElement,
             dayElement,
-            pingElement
+            pingElement,
+            shardTrackerElement
     );
 
     public static boolean isEditingHud() {

@@ -50,6 +50,8 @@ public class ShardTracker {
             }
             try {
                 JsonArray array = JsonParser.parseString(mc.keyboard.getClipboard()).getAsJsonArray();
+                JsonArray shards = data.value().get("shards").getAsJsonArray();
+                List<JsonObject> objects = new ArrayList<>();
                 for (JsonElement element : array) {
                     JsonObject shardData = element.getAsJsonObject();
                     JsonObject object = new JsonObject();
@@ -57,7 +59,10 @@ public class ShardTracker {
                     object.addProperty("needed", shardData.get("needed").getAsLong());
                     object.addProperty("obtained", 0L);
                     object.addProperty("source", shardData.get("source").getAsString());
-                    data.value().get("shards").getAsJsonArray().add(object);
+                    objects.add(object);
+                }
+                for (JsonObject object : objects) {
+                    shards.add(object);
                 }
             } catch (Exception ignored) {
                 Utils.info("§cFailed to import shard list from the calculator, no valid data found in your clipboard. Try updating the mod to the newest version if the import always fails.");
@@ -75,7 +80,7 @@ public class ShardTracker {
             }
             JsonObject object = new JsonObject();
             object.addProperty("name", "");
-            object.addProperty("needed", 160L);
+            object.addProperty("needed", 0L);
             object.addProperty("obtained", 0L);
             object.addProperty("source", "Direct");
             data.value().get("shards").getAsJsonArray().add(object);
@@ -99,6 +104,15 @@ public class ShardTracker {
         return settings;
     }
 
+    public static String getSourceColor(String source) {
+        return switch (source.toLowerCase()) {
+            case "direct", "bazaar" -> "§a";
+            case "fuse" -> "§d";
+            case "cycle" -> "§6";
+            default -> "§7";
+        };
+    }
+
     public static void refreshDisplay() {
         if (data.value().has("shards")) {
             JsonArray shards = data.value().get("shards").getAsJsonArray();
@@ -111,10 +125,13 @@ public class ShardTracker {
                 }
                 long needed = shardData.get("needed").getAsLong();
                 long obtained = shardData.get("obtained").getAsLong();
+                String source = shardData.get("source").getAsString();
                 lines.add(Utils.format("§f§l{}§r §7{}§f: {}",
                         Utils.uppercaseFirst(name, false),
-                        shardData.get("source").getAsString(),
-                        needed == 0 ? Utils.formatSeparator(obtained) : Utils.format("{}/{}", Utils.formatSeparator(obtained), Utils.formatSeparator(needed))
+                        Utils.format("{}{}", getSourceColor(source), source),
+                        needed == 0 ? Utils.formatSeparator(obtained) : Utils.format("{}{}/{}",
+                                obtained >= needed ? "§a" : "", Utils.formatSeparator(obtained), Utils.formatSeparator(needed)
+                        )
                 ));
             }
             if (!lines.isEmpty()) {

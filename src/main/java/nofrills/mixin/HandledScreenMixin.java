@@ -3,6 +3,10 @@ package nofrills.mixin;
 import com.google.gson.JsonElement;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import io.wispforest.owo.ui.core.Color;
+import io.wispforest.owo.ui.core.OwoUIDrawContext;
+import io.wispforest.owo.ui.renderstate.LineElementRenderState;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -28,6 +32,7 @@ import nofrills.misc.ScreenOptions;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix3x2f;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -96,7 +101,18 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void drawLine(DrawContext context, int firstSlot, int secondSlot, RenderColor color) {
         Slot slot1 = handler.getSlot(firstSlot);
         Slot slot2 = handler.getSlot(secondSlot);
-        context.fill(RenderPipelines.GUI, slot1.x + 8, slot1.y + 8, slot2.x + 8, slot2.y + 8, color.argb);
+        drawLine(context, RenderPipelines.GUI, slot1.x + 8, slot1.y + 8, slot2.x + 8, slot2.y + 8, 2.0, Color.ofArgb(color.argb));
+    }
+
+    public void drawLine(DrawContext context, RenderPipeline pipeline, int x1, int y1, int x2, int y2, double thickness, Color color) {
+        context.state.addSimpleElement(new LineElementRenderState(
+                pipeline,
+                new Matrix3x2f(context.getMatrices()),
+                context.scissorStack.peekLast(),
+                x1, y1, x2, y2,
+                thickness,
+                color
+        ));
     }
 
     @Unique

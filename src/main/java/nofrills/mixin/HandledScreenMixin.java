@@ -96,7 +96,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void drawLine(DrawContext context, int firstSlot, int secondSlot, RenderColor color) {
         Slot slot1 = handler.getSlot(firstSlot);
         Slot slot2 = handler.getSlot(secondSlot);
-        context.fill(RenderPipelines.LINES, slot1.x + 8, slot1.y + 8, slot2.x + 8, slot2.y + 8, color.argb);
+        context.fill(RenderPipelines.GUI, slot1.x + 8, slot1.y + 8, slot2.x + 8, slot2.y + 8, color.argb);
     }
 
     @Unique
@@ -200,10 +200,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V"))
     private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        context.push();
-        context.translate(this.x, this.y);
         if (isSlotBindingActive() && focusedSlot != null) {
             if (SlotBinding.isHotbar(focusedSlot.id)) {
                 String name = "hotbar" + SlotBinding.toHotbarNumber(focusedSlot.id);
@@ -257,7 +255,6 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackgroundColor(slot).argb);
             }
         }
-        context.pop();
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)

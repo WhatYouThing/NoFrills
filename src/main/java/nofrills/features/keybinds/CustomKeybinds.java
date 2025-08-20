@@ -11,6 +11,8 @@ import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -47,7 +49,7 @@ public class CustomKeybinds {
         });
         button.button.verticalSizing(Sizing.fixed(18));
         list.add(button);
-        Settings.Toggle allowInGuiToggle = new Settings.Toggle("Allow in GUI", allowInGui, "Allow keybinds to work while any GUI (inventory/chest/etc.) is open.");
+        Settings.Toggle allowInGuiToggle = new Settings.Toggle("Allow in GUI", allowInGui, "Allow keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
         list.add(allowInGuiToggle);
         if (data.value().has("binds")) {
             JsonArray binds = data.value().get("binds").getAsJsonArray();
@@ -66,7 +68,7 @@ public class CustomKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && (allowInGui.value() || mc.currentScreen == null)) {
+        if (instance.isActive() && ((allowInGui.value() && mc.currentScreen instanceof HandledScreen) || mc.currentScreen == null)) {
             if (data.value().has("binds")) {
                 for (JsonElement entry : data.value().get("binds").getAsJsonArray()) {
                     JsonObject bind = entry.getAsJsonObject();

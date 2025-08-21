@@ -8,7 +8,6 @@ import io.wispforest.owo.ui.core.Color;
 import io.wispforest.owo.ui.renderstate.LineElementRenderState;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.render.state.TextGuiElementRenderState;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -117,21 +116,6 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     }
 
     @Unique
-    public void drawCenteredText(DrawContext context, String text, int x, int y, RenderColor color) {
-        context.state.addText(new TextGuiElementRenderState(
-                this.textRenderer,
-                Text.literal(text).asOrderedText(),
-                new Matrix3x2f(context.getMatrices()),
-                x,
-                y,
-                color.hex,
-                color.hex,
-                true,
-                context.scissorStack.peekLast()
-        ));
-    }
-
-    @Unique
     private void drawBorder(DrawContext context, int slotId, RenderColor color) {
         Slot slot = handler.getSlot(slotId);
         context.drawBorder(slot.x, slot.y, 16, 16, color.argb);
@@ -232,8 +216,15 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
+    @Inject(method = "drawSlot", at = @At("HEAD"))
+    private void onRenderSlot(DrawContext context, Slot slot, CallbackInfo ci) {
+        if (SlotOptions.hasBackground(slot)) {
+            context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackgroundColor(slot).argb);
+        }
+    }
+
     @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V"))
-    private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+    private void onBeforeHighlightRender(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (isSlotBindingActive() && focusedSlot != null) {
             if (SlotBinding.isHotbar(focusedSlot.id)) {
                 String name = "hotbar" + SlotBinding.toHotbarNumber(focusedSlot.id);
@@ -270,19 +261,19 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.lineWidth.value(), SlotBinding.binding.value());
             }
         }
+    }
+
+    @SuppressWarnings("mapping")
+    @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;popMatrix()Lorg/joml/Matrix3x2fStack;"))
+    private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (KuudraChestValue.instance.isActive() && KuudraChestValue.currentValue > 0.0) {
             Slot targetSlot = this.handler.getSlot(4);
             String value = Utils.format("Chest Value: {}", Utils.formatSeparator(KuudraChestValue.currentValue));
             int width = mc.textRenderer.getWidth(value);
             int baseX = targetSlot.x + 8;
             int baseY = targetSlot.y + 8;
-            drawCenteredText(context, value, baseX, baseY - 4, RenderColor.green);
-            context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, RenderColor.darkGray.argb);
-        }
-        for (Slot slot : this.handler.slots) {
-            if (SlotOptions.hasBackground(slot)) {
-                context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackgroundColor(slot).argb);
-            }
+            context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, KuudraChestValue.background.argb);
+            context.drawCenteredTextWithShadow(this.textRenderer, value, baseX, baseY - 4, RenderColor.green.argb);
         }
     }
 

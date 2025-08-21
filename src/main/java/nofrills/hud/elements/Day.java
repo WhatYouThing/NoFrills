@@ -37,6 +37,9 @@ public class Day extends SimpleTextElement {
 
     @Override
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+        if (this.focusHandler() == null) {
+            return;
+        }
         if (HudManager.isEditingHud()) {
             this.updateSurface(instance.isActive());
         } else if (!instance.isActive()) {

@@ -23,6 +23,8 @@ public class ShardTrackerDisplay extends SimpleTextElement {
     public final SettingDouble y = new SettingDouble(0.36, "y", instance.key());
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
+    public final SettingBool hideIfNone = new SettingBool(false, "hideIfNone", instance.key());
+
 
     private final Identifier identifier = Identifier.of("nofrills", "shard-tracker-element");
     private MutableText lastText = ShardTracker.displayNone;
@@ -31,30 +33,36 @@ public class ShardTrackerDisplay extends SimpleTextElement {
         super(ShardTracker.displayNone);
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
-                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text.")
+                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
+                new Settings.Toggle("Hide If None", hideIfNone, "Hides the element if you are not tracking any shards (or the Shard Tracker is disabled).")
         ));
         this.options.setTitle(Text.of("Shard Tracker Element"));
     }
 
     @Override
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+        if (this.focusHandler() == null) {
+            return;
+        }
+        boolean trackerActive = ShardTracker.instance.isActive();
+        MutableText text = trackerActive ? ShardTracker.display : ShardTracker.displayNone;
         if (HudManager.isEditingHud()) {
             this.updateSurface(instance.isActive());
-        } else if (!instance.isActive()) {
-            return;
+        } else {
+            if (!instance.isActive()) {
+                return;
+            }
+            if (hideIfNone.value()) {
+                if (!trackerActive || text.equals(ShardTracker.displayNone)) {
+                    return;
+                }
+            }
         }
         this.updateShadow(shadow);
         this.updateAlignment(align);
-        if (!ShardTracker.instance.isActive()) {
-            if (!this.lastText.equals(ShardTracker.displayNone)) {
-                this.label.text(ShardTracker.displayNone);
-                this.lastText = ShardTracker.displayNone.copy();
-            }
-        } else {
-            if (!this.lastText.equals(ShardTracker.display)) {
-                this.label.text(ShardTracker.display);
-                this.lastText = ShardTracker.display.copy();
-            }
+        if (!this.lastText.equals(text)) {
+            this.label.text(text);
+            this.lastText = text.copy();
         }
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }

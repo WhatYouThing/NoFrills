@@ -23,6 +23,7 @@ public class SlotBinding {
     public final static SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "keybind", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
     public static final SettingBool lines = new SettingBool(false, "lines", instance.key());
+    public static final SettingDouble lineWidth = new SettingDouble(2.0, "lineWidth", instance.key());
     public static final SettingBool borders = new SettingBool(false, "borders", instance.key());
     public static final SettingColor binding = new SettingColor(RenderColor.fromHex(0x00ff00), "bindingColor", instance.key());
     public static final SettingColor bound = new SettingColor(RenderColor.fromHex(0x00ffff), "boundColor", instance.key());

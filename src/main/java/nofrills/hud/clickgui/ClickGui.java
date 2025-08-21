@@ -111,9 +111,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Separator("Settings"),
                                 new Settings.Keybind("Keybind", SlotBinding.keybind, "The keybind used for creating and removing slot binding combinations."),
                                 new Settings.Toggle("Show Lines", SlotBinding.lines, "Draw lines between the slot you're hovering over, and any slots bound to it."),
+                                new Settings.SliderDouble("Line Width", 0.1, 5.0, 0.1, SlotBinding.lineWidth, "The width of the lines"),
                                 new Settings.Toggle("Show Borders", SlotBinding.borders, "Draw borders around any slot that is bound to the slot you're hovering over."),
-                                new Settings.ColorPicker("Binding Color", false, SlotBinding.binding, "The color used to display the bind you are currently creating."),
-                                new Settings.ColorPicker("Bound Color", false, SlotBinding.bound, "The color used to display existing slot binds.")
+                                new Settings.ColorPicker("Binding Color", true, SlotBinding.binding, "The color used to display the bind you are currently creating."),
+                                new Settings.ColorPicker("Bound Color", true, SlotBinding.bound, "The color used to display existing slot binds.")
                         ))),
                         new Module("Price Tooltips", PriceTooltips.instance, "Adds pricing information to item tooltips. Requires connectivity to the NoFrills API.", new Settings(List.of(
                                 new Settings.Toggle("Lowest BIN", PriceTooltips.auction, "Adds the Lowest BIN price to applicable items."),

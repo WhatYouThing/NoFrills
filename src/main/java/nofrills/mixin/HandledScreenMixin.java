@@ -5,10 +5,10 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import io.wispforest.owo.ui.core.Color;
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
 import io.wispforest.owo.ui.renderstate.LineElementRenderState;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.render.state.TextGuiElementRenderState;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
@@ -98,12 +98,13 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     }
 
     @Unique
-    private void drawLine(DrawContext context, int firstSlot, int secondSlot, RenderColor color) {
+    private void drawLine(DrawContext context, int firstSlot, int secondSlot, double width, RenderColor color) {
         Slot slot1 = handler.getSlot(firstSlot);
         Slot slot2 = handler.getSlot(secondSlot);
-        drawLine(context, RenderPipelines.GUI, slot1.x + 8, slot1.y + 8, slot2.x + 8, slot2.y + 8, 2.0, Color.ofArgb(color.argb));
+        drawLine(context, RenderPipelines.GUI, slot1.x + 8, slot1.y + 8, slot2.x + 8, slot2.y + 8, width, Color.ofArgb(color.argb));
     }
 
+    @Unique
     public void drawLine(DrawContext context, RenderPipeline pipeline, int x1, int y1, int x2, int y2, double thickness, Color color) {
         context.state.addSimpleElement(new LineElementRenderState(
                 pipeline,
@@ -112,6 +113,21 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 x1, y1, x2, y2,
                 thickness,
                 color
+        ));
+    }
+
+    @Unique
+    public void drawCenteredText(DrawContext context, String text, int x, int y, RenderColor color) {
+        context.state.addText(new TextGuiElementRenderState(
+                this.textRenderer,
+                Text.literal(text).asOrderedText(),
+                new Matrix3x2f(context.getMatrices()),
+                x,
+                y,
+                color.hex,
+                color.hex,
+                true,
+                context.scissorStack.peekLast()
         ));
     }
 
@@ -224,7 +240,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 if (SlotBinding.data.value().has(name)) {
                     for (JsonElement element : SlotBinding.data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
                         if (SlotBinding.lines.value()) {
-                            drawLine(context, focusedSlot.id, element.getAsInt(), SlotBinding.bound.value());
+                            drawLine(context, focusedSlot.id, element.getAsInt(), SlotBinding.lineWidth.value(), SlotBinding.bound.value());
                         }
                         if (SlotBinding.borders.value()) {
                             drawBorder(context, element.getAsInt(), SlotBinding.bound.value());
@@ -238,7 +254,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                         for (JsonElement element : SlotBinding.data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
                             if (element.getAsInt() == focusedSlot.id) {
                                 if (SlotBinding.lines.value()) {
-                                    drawLine(context, focusedSlot.id, i + 35, SlotBinding.bound.value());
+                                    drawLine(context, focusedSlot.id, i + 35, SlotBinding.lineWidth.value(), SlotBinding.bound.value());
                                 }
                                 if (SlotBinding.borders.value()) {
                                     drawBorder(context, i + 35, SlotBinding.bound.value());
@@ -251,7 +267,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             if (SlotBinding.lastSlot != -1) {
                 drawBorder(context, SlotBinding.lastSlot, SlotBinding.binding.value());
                 drawBorder(context, focusedSlot.id, SlotBinding.binding.value());
-                drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.binding.value());
+                drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.lineWidth.value(), SlotBinding.binding.value());
             }
         }
         if (KuudraChestValue.instance.isActive() && KuudraChestValue.currentValue > 0.0) {
@@ -260,11 +276,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             int width = mc.textRenderer.getWidth(value);
             int baseX = targetSlot.x + 8;
             int baseY = targetSlot.y + 8;
-            context.push();
-            context.translate(0, 0);
-            context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, RenderColor.green.hex);
+            drawCenteredText(context, value, baseX, baseY - 4, RenderColor.green);
             context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, RenderColor.darkGray.argb);
-            context.pop();
         }
         for (Slot slot : this.handler.slots) {
             if (SlotOptions.hasBackground(slot)) {

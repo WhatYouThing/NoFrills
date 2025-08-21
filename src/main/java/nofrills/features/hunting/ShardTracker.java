@@ -109,6 +109,13 @@ public class ShardTracker {
         return list;
     }
 
+    public static Settings buildSettings() {
+        Settings settings = new Settings(getSettingsList());
+        settings.setTitle(Text.literal("Shard Tracker"));
+        refreshDisplay();
+        return settings;
+    }
+
     private static JsonArray parseTreeData(String payload) {
         try {
             String data = payload.substring(payload.indexOf(":") + 1);
@@ -117,13 +124,6 @@ public class ShardTracker {
         } catch (Exception ignored) {
         }
         return null;
-    }
-
-    public static Settings buildSettings() {
-        Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Shard Tracker"));
-        refreshDisplay();
-        return settings;
     }
 
     public static void refreshDisplay() {
@@ -141,11 +141,9 @@ public class ShardTracker {
                 String source = shardData.get("source").getAsString();
                 String shardName = Utils.format("{}§l{}", getShardColor(name.toLowerCase()), Utils.uppercaseFirst(name, false));
                 String shardSource = Utils.format("{}[{}]", getSourceColor(source), source);
-                String shardQuantity = Utils.format("{}§l{}",
-                        needed != 0 & obtained >= needed ? "§a" : "§f",
-                        needed == 0 ? Utils.formatSeparator(obtained) : Utils.format("{}/{}", Utils.formatSeparator(obtained), Utils.formatSeparator(needed))
-                );
-                lines.add(Utils.format("{}§r {}§f: §r{}", shardName, shardSource, shardQuantity));
+                String quantityColor = needed > 0 & obtained >= needed ? "§a" : "§f";
+                String shardQuantity = needed <= 0 ? Utils.format("{}x", Utils.formatSeparator(obtained)) : Utils.format("{}/{}x", Utils.formatSeparator(obtained), Utils.formatSeparator(needed));
+                lines.add(Utils.format("{}{}§r {}§r {}", quantityColor, shardQuantity, shardName, shardSource));
             }
             if (!lines.isEmpty()) {
                 StringBuilder builder = new StringBuilder();

@@ -37,6 +37,8 @@ public class CustomKeybinds {
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
+        Settings.Toggle allowInGuiToggle = new Settings.Toggle("Allow in GUI", allowInGui, "Allow keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
+        list.add(allowInGuiToggle);
         Settings.BigButton button = new Settings.BigButton("Add New Custom Keybind", btn -> {
             if (!data.value().has("binds")) {
                 data.value().add("binds", new JsonArray());
@@ -49,8 +51,6 @@ public class CustomKeybinds {
         });
         button.button.verticalSizing(Sizing.fixed(18));
         list.add(button);
-        Settings.Toggle allowInGuiToggle = new Settings.Toggle("Allow in GUI", allowInGui, "Allow keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
-        list.add(allowInGuiToggle);
         if (data.value().has("binds")) {
             JsonArray binds = data.value().get("binds").getAsJsonArray();
             for (int i = 0; i < binds.size(); i++) {

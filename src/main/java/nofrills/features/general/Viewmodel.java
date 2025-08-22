@@ -20,4 +20,7 @@ public class Viewmodel {
     public static final SettingDouble rotX = new SettingDouble(0.0, "rotX", instance.key());
     public static final SettingDouble rotY = new SettingDouble(0.0, "rotY", instance.key());
     public static final SettingDouble rotZ = new SettingDouble(0.0, "rotZ", instance.key());
+    public static final SettingDouble swingX = new SettingDouble(1.0, "swingX", instance.key());
+    public static final SettingDouble swingY = new SettingDouble(1.0, "swingY", instance.key());
+    public static final SettingDouble swingZ = new SettingDouble(1.0, "swingZ", instance.key());
 }

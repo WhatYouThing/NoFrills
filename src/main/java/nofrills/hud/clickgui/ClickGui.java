@@ -433,7 +433,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Silence Mania", RiftstalkerBloodfiend.mania, "Removes the very loud Mania sound effects."),
                                 new Settings.Toggle("Silence Killer Springs", RiftstalkerBloodfiend.springs, "Removes the sounds that play when your boss spawns a Killer Spring.")
                         ))),
-                        new Module("Voidgloom Seraph", VoidgloomSeraph.instance, "Various features for Vampire slayer.", new Settings(List.of(
+                        new Module("Voidgloom Seraph", VoidgloomSeraph.instance, "Various features for Enderman slayer.", new Settings(List.of(
                                 new Settings.Toggle("Hits Display", VoidgloomSeraph.hits, "Shows the amount of hits needed to break the hits shield of your boss.")
                         )))
                 )),

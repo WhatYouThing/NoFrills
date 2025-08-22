@@ -151,7 +151,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
   recent release, and add it to your mods folder.
 - Additional dependencies needed to launch the mod:
     - [Fabric API](https://modrinth.com/mod/fabric-api)
-    - [YetAnotherConfigLib](https://modrinth.com/mod/yacl) (Optional if using Skyblocker, it has YACL bundled in)
     - [Mod Menu](https://modrinth.com/mod/modmenu) (Optional, settings can be accessed with `/nofrills`, or `/nf`)
 - To finish off, open the mod's settings, and configure it to your liking. **Every feature is off by default**.
 

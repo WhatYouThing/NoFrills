@@ -12,7 +12,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
@@ -22,6 +24,7 @@ import nofrills.features.general.Fullbright;
 import nofrills.features.general.Viewmodel;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -30,6 +33,8 @@ import static nofrills.Main.mc;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
+    @Shadow public abstract boolean isHolding(Item item);
+
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
@@ -52,8 +57,12 @@ public abstract class LivingEntityMixin extends Entity {
 
     @ModifyReturnValue(method = "getHandSwingDuration", at = @At("RETURN"))
     private int getSwingSpeed(int original) {
-        if (Viewmodel.instance.isActive() && Viewmodel.speed.value() > 0 && Utils.isSelf(this)) {
-            return Viewmodel.speed.value();
+        if (Viewmodel.instance.isActive() && Utils.isSelf(this)) {
+            if (Viewmodel.noBowSwing.value() && this.isHolding(Items.BOW)) {
+                return 0;
+            } else if (Viewmodel.speed.value() > 0) {
+                return Viewmodel.speed.value();
+            }
         }
         return original;
     }

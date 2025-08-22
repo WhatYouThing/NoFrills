@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -69,6 +70,15 @@ public class HeldItemRendererMixin {
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Viewmodel.rotY.value()));
             matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Viewmodel.rotZ.value()));
             matrices.scale((float) Viewmodel.scaleX.value(), (float) Viewmodel.scaleY.value(), (float) Viewmodel.scaleZ.value());
+        }
+    }
+
+    @Redirect(method = "swingArm", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(FFF)V", ordinal = 0))
+    private void onSwingArmTranslate(MatrixStack instance, float x, float y, float z) {
+        if (Viewmodel.instance.isActive()) {
+            instance.translate(x * Viewmodel.swingX.value(), y * Viewmodel.swingY.value(), z * Viewmodel.swingZ.value());
+        } else {
+            instance.translate(x, y, z);
         }
     }
 

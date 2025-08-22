@@ -182,6 +182,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Viewmodel", Viewmodel.instance, "Easily customize the appearance of your held item.", new Settings(List.of(
                                 new Settings.Toggle("No Haste", Viewmodel.noHaste, "Prevents Haste and Mining Fatigue from affecting your swing speed."),
                                 new Settings.Toggle("No Equip Animation", Viewmodel.noEquip, "Removes the item swapping animation."),
+                                new Settings.Toggle("No Bow Swing", Viewmodel.noBowSwing, "Removes the swing animation for all bows."),
                                 new Settings.SliderInt("Swing Speed", 0, 20, 1, Viewmodel.speed, "Apply a custom swing speed. Set to 0 to disable."),
                                 new Settings.SliderDouble("Offset X", -2, 2, 0.01, Viewmodel.offsetX, "The X axis offset position of your held item."),
                                 new Settings.SliderDouble("Offset Y", -2, 2, 0.01, Viewmodel.offsetY, "The Y axis offset position of your held item."),
@@ -191,7 +192,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Scale Z", 0, 5, 0.01, Viewmodel.scaleZ, "The Z axis scale of your held item."),
                                 new Settings.SliderDouble("Rotation X", -180, 180, 0.5, Viewmodel.rotX, "The X axis rotation of your held item."),
                                 new Settings.SliderDouble("Rotation Y", -180, 180, 0.5, Viewmodel.rotY, "The Y axis rotation of your held item."),
-                                new Settings.SliderDouble("Rotation Z", -180, 180, 0.5, Viewmodel.rotZ, "The Z axis rotation of your held item.")
+                                new Settings.SliderDouble("Rotation Z", -180, 180, 0.5, Viewmodel.rotZ, "The Z axis rotation of your held item."),
+                                new Settings.SliderDouble("Swing X", 0, 2, 0.01, Viewmodel.swingX, "The X multiplier for swing animation offset."),
+                                new Settings.SliderDouble("Swing Y", 0, 2, 0.01, Viewmodel.swingY, "The Y multiplier for swing animation offset."),
+                                new Settings.SliderDouble("Swing Z", 0, 2, 0.01, Viewmodel.swingZ, "The Z multiplier for swing animation offset.")
                         ))),
                         new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings())
                 )),

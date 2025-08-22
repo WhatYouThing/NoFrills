@@ -7,8 +7,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 <details>
 <summary>Click to expand feature list</summary>
 
-### General
-
 - **General**
 
     - **Auto Sprint**: Essentially ToggleSprint, but always active.
@@ -34,7 +32,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Middle Click Fix**: Allows the middle mouse button to work just as it does on 1.8.9.
     - **Middle Click Override**: Replaces left clicks with middle clicks in applicable GUI's, making navigation
       smoother.
-    - **No Ability Place**:Prevents block items with abilities from being placeable client side, such as the Egglocator.
+    - **No Ability Place**: Prevents block items with abilities from being placeable client side, such as the Egglocator.
     - **No Drop Swing**: Don't swing your hand while dropping items.
     - **No Front Perspective**: Removes the front facing camera perspective.
     - **No Loading Screen**: Fully removes the loading terrain screen that appears when switching islands.
@@ -156,8 +154,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 ## Incompatibilities
 
-- Some highlight features might not render correctly with Iris shaders active, this might be fixed once the mod is
-  updated to 1.21.8.
+- Some highlight features might not render correctly with Iris shaders active.
 
 ## Credits
 

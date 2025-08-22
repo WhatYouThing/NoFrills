@@ -11,8 +11,11 @@ import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
+import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
 import nofrills.events.InputEvent;
 import nofrills.hud.clickgui.Settings;
@@ -29,10 +32,13 @@ import static nofrills.Main.mc;
 public class CustomKeybinds {
     public static final Feature instance = new Feature("customKeybinds");
 
+    public static final SettingBool allowInGui = new SettingBool(false, "allowInGui", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
+        Settings.Toggle allowInGuiToggle = new Settings.Toggle("Allow in GUI", allowInGui, "Allow keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
+        list.add(allowInGuiToggle);
         Settings.BigButton button = new Settings.BigButton("Add New Custom Keybind", btn -> {
             if (!data.value().has("binds")) {
                 data.value().add("binds", new JsonArray());
@@ -62,7 +68,7 @@ public class CustomKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.currentScreen == null) {
+        if (instance.isActive() && ((allowInGui.value() && mc.currentScreen instanceof HandledScreen) || mc.currentScreen == null)) {
             if (data.value().has("binds")) {
                 for (JsonElement entry : data.value().get("binds").getAsJsonArray()) {
                     JsonObject bind = entry.getAsJsonObject();

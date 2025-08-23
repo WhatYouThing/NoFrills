@@ -3,7 +3,7 @@ package nofrills.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
-import nofrills.features.fixes.AntiSwim;
+import nofrills.features.tweaks.AntiSwim;
 import nofrills.misc.EntityRendering;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;

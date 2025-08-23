@@ -1,4 +1,4 @@
-package nofrills.features.fixes;
+package nofrills.features.tweaks;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;

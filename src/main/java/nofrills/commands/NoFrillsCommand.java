@@ -15,7 +15,7 @@ import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
-import nofrills.features.keybinds.PearlRefill;
+import nofrills.features.general.PearlRefill;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.SkyblockData;

@@ -1,4 +1,4 @@
-package nofrills.features.general;
+package nofrills.features.misc;
 
 import nofrills.config.Feature;
 import nofrills.config.SettingDouble;

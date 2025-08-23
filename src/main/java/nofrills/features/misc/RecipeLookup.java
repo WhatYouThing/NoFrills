@@ -1,4 +1,4 @@
-package nofrills.features.keybinds;
+package nofrills.features.misc;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

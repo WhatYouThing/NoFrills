@@ -17,18 +17,16 @@ import nofrills.features.fishing.CapTracker;
 import nofrills.features.fishing.MuteDrake;
 import nofrills.features.fishing.RareAnnounce;
 import nofrills.features.fishing.RareGlow;
-import nofrills.features.fixes.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
-import nofrills.features.keybinds.CustomKeybinds;
-import nofrills.features.keybinds.PearlRefill;
-import nofrills.features.keybinds.RecipeLookup;
 import nofrills.features.kuudra.*;
 import nofrills.features.mining.*;
+import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
 import nofrills.features.solvers.CalendarDate;
 import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
+import nofrills.features.tweaks.*;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.misc.Utils;
@@ -274,7 +272,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(
                                 new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
-                        )))
+                        ))),
+                        new Module("Command Reveal", CommandReveal.instance, "Reveals the command your client would run upon clicking an applicable chat message.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experiments", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(

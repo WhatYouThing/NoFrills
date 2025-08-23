@@ -9,6 +9,7 @@ import net.minecraft.sound.SoundEvents;
 import nofrills.config.*;
 import nofrills.events.PartyChatMsgEvent;
 import nofrills.events.WorldTickEvent;
+import nofrills.features.misc.AutoRequeue;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 

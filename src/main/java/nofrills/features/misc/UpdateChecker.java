@@ -1,4 +1,4 @@
-package nofrills.features.general;
+package nofrills.features.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;

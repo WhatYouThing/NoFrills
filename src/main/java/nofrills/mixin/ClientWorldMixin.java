@@ -11,7 +11,7 @@ import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import nofrills.events.WorldTickEvent;
-import nofrills.features.fixes.StonkFix;
+import nofrills.features.tweaks.StonkFix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;

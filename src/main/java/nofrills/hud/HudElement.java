@@ -8,6 +8,8 @@ import net.minecraft.util.Identifier;
 import nofrills.config.SettingDouble;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.List;
+
 import static nofrills.Main.mc;
 
 public class HudElement extends DraggableContainer<FlowLayout> {
@@ -26,10 +28,10 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    protected void drawChildren(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta, List<? extends Component> children) {
         try {
-            super.draw(context, mouseX, mouseY, partialTicks, delta);
-        } catch (NullPointerException ignored) {
+            super.drawChildren(context, mouseX, mouseY, partialTicks, delta, children);
+        } catch (Exception ignored) {
         }
     }
 

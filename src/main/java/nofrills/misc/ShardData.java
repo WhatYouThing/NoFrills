@@ -8,6 +8,7 @@ public class ShardData {
 
     // shards that come from treasure catches, they can randomly go the inventory instead of hunting box and cannot be trusted
     public static final HashSet<String> fishingShards = Sets.newHashSet(
+            "azure",
             "cod",
             "verdant",
             "salmon",

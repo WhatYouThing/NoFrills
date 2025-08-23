@@ -25,7 +25,6 @@ public class ShardTrackerDisplay extends SimpleTextElement {
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingBool hideIfNone = new SettingBool(false, "hideIfNone", instance.key());
 
-
     private final Identifier identifier = Identifier.of("nofrills", "shard-tracker-element");
     private MutableText lastText = ShardTracker.displayNone;
 
@@ -41,9 +40,6 @@ public class ShardTrackerDisplay extends SimpleTextElement {
 
     @Override
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
-        if (this.focusHandler() == null) {
-            return;
-        }
         boolean trackerActive = ShardTracker.instance.isActive();
         MutableText text = trackerActive ? ShardTracker.display : ShardTracker.displayNone;
         if (HudManager.isEditingHud()) {

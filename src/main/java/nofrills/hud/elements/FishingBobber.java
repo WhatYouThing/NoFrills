@@ -48,9 +48,6 @@ public class FishingBobber extends SimpleTextElement {
 
     @Override
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
-        if (this.focusHandler() == null) {
-            return;
-        }
         if (HudManager.isEditingHud()) {
             super.layout.surface(instance.isActive() ? Surface.BLANK : this.disabledSurface);
         } else {

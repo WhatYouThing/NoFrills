@@ -2,10 +2,7 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.container.DraggableContainer;
 import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.Component;
-import io.wispforest.owo.ui.core.Positioning;
-import io.wispforest.owo.ui.core.Sizing;
-import io.wispforest.owo.ui.core.Surface;
+import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
 import nofrills.config.SettingDouble;
@@ -26,6 +23,14 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         this.layout.sizing(Sizing.content(), Sizing.content());
         this.foreheadSize(0);
         this.child(this.layout);
+    }
+
+    @Override
+    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+        try {
+            super.draw(context, mouseX, mouseY, partialTicks, delta);
+        } catch (NullPointerException ignored) {
+        }
     }
 
     @Override

@@ -1,4 +1,4 @@
-package nofrills.features.general;
+package nofrills.features.tweaks;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;

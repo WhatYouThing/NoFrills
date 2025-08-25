@@ -3,7 +3,7 @@ package nofrills.mixin;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.ActionResult;
-import nofrills.features.fixes.NoAbilityPlace;
+import nofrills.features.tweaks.NoAbilityPlace;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -52,8 +52,10 @@ public class HudManager {
 
     @EventHandler
     private static void onRenderHud(HudRenderEvent event) {
-        for (HudElement element : HudManager.elements) {
-            element.updatePosition();
+        if (!isEditingHud()) {
+            for (HudElement element : HudManager.elements) {
+                element.updatePosition();
+            }
         }
     }
 
@@ -80,8 +82,8 @@ public class HudManager {
         if (powerElement.instance.isActive()) {
             powerElement.setPower(SkyblockData.dungeonPower);
         }
-        if (dayElement.instance.isActive()) {
-            dayElement.setDay(mc.world.getTimeOfDay() / 24000L);
+        if (dayElement.instance.isActive() && mc.world != null) {
+            dayElement.setDay(mc.world.getLevelProperties().getTimeOfDay() / 24000L);
         }
         if (pingElement.instance.isActive()) { // pings every second when element is enabled, waits until ping result is received
             if (pingElement.ticks > 0) {

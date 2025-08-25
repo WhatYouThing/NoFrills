@@ -49,8 +49,13 @@ public class ShardTracker {
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
+        list.add(new Settings.Separator("Usage"));
+        list.add(new Settings.Description("Importing", "Click Copy Tree on the calculator, choose the NoFrills format, and click the Import Shard List button below."));
+        list.add(new Settings.Description("Tracking", "Enable this feature, and then enable the Shard Tracker element in the NoFrills HUD editor."));
+        list.add(new Settings.Separator("Settings"));
         Settings.Toggle boxToggle = new Settings.Toggle("Apply From Box", boxApply, "Automatically applies obtained amounts to shards when you open your Hunting Box.");
         list.add(boxToggle);
+        list.add(new Settings.Separator("Shards"));
         Settings.BigButton importButton = new Settings.BigButton("Import Shard List", btn -> {
             if (!data.value().has("shards")) {
                 data.value().add("shards", new JsonArray());

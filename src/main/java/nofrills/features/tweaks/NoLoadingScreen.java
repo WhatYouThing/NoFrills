@@ -1,4 +1,4 @@
-package nofrills.features.general;
+package nofrills.features.tweaks;
 
 import nofrills.config.Feature;
 

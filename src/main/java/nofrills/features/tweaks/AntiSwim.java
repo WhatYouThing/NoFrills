@@ -1,11 +1,11 @@
-package nofrills.features.fixes;
+package nofrills.features.tweaks;
 
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.misc.Utils;
 
-public class NoPearlCooldown {
-    public static final Feature instance = new Feature("noPearlCooldown");
+public class AntiSwim {
+    public static final Feature instance = new Feature("antiSwim");
 
     public static final SettingBool skyblockCheck = new SettingBool(false, "skyblockCheck", instance.key());
     public static final SettingBool modernCheck = new SettingBool(true, "modernCheck", instance.key());

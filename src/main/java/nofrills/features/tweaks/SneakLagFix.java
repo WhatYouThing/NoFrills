@@ -1,11 +1,11 @@
-package nofrills.features.fixes;
+package nofrills.features.tweaks;
 
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.misc.Utils;
 
-public class SnowFix {
-    public static final Feature instance = new Feature("snowFix");
+public class SneakLagFix {
+    public static final Feature instance = new Feature("sneakLagFix");
 
     public static final SettingBool skyblockCheck = new SettingBool(false, "skyblockCheck", instance.key());
     public static final SettingBool modernCheck = new SettingBool(true, "modernCheck", instance.key());

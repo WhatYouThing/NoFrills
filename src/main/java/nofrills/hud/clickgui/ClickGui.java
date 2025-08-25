@@ -17,18 +17,16 @@ import nofrills.features.fishing.CapTracker;
 import nofrills.features.fishing.MuteDrake;
 import nofrills.features.fishing.RareAnnounce;
 import nofrills.features.fishing.RareGlow;
-import nofrills.features.fixes.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
-import nofrills.features.keybinds.CustomKeybinds;
-import nofrills.features.keybinds.PearlRefill;
-import nofrills.features.keybinds.RecipeLookup;
 import nofrills.features.kuudra.*;
 import nofrills.features.mining.*;
+import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
 import nofrills.features.solvers.CalendarDate;
 import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
+import nofrills.features.tweaks.*;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.misc.Utils;
@@ -275,7 +273,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(
                                 new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
-                        )))
+                        ))),
+                        new Module("Command Tooltip", CommandTooltip.instance, "Reveals the command that the hovered chat message would run when clicked.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experiments", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
@@ -434,7 +433,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Silence Mania", RiftstalkerBloodfiend.mania, "Removes the very loud Mania sound effects."),
                                 new Settings.Toggle("Silence Killer Springs", RiftstalkerBloodfiend.springs, "Removes the sounds that play when your boss spawns a Killer Spring.")
                         ))),
-                        new Module("Voidgloom Seraph", VoidgloomSeraph.instance, "Various features for Vampire slayer.", new Settings(List.of(
+                        new Module("Voidgloom Seraph", VoidgloomSeraph.instance, "Various features for Enderman slayer.", new Settings(List.of(
                                 new Settings.Toggle("Hits Display", VoidgloomSeraph.hits, "Shows the amount of hits needed to break the hits shield of your boss.")
                         )))
                 )),

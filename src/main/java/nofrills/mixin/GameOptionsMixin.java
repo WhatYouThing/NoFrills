@@ -2,7 +2,7 @@ package nofrills.mixin;
 
 import net.minecraft.client.option.GameOptions;
 import net.minecraft.client.option.Perspective;
-import nofrills.features.general.NoFrontPerspective;
+import nofrills.features.tweaks.NoFrontPerspective;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

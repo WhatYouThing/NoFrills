@@ -18,10 +18,10 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import nofrills.features.fixes.EfficiencyFix;
-import nofrills.features.fixes.NoDropSwing;
 import nofrills.features.general.Fullbright;
 import nofrills.features.general.Viewmodel;
+import nofrills.features.tweaks.EfficiencyFix;
+import nofrills.features.tweaks.NoDropSwing;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,11 +33,12 @@ import static nofrills.Main.mc;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
-    @Shadow public abstract boolean isHolding(Item item);
-
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
     }
+
+    @Shadow
+    public abstract boolean isHolding(Item item);
 
     @ModifyExpressionValue(method = "getHandSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/effect/StatusEffectUtil;hasHaste(Lnet/minecraft/entity/LivingEntity;)Z"))
     private boolean hasHaste(boolean original) {

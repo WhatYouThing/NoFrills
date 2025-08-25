@@ -14,6 +14,7 @@
     "ClientWorldAccessor",
     "ClientWorldMixin",
     "CreeperEntityAccessor",
+    "DrawContextMixin",
     "EntityIndexAccessor",
     "EntityMixin",
     "EntityRendererMixin",

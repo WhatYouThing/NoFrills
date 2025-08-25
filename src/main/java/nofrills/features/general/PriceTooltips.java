@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
@@ -137,23 +138,25 @@ public class PriceTooltips {
     }
 
     private static Text buildLine(String name, double price, int quantity, String extra) {
+        MutableText tag = Text.literal("[NF] ").withColor(0x5ca0bf);
         String line = Utils.format(
-                "§c[NF] {}: §6{} {}",
+                "{}: §6{} {}",
                 name,
                 Utils.formatSeparator(price * quantity),
                 quantity > 1 ? Utils.format(extra, Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
-        return Text.of(line);
+        return tag.append(Text.literal(line).withColor(0xffffff));
     }
 
     private static Text buildLine(String name, long price, int quantity, String extra) {
+        MutableText tag = Text.literal("[NF] ").withColor(0x5ca0bf);
         String line = Utils.format(
-                "§c[NF] {}: §6{} {}",
+                "{}: §6{} {}",
                 name,
                 Utils.formatSeparator(price * quantity),
                 quantity > 1 ? Utils.format(extra, Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
-        return Text.of(line);
+        return tag.append(Text.literal(line).withColor(0xffffff));
     }
 
     @EventHandler

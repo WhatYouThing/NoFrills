@@ -15,7 +15,7 @@ import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
-import nofrills.features.keybinds.PearlRefill;
+import nofrills.features.general.PearlRefill;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.SkyblockData;
@@ -39,11 +39,11 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             }).then(literal("load").executes(context -> {
                 Config.load();
-                Utils.info("§aLoaded the settings file.");
+                Utils.info("§aLoaded latest settings from the configuration file.");
                 return SINGLE_SUCCESS;
             })).then(literal("save").executes(context -> {
                 Config.save();
-                Utils.info("§aSaved the settings file.");
+                Utils.info("§aSaved your current settings to the configuration file.");
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("partyCommands", "Allows you to manage the player whitelist and blacklist for the Party Commands feature.", literal("partyCommands").executes(context -> {

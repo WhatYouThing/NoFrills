@@ -1,4 +1,4 @@
-package nofrills.features.keybinds;
+package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.player.PlayerInventory;

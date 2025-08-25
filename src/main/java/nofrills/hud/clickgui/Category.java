@@ -35,7 +35,7 @@ public class Category extends FlowLayout {
             modules.child(module);
         }
         ScrollContainer<FlowLayout> scroll = Containers.verticalScroll(Sizing.content(), Sizing.fill(75), modules)
-                .scrollbarThiccness(3)
+                .scrollbarThiccness(2)
                 .scrollbar(ScrollContainer.Scrollbar.flat(color));
         BaseComponent label = new PlainLabel(Text.literal(title))
                 .color(textColor)

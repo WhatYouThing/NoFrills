@@ -85,7 +85,7 @@ public abstract class InGameHudMixin implements TitleRendering {
         }
     }
 
-    @Inject(method = "<init>", at = @At("TAIL"))
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;<init>(Lnet/minecraft/client/MinecraftClient;)V"))
     private void onInit(MinecraftClient client, CallbackInfo ci) {
         HudManager.registerElements();
     }

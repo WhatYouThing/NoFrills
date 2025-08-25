@@ -273,7 +273,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(
                                 new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
                         ))),
-                        new Module("Command Reveal", CommandReveal.instance, "Reveals the command your client would run upon clicking an applicable chat message.")
+                        new Module("Command Tooltip", CommandTooltip.instance, "Reveals the command that the hovered chat message would run when clicked.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experiments", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(

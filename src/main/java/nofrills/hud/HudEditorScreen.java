@@ -33,6 +33,9 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        for (HudElement element : HudManager.elements) {
+            element.updatePosition();
+        }
         super.render(context, mouseX, mouseY, delta);
         int center = context.getScaledWindowWidth() / 2;
         context.drawCenteredTextWithShadow(mc.textRenderer, "NoFrills HUD Editor", center, 10, 0xffffff);

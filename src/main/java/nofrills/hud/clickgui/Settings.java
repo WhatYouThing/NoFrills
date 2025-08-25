@@ -58,6 +58,11 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 }
                 continue;
             }
+            if (child instanceof Description description) {
+                PlainLabel label = (PlainLabel) description.children().getLast();
+                height += (10 + label.getTextHeight());
+                continue;
+            }
             height += 30;
         }
         return (int) Math.clamp(height, 30, mc.getWindow().getScaledHeight() * 0.8);

@@ -39,11 +39,11 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             }).then(literal("load").executes(context -> {
                 Config.load();
-                Utils.info("§aLoaded the settings file.");
+                Utils.info("§aLoaded latest settings from the configuration file.");
                 return SINGLE_SUCCESS;
             })).then(literal("save").executes(context -> {
                 Config.save();
-                Utils.info("§aSaved the settings file.");
+                Utils.info("§aSaved your current settings to the configuration file.");
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("partyCommands", "Allows you to manage the player whitelist and blacklist for the Party Commands feature.", literal("partyCommands").executes(context -> {

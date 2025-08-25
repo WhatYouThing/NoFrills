@@ -1,7 +1,6 @@
 package nofrills.mixin;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
@@ -12,7 +11,6 @@ import nofrills.features.general.NoRender;
 import nofrills.hud.HudManager;
 import nofrills.misc.TitleRendering;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -33,9 +31,6 @@ public abstract class InGameHudMixin implements TitleRendering {
     private static float titleScale;
     @Unique
     private static int titleColor;
-
-    @Shadow
-    public abstract TextRenderer getTextRenderer();
 
     @Override
     public void nofrills_mod$setRenderTitle(String title, int stayTicks, int yOffset, float scale, int color) {
@@ -59,10 +54,9 @@ public abstract class InGameHudMixin implements TitleRendering {
             matrices.translate((float) (context.getScaledWindowWidth() / 2), (float) (context.getScaledWindowHeight() / 2), 0.0F);
             matrices.push();
             matrices.scale(titleScale, titleScale, titleScale);
-            TextRenderer textRenderer = mc.inGameHud.getTextRenderer();
             Text title = Text.of(titleString);
-            int width = textRenderer.getWidth(title);
-            context.drawTextWithBackground(textRenderer, title, -width / 2, titleOffset, width, titleColor);
+            int width = mc.textRenderer.getWidth(title);
+            context.drawTextWithBackground(mc.textRenderer, title, -width / 2, titleOffset, width, titleColor);
             matrices.pop();
             matrices.pop();
         }
@@ -78,7 +72,7 @@ public abstract class InGameHudMixin implements TitleRendering {
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (!mc.options.hudHidden) {
-            eventBus.post(new HudRenderEvent(context, this.getTextRenderer(), tickCounter));
+            eventBus.post(new HudRenderEvent(context, mc.textRenderer, tickCounter));
         }
     }
 
@@ -89,8 +83,8 @@ public abstract class InGameHudMixin implements TitleRendering {
         }
     }
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    private void onInit(MinecraftClient client, CallbackInfo ci) {
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;<init>(Lnet/minecraft/client/MinecraftClient;)V"))
+    private void onHudInit(MinecraftClient client, CallbackInfo ci) {
         HudManager.registerElements();
     }
 }

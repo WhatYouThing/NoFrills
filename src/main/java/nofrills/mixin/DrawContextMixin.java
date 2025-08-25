@@ -7,7 +7,7 @@ import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import nofrills.features.misc.CommandReveal;
+import nofrills.features.misc.CommandTooltip;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,9 +16,9 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class DrawContextMixin {
     @ModifyExpressionValue(method = "drawHoverEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/HoverEvent$ShowText;value()Lnet/minecraft/text/Text;"))
     private Text getHoveredText(Text original, @Local(argsOnly = true) Style style) {
-        if (CommandReveal.instance.isActive() && style.getClickEvent() instanceof ClickEvent.RunCommand runCommand) {
+        if (CommandTooltip.instance.isActive() && style.getClickEvent() instanceof ClickEvent.RunCommand runCommand) {
             MutableText tag = Text.literal("[NF] ").withColor(0x5ca0bf);
-            return original.copy().append("\n\n").append(tag.append(Utils.format("§7Runs command: {}", runCommand.command())));
+            return original.copy().append("\n\n").append(tag.append(Utils.format("§7Command: {}", runCommand.command())));
         }
         return original;
     }

@@ -68,6 +68,10 @@ public class SlotBinding {
         return slotId % 9 + 1;
     }
 
+    public static boolean isBinding() {
+        return instance.isActive() && lastSlot != -1;
+    }
+
     @EventHandler
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.currentScreen instanceof InventoryScreen inventory) {

@@ -23,7 +23,6 @@ import nofrills.features.dungeons.TerminalSolvers;
 import nofrills.features.general.NoRender;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.kuudra.KuudraChestValue;
-import nofrills.features.misc.TooltipScale;
 import nofrills.features.tweaks.MiddleClickFix;
 import nofrills.hud.LeapMenuButton;
 import nofrills.misc.RenderColor;
@@ -156,26 +155,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), cancellable = true)
     private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (TerminalSolvers.shouldHideTooltips() || shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot)) {
+        if (TerminalSolvers.shouldHideTooltips() || shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot) || SlotBinding.isBinding()) {
             ci.cancel();
-            return;
-        }
-        if (SlotBinding.instance.isActive() && SlotBinding.lastSlot != -1) {
-            ci.cancel();
-            return;
-        }
-        if (TooltipScale.instance.isActive()) {
-            context.push();
-            float scale = (float) TooltipScale.scale.value();
-            context.translate(x - x * scale, y - y * scale);
-            context.scale(scale, scale);
-        }
-    }
-
-    @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V", shift = At.Shift.AFTER))
-    private void onAfterDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (TooltipScale.instance.isActive()) {
-            context.pop();
         }
     }
 

@@ -180,7 +180,8 @@ public class ShardTracker {
             return buildShardData(name, quantity.replace("x", ""), ShardSource.Caught);
         }
         if (msg.startsWith("LOOT SHARE You received ") && (msg.contains(" Shard for assisting ") || msg.contains(" Shards for assisting "))) {
-            msg = msg.replace("LOOT SHARE You received ", "").substring(0, msg.indexOf(" Shard")).trim();
+            msg = msg.replace("LOOT SHARE You received ", "").trim();
+            msg = msg.substring(0, msg.indexOf(" Shard")).trim();
             String quantity = msg.substring(0, msg.indexOf(" "));
             String name = msg.substring(msg.indexOf(" ") + 1);
             return buildShardData(name, quantity, ShardSource.Lootshare);
@@ -315,6 +316,7 @@ public class ShardTracker {
         if (instance.isActive()) {
             refreshDisplay();
         }
+        getShardFromMsg("LOOT SHARE You received 2 Mossybit Shards for assisting etic1118!");
     }
 
     public enum ShardSource {

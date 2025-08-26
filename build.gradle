@@ -20,6 +20,11 @@ repositories {
         name = "meteor-maven"
         url = "https://maven.meteordev.org/releases"
     }
+
+    maven {
+        name = "devauth-maven"
+        url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1"
+    }
 }
 
 dependencies {
@@ -31,6 +36,7 @@ dependencies {
     include "meteordevelopment:orbit:${project.orbit_version}"
     modImplementation("io.wispforest:owo-lib:${project.owolib_version}")
     include "io.wispforest:owo-lib:${project.owolib_version}"
+    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
 }
 
 processResources {

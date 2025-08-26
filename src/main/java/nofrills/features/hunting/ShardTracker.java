@@ -316,7 +316,6 @@ public class ShardTracker {
         if (instance.isActive()) {
             refreshDisplay();
         }
-        getShardFromMsg("LOOT SHARE You received 2 Mossybit Shards for assisting etic1118!");
     }
 
     public enum ShardSource {

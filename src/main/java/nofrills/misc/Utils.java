@@ -89,6 +89,18 @@ public class Utils {
         return ((TitleRendering) mc.inGameHud).nofrills_mod$isRenderingTitle();
     }
 
+    public static boolean isNearlyEqual(double a, double b, double eps) {
+        return Math.abs(a-b) < eps;
+    }
+
+    public static boolean isNearlyEqual(double a, double b) {
+        return isNearlyEqual(a, b, 1e-9);
+    }
+
+    public static boolean isNearlyEqual(float a, float b) {
+        return isNearlyEqual(a, b, 1e-5);
+    }
+
     public static void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
         Vec3d coords = mc.cameraEntity.getPos();
         PositionedSoundInstance sound = new PositionedSoundInstance(event, category, volume, pitch, soundRandom, coords.getX(), coords.getY(), coords.getZ());

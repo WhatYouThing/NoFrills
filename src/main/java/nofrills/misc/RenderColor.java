@@ -5,6 +5,7 @@ import net.minecraft.util.math.ColorHelper;
 public class RenderColor {
     public static final RenderColor white = RenderColor.fromHex(0xffffff);
     public static final RenderColor green = RenderColor.fromHex(0x55ff55);
+    public static final RenderColor red = RenderColor.fromHex(0xff5555);
     public static final RenderColor darkGray = RenderColor.fromHex(0x202020);
 
     public float r;

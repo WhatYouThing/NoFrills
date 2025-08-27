@@ -8,9 +8,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.util.Formatting;
 import nofrills.events.*;
 import nofrills.features.tweaks.AnimationFix;
@@ -61,11 +59,8 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onScreenHandlerSlotUpdate", at = @At("TAIL"))
     private void onUpdateInventory(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
-        if (mc.currentScreen instanceof GenericContainerScreen containerScreen) {
-            GenericContainerScreenHandler handler = containerScreen.getScreenHandler();
-            Inventory inventory = handler.getInventory();
-            int slot = packet.getSlot();
-            eventBus.post(new ScreenSlotUpdateEvent(packet, containerScreen, handler, inventory, slot, inventory.getStack(slot), containerScreen.getTitle().getString(), packet.getSlot() == handler.slots.getLast().id));
+        if (mc.currentScreen instanceof GenericContainerScreen container) {
+            eventBus.post(new ScreenSlotUpdateEvent(packet, container, container.getScreenHandler(), packet.getSlot()));
         }
     }
 

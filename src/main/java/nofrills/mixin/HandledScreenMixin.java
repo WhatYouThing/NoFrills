@@ -21,6 +21,7 @@ import nofrills.features.general.NoRender;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.kuudra.KuudraChestValue;
 import nofrills.features.misc.TooltipScale;
+import nofrills.features.solvers.BeaconTuningSolver;
 import nofrills.features.tweaks.MiddleClickFix;
 import nofrills.hud.LeapMenuButton;
 import nofrills.misc.*;
@@ -254,6 +255,17 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             context.getMatrices().translate(0, 0, 420);
             context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, RenderColor.green.hex);
             context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, RenderColor.darkGray.argb);
+            context.getMatrices().pop();
+        }
+        if (BeaconTuningSolver.instance.isActive() && BeaconTuningSolver.colorSlot1Id != -1) {
+            Slot targetSlot = this.handler.getSlot(BeaconTuningSolver.colorSlot1Id);
+            int baseX = targetSlot.x - 9;
+            int baseY = targetSlot.y + 8;
+            context.getMatrices().push();
+            context.getMatrices().translate(0, 0, 420);
+            String value = Integer.toString(BeaconTuningSolver.colorTarget1);
+            RenderColor color = BeaconTuningSolver.colorTarget1 >= 0 ? RenderColor.green : RenderColor.red;
+            context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, color.hex);
             context.getMatrices().pop();
         }
         for (Slot slot : this.handler.slots) {

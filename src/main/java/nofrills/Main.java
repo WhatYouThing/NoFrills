@@ -26,6 +26,7 @@ import nofrills.features.kuudra.*;
 import nofrills.features.mining.*;
 import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
+import nofrills.features.solvers.BeaconTuningSolver;
 import nofrills.features.solvers.CalendarDate;
 import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
@@ -74,6 +75,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(HudManager.class);
         eventBus.subscribe(SpookyChests.class);
         eventBus.subscribe(ExperimentSolver.class);
+        eventBus.subscribe(BeaconTuningSolver.class);
         eventBus.subscribe(CalendarDate.class);
         eventBus.subscribe(VoidgloomSeraph.class);
         eventBus.subscribe(RiftstalkerBloodfiend.class);

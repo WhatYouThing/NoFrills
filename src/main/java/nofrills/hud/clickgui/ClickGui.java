@@ -99,7 +99,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.categories = Lists.newArrayList(
                 new Category("General", List.of(
                         new Module("Auto Sprint", AutoSprint.instance, "Essentially Toggle Sprint, but always active.", new Settings(List.of(
-                                new Settings.Toggle("Submerged Check", AutoSprint.waterCheck, "Prevents Auto Sprint from working while you are underwater.")
+                                new Settings.Toggle("Water Check", AutoSprint.waterCheck, "Prevents Auto Sprint from working while you are in water.")
                         ))),
                         new Module("Slot Binding", SlotBinding.instance, "Bind your hotbar slots to your inventory slots, similarly to NEU's slot binding.", new Settings(List.of(
                                 new Settings.Separator("Usage"),

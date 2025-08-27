@@ -14,7 +14,7 @@ public class LassoAlert {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && event.namePlain.equals("REEL") && Utils.getHeldItem().getItem().equals(Items.LEAD)) {
-            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), SoundCategory.MASTER, 1.0f, 1.0f);
+            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1.0f, 1.0f);
         }
     }
 }

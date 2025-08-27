@@ -24,6 +24,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -92,6 +93,10 @@ public class Utils {
         Vec3d coords = mc.cameraEntity.getPos();
         PositionedSoundInstance sound = new PositionedSoundInstance(event, category, volume, pitch, soundRandom, coords.getX(), coords.getY(), coords.getZ());
         mc.getSoundManager().play(sound);
+    }
+
+    public static void playSound(RegistryEntry.Reference<SoundEvent> event, SoundCategory category, float volume, float pitch) {
+        playSound(event.value(), category, volume, pitch);
     }
 
     public static void sendMessage(String message) {

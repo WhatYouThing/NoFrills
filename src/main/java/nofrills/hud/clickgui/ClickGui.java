@@ -99,7 +99,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.categories = Lists.newArrayList(
                 new Category("General", List.of(
                         new Module("Auto Sprint", AutoSprint.instance, "Essentially Toggle Sprint, but always active.", new Settings(List.of(
-                                new Settings.Toggle("Submerged Check", AutoSprint.waterCheck, "Prevents Auto Sprint from working while you are underwater.")
+                                new Settings.Toggle("Water Check", AutoSprint.waterCheck, "Prevents Auto Sprint from working while you are in water.")
                         ))),
                         new Module("Slot Binding", SlotBinding.instance, "Bind your hotbar slots to your inventory slots, similarly to NEU's slot binding.", new Settings(List.of(
                                 new Settings.Separator("Usage"),
@@ -322,7 +322,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Lasso Alert", LassoAlert.instance, "Plays a sound effect once you can reel in with your lasso."),
                         new Module("Instant Fog", InstantFog.instance, "Makes the thick underwater fog disappear instantly."),
-                        new Module("Shard Tracker", ShardTracker.instance, "Tracks obtained shards for you and displays information with a HUD element.", ShardTracker.buildSettings())
+                        new Module("Shard Tracker", ShardTracker.instance, "Tracks obtained shards for you and displays information with a HUD element.", ShardTracker.buildSettings()),
+                        new Module("Huntaxe Lock", HuntaxeLock.instance, "Requires you to double right click with your Huntaxe to be able to open the GUI.")
                 )),
                 new Category("Dungeons", List.of(
                         new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(

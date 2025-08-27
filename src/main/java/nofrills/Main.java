@@ -136,6 +136,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(KuudraChestValue.class);
         eventBus.subscribe(DoubleUseFix.class);
         eventBus.subscribe(ShardTracker.class);
+        eventBus.subscribe(HuntaxeLock.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

@@ -28,7 +28,7 @@ public class ShopCleaner {
     @EventHandler
     private static void onSlot(ScreenSlotUpdateEvent event) {
         if (instance.isActive() && Utils.isInKuudra() && event.title.equals("Perk Menu")) {
-            if (event.inventory.getStack(event.slotId).isEmpty() || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
+            if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }
             String name = Formatting.strip(event.stack.getName().getString());

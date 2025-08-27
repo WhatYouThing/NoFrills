@@ -32,12 +32,12 @@ public class SlotBinding {
 
     private static void success(String message) {
         Utils.infoFormat("§a{}", message);
-        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), SoundCategory.MASTER, 1.0f, 1.0f);
+        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1.0f, 1.0f);
     }
 
     private static void error(String message) {
         Utils.infoFormat("§4{}", message);
-        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS.value(), SoundCategory.MASTER, 1.0f, 0.0f);
+        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
     }
 
     private static void alert(String message) {

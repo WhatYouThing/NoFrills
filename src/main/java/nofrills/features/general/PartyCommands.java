@@ -30,7 +30,7 @@ public class PartyCommands {
 
     private static void showDowntimeReminder() {
         Utils.showTitle("§6§lDOWNTIME", "", 5, 60, 5);
-        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS.value(), SoundCategory.MASTER, 1.0f, 0.0f);
+        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
         downtimeNeeded = false;
     }
 

@@ -42,10 +42,10 @@ public class ScathaMining {
     private static void alertSpawn(boolean scatha) {
         if (scatha) {
             Utils.showTitle("§cScatha", "§7GOLD GOLD GOLD!", 5, 20, 5);
-            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), SoundCategory.MASTER, 1.0f, 1.0f);
+            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1.0f, 1.0f);
         } else {
             Utils.showTitle("§eWorm", "§7Drops Hytale", 5, 20, 5);
-            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS.value(), SoundCategory.MASTER, 1.0f, 0.0f);
+            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
         }
     }
 
@@ -77,7 +77,7 @@ public class ScathaMining {
                 if (cooldown.value()) {
                     Utils.showTitle("§aWORM COOLDOWN ENDED", "", 5, 20, 5);
                     Utils.info("§a§lWorm spawn cooldown ended!");
-                    Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP.value(), SoundCategory.MASTER, 1.0f, 0.0f);
+                    Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.MASTER, 1.0f, 0.0f);
                 }
                 wormsCache.clearDropped();
             }

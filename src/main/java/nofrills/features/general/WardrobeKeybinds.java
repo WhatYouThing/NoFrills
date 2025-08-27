@@ -50,7 +50,7 @@ public class WardrobeKeybinds {
                                 if (item.equals(valid)) {
                                     mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, 0, SlotActionType.PICKUP, mc.player);
                                     if (sound.value()) {
-                                        Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR.value(), SoundCategory.MASTER, 0.65f, 1.0f);
+                                        Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR, SoundCategory.MASTER, 0.65f, 1.0f);
                                     }
                                     event.cancel();
                                     return;

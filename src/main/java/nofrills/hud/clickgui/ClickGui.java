@@ -321,7 +321,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Lasso Alert", LassoAlert.instance, "Plays a sound effect once you can reel in with your lasso."),
                         new Module("Instant Fog", InstantFog.instance, "Makes the thick underwater fog disappear instantly."),
-                        new Module("Shard Tracker", ShardTracker.instance, "Tracks obtained shards for you and displays information with a HUD element.", ShardTracker.buildSettings())
+                        new Module("Shard Tracker", ShardTracker.instance, "Tracks obtained shards for you and displays information with a HUD element.", ShardTracker.buildSettings()),
+                        new Module("Huntaxe Lock", HuntaxeLock.instance, "Requires you to double right click with your Huntaxe to be able to open the GUI.")
                 )),
                 new Category("Dungeons", List.of(
                         new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(

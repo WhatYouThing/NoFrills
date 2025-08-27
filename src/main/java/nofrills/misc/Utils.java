@@ -80,7 +80,7 @@ public class Utils {
         mc.inGameHud.setTitleTicks(fadeInTicks, stayTicks, fadeOutTicks);
     }
 
-    public static void showTitleCustom(String title, int stayTicks, int yOffset, float scale, int color) {
+    public static void showTitleCustom(String title, int stayTicks, int yOffset, float scale, RenderColor color) {
         ((TitleRendering) mc.inGameHud).nofrills_mod$setRenderTitle(title, stayTicks, yOffset, scale, color);
     }
 

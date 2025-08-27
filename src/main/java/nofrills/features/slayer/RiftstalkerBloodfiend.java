@@ -59,10 +59,10 @@ public class RiftstalkerBloodfiend {
         if (instance.isActive() && Utils.isInChateau()) {
             if (SlayerUtil.isFightingBoss(SlayerUtil.vampire)) {
                 if (ice.value() && !iceText.isEmpty()) {
-                    Utils.showTitleCustom(iceText, 1, 25, 4.0f, 0x00ffff);
+                    Utils.showTitleCustom(iceText, 1, 25, 4.0f, RenderColor.fromHex(0x00ffff));
                 }
                 if (steak.value() && shouldSteak && iceText.isEmpty()) {
-                    Utils.showTitleCustom("Steak!", 1, 25, 4.0f, 0xff0000);
+                    Utils.showTitleCustom("Steak!", 1, 25, 4.0f, RenderColor.fromHex(0xff0000));
                 }
             } else {
                 iceText = "";

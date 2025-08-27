@@ -9,6 +9,7 @@ import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.*;
+import nofrills.misc.RenderColor;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
@@ -31,7 +32,7 @@ public class InfernoDemonlord {
         if (instance.isActive() && pillarAlert.value() && !pillarData.isEmpty() && firePillarRegex.matcher(event.namePlain).matches()) {
             double dist = Utils.horizontalDistance(event.entity.getPos(), pillarData.getLast());
             if (dist <= 3) {
-                Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, 0xffff00);
+                Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, RenderColor.fromHex(0xffff00));
                 pillarClearTicks = 60;
             }
         }

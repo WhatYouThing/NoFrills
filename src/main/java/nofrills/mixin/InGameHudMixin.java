@@ -9,6 +9,7 @@ import net.minecraft.text.Text;
 import nofrills.events.HudRenderEvent;
 import nofrills.features.general.NoRender;
 import nofrills.hud.HudManager;
+import nofrills.misc.RenderColor;
 import nofrills.misc.TitleRendering;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,31 +38,17 @@ public abstract class InGameHudMixin implements TitleRendering {
     public abstract TextRenderer getTextRenderer();
 
     @Override
-    public void nofrills_mod$setRenderTitle(String title, int stayTicks, int yOffset, float scale, int color) {
+    public void nofrills_mod$setRenderTitle(String title, int stayTicks, int yOffset, float scale, RenderColor color) {
         titleString = title;
         titleTicks = stayTicks;
         titleOffset = yOffset;
         titleScale = scale;
-        titleColor = color;
+        titleColor = color.argb;
     }
 
     @Override
     public boolean nofrills_mod$isRenderingTitle() {
         return titleTicks > 0;
-    }
-
-    @Inject(method = "renderTitleAndSubtitle", at = @At("HEAD"))
-    private void onRenderTitle(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
-        if (titleTicks > 0) {
-            context.push();
-            context.translate((float) (context.getScaledWindowWidth() / 2), (float) (context.getScaledWindowHeight() / 2));
-            context.scale(titleScale, titleScale);
-            TextRenderer textRenderer = mc.inGameHud.getTextRenderer();
-            Text title = Text.of(titleString);
-            int width = textRenderer.getWidth(title);
-            context.drawTextWithBackground(textRenderer, title, -width / 2, titleOffset, width, titleColor);
-            context.pop();
-        }
     }
 
     @Inject(method = "tick()V", at = @At("TAIL"))
@@ -75,6 +62,16 @@ public abstract class InGameHudMixin implements TitleRendering {
     private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (!mc.options.hudHidden) {
             eventBus.post(new HudRenderEvent(context, this.getTextRenderer(), tickCounter));
+            if (titleTicks > 0) {
+                context.getMatrices().pushMatrix();
+                context.getMatrices().translate((float) (context.getScaledWindowWidth() / 2), (float) (context.getScaledWindowHeight() / 2));
+                context.getMatrices().scale(titleScale, titleScale);
+                TextRenderer textRenderer = mc.inGameHud.getTextRenderer();
+                Text title = Text.of(titleString);
+                int width = textRenderer.getWidth(title);
+                context.drawTextWithBackground(textRenderer, title, -width / 2, titleOffset, width, titleColor);
+                context.getMatrices().popMatrix();
+            }
         }
     }
 

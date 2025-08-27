@@ -115,7 +115,7 @@ public class WitherDragons {
     }
 
     private static void announceDragonSpawn(SpawnedDragon drag, boolean split) {
-        Utils.showTitleCustom(drag.data.name.toUpperCase() + " IS SPAWNING!", 60, -20, 4.0f, drag.data.color.hex);
+        Utils.showTitleCustom(drag.data.name.toUpperCase() + " IS SPAWNING!", 60, -20, 4.0f, drag.data.color);
         Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
         if (split) {
             Utils.infoRaw(Text.literal(drag.data.name + " is your priority dragon.").setStyle(Style.EMPTY.withColor(drag.data.color.hex)));

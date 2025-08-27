@@ -37,7 +37,7 @@ public class TerracottaTimer {
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isOnDungeonFloor("6")) {
             if (gyroTicks > 0) {
-                Utils.showTitleCustom("GYRO: " + Utils.formatDecimal(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, 0xffff00);
+                Utils.showTitleCustom("GYRO: " + Utils.formatDecimal(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, RenderColor.fromHex(0xffff00));
             }
         }
     }

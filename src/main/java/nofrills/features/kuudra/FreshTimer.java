@@ -9,6 +9,7 @@ import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.KuudraUtil;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 public class FreshTimer {
@@ -23,7 +24,7 @@ public class FreshTimer {
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInKuudra()) {
             if (freshTicks > 0 && KuudraUtil.getCurrentPhase() == KuudraUtil.phase.Build) {
-                Utils.showTitleCustom(Utils.format("FRESH: {}s", Utils.formatDecimal(freshTicks / 20f)), 1, 25, 2.5f, 0x55ff55);
+                Utils.showTitleCustom(Utils.format("FRESH: {}s", Utils.formatDecimal(freshTicks / 20f)), 1, 25, 2.5f, RenderColor.fromHex(0x55ff55));
             }
         }
     }

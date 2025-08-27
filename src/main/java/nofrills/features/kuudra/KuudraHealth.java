@@ -46,16 +46,16 @@ public class KuudraHealth {
                     Collection<ClientBossBar> bossBars = ((BossBarHudAccessor) mc.inGameHud.getBossBarHud()).getBossBars().values();
                     if (!bossBars.isEmpty()) {
                         float health = ((ClientBossBar) bossBars.toArray()[0]).getPercent();
-                        Utils.showTitleCustom(Utils.format("KUUDRA: {}% HP", Utils.formatDecimal(health * 100)), 1, 25, 2.5f, color.value().hex);
+                        Utils.showTitleCustom(Utils.format("KUUDRA: {}% HP", Utils.formatDecimal(health * 100)), 1, 25, 2.5f, color.value());
                     }
                 }
             } else {
                 if (KuudraUtil.getCurrentPhase() == KuudraUtil.phase.DPS) {
                     float health = kuudra.getHealth() / kuudra.getMaxHealth();
-                    Utils.showTitleCustom(Utils.format("KUUDRA: {}% HP", Utils.formatDecimal(health)), 1, 25, 2.5f, color.value().hex);
+                    Utils.showTitleCustom(Utils.format("KUUDRA: {}% HP", Utils.formatDecimal(health)), 1, 25, 2.5f, color.value());
                 }
                 if (dps.value() && KuudraUtil.getCurrentPhase() == KuudraUtil.phase.Lair && !Utils.isInstanceOver()) {
-                    Utils.showTitleCustom(Utils.format("DPS: {}M", Utils.formatDecimal(calculateDPS() * 20 * 0.000001)), 1, 25, 2.5f, color.value().hex);
+                    Utils.showTitleCustom(Utils.format("DPS: {}M", Utils.formatDecimal(calculateDPS() * 20 * 0.000001)), 1, 25, 2.5f, color.value());
                 }
             }
         }

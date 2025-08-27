@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
+import nofrills.misc.RenderColor;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
@@ -18,10 +19,10 @@ public class VoidgloomSeraph {
             if (hits.value() && SlayerUtil.isName(event.namePlain) && SlayerUtil.isNearSpawner(event.entity)) {
                 if (event.namePlain.endsWith("Hits")) {
                     String[] parts = event.namePlain.split(" ");
-                    Utils.showTitleCustom("Shield: " + parts[parts.length - 2] + " hits", 100, 25, 4.0f, 0xff55ff);
+                    Utils.showTitleCustom("Shield: " + parts[parts.length - 2] + " hits", 100, 25, 4.0f, RenderColor.fromHex(0xff55ff));
                 } else {
                     if (Utils.isRenderingCustomTitle()) {
-                        Utils.showTitleCustom("", 0, 0, 0, 0);
+                        Utils.showTitleCustom("", 0, 0, 0, RenderColor.white);
                     }
                 }
             }

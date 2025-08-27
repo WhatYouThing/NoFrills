@@ -151,7 +151,7 @@ public class ExperimentSolver {
 
     @EventHandler
     private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
-        if (!instance.isActive() || event.inventory.getStack(event.slotId).isEmpty()) {
+        if (!instance.isActive() || event.isInventory) {
             return;
         }
         ExperimentType experimentType = getExperimentType();

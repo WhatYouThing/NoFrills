@@ -1,6 +1,5 @@
 package nofrills.features.hunting;
 
-import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -42,6 +41,7 @@ public class ShardTracker {
     public static final Feature instance = new Feature("shardTracker");
 
     public static final SettingBool boxApply = new SettingBool(false, "load", instance.key());
+    public static final SettingBool doneMsg = new SettingBool(false, "doneMsg", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
 
     public static final MutableText displayNone = Text.literal("§bShard Tracker\n§7None tracked.");
@@ -53,8 +53,8 @@ public class ShardTracker {
         list.add(new Settings.Description("Importing", "Click Copy Tree on the calculator, choose the NoFrills format, and click the Import Shard List button below."));
         list.add(new Settings.Description("Tracking", "Enable this feature, and then enable the Shard Tracker element in the NoFrills HUD editor."));
         list.add(new Settings.Separator("Settings"));
-        Settings.Toggle boxToggle = new Settings.Toggle("Apply From Box", boxApply, "Automatically applies obtained amounts to shards when you open your Hunting Box.");
-        list.add(boxToggle);
+        list.add(new Settings.Toggle("Apply From Box", boxApply, "Automatically applies obtained amounts to shards when you open your Hunting Box."));
+        list.add(new Settings.Toggle("Done Message", doneMsg, "Shows a message in chat once you reach the needed amount for any shard."));
         list.add(new Settings.Separator("Shards"));
         Settings.BigButton importButton = new Settings.BigButton("Import Shard List", btn -> {
             if (!data.value().has("shards")) {
@@ -264,22 +264,33 @@ public class ShardTracker {
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
         if (instance.isActive() && !event.messagePlain.isEmpty() && Utils.isInSkyblock()) {
-            Shard newShard = getShardFromMsg(event.messagePlain.trim());
-            if (newShard != null && data.value().has("shards")) {
-                if (newShard.source.equals(ShardSource.Absorbed) && ShardData.fishingShards.contains(newShard.name)) {
+            Shard obtainedShard = getShardFromMsg(event.messagePlain.trim());
+            if (obtainedShard != null && data.value().has("shards")) {
+                if (obtainedShard.source.equals(ShardSource.Absorbed) && ShardData.fishingShards.contains(obtainedShard.name)) {
                     return;
                 }
-                for (JsonElement shard : Lists.reverse(data.value().get("shards").getAsJsonArray().asList())) {
+                List<JsonObject> trackedList = new ArrayList<>();
+                for (JsonElement shard : data.value().get("shards").getAsJsonArray()) {
                     JsonObject shardData = shard.getAsJsonObject();
-                    if (shardData.get("name").getAsString().equals(newShard.name)) {
-                        long needed = shardData.get("needed").getAsLong();
-                        long obtained = shardData.get("obtained").getAsLong();
-                        if (needed == 0 || obtained < needed) {
-                            shardData.addProperty("obtained", obtained + newShard.quantity);
-                            refreshDisplay();
-                            return;
-                        }
+                    if (shardData.get("name").getAsString().equals(obtainedShard.name)) {
+                        trackedList.add(shardData);
                     }
+                }
+                if (!trackedList.isEmpty()) {
+                    JsonObject tracked = trackedList.size() == 1 ? trackedList.getFirst() : trackedList.reversed().stream().filter(shard -> {
+                        long needed = shard.get("needed").getAsLong();
+                        long obtained = shard.get("obtained").getAsLong();
+                        return needed == 0 || obtained < needed;
+                    }).findFirst().orElse(trackedList.getFirst()); // scuffed order handling for if the same shard has multiple tracker entries
+                    long needed = tracked.get("needed").getAsLong();
+                    long obtained = tracked.get("obtained").getAsLong();
+                    long quantity = obtained + obtainedShard.quantity;
+                    if (doneMsg.value() && needed != 0 && obtained < needed && quantity >= needed) {
+                        String name = tracked.get("name").getAsString();
+                        Utils.infoFormat("{}§l{} §r§aShard done! {}/{}x obtained.", getShardColor(name), Utils.uppercaseFirst(name, false), quantity, needed);
+                    }
+                    tracked.addProperty("obtained", obtained + obtainedShard.quantity);
+                    refreshDisplay();
                 }
             }
         }
@@ -288,7 +299,7 @@ public class ShardTracker {
     @EventHandler
     private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
         if (instance.isActive() && boxApply.value() && event.title.equals("Hunting Box")) {
-            if (event.inventory.getStack(event.slotId).isEmpty() || !data.value().has("shards")) {
+            if (event.isInventory || !data.value().has("shards")) {
                 return;
             }
             JsonArray shards = data.value().get("shards").getAsJsonArray();

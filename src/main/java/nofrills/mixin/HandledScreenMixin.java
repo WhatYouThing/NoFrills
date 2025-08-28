@@ -14,7 +14,8 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import nofrills.events.DrawItemTooltip;
+import nofrills.events.SlotClickEvent;
+import nofrills.events.TooltipRenderEvent;
 import nofrills.features.dungeons.LeapOverlay;
 import nofrills.features.dungeons.TerminalSolvers;
 import nofrills.features.general.NoRender;
@@ -118,6 +119,10 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
         if (isLeapMenu() || shouldIgnoreBackground(slot) || SlotOptions.isSlotDisabled(slot)) {
             ci.cancel();
+            return;
+        }
+        if (eventBus.post(new SlotClickEvent(slot, slot != null ? slot.id : slotId, button, actionType)).isCancelled()) {
+            ci.cancel();
         }
     }
 
@@ -170,7 +175,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;getTooltipFromItem(Lnet/minecraft/item/ItemStack;)Ljava/util/List;"))
     private List<Text> onGetTooltipFromItem(List<Text> original, @Local ItemStack itemStack) {
         if (!itemStack.isEmpty()) {
-            eventBus.post(new DrawItemTooltip(original, itemStack, Utils.getCustomData(itemStack), this.getTitle().getString()));
+            eventBus.post(new TooltipRenderEvent(original, itemStack, Utils.getCustomData(itemStack), this.getTitle().getString()));
         }
         return original;
     }

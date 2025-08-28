@@ -13,7 +13,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingString;
-import nofrills.events.ScreenSlotUpdateEvent;
+import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.ScreenOptions;
 import nofrills.misc.SkyblockData;
@@ -53,7 +53,7 @@ public class LeapOverlay {
     }
 
     @EventHandler
-    private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
+    private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && event.isFinal && event.title.equals(leapMenuName) && Utils.isInDungeons()) {
             List<LeapTarget> validTargets = new ArrayList<>();
             List<LeapTarget> deadTargets = new ArrayList<>();

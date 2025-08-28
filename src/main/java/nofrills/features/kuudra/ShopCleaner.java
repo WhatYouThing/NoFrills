@@ -5,7 +5,7 @@ import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
-import nofrills.events.ScreenSlotUpdateEvent;
+import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 
@@ -26,7 +26,7 @@ public class ShopCleaner {
     );
 
     @EventHandler
-    private static void onSlot(ScreenSlotUpdateEvent event) {
+    private static void onSlot(SlotUpdateEvent event) {
         if (instance.isActive() && Utils.isInKuudra() && event.title.equals("Perk Menu")) {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;

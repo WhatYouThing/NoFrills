@@ -13,7 +13,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
 import nofrills.events.ScreenOpenEvent;
-import nofrills.events.ScreenSlotUpdateEvent;
+import nofrills.events.SlotUpdateEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
@@ -93,7 +93,7 @@ public class TerminalSolvers {
     }
 
     @EventHandler
-    private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
+    private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && !isTerminalBuilt) {
             isTerminalBuilt = event.isFinal;
             List<Slot> orderSlots = new ArrayList<>();

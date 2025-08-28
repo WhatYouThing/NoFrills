@@ -60,7 +60,7 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onScreenHandlerSlotUpdate", at = @At("TAIL"))
     private void onUpdateInventory(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
         if (mc.currentScreen instanceof GenericContainerScreen container) {
-            eventBus.post(new ScreenSlotUpdateEvent(packet, container, container.getScreenHandler(), packet.getSlot()));
+            eventBus.post(new SlotUpdateEvent(packet, container, container.getScreenHandler(), packet.getSlot()));
         }
     }
 

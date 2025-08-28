@@ -5,7 +5,7 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
-import nofrills.events.DrawItemTooltip;
+import nofrills.events.TooltipRenderEvent;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -26,7 +26,7 @@ public class CalendarDate {
     }
 
     @EventHandler
-    private static void onTooltip(DrawItemTooltip event) {
+    private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
             if (container.getTitle().getString().equals("Calendar and Events")) {
                 for (Text line : event.lines) {

@@ -11,7 +11,7 @@ import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
-import nofrills.events.DrawItemTooltip;
+import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -160,7 +160,7 @@ public class PriceTooltips {
     }
 
     @EventHandler
-    private static void onTooltip(DrawItemTooltip event) {
+    private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive()) {
             String itemId = parseItemId(event.stack, event.customData, event.title);
             int quantity = getStackQuantity(event.stack, event.title);

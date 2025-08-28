@@ -14,8 +14,8 @@ import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ScreenOpenEvent;
-import nofrills.events.ScreenSlotUpdateEvent;
 import nofrills.events.SendPacketEvent;
+import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
@@ -150,7 +150,7 @@ public class ExperimentSolver {
     }
 
     @EventHandler
-    private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
+    private static void onSlotUpdate(SlotUpdateEvent event) {
         if (!instance.isActive() || event.isInventory) {
             return;
         }

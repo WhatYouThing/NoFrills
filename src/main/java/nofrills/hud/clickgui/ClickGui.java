@@ -120,9 +120,21 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Motes Sell", PriceTooltips.mote, "Adds the Motes sell price to applicable items."),
                                 new Settings.SliderInt("Grubber Stacks", 0, 5, 1, PriceTooltips.burgers, "The amount of McGrubber's Burgers you've eaten, used to calculate the bonus Motes value.")
                         ))),
-                        new Module("Wardrobe Keybinds", WardrobeKeybinds.instance, "Adds number hotkeys (1-9) to the Skyblock Wardrobe.", new Settings(List.of(
-                                new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with the keybinds."),
-                                new Settings.Toggle("Sound Effect", WardrobeKeybinds.sound, "Plays a sound effect after switching your armor set with a hotkey.")
+                        new Module("Wardrobe Keybinds", WardrobeKeybinds.instance, "Adds hotkeys to the Skyblock Wardrobe.", new Settings(List.of(
+                                new Settings.Dropdown<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),
+                                new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with a keybind."),
+                                new Settings.Toggle("Sound Effect", WardrobeKeybinds.sound, "Plays a sound effect upon using a keybind."),
+                                new Settings.Keybind("Next Page", WardrobeKeybinds.next, "The keybind to go to the next wardrobe page."),
+                                new Settings.Keybind("Previous Page", WardrobeKeybinds.previous, "The keybind to go to the previous wardrobe page."),
+                                new Settings.Keybind("Custom Slot 1", WardrobeKeybinds.custom1, "Your custom keybind for the 1st wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 2", WardrobeKeybinds.custom2, "Your custom keybind for the 2nd wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 3", WardrobeKeybinds.custom3, "Your custom keybind for the 3rd wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 4", WardrobeKeybinds.custom4, "Your custom keybind for the 4th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 5", WardrobeKeybinds.custom5, "Your custom keybind for the 5th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 6", WardrobeKeybinds.custom6, "Your custom keybind for the 6th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 7", WardrobeKeybinds.custom7, "Your custom keybind for the 7th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 8", WardrobeKeybinds.custom8, "Your custom keybind for the 8th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 9", WardrobeKeybinds.custom9, "Your custom keybind for the 9th wardrobe slot.")
                         ))),
                         new Module("Chat Waypoints", ChatWaypoints.instance, "Automatically creates waypoints for coordinates sent in Party/Global chat.", new Settings(List.of(
                                 new Settings.Separator("Party Chat"),

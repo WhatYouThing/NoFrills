@@ -10,6 +10,7 @@ import nofrills.config.SettingColor;
 import nofrills.config.SettingInt;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
+import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,17 +49,24 @@ public class ChatWaypoints {
             }
             try {
                 coords.add(Double.parseDouble(coord));
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
                 if (!skipNextError) {
                     coords.clear();
                 }
                 skipNextError = false;
             }
             if (coords.size() == 3) {
-                int x = (int) Math.floor(coords.getFirst()), y = (int) Math.floor(coords.get(1)), z = (int) Math.floor(coords.get(2));
+                BlockPos pos = new BlockPos(
+                        (int) Math.floor(coords.getFirst()),
+                        (int) Math.floor(coords.get(1)),
+                        (int) Math.floor(coords.get(2))
+                );
+                if (pos.getY() < 0 || pos.getY() > 256) {
+                    break;
+                }
                 int duration = party ? partyDuration.value() * 20 : allDuration.value() * 20;
-                waypointList.removeIf(waypoint -> waypoint.name.equals(sender));
-                waypointList.add(new PlayerWaypoint(sender, new BlockPos(x, y, z), duration, party));
+                waypointList.removeIf(waypoint -> waypoint.name.getString().equals(sender));
+                waypointList.add(new PlayerWaypoint(sender, pos, duration, party));
                 break;
             }
         }

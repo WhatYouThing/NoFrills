@@ -1,18 +1,17 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
 import nofrills.events.ScreenOpenEvent;
+import nofrills.events.SlotClickEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SlotOptions;
@@ -25,6 +24,12 @@ import java.util.List;
 public class TerminalSolvers {
     public static final Feature instance = new Feature("terminalSolvers");
 
+    public static final SettingBool panes = new SettingBool(false, "panes", instance.key());
+    public static final SettingBool startsWith = new SettingBool(false, "startsWith", instance.key());
+    public static final SettingBool select = new SettingBool(false, "select", instance.key());
+    public static final SettingBool inOrder = new SettingBool(false, "inOrder", instance.key());
+    public static final SettingBool colors = new SettingBool(false, "colors", instance.key());
+    public static final SettingBool instant = new SettingBool(false, "instant", instance.key());
     public static final SettingBool melody = new SettingBool(false, "melody", instance.key());
     public static final SettingString melodyMsg = new SettingString("/pc MELODY", "melodyMsg", instance.key());
 
@@ -35,12 +40,24 @@ public class TerminalSolvers {
             Items.RED_STAINED_GLASS_PANE,
             Items.BLUE_STAINED_GLASS_PANE
     );
-    public static boolean isInTerminal = false;
-    private static boolean isTerminalBuilt = false;
     private static int melodyTicks = 0;
 
-    public static boolean shouldHideTooltips() {
-        return instance.isActive() && isInTerminal;
+    public static TerminalType getTerminalType(String title) {
+        if (title.startsWith("Correct all the panes!")) return TerminalType.Panes;
+        if (title.startsWith("Click in order!")) return TerminalType.InOrder;
+        if (title.startsWith("What starts with:") && title.endsWith("?")) return TerminalType.StartsWith;
+        if (title.startsWith("Select all the") && title.endsWith("items!")) return TerminalType.Select;
+        if (title.startsWith("Change all to same color!")) return TerminalType.Colors;
+        if (title.equals("Click the button on time!")) return TerminalType.Melody;
+        return TerminalType.None;
+    }
+
+    public static boolean isInTerminal(String title) {
+        return !getTerminalType(title).equals(TerminalType.None);
+    }
+
+    public static boolean shouldHideTooltips(String title) {
+        return instance.isActive() && isInTerminal(title);
     }
 
     private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
@@ -61,144 +78,164 @@ public class TerminalSolvers {
     }
 
     private static ItemStack stackWithCount(int count) {
-        ItemStack stack = count > 0 ? Items.LIME_CONCRETE.getDefaultStack() : Items.BLUE_CONCRETE.getDefaultStack();
-        stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(" "));
-        stack.setCount(Math.abs(count));
-        return stack;
+        return SlotOptions.stackWithQuantity(count > 0 ? SlotOptions.first : SlotOptions.second, Math.abs(count));
     }
 
     @EventHandler
     private static void onScreenOpen(ScreenOpenEvent event) {
-        isTerminalBuilt = false;
-        isInTerminal = false;
-
-        if (instance.isActive() && Utils.isInDungeons() && event.screen.getTitle().getString().equals("Click the button on time!")) {
-            isInTerminal = true;
-            if (melody.value()) {
+        if (instance.isActive() && Utils.isOnDungeonFloor("7")) {
+            if (melody.value() && getTerminalType(event.screen.getTitle().getString()).equals(TerminalType.Melody)) {
                 if (melodyTicks == 0 && !melodyMsg.value().isEmpty()) {
                     Utils.sendMessage(melodyMsg.value());
-                    melodyTicks = 100;
                 }
+                melodyTicks = 60;
             }
         }
     }
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("7")) {
-            if (melodyTicks > 0) {
-                melodyTicks--;
-            }
+        if (melodyTicks > 0) {
+            melodyTicks--;
         }
     }
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && !isTerminalBuilt) {
-            isTerminalBuilt = event.isFinal;
-            List<Slot> orderSlots = new ArrayList<>();
-            List<Slot> colorSlots = new ArrayList<>();
-            for (Slot slot : event.handler.slots) {
-                ItemStack stack = event.inventory.getStack(slot.id);
-                if (!stack.isEmpty()) {
-                    if (event.title.startsWith("Correct all the panes!")) {
-                        isInTerminal = true;
-                        if (stack.getItem().equals(Items.RED_STAINED_GLASS_PANE)) {
-                            Utils.setSpoofed(slot, SlotOptions.first);
-                            Utils.setDisabled(slot, false);
+        if (instance.isActive() && Utils.isOnDungeonFloor("7")) {
+            TerminalType type = getTerminalType(event.title);
+            if (event.isInventory || event.slot == null || type.equals(TerminalType.None)) {
+                return;
+            }
+            if (type.equals(TerminalType.Panes) && panes.value()) {
+                if (event.stack.getItem().equals(Items.RED_STAINED_GLASS_PANE)) {
+                    SlotOptions.spoofSlot(event.slot, SlotOptions.first);
+                    SlotOptions.disableSlot(event.slot, false);
+                } else {
+                    SlotOptions.spoofSlot(event.slot, SlotOptions.background);
+                    SlotOptions.disableSlot(event.slot, true);
+                }
+            }
+            if (type.equals(TerminalType.StartsWith) && startsWith.value()) {
+                String character = String.valueOf(event.title.charAt(event.title.indexOf("'") + 1)).toLowerCase();
+                String name = Formatting.strip(event.stack.getName().getString()).toLowerCase().trim();
+                if (!name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(event.stack)) {
+                    SlotOptions.spoofSlot(event.slot, SlotOptions.first);
+                    SlotOptions.disableSlot(event.slot, false);
+                } else {
+                    SlotOptions.spoofSlot(event.slot, SlotOptions.background);
+                    SlotOptions.disableSlot(event.slot, true);
+                }
+            }
+            if (type.equals(TerminalType.Select) && select.value()) {
+                String color = event.title.replace("Select all the", "").replace("items!", "").trim();
+                String colorName = color.equals("SILVER") ? "light_gray" : color.toLowerCase().replace(" ", "_");
+                for (DyeColor dye : DyeColor.values()) {
+                    if (dye.getId().equals(colorName)) {
+                        if (!Utils.hasGlint(event.stack) && checkStackColor(event.stack, dye, colorName)) {
+                            SlotOptions.spoofSlot(event.slot, SlotOptions.first);
+                            SlotOptions.disableSlot(event.slot, false);
                         } else {
-                            Utils.setSpoofed(slot, SlotOptions.background);
-                            Utils.setDisabled(slot, true);
+                            SlotOptions.spoofSlot(event.slot, SlotOptions.background);
+                            SlotOptions.disableSlot(event.slot, true);
                         }
+                        break;
                     }
-                    if (event.title.startsWith("Click in order!")) {
-                        isInTerminal = true;
-                        if (stack.getItem().equals(Items.RED_STAINED_GLASS_PANE) && event.isFinal) {
+                }
+            }
+            if (type.equals(TerminalType.InOrder) && inOrder.value()) {
+                List<Slot> orderSlots = new ArrayList<>();
+                for (Slot slot : event.handler.slots) {
+                    ItemStack stack = event.inventory.getStack(slot.id);
+                    if (!stack.isEmpty()) {
+                        Item item = stack.getItem();
+                        SlotOptions.spoofSlot(event.slot, SlotOptions.background);
+                        SlotOptions.disableSlot(event.slot, true);
+                        if (item.equals(Items.RED_STAINED_GLASS_PANE) || item.equals(Items.LIME_STAINED_GLASS_PANE)) {
                             orderSlots.add(slot);
-                        } else {
-                            Utils.setSpoofed(slot, SlotOptions.background);
-                            Utils.setDisabled(slot, true);
                         }
                     }
-                    if (event.title.startsWith("What starts with:") && event.title.endsWith("?")) {
-                        isInTerminal = true;
-                        String character = String.valueOf(event.title.charAt(event.title.indexOf("'") + 1)).toLowerCase();
-                        String name = Formatting.strip(stack.getName().getString()).toLowerCase().trim();
-                        if (!name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(stack)) {
-                            Utils.setSpoofed(slot, SlotOptions.first);
-                            Utils.setDisabled(slot, false);
-                        } else {
-                            Utils.setSpoofed(slot, SlotOptions.background);
-                            Utils.setDisabled(slot, true);
-                        }
+                }
+                if (orderSlots.size() == 14) { // scuffed way to ensure every slot is sent in by the server
+                    orderSlots.removeIf(slot -> slot.getStack().getItem().equals(Items.LIME_STAINED_GLASS_PANE));
+                    if (orderSlots.isEmpty()) {
+                        return;
                     }
-                    if (event.title.startsWith("Select all the") && event.title.endsWith("items!")) {
-                        isInTerminal = true;
-                        String color = event.title.replace("Select all the", "").replace("items!", "").trim();
-                        String colorName = color.equals("SILVER") ? "light_gray" : color.toLowerCase().replace(" ", "_");
-                        for (DyeColor dye : DyeColor.values()) {
-                            if (dye.getId().equals(colorName)) {
-                                if (!Utils.hasGlint(stack) && checkStackColor(stack, dye, colorName)) {
-                                    Utils.setSpoofed(slot, SlotOptions.first);
-                                    Utils.setDisabled(slot, false);
-                                } else {
-                                    Utils.setSpoofed(slot, SlotOptions.background);
-                                    Utils.setDisabled(slot, true);
-                                }
-                                break;
-                            }
-                        }
+                    orderSlots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
+                    Slot first = orderSlots.getFirst();
+                    SlotOptions.spoofSlot(first, SlotOptions.first);
+                    SlotOptions.disableSlot(first, false);
+                    if (orderSlots.size() > 1) {
+                        Slot second = orderSlots.get(1);
+                        SlotOptions.spoofSlot(second, SlotOptions.second);
+                        SlotOptions.disableSlot(second, true);
                     }
-                    if (event.title.startsWith("Change all to same color!")) {
-                        isInTerminal = true;
+                }
+            }
+            if (type.equals(TerminalType.Colors) && colors.value()) {
+                List<Slot> colorSlots = new ArrayList<>();
+                for (Slot slot : event.handler.slots) {
+                    ItemStack stack = event.inventory.getStack(slot.id);
+                    if (!stack.isEmpty()) {
+                        SlotOptions.spoofSlot(event.slot, SlotOptions.background);
+                        SlotOptions.disableSlot(event.slot, true);
                         if (colorsOrder.contains(stack.getItem()) && !colorSlots.contains(slot)) {
                             colorSlots.add(slot);
                         }
-                        Utils.setSpoofed(slot, SlotOptions.background);
-                        Utils.setDisabled(slot, true);
                     }
                 }
-            }
-            if (!orderSlots.isEmpty()) {
-                orderSlots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
-                Slot first = orderSlots.getFirst();
-                Utils.setSpoofed(first, SlotOptions.first);
-                Utils.setDisabled(first, false);
-                if (orderSlots.size() > 1) {
-                    Slot second = orderSlots.get(1);
-                    Utils.setSpoofed(second, SlotOptions.second);
-                    Utils.setDisabled(second, true);
-                }
-            }
-            if (!colorSlots.isEmpty() && colorSlots.size() >= 9) {
-                int[] colorCounts = {0, 0, 0, 0, 0};
-                for (Slot slot : colorSlots) {
-                    int index = colorsOrder.indexOf(slot.getStack().getItem());
-                    colorCounts[index] += 1;
-                }
-                int mostCommon = -1, highestCommon = 0;
-                for (int i = 0; i < 5; i++) {
-                    if (colorCounts[i] > highestCommon) {
-                        highestCommon = colorCounts[i];
-                        mostCommon = i;
+                if (colorSlots.size() == 9) {
+                    int[] colorCounts = {0, 0, 0, 0, 0};
+                    for (Slot slot : colorSlots) {
+                        int index = colorsOrder.indexOf(slot.getStack().getItem());
+                        colorCounts[index] += 1;
                     }
-                }
-                for (Slot slot : colorSlots) {
-                    int index = colorsOrder.indexOf(slot.getStack().getItem());
-                    int target = Math.negateExact(mostCommon - index);
-                    if (Math.abs(target) > 2) {
-                        int offset = Math.abs(target) == 4 ? 3 : 1;
-                        target = Math.negateExact(target) + (target > 0 ? offset : -offset);
+                    int mostCommon = -1, highestCommon = 0;
+                    for (int i = 0; i < 5; i++) {
+                        if (colorCounts[i] > highestCommon) {
+                            highestCommon = colorCounts[i];
+                            mostCommon = i;
+                        }
                     }
-                    if (target == 0) {
-                        Utils.setSpoofed(slot, SlotOptions.background);
-                        Utils.setDisabled(slot, true);
-                    } else {
-                        Utils.setSpoofed(slot, stackWithCount(target));
-                        Utils.setDisabled(slot, false);
+                    for (Slot slot : colorSlots) {
+                        int index = colorsOrder.indexOf(slot.getStack().getItem());
+                        int target = Math.negateExact(mostCommon - index);
+                        if (Math.abs(target) > 2) {
+                            int offset = Math.abs(target) == 4 ? 3 : 1;
+                            target = Math.negateExact(target) + (target > 0 ? offset : -offset);
+                        }
+                        if (target == 0) {
+                            SlotOptions.spoofSlot(slot, SlotOptions.background);
+                            SlotOptions.disableSlot(slot, true);
+                        } else {
+                            SlotOptions.spoofSlot(slot, stackWithCount(target));
+                            SlotOptions.disableSlot(slot, false);
+                        }
                     }
                 }
             }
         }
+    }
+
+    @EventHandler
+    private static void onSlotClick(SlotClickEvent event) {
+        if (instance.isActive() && Utils.isOnDungeonFloor("7") && event.slot != null && instant.value()) {
+            TerminalType type = getTerminalType(event.title);
+            if (type.equals(TerminalType.None) || type.equals(TerminalType.Melody) || type.equals(TerminalType.Colors)) {
+                return;
+            }
+            SlotOptions.spoofSlot(event.slot, SlotOptions.background);
+            SlotOptions.disableSlot(event.slot, true);
+        }
+    }
+
+    public enum TerminalType {
+        Panes,
+        InOrder,
+        StartsWith,
+        Select,
+        Colors,
+        Melody,
+        None
     }
 }

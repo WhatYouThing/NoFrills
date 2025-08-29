@@ -2,6 +2,7 @@ package nofrills.features.tweaks;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.SlotActionType;
@@ -89,7 +90,7 @@ public class MiddleClickOverride {
         };
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     private static void onClick(SlotClickEvent event) {
         if (instance.isActive() && event.slot != null && event.button == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.actionType.equals(SlotActionType.PICKUP)) {
             if (mc.currentScreen instanceof GenericContainerScreen container) {

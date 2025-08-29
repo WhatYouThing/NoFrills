@@ -120,7 +120,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             ci.cancel();
             return;
         }
-        if (eventBus.post(new SlotClickEvent(slot, slot != null ? slot.id : slotId, button, actionType)).isCancelled()) {
+        if (eventBus.post(new SlotClickEvent(slot, slot != null ? slot.id : slotId, button, actionType, this.title.getString())).isCancelled()) {
             ci.cancel();
         }
     }
@@ -148,7 +148,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), cancellable = true)
     private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (TerminalSolvers.shouldHideTooltips() || shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot)) {
+        if (TerminalSolvers.shouldHideTooltips(this.title.getString()) || shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot)) {
             ci.cancel();
             return;
         }

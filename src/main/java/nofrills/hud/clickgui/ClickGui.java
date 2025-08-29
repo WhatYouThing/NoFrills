@@ -360,7 +360,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Arch Color", false, LeapOverlay.arch, "The color used for Archer on the overlay."),
                                 new Settings.ColorPicker("Tank Color", false, LeapOverlay.tank, "The color used for Tank on the overlay.")
                         ))),
-                        new Module("Terminal Solvers", TerminalSolvers.instance, "Solves terminals in F7/M7.", new Settings(List.of(
+                        new Module("Terminal Solvers", TerminalSolvers.instance, "Solves terminals and prevents wrong clicks in F7/M7. Also hides item tooltips in every terminal.", new Settings(List.of(
+                                new Settings.Toggle("Solve Panes", TerminalSolvers.panes, "Solves the \"Correct all panes\" terminal."),
+                                new Settings.Toggle("Solve In Order", TerminalSolvers.inOrder, "Solves the \"Click in order\" Among Us task."),
+                                new Settings.Toggle("Solve Starts With", TerminalSolvers.startsWith, "Solves the \"What starts with\" terminal."),
+                                new Settings.Toggle("Solve Select", TerminalSolvers.select, "Solves the \"Select all\" terminal."),
+                                new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal."),
+                                new Settings.Toggle("Instant Click", TerminalSolvers.instant, "Instantly marks items as clicked instead of waiting until the terminal is updated.\nThis option makes terminals more responsive on high ping, but it also can show false positives."),
                                 new Settings.Toggle("Announce Melody", TerminalSolvers.melody, "Sends a message once you get the torture terminal."),
                                 new Settings.TextInput("Melody Message", TerminalSolvers.melodyMsg, "The message to send.")
                         ))),

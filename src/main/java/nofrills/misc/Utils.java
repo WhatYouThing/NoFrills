@@ -146,25 +146,6 @@ public class Utils {
         infoRaw(Text.literal(format(message, values)));
     }
 
-    /**
-     * Disables a specific slot in the provided screen, preventing it from being clicked and hiding its tooltip.
-     *
-     * @param slot The slot to disable
-     */
-    public static void setDisabled(Slot slot, boolean disabled) {
-        SlotOptions.disableSlot(slot, disabled);
-    }
-
-    /**
-     * Spoofs a slot to render a specific item stack, rather than the item that is actually in that slot.
-     *
-     * @param slot        The slot to spoof
-     * @param replacement The ItemStack to spoof as
-     */
-    public static void setSpoofed(Slot slot, ItemStack replacement) {
-        SlotOptions.spoofSlot(slot, replacement);
-    }
-
     public static String getCoordsFormatted(String format) {
         BlockPos pos = mc.player.getBlockPos();
         return Utils.format(format, pos.getX(), pos.getY(), pos.getZ());

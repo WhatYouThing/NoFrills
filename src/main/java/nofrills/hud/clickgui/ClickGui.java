@@ -10,6 +10,7 @@ import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
+import nofrills.config.Config;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
 import nofrills.features.farming.PlotBorders;
@@ -291,7 +292,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(
                                 new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
                         ))),
-                        new Module("Command Tooltip", CommandTooltip.instance, "Reveals the command that the hovered chat message would run when clicked.")
+                        new Module("Command Tooltip", CommandTooltip.instance, "Reveals the command that the hovered chat message would run when clicked."),
+                        new Module("Auto Save", AutoSave.instance, "Automatically saves your settings after closing the settings/HUD editor screen.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experiments", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
@@ -561,6 +563,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void close() {
+        if (AutoSave.instance.isActive()) {
+            Config.saveAsync();
+        }
         if (this.uiAdapter != null) {
             this.uiAdapter.dispose();
         }

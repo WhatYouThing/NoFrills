@@ -7,6 +7,8 @@ import io.wispforest.owo.ui.core.OwoUIAdapter;
 import io.wispforest.owo.ui.core.Surface;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
+import nofrills.config.Config;
+import nofrills.features.misc.AutoSave;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -69,6 +71,9 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void close() {
+        if (AutoSave.instance.isActive()) {
+            Config.saveAsync();
+        }
         super.close();
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import nofrills.config.Config;
 import nofrills.events.InteractBlockEvent;
 import nofrills.events.InteractEntityEvent;
 import nofrills.events.InteractItemEvent;
@@ -18,6 +19,8 @@ import nofrills.events.ScreenOpenEvent;
 import nofrills.features.tweaks.NoDropSwing;
 import nofrills.features.tweaks.NoLoadingScreen;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,6 +33,9 @@ import static nofrills.Main.mc;
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin {
 
+    @Shadow
+    @Final
+    private static Logger LOGGER;
     @Shadow
     @Nullable
     public ClientWorld world;
@@ -80,6 +86,6 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "stop", at = @At("HEAD"))
     private void beforeStop(CallbackInfo ci) {
-        nofrills.config.Config.save();
+        Config.save();
     }
 }

@@ -17,8 +17,8 @@ import java.util.List;
 public class LagMeter extends SimpleTextElement {
     public final Feature instance = new Feature("lagMeterElement");
 
-    public final SettingDouble x = new SettingDouble(0.01, "x", instance.key());
-    public final SettingDouble y = new SettingDouble(0.31, "y", instance.key());
+    public final SettingDouble x;
+    public final SettingDouble y;
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingInt min = new SettingInt(500, "min", instance.key());
@@ -27,14 +27,21 @@ public class LagMeter extends SimpleTextElement {
 
     public long lastTick = 0;
 
-    public LagMeter(Text text) {
-        super(text);
+    public LagMeter(String text, double x, double y) {
+        super(Text.literal(text));
+        this.x = new SettingDouble(x, "x", instance.key());
+        this.y = new SettingDouble(y, "y", instance.key());
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
                 new Settings.SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
         ));
         this.options.setTitle(Text.of("Lag Meter Element"));
+        HudManager.addNew(this);
+    }
+
+    public LagMeter(String text) {
+        this(text, HudManager.getDefaultX(), HudManager.getDefaultY());
     }
 
     @Override

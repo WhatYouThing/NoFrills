@@ -3,7 +3,6 @@ package nofrills.hud;
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import nofrills.events.*;
@@ -12,33 +11,41 @@ import nofrills.hud.elements.*;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static nofrills.Main.mc;
 
 public class HudManager {
-    public static FishingBobber bobberElement = new FishingBobber(Text.of("§cBobber: §7Inactive"));
-    public static SeaCreatures seaCreaturesElement = new SeaCreatures(Text.of("§3Sea Creatures: §70"));
-    public static TPS tpsElement = new TPS(Text.of("§bTPS: §f20.00"));
-    public static LagMeter lagMeterElement = new LagMeter(Text.of("§cLast server tick was 0.00s ago"));
-    public static Power powerElement = new Power(Text.of("§bPower: §f0"));
-    public static Day dayElement = new Day(Text.of("§bDay: §f0"));
-    public static Ping pingElement = new Ping(Text.of("§bPing: §f0ms"));
+    private static final List<HudElement> elements = new ArrayList<>();
+    public static FPS fpsElement = new FPS("§bFPS: §f0");
+    public static TPS tpsElement = new TPS("§bTPS: §f20.00");
+    public static Ping pingElement = new Ping("§bPing: §f0ms");
+    public static Day dayElement = new Day("§bDay: §f0");
+    public static SeaCreatures seaCreaturesElement = new SeaCreatures("§3Sea Creatures: §70");
+    public static FishingBobber bobberElement = new FishingBobber("§cBobber: §7Inactive");
+    public static LagMeter lagMeterElement = new LagMeter("§cLast server tick was 0.00s ago");
+    public static Power powerElement = new Power("§bPower: §f0");
     public static ShardTrackerDisplay shardTrackerElement = new ShardTrackerDisplay();
-
-    public static List<HudElement> elements = List.of(
-            bobberElement,
-            seaCreaturesElement,
-            tpsElement,
-            lagMeterElement,
-            powerElement,
-            dayElement,
-            pingElement,
-            shardTrackerElement
-    );
 
     public static boolean isEditingHud() {
         return mc.currentScreen instanceof HudEditorScreen;
+    }
+
+    public static List<HudElement> getElements() {
+        return elements;
+    }
+
+    public static void addNew(HudElement element) {
+        elements.add(element);
+    }
+
+    public static double getDefaultX() {
+        return 0.01;
+    }
+
+    public static double getDefaultY() {
+        return 0.01 + 0.05 * elements.size();
     }
 
     public static void registerElements() {
@@ -63,6 +70,7 @@ public class HudManager {
     private static void onJoinServer(ServerJoinEvent event) {
         pingElement.reset();
         tpsElement.reset();
+        fpsElement.reset();
         lagMeterElement.setTickTime(0); // temporarily disables the element, as the server doesn't send tick packets for a few seconds after joining
         bobberElement.hologram = null;
     }
@@ -111,6 +119,15 @@ public class HudManager {
                 bobberElement.setActive();
             } else if (mc.player.fishHook == null) {
                 bobberElement.setInactive();
+            }
+        }
+        if (fpsElement.instance.isActive()) {
+            if (fpsElement.ticks > 0) {
+                fpsElement.ticks -= 1;
+                if (fpsElement.ticks == 0) {
+                    fpsElement.setFps(mc.getCurrentFps());
+                    fpsElement.ticks = 20;
+                }
             }
         }
     }

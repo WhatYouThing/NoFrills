@@ -21,8 +21,8 @@ import java.util.List;
 public class FishingBobber extends SimpleTextElement {
     public final Feature instance = new Feature("bobberElement");
 
-    public final SettingDouble x = new SettingDouble(0.01, "x", instance.key());
-    public final SettingDouble y = new SettingDouble(0.16, "y", instance.key());
+    public final SettingDouble x;
+    public final SettingDouble y;
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
@@ -35,8 +35,10 @@ public class FishingBobber extends SimpleTextElement {
     public boolean active = false;
     public String currentText = "§cBobber: §7Inactive";
 
-    public FishingBobber(Text text) {
-        super(text);
+    public FishingBobber(String text, double x, double y) {
+        super(Text.literal(text));
+        this.x = new SettingDouble(x, "x", instance.key());
+        this.y = new SettingDouble(y, "y", instance.key());
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
@@ -44,6 +46,11 @@ public class FishingBobber extends SimpleTextElement {
                 new Settings.Toggle("Bobber Timer", timer, "Tracks how long your fishing bobber has existed for, useful for Slugfish.")
         ));
         this.options.setTitle(Text.of("Bobber Element"));
+        HudManager.addNew(this);
+    }
+
+    public FishingBobber(String text) {
+        this(text, HudManager.getDefaultX(), HudManager.getDefaultY());
     }
 
     @Override

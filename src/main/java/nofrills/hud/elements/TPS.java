@@ -17,12 +17,11 @@ import nofrills.misc.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class TPS extends SimpleTextElement {
     public final Feature instance = new Feature("tpsElement");
 
-    public final SettingDouble x = new SettingDouble(0.01, "x", instance.key());
-    public final SettingDouble y = new SettingDouble(0.06, "y", instance.key());
+    public final SettingDouble x;
+    public final SettingDouble y;
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingBool average = new SettingBool(false, "average", instance.key());
@@ -33,14 +32,21 @@ public class TPS extends SimpleTextElement {
     public int serverTicks = 0;
     public List<Integer> tpsList = new ArrayList<>();
 
-    public TPS(Text text) {
-        super(text);
+    public TPS(String text, double x, double y) {
+        super(Text.literal(text));
+        this.x = new SettingDouble(x, "x", instance.key());
+        this.y = new SettingDouble(y, "y", instance.key());
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
                 new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
         this.options.setTitle(Text.of("TPS Element"));
+        HudManager.addNew(this);
+    }
+
+    public TPS(String text) {
+        this(text, HudManager.getDefaultX(), HudManager.getDefaultY());
     }
 
     @Override

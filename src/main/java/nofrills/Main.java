@@ -15,6 +15,7 @@ import nofrills.commands.YeetCommand;
 import nofrills.config.Config;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
+import nofrills.features.farming.PlotBorders;
 import nofrills.features.farming.SpaceFarmer;
 import nofrills.features.fishing.CapTracker;
 import nofrills.features.fishing.MuteDrake;
@@ -139,6 +140,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(DoubleUseFix.class);
         eventBus.subscribe(ShardTracker.class);
         eventBus.subscribe(HuntaxeLock.class);
+        eventBus.subscribe(PlotBorders.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

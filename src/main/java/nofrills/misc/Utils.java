@@ -539,6 +539,17 @@ public class Utils {
         return component != null && component.isPresent();
     }
 
+    public static List<String> getTabListLines() {
+        List<String> lines = new ArrayList<>();
+        if (mc.getNetworkHandler() != null) {
+            for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
+                if (entry.getDisplayName() != null) {
+                    lines.add(Formatting.strip(entry.getDisplayName().getString()).trim());
+                }
+            }
+        }
+        return lines;
+    }
 
     /**
      * Returns every line of text from the tab list footer, otherwise an empty list.

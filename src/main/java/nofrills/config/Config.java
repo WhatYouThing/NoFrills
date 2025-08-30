@@ -38,6 +38,10 @@ public class Config {
         }
     }
 
+    public static void saveAsync() {
+        new Thread(Config::save).start();
+    }
+
     public static JsonObject get() {
         return data;
     }

@@ -38,7 +38,7 @@ public class FPS extends SimpleTextElement {
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
-                new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
+                new Settings.Toggle("Average", average, "Tracks and adds the average FPS to the element.")
         ));
         this.options.setTitle(Text.of("FPS Element"));
         HudManager.addNew(this);

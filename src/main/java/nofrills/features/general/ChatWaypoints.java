@@ -10,7 +10,6 @@ import nofrills.config.SettingColor;
 import nofrills.config.SettingInt;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
-import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

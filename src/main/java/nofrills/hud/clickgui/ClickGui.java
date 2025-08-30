@@ -12,6 +12,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
+import nofrills.features.farming.PlotBorders;
 import nofrills.features.farming.SpaceFarmer;
 import nofrills.features.fishing.CapTracker;
 import nofrills.features.fishing.MuteDrake;
@@ -490,6 +491,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Space Farmer", SpaceFarmer.instance, "Allows you to farm by holding space bar, sneak and press space to activate.\nThis feature will also lock your view once you start holding space."),
                         new Module("Glowing Mushrooms", GlowingMushroom.instance, "Highlights Glowing Mushrooms.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, GlowingMushroom.color, "The color of the highlight.")
+                        ))),
+                        new Module("Plot Borders", PlotBorders.instance, "Renders borders for plots.", new Settings(List.of(
+                                new Settings.Toggle("Infested Plots", PlotBorders.infested, "Adds borders to plots with pests in them."),
+                                new Settings.ColorPicker("Infested Color", true, PlotBorders.infestedColor, "The color of the infested plot border."),
+                                new Settings.Toggle("Current Plot", PlotBorders.current, "Adds a border to the plot you are in."),
+                                new Settings.ColorPicker("Current Color", true, PlotBorders.currentColor, "The color of the current plot border."),
+                                new Settings.Toggle("All Plots", PlotBorders.all, "Adds borders to every plot if no other border should apply."),
+                                new Settings.ColorPicker("All Color", true, PlotBorders.allColor, "The color of the border for every plot.")
                         )))
                 ))
         );

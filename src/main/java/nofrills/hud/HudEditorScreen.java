@@ -26,14 +26,14 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     protected void build(FlowLayout root) {
         root.surface(Surface.VANILLA_TRANSLUCENT);
         root.allowOverflow(false);
-        for (HudElement element : HudManager.elements) {
+        for (HudElement element : HudManager.getElements()) {
             root.child(element);
         }
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        for (HudElement element : HudManager.elements) {
+        for (HudElement element : HudManager.getElements()) {
             element.updatePosition();
         }
         super.render(context, mouseX, mouseY, delta);
@@ -46,7 +46,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            for (HudElement element : HudManager.elements) {
+            for (HudElement element : HudManager.getElements()) {
                 if (element.toggling) {
                     element.toggling = false;
                     element.toggle();
@@ -59,7 +59,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
-        for (HudElement element : HudManager.elements) {
+        for (HudElement element : HudManager.getElements()) {
             if (element.toggling) {
                 element.toggling = false;
             }

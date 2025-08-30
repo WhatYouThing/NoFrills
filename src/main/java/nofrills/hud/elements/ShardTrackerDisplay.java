@@ -19,8 +19,8 @@ import java.util.List;
 public class ShardTrackerDisplay extends SimpleTextElement {
     public final Feature instance = new Feature("shardTrackerElement");
 
-    public final SettingDouble x = new SettingDouble(0.01, "x", instance.key());
-    public final SettingDouble y = new SettingDouble(0.36, "y", instance.key());
+    public final SettingDouble x;
+    public final SettingDouble y;
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingBool hideIfNone = new SettingBool(false, "hideIfNone", instance.key());
@@ -28,14 +28,21 @@ public class ShardTrackerDisplay extends SimpleTextElement {
     private final Identifier identifier = Identifier.of("nofrills", "shard-tracker-element");
     private MutableText lastText = ShardTracker.displayNone;
 
-    public ShardTrackerDisplay() {
+    public ShardTrackerDisplay(double x, double y) {
         super(ShardTracker.displayNone);
+        this.x = new SettingDouble(x, "x", instance.key());
+        this.y = new SettingDouble(y, "y", instance.key());
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
                 new Settings.Toggle("Hide If None", hideIfNone, "Hides the element if you are not tracking any shards (or the Shard Tracker is disabled).")
         ));
         this.options.setTitle(Text.of("Shard Tracker Element"));
+        HudManager.addNew(this);
+    }
+
+    public ShardTrackerDisplay() {
+        this(HudManager.getDefaultX(), HudManager.getDefaultY());
     }
 
     @Override

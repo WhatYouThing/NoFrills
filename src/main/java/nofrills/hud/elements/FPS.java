@@ -14,34 +14,37 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class SeaCreatures extends SimpleTextElement {
-    public final Feature instance = new Feature("seaCreaturesElement");
+public class FPS extends SimpleTextElement {
+    public final Feature instance = new Feature("fpsElement");
 
     public final SettingDouble x;
     public final SettingDouble y;
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
-    public final SettingBool zero = new SettingBool(false, "zero", instance.key());
+    public final SettingBool average = new SettingBool(false, "average", instance.key());
 
-    private final Identifier identifier = Identifier.of("nofrills", "sea-creatures-element");
-    private boolean active = false;
+    private final Identifier identifier = Identifier.of("nofrills", "fps-element");
 
-    public SeaCreatures(String text, double x, double y) {
+    public int ticks = 20;
+    public List<Integer> fpsList = new ArrayList<>();
+
+    public FPS(String text, double x, double y) {
         super(Text.literal(text));
         this.x = new SettingDouble(x, "x", instance.key());
         this.y = new SettingDouble(y, "y", instance.key());
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
-                new Settings.Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
+                new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
-        this.options.setTitle(Text.of("Sea Creatures Element"));
+        this.options.setTitle(Text.of("FPS Element"));
         HudManager.addNew(this);
     }
 
-    public SeaCreatures(String text) {
+    public FPS(String text) {
         this(text, HudManager.getDefaultX(), HudManager.getDefaultY());
     }
 
@@ -49,37 +52,44 @@ public class SeaCreatures extends SimpleTextElement {
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (HudManager.isEditingHud()) {
             super.layout.surface(instance.isActive() ? Surface.BLANK : this.disabledSurface);
-        } else {
-            if (!instance.isActive()) {
-                return;
-            }
-            if (zero.value() && !this.active) {
-                return;
-            }
+        } else if (!instance.isActive()) {
+            return;
         }
         this.updateShadow(shadow);
         this.updateAlignment(align);
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void setCount(int count) {
-        if (count > 0) {
-            this.setText(Utils.format("§3Sea Creatures: §f{}", count));
-            this.active = true;
+    public void setFps(int fps) {
+        if (average.value()) {
+            if (this.fpsList.size() > 30) {
+                this.fpsList.removeFirst();
+            }
+            this.fpsList.add(fps);
+            int avg = 0;
+            for (int previous : this.fpsList) {
+                avg += previous;
+            }
+            this.setText(Utils.format("§bFPS: §f{} §7{}", fps, Utils.formatDecimal(avg / (double) fpsList.size())));
         } else {
-            this.setText("§3Sea Creatures: §70");
-            this.active = false;
+            this.setText(Utils.format("§bFPS: §f{}", fps));
         }
     }
 
-    @Override
-    public void toggle() {
-        instance.setActive(!instance.isActive());
+    public void reset() {
+        this.ticks = 20;
+        this.fpsList.clear();
+        this.setText("§bFPS: §f0");
     }
 
     @Override
     public void updatePosition() {
         this.updatePosition(x, y);
+    }
+
+    @Override
+    public void toggle() {
+        instance.setActive(!instance.isActive());
     }
 
     @Override

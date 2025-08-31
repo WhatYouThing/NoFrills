@@ -6,6 +6,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.events.TooltipRenderEvent;
+import nofrills.misc.Utils;
 
 import java.text.DateFormat;
 import java.util.Calendar;
@@ -22,7 +23,14 @@ public class CalendarDate {
     }
 
     private static String parseDate(Calendar calendar) {
-        return calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) + " " + DateFormat.getInstance().format(calendar.getTime());
+        return Utils.format("{} {}",
+                calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()),
+                DateFormat.getInstance().format(calendar.getTime())
+        );
+    }
+
+    private static Text buildLine(String prefix, Calendar calendar) {
+        return Text.literal(Utils.format("{}: §b{}", prefix, parseDate(calendar)));
     }
 
     @EventHandler
@@ -43,15 +51,15 @@ public class CalendarDate {
                             calendar.add(Calendar.SECOND, 5 - (second % 5));
                         }
                         event.addLine(Text.of(""));
-                        event.addLine(Text.of("§c[NF] §eDate of Event: §b" + parseDate(calendar)));
+                        event.addLine(Utils.getShortTag().append(buildLine("§eDate of Event", calendar)));
                         String stackName = Formatting.strip(event.stack.getName().getString());
                         if (stackName.endsWith("Spooky Festival")) {
                             calendar.add(Calendar.HOUR, -1);
-                            event.addLine(Text.of("§c[NF] §6Fear Mongerer Arrives: §b" + parseDate(calendar)));
+                            event.addLine(Utils.getShortTag().append(buildLine("§6Fear Mongerer Arrives", calendar)));
                         } else if (stackName.endsWith("Season of Jerry")) {
                             calendar.add(Calendar.HOUR, -7);
                             calendar.add(Calendar.MINUTE, -40);
-                            event.addLine(Text.of("§c[NF] §4Workshop Opens: §b" + parseDate(calendar)));
+                            event.addLine(Utils.getShortTag().append(buildLine("§cWorkshop Opens", calendar)));
                         }
                         return;
                     }

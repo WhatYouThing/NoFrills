@@ -20,7 +20,7 @@ public class Config {
             try {
                 data = JsonParser.parseString(Files.readString(filePath)).getAsJsonObject();
             } catch (IOException exception) {
-                LOGGER.error("Unable to load config file!", exception);
+                LOGGER.error("Unable to load NoFrills config file!", exception);
             }
         } else {
             save();
@@ -34,7 +34,7 @@ public class Config {
             }
             Files.writeString(filePath, data.toString());
         } catch (IOException exception) {
-            LOGGER.error("Unable to save config file!", exception);
+            LOGGER.error("Unable to save NoFrills config file!", exception);
         }
     }
 

@@ -15,7 +15,6 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 public class FishingBobber extends SimpleTextElement {
@@ -29,7 +28,6 @@ public class FishingBobber extends SimpleTextElement {
     public final SettingBool timer = new SettingBool(false, "timer", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "bobber-element");
-    private final DecimalFormat format = new DecimalFormat("0.0");
     public Entity hologram = null;
     public int timerTicks = 0;
     public boolean active = false;
@@ -66,7 +64,7 @@ public class FishingBobber extends SimpleTextElement {
             }
         }
         if (timer.value()) {
-            this.setText(Utils.format("{} §7{}s", this.currentText, format.format(this.timerTicks / 20.0)));
+            this.setText(Utils.format("{} §7{}s", this.currentText, Utils.formatDecimal(this.timerTicks / 20.0, 1)));
         } else {
             this.setText(this.currentText);
         }

@@ -109,6 +109,14 @@ public class Utils {
         }
     }
 
+    public static MutableText getTag() {
+        return Text.literal("[NoFrills] ").withColor(0x5ca0bf);
+    }
+
+    public static MutableText getShortTag() {
+        return Text.literal("[NF] ").withColor(0x5ca0bf);
+    }
+
     public static void info(String message) {
         infoRaw(Text.literal(message));
     }
@@ -126,8 +134,7 @@ public class Utils {
     }
 
     public static void infoRaw(MutableText message) {
-        MutableText tag = Text.literal("[NoFrills] ").withColor(0x5ca0bf);
-        mc.inGameHud.getChatHud().addMessage(tag.append(message.withColor(0xffffff)).append("§r"), null, noFrillsIndicator);
+        mc.inGameHud.getChatHud().addMessage(getTag().append(message.withColor(0xffffff)).append("§r"), null, noFrillsIndicator);
     }
 
     public static void infoFormat(String message, Object... values) {

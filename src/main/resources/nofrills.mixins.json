@@ -40,6 +40,7 @@
     "RenderPipelinesAccessor",
     "SimpleEntityLookupAccessor",
     "SnowBlockMixin",
+    "SoundManagerAccessor",
     "StatusEffectsDisplayMixin",
     "WorldMixin",
     "WorldRendererMixin"

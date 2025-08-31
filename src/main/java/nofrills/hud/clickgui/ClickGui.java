@@ -293,7 +293,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
                         ))),
                         new Module("Command Tooltip", CommandTooltip.instance, "Reveals the command that the hovered chat message would run when clicked."),
-                        new Module("Auto Save", AutoSave.instance, "Automatically saves your settings after closing the settings/HUD editor screen.")
+                        new Module("Auto Save", AutoSave.instance, "Automatically saves your settings after closing the settings/HUD editor screen."),
+                        new Module("Unfocused Tweaks", UnfocusedTweaks.instance, "Various optimizations for when you are tabbed out of Minecraft.", new Settings(List.of(
+                                new Settings.Toggle("Skip World Render", UnfocusedTweaks.noWorldRender, "Skips world rendering while unfocused which greatly reduces usage."),
+                                new Settings.Toggle("Mute Sounds", UnfocusedTweaks.muteSounds, "Mutes the in-game sound while unfocused."),
+                                new Settings.Toggle("No Vanilla Limit", UnfocusedTweaks.noVanilla, "Fully disables the vanilla \"Reduce FPS\" option."),
+                                new Settings.SliderInt("FPS Limit", 0, 200, 1, UnfocusedTweaks.fpsLimit, "The max FPS the game will render at while unfocused. Set to 0 to disable.")
+                        )))
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experiments", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(

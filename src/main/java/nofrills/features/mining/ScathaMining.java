@@ -29,12 +29,8 @@ public class ScathaMining {
 
     private static wormType getWormType(String name) {
         if (name.endsWith(Utils.Symbols.heart)) {
-            if (name.contains("Scatha")) {
-                return wormType.Scatha;
-            }
-            if (name.contains("Worm")) {
-                return wormType.Worm;
-            }
+            if (name.startsWith("[Lv10] Scatha ")) return wormType.Scatha;
+            if (name.startsWith("[Lv5] Worm ")) return wormType.Worm;
         }
         return wormType.None;
     }
@@ -75,7 +71,7 @@ public class ScathaMining {
             spawnCooldown--;
             if (spawnCooldown == 0) {
                 if (cooldown.value()) {
-                    Utils.showTitle("§aWORM COOLDOWN ENDED", "", 5, 20, 5);
+                    Utils.showTitle("§a§lWORM COOLDOWN ENDED", "", 5, 20, 5);
                     Utils.info("§a§lWorm spawn cooldown ended!");
                     Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.MASTER, 1.0f, 0.0f);
                 }

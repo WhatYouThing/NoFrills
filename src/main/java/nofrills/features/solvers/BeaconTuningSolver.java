@@ -17,7 +17,6 @@ import nofrills.misc.SlotOptions;
 import nofrills.misc.SoundPitch;
 import nofrills.misc.Utils;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -50,7 +49,6 @@ public class BeaconTuningSolver {
     public static int speedSlot1Id = -1;
     public static int pitchSlot1Id = -1;
     private static boolean isPaused = false;
-    private static PitchType matchPitch = null;
     private static PitchType changePitch = null;
     public static int colorTarget1 = 0;
     public static HashSet<PitchType> heardPitch = new HashSet<>();
@@ -115,7 +113,6 @@ public class BeaconTuningSolver {
             speedSlot1Id = -1;
             pitchSlot1Id = -1;
             isPaused = false;
-            matchPitch = null;
             changePitch = null;
             colorTarget1 = 0;
             heardPitch.clear();
@@ -135,10 +132,8 @@ public class BeaconTuningSolver {
                         heardPitch.remove(changePitch);
                     }
                 }
-                case TuningType.Upgrade -> {
-                } // TODO
-                case TuningType.None -> {
-                }
+                case TuningType.Upgrade -> {} // TODO
+                case TuningType.None -> {}
             }
         }
     }
@@ -148,13 +143,7 @@ public class BeaconTuningSolver {
         if (!instance.isActive() || event.inventory.getStack(event.slotId).isEmpty()) {
             return;
         }
-
         TuningType tuningType = getTuningType();
-        // left click decrements dye id
-        // right click increments dye id
-        // top is "Match the Beat"
-        // bottom is "Change the Beat"
-        // 1/2/3/4/5 speed matches to 55/45/35/25/15 ticks delays accordingly
 
         switch (tuningType) {
             case TuningType.Normal -> {
@@ -178,7 +167,6 @@ public class BeaconTuningSolver {
                         if (x.endsWith("Normal")) changePitch = PitchType.Normal;
                         if (x.endsWith("High")) changePitch = PitchType.High;
                     });
-//                    SlotOptions.disableSlot(event.handler.getSlot(event.slotId), heardPitch.contains(changePitch));
                 }
                 if (event.stack.getName().getString().startsWith("Speed")) {
                     speedSlot1Id = event.slotId;
@@ -186,13 +174,12 @@ public class BeaconTuningSolver {
                         changeSpeed = x.charAt(x.length() - 1) - '0';
                         if (matchSpeed > 0 && matchSpeed == changeSpeed) {
                             SlotOptions.setBackground(slot, RenderColor.green);
-//                            SlotOptions.disableSlot(event.handler.getSlot(event.slotId), true);
                         } else if (matchSpeed > 0) {
                             SlotOptions.setBackground(slot, RenderColor.red);
-//                            SlotOptions.disableSlot(event.handler.getSlot(event.slotId), false);
                         }
                     });
                 }
+                // 1/2/3/4/5 speed matches to 55/45/35/25/15 ticks delays accordingly
                 if (event.stack.getName().getString().startsWith("Match the Beat")) {
                     matchSpeed = getTileSpeed(tickCounter - lastMatchTick);
                     if (colorsOrder.contains(event.stack.getItem())) {

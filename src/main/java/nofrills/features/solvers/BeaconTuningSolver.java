@@ -9,7 +9,7 @@ import net.minecraft.util.Identifier;
 import nofrills.config.Feature;
 import nofrills.events.PlaySoundEvent;
 import nofrills.events.ScreenOpenEvent;
-import nofrills.events.ScreenSlotUpdateEvent;
+import nofrills.events.SlotUpdateEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
@@ -119,7 +119,7 @@ public class BeaconTuningSolver {
     }
 
     @EventHandler
-    private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
+    private static void onSlotUpdate(SlotUpdateEvent event) {
         if (!instance.isActive() || event.inventory.getStack(event.slotId).isEmpty()) {
             return;
         }

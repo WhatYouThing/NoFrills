@@ -17,14 +17,13 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
-import nofrills.events.DrawItemTooltip;
+import nofrills.events.TooltipRenderEvent;
 import nofrills.features.dungeons.LeapOverlay;
 import nofrills.features.dungeons.TerminalSolvers;
 import nofrills.features.general.NoRender;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.kuudra.KuudraChestValue;
 import nofrills.features.tweaks.MiddleClickFix;
-import nofrills.hud.LeapMenuButton;
 import nofrills.misc.RenderColor;
 import nofrills.misc.ScreenOptions;
 import nofrills.misc.SlotOptions;
@@ -46,7 +45,6 @@ import java.util.List;
 
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_CAPTURED;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen implements ScreenOptions {
@@ -61,7 +59,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Shadow
     protected int x;
     @Unique
-    List<LeapMenuButton> leapButtons = new ArrayList<>();
+    List<LeapOverlay.LeapButton> leapButtons = new ArrayList<>();
     @Unique
     boolean sentLeapMsg = false;
 
@@ -78,11 +76,6 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             return slot.getStack().getName().getString().trim().isEmpty();
         }
         return false;
-    }
-
-    @Unique
-    private boolean isLeapMenu() {
-        return Utils.isLeapMenu(title.getString());
     }
 
     @Unique
@@ -122,12 +115,12 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Override
     public void nofrills_mod$addLeapButton(int slotId, String name, String dungeonClass, RenderColor classColor) {
-        leapButtons.add(new LeapMenuButton(slotId, leapButtons.size(), name, dungeonClass, classColor));
+        leapButtons.add(new LeapOverlay.LeapButton(slotId, leapButtons.size(), name, dungeonClass, classColor));
     }
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        if (isLeapMenu() || shouldIgnoreBackground(slot) || SlotOptions.isSlotDisabled(slot)) {
+        if (LeapOverlay.isLeapMenu(this.title.getString()) || shouldIgnoreBackground(slot) || SlotOptions.isSlotDisabled(slot)) {
             ci.cancel();
         }
     }
@@ -155,7 +148,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), cancellable = true)
     private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (TerminalSolvers.shouldHideTooltips() || shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot) || SlotBinding.isBinding()) {
+        if (TerminalSolvers.shouldHideTooltips(this.title.getString()) || shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot) || SlotBinding.isBinding()) {
             ci.cancel();
         }
     }
@@ -163,7 +156,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;getTooltipFromItem(Lnet/minecraft/item/ItemStack;)Ljava/util/List;"))
     private List<Text> onGetTooltipFromItem(List<Text> original, @Local ItemStack itemStack) {
         if (!itemStack.isEmpty()) {
-            eventBus.post(new DrawItemTooltip(original, itemStack, Utils.getCustomData(itemStack), this.getTitle().getString()));
+            eventBus.post(new TooltipRenderEvent(original, itemStack, Utils.getCustomData(itemStack), this.getTitle().getString()));
         }
         return original;
     }
@@ -186,13 +179,20 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (isLeapMenu()) {
-            for (LeapMenuButton button : leapButtons) {
+        if (LeapOverlay.isLeapMenu(this.title.getString())) {
+            for (LeapOverlay.LeapButton button : leapButtons) {
                 if (button.slotId != -1) {
                     button.hovered = button.isHovered(mouseX, mouseY);
                 }
                 button.render(context, mouseX, mouseY, delta);
             }
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    private void onRenderBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (LeapOverlay.isLeapMenu(this.title.getString())) {
             ci.cancel();
         }
     }
@@ -260,8 +260,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (isLeapMenu() && button == GLFW.GLFW_MOUSE_BUTTON_1) {
-            for (LeapMenuButton leapButton : leapButtons) {
+        if (LeapOverlay.isLeapMenu(this.title.getString()) && button == GLFW.GLFW_MOUSE_BUTTON_1) {
+            for (LeapOverlay.LeapButton leapButton : leapButtons) {
                 if (leapButton.slotId != -1 && leapButton.isHovered(mouseX, mouseY)) {
                     mc.interactionManager.clickSlot(handler.syncId, leapButton.slotId, 0, SlotActionType.PICKUP, mc.player);
                     this.handler.setCursorStack(ItemStack.EMPTY);
@@ -286,12 +286,12 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        if (isLeapMenu()) {
+        if (LeapOverlay.isLeapMenu(this.title.getString())) {
             int x = mc.getWindow().getWidth() / 2;
             int y = mc.getWindow().getHeight() / 2;
             this.x = x;
             this.y = y;
-            InputUtil.setCursorParameters(mc.getWindow().getHandle(), GLFW_CURSOR_CAPTURED, x, y);
+            InputUtil.setCursorParameters(mc.getWindow().getHandle(), InputUtil.GLFW_CURSOR_NORMAL, x, y);
         }
     }
 }

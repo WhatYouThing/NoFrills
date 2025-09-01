@@ -15,28 +15,28 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 public class FishingBobber extends SimpleTextElement {
     public final Feature instance = new Feature("bobberElement");
 
-    public final SettingDouble x = new SettingDouble(0.01, "x", instance.key());
-    public final SettingDouble y = new SettingDouble(0.16, "y", instance.key());
+    public final SettingDouble x;
+    public final SettingDouble y;
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
     public final SettingBool timer = new SettingBool(false, "timer", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "bobber-element");
-    private final DecimalFormat format = new DecimalFormat("0.0");
     public Entity hologram = null;
     public int timerTicks = 0;
     public boolean active = false;
     public String currentText = "§cBobber: §7Inactive";
 
-    public FishingBobber(Text text) {
-        super(text);
+    public FishingBobber(String text, double x, double y) {
+        super(Text.literal(text));
+        this.x = new SettingDouble(x, "x", instance.key());
+        this.y = new SettingDouble(y, "y", instance.key());
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
@@ -44,6 +44,11 @@ public class FishingBobber extends SimpleTextElement {
                 new Settings.Toggle("Bobber Timer", timer, "Tracks how long your fishing bobber has existed for, useful for Slugfish.")
         ));
         this.options.setTitle(Text.of("Bobber Element"));
+        HudManager.addNew(this);
+    }
+
+    public FishingBobber(String text) {
+        this(text, HudManager.getDefaultX(), HudManager.getDefaultY());
     }
 
     @Override
@@ -59,7 +64,7 @@ public class FishingBobber extends SimpleTextElement {
             }
         }
         if (timer.value()) {
-            this.setText(Utils.format("{} §7{}s", this.currentText, format.format(this.timerTicks / 20.0)));
+            this.setText(Utils.format("{} §7{}s", this.currentText, Utils.formatDecimal(this.timerTicks / 20.0, 1)));
         } else {
             this.setText(this.currentText);
         }

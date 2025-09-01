@@ -7,7 +7,7 @@ import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
-public class ScreenSlotUpdateEvent {
+public class SlotUpdateEvent {
     public ScreenHandlerSlotUpdateS2CPacket packet;
     public GenericContainerScreen screen;
     public GenericContainerScreenHandler handler;
@@ -19,7 +19,7 @@ public class ScreenSlotUpdateEvent {
     public boolean isFinal;
     public boolean isInventory;
 
-    public ScreenSlotUpdateEvent(ScreenHandlerSlotUpdateS2CPacket packet, GenericContainerScreen screen, GenericContainerScreenHandler handler, int slotId) {
+    public SlotUpdateEvent(ScreenHandlerSlotUpdateS2CPacket packet, GenericContainerScreen screen, GenericContainerScreenHandler handler, int slotId) {
         this.packet = packet;
         this.screen = screen;
         this.handler = handler;

@@ -5,13 +5,12 @@ import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
-import nofrills.events.DrawItemTooltip;
+import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -138,29 +137,27 @@ public class PriceTooltips {
     }
 
     private static Text buildLine(String name, double price, int quantity, String extra) {
-        MutableText tag = Text.literal("[NF] ").withColor(0x5ca0bf);
         String line = Utils.format(
                 "{}: §6{} {}",
                 name,
                 Utils.formatSeparator(price * quantity),
                 quantity > 1 ? Utils.format(extra, Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
-        return tag.append(Text.literal(line).withColor(0xffffff));
+        return Utils.getShortTag().append(Text.literal(line).withColor(0xffffff));
     }
 
     private static Text buildLine(String name, long price, int quantity, String extra) {
-        MutableText tag = Text.literal("[NF] ").withColor(0x5ca0bf);
         String line = Utils.format(
                 "{}: §6{} {}",
                 name,
                 Utils.formatSeparator(price * quantity),
                 quantity > 1 ? Utils.format(extra, Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
-        return tag.append(Text.literal(line).withColor(0xffffff));
+        return Utils.getShortTag().append(Text.literal(line).withColor(0xffffff));
     }
 
     @EventHandler
-    private static void onTooltip(DrawItemTooltip event) {
+    private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive()) {
             String itemId = parseItemId(event.stack, event.customData, event.title);
             int quantity = getStackQuantity(event.stack, event.title);

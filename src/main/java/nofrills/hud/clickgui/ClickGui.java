@@ -10,8 +10,10 @@ import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
+import nofrills.config.Config;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
+import nofrills.features.farming.PlotBorders;
 import nofrills.features.farming.SpaceFarmer;
 import nofrills.features.fishing.CapTracker;
 import nofrills.features.fishing.MuteDrake;
@@ -121,9 +123,21 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Motes Sell", PriceTooltips.mote, "Adds the Motes sell price to applicable items."),
                                 new Settings.SliderInt("Grubber Stacks", 0, 5, 1, PriceTooltips.burgers, "The amount of McGrubber's Burgers you've eaten, used to calculate the bonus Motes value.")
                         ))),
-                        new Module("Wardrobe Keybinds", WardrobeKeybinds.instance, "Adds number hotkeys (1-9) to the Skyblock Wardrobe.", new Settings(List.of(
-                                new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with the keybinds."),
-                                new Settings.Toggle("Sound Effect", WardrobeKeybinds.sound, "Plays a sound effect after switching your armor set with a hotkey.")
+                        new Module("Wardrobe Keybinds", WardrobeKeybinds.instance, "Adds hotkeys to the Skyblock Wardrobe.", new Settings(List.of(
+                                new Settings.Dropdown<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),
+                                new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with a keybind."),
+                                new Settings.Toggle("Sound Effect", WardrobeKeybinds.sound, "Plays a sound effect upon using a keybind."),
+                                new Settings.Keybind("Next Page", WardrobeKeybinds.next, "The keybind to go to the next wardrobe page."),
+                                new Settings.Keybind("Previous Page", WardrobeKeybinds.previous, "The keybind to go to the previous wardrobe page."),
+                                new Settings.Keybind("Custom Slot 1", WardrobeKeybinds.custom1, "Your custom keybind for the 1st wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 2", WardrobeKeybinds.custom2, "Your custom keybind for the 2nd wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 3", WardrobeKeybinds.custom3, "Your custom keybind for the 3rd wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 4", WardrobeKeybinds.custom4, "Your custom keybind for the 4th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 5", WardrobeKeybinds.custom5, "Your custom keybind for the 5th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 6", WardrobeKeybinds.custom6, "Your custom keybind for the 6th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 7", WardrobeKeybinds.custom7, "Your custom keybind for the 7th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 8", WardrobeKeybinds.custom8, "Your custom keybind for the 8th wardrobe slot."),
+                                new Settings.Keybind("Custom Slot 9", WardrobeKeybinds.custom9, "Your custom keybind for the 9th wardrobe slot.")
                         ))),
                         new Module("Chat Waypoints", ChatWaypoints.instance, "Automatically creates waypoints for coordinates sent in Party/Global chat.", new Settings(List.of(
                                 new Settings.Separator("Party Chat"),
@@ -250,6 +264,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Double Use Fix", DoubleUseFix.instance, "Fixes Blaze Daggers and Fishing Rods being able to activate twice at once.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", DoubleUseFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", DoubleUseFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        ))),
+                        new Module("Old Safewalk", OldSafewalk.instance, "Allows you to walk onto short blocks (such as carpet) while sneaking.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", OldSafewalk.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", OldSafewalk.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         )))
                 )),
                 new Category("Misc", List.of(
@@ -274,7 +292,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(
                                 new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
                         ))),
-                        new Module("Command Tooltip", CommandTooltip.instance, "Reveals the command that the hovered chat message would run when clicked.")
+                        new Module("Command Tooltip", CommandTooltip.instance, "Reveals the command that the hovered chat message would run when clicked."),
+                        new Module("Auto Save", AutoSave.instance, "Automatically saves your settings after closing the settings/HUD editor screen."),
+                        new Module("Unfocused Tweaks", UnfocusedTweaks.instance, "Various optimizations for when you are tabbed out of Minecraft.", new Settings(List.of(
+                                new Settings.Toggle("Skip World Render", UnfocusedTweaks.noWorldRender, "Skips world rendering while unfocused which greatly reduces usage."),
+                                new Settings.Toggle("Mute Sounds", UnfocusedTweaks.muteSounds, "Mutes the in-game sound while unfocused."),
+                                new Settings.Toggle("No Vanilla Limit", UnfocusedTweaks.noVanilla, "Fully disables the vanilla \"Reduce FPS\" option."),
+                                new Settings.SliderInt("FPS Limit", 0, 200, 1, UnfocusedTweaks.fpsLimit, "The max FPS the game will render at while unfocused. Set to 0 to disable.")
+                        )))
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experiments", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
@@ -349,13 +374,20 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Leap Overlay", LeapOverlay.instance, "Renders a custom overlay in place of the Spirit Leap menu.", new Settings(List.of(
                                 new Settings.Toggle("Send Message", LeapOverlay.send, "Sends a message once you leap to a teammate."),
                                 new Settings.TextInput("Leap Message", LeapOverlay.message, "The message to send. Replaces {name} with the name of the player."),
+                                new Settings.SliderDouble("Text Scale", 1.0, 4.0, 1.0, LeapOverlay.scale, "The scale of the text on the overlay."),
                                 new Settings.ColorPicker("Healer Color", false, LeapOverlay.healer, "The color used for Healer on the overlay."),
                                 new Settings.ColorPicker("Mage Color", false, LeapOverlay.mage, "The color used for Mage on the overlay."),
                                 new Settings.ColorPicker("Bers Color", false, LeapOverlay.bers, "The color used for Berserker on the overlay."),
                                 new Settings.ColorPicker("Arch Color", false, LeapOverlay.arch, "The color used for Archer on the overlay."),
                                 new Settings.ColorPicker("Tank Color", false, LeapOverlay.tank, "The color used for Tank on the overlay.")
                         ))),
-                        new Module("Terminal Solvers", TerminalSolvers.instance, "Solves terminals in F7/M7.", new Settings(List.of(
+                        new Module("Terminal Solvers", TerminalSolvers.instance, "Solves terminals and prevents wrong clicks in F7/M7. Also hides item tooltips in every terminal.", new Settings(List.of(
+                                new Settings.Toggle("Solve Panes", TerminalSolvers.panes, "Solves the \"Correct all panes\" terminal."),
+                                new Settings.Toggle("Solve In Order", TerminalSolvers.inOrder, "Solves the \"Click in order\" Among Us task."),
+                                new Settings.Toggle("Solve Starts With", TerminalSolvers.startsWith, "Solves the \"What starts with\" terminal."),
+                                new Settings.Toggle("Solve Select", TerminalSolvers.select, "Solves the \"Select all\" terminal."),
+                                new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal."),
+                                new Settings.Toggle("Instant Click", TerminalSolvers.instant, "Instantly marks items as clicked instead of waiting until the terminal is updated.\nThis option makes terminals more responsive on high ping, but it also can show false positives."),
                                 new Settings.Toggle("Announce Melody", TerminalSolvers.melody, "Sends a message once you get the torture terminal."),
                                 new Settings.TextInput("Melody Message", TerminalSolvers.melodyMsg, "The message to send.")
                         ))),
@@ -469,6 +501,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Space Farmer", SpaceFarmer.instance, "Allows you to farm by holding space bar, sneak and press space to activate.\nThis feature will also lock your view once you start holding space."),
                         new Module("Glowing Mushrooms", GlowingMushroom.instance, "Highlights Glowing Mushrooms.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, GlowingMushroom.color, "The color of the highlight.")
+                        ))),
+                        new Module("Plot Borders", PlotBorders.instance, "Renders borders for plots.", new Settings(List.of(
+                                new Settings.Toggle("Infested Plots", PlotBorders.infested, "Adds borders to plots with pests in them."),
+                                new Settings.ColorPicker("Infested Color", true, PlotBorders.infestedColor, "The color of the infested plot border."),
+                                new Settings.Toggle("Current Plot", PlotBorders.current, "Adds a border to the plot you are in."),
+                                new Settings.ColorPicker("Current Color", true, PlotBorders.currentColor, "The color of the current plot border."),
+                                new Settings.Toggle("All Plots", PlotBorders.all, "Adds borders to every plot if no other border should apply."),
+                                new Settings.ColorPicker("All Color", true, PlotBorders.allColor, "The color of the border for every plot.")
                         )))
                 ))
         );
@@ -529,6 +569,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void close() {
+        if (AutoSave.instance.isActive()) {
+            Config.saveAsync();
+        }
         if (this.uiAdapter != null) {
             this.uiAdapter.dispose();
         }

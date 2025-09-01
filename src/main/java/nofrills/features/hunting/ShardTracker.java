@@ -19,8 +19,8 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
 import nofrills.events.ChatMsgEvent;
-import nofrills.events.ScreenSlotUpdateEvent;
 import nofrills.events.ServerJoinEvent;
+import nofrills.events.SlotUpdateEvent;
 import nofrills.features.general.PriceTooltips;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatTextbox;
@@ -297,7 +297,7 @@ public class ShardTracker {
     }
 
     @EventHandler
-    private static void onSlotUpdate(ScreenSlotUpdateEvent event) {
+    private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && boxApply.value() && event.title.equals("Hunting Box")) {
             if (event.isInventory || !data.value().has("shards")) {
                 return;

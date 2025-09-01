@@ -1,5 +1,6 @@
 package nofrills.misc;
 
+import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
@@ -45,7 +46,6 @@ import net.minecraft.world.entity.ClientEntityManager;
 import net.minecraft.world.entity.EntityIndex;
 import net.minecraft.world.entity.EntityLookup;
 import nofrills.events.WorldTickEvent;
-import nofrills.features.dungeons.LeapOverlay;
 import nofrills.mixin.*;
 import org.apache.commons.io.IOUtils;
 
@@ -53,7 +53,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -63,8 +62,8 @@ import static nofrills.Main.*;
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     private static final Random soundRandom = Random.create(0);
-    private static final DecimalFormat decimalFormat = new DecimalFormat("0.00");
-    private static final List<String> abilityWhitelist = List.of(
+    private static final HashSet<String> abilityWhitelist = Sets.newHashSet(
+            "ABINGOPHONE",
             "SUPERBOOM_TNT",
             "INFINITE_SUPERBOOM_TNT",
             "ARROW_SWAPPER",
@@ -109,48 +108,34 @@ public class Utils {
         }
     }
 
+    public static MutableText getTag() {
+        return Text.literal("[NoFrills] ").withColor(0x5ca0bf);
+    }
+
+    public static MutableText getShortTag() {
+        return Text.literal("[NF] ").withColor(0x5ca0bf);
+    }
+
     public static void info(String message) {
         infoRaw(Text.literal(message));
     }
 
     public static void infoButton(String message, String command) {
         ClickEvent click = new ClickEvent.RunCommand(command);
-        MutableText text = Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click));
-        infoRaw(text);
+        infoRaw(Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click)));
     }
 
     public static void infoLink(String message, String url) {
         ClickEvent click = new ClickEvent.OpenUrl(URI.create(url));
-        MutableText text = Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click));
-        infoRaw(text);
+        infoRaw(Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click)));
     }
 
     public static void infoRaw(MutableText message) {
-        MutableText tag = Text.literal("[NoFrills] ").withColor(0x5ca0bf);
-        mc.inGameHud.getChatHud().addMessage(tag.append(message.withColor(0xffffff)).append("§r"), null, noFrillsIndicator);
+        mc.inGameHud.getChatHud().addMessage(getTag().append(message.withColor(0xffffff)).append("§r"), null, noFrillsIndicator);
     }
 
     public static void infoFormat(String message, Object... values) {
         infoRaw(Text.literal(format(message, values)));
-    }
-
-    /**
-     * Disables a specific slot in the provided screen, preventing it from being clicked and hiding its tooltip.
-     *
-     * @param slot The slot to disable
-     */
-    public static void setDisabled(Slot slot, boolean disabled) {
-        SlotOptions.disableSlot(slot, disabled);
-    }
-
-    /**
-     * Spoofs a slot to render a specific item stack, rather than the item that is actually in that slot.
-     *
-     * @param slot        The slot to spoof
-     * @param replacement The ItemStack to spoof as
-     */
-    public static void setSpoofed(Slot slot, ItemStack replacement) {
-        SlotOptions.spoofSlot(slot, replacement);
     }
 
     public static String getCoordsFormatted(String format) {
@@ -390,13 +375,11 @@ public class Utils {
     public static boolean hasRightClickAbility(ItemStack stack) {
         String id = getSkyblockId(stack);
         if (!id.isEmpty()) {
-            if (id.startsWith("ABIPHONE") || id.equals("ABINGOPHONE")) {
+            if (id.startsWith("ABIPHONE")) {
                 return true;
             }
-            for (String item : abilityWhitelist) {
-                if (id.equals(item)) {
-                    return true;
-                }
+            if (abilityWhitelist.contains(id)) {
+                return true;
             }
         }
         return !getRightClickAbility(stack).isEmpty();
@@ -546,6 +529,17 @@ public class Utils {
         return component != null && component.isPresent();
     }
 
+    public static List<String> getTabListLines() {
+        List<String> lines = new ArrayList<>();
+        if (mc.getNetworkHandler() != null) {
+            for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
+                if (entry.getDisplayName() != null) {
+                    lines.add(Formatting.strip(entry.getDisplayName().getString()).trim());
+                }
+            }
+        }
+        return lines;
+    }
 
     /**
      * Returns every line of text from the tab list footer, otherwise an empty list.
@@ -628,19 +622,33 @@ public class Utils {
     }
 
     public static String formatDecimal(double number) {
-        return decimalFormat.format(number);
+        return formatDecimal(number, 2);
     }
 
     public static String formatDecimal(float number) {
-        return decimalFormat.format(number);
+        return formatDecimal(number, 2);
     }
 
-    public static String formatSeparator(int number) {
-        return String.format("%,d", number);
+    public static String formatDecimal(double number, int spaces) {
+        String num = number + "";
+        int index = num.indexOf(".");
+        if (index == -1) {
+            return num;
+        } else {
+            return num.substring(0, spaces == 0 ? index : Math.min(index + 1 + spaces, num.length()));
+        }
+    }
+
+    public static String formatDecimal(float number, int spaces) {
+        return formatDecimal((double) number, spaces);
     }
 
     public static String formatSeparator(long number) {
         return String.format("%,d", number);
+    }
+
+    public static String formatSeparator(int number) {
+        return formatSeparator((long) number);
     }
 
     public static String formatSeparator(double number) {
@@ -648,7 +656,7 @@ public class Utils {
     }
 
     public static String formatSeparator(float number) {
-        return String.format("%,.1f", number);
+        return formatSeparator((double) number);
     }
 
     /**
@@ -656,10 +664,6 @@ public class Utils {
      */
     public static float getTrueHealth(float health) {
         return (health - 1024.0f) * 10000.0f;
-    }
-
-    public static boolean isLeapMenu(String title) {
-        return LeapOverlay.instance.isActive() && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
     }
 
     public static void setScreen(Screen screen) {

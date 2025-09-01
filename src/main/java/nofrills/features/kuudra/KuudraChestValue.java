@@ -8,7 +8,7 @@ import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.ScreenOpenEvent;
-import nofrills.events.ScreenSlotUpdateEvent;
+import nofrills.events.SlotUpdateEvent;
 import nofrills.features.general.PriceTooltips;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -54,7 +54,7 @@ public class KuudraChestValue {
     }
 
     @EventHandler
-    private static void onSlot(ScreenSlotUpdateEvent event) {
+    private static void onSlot(SlotUpdateEvent event) {
         if (instance.isActive() && Utils.isInKuudra() && event.title.endsWith("Chest")) {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;

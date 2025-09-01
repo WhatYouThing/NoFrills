@@ -20,8 +20,8 @@ import java.util.List;
 public class Ping extends SimpleTextElement {
     public final Feature instance = new Feature("pingElement");
 
-    public final SettingDouble x = new SettingDouble(0.01, "x", instance.key());
-    public final SettingDouble y = new SettingDouble(0.01, "y", instance.key());
+    public final SettingDouble x;
+    public final SettingDouble y;
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingBool average = new SettingBool(false, "average", instance.key());
@@ -31,14 +31,21 @@ public class Ping extends SimpleTextElement {
     public int ticks = 20;
     public List<Long> pingList = new ArrayList<>();
 
-    public Ping(Text text) {
-        super(text);
+    public Ping(String text, double x, double y) {
+        super(Text.literal(text));
+        this.x = new SettingDouble(x, "x", instance.key());
+        this.y = new SettingDouble(y, "y", instance.key());
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
                 new Settings.Toggle("Average", average, "Tracks and adds your average ping to the element.")
         ));
         this.options.setTitle(Text.of("Ping Element"));
+        HudManager.addNew(this);
+    }
+
+    public Ping(String text) {
+        this(text, HudManager.getDefaultX(), HudManager.getDefaultY());
     }
 
     @Override

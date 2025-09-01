@@ -16,26 +16,32 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
-
 public class Power extends SimpleTextElement {
     public final Feature instance = new Feature("powerElement");
 
-    public final SettingDouble x = new SettingDouble(0.01, "x", instance.key());
-    public final SettingDouble y = new SettingDouble(0.26, "y", instance.key());
+    public final SettingDouble x;
+    public final SettingDouble y;
     public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
     public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingBool dungeon = new SettingBool(true, "dungeon", instance.key());
 
     private final Identifier identifier = Identifier.of("nofrills", "power-element");
 
-    public Power(Text text) {
-        super(text);
+    public Power(String text, double x, double y) {
+        super(Text.literal(text));
+        this.x = new SettingDouble(x, "x", instance.key());
+        this.y = new SettingDouble(y, "y", instance.key());
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
                 new Settings.Toggle("Dungeons Only", dungeon, "Hides the element outside of Dungeons.")
         ));
         this.options.setTitle(Text.of("Power Element"));
+        HudManager.addNew(this);
+    }
+
+    public Power(String text) {
+        this(text, HudManager.getDefaultX(), HudManager.getDefaultY());
     }
 
     @Override

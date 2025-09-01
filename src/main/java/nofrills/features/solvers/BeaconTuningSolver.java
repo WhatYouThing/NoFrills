@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import nofrills.config.Feature;
@@ -11,11 +12,14 @@ import nofrills.events.PlaySoundEvent;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.events.ServerTickEvent;
+import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
+import nofrills.misc.SoundPitch;
 import nofrills.misc.Utils;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -38,15 +42,18 @@ public class BeaconTuningSolver {
 
     private static int tickCounter = 0;
     private static int lastMatchTick = 0;
-    private static int matchSpeed = 0;
-    private static int changeSpeed = 0;
+    public static int matchSpeed = 0;
+    public static int changeSpeed = 0;
     private static Item matchColor = null;
     private static Item changeColor = null;
     public static int colorSlot1Id = -1;
+    public static int speedSlot1Id = -1;
+    public static int pitchSlot1Id = -1;
     private static boolean isPaused = false;
     private static PitchType matchPitch = null;
     private static PitchType changePitch = null;
     public static int colorTarget1 = 0;
+    public static HashSet<PitchType> heardPitch = new HashSet<>();
 
     public enum TuningType {
         Normal, Upgrade, None
@@ -55,14 +62,19 @@ public class BeaconTuningSolver {
     public enum PitchType {
         Low(0.0952381f), Normal(0.7936508f), High(1.4920635f);
 
-        public final float value;
+        public final SoundPitch value;
 
         PitchType(float v) {
-            this.value = v;
+            this.value = SoundPitch.from(v);
         }
 
         public static PitchType match(float v) {
-            return Arrays.stream(PitchType.values()).filter(x -> Utils.isNearlyEqual(x.value, v)).findFirst().get();
+            for (PitchType pitchType : values()) {
+                if (SoundPitch.from(v).equals(pitchType.value)) {
+                    return pitchType;
+                }
+            }
+            return null; // realistically never happens
         }
     }
 
@@ -100,20 +112,33 @@ public class BeaconTuningSolver {
             matchColor = null;
             changeColor = null;
             colorSlot1Id = -1;
+            speedSlot1Id = -1;
+            pitchSlot1Id = -1;
             isPaused = false;
             matchPitch = null;
             changePitch = null;
             colorTarget1 = 0;
+            heardPitch.clear();
         }
     }
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
         TuningType tuningType = getTuningType();
-        if (tuningType != TuningType.None && event.isSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS)) {
-            PitchType soundPitch = PitchType.match(event.packet.getPitch());
-            if (isPaused) {
-                matchPitch = soundPitch;
+        if (event.isSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS)) {
+            Utils.infoFormat("change pitch: {}, heard: {}", changePitch, heardPitch);
+            switch (tuningType) {
+                case TuningType.Normal -> {
+                    PitchType soundPitch = PitchType.match(event.packet.getPitch());
+                    if (changePitch != null) {
+                        heardPitch.add(soundPitch);
+                        heardPitch.remove(changePitch);
+                    }
+                }
+                case TuningType.Upgrade -> {
+                } // TODO
+                case TuningType.None -> {
+                }
             }
         }
     }
@@ -133,6 +158,7 @@ public class BeaconTuningSolver {
 
         switch (tuningType) {
             case TuningType.Normal -> {
+                Slot slot = event.handler.getSlot(event.slotId);
                 if (event.stack.getName().getString().startsWith("Pause")) {
                     getLoreLines(event.stack).stream().filter(s -> s.contains("Currently")).findFirst().ifPresent(pauseLine -> isPaused = !pauseLine.contains("UNPAUSED"));
                 }
@@ -146,23 +172,26 @@ public class BeaconTuningSolver {
 
                 }
                 if (event.stack.getName().getString().startsWith("Pitch")) {
+                    pitchSlot1Id = event.slotId;
                     getLoreLines(event.stack).stream().filter(s -> s.contains("Current pitch:")).findFirst().ifPresent(x -> {
                         if (x.endsWith("Low")) changePitch = PitchType.Low;
                         if (x.endsWith("Normal")) changePitch = PitchType.Normal;
                         if (x.endsWith("High")) changePitch = PitchType.High;
                     });
-                    SlotOptions.disableSlot(event.handler.getSlot(event.slotId), matchPitch != null && matchPitch == changePitch);
+//                    SlotOptions.disableSlot(event.handler.getSlot(event.slotId), heardPitch.contains(changePitch));
                 }
                 if (event.stack.getName().getString().startsWith("Speed")) {
-                    String speedLine = getLoreLines(event.stack).stream().filter(s -> s.contains("Current speed")).findFirst().orElse(null);
-                    if (speedLine != null) {
-                        changeSpeed = speedLine.charAt(speedLine.length() - 1) - '0';
+                    speedSlot1Id = event.slotId;
+                    getLoreLines(event.stack).stream().filter(s -> s.contains("Current speed")).findFirst().ifPresent(x -> {
+                        changeSpeed = x.charAt(x.length() - 1) - '0';
                         if (matchSpeed > 0 && matchSpeed == changeSpeed) {
-                            SlotOptions.disableSlot(event.handler.getSlot(event.slotId), true);
+                            SlotOptions.setBackground(slot, RenderColor.green);
+//                            SlotOptions.disableSlot(event.handler.getSlot(event.slotId), true);
                         } else if (matchSpeed > 0) {
-                            SlotOptions.disableSlot(event.handler.getSlot(event.slotId), false);
+                            SlotOptions.setBackground(slot, RenderColor.red);
+//                            SlotOptions.disableSlot(event.handler.getSlot(event.slotId), false);
                         }
-                    }
+                    });
                 }
                 if (event.stack.getName().getString().startsWith("Match the Beat")) {
                     matchSpeed = getTileSpeed(tickCounter - lastMatchTick);
@@ -177,6 +206,9 @@ public class BeaconTuningSolver {
                             SlotOptions.disableSlot(event.handler.getSlot(colorSlot1Id), false);
                         }
                     }
+                    if (pitchSlot1Id != -1) {
+                        SlotOptions.setBackground(event.handler.getSlot(pitchSlot1Id), heardPitch.contains(changePitch) || heardPitch.isEmpty() ? RenderColor.green : RenderColor.red);
+                    }
                 }
                 if (event.stack.getName().getString().startsWith("Change the Beat")) {
                     if (colorsOrder.contains(event.stack.getItem())) {
@@ -188,6 +220,9 @@ public class BeaconTuningSolver {
                         } else if (changeColor != null && !changeColor.equals(matchColor)) {
                             SlotOptions.disableSlot(event.handler.getSlot(colorSlot1Id), false);
                         }
+                    }
+                    if (pitchSlot1Id != -1) {
+                        SlotOptions.setBackground(event.handler.getSlot(pitchSlot1Id), heardPitch.contains(changePitch) || heardPitch.isEmpty() ? RenderColor.green : RenderColor.red);
                     }
                 }
             }

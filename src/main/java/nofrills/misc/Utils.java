@@ -694,5 +694,7 @@ public class Utils {
         public static String check = "✔";
         public static String cross = "✖";
         public static String bingo = "Ⓑ";
+        public static String aquatic = "⚓";
+        public static String magmatic = "♆";
     }
 }

@@ -26,7 +26,7 @@ public class RareGlow {
 
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
-        if (instance.isActive() && event.entity.age <= 10 && !Utils.isInDungeons() && event.entity instanceof ArmorStandEntity armorStand) {
+        if (instance.isActive() && event.entity.age <= 20 && !Utils.isInDungeons() && event.entity instanceof ArmorStandEntity armorStand) {
             GameProfile textures = Utils.getTextures(armorStand.getEquippedStack(EquipmentSlot.HEAD));
             if (textures != null) {
                 for (SeaCreatureData.SeaCreature creature : SeaCreatureData.list) {
@@ -43,9 +43,9 @@ public class RareGlow {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && !Utils.isInDungeons() && event.namePlain.contains(Utils.Symbols.heart)) {
+        if (instance.isActive() && !Utils.isInDungeons() && SeaCreatureData.isSeaCreature(event.namePlain)) {
             for (SeaCreatureData.SeaCreature creature : SeaCreatureData.list) {
-                if (creature.rare && creature.glow && event.entity.age <= 10 && event.namePlain.contains(creature.name)) {
+                if (creature.rare && creature.glow && event.entity.age <= 20 && event.namePlain.contains(creature.name)) {
                     Entity owner = Utils.findNametagOwner(event.entity, Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, RareGlow::isValidMob));
                     if (owner != null) {
                         Rendering.Entities.drawGlow(owner, true, color.value());

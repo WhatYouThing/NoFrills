@@ -23,10 +23,10 @@ public class SeaCreatureData {
                     "§e",
                     true,
                     false)
-                    .withTextures(List.of(
-                                    "b82086882b25e9e914362f2048c285c18c8d698a336f7e83f0a1964c760b11",
-                                    "645f2c0bbfe3b8b19b7452072db69a5f59da38ff61415545156e5701e1be756d"
-                            )
+                    .withTextures(
+                            "b82086882b25e9e914362f2048c285c18c8d698a336f7e83f0a1964c760b11",
+                            "645f2c0bbfe3b8b19b7452072db69a5f59da38ff61415545156e5701e1be756d"
+
                     ),
             new SeaCreature(
                     "Blue Ringed Octopus",
@@ -34,9 +34,9 @@ public class SeaCreatureData {
                     "§9",
                     true,
                     false)
-                    .withTextures(List.of(
-                                    "b2b6074d0c9d6b89a494cf4f74158282a64ee23ba8a0725633ad70932ada1a8f"
-                            )
+                    .withTextures(
+                            "b2b6074d0c9d6b89a494cf4f74158282a64ee23ba8a0725633ad70932ada1a8f"
+
                     ),
             new SeaCreature(
                     "Fiery Scuttler",
@@ -44,9 +44,9 @@ public class SeaCreatureData {
                     "§6",
                     true,
                     false)
-                    .withTextures(List.of(
-                                    "55b194025806687642e2bc239895d646a6d8c193d9253b61bfce908f6ce1b84a"
-                            )
+                    .withTextures(
+                            "55b194025806687642e2bc239895d646a6d8c193d9253b61bfce908f6ce1b84a"
+
                     ),
             new SeaCreature(
                     "Wiki Tiki",
@@ -54,65 +54,27 @@ public class SeaCreatureData {
                     "§d",
                     true,
                     false)
-                    .withTextures(List.of(
-                                    "f3c802e580bfefc18c4af94cceb82968b5b4aeab0d832346a633a7473a41dfac",
-                                    "e64331c8fb750f9043334320c94580e7896955695156d80689e5d0a6c60a10e7",
-                                    "9122f7a19b3197766b381fb36bfeb6f442d62509e44cc7847c75c8e8c387225a",
-                                    "c5fd6b9a59ec5b97db8bdc158fbd5f91ef7b317b859fcebe6d09e7bd80eaca9d"
-                            )
+                    .withTextures(
+                            "f3c802e580bfefc18c4af94cceb82968b5b4aeab0d832346a633a7473a41dfac",
+                            "e64331c8fb750f9043334320c94580e7896955695156d80689e5d0a6c60a10e7",
+                            "9122f7a19b3197766b381fb36bfeb6f442d62509e44cc7847c75c8e8c387225a",
+                            "c5fd6b9a59ec5b97db8bdc158fbd5f91ef7b317b859fcebe6d09e7bd80eaca9d"
                     ),
-            new SeaCreature("Ragnarok", "The sky darkens and the air thickens. The end times are upon us: Ragnarok is here.", "§c", true, true),
-            SeaCreature.plain("Squid"),
-            SeaCreature.plain("Sea Walker"),
-            SeaCreature.plain("Night Squid"),
-            SeaCreature.plain("Sea Guardian"),
-            SeaCreature.plain("Sea Archer"),
-            SeaCreature.plain("Sea Witch"),
-            SeaCreature.plain("Rider of the Deep"),
-            SeaCreature.plain("Mithril Grubber"),
-            SeaCreature.plain("Catfish"),
-            SeaCreature.plain("Sea Leech"),
-            SeaCreature.plain("Guardian Defender"),
-            SeaCreature.plain("Agarimoo"),
-            SeaCreature.plain("Deep Sea Protector"),
-            SeaCreature.plain("Oasis Rabbit"),
-            SeaCreature.plain("Oasis Sheep"),
-            SeaCreature.plain("Water Worm"),
-            SeaCreature.plain("Poisoned Water Worm"),
-            SeaCreature.plain("Scarecrow"),
-            SeaCreature.plain("Nightmare"),
-            SeaCreature.plain("Werewolf"),
-            SeaCreature.plain("Frozen Steve"),
-            SeaCreature.plain("Frosty"),
-            SeaCreature.plain("Grinch"),
-            SeaCreature.plain("Nutcracker"),
-            SeaCreature.plain("Nurse Shark"),
-            SeaCreature.plain("Blue Shark"),
-            SeaCreature.plain("Tiger Shark"),
-            SeaCreature.plain("Magma Slug"),
-            SeaCreature.plain("Moogma"),
-            SeaCreature.plain("Lava Leech"),
-            SeaCreature.plain("Pyroclastic Worm"),
-            SeaCreature.plain("Lava Flame"),
-            SeaCreature.plain("Fire Eel"),
-            SeaCreature.plain("Taurus"),
-            SeaCreature.plain("Flaming Worm"),
-            SeaCreature.plain("Lava Blaze"),
-            SeaCreature.plain("Lava Pigman"),
-            SeaCreature.plain("Frog Man"),
-            SeaCreature.plain("Trash Gobbler"),
-            SeaCreature.plain("Dumpster Diver"),
-            SeaCreature.plain("Banshee"),
-            SeaCreature.plain("Snapping Turtle"),
-            SeaCreature.plain("Fried Chicken"),
-            SeaCreature.plain("Bayou Sludge"),
-            SeaCreature.plain("Fireproof Witch"),
-            SeaCreature.plain("Tadgang"),
-            SeaCreature.plain("Ent"),
-            SeaCreature.plain("Bogged"),
-            SeaCreature.plain("Wetwing"),
-            SeaCreature.plain("Stridersurfer")
+            new SeaCreature(
+                    "Ragnarok",
+                    "The sky darkens and the air thickens. The end times are upon us: Ragnarok is here.",
+                    "§c",
+                    true,
+                    true
+            )
     );
+
+    public static boolean isSeaCreature(String name) {
+        if (name.endsWith(Utils.Symbols.heart)) {
+            return name.contains(Utils.Symbols.aquatic) || name.contains(Utils.Symbols.magmatic);
+        }
+        return false;
+    }
 
     public static class SeaCreature {
         public String name;
@@ -130,12 +92,8 @@ public class SeaCreatureData {
             this.glow = glow;
         }
 
-        public static SeaCreature plain(String name) {
-            return new SeaCreature(name, "", "", false, false);
-        }
-
-        public SeaCreature withTextures(List<String> textures) {
-            this.textures = textures;
+        public SeaCreature withTextures(String... textures) {
+            this.textures = List.of(textures);
             return this;
         }
     }

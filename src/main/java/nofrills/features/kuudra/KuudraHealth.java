@@ -29,6 +29,10 @@ public class KuudraHealth {
     private static final List<Float> dpsData = new ArrayList<>();
     private static float previousHealth = 0.0f;
 
+    private static float getTrueHealth(float health) {
+        return (health - 1024.0f) * 10000.0f;
+    }
+
     private static float calculateDPS() {
         float total = 0.0f;
         for (float damage : dpsData) {
@@ -65,7 +69,7 @@ public class KuudraHealth {
     private static void onServerTick(ServerTickEvent event) {
         if (instance.isActive() && Utils.isInKuudra() && dps.value()) {
             if (KuudraUtil.getCurrentPhase() == KuudraUtil.phase.Lair && !Utils.isInstanceOver()) {
-                float health = Utils.getTrueHealth(KuudraUtil.getKuudraEntity().getHealth());
+                float health = getTrueHealth(KuudraUtil.getKuudraEntity().getHealth());
                 float damage = Math.clamp(previousHealth - health, 0, 240_000_000);
                 dpsData.add(damage);
                 if (dpsData.size() > 20) {

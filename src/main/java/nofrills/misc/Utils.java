@@ -252,6 +252,10 @@ public class Utils {
         }
     }
 
+    public static boolean isBaseHealth(LivingEntity entity, float health) {
+        return entity.getHealth() >= health && entity.getHealth() % health == 0;
+    }
+
     @SuppressWarnings("unchecked")
     public static List<Entity> getEntities() {
         if (mc.world != null) { // only powerful wizards may cast such obscene spells
@@ -672,13 +676,6 @@ public class Utils {
         return formatSeparator((double) number);
     }
 
-    /**
-     * Attempts to calculate the actual health value from the provided Entity's (max) health. Mostly applies to bosses or anything that has millions of HP, because their actual health value is reduced.
-     */
-    public static float getTrueHealth(float health) {
-        return (health - 1024.0f) * 10000.0f;
-    }
-
     public static boolean isLeapMenu(String title) {
         return LeapOverlay.instance.isActive() && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
     }
@@ -706,5 +703,7 @@ public class Utils {
         public static String check = "✔";
         public static String cross = "✖";
         public static String bingo = "Ⓑ";
+        public static String aquatic = "⚓";
+        public static String magmatic = "♆";
     }
 }

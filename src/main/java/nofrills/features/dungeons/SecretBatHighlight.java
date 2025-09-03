@@ -17,7 +17,7 @@ public class SecretBatHighlight {
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && event.entity instanceof BatEntity bat) {
-            if (bat.getHealth() == 100.0f && !Rendering.Entities.isDrawingGlow(bat)) {
+            if (Utils.isBaseHealth(bat, 100.0f) && !Rendering.Entities.isDrawingGlow(bat)) {
                 Rendering.Entities.drawGlow(bat, true, color.value());
             }
         }

@@ -52,12 +52,8 @@ public class CapTracker {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && !Utils.isInDungeons() && event.namePlain.contains(Utils.Symbols.heart)) {
-            for (SeaCreatureData.SeaCreature creature : SeaCreatureData.list) {
-                if (event.namePlain.contains(creature.name)) {
-                    seaCreatures.add(event.entity);
-                }
-            }
+        if (instance.isActive() && !Utils.isInDungeons() && SeaCreatureData.isSeaCreature(event.namePlain)) {
+            seaCreatures.add(event.entity);
         }
     }
 

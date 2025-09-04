@@ -273,14 +273,6 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
                 RenderColor color = BeaconTuningSolver.colorTarget1 >= 0 ? RenderColor.green : RenderColor.red;
                 context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, color.hex);
             }
-            if (BeaconTuningSolver.speedSlot1Id != -1 && BeaconTuningSolver.matchSpeed != 0 && BeaconTuningSolver.matchSpeed <= 5) {
-                Slot targetSlot = this.handler.getSlot(BeaconTuningSolver.speedSlot1Id);
-                int baseX = targetSlot.x - 9;
-                int baseY = targetSlot.y + 8;
-                String value = Integer.toString(BeaconTuningSolver.matchSpeed);
-                RenderColor color = BeaconTuningSolver.matchSpeed == BeaconTuningSolver.changeSpeed ? RenderColor.green : RenderColor.red;
-                context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, color.hex);
-            }
             context.getMatrices().pop();
         }
         for (Slot slot : this.handler.slots) {

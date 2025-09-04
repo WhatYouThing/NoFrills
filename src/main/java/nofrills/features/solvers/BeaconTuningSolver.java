@@ -15,7 +15,6 @@ import nofrills.events.ServerTickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.SoundPitch;
-import nofrills.misc.Utils;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -48,7 +47,7 @@ public class BeaconTuningSolver {
     public static int colorSlot1Id = -1;
     public static int speedSlot1Id = -1;
     public static int pitchSlot1Id = -1;
-    private static boolean isPaused = false;
+    private static boolean isPaused1 = false; // might be useful
     private static PitchType changePitch = null;
     public static int colorTarget1 = 0;
     public static HashSet<PitchType> heardPitch = new HashSet<>();
@@ -112,7 +111,7 @@ public class BeaconTuningSolver {
             colorSlot1Id = -1;
             speedSlot1Id = -1;
             pitchSlot1Id = -1;
-            isPaused = false;
+            isPaused1 = false;
             changePitch = null;
             colorTarget1 = 0;
             heardPitch.clear();
@@ -123,7 +122,6 @@ public class BeaconTuningSolver {
     private static void onSound(PlaySoundEvent event) {
         TuningType tuningType = getTuningType();
         if (event.isSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS)) {
-            Utils.infoFormat("change pitch: {}, heard: {}", changePitch, heardPitch);
             switch (tuningType) {
                 case TuningType.Normal -> {
                     PitchType soundPitch = PitchType.match(event.packet.getPitch());
@@ -149,7 +147,7 @@ public class BeaconTuningSolver {
             case TuningType.Normal -> {
                 Slot slot = event.handler.getSlot(event.slotId);
                 if (event.stack.getName().getString().startsWith("Pause")) {
-                    getLoreLines(event.stack).stream().filter(s -> s.contains("Currently")).findFirst().ifPresent(pauseLine -> isPaused = !pauseLine.contains("UNPAUSED"));
+                    getLoreLines(event.stack).stream().filter(s -> s.contains("Currently")).findFirst().ifPresent(pauseLine -> isPaused1 = !pauseLine.contains("UNPAUSED"));
                 }
                 if (event.stack.getName().getString().startsWith("Color")) {
                     colorSlot1Id = event.slotId;
@@ -202,10 +200,9 @@ public class BeaconTuningSolver {
                         changeColor = event.stack.getItem();
                     }
                     if (colorSlot1Id != -1) {
-                        if (changeColor != null && changeColor.equals(matchColor)) {
-                            SlotOptions.disableSlot(event.handler.getSlot(colorSlot1Id), true);
-                        } else if (changeColor != null && !changeColor.equals(matchColor)) {
-                            SlotOptions.disableSlot(event.handler.getSlot(colorSlot1Id), false);
+                        if (changeColor != null) {
+                            SlotOptions.setBackground(event.handler.getSlot(colorSlot1Id), changeColor.equals(matchColor) ? RenderColor.green : RenderColor.red);
+                            SlotOptions.disableSlot(event.handler.getSlot(colorSlot1Id), changeColor.equals(matchColor));
                         }
                     }
                     if (pitchSlot1Id != -1) {
@@ -214,7 +211,7 @@ public class BeaconTuningSolver {
                 }
             }
             case TuningType.Upgrade -> {} // TODO
-            case TuningType.None -> {} // TODO
+            case TuningType.None -> {}
         }
     }
 }

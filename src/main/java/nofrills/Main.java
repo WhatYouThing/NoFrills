@@ -59,6 +59,12 @@ public class Main implements ModInitializer {
 
         mc = MinecraftClient.getInstance();
 
+        String renderdocPath = System.getProperty("nofrills.renderdoc.library_path");
+        if (renderdocPath != null) {
+            System.load(renderdocPath);
+            LOGGER.info("Loaded RenderDoc lib: {}", renderdocPath);
+        }
+
         Config.load();
 
         ConfigScreenProviders.register(MOD_ID, screen -> new ClickGui());

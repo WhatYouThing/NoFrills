@@ -91,8 +91,7 @@ public class Utils {
 
     public static void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
         Vec3d coords = mc.cameraEntity.getPos();
-        PositionedSoundInstance sound = new PositionedSoundInstance(event, category, volume, pitch, soundRandom, coords.getX(), coords.getY(), coords.getZ());
-        mc.getSoundManager().play(sound);
+        mc.getSoundManager().play(new PositionedSoundInstance(event, category, volume, pitch, soundRandom, coords.getX(), coords.getY(), coords.getZ()));
     }
 
     public static void playSound(RegistryEntry.Reference<SoundEvent> event, SoundCategory category, float volume, float pitch) {

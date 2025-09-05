@@ -52,15 +52,9 @@ public class ExperimentSolver {
     public static ExperimentType getExperimentType() {
         if (Utils.isOnPrivateIsland() && mc.currentScreen instanceof GenericContainerScreen container) {
             String title = container.getTitle().getString();
-            if (title.startsWith("Chronomatron (")) {
-                return ExperimentType.Chronomatron;
-            }
-            if (title.startsWith("Ultrasequencer (")) {
-                return ExperimentType.Ultrasequencer;
-            }
-            if (title.startsWith("Superpairs (")) {
-                return ExperimentType.Superpairs;
-            }
+            if (title.startsWith("Chronomatron (")) return ExperimentType.Chronomatron;
+            if (title.startsWith("Ultrasequencer (")) return ExperimentType.Ultrasequencer;
+            if (title.startsWith("Superpairs (")) return ExperimentType.Superpairs;
         }
         return ExperimentType.None;
     }

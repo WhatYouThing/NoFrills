@@ -41,7 +41,6 @@ public class Ping extends SimpleTextElement {
                 new Settings.Toggle("Average", average, "Tracks and adds your average ping to the element.")
         ));
         this.options.setTitle(Text.of("Ping Element"));
-        HudManager.addNew(this);
     }
 
     public Ping(String text) {

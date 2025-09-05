@@ -37,7 +37,6 @@ public class Power extends SimpleTextElement {
                 new Settings.Toggle("Dungeons Only", dungeon, "Hides the element outside of Dungeons.")
         ));
         this.options.setTitle(Text.of("Power Element"));
-        HudManager.addNew(this);
     }
 
     public Power(String text) {

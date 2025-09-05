@@ -209,4 +209,22 @@ public class ShardData {
             "starborn",
             "titanoboa"
     );
+
+    public static String getColorPrefix(String shard) {
+        if (ShardData.legendaryShards.contains(shard)) return "§6";
+        if (ShardData.epicShards.contains(shard)) return "§5";
+        if (ShardData.rareShards.contains(shard)) return "§9";
+        if (ShardData.uncommonShards.contains(shard)) return "§a";
+        if (ShardData.commonShards.contains(shard)) return "§f";
+        return "§7";
+    }
+
+    public static int getColorHex(String shard) {
+        if (ShardData.legendaryShards.contains(shard)) return 0xffffaa00;
+        if (ShardData.epicShards.contains(shard)) return 0xffaa00aa;
+        if (ShardData.rareShards.contains(shard)) return 0xff5555ff;
+        if (ShardData.uncommonShards.contains(shard)) return 0xff55ff55;
+        if (ShardData.commonShards.contains(shard)) return 0xffffffff;
+        return 0xffaaaaaa;
+    }
 }

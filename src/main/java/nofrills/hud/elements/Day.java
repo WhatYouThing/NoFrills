@@ -35,7 +35,6 @@ public class Day extends SimpleTextElement {
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text.")
         ));
         this.options.setTitle(Text.of("Day Element"));
-        HudManager.addNew(this);
     }
 
     public Day(String text) {

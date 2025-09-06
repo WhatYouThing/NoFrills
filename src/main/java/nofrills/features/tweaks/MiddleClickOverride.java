@@ -61,7 +61,8 @@ public class MiddleClickOverride {
             "Auction",
             "Trap",
             "Gemstone",
-            "Heart of the "
+            "Heart of the ",
+            "Widgets"
     );
 
     private static final HashSet<String> containWhitelist = Sets.newHashSet(

@@ -145,6 +145,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ShardTracker.class);
         eventBus.subscribe(HuntaxeLock.class);
         eventBus.subscribe(PlotBorders.class);
+        eventBus.subscribe(LividSolver.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

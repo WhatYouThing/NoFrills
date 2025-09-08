@@ -403,6 +403,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Secret Bat Highlight", SecretBatHighlight.instance, "Applies a glow effect to secret bats.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", false, SecretBatHighlight.color, "The color of the secret bat glow.")
+                        ))),
+                        new Module("Livid Solver", LividSolver.instance, "Finds and highlights the correct Livid in F5/M5.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, LividSolver.color, "The color of the correct Livid outline.")
                         )))
                 )),
                 new Category("Kuudra", List.of(

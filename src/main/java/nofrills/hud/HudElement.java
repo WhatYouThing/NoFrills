@@ -29,6 +29,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         this.foreheadSize(0);
         this.allowOverflow(true);
         this.child(this.layout);
+        HudManager.addNew(this);
     }
 
     @Override

@@ -44,7 +44,6 @@ public class FishingBobber extends SimpleTextElement {
                 new Settings.Toggle("Bobber Timer", timer, "Tracks how long your fishing bobber has existed for, useful for Slugfish.")
         ));
         this.options.setTitle(Text.of("Bobber Element"));
-        HudManager.addNew(this);
     }
 
     public FishingBobber(String text) {

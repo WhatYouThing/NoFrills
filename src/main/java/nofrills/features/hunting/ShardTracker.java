@@ -49,47 +49,22 @@ public class ShardTracker {
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
-        list.add(new Settings.Separator("Usage"));
-        list.add(new Settings.Description("Importing", "Click Copy Tree on the calculator, choose the NoFrills format, and click the Import Shard List button below."));
-        list.add(new Settings.Description("Tracking", "Enable this feature, and then enable the Shard Tracker element in the NoFrills HUD editor."));
-        list.add(new Settings.Separator("Settings"));
+        list.add(new Settings.Description("Usage", "Run the \"/nf shardTracker\" command to see more information."));
         list.add(new Settings.Toggle("Apply From Box", boxApply, "Automatically applies obtained amounts to shards when you open your Hunting Box."));
         list.add(new Settings.Toggle("Done Message", doneMsg, "Shows a message in chat once you reach the needed amount for any shard."));
-        list.add(new Settings.Separator("Shards"));
+        Settings.BigButton clearButton = new Settings.BigButton("Clear Shard List", btn -> {
+            data.value().add("shards", new JsonArray());
+            mc.setScreen(buildSettings());
+        });
+        clearButton.button.verticalSizing(Sizing.fixed(18));
+        clearButton.button.tooltip(Text.literal("Clears the list of your tracked shards."));
+        list.add(clearButton);
         Settings.BigButton importButton = new Settings.BigButton("Import Shard List", btn -> {
-            if (!data.value().has("shards")) {
-                data.value().add("shards", new JsonArray());
-            }
-            JsonArray shards = data.value().get("shards").getAsJsonArray();
-            List<JsonObject> objects = new ArrayList<>();
-            String clipboard = mc.keyboard.getClipboard();
-            JsonArray treeData = parseTreeData(clipboard);
-            if (treeData == null) {
-                Utils.info("§cFailed to import the fusion tree from the SkyShards calculator, no valid data found in your clipboard.");
-                return;
-            }
-            try {
-                for (JsonElement element : treeData) {
-                    JsonObject shardData = element.getAsJsonObject();
-                    JsonObject object = new JsonObject();
-                    object.addProperty("name", shardData.get("name").getAsString().toLowerCase());
-                    object.addProperty("needed", shardData.get("needed").getAsLong());
-                    object.addProperty("obtained", 0L);
-                    object.addProperty("source", shardData.get("source").getAsString());
-                    objects.add(object);
-                }
-            } catch (Exception ignored) {
-                Utils.info("§cSuccessfully read the fusion tree dara, but an unknown error occurred while importing. Try updating the mod to the newest version.");
-                return;
-            }
-            for (JsonObject object : objects) {
-                shards.add(object);
-            }
-            Utils.info("§aShard list imported successfully.");
+            importTreeData();
             mc.setScreen(buildSettings());
         });
         importButton.button.verticalSizing(Sizing.fixed(18));
-        importButton.button.tooltip(Text.literal("Pastes the list of shards (copied from the SkyShards calculator) that you need to get."));
+        importButton.button.tooltip(Text.literal("Pastes the list of shards that you need to get."));
         list.add(importButton);
         Settings.BigButton button = new Settings.BigButton("Add New Shard", btn -> {
             if (!data.value().has("shards")) {
@@ -121,6 +96,38 @@ public class ShardTracker {
         return settings;
     }
 
+    public static void importTreeData() {
+        if (!data.value().has("shards")) {
+            data.value().add("shards", new JsonArray());
+        }
+        JsonArray shards = data.value().get("shards").getAsJsonArray();
+        List<JsonObject> objects = new ArrayList<>();
+        String clipboard = mc.keyboard.getClipboard();
+        JsonArray treeData = parseTreeData(clipboard);
+        if (treeData == null) {
+            Utils.info("§cFailed to import the fusion tree from the SkyShards calculator, no valid data found in your clipboard.");
+            return;
+        }
+        try {
+            for (JsonElement element : treeData) {
+                JsonObject shardData = element.getAsJsonObject();
+                JsonObject object = new JsonObject();
+                object.addProperty("name", shardData.get("name").getAsString().toLowerCase());
+                object.addProperty("needed", shardData.get("needed").getAsLong());
+                object.addProperty("obtained", 0L);
+                object.addProperty("source", shardData.get("source").getAsString());
+                objects.add(object);
+            }
+        } catch (Exception ignored) {
+            Utils.info("§cSuccessfully read the fusion tree dara, but an unknown error occurred while importing. Try updating the mod to the newest version.");
+            return;
+        }
+        for (JsonObject object : objects) {
+            shards.add(object);
+        }
+        Utils.info("§aShard list imported successfully.");
+    }
+
     private static JsonArray parseTreeData(String payload) {
         try {
             String data = payload.substring(payload.indexOf(":") + 1);
@@ -144,7 +151,7 @@ public class ShardTracker {
                 long needed = shardData.get("needed").getAsLong();
                 long obtained = shardData.get("obtained").getAsLong();
                 String source = shardData.get("source").getAsString();
-                String shardName = Utils.format("{}§l{}", getShardColor(name.toLowerCase()), Utils.uppercaseFirst(name, false));
+                String shardName = Utils.format("{}§l{}", ShardData.getColorPrefix(name.toLowerCase()), Utils.uppercaseFirst(name, false));
                 String shardSource = Utils.format("{}[{}]", getSourceColor(source), source);
                 String quantityColor = needed > 0 & obtained >= needed ? "§a" : "§f";
                 String shardQuantity = needed <= 0 ? Utils.format("{}x", Utils.formatSeparator(obtained)) : Utils.format("{}/{}x", Utils.formatSeparator(obtained), Utils.formatSeparator(needed));
@@ -243,24 +250,6 @@ public class ShardTracker {
         return TrackerSource.Direct;
     }
 
-    public static String getShardColor(String shard) {
-        if (ShardData.legendaryShards.contains(shard)) return "§6";
-        if (ShardData.epicShards.contains(shard)) return "§5";
-        if (ShardData.rareShards.contains(shard)) return "§9";
-        if (ShardData.uncommonShards.contains(shard)) return "§a";
-        if (ShardData.commonShards.contains(shard)) return "§f";
-        return "§7";
-    }
-
-    public static int getShardColorHex(String shard) {
-        if (ShardData.legendaryShards.contains(shard)) return 0xffffaa00;
-        if (ShardData.epicShards.contains(shard)) return 0xffaa00aa;
-        if (ShardData.rareShards.contains(shard)) return 0xff5555ff;
-        if (ShardData.uncommonShards.contains(shard)) return 0xff55ff55;
-        if (ShardData.commonShards.contains(shard)) return 0xffffffff;
-        return 0xffaaaaaa;
-    }
-
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
         if (instance.isActive() && !event.messagePlain.isEmpty() && Utils.isInSkyblock()) {
@@ -287,7 +276,7 @@ public class ShardTracker {
                     long quantity = obtained + obtainedShard.quantity;
                     if (doneMsg.value() && needed != 0 && obtained < needed && quantity >= needed) {
                         String name = tracked.get("name").getAsString();
-                        Utils.infoFormat("{}§l{} §r§aShard done! {}/{}x obtained.", getShardColor(name), Utils.uppercaseFirst(name, false), quantity, needed);
+                        Utils.infoFormat("{}§l{} §r§aShard done! {}/{}x obtained.", ShardData.getColorPrefix(name), Utils.uppercaseFirst(name, false), quantity, needed);
                     }
                     tracked.addProperty("obtained", obtained + obtainedShard.quantity);
                     refreshDisplay();
@@ -375,10 +364,10 @@ public class ShardTracker {
             this.inputName.margins(Insets.of(0, 0, 0, 5));
             this.inputName.tooltip(Text.literal("The name of the shard you want to track."));
             this.inputName.text(getData().get("name").getAsString());
-            this.inputName.borderColor = getShardColorHex(getData().get("name").getAsString());
+            this.inputName.borderColor = ShardData.getColorHex(getData().get("name").getAsString());
             this.inputName.onChanged().subscribe(value -> {
                 getData().addProperty("name", value.toLowerCase());
-                this.inputName.borderColor = getShardColorHex(value.toLowerCase());
+                this.inputName.borderColor = ShardData.getColorHex(value.toLowerCase());
                 refreshDisplay();
             });
             this.inputObtained = new FlatTextbox(Sizing.fixed(50));

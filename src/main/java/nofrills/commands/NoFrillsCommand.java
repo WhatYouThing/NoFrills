@@ -3,6 +3,8 @@ package nofrills.commands;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftProfileTextures;
+import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -10,12 +12,14 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.general.PearlRefill;
+import nofrills.features.hunting.ShardTracker;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.SkyblockData;
@@ -224,6 +228,44 @@ public class NoFrillsCommand {
                     }
                 }
                 Utils.info("Dumped head texture URL's to latest.log.");
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpPlayerTextures").executes(context -> {
+                MinecraftSessionService service = mc.getSessionService();
+                for (Entity ent : Utils.getEntities()) {
+                    if (ent instanceof PlayerEntity player) {
+                        if (player.getGameProfile() != null) {
+                            MinecraftProfileTextures textures = service.getTextures(player.getGameProfile());
+                            Vec3d pos = player.getPos();
+                            if (textures.skin() == null) {
+                                continue;
+                            }
+                            LOGGER.info(Utils.format("\n\tURL - {}\n\tEntity Name - {}\n\tPosition - {} {} {}",
+                                    textures.skin().getUrl(),
+                                    player.getName().getString(),
+                                    pos.getX(),
+                                    pos.getY(),
+                                    pos.getZ()
+                            ));
+                        }
+                    }
+                }
+                Utils.info("Dumped player texture URL's to latest.log.");
+                return SINGLE_SUCCESS;
+            }))),
+            new ModCommand("shardTracker", "Commands for managing the Shard Tracker feature.", literal("shardTracker").executes(context -> {
+                Utils.info("§f§lImporting shards§7: Click \"Copy Tree\" on the SkyShards calculator, choose the NoFrills format in the pop-up, and click the Import Shard List button on the Shard Tracker settings screen.\n\n§f§lTracking shards§7: Make sure to enable the Shard Tracker feature, and the Shard Tracker element in the NoFrills HUD editor. When enabled, the feature will track the obtained quantity of each shard that you are tracking.");
+                return SINGLE_SUCCESS;
+            }).then(literal("import").executes(context -> {
+                ShardTracker.importTreeData();
+                ShardTracker.refreshDisplay();
+                return SINGLE_SUCCESS;
+            })).then(literal("clear").executes(context -> {
+                ShardTracker.data.value().add("shards", new JsonArray());
+                ShardTracker.refreshDisplay();
+                Utils.info("§aTracked shard list cleared successfully.");
+                return SINGLE_SUCCESS;
+            })).then(literal("settings").executes(context -> {
+                Utils.setScreen(ShardTracker.buildSettings());
                 return SINGLE_SUCCESS;
             })))
     };

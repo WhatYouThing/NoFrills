@@ -38,7 +38,6 @@ public class SeaCreatures extends SimpleTextElement {
                 new Settings.Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
         ));
         this.options.setTitle(Text.of("Sea Creatures Element"));
-        HudManager.addNew(this);
     }
 
     public SeaCreatures(String text) {

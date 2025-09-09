@@ -37,7 +37,6 @@ public class LagMeter extends SimpleTextElement {
                 new Settings.SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
         ));
         this.options.setTitle(Text.of("Lag Meter Element"));
-        HudManager.addNew(this);
     }
 
     public LagMeter(String text) {

@@ -41,7 +41,6 @@ public class FPS extends SimpleTextElement {
                 new Settings.Toggle("Average", average, "Tracks and adds the average FPS to the element.")
         ));
         this.options.setTitle(Text.of("FPS Element"));
-        HudManager.addNew(this);
     }
 
     public FPS(String text) {

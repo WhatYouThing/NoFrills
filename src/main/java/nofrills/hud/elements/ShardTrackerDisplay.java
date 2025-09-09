@@ -38,7 +38,6 @@ public class ShardTrackerDisplay extends SimpleTextElement {
                 new Settings.Toggle("Hide If None", hideIfNone, "Hides the element if you are not tracking any shards (or the Shard Tracker is disabled).")
         ));
         this.options.setTitle(Text.of("Shard Tracker Element"));
-        HudManager.addNew(this);
     }
 
     public ShardTrackerDisplay() {

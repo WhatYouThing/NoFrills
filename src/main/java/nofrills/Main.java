@@ -60,6 +60,12 @@ public class Main implements ModInitializer {
 
         mc = MinecraftClient.getInstance();
 
+        String renderdocPath = System.getProperty("nofrills.renderdoc.library_path");
+        if (renderdocPath != null) {
+            System.load(renderdocPath);
+            LOGGER.info("Loaded RenderDoc lib: {}", renderdocPath);
+        }
+
         Config.load();
 
         ConfigScreenProviders.register(MOD_ID, screen -> new ClickGui());
@@ -141,6 +147,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ShardTracker.class);
         eventBus.subscribe(HuntaxeLock.class);
         eventBus.subscribe(PlotBorders.class);
+        eventBus.subscribe(LividSolver.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

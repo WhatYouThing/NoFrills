@@ -42,7 +42,6 @@ public class TPS extends SimpleTextElement {
                 new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
         this.options.setTitle(Text.of("TPS Element"));
-        HudManager.addNew(this);
     }
 
     public TPS(String text) {

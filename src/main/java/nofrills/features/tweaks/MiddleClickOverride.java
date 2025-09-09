@@ -61,7 +61,8 @@ public class MiddleClickOverride {
             "Auction",
             "Trap",
             "Gemstone",
-            "Heart of the "
+            "Heart of the ",
+            "Widgets"
     );
 
     private static final HashSet<String> containWhitelist = Sets.newHashSet(
@@ -92,8 +93,8 @@ public class MiddleClickOverride {
 
     @EventHandler(priority = EventPriority.LOW)
     private static void onClick(SlotClickEvent event) {
-        if (instance.isActive() && event.slot != null && event.button == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.actionType.equals(SlotActionType.PICKUP)) {
-            if (mc.currentScreen instanceof GenericContainerScreen container) {
+        if (instance.isActive() && Utils.isInSkyblock() && mc.currentScreen instanceof GenericContainerScreen container) {
+            if (event.slot != null && event.button == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.actionType.equals(SlotActionType.PICKUP)) {
                 String title = container.getTitle().getString();
                 ItemStack stack = event.slot.getStack();
                 if (!SlotOptions.isSlotDisabled(event.slot) && !stack.isEmpty() && !isBlacklisted(title) && experimentCheck()) {

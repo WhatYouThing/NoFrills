@@ -1,11 +1,9 @@
 package nofrills.features.hunting;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.passive.BatEntity;
-import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
@@ -39,17 +37,12 @@ public class CinderbatHighlight {
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInArea("Crimson Isle") && event.entity instanceof BatEntity bat) {
-            MinecraftClient INSTANCE = MinecraftClient.getInstance();
-            List<ArmorStandEntity> armorstands = List.of();
-            if (INSTANCE.world != null) {
-                armorstands = INSTANCE.world.getEntitiesByType(
-                        TypeFilter.instanceOf(ArmorStandEntity.class), new Box(bat.getBlockPos()).expand(0.25), (e) -> {
-                    if (e.getDisplayName() != null) {
-                        return e.getDisplayName().getString().contains("Primordial Bat");
-                    }
-                    return false;
-                });
-            }
+            List<Entity> armorstands = Utils.getOtherEntities(event.entity, 0.25, (e) -> {
+                if (e instanceof ArmorStandEntity && e.getDisplayName() != null) {
+                    return e.getDisplayName().getString().contains("Primordial Bat");
+                }
+                return false;
+            });
             if (!armorstands.isEmpty()) {
                 cinderbatList.remove(event.entity);
             }

@@ -23,6 +23,7 @@ public class CinderbatHighlight {
     public static final SettingColor color = new SettingColor(RenderColor.fromHex(0x00ff00), "color", instance.key());
 
     private static final EntityCache cinderbatList = new EntityCache();
+    private static final EntityCache otherbatList = new EntityCache();
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
@@ -36,18 +37,32 @@ public class CinderbatHighlight {
 
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
-        if (instance.isActive() && Utils.isInArea("Crimson Isle") && event.entity instanceof BatEntity bat) {
-            List<Entity> armorstands = Utils.getOtherEntities(event.entity, 0.25, (e) -> {
-                if (e instanceof ArmorStandEntity && e.getDisplayName() != null) {
-                    return e.getDisplayName().getString().contains("Primordial Bat");
+        if (instance.isActive() && Utils.isInArea("Crimson Isle")) {
+            if (event.entity instanceof BatEntity bat) {
+                List<Entity> armorstands = Utils.getOtherEntities(event.entity, 0.25, (e) -> {
+                    if (e instanceof ArmorStandEntity && e.getDisplayName() != null) {
+                        return e.getDisplayName().getString().contains("Primordial Bat");
+                    }
+                    return false;
+                });
+                if (!armorstands.isEmpty()) {
+                    cinderbatList.remove(event.entity);
+                    otherbatList.add(event.entity);
                 }
-                return false;
-            });
-            if (!armorstands.isEmpty()) {
-                cinderbatList.remove(event.entity);
-            }
-            if (armorstands.isEmpty() && bat.getHealth() > 20.0f && bat.getMaxHealth() == 6.0f && !cinderbatList.has(event.entity)) {
-                cinderbatList.add(event.entity);
+                if (!otherbatList.has(event.entity) && bat.getHealth() > 20.0f && bat.getMaxHealth() == 6.0f && !cinderbatList.has(event.entity)) {
+                    cinderbatList.add(event.entity);
+                }
+            } else if (event.entity instanceof ArmorStandEntity) {
+                if (event.entity.getDisplayName() != null && event.entity.getDisplayName().getString().contains("Primordial Bat")) {
+                    Utils.getOtherEntities(event.entity, 0.25, (e) -> {
+                        if (e instanceof BatEntity) {
+                            cinderbatList.remove(e);
+                            otherbatList.add(e);
+                            return true;
+                        }
+                        return false;
+                    });
+                }
             }
         }
     }
@@ -55,5 +70,6 @@ public class CinderbatHighlight {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         cinderbatList.clear();
+        otherbatList.clear();
     }
 }

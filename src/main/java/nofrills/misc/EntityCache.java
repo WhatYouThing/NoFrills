@@ -15,14 +15,14 @@ public class EntityCache {
     private final List<Entity> entities = new ArrayList<>();
 
     public boolean equals(Entity ent1, Entity ent2) {
-        return Objects.equals(ent1.getUuidAsString(), ent2.getUuidAsString());
+        return Objects.equals(ent1.getUuid(), ent2.getUuid());
     }
 
     public boolean has(Entity ent) {
         return entities.stream().anyMatch(entity -> equals(ent, entity));
     }
 
-    public boolean exists(Entity ent) {
+    public static boolean exists(Entity ent) {
         if (mc.world != null && ent != null) {
             Entity ent2 = mc.world.getEntityById(ent.getId());
             return ent2 != null && ent2.isAlive();

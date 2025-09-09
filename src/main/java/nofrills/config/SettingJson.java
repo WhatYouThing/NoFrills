@@ -6,14 +6,20 @@ public class SettingJson {
     private final String key;
     private final String parent;
     private final JsonObject defaultValue;
+    private final JsonObject value;
 
     public SettingJson(JsonObject defaultValue, String key, String parentKey) {
-        this.defaultValue = defaultValue;
         this.key = key;
         this.parent = parentKey;
+        this.defaultValue = defaultValue;
+        this.value = this.load();
     }
 
-    public JsonObject value() {
+    public SettingJson(JsonObject defaultValue, String key, Feature instance) {
+        this(defaultValue, key, instance.key());
+    }
+
+    private JsonObject load() {
         if (!Config.get().has(this.parent)) {
             Config.get().add(this.parent, new JsonObject());
         }
@@ -24,10 +30,8 @@ public class SettingJson {
         return data.get(this.key).getAsJsonObject();
     }
 
-    public void reset() {
-        if (!Config.get().has(this.parent)) {
-            Config.get().add(this.parent, new JsonObject());
-        }
-        Config.get().get(this.parent).getAsJsonObject().add(this.key, this.defaultValue);
+    // returns a pointer for the json data, any changes made are automatically saved
+    public JsonObject value() {
+        return this.value;
     }
 }

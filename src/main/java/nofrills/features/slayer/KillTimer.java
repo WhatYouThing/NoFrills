@@ -2,6 +2,7 @@ package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
+import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
@@ -21,5 +22,11 @@ public class KillTimer {
                 aliveTicks = 0;
             }
         }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        SlayerUtil.bossAlive = false;
+        aliveTicks = 0;
     }
 }

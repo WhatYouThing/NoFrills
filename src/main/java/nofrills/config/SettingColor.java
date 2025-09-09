@@ -7,37 +7,41 @@ public class SettingColor {
     private final String key;
     private final String parent;
     private final RenderColor defaultValue;
-    private RenderColor color;
+    private RenderColor value;
 
     public SettingColor(RenderColor defaultValue, String key, String parentKey) {
-        this.defaultValue = defaultValue;
-        this.color = defaultValue;
         this.key = key;
         this.parent = parentKey;
+        this.defaultValue = defaultValue;
+        this.value = this.load();
     }
 
-    public RenderColor value() {
+    public SettingColor(RenderColor defaultValue, String key, Feature instance) {
+        this(defaultValue, key, instance.key());
+    }
+
+    private RenderColor load() {
         if (Config.get().has(this.parent)) {
             JsonObject data = Config.get().getAsJsonObject(this.parent);
-            if (data.has(this.key)) {
-                int color = data.get(this.key).getAsInt();
-                if (this.color.argb == color) {
-                    return this.color;
-                } else {
-                    RenderColor newColor = RenderColor.fromArgb(color);
-                    this.color = newColor;
-                    return newColor;
-                }
-            }
+            if (data.has(this.key)) return RenderColor.fromArgb(data.get(this.key).getAsInt());
         }
         return this.defaultValue;
     }
 
-    public void set(RenderColor value) {
+    private void save() {
         if (!Config.get().has(this.parent)) {
             Config.get().add(this.parent, new JsonObject());
         }
-        Config.get().get(this.parent).getAsJsonObject().addProperty(this.key, value.argb);
+        Config.get().get(this.parent).getAsJsonObject().addProperty(this.key, this.value.argb);
+    }
+
+    public RenderColor value() {
+        return this.value;
+    }
+
+    public void set(RenderColor value) {
+        this.value = value;
+        this.save();
     }
 
     public void reset() {

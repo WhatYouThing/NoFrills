@@ -99,7 +99,7 @@ public class Utils {
     }
 
     public static void sendMessage(String message) {
-        if (mc.player != null) {
+        if (mc.player != null && !message.isEmpty()) {
             if (message.startsWith("/")) {
                 mc.player.networkHandler.sendChatCommand(message.substring(1));
             } else {

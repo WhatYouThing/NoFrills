@@ -406,6 +406,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Livid Solver", LividSolver.instance, "Finds and highlights the correct Livid in F5/M5.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, LividSolver.color, "The color of the correct Livid outline.")
+                        ))),
+                        new Module("Prince Message", PrinceMessage.instance, "Sends a message when you gain bonus score from the Prince Shard.", new Settings(List.of(
+                                new Settings.TextInput("Message", PrinceMessage.msg, "The message to send.")
+                        ))),
+                        new Module("Mimic Message", MimicMessage.instance, "Sends a message once you kill the Mimic. Should work even if it's instantly killed.", new Settings(List.of(
+                                new Settings.TextInput("Message", MimicMessage.msg, "The message to send.")
                         )))
                 )),
                 new Category("Kuudra", List.of(

@@ -1,12 +1,12 @@
 package nofrills.config;
 
-public class SettingKeybind extends SettingInt { // just extend since keycodes are also integers
+public class SettingKeybind extends SettingInt {
     public SettingKeybind(int defaultValue, String key, String parentKey) {
         super(defaultValue, key, parentKey);
     }
 
     public SettingKeybind(int defaultValue, String key, Feature instance) {
-        super(defaultValue, key, instance);
+        this(defaultValue, key, instance.key());
     }
 
     public int key() {

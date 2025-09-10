@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -167,6 +168,19 @@ public class Utils {
      */
     public static boolean isOnDungeonFloor(String floor) {
         return isInDungeons() && SkyblockData.getLocation().endsWith(floor + ")");
+    }
+
+    /**
+     * Checks if the player is currently inside the boss room on the specific floor.
+     */
+    public static boolean isInDungeonBoss(String floor) {
+        return isOnDungeonFloor(floor) && switch (floor) {
+            case "4" -> isInZone(50, 112, 81, -40, 53, -40);
+            case "5" -> isInZone(50, 112, 118, -40, 53, -8);
+            case "6" -> isInZone(22, 110, 134, -40, 51, -8);
+            case "7" -> isInZone(134, 254, 147, -8, 0, -8);
+            default -> false;
+        };
     }
 
     public static boolean isInKuudra() {
@@ -634,13 +648,7 @@ public class Utils {
     }
 
     public static String formatDecimal(double number, int spaces) {
-        String num = number + "";
-        int index = num.indexOf(".");
-        if (index == -1) {
-            return num;
-        } else {
-            return num.substring(0, spaces == 0 ? index : Math.min(index + 1 + spaces, num.length()));
-        }
+        return new DecimalFormat("0." + "0".repeat(spaces)).format(number);
     }
 
     public static String formatDecimal(float number, int spaces) {

@@ -50,11 +50,7 @@ public class WitherDragons {
     private static boolean dragonSplitDone = false;
 
     private static boolean isDragonPhase() {
-        if (mc.player != null) {
-            Vec3d pos = mc.player.getPos();
-            return Utils.isOnDungeonFloor("M7") && pos.getX() > 0 && pos.getY() < 50 && pos.getZ() > 0;
-        }
-        return false;
+        return Utils.isInDungeonBoss("7") && mc.player.getPos().getY() < 50;
     }
 
     private static boolean isArcherTeam() {
@@ -141,7 +137,7 @@ public class WitherDragons {
                     }
                 }
                 if (timer.value() && !drag.spawned) {
-                    event.drawText(drag.data.pos.getCenter().add(0, 4, 0), Text.of(Utils.formatDecimal(drag.spawnTicks / 20.0f) + "s"), 0.3f, true, drag.data.color);
+                    event.drawText(drag.data.pos.getCenter().add(0, 4, 0), Text.of(Utils.formatDecimal(drag.spawnTicks / 20.0f, 3) + "s"), 0.3f, true, drag.data.color);
                 }
                 if (health.value() && drag.entity != null) {
                     Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickProgress(true)); // should make the text move smoothly with the dragons

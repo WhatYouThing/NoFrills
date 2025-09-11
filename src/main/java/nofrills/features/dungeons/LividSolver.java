@@ -4,11 +4,9 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.BlockUpdateEvent;
@@ -77,8 +75,7 @@ public class LividSolver {
         if (instance.isActive() && !Utils.isInstanceOver() && Utils.isInDungeonBoss("5")) {
             for (Entity livid : lividCache.get()) {
                 if (livid.getName().getString().equals(currentName)) {
-                    Box box = livid.getDimensions(EntityPose.STANDING).getBoxAt(livid.getLerpedPos(event.tickCounter.getTickProgress(true)));
-                    event.drawOutline(box, false, color.value());
+                    event.drawOutline(Utils.getLerpedBox(livid, event.tickCounter.getTickProgress(true)), false, color.value());
                     return;
                 }
             }

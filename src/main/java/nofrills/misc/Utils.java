@@ -18,6 +18,7 @@ import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -255,6 +256,13 @@ public class Utils {
 
     public static boolean isBaseHealth(LivingEntity entity, float health) {
         return entity.getHealth() >= health && entity.getHealth() % health == 0;
+    }
+
+    /**
+     * Returns the entity's bounding box at their interpolated position.
+     */
+    public static Box getLerpedBox(Entity entity, float tickProgress) {
+        return entity.getDimensions(EntityPose.STANDING).getBoxAt(entity.getLerpedPos(tickProgress));
     }
 
     @SuppressWarnings("unchecked")

@@ -163,11 +163,11 @@ public class TerminalSolvers {
                     }
                     orderSlots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
                     Slot first = orderSlots.getFirst();
-                    SlotOptions.spoofSlot(first, SlotOptions.first);
+                    SlotOptions.spoofSlot(first, SlotOptions.stackWithQuantity(SlotOptions.first, first.getStack().getCount()));
                     SlotOptions.disableSlot(first, false);
                     if (orderSlots.size() > 1) {
                         Slot second = orderSlots.get(1);
-                        SlotOptions.spoofSlot(second, SlotOptions.second);
+                        SlotOptions.spoofSlot(second, SlotOptions.stackWithQuantity(SlotOptions.second, second.getStack().getCount()));
                         SlotOptions.disableSlot(second, true);
                     }
                 }

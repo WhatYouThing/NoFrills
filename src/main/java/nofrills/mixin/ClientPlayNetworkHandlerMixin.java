@@ -9,10 +9,10 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.network.packet.s2c.play.*;
-import net.minecraft.util.Formatting;
 import nofrills.events.*;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.misc.SkyblockData;
+import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -43,7 +43,7 @@ public class ClientPlayNetworkHandlerMixin {
             if (ent instanceof ArmorStandEntity) {
                 for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
                     if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) && entry.value() != null && ent.getCustomName() != null) {
-                        eventBus.post(new EntityNamedEvent(ent, Formatting.strip(ent.getCustomName().getString())));
+                        eventBus.post(new EntityNamedEvent(ent, Utils.toPlainString(ent.getCustomName())));
                         break;
                     }
                 }
@@ -96,7 +96,7 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/message/MessageHandler;onGameMessage(Lnet/minecraft/text/Text;Z)V"), cancellable = true)
     private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
         if (!packet.overlay()) {
-            String msg = Formatting.strip(packet.content().getString());
+            String msg = Utils.toPlainString(packet.content());
             ChatMsgEvent event = eventBus.post(new ChatMsgEvent(packet.content(), msg));
             if (event.isCancelled()) {
                 ci.cancel();

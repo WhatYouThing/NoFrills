@@ -6,7 +6,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
@@ -37,7 +36,7 @@ public class PriceTooltips {
             if (title.equals("Attribute Menu")) {
                 for (String line : Utils.getLoreLines(stack)) {
                     if (line.startsWith("Source: ")) {
-                        return correctShardId(line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1).toUpperCase().replaceAll(" ", "_"));
+                        return correctShardId(Utils.toUpper(line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1)).replaceAll(" ", "_"));
                     }
                 }
             }
@@ -67,7 +66,7 @@ public class PriceTooltips {
                     if (enchants.size() == 1) {
                         String enchantId = (String) enchantData.getKeys().toArray()[0];
                         int enchantLevel = enchantData.getInt(enchantId).orElse(0);
-                        return Utils.format("ENCHANTMENT_{}_{}", enchantId.toUpperCase(), enchantLevel);
+                        return Utils.format("ENCHANTMENT_{}_{}", Utils.toUpper(enchantId), enchantLevel);
                     }
                 } else {
                     return "ENCHANTMENT_UNKNOWN";
@@ -81,7 +80,7 @@ public class PriceTooltips {
     }
 
     public static String getShardId(ItemStack stack) {
-        return Formatting.strip(stack.getName().getString()).replaceAll(" Shard", "").replaceAll(" ", "_").toUpperCase();
+        return Utils.toUpper(Utils.toPlainString(stack.getName()).replaceAll(" Shard", "").replaceAll(" ", "_"));
     }
 
     public static String correctShardId(String id) {

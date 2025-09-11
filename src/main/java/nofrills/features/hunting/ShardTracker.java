@@ -14,7 +14,6 @@ import io.wispforest.owo.ui.core.Sizing;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
@@ -112,7 +111,7 @@ public class ShardTracker {
             for (JsonElement element : treeData) {
                 JsonObject shardData = element.getAsJsonObject();
                 JsonObject object = new JsonObject();
-                object.addProperty("name", shardData.get("name").getAsString().toLowerCase());
+                object.addProperty("name", Utils.toLower(shardData.get("name").getAsString()));
                 object.addProperty("needed", shardData.get("needed").getAsLong());
                 object.addProperty("obtained", 0L);
                 object.addProperty("source", shardData.get("source").getAsString());
@@ -151,7 +150,7 @@ public class ShardTracker {
                 long needed = shardData.get("needed").getAsLong();
                 long obtained = shardData.get("obtained").getAsLong();
                 String source = shardData.get("source").getAsString();
-                String shardName = Utils.format("{}§l{}", ShardData.getColorPrefix(name.toLowerCase()), Utils.uppercaseFirst(name, false));
+                String shardName = Utils.format("{}§l{}", ShardData.getColorPrefix(Utils.toLower(name)), Utils.uppercaseFirst(name, false));
                 String shardSource = Utils.format("{}[{}]", getSourceColor(source), source);
                 String quantityColor = needed > 0 & obtained >= needed ? "§a" : "§f";
                 String shardQuantity = needed <= 0 ? Utils.format("{}x", Utils.formatSeparator(obtained)) : Utils.format("{}/{}x", Utils.formatSeparator(obtained), Utils.formatSeparator(needed));
@@ -173,10 +172,10 @@ public class ShardTracker {
     private static Shard buildShardData(String name, String quantity, ShardSource source) {
         try {
             int amount = Integer.parseInt(quantity);
-            return new Shard(name.toLowerCase(), amount, source);
+            return new Shard(Utils.toLower(name), amount, source);
         } catch (NumberFormatException ignored) {
         }
-        return new Shard(name.toLowerCase(), 1, source);
+        return new Shard(Utils.toLower(name), 1, source);
     }
 
     private static Shard getShardFromMsg(String msg) { // parses various messages about obtaining shards, do not touch
@@ -233,7 +232,7 @@ public class ShardTracker {
     }
 
     public static String getSourceColor(String source) {
-        return switch (source.toLowerCase()) {
+        return switch (Utils.toLower(source)) {
             case "direct", "bazaar" -> "§a";
             case "fuse" -> "§d";
             case "cycle" -> "§6";
@@ -295,7 +294,7 @@ public class ShardTracker {
             if (!shards.isEmpty()) {
                 for (String line : Utils.getLoreLines(event.stack)) {
                     if (line.startsWith("Owned: ")) {
-                        String name = Formatting.strip(event.stack.getName().getString()).toLowerCase();
+                        String name = Utils.toLower(Utils.toPlainString(event.stack.getName()));
                         for (JsonElement shard : shards) {
                             JsonObject shardData = shard.getAsJsonObject();
                             if (name.equals(shardData.get("name").getAsString())) {
@@ -366,8 +365,8 @@ public class ShardTracker {
             this.inputName.text(getData().get("name").getAsString());
             this.inputName.borderColor = ShardData.getColorHex(getData().get("name").getAsString());
             this.inputName.onChanged().subscribe(value -> {
-                getData().addProperty("name", value.toLowerCase());
-                this.inputName.borderColor = ShardData.getColorHex(value.toLowerCase());
+                getData().addProperty("name", Utils.toLower(value));
+                this.inputName.borderColor = ShardData.getColorHex(Utils.toLower(value));
                 refreshDisplay();
             });
             this.inputObtained = new FlatTextbox(Sizing.fixed(50));

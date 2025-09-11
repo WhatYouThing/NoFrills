@@ -33,7 +33,7 @@ public class BetterSkyMall {
 
     private static boolean isBuffWhitelisted(String buff) {
         if (!whitelist.value().isEmpty()) {
-            return Arrays.stream(whitelist.value().split(",")).anyMatch(keyword -> buff.toLowerCase().contains(keyword.toLowerCase().trim()));
+            return Arrays.stream(whitelist.value().split(",")).anyMatch(keyword -> Utils.toLower(buff).contains(Utils.toLower(keyword).trim()));
         }
         return false;
     }

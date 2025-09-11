@@ -380,7 +380,7 @@ public class Utils {
         LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
         if (lore != null) {
             for (Text line : lore.lines()) {
-                lines.add(Formatting.strip(line.getString()).trim());
+                lines.add(toPlainString(line).trim());
             }
         }
         return lines;
@@ -560,7 +560,7 @@ public class Utils {
         if (mc.getNetworkHandler() != null) {
             for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
                 if (entry.getDisplayName() != null) {
-                    lines.add(Formatting.strip(entry.getDisplayName().getString()).trim());
+                    lines.add(toPlainString(entry.getDisplayName()).trim());
                 }
             }
         }
@@ -628,6 +628,21 @@ public class Utils {
             }
         }
         return result;
+    }
+
+    public static String toLower(String string) {
+        return string.toLowerCase(Locale.ROOT);
+    }
+
+    public static String toUpper(String string) {
+        return string.toUpperCase(Locale.ROOT);
+    }
+
+    public static String toPlainString(Text text) {
+        if (text != null) {
+            return Formatting.strip(text.getString());
+        }
+        return "";
     }
 
     /**

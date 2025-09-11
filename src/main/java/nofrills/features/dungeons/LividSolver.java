@@ -43,7 +43,7 @@ public class LividSolver {
     }
 
     private static void announceColor(Block block) {
-        String name = Utils.format("{}!", block.getName().getString().replace(" Wool", "").trim().toUpperCase());
+        String name = Utils.format("{}!", Utils.toUpper(Utils.toPlainString(block.getName()).replace(" Wool", "").trim()));
         Utils.showTitleCustom(name, 60, -20, 4.0f, block.getDefaultMapColor().color);
         Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
     }

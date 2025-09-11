@@ -4,7 +4,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -78,7 +77,7 @@ public class InfernoDemonlord {
                 if (pillarData.isEmpty()) {
                     for (Entity ent : Utils.getEntities()) {
                         if (ent instanceof ArmorStandEntity && ent.getCustomName() != null) {
-                            if (SlayerUtil.isSpawner(Formatting.strip(ent.getCustomName().getString()))) {
+                            if (SlayerUtil.isSpawner(Utils.toPlainString(ent.getCustomName()))) {
                                 double dist = Utils.horizontalDistance(pos, ent.getPos());
                                 if (dist <= 1.5) {
                                     pillarData.add(pos);

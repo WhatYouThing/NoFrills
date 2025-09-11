@@ -8,7 +8,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -62,8 +61,8 @@ public class LeapOverlay {
                 if (!stack.isEmpty() && stack.getItem().equals(Items.PLAYER_HEAD)) {
                     LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
                     if (lore != null) {
-                        String line = Formatting.strip(lore.lines().getFirst().getString());
-                        String name = Formatting.strip(stack.getName().getString());
+                        String line = Utils.toPlainString(lore.lines().getFirst());
+                        String name = Utils.toPlainString(stack.getName());
                         if (name.equals("Unknown Player") || line.equals("This player is offline!")) {
                             continue;
                         }
@@ -73,7 +72,7 @@ public class LeapOverlay {
                             for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
                                 Text displayName = entry.getDisplayName();
                                 if (displayName != null) {
-                                    String entryName = Formatting.strip(displayName.getString());
+                                    String entryName = Utils.toPlainString(displayName);
                                     if (entryName.contains(name)) {
                                         for (String dungeonClass : SkyblockData.dungeonClasses) {
                                             if (entryName.contains("(" + dungeonClass) && entryName.endsWith(")")) {

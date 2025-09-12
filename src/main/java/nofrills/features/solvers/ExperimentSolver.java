@@ -10,7 +10,6 @@ import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ScreenOpenEvent;
@@ -61,7 +60,7 @@ public class ExperimentSolver {
 
     private static boolean isStatus(ItemStack stack) {
         Item item = stack.getItem();
-        String name = Formatting.strip(stack.getName().getString());
+        String name = Utils.toPlainString(stack.getName());
         return item.equals(Items.CLOCK)
                 || item.equals(Items.BOOKSHELF)
                 || (item.equals(Items.GLOWSTONE) && !name.equals("Enchanted Book"))
@@ -79,7 +78,7 @@ public class ExperimentSolver {
 
     private static boolean isPowerup(ItemStack stack) {
         for (String line : Utils.getLoreLines(stack)) {
-            if (line.toLowerCase().contains("powerup")) {
+            if (Utils.toLower(line).contains("powerup")) {
                 return true;
             }
         }

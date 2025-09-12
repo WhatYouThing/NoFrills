@@ -69,7 +69,7 @@ public class FPS extends SimpleTextElement {
             for (int previous : this.fpsList) {
                 avg += previous;
             }
-            this.setText(Utils.format("§bFPS: §f{} §7{}", fps, Utils.formatDecimal(avg / (double) fpsList.size())));
+            this.setText(Utils.format("§bFPS: §f{} §7{}", fps, avg / fpsList.size()));
         } else {
             this.setText(Utils.format("§bFPS: §f{}", fps));
         }

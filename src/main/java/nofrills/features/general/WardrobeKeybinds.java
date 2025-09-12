@@ -11,7 +11,6 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
@@ -101,7 +100,7 @@ public class WardrobeKeybinds {
     private static boolean isEquipButton(Slot slot, int target) {
         ItemStack stack = slot.getStack();
         Item item = stack.getItem();
-        String name = Formatting.strip(stack.getName().getString());
+        String name = Utils.toPlainString(stack.getName());
         if (!stack.isEmpty() && target != -1 && name.startsWith(Utils.format("Slot {}:", target))) {
             if (noUnequip.value() && item.equals(Items.LIME_DYE)) {
                 return false;
@@ -113,7 +112,7 @@ public class WardrobeKeybinds {
 
     private static boolean isPageButton(ItemStack stack, int key) {
         if (!stack.isEmpty() && stack.getItem().equals(Items.ARROW)) {
-            String name = Formatting.strip(stack.getName().getString());
+            String name = Utils.toPlainString(stack.getName());
             return (name.equals("Next Page") && next.value() == key) || (name.equals("Previous Page") && previous.value() == key);
         }
         return false;

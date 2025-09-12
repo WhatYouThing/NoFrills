@@ -74,9 +74,13 @@ public final class Rendering {
     public static void drawTracer(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, Vec3d pos, RenderColor color) {
         Vec3d camPos = camera.getPos();
         matrices.push();
-        matrices.translate(pos.getX() - camPos.getX(), pos.getY() - camPos.getY(), pos.getZ() - camPos.getZ());
-        Vector3f plane = camera.getHorizontalPlane().normalize(camera.getVerticalPlane());
-        VertexRendering.drawVector(matrices, consumer.getBuffer(Layers.BoxOutlineNoCull), plane, camPos, color.argb);
+        matrices.translate(-camPos.getX(), -camPos.getY(), -camPos.getZ());
+        MatrixStack.Entry entry = matrices.peek();
+        VertexConsumer buffer = consumer.getBuffer(Layers.BoxOutlineNoCull);
+        Vec3d point = camPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw())); // taken from Skyblocker's RenderHelper, my brain cannot handle OpenGL
+        Vector3f normal = pos.toVector3f().sub((float) point.getX(), (float) point.getY(), (float) point.getZ()).normalize();
+        buffer.vertex(entry, (float) point.getX(), (float) point.getY(), (float) point.getZ()).color(color.r, color.g, color.b, color.a).normal(entry, normal);
+        buffer.vertex(entry, (float) pos.getX(), (float) pos.getY(), (float) pos.getZ()).color(color.r, color.g, color.b, color.a).normal(entry, normal);
         matrices.pop();
     }
 

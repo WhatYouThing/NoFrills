@@ -16,6 +16,10 @@ public class SettingColor {
         this.parent = parentKey;
     }
 
+    public SettingColor(RenderColor defaultValue, String key, Feature instance) {
+        this(defaultValue, key, instance.key());
+    }
+
     public RenderColor value() {
         if (Config.get().has(this.parent)) {
             JsonObject data = Config.get().getAsJsonObject(this.parent);

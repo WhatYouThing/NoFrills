@@ -20,7 +20,7 @@ public class PartyFinder {
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
         if (instance.isActive() && buttons.value() && event.messagePlain.startsWith("Party Finder >") && event.messagePlain.contains("joined")) {
-            String name = event.messagePlain.replace("Party Finder >", "").trim().split(" ", 2)[0].toLowerCase();
+            String name = Utils.toLower(event.messagePlain.replace("Party Finder >", "").trim().split(" ", 2)[0]);
             if (name.equalsIgnoreCase(mc.getSession().getUsername())) {
                 return;
             }

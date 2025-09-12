@@ -2,7 +2,6 @@ package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.mob.MagmaCubeEntity;
-import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -22,8 +21,7 @@ public class KuudraHitbox {
         if (instance.isActive() && Utils.isInKuudra()) {
             MagmaCubeEntity kuudra = KuudraUtil.getKuudraEntity();
             if (kuudra != null) {
-                Box box = kuudra.getDimensions(kuudra.getPose()).getBoxAt(kuudra.getLerpedPos(event.tickCounter.getTickProgress(true)));
-                event.drawOutline(box, walls.value(), color.value());
+                event.drawOutline(Utils.getLerpedBox(kuudra, event.tickCounter.getTickProgress(true)), walls.value(), color.value());
             }
         }
     }

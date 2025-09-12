@@ -4,7 +4,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.WorldTickEvent;
@@ -27,7 +26,7 @@ public class CorpseHighlight {
                 if (ent instanceof ArmorStandEntity stand && !stand.isInvisible() && !Rendering.Entities.isDrawingGlow(stand)) {
                     ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
                     if (!helmet.isEmpty()) {
-                        String pieceName = Formatting.strip(helmet.getName().getString());
+                        String pieceName = Utils.toPlainString(helmet.getName());
                         RenderColor color = switch (pieceName) {
                             case "Lapis Armor Helmet" -> lapisColor.value();
                             case "Mineral Helmet" -> mineralColor.value();

@@ -7,10 +7,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
+import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
@@ -26,7 +26,7 @@ public class FusionKeybinds {
 
     private static boolean isBindValid(ItemStack stack, String title, int key) {
         if (!stack.isEmpty()) {
-            String name = Formatting.strip(stack.getName().getString());
+            String name = Utils.toPlainString(stack.getName());
             if (title.equals("Fusion Box")) {
                 return name.equals("Repeat Previous Fusion") && key == repeat.value();
             }

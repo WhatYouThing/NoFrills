@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
@@ -46,7 +45,7 @@ public class RecipeLookup {
                         }
                         event.cancel();
                     } else if (!stack.isEmpty() && mc.currentScreen.getTitle().getString().startsWith("Museum")) {
-                        String entryName = Formatting.strip(stack.getName().getString());
+                        String entryName = Utils.toPlainString(stack.getName());
                         if (entryName.endsWith("Armor") || entryName.endsWith("Set") || entryName.endsWith("Equipment")) {
                             String[] words = entryName.split(" ");
                             entryName = String.join(" ", Arrays.copyOf(words, words.length - 1));

@@ -5,7 +5,6 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Formatting;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -45,7 +44,7 @@ public class SlayerUtil {
 
     public static boolean isNearSpawner(Entity entity) {
         for (Entity ent : Utils.getOtherEntities(entity, 1, 3, 1, Utils::isMob)) {
-            if (ent instanceof ArmorStandEntity && ent.getCustomName() != null && isSpawner(Formatting.strip(ent.getCustomName().getString()))) {
+            if (ent instanceof ArmorStandEntity && isSpawner(Utils.toPlainString(ent.getCustomName()))) {
                 return true;
             }
         }

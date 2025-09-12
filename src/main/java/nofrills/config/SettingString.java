@@ -13,6 +13,10 @@ public class SettingString {
         this.parent = parentKey;
     }
 
+    public SettingString(String defaultValue, String key, Feature instance) {
+        this(defaultValue, key, instance.key());
+    }
+
     public String value() {
         if (Config.get().has(this.parent)) {
             JsonObject data = Config.get().getAsJsonObject(this.parent);

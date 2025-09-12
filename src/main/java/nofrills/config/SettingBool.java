@@ -13,6 +13,10 @@ public class SettingBool {
         this.parent = parentKey;
     }
 
+    public SettingBool(boolean defaultValue, String key, Feature instance) {
+        this(defaultValue, key, instance.key());
+    }
+
     public boolean value() {
         if (Config.get().has(this.parent)) {
             JsonObject data = Config.get().getAsJsonObject(this.parent);

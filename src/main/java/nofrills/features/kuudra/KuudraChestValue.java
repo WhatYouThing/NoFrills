@@ -4,7 +4,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.ScreenOpenEvent;
@@ -46,7 +45,7 @@ public class KuudraChestValue {
                 return "ESSENCE_CRIMSON";
             }
             if (name.contains(" Shard")) {
-                return PriceTooltips.correctShardId(name.substring(0, name.indexOf("Shard")).trim().replaceAll(" ", "_").toUpperCase());
+                return PriceTooltips.correctShardId(Utils.toUpper(name.substring(0, name.indexOf("Shard")).trim().replaceAll(" ", "_")));
             }
         }
         return PriceTooltips.parseItemId(stack, data, "");
@@ -58,7 +57,7 @@ public class KuudraChestValue {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }
-            String name = Formatting.strip(event.stack.getName().getString());
+            String name = Utils.toPlainString(event.stack.getName());
             String id = getLootID(event.stack, name);
             int quantity = getLootQuantity(event.stack, name);
             if (auctionPricing.containsKey(id)) {

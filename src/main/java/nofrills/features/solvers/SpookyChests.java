@@ -34,7 +34,7 @@ public class SpookyChests {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && isSpooky() && event.entity.isCustomNameVisible()) {
-            String name = event.namePlain.toLowerCase();
+            String name = Utils.toLower(event.namePlain);
             if (name.equals("trick or treat?") || name.equals("party chest")) {
                 if (!chestList.has(event.entity)) {
                     Utils.showTitle("§6§lCHEST SPAWNED!", "", 5, 20, 5);

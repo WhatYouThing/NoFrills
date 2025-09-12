@@ -13,6 +13,10 @@ public class SettingDouble {
         this.parent = parentKey;
     }
 
+    public SettingDouble(double defaultValue, String key, Feature instance) {
+        this(defaultValue, key, instance.key());
+    }
+
     public double value() {
         if (Config.get().has(this.parent)) {
             JsonObject data = Config.get().getAsJsonObject(this.parent);

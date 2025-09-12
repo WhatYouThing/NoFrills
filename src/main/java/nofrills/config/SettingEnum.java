@@ -15,6 +15,10 @@ public class SettingEnum<T extends Enum<T>> {
         this.parent = parentKey;
     }
 
+    public SettingEnum(T defaultValue, Class<T> values, String key, Feature instance) {
+        this(defaultValue, values, key, instance.key());
+    }
+
     public T value() {
         if (Config.get().has(this.parent)) {
             JsonObject data = Config.get().getAsJsonObject(this.parent);

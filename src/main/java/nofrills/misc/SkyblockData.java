@@ -134,7 +134,7 @@ public class SkyblockData {
 
     public static void updateTabList(PlayerListS2CPacket packet, List<PlayerListS2CPacket.Entry> entries) {
         for (PlayerListS2CPacket.Entry entry : entries) {
-            String name = Formatting.strip(entry.displayName().getString()).trim();
+            String name = Utils.toPlainString(entry.displayName()).trim();
             if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
                 area = name.split(":", 2)[1].trim();
                 break;
@@ -146,7 +146,7 @@ public class SkyblockData {
         Scoreboard scoreboard = mc.player.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
         if (objective != null) {
-            inSkyblock = Formatting.strip(objective.getDisplayName().getString()).contains("SKYBLOCK");
+            inSkyblock = Utils.toPlainString(objective.getDisplayName()).contains("SKYBLOCK");
         }
     }
 
@@ -158,9 +158,9 @@ public class SkyblockData {
             if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
                 Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
                 if (team != null) {
-                    String line = team.getPrefix().getString() + team.getSuffix().getString();
+                    String line = Formatting.strip(team.getPrefix().getString() + team.getSuffix().getString());
                     if (!line.trim().isEmpty()) {
-                        String cleanLine = Formatting.strip(line).trim();
+                        String cleanLine = line.trim();
                         if (cleanLine.startsWith(Utils.Symbols.zone) || cleanLine.startsWith(Utils.Symbols.zoneRift)) {
                             location = cleanLine;
                         }

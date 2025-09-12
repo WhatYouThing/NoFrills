@@ -29,7 +29,7 @@ public class RareAnnounce {
             for (SeaCreatureData.SeaCreature creature : SeaCreatureData.list) {
                 if (creature.rare && event.messagePlain.equals(creature.spawnMsg)) {
                     if (title.value()) {
-                        Utils.showTitle(creature.color + "§l" + creature.name.toUpperCase(), "", 5, 20, 5);
+                        Utils.showTitle(creature.color + "§l" + Utils.toUpper(creature.name), "", 5, 20, 5);
                     }
                     if (sound.value()) {
                         Utils.playSound(SoundEvents.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, SoundCategory.MASTER, 1, 1);

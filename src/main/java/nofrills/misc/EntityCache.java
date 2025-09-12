@@ -23,11 +23,7 @@ public class EntityCache {
     }
 
     public boolean exists(Entity ent) {
-        if (mc.world != null && ent != null) {
-            Entity ent2 = mc.world.getEntityById(ent.getId());
-            return ent2 != null && ent2.isAlive();
-        }
-        return false;
+        return ent != null && ent.isAlive() && mc.world != null && mc.world.getEntityById(ent.getId()) != null;
     }
 
     public boolean empty() {

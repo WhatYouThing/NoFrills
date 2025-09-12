@@ -15,6 +15,7 @@ import nofrills.features.general.NoRender;
 import nofrills.misc.EntityRendering;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
+import nofrills.misc.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
@@ -68,7 +69,7 @@ public abstract class WorldRendererMixin {
         if (!rendering.nofrills_mod$getRenderingOutline() && !rendering.nofrills_mod$getRenderingFilled()) {
             return;
         }
-        Box box = entity.getDimensions(entity.getPose()).getBoxAt(entity.getLerpedPos(tickProgress));
+        Box box = Utils.getLerpedBox(entity, tickProgress);
         matrices.push();
         matrices.translate(-cameraX, -cameraY, -cameraZ);
         if (rendering.nofrills_mod$getRenderingOutline()) {

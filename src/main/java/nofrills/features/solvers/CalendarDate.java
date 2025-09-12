@@ -3,7 +3,6 @@ package nofrills.features.solvers;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.Utils;
@@ -38,7 +37,7 @@ public class CalendarDate {
         if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
             if (container.getTitle().getString().equals("Calendar and Events")) {
                 for (Text line : event.lines) {
-                    String l = Formatting.strip(line.getString());
+                    String l = Utils.toPlainString(line);
                     if (l.startsWith("Starts in: ")) {
                         String time = l.substring(l.indexOf(":")).trim();
                         Calendar calendar = Calendar.getInstance();
@@ -52,7 +51,7 @@ public class CalendarDate {
                         }
                         event.addLine(Text.of(""));
                         event.addLine(Utils.getShortTag().append(buildLine("§eDate of Event", calendar)));
-                        String stackName = Formatting.strip(event.stack.getName().getString());
+                        String stackName = Utils.toPlainString(event.stack.getName());
                         if (stackName.endsWith("Spooky Festival")) {
                             calendar.add(Calendar.HOUR, -1);
                             event.addLine(Utils.getShortTag().append(buildLine("§6Fear Mongerer Arrives", calendar)));

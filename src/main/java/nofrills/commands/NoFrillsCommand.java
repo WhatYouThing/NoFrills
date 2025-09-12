@@ -3,6 +3,8 @@ package nofrills.commands;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.minecraft.MinecraftProfileTextures;
+import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -10,6 +12,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.util.math.Vec3d;
@@ -57,7 +60,7 @@ public class NoFrillsCommand {
                 Utils.info("§7You must provide the name of the player that you want to add.");
                 return SINGLE_SUCCESS;
             }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
-                String name = StringArgumentType.getString(context, "playerName").toLowerCase();
+                String name = Utils.toLower(StringArgumentType.getString(context, "playerName"));
                 if (PartyCommands.isOnList(name, "whitelist")) {
                     Utils.infoFormat("§7{} is already in the party whitelist.", name);
                 } else if (PartyCommands.isOnList(name, "blacklist")) {
@@ -71,7 +74,7 @@ public class NoFrillsCommand {
                 Utils.info("§7You must provide the name of the player that you want to remove.");
                 return SINGLE_SUCCESS;
             }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
-                String name = StringArgumentType.getString(context, "playerName").toLowerCase();
+                String name = Utils.toLower(StringArgumentType.getString(context, "playerName"));
                 if (!PartyCommands.isOnList(name, "whitelist")) {
                     Utils.infoFormat("§7{} is not in the party whitelist.", name);
                 } else if (PartyCommands.isOnList(name, "blacklist")) {
@@ -107,7 +110,7 @@ public class NoFrillsCommand {
                 Utils.info("§7You must provide the name of the player that you want to add.");
                 return SINGLE_SUCCESS;
             }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
-                String name = StringArgumentType.getString(context, "playerName").toLowerCase();
+                String name = Utils.toLower(StringArgumentType.getString(context, "playerName"));
                 if (PartyCommands.isOnList(name, "blacklist")) {
                     Utils.infoFormat("§7{} is already in the party blacklist.", name);
                 } else if (PartyCommands.isOnList(name, "whitelist")) {
@@ -121,7 +124,7 @@ public class NoFrillsCommand {
                 Utils.info("§7You must provide the name of the player that you want to remove.");
                 return SINGLE_SUCCESS;
             }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
-                String name = StringArgumentType.getString(context, "playerName").toLowerCase();
+                String name = Utils.toLower(StringArgumentType.getString(context, "playerName"));
                 if (!PartyCommands.isOnList(name, "blacklist")) {
                     Utils.infoFormat("§7{} is not in the party blacklist.", name);
                 } else if (PartyCommands.isOnList(name, "whitelist")) {
@@ -213,7 +216,7 @@ public class NoFrillsCommand {
                                 Vec3d pos = living.getPos();
                                 LOGGER.info(Utils.format("\n\tURL - {}\n\tSlot - {}\n\tEntity Name - {}\n\tHead Name - {}\n\tPosition - {} {} {}",
                                         Utils.getTextureUrl(textures),
-                                        slot.name().toUpperCase(),
+                                        Utils.toUpper(slot.name()),
                                         living.getName().getString(),
                                         stack.getName().getString(),
                                         pos.getX(),
@@ -225,6 +228,28 @@ public class NoFrillsCommand {
                     }
                 }
                 Utils.info("Dumped head texture URL's to latest.log.");
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpPlayerTextures").executes(context -> {
+                MinecraftSessionService service = mc.getSessionService();
+                for (Entity ent : Utils.getEntities()) {
+                    if (ent instanceof PlayerEntity player) {
+                        if (player.getGameProfile() != null) {
+                            MinecraftProfileTextures textures = service.getTextures(player.getGameProfile());
+                            Vec3d pos = player.getPos();
+                            if (textures.skin() == null) {
+                                continue;
+                            }
+                            LOGGER.info(Utils.format("\n\tURL - {}\n\tEntity Name - {}\n\tPosition - {} {} {}",
+                                    textures.skin().getUrl(),
+                                    player.getName().getString(),
+                                    pos.getX(),
+                                    pos.getY(),
+                                    pos.getZ()
+                            ));
+                        }
+                    }
+                }
+                Utils.info("Dumped player texture URL's to latest.log.");
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("shardTracker", "Commands for managing the Shard Tracker feature.", literal("shardTracker").executes(context -> {

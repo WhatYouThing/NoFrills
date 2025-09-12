@@ -37,7 +37,7 @@ public class PartyCommands {
     public static String listInstancesFormatted() {
         StringBuilder builder = new StringBuilder();
         for (SkyblockData.InstanceType instanceType : SkyblockData.instances) {
-            builder.append(Utils.format("\n!{} - {}", instanceType.name, Utils.uppercaseFirst(instanceType.type.toLowerCase(), true)));
+            builder.append(Utils.format("\n!{} - {}", instanceType.name, Utils.uppercaseFirst(Utils.toLower(instanceType.type), true)));
         }
         return builder.toString();
     }
@@ -75,10 +75,10 @@ public class PartyCommands {
             if (!self.value() && event.self) {
                 return;
             }
-            String msg = event.message.toLowerCase();
-            String author = event.sender.toLowerCase();
+            String msg = Utils.toLower(event.message);
+            String author = Utils.toLower(event.sender);
             for (String prefix : prefixes.value().split(" ")) {
-                if (msg.startsWith(prefix.toLowerCase())) {
+                if (msg.startsWith(Utils.toLower(prefix))) {
                     if (isOnList(author, "blacklist")) {
                         return;
                     }
@@ -126,7 +126,7 @@ public class PartyCommands {
                                 if (whitelisted || queue.value().equals(behavior.Automatic)) {
                                     Utils.sendMessage("/joininstance " + instance.type);
                                 } else if (!queue.value().equals(behavior.Ignore)) {
-                                    Utils.infoButton("§aClick to queue for §6" + Utils.uppercaseFirst(instance.type.toLowerCase(), true) + "§a.", "/joininstance " + instance.type);
+                                    Utils.infoButton("§aClick to queue for §6" + Utils.uppercaseFirst(Utils.toLower(instance.type), true) + "§a.", "/joininstance " + instance.type);
                                 }
                                 break;
                             }

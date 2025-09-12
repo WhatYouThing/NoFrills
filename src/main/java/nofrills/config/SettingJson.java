@@ -13,6 +13,10 @@ public class SettingJson {
         this.parent = parentKey;
     }
 
+    public SettingJson(JsonObject defaultValue, String key, Feature instance) {
+        this(defaultValue, key, instance.key());
+    }
+
     public JsonObject value() {
         if (!Config.get().has(this.parent)) {
             Config.get().add(this.parent, new JsonObject());

@@ -6,7 +6,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.DyeColor;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
@@ -62,7 +61,7 @@ public class TerminalSolvers {
 
     private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
         Item item = stack.getItem();
-        if (Formatting.strip(stack.getName().getString()).trim().isEmpty()) {
+        if (Utils.toPlainString(stack.getName()).trim().isEmpty()) {
             return false;
         }
         if (stack.getItem().toString().startsWith("minecraft:" + colorName)) {
@@ -117,8 +116,8 @@ public class TerminalSolvers {
                 }
             }
             if (type.equals(TerminalType.StartsWith) && startsWith.value()) {
-                String character = String.valueOf(event.title.charAt(event.title.indexOf("'") + 1)).toLowerCase();
-                String name = Formatting.strip(event.stack.getName().getString()).toLowerCase().trim();
+                String character = Utils.toLower(String.valueOf(event.title.charAt(event.title.indexOf("'") + 1)));
+                String name = Utils.toLower(Utils.toPlainString(event.stack.getName())).trim();
                 if (!name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(event.stack)) {
                     SlotOptions.spoofSlot(event.slot, SlotOptions.first);
                     SlotOptions.disableSlot(event.slot, false);
@@ -129,7 +128,7 @@ public class TerminalSolvers {
             }
             if (type.equals(TerminalType.Select) && select.value()) {
                 String color = event.title.replace("Select all the", "").replace("items!", "").trim();
-                String colorName = color.equals("SILVER") ? "light_gray" : color.toLowerCase().replace(" ", "_");
+                String colorName = color.equals("SILVER") ? "light_gray" : Utils.toLower(color).replace(" ", "_");
                 for (DyeColor dye : DyeColor.values()) {
                     if (dye.getId().equals(colorName)) {
                         if (!Utils.hasGlint(event.stack) && checkStackColor(event.stack, dye, colorName)) {
@@ -163,11 +162,11 @@ public class TerminalSolvers {
                     }
                     orderSlots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
                     Slot first = orderSlots.getFirst();
-                    SlotOptions.spoofSlot(first, SlotOptions.first);
+                    SlotOptions.spoofSlot(first, SlotOptions.stackWithQuantity(SlotOptions.first, first.getStack().getCount()));
                     SlotOptions.disableSlot(first, false);
                     if (orderSlots.size() > 1) {
                         Slot second = orderSlots.get(1);
-                        SlotOptions.spoofSlot(second, SlotOptions.second);
+                        SlotOptions.spoofSlot(second, SlotOptions.stackWithQuantity(SlotOptions.second, second.getStack().getCount()));
                         SlotOptions.disableSlot(second, true);
                     }
                 }

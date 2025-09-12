@@ -7,7 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.ColorHelper;
 import nofrills.config.*;
 import nofrills.events.SlotUpdateEvent;
@@ -66,7 +65,7 @@ public class LeapOverlay {
                     List<String> lore = Utils.getLoreLines(stack);
                     if (!lore.isEmpty()) {
                         String line = lore.getFirst();
-                        String name = Formatting.strip(stack.getName().getString());
+                        String name = Utils.toPlainString(stack.getName());
                         if (name.equals("Unknown Player") || line.equals("This player is offline!")) {
                             continue;
                         }

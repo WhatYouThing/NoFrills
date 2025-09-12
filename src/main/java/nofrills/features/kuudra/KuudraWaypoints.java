@@ -3,7 +3,6 @@ package nofrills.features.kuudra;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.GiantEntity;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
@@ -39,7 +38,7 @@ public class KuudraWaypoints {
     }
 
     private static boolean hasName(Entity ent, String name) {
-        return ent.isCustomNameVisible() && ent.getCustomName() != null && Formatting.strip(ent.getCustomName().getString()).endsWith(name);
+        return ent.isCustomNameVisible() && ent.getCustomName() != null && Utils.toPlainString(ent.getCustomName()).endsWith(name);
     }
 
     @EventHandler

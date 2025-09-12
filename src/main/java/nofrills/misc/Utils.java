@@ -18,6 +18,7 @@ import net.minecraft.component.type.LoreComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -53,6 +54,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -98,7 +100,7 @@ public class Utils {
     }
 
     public static void sendMessage(String message) {
-        if (mc.player != null) {
+        if (mc.player != null && !message.isEmpty()) {
             if (message.startsWith("/")) {
                 mc.player.networkHandler.sendChatCommand(message.substring(1));
             } else {
@@ -166,6 +168,19 @@ public class Utils {
      */
     public static boolean isOnDungeonFloor(String floor) {
         return isInDungeons() && SkyblockData.getLocation().endsWith(floor + ")");
+    }
+
+    /**
+     * Checks if the player is currently inside the boss room on the specific floor.
+     */
+    public static boolean isInDungeonBoss(String floor) {
+        return isOnDungeonFloor(floor) && switch (floor) {
+            case "4" -> isInZone(50, 112, 81, -40, 53, -40);
+            case "5" -> isInZone(50, 112, 118, -40, 53, -8);
+            case "6" -> isInZone(22, 110, 134, -40, 51, -8);
+            case "7" -> isInZone(134, 254, 147, -8, 0, -8);
+            default -> false;
+        };
     }
 
     public static boolean isInKuudra() {
@@ -240,6 +255,13 @@ public class Utils {
 
     public static boolean isBaseHealth(LivingEntity entity, float health) {
         return entity.getHealth() >= health && entity.getHealth() % health == 0;
+    }
+
+    /**
+     * Returns the entity's bounding box at their interpolated position.
+     */
+    public static Box getLerpedBox(Entity entity, float tickProgress) {
+        return entity.getDimensions(EntityPose.STANDING).getBoxAt(entity.getLerpedPos(tickProgress));
     }
 
     @SuppressWarnings("unchecked")
@@ -357,7 +379,7 @@ public class Utils {
         LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
         if (lore != null) {
             for (Text line : lore.lines()) {
-                lines.add(Formatting.strip(line.getString()).trim());
+                lines.add(toPlainString(line).trim());
             }
         }
         return lines;
@@ -537,7 +559,7 @@ public class Utils {
         if (mc.getNetworkHandler() != null) {
             for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
                 if (entry.getDisplayName() != null) {
-                    lines.add(Formatting.strip(entry.getDisplayName().getString()).trim());
+                    lines.add(toPlainString(entry.getDisplayName()).trim());
                 }
             }
         }
@@ -607,6 +629,21 @@ public class Utils {
         return result;
     }
 
+    public static String toLower(String string) {
+        return string.toLowerCase(Locale.ROOT);
+    }
+
+    public static String toUpper(String string) {
+        return string.toUpperCase(Locale.ROOT);
+    }
+
+    public static String toPlainString(Text text) {
+        if (text != null) {
+            return Formatting.strip(text.getString());
+        }
+        return "";
+    }
+
     /**
      * Formats the string by replacing each set of curly brackets "{}" with one of the values in order, similarly to Rust's format macro.
      */
@@ -633,13 +670,7 @@ public class Utils {
     }
 
     public static String formatDecimal(double number, int spaces) {
-        String num = number + "";
-        int index = num.indexOf(".");
-        if (index == -1) {
-            return num;
-        } else {
-            return num.substring(0, spaces == 0 ? index : Math.min(index + 1 + spaces, num.length()));
-        }
+        return new DecimalFormat("0." + "0".repeat(spaces)).format(number);
     }
 
     public static String formatDecimal(float number, int spaces) {

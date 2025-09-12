@@ -2,6 +2,7 @@ package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
@@ -34,6 +35,7 @@ public class WitherDragons {
     public static final SettingDouble powerEasy = new SettingDouble(0.0, "powerEasy", instance.key());
     public static final SettingBool glow = new SettingBool(false, "glow", instance.key());
     public static final SettingBool boxes = new SettingBool(false, "boxes", instance.key());
+    public static final SettingBool tracers = new SettingBool(false, "tracers", instance.key());
     public static final SettingBool stack = new SettingBool(false, "stack", instance.key());
     public static final SettingEnum<stackTypes> stackType = new SettingEnum<>(stackTypes.Simple, stackTypes.class, "stackType", instance.key());
     public static final SettingBool timer = new SettingBool(false, "timer", instance.key());
@@ -50,11 +52,7 @@ public class WitherDragons {
     private static boolean dragonSplitDone = false;
 
     private static boolean isDragonPhase() {
-        if (mc.player != null) {
-            Vec3d pos = mc.player.getPos();
-            return Utils.isOnDungeonFloor("M7") && pos.getX() > 0 && pos.getY() < 50 && pos.getZ() > 0;
-        }
-        return false;
+        return mc.player != null && mc.player.getPos().getY() < 50 && Utils.isInDungeonBoss("7");
     }
 
     private static boolean isArcherTeam() {
@@ -90,11 +88,18 @@ public class WitherDragons {
 
     private static boolean isPurpleInArea(Dragon dragon) {
         for (SpawnedDragon drag : getSpawnedDragons()) {
-            if (drag.data.name.equals("Purple") && drag.entity != null && dragon.area.contains(drag.entity.getPos())) {
-                return true;
+            if (drag.data.name.equals("Purple") && drag.entity != null) {
+                Box box = drag.entity.getDimensions(EntityPose.STANDING).getBoxAt(drag.entity.getPos());
+                if (dragon.area.intersects(box)) {
+                    return true;
+                }
             }
         }
         return false;
+    }
+
+    private static boolean isEitherPurple(SpawnedDragon first, SpawnedDragon second) {
+        return first.data.name.equals("Purple") || second.data.name.equals("Purple");
     }
 
     private static boolean doesDragonExist(Entity dragon) {
@@ -115,7 +120,7 @@ public class WitherDragons {
     }
 
     private static void announceDragonSpawn(SpawnedDragon drag, boolean split) {
-        Utils.showTitleCustom(drag.data.name.toUpperCase() + " IS SPAWNING!", 60, -20, 4.0f, drag.data.color);
+        Utils.showTitleCustom(Utils.toUpper(drag.data.name) + " IS SPAWNING!", 60, -20, 4.0f, drag.data.color);
         Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
         if (split) {
             Utils.infoRaw(Text.literal(drag.data.name + " is your priority dragon.").setStyle(Style.EMPTY.withColor(drag.data.color.hex)));
@@ -127,7 +132,8 @@ public class WitherDragons {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !spawnedDragons.isEmpty()) {
-            for (SpawnedDragon drag : getSpawnedDragons()) {
+            List<SpawnedDragon> spawnedDrags = getSpawnedDragons();
+            for (SpawnedDragon drag : spawnedDrags) {
                 if (boxes.value()) {
                     event.drawOutline(drag.data.area, true, drag.data.color);
                 }
@@ -141,11 +147,17 @@ public class WitherDragons {
                     }
                 }
                 if (timer.value() && !drag.spawned) {
-                    event.drawText(drag.data.pos.getCenter().add(0, 4, 0), Text.of(Utils.formatDecimal(drag.spawnTicks / 20.0f) + "s"), 0.3f, true, drag.data.color);
+                    event.drawText(drag.data.pos.getCenter().add(0, 4, 0), Text.of(Utils.formatDecimal(drag.spawnTicks / 20.0f, 3) + "s"), 0.3f, true, drag.data.color);
                 }
                 if (health.value() && drag.entity != null) {
                     Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickProgress(true)); // should make the text move smoothly with the dragons
                     event.drawText(pos, Text.of(Utils.formatDecimal(drag.health * 0.000001) + "M"), 0.2f, true, drag.data.color);
+                }
+            }
+            if (tracers.value()) {
+                SpawnedDragon drag = spawnedDrags.size() == 2 ? getHigherPriority(spawnedDrags.getFirst(), spawnedDrags.get(1), isArcherTeam()) : spawnedDrags.getFirst();
+                if (!drag.spawned) {
+                    event.drawTracer(drag.data.pos.getCenter(), drag.data.color);
                 }
             }
         }
@@ -153,7 +165,7 @@ public class WitherDragons {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (instance.isActive() && isDragonPhase() && isDragonParticle(event.packet)) {
+        if (instance.isActive() && isDragonParticle(event.packet) && isDragonPhase()) {
             for (Dragon drag : dragons) {
                 if (!isDragonSpawned(drag) && drag.area.contains(event.pos) && !isPurpleInArea(drag)) {
                     SpawnedDragon spawnedDragon = new SpawnedDragon(drag);
@@ -164,8 +176,7 @@ public class WitherDragons {
                             double currentPower = getPowerLevel();
                             SpawnedDragon first = dragons.getFirst();
                             SpawnedDragon second = dragons.getLast();
-                            boolean purple = first.data.name.equals("Purple") || second.data.name.equals("Purple");
-                            if ((currentPower >= powerEasy.value() && purple) || currentPower >= power.value()) {
+                            if ((currentPower >= powerEasy.value() && isEitherPurple(first, second)) || currentPower >= power.value()) {
                                 announceDragonSpawn(getHigherPriority(first, second, isArcherTeam()), true);
                             } else { // no split
                                 announceDragonSpawn(getHigherPriority(first, second, true), true);
@@ -198,7 +209,7 @@ public class WitherDragons {
                         Rendering.Entities.drawGlow(event.entity, true, drag.data.color);
                     }
                 } else if (drag.spawned && uuid.equals(drag.uuid)) {
-                    if (health > 0.0f && !event.entity.isRemoved() && dragonEntity.ticksSinceDeath == 0) {
+                    if (dragonEntity.isAlive() && dragonEntity.ticksSinceDeath == 0) {
                         drag.health = health;
                         drag.entity = event.entity;
                         if (glow.value()) {
@@ -214,7 +225,7 @@ public class WitherDragons {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (instance.isActive()) {
+        if (instance.isActive() && isDragonPhase()) {
             for (SpawnedDragon drag : getSpawnedDragons()) {
                 if (!drag.spawned && drag.spawnTicks > 0) {
                     drag.spawnTicks--;

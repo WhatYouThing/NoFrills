@@ -291,6 +291,10 @@ public class Utils {
         return getOtherEntities(from, Box.of(from.getPos(), distX, distY, distZ), filter);
     }
 
+    public static List<Entity> getOtherEntities(Entity from, double dist, Predicate<? super Entity> filter) {
+        return getOtherEntities(from, Box.of(from.getPos(), dist, dist, dist), filter);
+    }
+
     public static void sendPingPacket() {
         ClientPlayNetworkHandler handler = mc.getNetworkHandler();
         if (handler != null) {

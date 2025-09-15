@@ -15,6 +15,7 @@ public class SlotOptions {
     public static final ItemStack background = stackWithName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
     public static final ItemStack first = stackWithName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
     public static final ItemStack second = stackWithName(Items.ORANGE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
+    public static final ItemStack third = stackWithName(Items.RED_CONCRETE.getDefaultStack(), Utils.Symbols.format + "cClick after.");
     public static final ConcurrentHashMap<Slot, Flags> slotFlags = new ConcurrentHashMap<>();
 
     public static ItemStack stackWithName(ItemStack stack, String name) {

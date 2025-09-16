@@ -20,6 +20,7 @@ import nofrills.events.InteractBlockEvent;
 import nofrills.events.InteractEntityEvent;
 import nofrills.events.InteractItemEvent;
 import nofrills.events.ScreenOpenEvent;
+import nofrills.features.hunting.ShardTracker;
 import nofrills.features.misc.UnfocusedTweaks;
 import nofrills.features.tweaks.NoDropSwing;
 import nofrills.features.tweaks.NoLoadingScreen;
@@ -68,8 +69,13 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "setScreen", at = @At("TAIL"))
     private void onOpenScreen(Screen screen, CallbackInfo ci) {
-        if (screen != null && world != null) {
+        if (this.world == null) return;
+        if (screen != null) {
             eventBus.post(new ScreenOpenEvent(screen));
+        } else {
+            if (ShardTracker.instance.isActive()) {
+                ShardTracker.refreshDisplay();
+            }
         }
     }
 

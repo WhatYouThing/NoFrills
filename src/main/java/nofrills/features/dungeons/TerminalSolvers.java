@@ -170,9 +170,9 @@ public class TerminalSolvers {
                         SlotOptions.disableSlot(second, true);
                     }
                     if (orderSlots.size() > 2) {
-                        Slot second = orderSlots.get(2);
-                        SlotOptions.spoofSlot(second, SlotOptions.stackWithQuantity(SlotOptions.third, second.getStack().getCount()));
-                        SlotOptions.disableSlot(second, true);
+                        Slot third = orderSlots.get(2);
+                        SlotOptions.spoofSlot(third, SlotOptions.stackWithQuantity(SlotOptions.third, third.getStack().getCount()));
+                        SlotOptions.disableSlot(third, true);
                     }
                 }
             }

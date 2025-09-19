@@ -24,39 +24,30 @@ public class LividSolver {
 
     public static final SettingColor color = new SettingColor(RenderColor.fromArgb(0xff00ff00), "color", instance.key());
 
-    private static final HashMap<Block, String> lividData = buildLividData();
+    private static final HashMap<Block, Livid> lividData = new HashMap<>();
     private static final EntityCache lividCache = new EntityCache();
     private static String currentName = "";
 
-    private static HashMap<Block, String> buildLividData() {
-        HashMap<Block, String> data = new HashMap<>();
-        data.put(Blocks.RED_WOOL, "Hockey Livid");
-        data.put(Blocks.YELLOW_WOOL, "Arcade Livid");
-        data.put(Blocks.LIME_WOOL, "Smile Livid");
-        data.put(Blocks.GREEN_WOOL, "Frog Livid");
-        data.put(Blocks.BLUE_WOOL, "Scream Livid");
-        data.put(Blocks.MAGENTA_WOOL, "Crossed Livid");
-        data.put(Blocks.PURPLE_WOOL, "Purple Livid");
-        data.put(Blocks.GRAY_WOOL, "Doctor Livid");
-        data.put(Blocks.WHITE_WOOL, "Vendetta Livid");
-        return data;
-    }
-
-    private static void announceColor(Block block) {
-        String name = Utils.format("{}!", Utils.toUpper(Utils.toPlainString(block.getName()).replace(" Wool", "").trim()));
-        Utils.showTitleCustom(name, 60, -20, 4.0f, RenderColor.fromHex(block.getDefaultMapColor().color));
-        Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+    static {
+        lividData.put(Blocks.RED_WOOL, new Livid("Hockey Livid", "§c§lRED"));
+        lividData.put(Blocks.YELLOW_WOOL, new Livid("Arcade Livid", "§e§lYELLOW"));
+        lividData.put(Blocks.LIME_WOOL, new Livid("Smile Livid", "§a§lGREEN"));
+        lividData.put(Blocks.GREEN_WOOL, new Livid("Frog Livid", "§2§lDARK GREEN"));
+        lividData.put(Blocks.BLUE_WOOL, new Livid("Scream Livid", "§9§lBLUE"));
+        lividData.put(Blocks.MAGENTA_WOOL, new Livid("Crossed Livid", "§d§lPINK"));
+        lividData.put(Blocks.PURPLE_WOOL, new Livid("Purple Livid", "§5§lPURPLE"));
+        lividData.put(Blocks.GRAY_WOOL, new Livid("Doctor Livid", "§7§lGRAY"));
+        lividData.put(Blocks.WHITE_WOOL, new Livid("Vendetta Livid", "§f§lWHITE"));
     }
 
     @EventHandler
     private static void onBlock(BlockUpdateEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("5") && event.pos.getY() == 110) {
-            Block block = event.newState.getBlock();
-            if (!lividData.containsKey(block)) return;
-            String name = lividData.get(block);
-            if (!currentName.equals(name)) {
-                announceColor(block);
-                currentName = lividData.get(block);
+        if (instance.isActive() && Utils.isInDungeonBoss("5") && event.pos.getY() == 108 && lividData.containsKey(event.newState.getBlock())) {
+            Livid livid = lividData.get(event.newState.getBlock());
+            if (!currentName.equals(livid.name)) {
+                Utils.showTitle(livid.title + "!", "", 0, 50, 10);
+                Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+                currentName = livid.name;
             }
         }
     }
@@ -64,7 +55,8 @@ public class LividSolver {
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInDungeonBoss("5") && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
-            if (player.getName().getString().endsWith(" Livid")) {
+            String name = Utils.toPlainString(player.getName());
+            if (lividData.values().stream().anyMatch(livid -> livid.name.equals(name))) {
                 lividCache.add(player);
             }
         }
@@ -74,7 +66,7 @@ public class LividSolver {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !Utils.isInstanceOver() && Utils.isInDungeonBoss("5")) {
             for (Entity livid : lividCache.get()) {
-                if (livid.getName().getString().equals(currentName)) {
+                if (Utils.toPlainString(livid.getName()).equals(currentName)) {
                     event.drawOutline(Utils.getLerpedBox(livid, event.tickCounter.getTickProgress(true)), false, color.value());
                     return;
                 }
@@ -86,5 +78,15 @@ public class LividSolver {
     private static void onJoin(ServerJoinEvent event) {
         currentName = "";
         lividCache.clear();
+    }
+
+    private static class Livid {
+        public String name;
+        public String title;
+
+        public Livid(String name, String title) {
+            this.name = name;
+            this.title = title;
+        }
     }
 }

@@ -169,6 +169,11 @@ public class TerminalSolvers {
                         SlotOptions.spoofSlot(second, SlotOptions.stackWithQuantity(SlotOptions.second, second.getStack().getCount()));
                         SlotOptions.disableSlot(second, true);
                     }
+                    if (orderSlots.size() > 2) {
+                        Slot third = orderSlots.get(2);
+                        SlotOptions.spoofSlot(third, SlotOptions.stackWithQuantity(SlotOptions.third, third.getStack().getCount()));
+                        SlotOptions.disableSlot(third, true);
+                    }
                 }
             }
             if (type.equals(TerminalType.Colors) && colors.value()) {

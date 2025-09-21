@@ -2,10 +2,12 @@ package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.WorldRenderEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.SlayerUtil;
@@ -70,22 +72,20 @@ public class BossHighlight {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && SlayerUtil.bossAlive && SlayerUtil.currentBoss != null) {
-            if (SlayerUtil.currentBoss.equals(SlayerUtil.blaze)) {
-                if (SlayerUtil.isTimer(event.namePlain)) {
-                    highlightBlaze(event.entity, event.namePlain);
-                }
-            } else if (SlayerUtil.isSpawner(event.namePlain)) {
-                List<Entity> other = Utils.getOtherEntities(event.entity, 1, 3, 1, SlayerUtil.currentBoss.predicate);
-                Entity owner = Utils.findNametagOwner(event.entity, other);
-                if (owner != null) {
-                    applyHighlight(owner, fillColor.value(), outlineColor.value());
-                    if (owner.hasVehicle()) {
-                        applyHighlight(owner.getVehicle(), fillColor.value(), outlineColor.value());
-                    } else if (owner.hasPassengers()) {
-                        applyHighlight(owner.getFirstPassenger(), fillColor.value(), outlineColor.value());
-                    }
-                }
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze) && SlayerUtil.isTimer(event.namePlain)) {
+            highlightBlaze(event.entity, event.namePlain);
+        }
+    }
+
+    @EventHandler
+    private static void onRender(WorldRenderEvent event) {
+        if (instance.isActive() && SlayerUtil.bossEntity != null && !SlayerUtil.isFightingBoss(SlayerUtil.blaze)) {
+            Box box = Utils.getLerpedBox(SlayerUtil.bossEntity, event.tickCounter.getTickProgress(true));
+            if (!highlightStyle.value().equals(style.Outline)) {
+                event.drawFilled(box, false, fillColor.value());
+            }
+            if (!highlightStyle.value().equals(style.Filled)) {
+                event.drawOutline(box, false, outlineColor.value());
             }
         }
     }

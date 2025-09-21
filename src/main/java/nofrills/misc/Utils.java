@@ -249,9 +249,8 @@ public class Utils {
     public static boolean isMob(Entity entity) {
         if (entity instanceof PlayerEntity player) {
             return !isPlayer(player);
-        } else {
-            return entity instanceof LivingEntity;
         }
+        return entity instanceof LivingEntity;
     }
 
     public static boolean isBaseHealth(LivingEntity entity, float health) {

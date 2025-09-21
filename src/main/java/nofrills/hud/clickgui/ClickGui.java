@@ -462,21 +462,20 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Crystal Fill", true, BossHighlight.crystalFill, "The color of the filled box if your boss is using the Crystal attunement."),
                                 new Settings.ColorPicker("Crystal Outline", true, BossHighlight.crystalOutline, "The color of the outline box if your boss is using the Crystal attunement.")
                         ))),
-                        new Module("Inferno Demonlord", InfernoDemonlord.instance, "Various features for Blaze slayer.", new Settings(List.of(
-                                new Settings.Toggle("Pillar Alert", InfernoDemonlord.pillarAlert, "Displays information about your fire pillars.\nThis feature tries to ensure that you only get alerted for your own pillars, no false flags."),
-                                new Settings.Toggle("No Spam", InfernoDemonlord.noSpam, "Hides the chat messages about using the wrong attunement.")
-                        ))),
+                        new Module("Pillar Alert", PillarAlert.instance, "Alerts you when your Blaze boss spawns a fire pillar.\nThis feature tries to prevent false flags by tracking the \"path\" that the pillars take."),
+                        new Module("No Attunement Spam", NoAttunementSpam.instance, "Filters the chat messages about using the wrong attunement on the Blaze boss."),
                         new Module("Kill Timer", KillTimer.instance, "Tracks how long your slayer boss took to kill."),
-                        new Module("Riftstalker Bloodfiend", RiftstalkerBloodfiend.instance, "Various features for Vampire slayer.", new Settings(List.of(
-                                new Settings.Toggle("Ice Indicator", RiftstalkerBloodfiend.ice, "Shows when to use your Holy Ice against Twinclaws."),
-                                new Settings.Toggle("Steak Indicator", RiftstalkerBloodfiend.steak, "Shows text on screen once you can vanquish your boss with the Steak Stake."),
-                                new Settings.Toggle("Ichor Highlight", RiftstalkerBloodfiend.ichor, "Highlights the Blood Ichors during the T5 fight."),
-                                new Settings.ColorPicker("Ichor Color", true, RiftstalkerBloodfiend.ichorColor, "The color of the Blood Ichor highlight."),
-                                new Settings.Toggle("Silence Mania", RiftstalkerBloodfiend.mania, "Removes the very loud Mania sound effects."),
-                                new Settings.Toggle("Silence Killer Springs", RiftstalkerBloodfiend.springs, "Removes the sounds that play when your boss spawns a Killer Spring.")
+                        new Module("Chalice Highlight", ChaliceHighlight.instance, "Highlights the Blood Ichor chalices spawned by the T5 Vampire.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, ChaliceHighlight.color, "The color of the chalice highlight.")
                         ))),
-                        new Module("Voidgloom Seraph", VoidgloomSeraph.instance, "Various features for Enderman slayer.", new Settings(List.of(
-                                new Settings.Toggle("Hits Display", VoidgloomSeraph.hits, "Shows the amount of hits needed to break the hits shield of your boss.")
+                        new Module("Ice Alert", IceAlert.instance, "Shows a timer for when your Vampire boss is going to cast Twinclaws."),
+                        new Module("Stake Alert", StakeAlert.instance, "Shows text on screen once you can vanquish your Vampire boss with the Steak Stake."),
+                        new Module("Mute Vampire", MuteVampire.instance, "Prevents the Vampire Mania/Killer Springs sounds from playing.", new Settings(List.of(
+                                new Settings.Toggle("Mania", MuteVampire.mania, "Mutes the loud Mania sounds while in the Chateau."),
+                                new Settings.Toggle("Killer Springs", MuteVampire.springs, "Mutes the Wither sound spam that occurs when your boss spawns a Killer Spring.")
+                        ))),
+                        new Module("Hits Display", HitsDisplay.instance, "Renders the Voidgloom Seraph hits shield as large text.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, HitsDisplay.color, "The color of the hits display text.")
                         )))
                 )),
                 new Category("Mining", List.of(

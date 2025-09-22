@@ -166,11 +166,18 @@ public class ShardTracker {
         return null;
     }
 
+    private static boolean isInFusion() {
+        if (mc.currentScreen instanceof GenericContainerScreen container) {
+            String title = container.getTitle().getString();
+            return title.equals("Fusion Box") || title.equals("Confirm Fusion");
+        }
+        return false;
+    }
+
     private static boolean shouldFilter(TrackerSource source) {
-        boolean inFusion = mc.currentScreen instanceof GenericContainerScreen container && container.getTitle().getString().equals("Fusion Box");
         return switch (source) {
-            case Direct, Bazaar -> filterDirect.value() && inFusion;
-            case Fuse, Cycle -> filterFuse.value() && !inFusion;
+            case Direct, Bazaar -> filterDirect.value() && isInFusion();
+            case Fuse, Cycle -> filterFuse.value() && !isInFusion();
         };
     }
 

@@ -27,6 +27,10 @@ public class SettingDouble {
         return this.defaultValue;
     }
 
+    public float valueFloat() {
+        return (float) this.value();
+    }
+
     public void set(double value) {
         if (!Config.get().has(this.parent)) {
             Config.get().add(this.parent, new JsonObject());

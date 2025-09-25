@@ -1,6 +1,7 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.Entity;
 import nofrills.config.Feature;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SlayerUtil;
@@ -11,8 +12,10 @@ public class IceAlert {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && SlayerUtil.timerEntity != null && SlayerUtil.isFightingBoss(SlayerUtil.vampire) && Utils.isInChateau()) {
-            String name = Utils.toPlainString(SlayerUtil.timerEntity.getName());
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.vampire) && Utils.isInChateau()) {
+            Entity timer = SlayerUtil.getTimerEntity();
+            if (timer == null) return;
+            String name = Utils.toPlainString(timer.getName());
             if (name.contains("TWINCLAWS")) {
                 Utils.showTitleCustom(Utils.format("Ice: {}", name.split("TWINCLAWS")[1].trim().split(" ")[0]), 1, 25, 4.0f, 0x00ffff);
             }

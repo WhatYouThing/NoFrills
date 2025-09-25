@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static nofrills.Main.mc;
 
@@ -23,41 +24,45 @@ public class EntityCache {
     }
 
     public boolean has(Entity ent) {
-        return entities.contains(ent);
+        return this.entities.contains(ent);
     }
 
     public boolean empty() {
-        return entities.isEmpty();
+        return this.entities.isEmpty();
     }
 
     public int size() {
-        return entities.size();
+        return this.entities.size();
     }
 
     /**
      * Adds an entity handle to the object. Does nothing if the entity is already on the list.
      */
     public void add(Entity ent) {
-        entities.add(ent);
+        this.entities.add(ent);
     }
 
     public void remove(Entity ent) {
-        entities.removeIf(ent::equals);
+        this.entities.removeIf(ent::equals);
     }
 
     public void clear() {
-        entities.clear();
+        this.entities.clear();
     }
 
-    public void clearDropped() {
-        entities.removeIf(entity -> !exists(entity));
+    public void removeDead() {
+        this.entities.removeIf(entity -> !exists(entity));
+    }
+
+    public void removeIf(Predicate<Entity> filter) {
+        this.entities.removeIf(filter);
     }
 
     /**
      * Removes any dead/dropped entities from the list, and returns a copy.
      */
     public List<Entity> get() {
-        clearDropped();
-        return new ArrayList<>(entities);
+        this.removeDead();
+        return new ArrayList<>(this.entities);
     }
 }

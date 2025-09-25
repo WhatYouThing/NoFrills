@@ -1,6 +1,7 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.Entity;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
@@ -54,10 +55,12 @@ public class PillarAlert {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze) && SlayerUtil.spawnerEntity != null && event.isSound(SoundEvents.ENTITY_CHICKEN_EGG)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze) && event.isSound(SoundEvents.ENTITY_CHICKEN_EGG)) {
+            Entity spawner = SlayerUtil.getSpawnerEntity();
+            if (spawner == null) return;
             Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             if (pillarData.isEmpty()) {
-                if (Utils.horizontalDistance(pos, SlayerUtil.spawnerEntity.getPos()) <= 1.5) {
+                if (Utils.horizontalDistance(pos, spawner.getPos()) <= 1.5) {
                     pillarData.add(pos);
                     pillarClearTicks = 60;
                 }

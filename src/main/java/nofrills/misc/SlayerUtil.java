@@ -2,7 +2,6 @@ package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.WolfEntity;
@@ -26,10 +25,10 @@ public class SlayerUtil {
     public static final List<SlayerBoss> bossList = List.of(revenant, tarantula, sven, voidgloom, vampire, blaze);
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
-    public static ArmorStandEntity spawnerEntity = null;
-    public static ArmorStandEntity timerEntity = null;
-    public static ArmorStandEntity nameEntity = null;
-    public static LivingEntity bossEntity = null;
+    private static final EntityCache spawnerEntities = new EntityCache();
+    private static final EntityCache timerEntities = new EntityCache();
+    private static final EntityCache nameEntities = new EntityCache();
+    private static final EntityCache bossEntities = new EntityCache();
     public static boolean bossAlive = false;
     public static SlayerBoss currentBoss = null;
 
@@ -49,6 +48,26 @@ public class SlayerUtil {
         return bossAlive && currentBoss != null && currentBoss.equals(boss);
     }
 
+    private static ArmorStandEntity getFromList(List<Entity> list) {
+        return !list.isEmpty() ? (ArmorStandEntity) list.getFirst() : null;
+    }
+
+    public static ArmorStandEntity getSpawnerEntity() {
+        return getFromList(spawnerEntities.get());
+    }
+
+    public static ArmorStandEntity getTimerEntity() {
+        return getFromList(timerEntities.get());
+    }
+
+    public static ArmorStandEntity getNameEntity() {
+        return getFromList(nameEntities.get());
+    }
+
+    public static List<Entity> getBossEntities() {
+        return bossEntities.get();
+    }
+
     public static void updateQuestState(List<String> lines) {
         bossAlive = lines.contains("Slay the boss!");
         for (SlayerBoss boss : bossList) {
@@ -64,27 +83,31 @@ public class SlayerUtil {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (currentBoss != null && isSpawner(event.namePlain)) {
-            spawnerEntity = (ArmorStandEntity) event.entity;
+        if (currentBoss != null && !spawnerEntities.has(event.entity) && isSpawner(event.namePlain)) {
+            spawnerEntities.add(event.entity);
         }
     }
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (currentBoss != null) {
-            if (!EntityCache.exists(spawnerEntity)) spawnerEntity = null;
-            if (!EntityCache.exists(timerEntity)) timerEntity = null;
-            if (!EntityCache.exists(nameEntity)) nameEntity = null;
-            if (!EntityCache.exists(bossEntity)) bossEntity = null;
-            if (spawnerEntity != null && !currentBoss.equals(blaze)) {
-                List<Entity> other = Utils.getOtherEntities(spawnerEntity, 0.5, 2.0, 0.5, Utils::isMob);
+            Entity spawner = getSpawnerEntity();
+            if (spawner != null && !currentBoss.equals(blaze)) {
+                List<Entity> other = Utils.getOtherEntities(spawner, 1.5, 3.0, 1.5, Utils::isMob);
+                timerEntities.clear();
+                nameEntities.clear();
+                bossEntities.clear();
                 for (Entity entity : other) {
                     if (entity instanceof ArmorStandEntity stand) {
                         String name = Utils.toPlainString(stand.getName());
-                        if (isTimer(name)) timerEntity = (ArmorStandEntity) entity;
-                        if (isName(name)) nameEntity = (ArmorStandEntity) entity;
+                        if (isTimer(name)) {
+                            timerEntities.add(entity);
+                        }
+                        if (isName(name)) {
+                            nameEntities.add(entity);
+                        }
                     } else if (currentBoss.predicate.test(entity)) {
-                        bossEntity = (LivingEntity) entity;
+                        bossEntities.add(entity);
                     }
                 }
             }

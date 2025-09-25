@@ -474,8 +474,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Mania", MuteVampire.mania, "Mutes the loud Mania sounds while in the Chateau."),
                                 new Settings.Toggle("Killer Springs", MuteVampire.springs, "Mutes the Wither sound spam that occurs when your boss spawns a Killer Spring.")
                         ))),
-                        new Module("Hits Display", HitsDisplay.instance, "Renders the Voidgloom Seraph hits shield as large text.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, HitsDisplay.color, "The color of the hits display text.")
+                        new Module("Hits Shield Display", HitsShieldDisplay.instance, "Renders the needed hits for the Voidgloom Seraph hits shield phase.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, HitsShieldDisplay.color, "The color of the text."),
+                                new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, HitsShieldDisplay.scale, "The scale of the text.")
+                        ))),
+                        new Module("Egg Hits Display", EggHitsDisplay.instance, "Renders the needed hits for the Tarantula Broodfather egg sack phase.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, EggHitsDisplay.color, "The color of the text."),
+                                new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, EggHitsDisplay.scale, "The scale of the text.")
+                        ))),
+                        new Module("Beacon Tracer", BeaconTracer.instance, "Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, BeaconTracer.color, "The color of the tracer.")
                         )))
                 )),
                 new Category("Mining", List.of(

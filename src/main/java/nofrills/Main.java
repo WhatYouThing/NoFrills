@@ -83,7 +83,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SpookyChests.class);
         eventBus.subscribe(ExperimentSolver.class);
         eventBus.subscribe(CalendarDate.class);
-        eventBus.subscribe(HitsDisplay.class);
+        eventBus.subscribe(HitsShieldDisplay.class);
         eventBus.subscribe(ChaliceHighlight.class);
         eventBus.subscribe(IceAlert.class);
         eventBus.subscribe(StakeAlert.class);
@@ -154,6 +154,8 @@ public class Main implements ModInitializer {
         eventBus.subscribe(MimicMessage.class);
         eventBus.subscribe(PrinceMessage.class);
         eventBus.subscribe(SpiritBearTimer.class);
+        eventBus.subscribe(EggHitsDisplay.class);
+        eventBus.subscribe(BeaconTracer.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

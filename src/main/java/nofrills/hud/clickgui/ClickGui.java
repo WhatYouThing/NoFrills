@@ -484,7 +484,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Beacon Tracer", BeaconTracer.instance, "Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, BeaconTracer.color, "The color of the tracer.")
-                        )))
+                        ))),
+                        new Module("Mute Enderman", MuteEnderman.instance, "Prevents the angry Enderman sounds from playing.")
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your mining ability is ready to be used again."),

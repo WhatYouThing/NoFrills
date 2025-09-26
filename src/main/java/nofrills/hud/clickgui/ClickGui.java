@@ -267,7 +267,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Old Safewalk", OldSafewalk.instance, "Allows you to walk onto short blocks (such as carpet) while sneaking.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", OldSafewalk.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", OldSafewalk.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        )))
+                        ))),
+                        new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\nCurrently fixes:\n- Occasional invalid packet kicks while doing spider slayer.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of item tooltips.", new Settings(List.of(

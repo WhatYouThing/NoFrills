@@ -19,8 +19,6 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
-import java.util.List;
-
 import static nofrills.Main.mc;
 
 public class BeaconTracer {
@@ -50,9 +48,9 @@ public class BeaconTracer {
     private static void onUpdate(EntityUpdatedEvent event) {
         if (isActive() && event.entity instanceof ArmorStandEntity stand) {
             ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
-            List<Entity> bossEntities = SlayerUtil.getBossEntities();
-            if (!helmet.getItem().equals(Items.BEACON) || bossEntities.isEmpty()) return;
-            if (Utils.horizontalDistance(bossEntities.getFirst().getPos(), event.entity.getPos()) <= 4.0) {
+            Entity boss = SlayerUtil.getBossEntity();
+            if (!helmet.getItem().equals(Items.BEACON) || boss == null) return;
+            if (Utils.horizontalDistance(boss.getPos(), event.entity.getPos()) <= 4.0) {
                 beaconEntity = event.entity;
             }
         }
@@ -60,7 +58,7 @@ public class BeaconTracer {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (beaconPos != null && isActive()) {
+        if (beaconPos != null && mc.world != null && isActive()) {
             if (!mc.world.getBlockState(beaconPos).getBlock().equals(Blocks.BEACON)) {
                 beaconPos = null;
                 return;

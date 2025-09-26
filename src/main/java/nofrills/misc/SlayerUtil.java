@@ -2,6 +2,7 @@ package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.mob.*;
 import net.minecraft.entity.passive.WolfEntity;
@@ -9,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldTickEvent;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -25,10 +27,7 @@ public class SlayerUtil {
     public static final List<SlayerBoss> bossList = List.of(revenant, tarantula, sven, voidgloom, vampire, blaze);
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
-    private static final EntityCache spawnerEntities = new EntityCache();
-    private static final EntityCache timerEntities = new EntityCache();
-    private static final EntityCache nameEntities = new EntityCache();
-    private static final EntityCache bossEntities = new EntityCache();
+    private static final HashMap<String, Entity> entities = new HashMap<>();
     public static boolean bossAlive = false;
     public static SlayerBoss currentBoss = null;
 
@@ -48,24 +47,20 @@ public class SlayerUtil {
         return bossAlive && currentBoss != null && currentBoss.equals(boss);
     }
 
-    private static ArmorStandEntity getFromList(List<Entity> list) {
-        return !list.isEmpty() ? (ArmorStandEntity) list.getFirst() : null;
-    }
-
     public static ArmorStandEntity getSpawnerEntity() {
-        return getFromList(spawnerEntities.get());
+        return entities.containsKey("spawner") ? (ArmorStandEntity) entities.get("spawner") : null;
     }
 
     public static ArmorStandEntity getTimerEntity() {
-        return getFromList(timerEntities.get());
+        return entities.containsKey("timer") ? (ArmorStandEntity) entities.get("timer") : null;
     }
 
     public static ArmorStandEntity getNameEntity() {
-        return getFromList(nameEntities.get());
+        return entities.containsKey("name") ? (ArmorStandEntity) entities.get("name") : null;
     }
 
-    public static List<Entity> getBossEntities() {
-        return bossEntities.get();
+    public static LivingEntity getBossEntity() {
+        return entities.containsKey("boss") ? (LivingEntity) entities.get("boss") : null;
     }
 
     public static void updateQuestState(List<String> lines) {
@@ -83,8 +78,8 @@ public class SlayerUtil {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (currentBoss != null && !spawnerEntities.has(event.entity) && isSpawner(event.namePlain)) {
-            spawnerEntities.add(event.entity);
+        if (currentBoss != null && isSpawner(event.namePlain)) {
+            entities.put("spawner", event.entity);
         }
     }
 
@@ -93,21 +88,14 @@ public class SlayerUtil {
         if (currentBoss != null) {
             Entity spawner = getSpawnerEntity();
             if (spawner != null && !currentBoss.equals(blaze)) {
-                List<Entity> other = Utils.getOtherEntities(spawner, 1.5, 3.0, 1.5, Utils::isMob);
-                timerEntities.clear();
-                nameEntities.clear();
-                bossEntities.clear();
-                for (Entity entity : other) {
+                entities.entrySet().removeIf(entry -> !EntityCache.exists(entry.getValue()));
+                for (Entity entity : Utils.getOtherEntities(spawner, 0.5, 2.0, 0.5, Utils::isMob)) {
                     if (entity instanceof ArmorStandEntity stand) {
                         String name = Utils.toPlainString(stand.getName());
-                        if (isTimer(name)) {
-                            timerEntities.add(entity);
-                        }
-                        if (isName(name)) {
-                            nameEntities.add(entity);
-                        }
+                        if (isTimer(name)) entities.put("timer", entity);
+                        if (isName(name)) entities.put("name", entity);
                     } else if (currentBoss.predicate.test(entity)) {
-                        bossEntities.add(entity);
+                        entities.put("boss", entity);
                     }
                 }
             }

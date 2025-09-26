@@ -80,14 +80,14 @@ public class BossHighlight {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !SlayerUtil.isFightingBoss(SlayerUtil.blaze)) {
-            for (Entity entity : SlayerUtil.getBossEntities()) {
-                Box box = Utils.getLerpedBox(entity, event.tickCounter.getTickProgress(true));
-                if (!highlightStyle.value().equals(style.Outline)) {
-                    event.drawFilled(box, false, fillColor.value());
-                }
-                if (!highlightStyle.value().equals(style.Filled)) {
-                    event.drawOutline(box, false, outlineColor.value());
-                }
+            Entity boss = SlayerUtil.getBossEntity();
+            if (boss == null) return;
+            Box box = Utils.getLerpedBox(boss, event.tickCounter.getTickProgress(true));
+            if (!highlightStyle.value().equals(style.Outline)) {
+                event.drawFilled(box, false, fillColor.value());
+            }
+            if (!highlightStyle.value().equals(style.Filled)) {
+                event.drawOutline(box, false, outlineColor.value());
             }
         }
     }

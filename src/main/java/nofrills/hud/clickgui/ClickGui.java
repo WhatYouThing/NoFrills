@@ -268,7 +268,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", OldSafewalk.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", OldSafewalk.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\nCurrently fixes:\n- Occasional invalid packet kicks while doing spider slayer.")
+                        new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\nCurrently fixes:\n- Rare invalid packet kicks while doing spider slayer.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of item tooltips.", new Settings(List.of(
@@ -486,7 +486,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Beacon Tracer", BeaconTracer.instance, "Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, BeaconTracer.color, "The color of the tracer.")
                         ))),
-                        new Module("Mute Enderman", MuteEnderman.instance, "Prevents the angry Enderman sounds from playing.")
+                        new Module("Mute Enderman", MuteEnderman.instance, "Prevents the angry Enderman sounds from playing."),
+                        new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt.")
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your mining ability is ready to be used again."),

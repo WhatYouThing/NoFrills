@@ -27,6 +27,7 @@ public class SlayerUtil {
     public static final List<SlayerBoss> bossList = List.of(revenant, tarantula, sven, voidgloom, vampire, blaze);
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
+    private static final Predicate<Entity> predicate = entity -> entity.isAlive() && Utils.isMob(entity);
     private static final HashMap<String, Entity> entities = new HashMap<>();
     public static boolean bossAlive = false;
     public static SlayerBoss currentBoss = null;
@@ -89,13 +90,19 @@ public class SlayerUtil {
             Entity spawner = getSpawnerEntity();
             if (spawner != null && !currentBoss.equals(blaze)) {
                 entities.entrySet().removeIf(entry -> !EntityCache.exists(entry.getValue()));
-                for (Entity entity : Utils.getOtherEntities(spawner, 0.5, 2.0, 0.5, Utils::isMob)) {
+                for (Entity entity : Utils.getOtherEntities(spawner, 0.5, 2.0, 0.5, predicate)) {
                     if (entity instanceof ArmorStandEntity stand) {
                         String name = Utils.toPlainString(stand.getName());
-                        if (isTimer(name)) entities.put("timer", entity);
-                        if (isName(name)) entities.put("name", entity);
-                    } else if (currentBoss.predicate.test(entity)) {
-                        entities.put("boss", entity);
+                        if (isTimer(name)) {
+                            entities.put("timer", entity);
+                        }
+                        if (isName(name)) {
+                            entities.put("name", entity);
+                        }
+                    } else {
+                        if (currentBoss.predicate.test(entity)) {
+                            entities.put("boss", entity);
+                        }
                     }
                 }
             }

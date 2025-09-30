@@ -126,8 +126,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Dropdown<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),
                                 new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with a keybind."),
                                 new Settings.Toggle("Sound Effect", WardrobeKeybinds.sound, "Plays a sound effect upon using a keybind."),
-                                new Settings.Keybind("Next Page", WardrobeKeybinds.next, "The keybind to go to the next wardrobe page."),
-                                new Settings.Keybind("Previous Page", WardrobeKeybinds.previous, "The keybind to go to the previous wardrobe page."),
                                 new Settings.Keybind("Custom Slot 1", WardrobeKeybinds.custom1, "Your custom keybind for the 1st wardrobe slot."),
                                 new Settings.Keybind("Custom Slot 2", WardrobeKeybinds.custom2, "Your custom keybind for the 2nd wardrobe slot."),
                                 new Settings.Keybind("Custom Slot 3", WardrobeKeybinds.custom3, "Your custom keybind for the 3rd wardrobe slot."),
@@ -212,7 +210,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),
-                        new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUI's, making navigation smoother."),
+                        new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother."),
                         new Module("No Front Perspective", NoFrontPerspective.instance, "Removes the front facing camera perspective."),
                         new Module("No Ability Place", NoAbilityPlace.instance, "Prevents block items with abilities from being placeable client side, such as the Egglocator.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", NoAbilityPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
@@ -299,6 +297,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Mute Sounds", UnfocusedTweaks.muteSounds, "Mutes the in-game sound while unfocused."),
                                 new Settings.Toggle("No Vanilla Limit", UnfocusedTweaks.noVanilla, "Fully disables the vanilla \"Reduce FPS\" option."),
                                 new Settings.SliderInt("FPS Limit", 0, 200, 1, UnfocusedTweaks.fpsLimit, "The max FPS the game will render at while unfocused. Set to 0 to disable.")
+                        ))),
+                        new Module("Page Keybinds", PageKeybinds.instance, "Adds next/previous page keybinds to applicable Skyblock GUIs.", new Settings(List.of(
+                                new Settings.Keybind("Next Page", PageKeybinds.next, "The keybind to go to the next page of the GUI."),
+                                new Settings.Keybind("Previous Page", PageKeybinds.previous, "The keybind to go to the previous page of the GUI.")
                         )))
                 )),
                 new Category("Solvers", List.of(

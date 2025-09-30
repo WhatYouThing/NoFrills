@@ -57,7 +57,6 @@ public class ShardTracker {
         list.add(new Settings.Toggle("Done Message", doneMsg, "Shows a message in chat once you reach the needed amount for any shard."));
         list.add(new Settings.Toggle("Filter Fuse", filterFuse, "Hides every Fuse/Cycle shard while outside of the Fusion Machine."));
         list.add(new Settings.Toggle("Filter Direct", filterDirect, "Hides every Direct/Bazaar shard while inside of the Fusion Machine."));
-        list.add(new Settings.Toggle("Done Message", doneMsg, "Shows a message in chat once you reach the needed amount for any shard."));
         Settings.BigButton clearButton = new Settings.BigButton("Clear Shard List", btn -> {
             data.value().add("shards", new JsonArray());
             mc.setScreen(buildSettings());

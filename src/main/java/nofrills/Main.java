@@ -157,6 +157,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(EggHitsDisplay.class);
         eventBus.subscribe(BeaconTracer.class);
         eventBus.subscribe(CocoonAlert.class);
+        eventBus.subscribe(PageKeybinds.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

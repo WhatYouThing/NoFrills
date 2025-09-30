@@ -93,16 +93,10 @@ public class SlayerUtil {
                 for (Entity entity : Utils.getOtherEntities(spawner, 0.5, 2.0, 0.5, predicate)) {
                     if (entity instanceof ArmorStandEntity stand) {
                         String name = Utils.toPlainString(stand.getName());
-                        if (isTimer(name)) {
-                            entities.put("timer", entity);
-                        }
-                        if (isName(name)) {
-                            entities.put("name", entity);
-                        }
+                        if (isTimer(name)) entities.put("timer", entity);
+                        if (isName(name)) entities.put("name", entity);
                     } else {
-                        if (currentBoss.predicate.test(entity)) {
-                            entities.put("boss", entity);
-                        }
+                        if (currentBoss.predicate.test(entity)) entities.put("boss", entity);
                     }
                 }
             }

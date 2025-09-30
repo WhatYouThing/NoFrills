@@ -15,11 +15,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
 public class CurveSolver {
     private static final List<Vec3d> particleList = new ArrayList<>();
+    private static final PolynomialFitter3D fitter3D = new PolynomialFitter3D();
     private static ParticleType<?> currentParticle = null;
     private static int currentTicks = 0;
     private static Vec3d lastPos = null;
@@ -42,25 +42,19 @@ public class CurveSolver {
         return array;
     }
 
-    private static double[][] arraySet(double[][] target, double[] value, int index) {
-        int length = Math.max(index + 1, target.length);
-        double[][] array = Arrays.copyOf(target, length);
-        array[index] = value;
-        return array;
-    }
-
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (event.type.equals(currentParticle)) {
             if (event.pos.distanceTo(particleList.isEmpty() ? mc.player.getPos() : particleList.getLast()) > 4) {
                 return;
             }
+            if (particleList.size() % 2 == 0) {
+                fitter3D.addPoint((double) (particleList.size() / 2), event.pos);
+            }
             particleList.add(event.pos);
             currentTicks = 40;
-            try {
-                lastPos = BezierCurve.solve();
-            } catch (RuntimeException exception) {
-                LOGGER.error("Caught exception while solving curve", exception);
+            if (particleList.size() > 6) {
+                lastPos = solve();
             }
         }
     }
@@ -69,6 +63,8 @@ public class CurveSolver {
     private static void onClientTick(WorldTickEvent event) {
         if (currentParticle == null) {
             if (mc.options.attackKey.isPressed() || mc.options.useKey.isPressed()) {
+                particleList.clear();
+                fitter3D.clear();
                 currentParticle = getCurveParticle();
                 currentTicks = 40;
             }
@@ -120,6 +116,11 @@ public class CurveSolver {
                     .transpose();
             return result.getArray()[0];
         }
+
+        public void clear() {
+            this.yMatrix = new Matrix(0, 1);
+            this.xMatrix = new Matrix(0, degree + 1);
+        }
     }
 
     public static class PolynomialFitter3D {
@@ -146,66 +147,36 @@ public class CurveSolver {
             }
             return new Matrix(coefficients).transpose().getArray();
         }
+
+        public void clear() {
+            for (PolynomialFitter fitter : fitters) {
+                fitter.clear();
+            }
+        }
     }
 
-    public static class BezierCurve {
-        public Matrix coefficients;
 
-        public BezierCurve(double[][] coefficients) {
-            double[][] bezierArray = {
-                    {1, 0, 0, 0},
-                    {-3, 3, 0, 0},
-                    {3, -6, 3, 0},
-                    {-1, 3, -3, 1}
-            };
-            this.coefficients = new Matrix(coefficients);
-            Matrix bezierMatrix = new Matrix(bezierArray).inverse();
-            Matrix coefficientsMatrix = new Matrix(Arrays.copyOf(coefficients, coefficients.length)).transpose();
-            for (int i = 0; i < 3; i++) { // may or may not be broken :kek:
-                double[] row = coefficientsMatrix.getArray()[i];
-                Matrix coefficient = new Matrix(new double[][]{{row[0], row[1], row[2], row[3]}}).transpose();
-                Matrix matrix = bezierMatrix.times(coefficient).transpose();
-                this.coefficients = new Matrix(arraySet(this.coefficients.getArray(), matrix.getArray()[i], i));
-            }
-        }
+    private static double calculateT(double[] vec) {
+        double x = vec[0], y = vec[1], z = vec[2];
+        return 7 / (Math.sqrt(9 * java.lang.Math.pow(y, 2) + 7 * (java.lang.Math.pow(x, 2) + java.lang.Math.pow(z, 2) + java.lang.Math.pow(y, 2))) - 3 * y);
+    }
 
-        public static Vec3d solve() {
-            if (particleList.size() < 3) {
-                return null;
-            }
-            PolynomialFitter3D fitter3D = new PolynomialFitter3D();
-            for (int i = 0; i < particleList.size(); i++) {
-                fitter3D.addPoint(i, particleList.get(i));
-            }
-            BezierCurve curve = new BezierCurve(fitter3D.fit());
-            double[] vecFirst = curve.coefficients.getArray()[0];
-            double[] vecSecond = curve.coefficients.getArray()[1];
-            double t = curve.calculateT(new double[]{vecSecond[0] - vecFirst[0], vecSecond[1] - vecFirst[1], vecSecond[2] - vecFirst[2]});
-            double[] vecResult = curve.at(1 / t);
-            return new Vec3d(vecResult[0], vecResult[1], vecResult[2]).subtract(0, 0.5, 0);
+    private static Vec3d solve() {
+        double[][] res = fitter3D.fit();
+        double[] deriv_0 = new double[3];
+        for (int i = 0; i < 3; i++) {
+            deriv_0[i] = res[1][i] / 3;
         }
-
-        public double[] at(double t) {
-            double[][] array = this.coefficients.copy().getArray();
-            int length = array.length;
-            for (int i = 0; i < length - 1; i++) {
-                double[][] coefficients1 = Arrays.copyOfRange(array, 0, array.length - 2);
-                double[][] coefficients2 = Arrays.copyOfRange(array, 1, array.length - 1);
-                double[][] data = new double[][]{};
-                for (int j = 1; j < length - 1; j++) {
-                    double[] vec1 = coefficients1[j];
-                    double[] vec2 = coefficients2[j];
-                    Vec3d result = new Vec3d(vec1[0], vec1[1], vec1[2]).multiply(1 - t).add(new Vec3d(vec2[0], vec2[1], vec2[2]).multiply(t));
-                    data = arrayPush(data, new double[]{result.getX(), result.getY(), result.getZ()});
-                }
-                array = data;
+        double end_t = calculateT(deriv_0);
+        double[] acc = new double[3];
+        double term = 1;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 3; j++) {
+                acc[j] += res[i][j] * term;
             }
-            return array[0];
+            term *= end_t;
         }
-
-        public double calculateT(double[] vec) {
-            double x = vec[0], y = vec[1], z = vec[2];
-            return 7 / (Math.sqrt(9 * java.lang.Math.pow(y, 2) + 7 * (java.lang.Math.pow(x, 2) + java.lang.Math.pow(z, 2) + java.lang.Math.pow(y, 2))) - 3 * y);
-        }
+        acc[1] -= 0.5;
+        return new Vec3d(acc[0], acc[1], acc[2]);
     }
 }

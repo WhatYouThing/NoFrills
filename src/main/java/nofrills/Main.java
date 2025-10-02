@@ -27,10 +27,7 @@ import nofrills.features.kuudra.*;
 import nofrills.features.mining.*;
 import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
-import nofrills.features.solvers.CalendarDate;
-import nofrills.features.solvers.DianaSolver;
-import nofrills.features.solvers.ExperimentSolver;
-import nofrills.features.solvers.SpookyChests;
+import nofrills.features.solvers.*;
 import nofrills.features.tweaks.DoubleUseFix;
 import nofrills.features.tweaks.MiddleClickOverride;
 import nofrills.hud.HudManager;
@@ -159,6 +156,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(BeaconTracer.class);
         eventBus.subscribe(CocoonAlert.class);
         eventBus.subscribe(DianaSolver.class);
+        eventBus.subscribe(HoppitySolver.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

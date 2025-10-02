@@ -15,11 +15,9 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.math.BlockPos;
 import nofrills.config.Config;
-import nofrills.events.InteractBlockEvent;
-import nofrills.events.InteractEntityEvent;
-import nofrills.events.InteractItemEvent;
-import nofrills.events.ScreenOpenEvent;
+import nofrills.events.*;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.features.misc.UnfocusedTweaks;
 import nofrills.features.tweaks.NoDropSwing;
@@ -32,6 +30,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
@@ -98,6 +97,11 @@ public abstract class MinecraftClientMixin {
         if (eventBus.post(new InteractItemEvent()).isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "doAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;attackBlock(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"), cancellable = true)
+    private void onAttackBlock(CallbackInfoReturnable<Boolean> cir, @Local BlockHitResult blockHitResult, @Local BlockPos blockPos) {
+        eventBus.post(new AttackBlockEvent(blockHitResult, blockPos));
     }
 
     @Inject(method = "stop", at = @At("HEAD"))

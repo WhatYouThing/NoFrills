@@ -65,7 +65,7 @@ public final class Rendering {
      * Draws a simulated beacon beam for the current frame. Automatically performs the required matrix stack translation.
      */
     public static void drawBeam(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, Vec3d pos, int height, boolean throughWalls, RenderColor color) {
-        drawFilled(matrices, consumer, camera, Box.of(pos, 0.35, 0, 0.35).stretch(0, height, 0), throughWalls, color);
+        drawFilled(matrices, consumer, camera, Box.of(pos, 0.5, 0, 0.5).stretch(0, height, 0), throughWalls, color);
     }
 
     /**
@@ -78,7 +78,7 @@ public final class Rendering {
         MatrixStack.Entry entry = matrices.peek();
         VertexConsumer buffer = consumer.getBuffer(Layers.BoxOutlineNoCull);
         Vec3d point = camPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw())); // taken from Skyblocker's RenderHelper, my brain cannot handle OpenGL
-        Vector3f normal = pos.toVector3f().sub((float) point.getX(), (float) point.getY(), (float) point.getZ()).normalize();
+        Vector3f normal = pos.toVector3f().sub((float) point.getX(), (float) point.getY(), (float) point.getZ()).normalize(new Vector3f(1.0f, 1.0f, 1.0f));
         buffer.vertex(entry, (float) point.getX(), (float) point.getY(), (float) point.getZ()).color(color.r, color.g, color.b, color.a).normal(entry, normal);
         buffer.vertex(entry, (float) pos.getX(), (float) pos.getY(), (float) pos.getZ()).color(color.r, color.g, color.b, color.a).normal(entry, normal);
         matrices.pop();

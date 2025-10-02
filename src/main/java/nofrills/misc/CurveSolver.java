@@ -20,11 +20,9 @@ public class CurveSolver {
     }
 
     public void addPos(Vec3d pos) {
-        if (this.particleList.size() % 2 == 0) {
-            this.fitter3D.addPoint(this.particleList.size() / 2.0, pos);
-        }
+        this.fitter3D.addPoint(this.particleList.size(), pos);
         this.particleList.add(pos);
-        if (this.particleList.size() > 6) {
+        if (this.particleList.size() > 3) {
             this.lastPos = solve();
         }
     }

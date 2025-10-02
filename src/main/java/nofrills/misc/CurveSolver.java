@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static nofrills.Main.mc;
+
 public class CurveSolver {
     private final List<Vec3d> particleList = new ArrayList<>();
     private final PolynomialFitter3D fitter3D = new PolynomialFitter3D();
@@ -25,6 +27,10 @@ public class CurveSolver {
         if (this.particleList.size() > 3) {
             this.lastPos = solve();
         }
+    }
+
+    public double getLastDist(Vec3d pos) {
+        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) : mc.player.getEyePos().distanceTo(pos);
     }
 
     public Vec3d getSolvedPos() {

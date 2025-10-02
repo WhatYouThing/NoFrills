@@ -1,6 +1,12 @@
 package nofrills.features.solvers;
 
+import com.google.common.collect.Sets;
+import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -10,8 +16,11 @@ import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.events.*;
 import nofrills.misc.CurveSolver;
+import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
+
+import java.util.HashSet;
 
 public class HoppitySolver {
     public static final Feature instance = new Feature("hoppitySolver");
@@ -21,29 +30,33 @@ public class HoppitySolver {
     public static final SettingColor guessTracerColor = new SettingColor(RenderColor.fromArgb(0xffffffff), "guessTracerColor", instance);
 
     private static final CurveSolver solver = new CurveSolver();
-    private static Vec3d guess = null;
+    private static final EntityCache eggCache = new EntityCache();
+    private static final HashSet<String> textureList = Sets.newHashSet(
+        "a49333d85b8a315d0336eb2df37d8a714ca24c51b8c6074f1b5b927deb516c24",
+            "7ae6d2d31d8167bcaf95293b68a4acd872d66e751db5a34f2cbc6766a0356d0a",
+            "e5e36165819fd2850f98552edcd763ff986313119283c126ace0c4cc495e76a8"
+    );
     private static int ticks = 0;
 
     private static boolean isHoldingEgglocator() {
         return Utils.getSkyblockId(Utils.getHeldItem()).equals("EGGLOCATOR");
     }
 
-    private static void startTicking() {
-        ticks = 10;
-    }
-
     private static void onLocatingStart() {
         solver.resetFitter();
         solver.resetSolvedPos();
-        startTicking();
+        ticks = 40;
+    }
+
+    private static boolean isEgglocatorParticle(ParticleS2CPacket packet) {
+        return packet.getParameters().getType().equals(ParticleTypes.HAPPY_VILLAGER) && packet.getSpeed() == 0.0f && packet.getCount() == 1
+                && packet.getOffsetX() == 0.0f && packet.getOffsetY() == 0.0f && packet.getOffsetZ() == 0.0f;
     }
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (event.type.equals(ParticleTypes.HAPPY_VILLAGER)) {
-            Utils.infoFormat("{} {} {} {} {} {} {} {}", event.pos.getX(), event.pos.getY(), event.pos.getZ(), event.packet.getSpeed(), event.packet.getCount(), event.packet.getOffsetX(), event.packet.getOffsetY(), event.packet.getOffsetZ());
+        if (isEgglocatorParticle(event.packet) && ticks > 0 && solver.getLastDist(event.pos) <= 3.0) {
             solver.addPos(event.pos);
-            guess = solver.getSolvedPos();
         }
     }
 
@@ -51,7 +64,7 @@ public class HoppitySolver {
     private static void onUseItem(InteractItemEvent event) {
         if (isHoldingEgglocator()) {
             onLocatingStart();
-            startTicking();
+            ticks = 40;
         }
     }
 
@@ -59,7 +72,7 @@ public class HoppitySolver {
     private static void onUseBlock(InteractBlockEvent event) {
         if (isHoldingEgglocator()) {
             onLocatingStart();
-            startTicking();
+            ticks = 40;
         }
     }
 
@@ -71,13 +84,27 @@ public class HoppitySolver {
                 solver.resetFitter();
             }
         }
+        if (solver.getSolvedPos() != null) {
+            for (Entity ent : Utils.getOtherEntities(null, Box.of(solver.getSolvedPos(), 3.0, 3.0, 3.0), null)) {
+                if (ent instanceof ArmorStandEntity stand && !eggCache.has(ent)) {
+                    GameProfile textures = Utils.getTextures(Utils.getEntityArmor(stand).getFirst());
+                    for (String texture : textureList) {
+                        if (Utils.isTextureEqual(textures, texture)) {
+                            eggCache.add(ent);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (guess != null) {
-            BlockPos pos = BlockPos.ofFloored(guess);
-            event.drawFilled(Box.enclosing(pos, pos), true, guessColor.value());
+        for (Entity egg : eggCache.get()) {
+            BlockPos pos = BlockPos.ofFloored(egg.getEyePos());
+            Box box = Box.enclosing(pos, pos);
+            event.drawFilled(box, true, guessColor.value());
         }
     }
 
@@ -85,7 +112,7 @@ public class HoppitySolver {
     private static void onJoin(ServerJoinEvent event) {
         solver.resetFitter();
         solver.resetSolvedPos();
-        guess = null;
+        eggCache.clear();
         ticks = 0;
     }
 }

@@ -44,14 +44,10 @@ public class DianaSolver {
         return Utils.getSkyblockId(Utils.getHeldItem()).equals("ANCESTRAL_SPADE");
     }
 
-    private static void startTicking() {
-        ticks = 10;
-    }
-
     private static void onSpooningStart() {
         solver.resetFitter();
         solver.resetSolvedPos();
-        startTicking();
+        ticks = 20;
     }
 
     private static BurrowType getTypeFromPacket(ParticleS2CPacket packet) {
@@ -80,51 +76,50 @@ public class DianaSolver {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (!instance.isActive()) return;
-        BurrowType type = getTypeFromPacket(event.packet);
-        if (type.equals(BurrowType.Guess)) {
-            if (ticks > 0 && mc.player.getPos().distanceTo(event.pos) <= 32.0) {
-                solver.addPos(event.pos);
-                startTicking();
-                if (solver.getSolvedPos() != null) {
-                    Burrow guess = new Burrow(solver.getSolvedPos(), BurrowType.Guess);
-                    burrowsList.removeIf(burrow -> burrow.type.equals(BurrowType.Guess) || burrow.equals(guess));
-                    burrowsList.add(guess);
-                }
-            }
-        } else if (!type.equals(BurrowType.None) && isHoldingSpoon()) {
-            BlockPos pos = BlockPos.ofFloored(event.pos.subtract(0, 0.5, 0));
-            Burrow nearby = new Burrow(pos, type);
-            if (mc.world.getBlockState(pos).getBlock().equals(Blocks.GRASS_BLOCK)) {
-                for (Burrow burrow : getBurrowsList()) {
-                    if (burrow.type.equals(BurrowType.Guess)) {
-                        if (burrow.getVec().distanceTo(nearby.getVec()) <= 4.0) {
-                            burrowsList.remove(burrow);
-                            break;
-                        }
-                    } else {
-                        if (burrow.equals(nearby)) {
-                            return;
-                        }
+        if (instance.isActive()) {
+            BurrowType type = getTypeFromPacket(event.packet);
+            if (type.equals(BurrowType.Guess)) {
+                if (ticks > 0 && solver.getLastDist(event.pos) <= 3.0) {
+                    solver.addPos(event.pos);
+                    ticks = 20;
+                    if (solver.getSolvedPos() != null) {
+                        Burrow guess = new Burrow(solver.getSolvedPos(), BurrowType.Guess);
+                        burrowsList.removeIf(burrow -> burrow.type.equals(BurrowType.Guess) || burrow.equals(guess));
+                        burrowsList.add(guess);
                     }
                 }
-                burrowsList.add(nearby);
+            } else if (!type.equals(BurrowType.None) && isHoldingSpoon()) {
+                BlockPos pos = BlockPos.ofFloored(event.pos.subtract(0, 0.5, 0));
+                Burrow nearby = new Burrow(pos, type);
+                if (mc.world.getBlockState(pos).getBlock().equals(Blocks.GRASS_BLOCK)) {
+                    for (Burrow burrow : getBurrowsList()) {
+                        if (burrow.type.equals(BurrowType.Guess)) {
+                            if (burrow.getVec().distanceTo(nearby.getVec()) <= 4.0) {
+                                burrowsList.remove(burrow);
+                                break;
+                            }
+                        } else {
+                            if (burrow.equals(nearby)) {
+                                return;
+                            }
+                        }
+                    }
+                    burrowsList.add(nearby);
+                }
             }
         }
     }
 
     @EventHandler
     private static void onUseItem(InteractItemEvent event) {
-        if (!instance.isActive()) return;
-        if (isHoldingSpoon()) {
+        if (instance.isActive() && isHoldingSpoon()) {
             onSpooningStart();
         }
     }
 
     @EventHandler
     private static void onUseBlock(InteractBlockEvent event) {
-        if (!instance.isActive()) return;
-        if (isHoldingSpoon()) {
+        if (instance.isActive() && isHoldingSpoon()) {
             Burrow target = new Burrow(event.blockHitResult.getBlockPos(), BurrowType.None);
             List<Burrow> burrowsList = getBurrowsList();
             for (Burrow burrow : burrowsList) {
@@ -139,8 +134,7 @@ public class DianaSolver {
 
     @EventHandler
     private static void onAttackBlock(AttackBlockEvent event) {
-        if (!instance.isActive()) return;
-        if (isHoldingSpoon()) {
+        if (instance.isActive() && isHoldingSpoon()) {
             Burrow target = new Burrow(event.blockHitResult.getBlockPos(), BurrowType.None);
             for (Burrow burrow : getBurrowsList()) {
                 if (burrow.equals(target)) {

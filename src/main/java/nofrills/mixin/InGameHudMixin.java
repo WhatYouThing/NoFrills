@@ -5,6 +5,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
 import nofrills.events.HudRenderEvent;
 import nofrills.features.general.NoRender;
@@ -79,6 +80,20 @@ public abstract class InGameHudMixin implements TitleRendering {
     @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderEffectOverlay(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (NoRender.instance.isActive() && NoRender.effectDisplay.value()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderNauseaOverlay", at = @At("HEAD"), cancellable = true)
+    private void onRenderNausea(DrawContext context, float nauseaStrength, CallbackInfo ci) {
+        if (NoRender.instance.isActive() && NoRender.nausea.value()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "renderVignetteOverlay", at = @At("HEAD"), cancellable = true)
+    private void onRenderVignette(DrawContext context, Entity entity, CallbackInfo ci) {
+        if (NoRender.instance.isActive() && NoRender.vignette.value()) {
             ci.cancel();
         }
     }

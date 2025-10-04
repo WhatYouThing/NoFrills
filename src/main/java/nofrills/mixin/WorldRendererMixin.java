@@ -4,10 +4,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.util.math.Box;
 import nofrills.events.WorldRenderEvent;
 import nofrills.features.general.NoRender;
@@ -53,6 +50,9 @@ public abstract class WorldRendererMixin {
                 ci.cancel();
             }
             if (NoRender.lightning.value() && entity instanceof LightningEntity) {
+                ci.cancel();
+            }
+            if (NoRender.expOrbs.value() && entity instanceof ExperienceOrbEntity) {
                 ci.cancel();
             }
         }

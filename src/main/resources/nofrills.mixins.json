@@ -20,6 +20,7 @@
     "EntityMixin",
     "EntityRendererMixin",
     "GameOptionsMixin",
+    "GameRendererMixin",
     "HandledScreenAccessor",
     "HandledScreenMixin",
     "HeldItemRendererMixin",

@@ -53,17 +53,24 @@ public class Main implements ModInitializer {
         NoFrillsCommand.init(dispatcher);
     }
 
+    public static void injectRenderDoc() {
+        try {
+            String path = System.getProperty("nofrills.renderdoc.library_path");
+            if (path != null) {
+                System.load(path);
+                LOGGER.info("Loaded RenderDoc lib: {}", path);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     @Override
     public void onInitialize() {
         long start = Util.getMeasuringTimeMs();
 
         mc = MinecraftClient.getInstance();
 
-        String renderdocPath = System.getProperty("nofrills.renderdoc.library_path");
-        if (renderdocPath != null) {
-            System.load(renderdocPath);
-            LOGGER.info("Loaded RenderDoc lib: {}", renderdocPath);
-        }
+        injectRenderDoc();
 
         Config.load();
 

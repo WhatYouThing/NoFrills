@@ -1,5 +1,6 @@
 package nofrills.features.general;
 
+import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -17,6 +18,7 @@ import nofrills.events.ReceivePacketEvent;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.misc.Utils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -46,14 +48,14 @@ public class NoRender {
             Pattern.compile(".* 0/.*" + Utils.Symbols.heart + " " + Utils.Symbols.vampLow)
     );
 
-    private static final List<Block> treeBlocks = List.of(
+    private static final HashSet<Block> treeBlocks = Sets.newHashSet(
             Blocks.MANGROVE_WOOD,
             Blocks.MANGROVE_LEAVES,
             Blocks.STRIPPED_SPRUCE_WOOD,
             Blocks.AZALEA_LEAVES
     );
 
-    private static final List<ParticleType<?>> explosionParticles = List.of(
+    private static final HashSet<ParticleType<?>> explosionParticles = Sets.newHashSet(
             ParticleTypes.EXPLOSION,
             ParticleTypes.EXPLOSION_EMITTER,
             ParticleTypes.GUST,
@@ -62,12 +64,7 @@ public class NoRender {
 
     public static boolean isTreeBlock(Entity entity) {
         if (entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
-            Block block = blockDisplay.getBlockState().getBlock();
-            for (Block blacklisted : treeBlocks) {
-                if (block.equals(blacklisted)) {
-                    return true;
-                }
-            }
+            return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
         }
         return false;
     }
@@ -87,13 +84,8 @@ public class NoRender {
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive()) {
-            if (explosions.value()) {
-                for (ParticleType<?> type : explosionParticles) {
-                    if (event.type.equals(type)) {
-                        event.cancel();
-                        return;
-                    }
-                }
+            if (explosions.value() && explosionParticles.contains(event.type)) {
+                event.cancel();
             }
             if (mageBeam.value() && Utils.isInDungeons() && event.type.equals(ParticleTypes.FIREWORK)) {
                 event.cancel();

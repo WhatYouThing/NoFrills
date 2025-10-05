@@ -16,6 +16,7 @@
     "CreeperEntityAccessor",
     "DataTrackerMixin",
     "DrawContextMixin",
+    "EntityAttributeInstanceMixin",
     "EntityIndexAccessor",
     "EntityMixin",
     "EntityRendererMixin",

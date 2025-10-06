@@ -57,7 +57,6 @@ public class ShardTracker {
         list.add(new Settings.Toggle("Done Message", doneMsg, "Shows a message in chat once you reach the needed amount for any shard."));
         list.add(new Settings.Toggle("Filter Fuse", filterFuse, "Hides every Fuse/Cycle shard while outside of the Fusion Machine."));
         list.add(new Settings.Toggle("Filter Direct", filterDirect, "Hides every Direct/Bazaar shard while inside of the Fusion Machine."));
-        list.add(new Settings.Toggle("Done Message", doneMsg, "Shows a message in chat once you reach the needed amount for any shard."));
         Settings.BigButton clearButton = new Settings.BigButton("Clear Shard List", btn -> {
             data.value().add("shards", new JsonArray());
             mc.setScreen(buildSettings());
@@ -166,11 +165,18 @@ public class ShardTracker {
         return null;
     }
 
+    private static boolean isInFusion() {
+        if (mc.currentScreen instanceof GenericContainerScreen container) {
+            String title = container.getTitle().getString();
+            return title.equals("Fusion Box") || title.equals("Confirm Fusion");
+        }
+        return false;
+    }
+
     private static boolean shouldFilter(TrackerSource source) {
-        boolean inFusion = mc.currentScreen instanceof GenericContainerScreen container && container.getTitle().getString().equals("Fusion Box");
         return switch (source) {
-            case Direct, Bazaar -> filterDirect.value() && inFusion;
-            case Fuse, Cycle -> filterFuse.value() && !inFusion;
+            case Direct, Bazaar -> filterDirect.value() && isInFusion();
+            case Fuse, Cycle -> filterFuse.value() && !isInFusion();
         };
     }
 

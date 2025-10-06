@@ -23,10 +23,12 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -248,9 +250,8 @@ public class Utils {
     public static boolean isMob(Entity entity) {
         if (entity instanceof PlayerEntity player) {
             return !isPlayer(player);
-        } else {
-            return entity instanceof LivingEntity;
         }
+        return entity instanceof LivingEntity;
     }
 
     public static boolean isBaseHealth(LivingEntity entity, float health) {
@@ -586,6 +587,16 @@ public class Utils {
             }
         }
         return list;
+    }
+
+    /**
+     * Returns every slot that is part of the container screen handler, excluding the player inventory slots.
+     */
+    public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
+        Inventory inventory = handler.getInventory();
+        List<Slot> slots = new ArrayList<>(handler.slots);
+        slots.removeIf(slot -> inventory.getStack(slot.id).equals(ItemStack.EMPTY));
+        return slots;
     }
 
     public static ItemStack getHeldItem() {

@@ -6,11 +6,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.MutableWorldProperties;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import nofrills.events.WorldTickEvent;
+import nofrills.features.slayer.MuteEnderman;
 import nofrills.features.tweaks.StonkFix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,6 +44,15 @@ public abstract class ClientWorldMixin extends World {
     private void onWorldTick(CallbackInfo ci) {
         if (mc.player != null) {
             eventBus.post(new WorldTickEvent());
+        }
+    }
+
+    @Inject(method = "playSound(DDDLnet/minecraft/sound/SoundEvent;Lnet/minecraft/sound/SoundCategory;FFZJ)V", at = @At("HEAD"), cancellable = true)
+    private void onSound(double x, double y, double z, SoundEvent event, SoundCategory category, float volume, float pitch, boolean useDistance, long seed, CallbackInfo ci) {
+        if (MuteEnderman.instance.isActive()) {
+            if (event.id().equals(SoundEvents.ENTITY_ENDERMAN_SCREAM.id()) || event.id().equals(SoundEvents.ENTITY_ENDERMAN_STARE.id())) {
+                ci.cancel();
+            }
         }
     }
 }

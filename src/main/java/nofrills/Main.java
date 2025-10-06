@@ -53,17 +53,24 @@ public class Main implements ModInitializer {
         NoFrillsCommand.init(dispatcher);
     }
 
+    public static void injectRenderDoc() {
+        try {
+            String path = System.getProperty("nofrills.renderdoc.library_path");
+            if (path != null) {
+                System.load(path);
+                LOGGER.info("Loaded RenderDoc lib: {}", path);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     @Override
     public void onInitialize() {
         long start = Util.getMeasuringTimeMs();
 
         mc = MinecraftClient.getInstance();
 
-        String renderdocPath = System.getProperty("nofrills.renderdoc.library_path");
-        if (renderdocPath != null) {
-            System.load(renderdocPath);
-            LOGGER.info("Loaded RenderDoc lib: {}", renderdocPath);
-        }
+        injectRenderDoc();
 
         Config.load();
 
@@ -78,14 +85,19 @@ public class Main implements ModInitializer {
         eventBus.subscribe(Utils.class);
         eventBus.subscribe(NoFrillsAPI.class);
         eventBus.subscribe(KuudraUtil.class);
+        eventBus.subscribe(SlayerUtil.class);
         eventBus.subscribe(HudManager.class);
         eventBus.subscribe(SpookyChests.class);
         eventBus.subscribe(ExperimentSolver.class);
         eventBus.subscribe(CalendarDate.class);
-        eventBus.subscribe(VoidgloomSeraph.class);
-        eventBus.subscribe(RiftstalkerBloodfiend.class);
+        eventBus.subscribe(HitsShieldDisplay.class);
+        eventBus.subscribe(ChaliceHighlight.class);
+        eventBus.subscribe(IceAlert.class);
+        eventBus.subscribe(StakeAlert.class);
+        eventBus.subscribe(NoAttunementSpam.class);
+        eventBus.subscribe(MuteVampire.class);
         eventBus.subscribe(KillTimer.class);
-        eventBus.subscribe(InfernoDemonlord.class);
+        eventBus.subscribe(PillarAlert.class);
         eventBus.subscribe(BossHighlight.class);
         eventBus.subscribe(ScathaMining.class);
         eventBus.subscribe(SafePickobulus.class);
@@ -149,6 +161,10 @@ public class Main implements ModInitializer {
         eventBus.subscribe(MimicMessage.class);
         eventBus.subscribe(PrinceMessage.class);
         eventBus.subscribe(SpiritBearTimer.class);
+        eventBus.subscribe(EggHitsDisplay.class);
+        eventBus.subscribe(BeaconTracer.class);
+        eventBus.subscribe(CocoonAlert.class);
+        eventBus.subscribe(PageKeybinds.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

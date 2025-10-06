@@ -75,7 +75,7 @@ public class ScathaMining {
                     Utils.info("§a§lWorm spawn cooldown ended!");
                     Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.MASTER, 1.0f, 0.0f);
                 }
-                wormsCache.clearDropped();
+                wormsCache.removeDead();
             }
         }
     }

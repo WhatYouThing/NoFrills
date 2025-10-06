@@ -3,8 +3,9 @@ package nofrills.misc;
 import net.minecraft.entity.Entity;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.function.Predicate;
 
 import static nofrills.Main.mc;
 
@@ -12,54 +13,56 @@ import static nofrills.Main.mc;
  * An object for temporarily storing any relevant entity handles, such as armor stands with custom names.
  */
 public class EntityCache {
-    private final List<Entity> entities = new ArrayList<>();
+    private final HashSet<Entity> entities = new HashSet<>();
 
     public static boolean exists(Entity ent) {
         return ent != null && ent.isAlive() && mc.world != null && mc.world.getEntityById(ent.getId()) != null;
     }
 
     public boolean equals(Entity ent1, Entity ent2) {
-        return Objects.equals(ent1.getUuid(), ent2.getUuid());
+        return ent1.equals(ent2);
     }
 
     public boolean has(Entity ent) {
-        return entities.stream().anyMatch(entity -> equals(ent, entity));
+        return this.entities.contains(ent);
     }
 
     public boolean empty() {
-        return entities.isEmpty();
+        return this.entities.isEmpty();
     }
 
     public int size() {
-        return entities.size();
+        return this.entities.size();
     }
 
     /**
      * Adds an entity handle to the object. Does nothing if the entity is already on the list.
      */
     public void add(Entity ent) {
-        if (!has(ent)) {
-            entities.add(ent);
-        }
+        this.entities.add(ent);
     }
 
     public void remove(Entity ent) {
-        entities.removeIf(entity -> equals(ent, entity));
+        this.entities.removeIf(ent::equals);
     }
 
     public void clear() {
-        entities.clear();
+        this.entities.clear();
     }
 
-    public void clearDropped() {
-        entities.removeIf(entity -> !exists(entity));
+    public void removeDead() {
+        this.entities.removeIf(entity -> !exists(entity));
+    }
+
+    public void removeIf(Predicate<Entity> filter) {
+        this.entities.removeIf(filter);
     }
 
     /**
      * Removes any dead/dropped entities from the list, and returns a copy.
      */
     public List<Entity> get() {
-        clearDropped();
-        return new ArrayList<>(entities);
+        this.removeDead();
+        return new ArrayList<>(this.entities);
     }
 }

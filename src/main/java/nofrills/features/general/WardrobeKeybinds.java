@@ -3,7 +3,6 @@ package nofrills.features.general;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -29,8 +28,6 @@ public class WardrobeKeybinds {
     public static final SettingEnum<KeybindStyle> style = new SettingEnum<>(KeybindStyle.Simple, KeybindStyle.class, "style", instance.key());
     public static final SettingBool noUnequip = new SettingBool(false, "noUnequip", instance.key());
     public static final SettingBool sound = new SettingBool(false, "sound", instance.key());
-    public static final SettingKeybind next = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "next", instance.key());
-    public static final SettingKeybind previous = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "previous", instance.key());
     public static final SettingKeybind custom1 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom1", instance.key());
     public static final SettingKeybind custom2 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom2", instance.key());
     public static final SettingKeybind custom3 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom3", instance.key());
@@ -110,43 +107,22 @@ public class WardrobeKeybinds {
         return false;
     }
 
-    private static boolean isPageButton(ItemStack stack, int key) {
-        if (!stack.isEmpty() && stack.getItem().equals(Items.ARROW)) {
-            String name = Utils.toPlainString(stack.getName());
-            return (name.equals("Next Page") && next.value() == key) || (name.equals("Previous Page") && previous.value() == key);
-        }
-        return false;
-    }
-
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
-            Inventory inventory = container.getScreenHandler().getInventory();
             int page = getWardrobePage(container.getTitle().getString());
             if (page == -1) return;
-            if (next.value() == event.key || previous.value() == event.key) {
-                for (Slot slot : container.getScreenHandler().slots) {
-                    if (!inventory.getStack(slot.id).equals(ItemStack.EMPTY) && isPageButton(slot.getStack(), event.key)) {
-                        if (event.action == GLFW.GLFW_PRESS) {
-                            mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
+            int target = getTargetSlot(event.key, page);
+            for (Slot slot : Utils.getContainerSlots(container.getScreenHandler())) {
+                if (isEquipButton(slot, target)) {
+                    if (event.action == GLFW.GLFW_PRESS) {
+                        mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_LEFT, SlotActionType.PICKUP, mc.player);
+                        if (sound.value()) {
+                            Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR, SoundCategory.MASTER, 0.69f, 1.0f);
                         }
-                        event.cancel();
-                        return;
                     }
-                }
-            } else {
-                int target = getTargetSlot(event.key, page);
-                for (Slot slot : container.getScreenHandler().slots) {
-                    if (!inventory.getStack(slot.id).equals(ItemStack.EMPTY) && isEquipButton(slot, target)) {
-                        if (event.action == GLFW.GLFW_PRESS) {
-                            mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_LEFT, SlotActionType.PICKUP, mc.player);
-                            if (sound.value()) {
-                                Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR, SoundCategory.MASTER, 0.69f, 1.0f);
-                            }
-                        }
-                        event.cancel();
-                        return;
-                    }
+                    event.cancel();
+                    break;
                 }
             }
         }

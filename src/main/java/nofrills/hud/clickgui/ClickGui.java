@@ -127,8 +127,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Dropdown<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),
                                 new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with a keybind."),
                                 new Settings.Toggle("Sound Effect", WardrobeKeybinds.sound, "Plays a sound effect upon using a keybind."),
-                                new Settings.Keybind("Next Page", WardrobeKeybinds.next, "The keybind to go to the next wardrobe page."),
-                                new Settings.Keybind("Previous Page", WardrobeKeybinds.previous, "The keybind to go to the previous wardrobe page."),
                                 new Settings.Keybind("Custom Slot 1", WardrobeKeybinds.custom1, "Your custom keybind for the 1st wardrobe slot."),
                                 new Settings.Keybind("Custom Slot 2", WardrobeKeybinds.custom2, "Your custom keybind for the 2nd wardrobe slot."),
                                 new Settings.Keybind("Custom Slot 3", WardrobeKeybinds.custom3, "Your custom keybind for the 3rd wardrobe slot."),
@@ -175,7 +173,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Falling Blocks", NoRender.fallingBlocks, "Hides falling block entities such as sand."),
                                 new Settings.Toggle("Mage Beam", NoRender.mageBeam, "Prevents the server from spawning the Mage Beam particles in Dungeons."),
                                 new Settings.Toggle("Tree Bits", NoRender.treeBits, "Hides the flying wood and leaves blocks that appear when chopping trees on the Galatea."),
-                                new Settings.Toggle("Nametag Invisibility", NoRender.nametagInvisibility, "Keeps player nametags visible, even if they are sneaking or have the invisibility effect.")
+                                new Settings.Toggle("Nausea", NoRender.nausea, "Prevents the nausea screen wobble and/or green overlay from rendering."),
+                                new Settings.Toggle("Vignette", NoRender.vignette, "Prevents the dark vignette overlay from rendering."),
+                                new Settings.Toggle("Exp Orbs", NoRender.expOrbs, "Prevents experience orbs from rendering.")
                         ))),
                         new Module("Pearl Refill", PearlRefill.instance, "Easily refill your Ender Pearls from your sacks with a keybind.", new Settings(List.of(
                                 new Settings.Keybind("Keybind", PearlRefill.keybind, "The key that activates the feature.")
@@ -213,7 +213,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),
-                        new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUI's, making navigation smoother."),
+                        new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother."),
                         new Module("No Front Perspective", NoFrontPerspective.instance, "Removes the front facing camera perspective."),
                         new Module("No Ability Place", NoAbilityPlace.instance, "Prevents block items with abilities from being placeable client side, such as the Egglocator.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", NoAbilityPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
@@ -223,9 +223,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", AntiSwim.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", AntiSwim.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Efficiency Fix", EfficiencyFix.instance, "Fixes the Efficiency enchant being ping and lag dependent.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", EfficiencyFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", EfficiencyFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        new Module("Enchant Fix", EnchantFix.instance, "Fixes client side issues with certain vanilla enchants.\n\n- Fixes Efficiency being lag and ping dependent\n- Fixes Aqua Affinity not working", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", EnchantFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", EnchantFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Item Count Fix", ItemCountFix.instance, "Prevents the game from hiding item counts for unstackable items."),
                         new Module("Middle Click Fix", MiddleClickFix.instance, "Allows the middle mouse button to work just as it does on 1.8.9."),
@@ -268,7 +268,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Old Safewalk", OldSafewalk.instance, "Allows you to walk onto short blocks (such as carpet) while sneaking.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", OldSafewalk.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", OldSafewalk.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        )))
+                        ))),
+                        new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\n- Fixes the rare disconnects that occur while doing Tarantula slayer.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(
@@ -299,7 +300,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Mute Sounds", UnfocusedTweaks.muteSounds, "Mutes the in-game sound while unfocused."),
                                 new Settings.Toggle("No Vanilla Limit", UnfocusedTweaks.noVanilla, "Fully disables the vanilla \"Reduce FPS\" option."),
                                 new Settings.SliderInt("FPS Limit", 0, 200, 1, UnfocusedTweaks.fpsLimit, "The max FPS the game will render at while unfocused. Set to 0 to disable.")
-                        )))
+                        ))),
+                        new Module("Page Keybinds", PageKeybinds.instance, "Adds next/previous page keybinds to applicable Skyblock GUIs.", new Settings(List.of(
+                                new Settings.Keybind("Next Page", PageKeybinds.next, "The keybind to go to the next page of the GUI."),
+                                new Settings.Keybind("Previous Page", PageKeybinds.previous, "The keybind to go to the previous page of the GUI.")
+                        ))),
+                        new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experiments", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
@@ -464,22 +470,31 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Crystal Fill", true, BossHighlight.crystalFill, "The color of the filled box if your boss is using the Crystal attunement."),
                                 new Settings.ColorPicker("Crystal Outline", true, BossHighlight.crystalOutline, "The color of the outline box if your boss is using the Crystal attunement.")
                         ))),
-                        new Module("Inferno Demonlord", InfernoDemonlord.instance, "Various features for Blaze slayer.", new Settings(List.of(
-                                new Settings.Toggle("Pillar Alert", InfernoDemonlord.pillarAlert, "Displays information about your fire pillars.\nThis feature tries to ensure that you only get alerted for your own pillars, no false flags."),
-                                new Settings.Toggle("No Spam", InfernoDemonlord.noSpam, "Hides the chat messages about using the wrong attunement.")
-                        ))),
+                        new Module("Pillar Alert", PillarAlert.instance, "Alerts you when your Blaze boss spawns a fire pillar.\nThis feature tries to prevent false flags by tracking the \"path\" that the pillars take."),
+                        new Module("No Attunement Spam", NoAttunementSpam.instance, "Filters the chat messages about using the wrong attunement on the Blaze boss."),
                         new Module("Kill Timer", KillTimer.instance, "Tracks how long your slayer boss took to kill."),
-                        new Module("Riftstalker Bloodfiend", RiftstalkerBloodfiend.instance, "Various features for Vampire slayer.", new Settings(List.of(
-                                new Settings.Toggle("Ice Indicator", RiftstalkerBloodfiend.ice, "Shows when to use your Holy Ice against Twinclaws."),
-                                new Settings.Toggle("Steak Indicator", RiftstalkerBloodfiend.steak, "Shows text on screen once you can vanquish your boss with the Steak Stake."),
-                                new Settings.Toggle("Ichor Highlight", RiftstalkerBloodfiend.ichor, "Highlights the Blood Ichors during the T5 fight."),
-                                new Settings.ColorPicker("Ichor Color", true, RiftstalkerBloodfiend.ichorColor, "The color of the Blood Ichor highlight."),
-                                new Settings.Toggle("Silence Mania", RiftstalkerBloodfiend.mania, "Removes the very loud Mania sound effects."),
-                                new Settings.Toggle("Silence Killer Springs", RiftstalkerBloodfiend.springs, "Removes the sounds that play when your boss spawns a Killer Spring.")
+                        new Module("Chalice Highlight", ChaliceHighlight.instance, "Highlights the Blood Ichor chalices spawned by the T5 Vampire.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, ChaliceHighlight.color, "The color of the chalice highlight.")
                         ))),
-                        new Module("Voidgloom Seraph", VoidgloomSeraph.instance, "Various features for Enderman slayer.", new Settings(List.of(
-                                new Settings.Toggle("Hits Display", VoidgloomSeraph.hits, "Shows the amount of hits needed to break the hits shield of your boss.")
-                        )))
+                        new Module("Ice Alert", IceAlert.instance, "Shows a timer for when your Vampire boss is going to cast Twinclaws."),
+                        new Module("Stake Alert", StakeAlert.instance, "Shows text on screen once you can vanquish your Vampire boss with the Steak Stake."),
+                        new Module("Mute Vampire", MuteVampire.instance, "Prevents the Vampire Mania/Killer Springs sounds from playing.", new Settings(List.of(
+                                new Settings.Toggle("Mania", MuteVampire.mania, "Mutes the loud Mania sounds while in the Chateau."),
+                                new Settings.Toggle("Killer Springs", MuteVampire.springs, "Mutes the Wither sound spam that occurs when your boss spawns a Killer Spring.")
+                        ))),
+                        new Module("Hits Shield Display", HitsShieldDisplay.instance, "Renders the needed hits for the Voidgloom Seraph hits shield phase.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, HitsShieldDisplay.color, "The color of the text."),
+                                new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, HitsShieldDisplay.scale, "The scale of the text.")
+                        ))),
+                        new Module("Egg Hits Display", EggHitsDisplay.instance, "Renders the needed hits for the Tarantula Broodfather egg sack phase.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, EggHitsDisplay.color, "The color of the text."),
+                                new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, EggHitsDisplay.scale, "The scale of the text.")
+                        ))),
+                        new Module("Beacon Tracer", BeaconTracer.instance, "Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", true, BeaconTracer.color, "The color of the tracer.")
+                        ))),
+                        new Module("Mute Enderman", MuteEnderman.instance, "Prevents the angry Enderman sounds from playing."),
+                        new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt.")
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your mining ability is ready to be used again."),

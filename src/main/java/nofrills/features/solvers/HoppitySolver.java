@@ -136,7 +136,10 @@ public class HoppitySolver {
                     HashSet<Integer> toRemove = new HashSet<>();
                     for (HashMap.Entry<Integer, Vec3d> entry : farGuesses.entrySet()) {
                         Optional<Entity> refined = refineGuess(entry.getValue());
-                        refined.ifPresent(eggCache::add);
+                        if (refined.isPresent()) {
+                            eggCache.add(refined.get());
+                            toRemove.add(entry.getKey());
+                        }
                         if (mc.player != null && mc.player.squaredDistanceTo(entry.getValue()) < 16 * 16) {
                             toRemove.add(entry.getKey());
                         }

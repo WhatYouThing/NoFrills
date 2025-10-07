@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Optional;
 
+import static nofrills.Main.mc;
+
 public class HoppitySolver {
     public static final Feature instance = new Feature("hoppitySolver");
 
@@ -50,7 +52,6 @@ public class HoppitySolver {
     private static void onLocatingStart() {
         solver.resetFitter();
         ticks = 40;
-        scanInstance++;
     }
 
     private static boolean isEgglocatorParticle(ParticleS2CPacket packet) {
@@ -70,6 +71,12 @@ public class HoppitySolver {
             }
         }
         return Optional.empty();
+    }
+
+    private static void eggInteract() {
+        solver.resetFitter();
+        solver.resetSolvedPos();
+        scanInstance++;
     }
 
     @EventHandler
@@ -98,8 +105,7 @@ public class HoppitySolver {
     @EventHandler
     private static void onInteractEntity(InteractEntityEvent event) {
         if (eggCache.has(event.entity)) {
-            solver.resetFitter();
-            solver.resetSolvedPos();
+            eggInteract();
         }
         eggCache.remove(event.entity);
     }
@@ -107,8 +113,7 @@ public class HoppitySolver {
     @EventHandler
     private static void onAttackEntity(AttackEntityEvent event) {
         if (eggCache.has(event.entity)) {
-            solver.resetFitter();
-            solver.resetSolvedPos();
+            eggInteract();
         }
         eggCache.remove(event.entity);
     }
@@ -131,9 +136,9 @@ public class HoppitySolver {
                     HashSet<Integer> toRemove = new HashSet<>();
                     for (HashMap.Entry<Integer, Vec3d> entry : farGuesses.entrySet()) {
                         Optional<Entity> refined = refineGuess(entry.getValue());
-                        if (refined.isPresent()) {
+                        refined.ifPresent(eggCache::add);
+                        if (mc.player != null && mc.player.squaredDistanceTo(entry.getValue()) < 16 * 16) {
                             toRemove.add(entry.getKey());
-                            eggCache.add(refined.get());
                         }
                     }
                     solver.resetFitter();

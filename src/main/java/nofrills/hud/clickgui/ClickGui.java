@@ -25,10 +25,7 @@ import nofrills.features.kuudra.*;
 import nofrills.features.mining.*;
 import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
-import nofrills.features.solvers.CalendarDate;
-import nofrills.features.solvers.DianaSolver;
-import nofrills.features.solvers.ExperimentSolver;
-import nofrills.features.solvers.SpookyChests;
+import nofrills.features.solvers.*;
 import nofrills.features.tweaks.*;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.components.PlainLabel;
@@ -321,6 +318,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Treasure Color", true, DianaSolver.treasureColor, "The color of the treasure burrow beacon."),
                                 new Settings.ColorPicker("Enemy Color", true, DianaSolver.enemyColor, "The color of the enemy burrow beacon."),
                                 new Settings.ColorPicker("Start Color", true, DianaSolver.startColor, "The color of the start burrow beacon.")
+                        ))),
+                        new Module("Hoppity Solver", HoppitySolver.instance, "Guesses the position of the egg when using the Egglocator.", new Settings(List.of(
+                                new Settings.Toggle("Guess Tracer", HoppitySolver.guessTracer, "Draws a tracer towards the guessed egg."),
+                                new Settings.ColorPicker("Guess Color", true, HoppitySolver.guessColor, "The color of the guessed egg beacon."),
+                                new Settings.ColorPicker("Tracer Color", true, HoppitySolver.guessTracerColor, "The color of the guessed egg tracer.")
                         )))
                 )),
                 new Category("Fishing", List.of(

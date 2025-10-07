@@ -44,6 +44,7 @@ public class CurveSolver {
     public void resetFitter() {
         this.particleList.clear();
         this.fitter3D.clear();
+        this.resetSolvedPos();
     }
 
     private double calculateT(double[] vec) {

@@ -81,7 +81,7 @@ public class HoppitySolver {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (isEgglocatorParticle(event.packet) && ticks > 0 && solver.getLastDist(event.pos) <= 3.0) {
+        if (isEgglocatorParticle(event.packet) && ticks > 0 && solver.getLastDist(event.pos) <= 5.0) {
             solver.addPos(event.pos);
         }
     }

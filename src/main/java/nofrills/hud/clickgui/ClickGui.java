@@ -268,7 +268,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", OldSafewalk.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", OldSafewalk.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\n- Fixes the rare disconnects that occur while doing Tarantula slayer.")
+                        new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\n- Fixes the rare disconnects that occur while doing Tarantula slayer."),
+                        new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", BreakResetFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", BreakResetFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        )))
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of item tooltips.", new Settings(List.of(

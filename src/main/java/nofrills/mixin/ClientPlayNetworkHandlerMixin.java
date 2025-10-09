@@ -16,6 +16,7 @@ import net.minecraft.network.packet.s2c.play.*;
 import nofrills.events.*;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
+import nofrills.features.tweaks.BreakResetFix;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -64,6 +65,11 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onScreenHandlerSlotUpdate", at = @At("TAIL"))
     private void onUpdateInventory(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
+        if (BreakResetFix.active() && mc.currentScreen == null && mc.player != null && mc.interactionManager != null) {
+            if (packet.getSlot() >= 36 && packet.getSlot() <= 44 && mc.player.getInventory().getSelectedSlot() == packet.getSlot() - 36) {
+                ((ClientPlayerInteractionManagerAccessor) mc.interactionManager).setStack(packet.getStack());
+            } // manually update the variable once the server updates our held item, prevents the mismatch and thus fixes the break cancel
+        }
         if (mc.currentScreen instanceof GenericContainerScreen container) {
             eventBus.post(new SlotUpdateEvent(packet, container, container.getScreenHandler(), packet.getSlot()));
         }

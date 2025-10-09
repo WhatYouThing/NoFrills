@@ -1,15 +1,20 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.network.packet.s2c.play.*;
 import nofrills.events.*;
+import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -76,6 +81,11 @@ public class ClientPlayNetworkHandlerMixin {
         if (eventBus.post(new SpawnParticleEvent(packet)).isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @WrapWithCondition(method = "onItemPickupAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleManager;addParticle(Lnet/minecraft/client/particle/Particle;)V"))
+    private boolean onAddPickupParticle(ParticleManager instance, Particle particle, @Local Entity entity) {
+        return !(NoRender.instance.isActive() && NoRender.expOrbs.value() && entity instanceof ExperienceOrbEntity);
     }
 
     @Inject(method = "onScoreboardObjectiveUpdate", at = @At("TAIL"))

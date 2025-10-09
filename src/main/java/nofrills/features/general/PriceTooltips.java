@@ -46,18 +46,18 @@ public class PriceTooltips {
                 if (data.contains("petInfo")) {
                     JsonObject petData = JsonParser.parseString(data.getString("petInfo").orElse("")).getAsJsonObject();
                     return Utils.format("{}_PET_{}", petData.get("type").getAsString(), petData.get("tier").getAsString());
-                } else {
-                    return "UNKNOWN_PET";
                 }
+                return "UNKNOWN_PET";
             }
-            case "RUNE" -> {
+            case "RUNE", "UNIQUE_RUNE" -> {
                 if (data.contains("runes")) {
                     NbtCompound runeData = data.getCompound("runes").orElse(null);
-                    String runeId = (String) runeData.getKeys().toArray()[0];
-                    return Utils.format("{}_{}_RUNE", runeId, runeData.getInt(runeId));
-                } else {
-                    return "EMPTY_RUNE";
+                    if (runeData != null) {
+                        String runeId = (String) runeData.getKeys().toArray()[0];
+                        return Utils.format("{}_{}_RUNE", runeId, runeData.getInt(runeId).orElse(0));
+                    }
                 }
+                return "EMPTY_RUNE";
             }
             case "ENCHANTED_BOOK" -> {
                 if (data.contains("enchantments")) {
@@ -68,12 +68,20 @@ public class PriceTooltips {
                         int enchantLevel = enchantData.getInt(enchantId).orElse(0);
                         return Utils.format("ENCHANTMENT_{}_{}", Utils.toUpper(enchantId), enchantLevel);
                     }
-                } else {
-                    return "ENCHANTMENT_UNKNOWN";
                 }
+                return "ENCHANTMENT_UNKNOWN";
             }
             case "ATTRIBUTE_SHARD" -> {
                 return correctShardId(getShardId(stack));
+            }
+            case "POTION" -> {
+                if (data.contains("potion")) {
+                    return Utils.format("{}_{}_POTION",
+                            Utils.toUpper(data.getString("potion").orElse("")),
+                            data.getInt("potion_level").orElse(0)
+                    );
+                }
+                return "UNKNOWN_POTION";
             }
         }
         return id;
@@ -135,22 +143,22 @@ public class PriceTooltips {
         return stack.getCount();
     }
 
-    private static Text buildLine(String name, double price, int quantity, String extra) {
+    private static Text buildLine(String name, double price, int quantity) {
         String line = Utils.format(
                 "{}: §6{} {}",
                 name,
                 Utils.formatSeparator(price * quantity),
-                quantity > 1 ? Utils.format(extra, Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
+                quantity > 1 ? Utils.format("§8({}x {})", Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
         return Utils.getShortTag().append(Text.literal(line).withColor(0xffffff));
     }
 
-    private static Text buildLine(String name, long price, int quantity, String extra) {
+    private static Text buildLine(String name, long price, int quantity) {
         String line = Utils.format(
                 "{}: §6{} {}",
                 name,
                 Utils.formatSeparator(price * quantity),
-                quantity > 1 ? Utils.format(extra, Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
+                quantity > 1 ? Utils.format("§8({}x {})", Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
         return Utils.getShortTag().append(Text.literal(line).withColor(0xffffff));
     }
@@ -167,22 +175,22 @@ public class PriceTooltips {
                 HashMap<String, Double> prices = npcPricing.get(itemId);
                 if (prices.containsKey("mote")) {
                     double burgerBonus = 1 + 0.05 * burgers.value();
-                    event.addLine(buildLine("§dMotes Price", prices.get("mote") * burgerBonus, quantity, "§8({}x {})"));
+                    event.addLine(buildLine("§dMotes Price", prices.get("mote") * burgerBonus, quantity));
                 }
             }
             if (npc.value() && npcPricing.containsKey(itemId)) {
                 HashMap<String, Double> prices = npcPricing.get(itemId);
                 if (prices.containsKey("coin")) {
-                    event.addLine(buildLine("§eNPC Price", prices.get("coin"), quantity, "§8({}x {})"));
+                    event.addLine(buildLine("§eNPC Price", prices.get("coin"), quantity));
                 }
             }
             if (auction.value() && auctionPricing.containsKey(itemId)) {
-                event.addLine(buildLine("§eLowest BIN", auctionPricing.get(itemId), quantity, "§8({}x {})"));
+                event.addLine(buildLine("§eLowest BIN", auctionPricing.get(itemId), quantity));
             }
             if (bazaar.value() && bazaarPricing.containsKey(itemId)) {
                 HashMap<String, Double> prices = bazaarPricing.get(itemId);
-                event.addLine(buildLine("§eBazaar Buy", prices.get("buy"), quantity, "§8({}x {})"));
-                event.addLine(buildLine("§eBazaar Sell", prices.get("sell"), quantity, "§8({}x {})"));
+                event.addLine(buildLine("§eBazaar Buy", prices.get("buy"), quantity));
+                event.addLine(buildLine("§eBazaar Sell", prices.get("sell"), quantity));
             }
         }
     }

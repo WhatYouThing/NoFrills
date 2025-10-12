@@ -5,7 +5,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.Arm;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.RotationAxis;
@@ -34,15 +33,10 @@ public class HeldItemRendererMixin {
     @Shadow
     private float lastEquipProgressOffHand;
 
-    @Unique
-    private boolean handEmpty() {
-        return Utils.getHeldItem().isEmpty() || Utils.getHeldItem().getItem().equals(Items.AIR);
-    }
-
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;push()V", shift = At.Shift.AFTER))
     private void onBeforeRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
         if (Viewmodel.instance.isActive()) {
-            if (handEmpty() && Viewmodel.keepEmptyHand.value()) {
+            if (Utils.getHeldItem().isEmpty() && !Viewmodel.applyToHand.value()) {
                 return;
             }
             if (hand == Hand.MAIN_HAND) {
@@ -66,7 +60,7 @@ public class HeldItemRendererMixin {
     @Inject(method = "renderArmHoldingItem", at = @At("HEAD"))
     private void onBeforeRenderHand(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
         if (Viewmodel.instance.isActive()) {
-            if (handEmpty() && Viewmodel.keepEmptyHand.value()) {
+            if (Utils.getHeldItem().isEmpty() && !Viewmodel.applyToHand.value()) {
                 return;
             }
             if (arm == Arm.RIGHT) {
@@ -80,7 +74,7 @@ public class HeldItemRendererMixin {
     @Inject(method = "renderArmHoldingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getRenderer(Lnet/minecraft/entity/Entity;)Lnet/minecraft/client/render/entity/EntityRenderer;"))
     private void onRenderHand(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
         if (Viewmodel.instance.isActive()) {
-            if (handEmpty() && Viewmodel.keepEmptyHand.value()) {
+            if (Utils.getHeldItem().isEmpty() && !Viewmodel.applyToHand.value()) {
                 return;
             }
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Viewmodel.rotX.value()));

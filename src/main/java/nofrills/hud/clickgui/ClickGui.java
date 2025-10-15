@@ -111,9 +111,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Separator("Settings"),
                                 new Settings.Keybind("Keybind", SlotBinding.keybind, "The keybind used for creating and removing slot binding combinations."),
                                 new Settings.Toggle("Show Lines", SlotBinding.lines, "Draw lines between the slot you're hovering over, and any slots bound to it."),
+                                new Settings.SliderDouble("Line Width", 0.1, 5.0, 0.1, SlotBinding.lineWidth, "The width of the lines"),
                                 new Settings.Toggle("Show Borders", SlotBinding.borders, "Draw borders around any slot that is bound to the slot you're hovering over."),
-                                new Settings.ColorPicker("Binding Color", false, SlotBinding.binding, "The color used to display the bind you are currently creating."),
-                                new Settings.ColorPicker("Bound Color", false, SlotBinding.bound, "The color used to display existing slot binds.")
+                                new Settings.ColorPicker("Binding Color", true, SlotBinding.binding, "The color used to display the bind you are currently creating."),
+                                new Settings.ColorPicker("Bound Color", true, SlotBinding.bound, "The color used to display existing slot binds.")
                         ))),
                         new Module("Price Tooltips", PriceTooltips.instance, "Adds pricing information to item tooltips. Requires connectivity to the NoFrills API.", new Settings(List.of(
                                 new Settings.Toggle("Lowest BIN", PriceTooltips.auction, "Adds the Lowest BIN price to applicable items."),
@@ -272,7 +273,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         )))
                 )),
                 new Category("Misc", List.of(
-                        new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of item tooltips.", new Settings(List.of(
+                        new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(
                                 new Settings.SliderDouble("Scale", 0.0, 4.0, 0.01, TooltipScale.scale, "The scale multiplier.")
                         ))),
                         new Module("Recipe Lookup", RecipeLookup.instance, "Search up recipes for the hovered item with a keybind.", new Settings(List.of(
@@ -380,6 +381,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Leap Overlay", LeapOverlay.instance, "Renders a custom overlay in place of the Spirit Leap menu.", new Settings(List.of(
                                 new Settings.Toggle("Send Message", LeapOverlay.send, "Sends a message once you leap to a teammate."),
                                 new Settings.TextInput("Leap Message", LeapOverlay.message, "The message to send. Replaces {name} with the name of the player."),
+                                new Settings.SliderDouble("Text Scale", 1.0, 4.0, 1.0, LeapOverlay.scale, "The scale of the text on the overlay."),
                                 new Settings.ColorPicker("Healer Color", false, LeapOverlay.healer, "The color used for Healer on the overlay."),
                                 new Settings.ColorPicker("Mage Color", false, LeapOverlay.mage, "The color used for Mage on the overlay."),
                                 new Settings.ColorPicker("Bers Color", false, LeapOverlay.bers, "The color used for Berserker on the overlay."),
@@ -579,9 +581,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
             }
         });
         parent.child(search);
-        ScrollContainer<FlowLayout> scroll = Containers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
-        this.mainScroll = scroll;
-        root.child(scroll);
+        this.mainScroll = Containers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
+        this.mainScroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
+        root.child(this.mainScroll);
         ButtonComponent hudEditorButton = Components.button(Text.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
         hudEditorButton.margins(Insets.of(0, 3, 0, 3));
         hudEditorButton.positioning(Positioning.relative(100, 100));

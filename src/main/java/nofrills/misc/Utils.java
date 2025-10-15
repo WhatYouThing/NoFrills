@@ -49,7 +49,6 @@ import net.minecraft.world.entity.ClientEntityManager;
 import net.minecraft.world.entity.EntityIndex;
 import net.minecraft.world.entity.EntityLookup;
 import nofrills.events.WorldTickEvent;
-import nofrills.features.dungeons.LeapOverlay;
 import nofrills.mixin.*;
 import org.apache.commons.io.IOUtils;
 
@@ -85,7 +84,7 @@ public class Utils {
         mc.inGameHud.setTitleTicks(fadeInTicks, stayTicks, fadeOutTicks);
     }
 
-    public static void showTitleCustom(String title, int stayTicks, int yOffset, float scale, int color) {
+    public static void showTitleCustom(String title, int stayTicks, int yOffset, float scale, RenderColor color) {
         ((TitleRendering) mc.inGameHud).nofrills_mod$setRenderTitle(title, stayTicks, yOffset, scale, color);
     }
 
@@ -712,10 +711,6 @@ public class Utils {
 
     public static String formatSeparator(float number) {
         return formatSeparator((double) number);
-    }
-
-    public static boolean isLeapMenu(String title) {
-        return LeapOverlay.instance.isActive() && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
     }
 
     public static void setScreen(Screen screen) {

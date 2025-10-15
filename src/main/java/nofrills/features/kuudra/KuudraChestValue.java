@@ -9,6 +9,7 @@ import nofrills.config.SettingInt;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.features.general.PriceTooltips;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import static nofrills.misc.NoFrillsAPI.auctionPricing;
@@ -18,7 +19,7 @@ public class KuudraChestValue {
     public static final Feature instance = new Feature("kuudraChestValue");
 
     public static final SettingInt petBonus = new SettingInt(0, "petBonus", instance.key());
-
+    public static final RenderColor background = RenderColor.fromHex(0x202020, 0.75f);
     public static double currentValue = 0.0;
 
     private static int getLootQuantity(ItemStack stack, String name) {

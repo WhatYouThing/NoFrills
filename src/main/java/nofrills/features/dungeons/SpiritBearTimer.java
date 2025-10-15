@@ -8,6 +8,7 @@ import nofrills.events.BlockUpdateEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.events.WorldTickEvent;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 public class SpiritBearTimer {
@@ -26,7 +27,7 @@ public class SpiritBearTimer {
     @EventHandler
     private static void onWorldTick(WorldTickEvent event) {
         if (spawnTicks > 0) {
-            Utils.showTitleCustom(Utils.format("BEAR: " + Utils.formatDecimal(spawnTicks / 20.0f) + "s"), 1, 25, 2.5f, 0xffff00);
+            Utils.showTitleCustom(Utils.format("BEAR: " + Utils.formatDecimal(spawnTicks / 20.0f) + "s"), 1, 25, 2.5f, RenderColor.fromHex(0xffff00));
         }
     }
 

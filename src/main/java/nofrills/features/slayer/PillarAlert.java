@@ -9,6 +9,7 @@ import nofrills.events.EntityNamedEvent;
 import nofrills.events.PlaySoundEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.events.WorldTickEvent;
+import nofrills.misc.RenderColor;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
@@ -27,7 +28,7 @@ public class PillarAlert {
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && !pillarData.isEmpty() && firePillarRegex.matcher(event.namePlain).matches()) {
             if (Utils.horizontalDistance(event.entity.getPos(), pillarData.getLast()) <= 3) {
-                Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, 0xffff00);
+                Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, RenderColor.fromHex(0xffff00));
                 pillarClearTicks = 60;
             }
         }

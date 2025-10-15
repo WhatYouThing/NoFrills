@@ -128,9 +128,8 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             option.horizontalSizing(Sizing.fixed(width));
             settings.child(option);
         }
-        this.scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(getSettingsHeight(settings.children())), settings)
-                .scrollbarThiccness(5)
-                .scrollbar(ScrollContainer.Scrollbar.flat(textColor));
+        this.scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(getSettingsHeight(settings.children())), settings);
+        this.scroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
         BaseComponent label = new PlainLabel(this.title)
                 .color(textColor)
                 .horizontalTextAlignment(HorizontalAlignment.CENTER)

@@ -213,10 +213,15 @@ public class Utils {
     }
 
     /**
-     * Returns true if the player is currently on a 1.21+ Skyblock island (currently only Park and Galatea)
+     * Returns true if the current island is running on a modern Minecraft version and/or running under prediction-based Watchdog.
      */
     public static boolean isOnModernIsland() {
-        return isInArea("The Park") || isInArea("Galatea");
+        HashSet<String> islands = Sets.newHashSet(
+                "The Park",
+                "Galatea",
+                "Catacombs"
+        );
+        return islands.contains(SkyblockData.getArea());
     }
 
     public static boolean isInstanceOver() {

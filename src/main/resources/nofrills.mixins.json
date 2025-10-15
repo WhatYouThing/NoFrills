@@ -10,7 +10,6 @@
     "ClientEntityManagerAccessor",
     "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerAccessor",
-    "ClientPlayerInteractionManagerMixin",
     "ClientPlayNetworkHandlerMixin",
     "ClientWorldAccessor",
     "ClientWorldMixin",

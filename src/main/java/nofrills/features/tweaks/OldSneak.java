@@ -16,7 +16,7 @@ public class OldSneak {
             if (skyblockCheck.value() && !Utils.isInSkyblock()) {
                 return false;
             }
-            if (modernCheck.value() && Utils.isOnModernIsland()) {
+            if (modernCheck.value() && Utils.isOnModernIsland() && !Utils.isInDungeons()) {
                 return false;
             }
         }

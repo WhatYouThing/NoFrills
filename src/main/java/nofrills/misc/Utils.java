@@ -530,7 +530,7 @@ public class Utils {
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
     public static HitResult raycastFullBlock(Entity entity, double maxDistance, float tickDelta) {
-        Vec3d height = entity.getLerpedPos(tickDelta).add(0, isOnModernIsland() ? 1.27 : 1.54, 0);
+        Vec3d height = entity.getLerpedPos(tickDelta).add(0, isOnModernIsland() && !isInDungeons() ? 1.27 : 1.54, 0);
         Vec3d camPos = entity.getCameraPosVec(tickDelta);
         Vec3d rot = entity.getRotationVec(tickDelta);
         Vec3d pos = new Vec3d(camPos.getX(), height.getY(), camPos.getZ());

@@ -194,7 +194,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("No Haste", Viewmodel.noHaste, "Prevents Haste and Mining Fatigue from affecting your swing speed."),
                                 new Settings.Toggle("No Equip Animation", Viewmodel.noEquip, "Removes the item swapping animation."),
                                 new Settings.Toggle("No Bow Swing", Viewmodel.noBowSwing, "Removes the swing animation for all bows."),
-                                new Settings.Toggle("Apply To Hand", Viewmodel.applyToHand, "Apply position & rotation changes to viewmodel for empty hand as well."),
+                                new Settings.Toggle("Apply To Hand", Viewmodel.applyToHand, "Applies the viewmodel changes to the empty hand."),
                                 new Settings.SliderInt("Swing Speed", 0, 20, 1, Viewmodel.speed, "Apply a custom swing speed. Set to 0 to disable."),
                                 new Settings.SliderDouble("Offset X", -2, 2, 0.01, Viewmodel.offsetX, "The X axis offset position of your held item."),
                                 new Settings.SliderDouble("Offset Y", -2, 2, 0.01, Viewmodel.offsetY, "The Y axis offset position of your held item."),
@@ -248,10 +248,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Snow Fix", SnowFix.instance, "Adjusts snow layer collision to reduce lagbacks.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", SnowFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", SnowFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("Stonk Fix", StonkFix.instance, "Reverts Microsoft's client side stonking patch.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", StonkFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", StonkFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Animation Fix", AnimationFix.instance, "Fixes the ancient bug where certain animations can play twice, such as unsneaking.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", AnimationFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),

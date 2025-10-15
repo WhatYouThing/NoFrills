@@ -6,12 +6,10 @@ import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
 import nofrills.config.SettingDouble;
-import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
-import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
 public class HudElement extends DraggableContainer<FlowLayout> {
@@ -36,10 +34,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     protected void drawChildren(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta, List<? extends Component> children) {
         try {
             super.drawChildren(context, mouseX, mouseY, partialTicks, delta, children);
-        } catch (Exception exception) {
-            if (this.getIdentifier() != null) {
-                LOGGER.error(Utils.format("HUD element {} failed to render!", this.getIdentifier().toString()), exception);
-            }
+        } catch (Exception ignored) {
         }
     }
 

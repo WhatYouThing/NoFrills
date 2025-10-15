@@ -10,6 +10,7 @@ public class Viewmodel {
 
     public static final SettingBool noHaste = new SettingBool(false, "noHaste", instance.key());
     public static final SettingBool noEquip = new SettingBool(false, "noEquipAnim", instance.key());
+    public static final SettingBool applyToHand = new SettingBool(false, "applyToHand", instance.key());
     public static final SettingBool noBowSwing = new SettingBool(false, "noBowSwing", instance.key());
     public static final SettingInt speed = new SettingInt(0, "speed", instance.key());
     public static final SettingDouble offsetX = new SettingDouble(0.0, "offsetX", instance.key());

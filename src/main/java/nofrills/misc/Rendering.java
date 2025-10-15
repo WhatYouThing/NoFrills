@@ -12,8 +12,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
-import nofrills.mixin.PhaseParameterBuilderAccessor;
-import nofrills.mixin.RenderPipelinesAccessor;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -129,40 +127,33 @@ public final class Rendering {
     }
 
     public static class Pipelines {
-        public static final RenderPipeline.Snippet filledSnippet = RenderPipelinesAccessor.positionColorSnippet();
-        public static final RenderPipeline.Snippet outlineSnippet = RenderPipelinesAccessor.rendertypeLinesSnippet();
+        public static final RenderPipeline.Snippet filledSnippet = RenderPipelines.POSITION_COLOR_SNIPPET;
+        public static final RenderPipeline.Snippet outlineSnippet = RenderPipelines.RENDERTYPE_LINES_SNIPPET;
 
-        public static final RenderPipeline filledNoCull = RenderPipelinesAccessor.registerPipeline(RenderPipeline.builder(filledSnippet)
+        public static final RenderPipeline filledNoCull = RenderPipelines.register(RenderPipeline.builder(filledSnippet)
                 .withLocation(Identifier.of("nofrills", "pipeline/nofrills_filled_no_cull"))
                 .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_STRIP)
                 .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
                 .build());
-        public static final RenderPipeline filledCull = RenderPipelinesAccessor.registerPipeline(RenderPipeline.builder(filledSnippet)
+        public static final RenderPipeline filledCull = RenderPipelines.register(RenderPipeline.builder(filledSnippet)
                 .withLocation(Identifier.of("nofrills", "pipeline/nofrills_filled_cull"))
                 .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLE_STRIP)
                 .build());
-        public static final RenderPipeline outlineNoCull = RenderPipelinesAccessor.registerPipeline(RenderPipeline.builder(outlineSnippet)
+        public static final RenderPipeline outlineNoCull = RenderPipelines.register(RenderPipeline.builder(outlineSnippet)
                 .withLocation(Identifier.of("nofrills", "pipeline/nofrills_outline_no_cull"))
                 .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
                 .build());
-        public static final RenderPipeline outlineCull = RenderPipelinesAccessor.registerPipeline(RenderPipeline.builder(outlineSnippet)
+        public static final RenderPipeline outlineCull = RenderPipelines.register(RenderPipeline.builder(outlineSnippet)
                 .withLocation(Identifier.of("nofrills", "pipeline/nofrills_outline_cull"))
                 .build());
     }
 
     public static class Parameters {
-        public static final RenderLayer.MultiPhaseParameters.Builder filled = RenderLayer.MultiPhaseParameters.builder();
-        public static final RenderLayer.MultiPhaseParameters.Builder lines = RenderLayer.MultiPhaseParameters.builder();
-
-        static {
-            PhaseParameterBuilderAccessor filledAccessor = (PhaseParameterBuilderAccessor) filled;
-            PhaseParameterBuilderAccessor linesAccessor = (PhaseParameterBuilderAccessor) lines;
-
-            filledAccessor.setLayering(RenderLayer.VIEW_OFFSET_Z_LAYERING);
-
-            linesAccessor.setLayering(RenderLayer.VIEW_OFFSET_Z_LAYERING);
-            linesAccessor.setLineWidth(new RenderPhase.LineWidth(OptionalDouble.of(3.0)));
-        }
+        public static final RenderLayer.MultiPhaseParameters.Builder filled = RenderLayer.MultiPhaseParameters.builder()
+                .layering(RenderLayer.VIEW_OFFSET_Z_LAYERING);
+        public static final RenderLayer.MultiPhaseParameters.Builder lines = RenderLayer.MultiPhaseParameters.builder()
+                .layering(RenderLayer.VIEW_OFFSET_Z_LAYERING)
+                .lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(3.0)));
     }
 
     public static class Layers {
@@ -172,7 +163,7 @@ public final class Rendering {
                 false,
                 true,
                 Pipelines.filledCull,
-                ((PhaseParameterBuilderAccessor) Parameters.filled).buildParameters(false)
+                Parameters.filled.build(false)
         );
         public static final RenderLayer.MultiPhase BoxFilledNoCull = RenderLayer.of(
                 "nofrills_box_filled_no_cull",
@@ -180,7 +171,7 @@ public final class Rendering {
                 false,
                 true,
                 Pipelines.filledNoCull,
-                ((PhaseParameterBuilderAccessor) Parameters.filled).buildParameters(false)
+                Parameters.filled.build(false)
         );
         public static final RenderLayer.MultiPhase BoxOutline = RenderLayer.of(
                 "nofrills_box_outline",
@@ -188,7 +179,7 @@ public final class Rendering {
                 false,
                 false,
                 Pipelines.outlineCull,
-                ((PhaseParameterBuilderAccessor) Parameters.lines).buildParameters(false)
+                Parameters.lines.build(false)
         );
         public static final RenderLayer.MultiPhase BoxOutlineNoCull = RenderLayer.of(
                 "nofrills_box_outline_no_cull",
@@ -196,7 +187,7 @@ public final class Rendering {
                 false,
                 false,
                 Pipelines.outlineNoCull,
-                ((PhaseParameterBuilderAccessor) Parameters.lines).buildParameters(false)
+                Parameters.lines.build(false)
         );
         public static final RenderLayer.MultiPhase GuiLine = RenderLayer.of(
                 "nofrills_gui_line",
@@ -204,7 +195,7 @@ public final class Rendering {
                 false,
                 false,
                 RenderPipelines.DEBUG_LINE_STRIP,
-                ((PhaseParameterBuilderAccessor) Parameters.lines).buildParameters(false)
+                Parameters.lines.build(false)
         );
     }
 }

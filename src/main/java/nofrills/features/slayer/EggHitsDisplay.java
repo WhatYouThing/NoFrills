@@ -13,21 +13,22 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
+import java.util.regex.Pattern;
+
 public class EggHitsDisplay {
     public static final Feature instance = new Feature("eggHitsDisplay");
 
     public static final SettingColor color = new SettingColor(RenderColor.fromHex(0xffffff), "color", instance);
     public static final SettingDouble scale = new SettingDouble(0.1, "scale", instance);
 
+    private static final Pattern eggRegex = Pattern.compile("[0-9]+s [0-9]+/[0-9]+");
     private static final EntityCache cache = new EntityCache();
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.tarantula)) {
-            String name = event.namePlain;
-            if (name.contains("s ") && name.contains("/")) {
-                String hits = name.substring(name.indexOf(" ") + 1);
-                if (hits.length() == 3) cache.add(event.entity);
+            if (!cache.has(event.entity) && eggRegex.matcher(event.namePlain).matches()) {
+                cache.add(event.entity);
             }
         }
     }

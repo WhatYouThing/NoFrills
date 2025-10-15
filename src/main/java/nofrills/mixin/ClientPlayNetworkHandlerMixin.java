@@ -1,16 +1,22 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.network.packet.s2c.play.*;
 import nofrills.events.*;
+import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
+import nofrills.features.tweaks.BreakResetFix;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -59,6 +65,11 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onScreenHandlerSlotUpdate", at = @At("TAIL"))
     private void onUpdateInventory(ScreenHandlerSlotUpdateS2CPacket packet, CallbackInfo ci) {
+        if (BreakResetFix.active() && mc.currentScreen == null && mc.player != null && mc.interactionManager != null) {
+            if (packet.getSlot() >= 36 && packet.getSlot() <= 44 && mc.player.getInventory().getSelectedSlot() == packet.getSlot() - 36) {
+                ((ClientPlayerInteractionManagerAccessor) mc.interactionManager).setStack(packet.getStack());
+            } // manually update the variable once the server updates our held item, prevents the mismatch and thus fixes the break cancel
+        }
         if (mc.currentScreen instanceof GenericContainerScreen container) {
             eventBus.post(new SlotUpdateEvent(packet, container, container.getScreenHandler(), packet.getSlot()));
         }
@@ -76,6 +87,11 @@ public class ClientPlayNetworkHandlerMixin {
         if (eventBus.post(new SpawnParticleEvent(packet)).isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @WrapWithCondition(method = "onItemPickupAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleManager;addParticle(Lnet/minecraft/client/particle/Particle;)V"))
+    private boolean onAddPickupParticle(ParticleManager instance, Particle particle, @Local Entity entity) {
+        return !(NoRender.instance.isActive() && NoRender.expOrbs.value() && entity instanceof ExperienceOrbEntity);
     }
 
     @Inject(method = "onScoreboardObjectiveUpdate", at = @At("TAIL"))

@@ -5,24 +5,19 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
-import nofrills.events.ReceivePacketEvent;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.misc.Utils;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static nofrills.Main.mc;
 
 public class NoRender {
     public static final Feature instance = new Feature("noRender");
@@ -89,15 +84,6 @@ public class NoRender {
             }
             if (mageBeam.value() && Utils.isInDungeons() && event.type.equals(ParticleTypes.FIREWORK)) {
                 event.cancel();
-            }
-        }
-    }
-
-    @EventHandler
-    private static void onPacket(ReceivePacketEvent event) {
-        if (instance.isActive() && expOrbs.value() && mc.world != null && event.packet instanceof ItemPickupAnimationS2CPacket pickupPacket) {
-            if (mc.world.getEntityById(pickupPacket.getEntityId()) instanceof ExperienceOrbEntity) {
-                event.cancel(); // cancelling packets == cheat confirmed!!
             }
         }
     }

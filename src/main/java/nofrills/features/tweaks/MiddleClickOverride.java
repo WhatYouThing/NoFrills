@@ -70,15 +70,15 @@ public class MiddleClickOverride {
             "Bits Shop"
     );
 
-    private static boolean isBlacklisted(String title) {
+    public static boolean isBlacklisted(String title) {
         return matchBlacklist.contains(title) || containBlacklist.stream().anyMatch(title::contains);
     }
 
-    private static boolean isWhitelisted(String title) {
+    public static boolean isWhitelisted(String title) {
         return matchWhitelist.contains(title) || containWhitelist.stream().anyMatch(title::contains);
     }
 
-    private static boolean isTransaction(ItemStack stack) {
+    public static boolean isTransaction(ItemStack stack) {
         return Utils.getLoreLines(stack).stream().anyMatch(line -> line.equals("Cost") || line.equals("Sell Price") || line.equals("Bazaar Price"));
     }
 

@@ -10,6 +10,7 @@ import net.minecraft.screen.slot.SlotActionType;
 import nofrills.config.Feature;
 import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
+import nofrills.features.tweaks.MiddleClickOverride;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
@@ -43,7 +44,11 @@ public class PageKeybinds {
                 ButtonType type = getButtonType(slot.getStack());
                 if ((type.equals(ButtonType.Next) && next.value() == event.key) || (type.equals(ButtonType.Previous) && previous.value() == event.key)) {
                     if (event.action == GLFW.GLFW_PRESS) {
-                        mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
+                        if (!MiddleClickOverride.isBlacklisted(container.getTitle().getString())) {
+                            mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
+                        } else {
+                            mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_LEFT, SlotActionType.PICKUP, mc.player);
+                        }
                     }
                     event.cancel();
                     break;

@@ -25,7 +25,7 @@ public class PageKeybinds {
     private static ButtonType getButtonType(ItemStack stack) {
         if (stack.isEmpty() || !Utils.getSkyblockId(stack).isEmpty()) return ButtonType.None;
         Item item = stack.getItem();
-        String name = Utils.toPlainString(stack.getName());
+        String name = Utils.toPlain(stack.getName());
         if (item.equals(Items.ARROW)) {
             if (name.equals("Next Page")) return ButtonType.Next;
             if (name.equals("Previous Page")) return ButtonType.Previous;

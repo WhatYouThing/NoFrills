@@ -37,7 +37,7 @@ public class CalendarDate {
         if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
             if (container.getTitle().getString().equals("Calendar and Events")) {
                 for (Text line : event.lines) {
-                    String l = Utils.toPlainString(line);
+                    String l = Utils.toPlain(line);
                     if (l.startsWith("Starts in: ")) {
                         String time = l.substring(l.indexOf(":")).trim();
                         Calendar calendar = Calendar.getInstance();
@@ -51,7 +51,7 @@ public class CalendarDate {
                         }
                         event.addLine(Text.of(""));
                         event.addLine(Utils.getShortTag().append(buildLine("§eDate of Event", calendar)));
-                        String stackName = Utils.toPlainString(event.stack.getName());
+                        String stackName = Utils.toPlain(event.stack.getName());
                         if (stackName.endsWith("Spooky Festival")) {
                             calendar.add(Calendar.HOUR, -1);
                             event.addLine(Utils.getShortTag().append(buildLine("§6Fear Mongerer Arrives", calendar)));

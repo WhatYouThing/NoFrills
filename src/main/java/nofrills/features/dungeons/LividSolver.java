@@ -66,7 +66,7 @@ public class LividSolver {
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInDungeonBoss("5") && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
-            String name = Utils.toPlainString(player.getName());
+            String name = Utils.toPlain(player.getName());
             if (!lividCache.has(event.entity) && lividData.values().stream().anyMatch(livid -> livid.name.equals(name))) {
                 lividCache.add(player);
             }
@@ -79,7 +79,7 @@ public class LividSolver {
             List<Entity> livids = lividCache.get();
             if (livids.size() > 1) {
                 for (Entity livid : livids) {
-                    if (Utils.toPlainString(livid.getName()).equals(currentName)) {
+                    if (Utils.toPlain(livid.getName()).equals(currentName)) {
                         event.drawOutline(Utils.getLerpedBox(livid, event.tickCounter.getTickProgress(true)), false, color.value());
                         break;
                     }

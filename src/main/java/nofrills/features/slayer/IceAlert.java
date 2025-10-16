@@ -16,7 +16,7 @@ public class IceAlert {
         if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.vampire) && Utils.isInChateau()) {
             Entity timer = SlayerUtil.getTimerEntity();
             if (timer == null) return;
-            String name = Utils.toPlainString(timer.getName());
+            String name = Utils.toPlain(timer.getName());
             if (name.contains("TWINCLAWS")) {
                 Utils.showTitleCustom(Utils.format("Ice: {}", name.split("TWINCLAWS")[1].trim().split(" ")[0]), 1, 25, 4.0f, RenderColor.fromHex(0x00ffff));
             }

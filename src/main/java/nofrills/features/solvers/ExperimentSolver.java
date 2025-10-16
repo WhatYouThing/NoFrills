@@ -60,7 +60,7 @@ public class ExperimentSolver {
 
     private static boolean isStatus(ItemStack stack) {
         Item item = stack.getItem();
-        String name = Utils.toPlainString(stack.getName());
+        String name = Utils.toPlain(stack.getName());
         return item.equals(Items.CLOCK)
                 || item.equals(Items.BOOKSHELF)
                 || (item.equals(Items.GLOWSTONE) && !name.equals("Enchanted Book"))

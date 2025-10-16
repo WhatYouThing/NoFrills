@@ -134,7 +134,7 @@ public class SkyblockData {
 
     public static void updateTabList(PlayerListS2CPacket packet, List<PlayerListS2CPacket.Entry> entries) {
         for (PlayerListS2CPacket.Entry entry : entries) {
-            String name = Utils.toPlainString(entry.displayName()).trim();
+            String name = Utils.toPlain(entry.displayName()).trim();
             if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
                 area = name.split(":", 2)[1].trim();
                 break;
@@ -146,7 +146,7 @@ public class SkyblockData {
         Scoreboard scoreboard = mc.player.getScoreboard();
         ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
         if (objective != null) {
-            inSkyblock = Utils.toPlainString(objective.getDisplayName()).contains("SKYBLOCK");
+            inSkyblock = Utils.toPlain(objective.getDisplayName()).contains("SKYBLOCK");
         }
     }
 

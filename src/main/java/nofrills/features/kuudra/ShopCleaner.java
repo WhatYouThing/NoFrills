@@ -30,7 +30,7 @@ public class ShopCleaner {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }
-            String name = Utils.toPlainString(event.stack.getName());
+            String name = Utils.toPlain(event.stack.getName());
             for (String garbage : garbageList) {
                 if (name.startsWith(garbage)) {
                     Slot slot = event.handler.getSlot(event.slotId);

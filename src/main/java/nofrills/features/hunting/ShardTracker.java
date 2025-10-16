@@ -322,7 +322,7 @@ public class ShardTracker {
             if (!shards.isEmpty()) {
                 for (String line : Utils.getLoreLines(event.stack)) {
                     if (line.startsWith("Owned: ")) {
-                        String name = Utils.toLower(Utils.toPlainString(event.stack.getName()));
+                        String name = Utils.toLower(Utils.toPlain(event.stack.getName()));
                         JsonObject tracked = getTrackedShard(name);
                         if (tracked != null) {
                             tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack, event.title));

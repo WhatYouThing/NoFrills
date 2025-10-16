@@ -49,7 +49,7 @@ public class ClientPlayNetworkHandlerMixin {
             if (ent instanceof ArmorStandEntity) {
                 for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
                     if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) && entry.value() != null && ent.getCustomName() != null) {
-                        eventBus.post(new EntityNamedEvent(ent, Utils.toPlainString(ent.getCustomName())));
+                        eventBus.post(new EntityNamedEvent(ent, Utils.toPlain(ent.getCustomName())));
                         break;
                     }
                 }
@@ -112,7 +112,7 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/message/MessageHandler;onGameMessage(Lnet/minecraft/text/Text;Z)V"), cancellable = true)
     private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
         if (!packet.overlay()) {
-            String msg = Utils.toPlainString(packet.content());
+            String msg = Utils.toPlain(packet.content());
             ChatMsgEvent event = eventBus.post(new ChatMsgEvent(packet.content(), msg));
             if (event.isCancelled()) {
                 ci.cancel();

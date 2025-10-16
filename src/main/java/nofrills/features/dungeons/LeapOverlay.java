@@ -65,7 +65,7 @@ public class LeapOverlay {
                     List<String> lore = Utils.getLoreLines(stack);
                     if (!lore.isEmpty()) {
                         String line = lore.getFirst();
-                        String name = Utils.toPlainString(stack.getName());
+                        String name = Utils.toPlain(stack.getName());
                         if (name.equals("Unknown Player") || line.equals("This player is offline!")) {
                             continue;
                         }

@@ -97,7 +97,7 @@ public class WardrobeKeybinds {
     private static boolean isEquipButton(Slot slot, int target) {
         ItemStack stack = slot.getStack();
         Item item = stack.getItem();
-        String name = Utils.toPlainString(stack.getName());
+        String name = Utils.toPlain(stack.getName());
         if (!stack.isEmpty() && target != -1 && name.startsWith(Utils.format("Slot {}:", target))) {
             if (noUnequip.value() && item.equals(Items.LIME_DYE)) {
                 return false;

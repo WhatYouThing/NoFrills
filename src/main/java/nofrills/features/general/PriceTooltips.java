@@ -88,7 +88,7 @@ public class PriceTooltips {
     }
 
     public static String getShardId(ItemStack stack) {
-        return Utils.toUpper(Utils.toPlainString(stack.getName()).replaceAll(" Shard", "").replaceAll(" ", "_"));
+        return Utils.toUpper(Utils.toPlain(stack.getName()).replaceAll(" Shard", "").replaceAll(" ", "_"));
     }
 
     public static String correctShardId(String id) {

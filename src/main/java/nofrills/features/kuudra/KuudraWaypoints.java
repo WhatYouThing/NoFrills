@@ -38,7 +38,7 @@ public class KuudraWaypoints {
     }
 
     private static boolean hasName(Entity ent, String name) {
-        return ent.isCustomNameVisible() && ent.getCustomName() != null && Utils.toPlainString(ent.getCustomName()).endsWith(name);
+        return ent.isCustomNameVisible() && ent.getCustomName() != null && Utils.toPlain(ent.getCustomName()).endsWith(name);
     }
 
     @EventHandler

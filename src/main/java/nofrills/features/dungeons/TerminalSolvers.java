@@ -61,7 +61,7 @@ public class TerminalSolvers {
 
     private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
         Item item = stack.getItem();
-        if (Utils.toPlainString(stack.getName()).trim().isEmpty()) {
+        if (Utils.toPlain(stack.getName()).trim().isEmpty()) {
             return false;
         }
         if (stack.getItem().toString().startsWith("minecraft:" + colorName)) {
@@ -117,7 +117,7 @@ public class TerminalSolvers {
             }
             if (type.equals(TerminalType.StartsWith) && startsWith.value()) {
                 String character = Utils.toLower(String.valueOf(event.title.charAt(event.title.indexOf("'") + 1)));
-                String name = Utils.toLower(Utils.toPlainString(event.stack.getName())).trim();
+                String name = Utils.toLower(Utils.toPlain(event.stack.getName())).trim();
                 if (!name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(event.stack)) {
                     SlotOptions.spoofSlot(event.slot, SlotOptions.first);
                     SlotOptions.disableSlot(event.slot, false);

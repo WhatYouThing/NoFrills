@@ -389,7 +389,7 @@ public class Utils {
         LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
         if (lore != null) {
             for (Text line : lore.lines()) {
-                lines.add(toPlainString(line).trim());
+                lines.add(toPlain(line).trim());
             }
         }
         return lines;
@@ -569,7 +569,7 @@ public class Utils {
         if (mc.getNetworkHandler() != null) {
             for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
                 if (entry.getDisplayName() != null) {
-                    lines.add(toPlainString(entry.getDisplayName()).trim());
+                    lines.add(toPlain(entry.getDisplayName()).trim());
                 }
             }
         }
@@ -657,7 +657,10 @@ public class Utils {
         return string.toUpperCase(Locale.ROOT);
     }
 
-    public static String toPlainString(Text text) {
+    /**
+     * Gets the string out of a Text object and removes any formatting codes.
+     */
+    public static String toPlain(Text text) {
         if (text != null) {
             return Formatting.strip(text.getString());
         }

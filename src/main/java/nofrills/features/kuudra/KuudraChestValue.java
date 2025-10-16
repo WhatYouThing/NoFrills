@@ -58,7 +58,7 @@ public class KuudraChestValue {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }
-            String name = Utils.toPlainString(event.stack.getName());
+            String name = Utils.toPlain(event.stack.getName());
             String id = getLootID(event.stack, name);
             int quantity = getLootQuantity(event.stack, name);
             if (auctionPricing.containsKey(id)) {

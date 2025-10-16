@@ -148,7 +148,6 @@ public class ShardData {
             "basilisk",
             "iguana",
             "moray eel",
-            "thorn",
             "lunar moth",
             "fire eel",
             "bal",
@@ -207,7 +206,9 @@ public class ShardData {
             "galaxy fish",
             "molthorn",
             "starborn",
-            "titanoboa"
+            "titanoboa",
+            "thorn",
+            "scarf"
     );
 
     public static String getColorPrefix(String shard) {

@@ -16,9 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static nofrills.Main.eventBus;
 
 @Mixin(ClientConnection.class)
@@ -29,9 +26,7 @@ public abstract class ClientConnectionMixin {
             eventBus.post(new ServerTickEvent());
         }
         if (packet instanceof PlayerListS2CPacket listPacket) {
-            List<PlayerListS2CPacket.Entry> entries = new ArrayList<>(listPacket.getEntries());
-            entries.removeIf(entry -> entry.displayName() == null);
-            SkyblockData.updateTabList(listPacket, entries);
+            SkyblockData.updateTabList(listPacket, listPacket.getEntries());
         }
         if (eventBus.post(new ReceivePacketEvent(packet)).isCancelled()) {
             ci.cancel();

@@ -134,6 +134,7 @@ public class SkyblockData {
 
     public static void updateTabList(PlayerListS2CPacket packet, List<PlayerListS2CPacket.Entry> entries) {
         for (PlayerListS2CPacket.Entry entry : entries) {
+            if (entry.displayName() == null) continue;
             String name = Utils.toPlain(entry.displayName()).trim();
             if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
                 area = name.split(":", 2)[1].trim();

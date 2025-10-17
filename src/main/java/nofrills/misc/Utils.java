@@ -567,7 +567,7 @@ public class Utils {
     public static List<String> getTabListLines() {
         List<String> lines = new ArrayList<>();
         if (mc.getNetworkHandler() != null) {
-            for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
+            for (PlayerListEntry entry : new ArrayList<>(mc.getNetworkHandler().getPlayerList())) {
                 if (entry.getDisplayName() != null) {
                     lines.add(toPlain(entry.getDisplayName()).trim());
                 }

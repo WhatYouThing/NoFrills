@@ -100,7 +100,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(PillarAlert.class);
         eventBus.subscribe(BossHighlight.class);
         eventBus.subscribe(ScathaMining.class);
-        eventBus.subscribe(SafePickobulus.class);
         eventBus.subscribe(GhostVision.class);
         eventBus.subscribe(CorpseHighlight.class);
         eventBus.subscribe(BetterSkyMall.class);

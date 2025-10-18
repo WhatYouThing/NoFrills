@@ -76,6 +76,11 @@ public class Utils {
             "SNOW_BLASTER",
             "SNOW_HOWITZER"
     );
+    private static final HashSet<String> modernIslands = Sets.newHashSet(
+            "The Park",
+            "Galatea",
+            "Catacombs"
+    );
     private static Screen newScreen = null;
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
@@ -215,12 +220,7 @@ public class Utils {
      * Returns true if the current island is running on a modern Minecraft version and/or running under prediction-based Watchdog.
      */
     public static boolean isOnModernIsland() {
-        HashSet<String> islands = Sets.newHashSet(
-                "The Park",
-                "Galatea",
-                "Catacombs"
-        );
-        return islands.contains(SkyblockData.getArea());
+        return modernIslands.contains(SkyblockData.getArea());
     }
 
     public static boolean isInstanceOver() {
@@ -665,6 +665,22 @@ public class Utils {
             return Formatting.strip(text.getString());
         }
         return "";
+    }
+
+    public static Optional<Integer> parseInt(String value) {
+        try {
+            return Optional.of(Integer.parseInt(value));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Double> parseDouble(String value) {
+        try {
+            return Optional.of(Double.parseDouble(value));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
     }
 
     /**

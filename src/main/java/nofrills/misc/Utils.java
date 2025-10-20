@@ -737,6 +737,14 @@ public class Utils {
         }
     }
 
+    public static Optional<Long> parseLong(String value) {
+        try {
+            return Optional.of(Long.parseLong(value));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
+    }
+
     /**
      * Formats the string by replacing each set of curly brackets "{}" with one of the values in order, similarly to Rust's format macro.
      */

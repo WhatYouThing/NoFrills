@@ -30,7 +30,9 @@ import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
 import nofrills.features.tweaks.*;
 import nofrills.hud.HudEditorScreen;
+import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -88,10 +90,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         super.render(context, mouseX, mouseY, delta);
         this.mouseX = mouseX;
         this.mouseY = mouseY;
-        int height = context.getScaledWindowHeight() - 4;
-        context.drawTextWithShadow(this.textRenderer, "Left click a feature to toggle", 1, height - 24, 0xffffff);
-        context.drawTextWithShadow(this.textRenderer, "Right click a feature open its settings", 1, height - 16, 0xffffff);
-        context.drawTextWithShadow(this.textRenderer, "Scrolling supported in each category and the screen itself", 1, height - 8, 0xffffff);
+        int height = context.getScaledWindowHeight();
+        context.drawTextWithShadow(this.textRenderer, "Left click a feature to toggle", 1, height - 20, RenderColor.white.argb);
+        context.drawTextWithShadow(this.textRenderer, "Right click a feature open its settings", 1, height - 10, RenderColor.white.argb);
     }
 
     @Override
@@ -539,12 +540,28 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         )))
                 ))
         );
+        this.categories.getLast().margins(Insets.of(5, 0, 3, 3));
         for (Category category : this.categories) {
             parent.child(category);
         }
-        SearchBox search = new SearchBox();
-        search.input.onChanged().subscribe(value -> {
+        this.mainScroll = Containers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
+        this.mainScroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
+        root.child(this.mainScroll);
+        ButtonComponent hudEditorButton = Components.button(Text.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
+        hudEditorButton.margins(Insets.of(0, 3, 0, 3));
+        hudEditorButton.positioning(Positioning.relative(100, 100));
+        hudEditorButton.renderer((context, button, delta) -> {
+            context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
+            context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
+        });
+        root.child(hudEditorButton);
+        FlatTextbox searchBox = new FlatTextbox(Sizing.fixed(200));
+        searchBox.setSuggestion("Search...");
+        searchBox.margins(Insets.of(0, 3, 0, 0));
+        searchBox.positioning(Positioning.relative(50, 100));
+        searchBox.onChanged().subscribe(value -> {
             if (value.isEmpty()) {
+                searchBox.setSuggestion("Search...");
                 for (Category category : this.categories) {
                     category.scroll.child().clearChildren();
                     for (Module module : category.features) {
@@ -553,6 +570,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                     }
                 }
             } else {
+                searchBox.setSuggestion("");
                 for (Category category : this.categories) {
                     List<Module> features = new ArrayList<>(category.features);
                     features.removeIf(feature -> {
@@ -580,18 +598,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 }
             }
         });
-        parent.child(search);
-        this.mainScroll = Containers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
-        this.mainScroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
-        root.child(this.mainScroll);
-        ButtonComponent hudEditorButton = Components.button(Text.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
-        hudEditorButton.margins(Insets.of(0, 3, 0, 3));
-        hudEditorButton.positioning(Positioning.relative(100, 100));
-        hudEditorButton.renderer((context, button, delta) -> {
-            context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
-            context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
-        });
-        root.child(hudEditorButton);
+        root.child(searchBox);
     }
 
     @Override

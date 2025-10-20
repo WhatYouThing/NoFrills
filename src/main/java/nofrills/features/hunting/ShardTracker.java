@@ -31,10 +31,7 @@ import nofrills.misc.Utils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 import static nofrills.Main.mc;
@@ -419,22 +416,22 @@ public class ShardTracker {
             this.inputObtained.margins(Insets.of(0, 0, 0, 5));
             this.inputObtained.tooltip(Text.literal("The amount of this shard that you currently have."));
             this.inputObtained.text(String.valueOf(getData().get("obtained").getAsLong()));
-            this.inputObtained.onChanged().subscribe(value -> {
-                try {
-                    getData().addProperty("obtained", Long.valueOf(value));
+            this.inputObtained.onChanged().subscribe(text -> {
+                Optional<Long> value = Utils.parseLong(text);
+                if (value.isPresent()) {
+                    getData().addProperty("obtained", value.get());
                     refreshDisplay();
-                } catch (NumberFormatException ignored) {
                 }
             });
             this.inputNeeded = new FlatTextbox(Sizing.fixed(50));
             this.inputNeeded.margins(Insets.of(0, 0, 0, 5));
             this.inputNeeded.tooltip(Text.literal("The amount of this shard that you want to obtain. Set to 0 for no target amount."));
             this.inputNeeded.text(String.valueOf(getData().get("needed").getAsLong()));
-            this.inputNeeded.onChanged().subscribe(value -> {
-                try {
-                    getData().addProperty("needed", Long.valueOf(value));
+            this.inputNeeded.onChanged().subscribe(text -> {
+                Optional<Long> value = Utils.parseLong(text);
+                if (value.isPresent()) {
+                    getData().addProperty("needed", value.get());
                     refreshDisplay();
-                } catch (NumberFormatException ignored) {
                 }
             });
             this.inputSource = Components.button(this.getSourceInputLabel(getTrackedSource(getData().get("source").getAsString())), button -> {

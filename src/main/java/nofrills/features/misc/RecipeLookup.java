@@ -39,7 +39,7 @@ public class RecipeLookup {
                             NbtCompound data = Utils.getCustomData(stack);
                             JsonObject petData = JsonParser.parseString(data.getString("petInfo").orElse("")).getAsJsonObject();
                             String petName = petData.get("type").getAsString().replaceAll("_", " ");
-                            Utils.sendMessage("/recipe " + petName + " PET");
+                            Utils.sendMessage("/recipe " + petName);
                         } else {
                             Utils.sendMessage("/recipe " + itemId);
                         }

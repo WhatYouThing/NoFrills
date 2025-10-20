@@ -1,11 +1,12 @@
 package nofrills.misc;
 
 import com.google.common.collect.Sets;
+import net.minecraft.item.ItemStack;
 
 import java.util.HashSet;
+import java.util.List;
 
 public class ShardData {
-
     // shards that come from treasure catches, they can randomly go the inventory instead of hunting box and cannot be trusted
     public static final HashSet<String> fishingShards = Sets.newHashSet(
             "azure",
@@ -18,7 +19,6 @@ public class ShardData {
             "inferno koi",
             "shinyfish"
     );
-
     public static final HashSet<String> commonShards = Sets.newHashSet(
             "grove",
             "mist",
@@ -50,7 +50,6 @@ public class ShardData {
             "newt",
             "miner zombie"
     );
-
     public static final HashSet<String> uncommonShards = Sets.newHashSet(
             "bramble",
             "tide",
@@ -85,7 +84,6 @@ public class ShardData {
             "rana",
             "termite"
     );
-
     public static final HashSet<String> rareShards = Sets.newHashSet(
             "sylvan",
             "cascade",
@@ -136,7 +134,6 @@ public class ShardData {
             "gecko",
             "hummingbird"
     );
-
     public static final HashSet<String> epicShards = Sets.newHashSet(
             "terra",
             "cryo",
@@ -171,7 +168,6 @@ public class ShardData {
             "cavernshade",
             "dragonfly"
     );
-
     public static final HashSet<String> legendaryShards = Sets.newHashSet(
             "tenebris",
             "blizzard",
@@ -180,7 +176,7 @@ public class ShardData {
             "tiamat",
             "wyvern",
             "tortoise",
-            "endstone protector",
+            "end stone protector",
             "naga",
             "lapis creeper",
             "wartybug",
@@ -211,21 +207,62 @@ public class ShardData {
             "scarf"
     );
 
+    public static final List<HashSet<String>> shardSetList = List.of(
+            legendaryShards,
+            epicShards,
+            rareShards,
+            uncommonShards,
+            commonShards
+    );
+
+    public static String getId(ItemStack stack) {
+        String name = Utils.toPlain(stack.getName());
+        String id = Utils.getSkyblockId(stack);
+        if (id.equals("ATTRIBUTE_SHARD") || id.isEmpty() || name.contains(" Shard")) {
+            String source = getSource(stack);
+            String shardName = Utils.toLower(!source.isEmpty() ? source : name);
+            for (HashSet<String> set : shardSetList) {
+                for (String shard : set) {
+                    if (shardName.equals(shard) || shardName.startsWith(shard)) {
+                        return switch (shard) {
+                            case "cinderbat" -> "SHARD_CINDER_BAT";
+                            case "abyssal lanternfish" -> "SHARD_ABYSSAL_LANTERN";
+                            case "stridersurfer" -> "SHARD_STRIDER_SURFER";
+                            case "bogged" -> "SHARD_SEA_ARCHER";
+                            case "loch emperor" -> "SHARD_SEA_EMPEROR";
+                            default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
+                        };
+                    }
+                }
+            }
+        }
+        return "";
+    }
+
+    private static String getSource(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            if (line.startsWith("Source: ") && line.contains(" Shard")) {
+                return Utils.toLower(line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1));
+            }
+        }
+        return "";
+    }
+
     public static String getColorPrefix(String shard) {
-        if (ShardData.legendaryShards.contains(shard)) return "§6";
-        if (ShardData.epicShards.contains(shard)) return "§5";
-        if (ShardData.rareShards.contains(shard)) return "§9";
-        if (ShardData.uncommonShards.contains(shard)) return "§a";
-        if (ShardData.commonShards.contains(shard)) return "§f";
+        if (legendaryShards.contains(shard)) return "§6";
+        if (epicShards.contains(shard)) return "§5";
+        if (rareShards.contains(shard)) return "§9";
+        if (uncommonShards.contains(shard)) return "§a";
+        if (commonShards.contains(shard)) return "§f";
         return "§7";
     }
 
     public static int getColorHex(String shard) {
-        if (ShardData.legendaryShards.contains(shard)) return 0xffffaa00;
-        if (ShardData.epicShards.contains(shard)) return 0xffaa00aa;
-        if (ShardData.rareShards.contains(shard)) return 0xff5555ff;
-        if (ShardData.uncommonShards.contains(shard)) return 0xff55ff55;
-        if (ShardData.commonShards.contains(shard)) return 0xffffffff;
+        if (legendaryShards.contains(shard)) return 0xffffaa00;
+        if (epicShards.contains(shard)) return 0xffaa00aa;
+        if (rareShards.contains(shard)) return 0xff5555ff;
+        if (uncommonShards.contains(shard)) return 0xff55ff55;
+        if (commonShards.contains(shard)) return 0xffffffff;
         return 0xffaaaaaa;
     }
 }

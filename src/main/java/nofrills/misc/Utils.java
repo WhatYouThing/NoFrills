@@ -1,6 +1,8 @@
 package nofrills.misc;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
@@ -349,6 +351,59 @@ public class Utils {
         return getSkyblockId(getCustomData(stack));
     }
 
+    /**
+     * Returns the Bazaar/Auction ID tied to the item.
+     */
+    public static String getMarketId(ItemStack stack) {
+        NbtCompound data = getCustomData(stack);
+        String id = getSkyblockId(data);
+        String shardId = ShardData.getId(stack);
+        if (!shardId.isEmpty()) {
+            return shardId;
+        }
+        switch (id) {
+            case "PET" -> {
+                String petInfo = data.getString("petInfo").orElse("");
+                if (!petInfo.isEmpty()) {
+                    JsonObject petData = JsonParser.parseString(petInfo).getAsJsonObject();
+                    return Utils.format("{}_PET_{}", petData.get("type").getAsString(), petData.get("tier").getAsString());
+                }
+                return "UNKNOWN_PET";
+            }
+            case "RUNE", "UNIQUE_RUNE" -> {
+                NbtCompound runeData = data.getCompound("runes").orElse(null);
+                if (runeData != null) {
+                    String runeId = (String) runeData.getKeys().toArray()[0];
+                    return Utils.format("{}_{}_RUNE", runeId, runeData.getInt(runeId).orElse(0));
+                }
+                return "EMPTY_RUNE";
+            }
+            case "ENCHANTED_BOOK" -> {
+                NbtCompound enchantData = data.getCompound("enchantments").orElse(null);
+                if (enchantData != null) {
+                    Set<String> enchants = enchantData.getKeys();
+                    if (enchants.size() == 1) {
+                        String enchantId = (String) enchantData.getKeys().toArray()[0];
+                        int enchantLevel = enchantData.getInt(enchantId).orElse(0);
+                        return Utils.format("ENCHANTMENT_{}_{}", Utils.toUpper(enchantId), enchantLevel);
+                    }
+                }
+                return "ENCHANTMENT_UNKNOWN";
+            }
+            case "POTION" -> {
+                String potion = data.getString("potion").orElse("");
+                if (!potion.isEmpty()) {
+                    return Utils.format("{}_{}_POTION",
+                            Utils.toUpper(potion),
+                            data.getInt("potion_level").orElse(0)
+                    );
+                }
+                return "UNKNOWN_POTION";
+            }
+        }
+        return id;
+    }
+
     public static GameProfile getTextures(ItemStack stack) {
         ProfileComponent profile = stack.getComponents().get(DataComponentTypes.PROFILE);
         if (!stack.isEmpty() && profile != null) {
@@ -462,12 +517,11 @@ public class Utils {
     }
 
     private static int getVersionNumber(String version) {
-        try {
-            String[] numbers = version.split("\\.");
-            return Integer.parseInt(numbers[0]) * 1000 + Integer.parseInt(numbers[1]) * 100 + Integer.parseInt(numbers[2]);
-        } catch (RuntimeException ignored) {
-            return 0;
+        String[] numbers = version.split("\\.");
+        if (numbers.length >= 3) {
+            return parseInt(numbers[0]).orElse(0) * 1000 + parseInt(numbers[1]).orElse(0) * 100 + parseInt(numbers[2]).orElse(0);
         }
+        return 0;
     }
 
     public static void checkUpdate(boolean notifyIfMatch) {

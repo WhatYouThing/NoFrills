@@ -13,6 +13,7 @@ import net.minecraft.text.Text;
 import nofrills.config.*;
 import nofrills.hud.clickgui.components.*;
 import nofrills.misc.RenderColor;
+import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static nofrills.Main.mc;
@@ -214,11 +216,10 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
             text.onChanged().subscribe(change -> {
-                try {
-                    double value = Double.parseDouble(text.getText());
-                    this.setting.set(value);
-                    slider.value(value);
-                } catch (NumberFormatException ignored) {
+                Optional<Double> value = Utils.parseDouble(text.getText());
+                if (value.isPresent()) {
+                    this.setting.set(value.get());
+                    slider.value(value.get());
                 }
             });
             text.text(String.valueOf(this.setting.value()));
@@ -252,11 +253,10 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
             text.onChanged().subscribe(change -> {
-                try {
-                    int value = Integer.parseInt(text.getText());
-                    this.setting.set(value);
-                    slider.value(value);
-                } catch (NumberFormatException ignored) {
+                Optional<Integer> value = Utils.parseInt(text.getText());
+                if (value.isPresent()) {
+                    this.setting.set(value.get());
+                    slider.value(value.get());
                 }
             });
             text.text(String.valueOf(this.setting.value()));
@@ -337,12 +337,11 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 slider.min(0).max(255).stepSize(1).horizontalSizing(Sizing.fixed(60)).verticalSizing(Sizing.fixed(20));
                 sliderList.add(slider);
                 text.onChanged().subscribe(change -> {
-                    try {
-                        int value = Integer.parseInt(text.getText());
-                        setColorValue(id, value / 255.0f);
-                        slider.value(value);
+                    Optional<Integer> value = Utils.parseInt(text.getText());
+                    if (value.isPresent()) {
+                        setColorValue(id, value.get() / 255.0f);
+                        slider.value(value.get());
                         colorDisplay.surface(Surface.flat(this.setting.value().argb));
-                    } catch (NumberFormatException ignored) {
                     }
                 });
                 text.text(String.valueOf((int) (getColorValue(id) * 255.0f)));

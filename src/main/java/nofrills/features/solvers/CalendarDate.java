@@ -18,13 +18,16 @@ public class CalendarDate {
 
     private static int parseTime(String time, String unit) {
         int index = time.indexOf(unit);
-        return index != -1 ? Integer.parseInt(time.substring(Math.max(0, time.lastIndexOf(" ", index)), index).trim()) : 0;
+        if (index != -1) {
+            return Utils.parseInt(time.substring(Math.max(0, time.lastIndexOf(" ", index)), index).trim()).orElse(0);
+        }
+        return 0;
     }
 
     private static String parseDate(Calendar calendar) {
         return Utils.format("{} {}",
                 calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()),
-                DateFormat.getInstance().format(calendar.getTime())
+                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault()).format(calendar.getTime())
         );
     }
 

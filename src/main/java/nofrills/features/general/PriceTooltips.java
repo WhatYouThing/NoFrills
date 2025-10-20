@@ -1,10 +1,7 @@
 package nofrills.features.general;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -14,7 +11,7 @@ import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.HashMap;
-import java.util.Set;
+import java.util.Optional;
 
 import static nofrills.misc.NoFrillsAPI.*;
 
@@ -27,79 +24,8 @@ public class PriceTooltips {
     public static final SettingBool mote = new SettingBool(false, "mote", instance.key());
     public static final SettingInt burgers = new SettingInt(0, "burgers", instance.key());
 
-    public static String parseItemId(ItemStack stack, NbtCompound data, String title) {
-        String id = Utils.getSkyblockId(data);
-        if (id.isEmpty()) {
-            if (title.equals("Hunting Box")) {
-                return correctShardId(getShardId(stack));
-            }
-            if (title.equals("Attribute Menu")) {
-                for (String line : Utils.getLoreLines(stack)) {
-                    if (line.startsWith("Source: ")) {
-                        return correctShardId(Utils.toUpper(line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1)).replaceAll(" ", "_"));
-                    }
-                }
-            }
-        }
-        switch (id) {
-            case "PET" -> {
-                if (data.contains("petInfo")) {
-                    JsonObject petData = JsonParser.parseString(data.getString("petInfo").orElse("")).getAsJsonObject();
-                    return Utils.format("{}_PET_{}", petData.get("type").getAsString(), petData.get("tier").getAsString());
-                }
-                return "UNKNOWN_PET";
-            }
-            case "RUNE", "UNIQUE_RUNE" -> {
-                if (data.contains("runes")) {
-                    NbtCompound runeData = data.getCompound("runes").orElse(null);
-                    if (runeData != null) {
-                        String runeId = (String) runeData.getKeys().toArray()[0];
-                        return Utils.format("{}_{}_RUNE", runeId, runeData.getInt(runeId).orElse(0));
-                    }
-                }
-                return "EMPTY_RUNE";
-            }
-            case "ENCHANTED_BOOK" -> {
-                if (data.contains("enchantments")) {
-                    NbtCompound enchantData = data.getCompound("enchantments").orElse(null);
-                    Set<String> enchants = enchantData.getKeys();
-                    if (enchants.size() == 1) {
-                        String enchantId = (String) enchantData.getKeys().toArray()[0];
-                        int enchantLevel = enchantData.getInt(enchantId).orElse(0);
-                        return Utils.format("ENCHANTMENT_{}_{}", Utils.toUpper(enchantId), enchantLevel);
-                    }
-                }
-                return "ENCHANTMENT_UNKNOWN";
-            }
-            case "ATTRIBUTE_SHARD" -> {
-                return correctShardId(getShardId(stack));
-            }
-            case "POTION" -> {
-                if (data.contains("potion")) {
-                    return Utils.format("{}_{}_POTION",
-                            Utils.toUpper(data.getString("potion").orElse("")),
-                            data.getInt("potion_level").orElse(0)
-                    );
-                }
-                return "UNKNOWN_POTION";
-            }
-        }
-        return id;
-    }
-
-    public static String getShardId(ItemStack stack) {
-        return Utils.toUpper(Utils.toPlain(stack.getName()).replaceAll(" Shard", "").replaceAll(" ", "_"));
-    }
-
-    public static String correctShardId(String id) {
-        return switch (id) {
-            case "CINDERBAT" -> "SHARD_CINDER_BAT";
-            case "ABYSSAL_LANTERNFISH" -> "SHARD_ABYSSAL_LANTERN";
-            case "STRIDERSURFER" -> "SHARD_STRIDER_SURFER";
-            case "BOGGED" -> "SHARD_SEA_ARCHER";
-            case "LOCH_EMPEROR" -> "SHARD_SEA_EMPEROR";
-            default -> Utils.format("SHARD_{}", id);
-        };
+    public static String parseItemId(ItemStack stack) {
+        return Utils.getMarketId(stack);
     }
 
     public static int getStackQuantity(ItemStack stack, String title) {
@@ -107,10 +33,9 @@ public class PriceTooltips {
             for (String line : Utils.getLoreLines(stack)) {
                 if (line.startsWith("Stored: ") && line.contains("/")) {
                     String count = line.substring(line.indexOf(":") + 1, line.indexOf("/")).trim();
-                    try {
-                        int countInt = Integer.parseInt(count.replaceAll(",", ""));
-                        return countInt > 0 ? countInt : 1;
-                    } catch (NumberFormatException ignored) {
+                    Optional<Integer> countInt = Utils.parseInt(count.replaceAll(",", ""));
+                    if (countInt.isPresent()) {
+                        return Math.max(1, countInt.get());
                     }
                 }
             }
@@ -120,10 +45,9 @@ public class PriceTooltips {
                 if (line.startsWith("Owned: ")) {
                     int start = line.indexOf(":") + 2;
                     int end = line.indexOf(" ", start);
-                    try {
-                        int countInt = Integer.parseInt(line.substring(start, end).replaceAll(",", ""));
-                        return countInt > 0 ? countInt : 1;
-                    } catch (NumberFormatException ignored) {
+                    Optional<Integer> countInt = Utils.parseInt(line.substring(start, end).replaceAll(",", ""));
+                    if (countInt.isPresent()) {
+                        return Math.max(1, countInt.get());
                     }
                 }
             }
@@ -132,10 +56,9 @@ public class PriceTooltips {
             for (String line : Utils.getLoreLines(stack)) {
                 if (line.startsWith("Syphon") && line.endsWith("more to level up!")) {
                     String replaced = line.replace("Syphon", "").trim();
-                    try {
-                        int countInt = Integer.parseInt(replaced.substring(0, replaced.indexOf(" ")).replaceAll(",", ""));
-                        return countInt > 0 ? countInt : 1;
-                    } catch (NumberFormatException ignored) {
+                    Optional<Integer> countInt = Utils.parseInt(replaced.substring(0, replaced.indexOf(" ")).replaceAll(",", ""));
+                    if (countInt.isPresent()) {
+                        return Math.max(1, countInt.get());
                     }
                 }
             }
@@ -166,11 +89,9 @@ public class PriceTooltips {
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive()) {
-            String itemId = parseItemId(event.stack, event.customData, event.title);
+            String itemId = parseItemId(event.stack);
+            if (itemId.isEmpty()) return;
             int quantity = getStackQuantity(event.stack, event.title);
-            if (itemId.isEmpty()) {
-                return;
-            }
             if (mote.value() && npcPricing.containsKey(itemId) && SkyblockData.getArea().equals("The Rift")) {
                 HashMap<String, Double> prices = npcPricing.get(itemId);
                 if (prices.containsKey("mote")) {

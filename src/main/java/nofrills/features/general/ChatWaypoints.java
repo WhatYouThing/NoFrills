@@ -10,10 +10,12 @@ import nofrills.config.SettingColor;
 import nofrills.config.SettingInt;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
+import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static nofrills.Main.mc;
 
@@ -46,9 +48,10 @@ public class ChatWaypoints {
                 coord = coord.replace(",", "");
                 skipNextError = true;
             }
-            try {
-                coords.add(Double.parseDouble(coord));
-            } catch (NumberFormatException ignored) {
+            Optional<Double> parsed = Utils.parseDouble(coord);
+            if (parsed.isPresent()) {
+                coords.add(parsed.get());
+            } else {
                 if (!skipNextError) {
                     coords.clear();
                 }

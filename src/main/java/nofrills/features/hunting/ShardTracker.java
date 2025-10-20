@@ -33,6 +33,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -262,6 +263,14 @@ public class ShardTracker {
             msg = msg.substring(0, msg.indexOf(" Shard (")).trim();
             return new Shard(msg, 1, ShardSource.TreeGift);
         }
+        if (msg.startsWith("You bought ") && msg.endsWith("!")) {
+            msg = Utils.toLower(msg.replace("You bought ", "").replace("!", "").trim());
+            for (HashSet<String> set : ShardData.shardSetList) {
+                if (set.contains(msg)) {
+                    return new Shard(msg, 1, ShardSource.Bought);
+                }
+            }
+        }
         return null;
     }
 
@@ -356,7 +365,8 @@ public class ShardTracker {
         Charmed,
         Fused,
         Absorbed,
-        TreeGift
+        TreeGift,
+        Bought
     }
 
     public enum TrackerSource {
@@ -372,19 +382,13 @@ public class ShardTracker {
         public ShardSource source;
 
         public Shard(String name, int quantity, ShardSource source) {
-            this.name = name;
+            this.name = Utils.toLower(name);
             this.quantity = quantity;
             this.source = source;
         }
 
         public static Shard of(String name, String quantity, ShardSource source) {
-            String shardName = Utils.toLower(name);
-            try {
-                int amount = Integer.parseInt(quantity);
-                return new Shard(shardName, amount, source);
-            } catch (NumberFormatException ignored) {
-            }
-            return new Shard(shardName, 1, source);
+            return new Shard(Utils.toLower(name), Utils.parseInt(quantity).orElse(1), source);
         }
     }
 

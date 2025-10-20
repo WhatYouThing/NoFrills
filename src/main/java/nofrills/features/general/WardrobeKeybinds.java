@@ -57,10 +57,7 @@ public class WardrobeKeybinds {
 
     private static int getWardrobePage(String title) {
         if (title.startsWith("Wardrobe (") && title.endsWith(")")) {
-            try {
-                return Integer.parseInt(title.replace("Wardrobe (", "").split("/")[0]);
-            } catch (NumberFormatException ignored) {
-            }
+            return Utils.parseInt(title.replace("Wardrobe (", "").split("/")[0]).orElse(-1);
         }
         return -1;
     }

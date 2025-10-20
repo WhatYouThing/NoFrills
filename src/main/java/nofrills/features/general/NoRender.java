@@ -7,8 +7,10 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.screen.slot.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
@@ -29,6 +31,7 @@ public class NoRender {
     public static final SettingBool bossBar = new SettingBool(false, "bossBar", instance.key());
     public static final SettingBool effectDisplay = new SettingBool(false, "effectDisplay", instance.key());
     public static final SettingBool deadEntities = new SettingBool(false, "deadEntities", instance.key());
+    public static final SettingBool deadPoof = new SettingBool(false, "deadPoof", instance.key());
     public static final SettingBool lightning = new SettingBool(false, "lightning", instance.key());
     public static final SettingBool fallingBlocks = new SettingBool(false, "fallingBlocks", instance.key());
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
@@ -64,6 +67,25 @@ public class NoRender {
         return false;
     }
 
+    public static boolean shouldHideTooltip(Slot slot, String title) {
+        if (title.startsWith("Ultrasequencer (")) {
+            return false;
+        }
+        return instance.isActive() && emptyTooltips.value() && slot != null && slot.getStack().getName().getString().trim().isEmpty();
+    }
+
+    private static boolean isPoofParticle(ParticleS2CPacket packet) {
+        if (packet.getCount() == 1 && packet.getSpeed() == 0.0f) {
+            for (float offset : List.of(packet.getOffsetX(), packet.getOffsetY(), packet.getOffsetZ())) {
+                if (offset >= 0.1f || offset <= -0.1f || offset == 0.0f) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && deadEntities.value() && event.entity instanceof ArmorStandEntity) {
@@ -79,6 +101,9 @@ public class NoRender {
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive()) {
+            if (deadPoof.value() && event.type.equals(ParticleTypes.POOF) && isPoofParticle(event.packet)) {
+                event.cancel();
+            }
             if (explosions.value() && explosionParticles.contains(event.type)) {
                 event.cancel();
             }

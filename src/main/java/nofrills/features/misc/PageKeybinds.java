@@ -22,16 +22,13 @@ public class PageKeybinds {
     public static final SettingKeybind previous = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "previous", instance.key());
 
     private static ButtonType getButtonType(ItemStack stack) {
-        if (stack.isEmpty() || !Utils.getSkyblockId(stack).isEmpty()) return ButtonType.None;
-        Item item = stack.getItem();
-        String name = Utils.toPlain(stack.getName());
-        if (item.equals(Items.ARROW)) {
-            if (name.equals("Next Page")) return ButtonType.Next;
-            if (name.equals("Previous Page")) return ButtonType.Previous;
-        }
-        if (item.equals(Items.PLAYER_HEAD)) {
-            if (name.startsWith("Next Page")) return ButtonType.Next;
-            if (name.endsWith("Previous Page")) return ButtonType.Previous;
+        if (!stack.isEmpty() && Utils.getSkyblockId(stack).isEmpty()) {
+            Item item = stack.getItem();
+            String name = Utils.toPlain(stack.getName());
+            if (item.equals(Items.ARROW) || item.equals(Items.PLAYER_HEAD)) {
+                if (name.startsWith("Next Page") || name.endsWith("Next Page")) return ButtonType.Next;
+                if (name.startsWith("Previous Page") || name.endsWith("Previous Page")) return ButtonType.Previous;
+            }
         }
         return ButtonType.None;
     }

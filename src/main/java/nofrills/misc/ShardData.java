@@ -216,14 +216,13 @@ public class ShardData {
     );
 
     public static String getId(ItemStack stack) {
-        String name = Utils.toPlain(stack.getName());
-        String id = Utils.getSkyblockId(stack);
-        if (id.equals("ATTRIBUTE_SHARD") || id.isEmpty() || name.contains(" Shard")) {
+        if (isShard(stack)) {
+            String name = Utils.toPlain(stack.getName());
             String source = getSource(stack);
             String shardName = Utils.toLower(!source.isEmpty() ? source : name);
             for (HashSet<String> set : shardSetList) {
                 for (String shard : set) {
-                    if (shardName.equals(shard) || shardName.startsWith(shard)) {
+                    if (shardName.equals(shard) || shardName.startsWith(shard + " ")) {
                         return switch (shard) {
                             case "cinderbat" -> "SHARD_CINDER_BAT";
                             case "abyssal lanternfish" -> "SHARD_ABYSSAL_LANTERN";
@@ -237,6 +236,29 @@ public class ShardData {
             }
         }
         return "";
+    }
+
+    private static boolean isShard(ItemStack stack) {
+        String id = Utils.getSkyblockId(stack);
+        if (id.equals("ATTRIBUTE_SHARD")) {
+            return true;
+        }
+        if (id.isEmpty()) {
+            boolean source = false, rarity = false;
+            for (String line : Utils.getLoreLines(stack)) {
+                if (line.contains(" SHARD (ID ")) {
+                    return true;
+                }
+                if (line.startsWith("Source: ") && line.contains(" Shard")) {
+                    source = true;
+                }
+                if (line.startsWith("Rarity: ")) {
+                    rarity = true;
+                }
+            }
+            return source && rarity;
+        }
+        return false;
     }
 
     private static String getSource(ItemStack stack) {

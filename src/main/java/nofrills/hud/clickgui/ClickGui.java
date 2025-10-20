@@ -25,6 +25,7 @@ import nofrills.features.kuudra.*;
 import nofrills.features.mining.*;
 import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
+import nofrills.features.solvers.BeaconTuningSolver;
 import nofrills.features.solvers.CalendarDate;
 import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
@@ -319,7 +320,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Calendar Date", CalendarDate.instance, "Calculates the exact starting dates of events in the calendar."),
                         new Module("Spooky Chests", SpookyChests.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, SpookyChests.color, "The color of the spooky chest highlight.")
-                        )))
+                        ))),
+                        new Module("Beacon Tuning Solver", BeaconTuningSolver.instance, "Solves the beacon tuning mini-game on Galatea.")
                 )),
                 new Category("Fishing", List.of(
                         new Module("Cap Tracker", CapTracker.instance, "Tracks the sea creature cap. Mostly for barn fishing.", new Settings(List.of(

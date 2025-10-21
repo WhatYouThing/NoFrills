@@ -101,13 +101,13 @@ public class NoRender {
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive()) {
-            if (deadPoof.value() && event.type.equals(ParticleTypes.POOF) && isPoofParticle(event.packet)) {
+            if (event.type.equals(ParticleTypes.POOF) && deadPoof.value() && isPoofParticle(event.packet)) {
                 event.cancel();
             }
-            if (explosions.value() && explosionParticles.contains(event.type)) {
+            if (explosionParticles.contains(event.type) && explosions.value()) {
                 event.cancel();
             }
-            if (mageBeam.value() && Utils.isInDungeons() && event.type.equals(ParticleTypes.FIREWORK)) {
+            if (event.type.equals(ParticleTypes.FIREWORK) && mageBeam.value() && Utils.isInDungeons()) {
                 event.cancel();
             }
         }

@@ -24,6 +24,7 @@ import nofrills.events.ServerJoinEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.features.general.PriceTooltips;
 import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.misc.ShardData;
 import nofrills.misc.Utils;
@@ -394,7 +395,7 @@ public class ShardTracker {
         public FlatTextbox inputName;
         public FlatTextbox inputObtained;
         public FlatTextbox inputNeeded;
-        public ButtonComponent inputSource;
+        public EnumButton<TrackerSource> inputSource;
         public ButtonComponent delete;
 
         public Setting(int index) {
@@ -434,25 +435,12 @@ public class ShardTracker {
                     refreshDisplay();
                 }
             });
-            this.inputSource = Components.button(this.getSourceInputLabel(getTrackedSource(getData().get("source").getAsString())), button -> {
-                TrackerSource[] values = TrackerSource.values();
-                TrackerSource source = getTrackedSource(getData().get("source").getAsString());
-                for (int i = 0; i < values.length; i++) {
-                    if (values[i].equals(source)) {
-                        TrackerSource newSource = i == values.length - 1 ? values[0] : values[i + 1];
-                        getData().addProperty("source", newSource.name());
-                        this.inputSource.setMessage(this.getSourceInputLabel(newSource));
-                        refreshDisplay();
-                        return;
-                    }
-                }
-                getData().addProperty("source", TrackerSource.Direct.name());
-                this.inputSource.setMessage(this.getSourceInputLabel(TrackerSource.Direct));
+            this.inputSource = new EnumButton<>(getData().get("source").getAsString(), TrackerSource.Direct, TrackerSource.class);
+            this.inputSource.setMessage(this.getSourceInputLabel(getData().get("source").getAsString()));
+            this.inputSource.onChanged().subscribe(value -> {
+                getData().addProperty("source", value);
+                this.inputSource.setMessage(this.getSourceInputLabel(value));
                 refreshDisplay();
-            });
-            this.inputSource.renderer((context, button, delta) -> {
-                context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
-                context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
             });
             this.inputSource.margins(Insets.of(1, 0, 0, 0));
             this.inputSource.sizing(Sizing.fixed(48), Sizing.fixed(18));
@@ -477,8 +465,8 @@ public class ShardTracker {
             return data.value().get("shards").getAsJsonArray().get(this.index).getAsJsonObject();
         }
 
-        public MutableText getSourceInputLabel(TrackerSource source) {
-            return Text.literal(Utils.format("{}{}", getSourceColor(source.name()), source.name()));
+        public MutableText getSourceInputLabel(String source) {
+            return Text.literal(Utils.format("{}{}", getSourceColor(source), source));
         }
     }
 }

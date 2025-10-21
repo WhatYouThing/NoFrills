@@ -144,37 +144,40 @@ public class SkyblockData {
     }
 
     public static void updateObjective(ScoreboardObjectiveUpdateS2CPacket packet) {
-        Scoreboard scoreboard = mc.player.getScoreboard();
-        ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
-        if (objective != null) {
-            inSkyblock = Utils.toPlain(objective.getDisplayName()).contains("SKYBLOCK");
+        if (mc.player != null) {
+            Scoreboard scoreboard = mc.player.getScoreboard();
+            ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
+            if (objective != null) {
+                inSkyblock = Utils.toPlain(objective.getDisplayName()).contains("SKYBLOCK");
+            }
         }
     }
 
     public static void updateScoreboard(TeamS2CPacket packet) {
-        List<String> currentLines = new ArrayList<>();
-        Scoreboard scoreboard = mc.player.getScoreboard();
-        ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
-        for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
-            if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
-                Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
-                if (team != null) {
-                    String line = Formatting.strip(team.getPrefix().getString() + team.getSuffix().getString());
-                    if (!line.trim().isEmpty()) {
-                        String cleanLine = line.trim();
-                        if (cleanLine.startsWith(Utils.Symbols.zone) || cleanLine.startsWith(Utils.Symbols.zoneRift)) {
-                            location = cleanLine;
+        if (mc.player != null) {
+            List<String> currentLines = new ArrayList<>();
+            Scoreboard scoreboard = mc.player.getScoreboard();
+            ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
+            for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
+                if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
+                    Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
+                    if (team != null) {
+                        String line = Formatting.strip(team.getPrefix().getString() + team.getSuffix().getString()).trim();
+                        if (!line.isEmpty()) {
+                            if (line.startsWith(Utils.Symbols.zone) || line.startsWith(Utils.Symbols.zoneRift)) {
+                                location = line;
+                            }
+                            if (Utils.isInKuudra() && !instanceOver) {
+                                instanceOver = line.startsWith("Instance Shutdown");
+                            }
+                            currentLines.add(line);
                         }
-                        if (Utils.isInKuudra() && !instanceOver) {
-                            instanceOver = cleanLine.startsWith("Instance Shutdown");
-                        }
-                        currentLines.add(cleanLine);
                     }
                 }
             }
+            lines = currentLines;
+            SlayerUtil.updateQuestState(currentLines);
         }
-        lines = currentLines;
-        SlayerUtil.updateQuestState(currentLines);
     }
 
     @EventHandler

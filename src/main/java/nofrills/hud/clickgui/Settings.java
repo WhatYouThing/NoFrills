@@ -11,6 +11,7 @@ import io.wispforest.owo.ui.core.*;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.*;
+import nofrills.features.general.CustomKeybinds;
 import nofrills.hud.clickgui.components.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -27,6 +28,10 @@ import java.util.function.Consumer;
 import static nofrills.Main.mc;
 
 public class Settings extends BaseOwoScreen<FlowLayout> {
+    public static final ButtonComponent.Renderer buttonRenderer = (context, button, delta) -> {
+        context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
+        context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
+    };
     public List<FlowLayout> settings;
     public Text title = Text.empty();
     public ScrollContainer<FlowLayout> scroll;
@@ -65,22 +70,46 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 height += (10 + label.getTextHeight());
                 continue;
             }
+            if (child instanceof CustomKeybinds.Setting) {
+                height += 51;
+                continue;
+            }
             height += 30;
         }
         return (int) Math.clamp(height, 30, mc.getWindow().getScaledHeight() * 0.8);
     }
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        for (FlowLayout setting : this.settings) {
+    private static boolean isBinding(List<FlowLayout> settings, int button) {
+        for (FlowLayout setting : settings) {
             for (Component child : setting.children()) {
-                if (child instanceof KeybindButton keybind) {
-                    if (keybind.isBinding) {
-                        keybind.bind(keyCode);
-                        return true;
-                    }
+                if (findKeybindButton(child, button)) {
+                    return true;
                 }
             }
+        }
+        return false;
+    }
+
+    private static boolean findKeybindButton(Component child, int button) {
+        if (child instanceof KeybindButton keybind) {
+            if (keybind.isBinding) {
+                keybind.bind(button);
+                return true;
+            }
+        } else if (child instanceof FlowLayout layout) {
+            for (Component layoutChild : layout.children()) {
+                if (findKeybindButton(layoutChild, button)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (isBinding(this.settings, keyCode)) {
+            return true;
         }
         if (keyCode == GLFW.GLFW_KEY_PAGE_UP || keyCode == GLFW.GLFW_KEY_PAGE_DOWN) {
             this.scroll.onMouseScroll(0, 0, keyCode == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
@@ -97,15 +126,8 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        for (FlowLayout setting : this.settings) {
-            for (Component child : setting.children()) {
-                if (child instanceof KeybindButton keybind) {
-                    if (keybind.isBinding) {
-                        keybind.bind(button);
-                        return true;
-                    }
-                }
-            }
+        if (isBinding(this.settings, button)) {
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
@@ -157,47 +179,25 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     }
 
     public static class Toggle extends FlowLayout {
-        public boolean active = false;
         public SettingBool setting;
-        public Text enabledText;
-        public Text disabledText;
-        public ButtonComponent toggle;
+        public ToggleButton toggle;
 
         public Toggle(String name, SettingBool setting, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.setting = setting;
-            this.enabledText = Text.literal("Enabled").withColor(0x55ff55);
-            this.disabledText = Text.literal("Disabled").withColor(0xff5555);
             PlainLabel label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             label.tooltip(Text.literal(tooltip));
-            this.toggle = Components.button(Text.empty(), button -> {
-                boolean value = this.setting.value();
-                active(!value);
-            });
-            this.toggle.renderer((context, button, delta) -> {
-                context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
-                context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
-            });
+            this.toggle = new ToggleButton(this.setting.value());
+            this.toggle.onToggled().subscribe(value -> this.setting.set(value));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            this.active(this.setting.value());
             this.child(label);
             this.child(this.toggle);
             this.child(buildResetButton(btn -> {
                 this.setting.reset();
-                this.active(this.setting.value());
+                this.toggle.setToggle(this.setting.value());
             }));
-        }
-
-        private void active(boolean active) {
-            if (active) {
-                this.toggle.setMessage(this.enabledText);
-            } else {
-                this.toggle.setMessage(this.disabledText);
-            }
-            this.setting.set(active);
-            this.active = active;
         }
     }
 
@@ -497,10 +497,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.horizontalAlignment(HorizontalAlignment.CENTER);
             this.button = Components.button(Text.literal(name).withColor(0xffffff), onPress);
             this.button.horizontalSizing(Sizing.fixed(290));
-            this.button.renderer((context, btn, delta) -> {
-                context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
-                context.drawBorder(btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xff5ca0bf);
-            });
+            this.button.renderer(buttonRenderer);
             this.child(this.button);
         }
     }

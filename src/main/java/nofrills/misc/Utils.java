@@ -100,7 +100,7 @@ public class Utils {
     }
 
     public static boolean isNearlyEqual(double a, double b, double eps) {
-        return Math.abs(a-b) < eps;
+        return Math.abs(a - b) < eps;
     }
 
     public static boolean isNearlyEqual(double a, double b) {

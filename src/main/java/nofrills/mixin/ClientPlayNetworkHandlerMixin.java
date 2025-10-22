@@ -1,5 +1,6 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
@@ -17,6 +18,7 @@ import nofrills.events.*;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.BreakResetFix;
+import nofrills.features.tweaks.NoConfirmScreen;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -87,6 +89,14 @@ public class ClientPlayNetworkHandlerMixin {
         if (eventBus.post(new SpawnParticleEvent(packet)).isCancelled()) {
             ci.cancel();
         }
+    }
+
+    @ModifyExpressionValue(method = "runClickEventCommand", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayNetworkHandler;parseCommand(Ljava/lang/String;)Lnet/minecraft/client/network/ClientPlayNetworkHandler$CommandRunResult;"))
+    private ClientPlayNetworkHandler.CommandRunResult onParseCommand(ClientPlayNetworkHandler.CommandRunResult original) {
+        if (NoConfirmScreen.instance.isActive()) {
+            return ClientPlayNetworkHandler.CommandRunResult.NO_ISSUES;
+        }
+        return original;
     }
 
     @WrapWithCondition(method = "onItemPickupAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleManager;addParticle(Lnet/minecraft/client/particle/Particle;)V"))

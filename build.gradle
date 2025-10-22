@@ -39,6 +39,10 @@ dependencies {
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
 }
 
+loom {
+    accessWidenerPath = file("src/main/resources/nofrills.accesswidener")
+}
+
 processResources {
     inputs.property "version", project.version
 

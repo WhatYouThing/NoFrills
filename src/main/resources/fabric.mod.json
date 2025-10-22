@@ -21,6 +21,7 @@
   "mixins": [
     "nofrills.mixins.json"
   ],
+  "accessWidener" : "nofrills.accesswidener",
   "depends": {
     "fabricloader": ">=0.17.2",
     "fabric-api": "*",

@@ -23,6 +23,11 @@ public class SlotOptions {
         return stack;
     }
 
+    public static ItemStack stackWithName(ItemStack stack, Text name) {
+        stack.set(DataComponentTypes.CUSTOM_NAME, name);
+        return stack;
+    }
+
     public static ItemStack stackWithQuantity(ItemStack stack, int quantity) {
         ItemStack copy = stack.copy();
         copy.setCount(quantity);

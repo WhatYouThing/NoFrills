@@ -25,6 +25,7 @@ import nofrills.features.kuudra.*;
 import nofrills.features.mining.*;
 import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
+import nofrills.features.solvers.BeaconTuningSolver;
 import nofrills.features.solvers.CalendarDate;
 import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
@@ -312,7 +313,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking.")
                 )),
                 new Category("Solvers", List.of(
-                        new Module("Experiments", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
+                        new Module("Experimentation Table", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
                                 new Settings.Toggle("Chronomatron", ExperimentSolver.chronomatron, "Reveals the solution in Chronomatron."),
                                 new Settings.Toggle("Ultrasequencer", ExperimentSolver.ultrasequencer, "Reveals the solution in Ultrasequencer."),
                                 new Settings.Toggle("Superpairs", ExperimentSolver.superpairs, "Reveals uncovered rewards in Superpairs and highlights matchable/matched pairs.")
@@ -320,7 +321,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Calendar Date", CalendarDate.instance, "Calculates the exact starting dates of events in the calendar."),
                         new Module("Spooky Chests", SpookyChests.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, SpookyChests.color, "The color of the spooky chest highlight.")
-                        )))
+                        ))),
+                        new Module("Moonglade Beacon", BeaconTuningSolver.instance, "Solves the beacon tuning mini-game on Galatea.")
                 )),
                 new Category("Fishing", List.of(
                         new Module("Cap Tracker", CapTracker.instance, "Tracks the sea creature cap. Mostly for barn fishing.", new Settings(List.of(

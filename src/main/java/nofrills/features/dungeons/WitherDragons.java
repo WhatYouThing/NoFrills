@@ -8,7 +8,6 @@ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -119,13 +118,13 @@ public class WitherDragons {
         }
     }
 
-    private static void announceDragonSpawn(SpawnedDragon drag, boolean split) {
+    private static void announceSpawn(SpawnedDragon drag, boolean split) {
         Utils.showTitleCustom(Utils.toUpper(drag.data.name) + " IS SPAWNING!", 60, -20, 4.0f, drag.data.color);
         Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
         if (split) {
-            Utils.infoRaw(Text.literal(drag.data.name + " is your priority dragon.").setStyle(Style.EMPTY.withColor(drag.data.color.hex)));
+            Utils.infoRaw(Text.literal(drag.data.name + " is your priority dragon.").withColor(drag.data.color.hex));
         } else if (dragonSplitDone) {
-            Utils.infoRaw(Text.literal(drag.data.name + " is spawning.").setStyle(Style.EMPTY.withColor(drag.data.color.hex)));
+            Utils.infoRaw(Text.literal(drag.data.name + " is spawning.").withColor(drag.data.color.hex));
         }
     }
 
@@ -177,15 +176,15 @@ public class WitherDragons {
                             SpawnedDragon first = dragons.getFirst();
                             SpawnedDragon second = dragons.getLast();
                             if ((currentPower >= powerEasy.value() && isEitherPurple(first, second)) || currentPower >= power.value()) {
-                                announceDragonSpawn(getHigherPriority(first, second, isArcherTeam()), true);
+                                announceSpawn(getHigherPriority(first, second, isArcherTeam()), true);
                             } else { // no split
-                                announceDragonSpawn(getHigherPriority(first, second, true), true);
+                                announceSpawn(getHigherPriority(first, second, true), true);
                             }
                             dragonSplitDone = true;
                         }
                     } else if (dragonSplitDone) {
                         if (alert.value()) {
-                            announceDragonSpawn(spawnedDragon, false);
+                            announceSpawn(spawnedDragon, false);
                         }
                     }
                 }

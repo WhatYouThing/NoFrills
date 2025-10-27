@@ -153,7 +153,10 @@ public class Utils {
     }
 
     public static void infoRaw(MutableText message) {
-        mc.inGameHud.getChatHud().addMessage(getTag().append("§f").append(message).append("§r"), null, noFrillsIndicator);
+        if (message.getStyle() == null || message.getStyle().getColor() == null) {
+            message = message.withColor(0xffffff);
+        }
+        mc.inGameHud.getChatHud().addMessage(getTag().append(message), null, noFrillsIndicator);
     }
 
     public static void infoFormat(String message, Object... values) {

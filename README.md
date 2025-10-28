@@ -182,6 +182,11 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 ## Incompatibilities
 
 - Some highlight features might not render correctly with Iris shaders active.
+- The mod may not work with third party loaders such as Lunar or Feather, only Fabric is supported.
+    - If you aren't using Fabric already, it is recommended you upgrade to either
+      the [Modrinth App](https://modrinth.com/app) or the [Prism Launcher](https://prismlauncher.org/). Automatic mod
+      updates, instance management, and most
+      importantly: [no selling of your personal data](https://www.lunarclient.com/do-not-sell-or-share-my-personal-information).
 
 ## Credits
 

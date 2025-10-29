@@ -399,9 +399,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve Starts With", TerminalSolvers.startsWith, "Solves the \"What starts with\" terminal."),
                                 new Settings.Toggle("Solve Select", TerminalSolvers.select, "Solves the \"Select all\" terminal."),
                                 new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal."),
-                                new Settings.Toggle("Instant Click", TerminalSolvers.instant, "Instantly marks items as clicked instead of waiting until the terminal is updated.\nThis option makes terminals more responsive on high ping, but it also can show false positives."),
-                                new Settings.Toggle("Announce Melody", TerminalSolvers.melody, "Sends a message once you get the torture terminal."),
-                                new Settings.TextInput("Melody Message", TerminalSolvers.melodyMsg, "The message to send.")
+                                new Settings.Toggle("Instant Click", TerminalSolvers.instant, "Instantly marks items as clicked instead of waiting until the terminal is updated.\nThis option makes terminals more responsive on high ping, but it also can show false positives.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders timers on screen and for every dead terracotta in F6/M6."),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(
@@ -450,6 +448,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.TextInput("Levers Sound", SecretChime.leverSound, "The identifier of the sound to play."),
                                 new Settings.SliderDouble("Levers Volume", 0.0, 5.0, 0.1, SecretChime.leverVolume, "The volume of the sound."),
                                 new Settings.SliderDouble("Levers Pitch", 0.0, 2.0, 0.05, SecretChime.leverPitch, "The pitch of the sound.")
+                        ))),
+                        new Module("Melody Message", MelodyMessage.instance, "Send start and progress messages when you get the Melody terminal in F7/M7.", new Settings(List.of(
+                                new Settings.TextInput("Message", MelodyMessage.msg, "The message to send when the terminal is opened."),
+                                new Settings.Toggle("Send Progress", MelodyMessage.progress, "Send messages when you make progress in the terminal."),
+                                new Settings.TextInput("% Message", MelodyMessage.progressMsg, "The message to send when you make progress.\nReplaces {percent} with your progress percentage (25%/50%/75%).")
                         )))
                 )),
                 new Category("Kuudra", List.of(

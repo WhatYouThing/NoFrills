@@ -8,11 +8,8 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.DyeColor;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
-import nofrills.config.SettingString;
-import nofrills.events.ScreenOpenEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.events.SlotUpdateEvent;
-import nofrills.events.WorldTickEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 
@@ -29,8 +26,6 @@ public class TerminalSolvers {
     public static final SettingBool inOrder = new SettingBool(false, "inOrder", instance.key());
     public static final SettingBool colors = new SettingBool(false, "colors", instance.key());
     public static final SettingBool instant = new SettingBool(false, "instant", instance.key());
-    public static final SettingBool melody = new SettingBool(false, "melody", instance.key());
-    public static final SettingString melodyMsg = new SettingString("/pc MELODY", "melodyMsg", instance.key());
 
     private static final List<Item> colorsOrder = List.of(
             Items.GREEN_STAINED_GLASS_PANE,
@@ -39,7 +34,6 @@ public class TerminalSolvers {
             Items.RED_STAINED_GLASS_PANE,
             Items.BLUE_STAINED_GLASS_PANE
     );
-    private static int melodyTicks = 0;
 
     public static TerminalType getTerminalType(String title) {
         if (title.startsWith("Correct all the panes!")) return TerminalType.Panes;
@@ -78,25 +72,6 @@ public class TerminalSolvers {
 
     private static ItemStack stackWithCount(int count) {
         return SlotOptions.stackWithQuantity(count > 0 ? SlotOptions.first : SlotOptions.second, Math.abs(count));
-    }
-
-    @EventHandler
-    private static void onScreenOpen(ScreenOpenEvent event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("7")) {
-            if (melody.value() && getTerminalType(event.screen.getTitle().getString()).equals(TerminalType.Melody)) {
-                if (melodyTicks == 0 && !melodyMsg.value().isEmpty()) {
-                    Utils.sendMessage(melodyMsg.value());
-                }
-                melodyTicks = 60;
-            }
-        }
-    }
-
-    @EventHandler
-    private static void onTick(WorldTickEvent event) {
-        if (melodyTicks > 0) {
-            melodyTicks--;
-        }
     }
 
     @EventHandler

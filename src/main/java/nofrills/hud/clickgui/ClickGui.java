@@ -453,7 +453,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.TextInput("Message", MelodyMessage.msg, "The message to send when the terminal is opened."),
                                 new Settings.Toggle("Send Progress", MelodyMessage.progress, "Send messages when you make progress in the terminal."),
                                 new Settings.TextInput("% Message", MelodyMessage.progressMsg, "The message to send when you make progress.\nReplaces {percent} with your progress percentage (25%/50%/75%).")
-                        )))
+                        ))),
+                        new Module("Quick Close", QuickClose.instance, "Quickly close Dungeon secret and/or loot chests by pressing any key on your keyboard.")
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(

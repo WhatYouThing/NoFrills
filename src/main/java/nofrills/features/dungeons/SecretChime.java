@@ -124,6 +124,7 @@ public class SecretChime {
                     }
                     if (isSecretBat(id) && batToggle.value()) {
                         playBatChime();
+                        break;
                     }
                 }
             }

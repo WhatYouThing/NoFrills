@@ -80,8 +80,7 @@ public class Utils {
     );
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "The Park",
-            "Galatea",
-            "Catacombs"
+            "Galatea"
     );
     private static Screen newScreen = null;
 

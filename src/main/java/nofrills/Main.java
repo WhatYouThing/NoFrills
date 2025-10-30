@@ -169,6 +169,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SecretChime.class);
         eventBus.subscribe(MelodyMessage.class);
         eventBus.subscribe(QuickClose.class);
+        eventBus.subscribe(DungeonChestValue.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

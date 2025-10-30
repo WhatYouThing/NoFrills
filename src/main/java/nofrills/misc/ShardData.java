@@ -240,7 +240,8 @@ public class ShardData {
 
     private static boolean isShard(ItemStack stack) {
         String id = Utils.getSkyblockId(stack);
-        if (id.equals("ATTRIBUTE_SHARD")) {
+        String name = Utils.toPlain(stack.getName());
+        if (id.equals("ATTRIBUTE_SHARD") || name.contains(" Shard")) {
             return true;
         }
         if (id.isEmpty()) {

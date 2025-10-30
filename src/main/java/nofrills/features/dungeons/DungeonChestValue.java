@@ -1,63 +1,81 @@
-package nofrills.features.kuudra;
+package nofrills.features.dungeons;
 
+import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
-import nofrills.config.SettingInt;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+import java.util.HashSet;
 import java.util.Optional;
 
 import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
-public class KuudraChestValue {
-    public static final Feature instance = new Feature("kuudraChestValue");
+public class DungeonChestValue {
+    public static final Feature instance = new Feature("dungeonChestValue");
 
     public static final SettingColor background = new SettingColor(RenderColor.fromHex(0x202020, 0.8f), "background", instance);
-    public static final SettingInt petBonus = new SettingInt(0, "petBonus", instance.key());
 
+    private static final HashSet<String> chestNames = Sets.newHashSet(
+            "Wood Chest",
+            "Gold Chest",
+            "Diamond Chest",
+            "Emerald Chest",
+            "Obsidian Chest",
+            "Bedrock Chest"
+    );
     private static double currentValue = 0.0;
 
     private static int getLootQuantity(ItemStack stack, String name) {
         String[] parts = name.split(" ");
         String last = parts[parts.length - 1];
         if (last.startsWith("x")) {
-            Optional<Integer> quantity = Utils.parseInt(last.replaceAll("x", "").replaceAll(",", ""));
-            if (quantity.isPresent()) {
-                if (name.startsWith("Crimson Essence")) {
-                    return (int) Math.floor(quantity.get() * (1 + petBonus.value() * 0.01));
-                }
-                return quantity.get();
-            }
+            return Utils.parseInt(last.replaceAll("x", "").replaceAll(",", "")).orElse(stack.getCount());
         }
         return stack.getCount();
     }
 
     private static String getLootID(ItemStack stack, String name) {
-        if (name.startsWith("Crimson Essence")) {
-            return "ESSENCE_CRIMSON";
+        if (name.startsWith("Wither Essence")) {
+            return "ESSENCE_WITHER";
+        }
+        if (name.startsWith("Undead Essence")) {
+            return "ESSENCE_UNDEAD";
         }
         return Utils.getMarketId(stack);
     }
 
     @EventHandler
     private static void onSlot(SlotUpdateEvent event) {
-        if (instance.isActive() && Utils.isInKuudra() && event.title.endsWith("Chest")) {
+        if (instance.isActive() && chestNames.contains(event.title) && (Utils.isInDungeons() || Utils.isInArea("Dungeon Hub"))) {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }
             String name = Utils.toPlain(event.stack.getName());
             String id = getLootID(event.stack, name);
-            if (id.isEmpty()) return;
+            if (id.isEmpty()) {
+                if (name.equals("Open Reward Chest")) {
+                    for (String line : Utils.getLoreLines(event.stack)) {
+                        if (line.endsWith(" Coins")) {
+                            Optional<Integer> cost = Utils.parseInt(line.replace(" Coins", "").replaceAll(",", ""));
+                            if (cost.isPresent()) {
+                                currentValue -= cost.get();
+                                break;
+                            }
+                        }
+                    }
+                }
+                return;
+            }
             int quantity = getLootQuantity(event.stack, name);
             if (auctionPricing.containsKey(id)) {
                 currentValue += auctionPricing.get(id) * quantity;
@@ -69,20 +87,20 @@ public class KuudraChestValue {
 
     @EventHandler
     private static void onRender(ScreenRenderEvent.After event) {
-        if (instance.isActive() && currentValue > 0.0) {
+        if (instance.isActive() && currentValue != 0.0) {
             Slot targetSlot = event.handler.getSlot(4);
             String value = Utils.format("Chest Value: {}", Utils.formatSeparator(currentValue));
             int width = mc.textRenderer.getWidth(value);
             int baseX = targetSlot.x + 8;
             int baseY = targetSlot.y + 8;
             event.context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, background.value().argb);
-            event.context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, RenderColor.green.argb);
+            event.context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, currentValue > 0 ? RenderColor.green.argb : RenderColor.red.argb);
         }
     }
 
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
-        if (instance.isActive() && currentValue > 0.0) {
+        if (instance.isActive() && currentValue != 0.0) {
             currentValue = 0.0;
         }
     }

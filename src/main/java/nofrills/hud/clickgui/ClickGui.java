@@ -398,8 +398,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve In Order", TerminalSolvers.inOrder, "Solves the \"Click in order\" Among Us task."),
                                 new Settings.Toggle("Solve Starts With", TerminalSolvers.startsWith, "Solves the \"What starts with\" terminal."),
                                 new Settings.Toggle("Solve Select", TerminalSolvers.select, "Solves the \"Select all\" terminal."),
-                                new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal."),
-                                new Settings.Toggle("Instant Click", TerminalSolvers.instant, "Instantly marks items as clicked instead of waiting until the terminal is updated.\nThis option makes terminals more responsive on high ping, but it also can show false positives.")
+                                new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders timers on screen and for every dead terracotta in F6/M6."),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(

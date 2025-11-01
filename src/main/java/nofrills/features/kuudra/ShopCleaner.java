@@ -34,8 +34,8 @@ public class ShopCleaner {
             for (String garbage : garbageList) {
                 if (name.startsWith(garbage)) {
                     Slot slot = event.handler.getSlot(event.slotId);
-                    SlotOptions.disableSlot(slot, true);
-                    SlotOptions.spoofSlot(slot, SlotOptions.background);
+                    SlotOptions.setDisabled(slot, true);
+                    SlotOptions.setSpoofed(slot, SlotOptions.BACKGROUND);
                 }
             }
         }

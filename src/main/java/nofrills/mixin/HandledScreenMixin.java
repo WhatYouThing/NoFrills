@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -68,39 +69,39 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        if (LeapOverlay.isLeapMenu(this.title.getString()) || NoRender.shouldHideTooltip(slot, this.title.getString()) || SlotOptions.isSlotDisabled(slot)) {
+        if (LeapOverlay.isLeapMenu(this.title.getString()) || NoRender.shouldHideTooltip(slot, this.title.getString()) || SlotOptions.isDisabled(slot)) {
             ci.cancel();
             return;
         }
-        if (eventBus.post(new SlotClickEvent(slot, slot != null ? slot.id : slotId, button, actionType, this.title.getString())).isCancelled()) {
+        if (eventBus.post(new SlotClickEvent(slot, slot != null ? slot.id : slotId, button, actionType, this.title.getString(), this.handler)).isCancelled()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("TAIL"))
     private void onClickSlotTail(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        if (SlotOptions.isSlotSpoofed(slot)) {
+        if (SlotOptions.isSpoofed(slot)) {
             this.handler.setCursorStack(ItemStack.EMPTY); // prevents the real item from showing at the cursor
         }
     }
 
     @Inject(method = "drawSlotHighlightBack", at = @At("HEAD"), cancellable = true)
     private void onDrawHighlight(DrawContext context, CallbackInfo ci) {
-        if (NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isSlotDisabled(focusedSlot)) {
+        if (NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isDisabled(focusedSlot)) {
             ci.cancel();
         }
     }
 
     @Inject(method = "drawSlotHighlightFront", at = @At("HEAD"), cancellable = true)
     private void onDrawHighlightFront(DrawContext context, CallbackInfo ci) {
-        if (NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isSlotDisabled(focusedSlot)) {
+        if (NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isDisabled(focusedSlot)) {
             ci.cancel();
         }
     }
 
     @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), cancellable = true)
     private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (TerminalSolvers.shouldHideTooltips(this.title.getString()) || NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isSlotDisabled(focusedSlot) || SlotBinding.isBinding()) {
+        if (TerminalSolvers.shouldHideTooltips(this.title.getString()) || NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isDisabled(focusedSlot) || SlotBinding.isBinding()) {
             ci.cancel();
         }
     }
@@ -115,16 +116,24 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @ModifyExpressionValue(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
     private ItemStack onDrawStack(ItemStack original, DrawContext context, Slot slot) {
-        if (SlotOptions.isSlotSpoofed(slot)) {
-            return SlotOptions.getSpoofedStack(slot);
+        if (SlotOptions.isSpoofed(slot)) {
+            return SlotOptions.getSpoofed(slot);
         }
         return original;
     }
 
+    @ModifyArg(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawStackOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V"), index = 4)
+    private @Nullable String onDrawStackCount(@Nullable String stackCountText, @Local(argsOnly = true) Slot slot) {
+        if (SlotOptions.hasCount(slot)) {
+            return SlotOptions.getCount(slot);
+        }
+        return stackCountText;
+    }
+
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
     private ItemStack onDrawSpoofedTooltip(ItemStack original) {
-        if (SlotOptions.isSlotSpoofed(focusedSlot)) {
-            return SlotOptions.getSpoofedStack(focusedSlot);
+        if (SlotOptions.isSpoofed(focusedSlot)) {
+            return SlotOptions.getSpoofed(focusedSlot);
         }
         return original;
     }
@@ -152,19 +161,19 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Inject(method = "drawSlot", at = @At("HEAD"))
     private void onRenderSlot(DrawContext context, Slot slot, CallbackInfo ci) {
         if (SlotOptions.hasBackground(slot)) {
-            context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackgroundColor(slot).argb);
+            context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackground(slot).argb);
         }
     }
 
     @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V"))
     private void onBeforeHighlightRender(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        eventBus.post(new ScreenRenderEvent.Before(context, mouseX, mouseY, deltaTicks, this.handler, this.focusedSlot));
+        eventBus.post(new ScreenRenderEvent.Before(context, mouseX, mouseY, deltaTicks, this.title.getString(), this.handler, this.focusedSlot));
     }
 
     @SuppressWarnings("mapping")
     @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;popMatrix()Lorg/joml/Matrix3x2fStack;"))
     private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        eventBus.post(new ScreenRenderEvent.After(context, mouseX, mouseY, delta, this.handler, this.focusedSlot));
+        eventBus.post(new ScreenRenderEvent.After(context, mouseX, mouseY, delta, this.title.getString(), this.handler, this.focusedSlot));
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)

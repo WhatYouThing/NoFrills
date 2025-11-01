@@ -95,8 +95,8 @@ public class BeaconTuningSolver {
                             .append(Text.literal(Utils.format("{}", changeSpeed)).styled(style -> style.withItalic(false).withColor(matchSpeed == changeSpeed ? Formatting.GREEN : Formatting.RED)))
 
             )));
-            SlotOptions.spoofSlot(handler.getSlot(speedSlot1Id), SlotOptions.stackWithName(
-                    SlotOptions.stackWithQuantity(stack, changeSpeed),
+            SlotOptions.setSpoofed(handler.getSlot(speedSlot1Id), SlotOptions.stackWithName(
+                    SlotOptions.stackWithCount(stack, changeSpeed),
                     Text.literal("Speed").styled(style -> style.withItalic(false).withColor(Formatting.YELLOW))
             ));
         }
@@ -121,7 +121,7 @@ public class BeaconTuningSolver {
                                     }
                             )))
             )));
-            SlotOptions.spoofSlot(handler.getSlot(pitchSlot1Id), SlotOptions.stackWithName(stack,
+            SlotOptions.setSpoofed(handler.getSlot(pitchSlot1Id), SlotOptions.stackWithName(stack,
                     Text.literal("Pitch").styled(style -> style.withItalic(false).withColor(Formatting.YELLOW))
             ));
         }
@@ -152,8 +152,8 @@ public class BeaconTuningSolver {
             // just in case, unreachable
             stack = Items.WHITE_WOOL.getDefaultStack();
         }
-        SlotOptions.spoofSlot(handler.getSlot(colorSlot1Id), SlotOptions.stackWithName(
-                SlotOptions.stackWithQuantity(stack, Math.abs(colorTarget1)),
+        SlotOptions.setSpoofed(handler.getSlot(colorSlot1Id), SlotOptions.stackWithName(
+                SlotOptions.stackWithCount(stack, Math.abs(colorTarget1)),
                 Text.literal("Color").styled(style -> style.withItalic(false).withColor(Formatting.YELLOW))
         ));
     }
@@ -248,9 +248,9 @@ public class BeaconTuningSolver {
                         }
                         if (colorSlot1Id != -1) {
                             if (changeColor != null && changeColor.equals(matchColor)) {
-                                SlotOptions.disableSlot(event.handler.getSlot(colorSlot1Id), true);
+                                SlotOptions.setDisabled(event.handler.getSlot(colorSlot1Id), true);
                             } else if (changeColor != null && !changeColor.equals(matchColor)) {
-                                SlotOptions.disableSlot(event.handler.getSlot(colorSlot1Id), false);
+                                SlotOptions.setDisabled(event.handler.getSlot(colorSlot1Id), false);
                             }
                         }
                     }

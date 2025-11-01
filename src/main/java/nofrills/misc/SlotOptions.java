@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SlotOptions {
-    public static final ItemStack background = stackWithName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
-    public static final ItemStack first = stackWithName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
-    public static final ItemStack second = stackWithName(Items.ORANGE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
-    public static final ItemStack third = stackWithName(Items.RED_CONCRETE.getDefaultStack(), Utils.Symbols.format + "cClick after.");
+    public static final ItemStack BACKGROUND = stackWithName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
+    public static final ItemStack FIRST = stackWithName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
+    public static final ItemStack SECOND = stackWithName(Items.ORANGE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
+    public static final ItemStack THIRD = stackWithName(Items.RED_CONCRETE.getDefaultStack(), Utils.Symbols.format + "cClick after.");
     public static final ConcurrentHashMap<Slot, Flags> slotFlags = new ConcurrentHashMap<>();
 
     public static ItemStack stackWithName(ItemStack stack, String name) {
@@ -28,27 +28,29 @@ public class SlotOptions {
         return stack;
     }
 
-    public static ItemStack stackWithQuantity(ItemStack stack, int quantity) {
-        ItemStack copy = stack.copy();
-        copy.setCount(quantity);
-        return copy;
+    public static ItemStack stackWithCount(ItemStack stack, int quantity) {
+        return stack.copyWithCount(quantity);
     }
 
-    public static boolean isSlotDisabled(Slot slot) {
+    public static Flags getOrInit(Slot slot) {
+        if (slot != null) {
+            if (!slotFlags.containsKey(slot)) {
+                slotFlags.put(slot, new Flags());
+            }
+            return slotFlags.get(slot);
+        }
+        return new Flags();
+    }
+
+    public static boolean isDisabled(Slot slot) {
         return slot != null && slotFlags.containsKey(slot) && slotFlags.get(slot).disabled;
     }
 
-    public static void disableSlot(Slot slot, boolean disabled) {
-        if (slot != null) {
-            if (slotFlags.containsKey(slot)) {
-                slotFlags.get(slot).setDisabled(disabled);
-            } else {
-                slotFlags.put(slot, new Flags().setDisabled(disabled));
-            }
-        }
+    public static void setDisabled(Slot slot, boolean disabled) {
+        getOrInit(slot).setDisabled(disabled);
     }
 
-    public static void clearDisabledSlots() {
+    public static void clearDisabled() {
         for (Map.Entry<Slot, Flags> entry : slotFlags.entrySet()) {
             Flags value = entry.getValue();
             if (value.disabled) {
@@ -57,34 +59,28 @@ public class SlotOptions {
         }
     }
 
-    public static boolean isSlotSpoofed(Slot slot) {
+    public static boolean isSpoofed(Slot slot) {
         return slot != null && slotFlags.containsKey(slot) && slotFlags.get(slot).spoofed;
     }
 
-    public static ItemStack getSpoofedStack(Slot slot) {
-        if (isSlotSpoofed(slot)) {
+    public static ItemStack getSpoofed(Slot slot) {
+        if (isSpoofed(slot)) {
             return slotFlags.get(slot).replacement;
         }
         return ItemStack.EMPTY;
     }
 
-    public static void spoofSlot(Slot slot, ItemStack replacement) {
-        if (slot != null) {
-            if (slotFlags.containsKey(slot)) {
-                slotFlags.get(slot).setSpoofed(true).setReplacement(replacement);
-            } else {
-                slotFlags.put(slot, new Flags().setSpoofed(true).setReplacement(replacement));
-            }
-        }
+    public static void setSpoofed(Slot slot, ItemStack replacement) {
+        getOrInit(slot).setSpoofed(true).setReplacement(replacement);
     }
 
-    public static void clearSpoof(Slot slot) {
+    public static void clearSpoofed(Slot slot) {
         if (slot != null && slotFlags.containsKey(slot)) {
             slotFlags.get(slot).setSpoofed(false);
         }
     }
 
-    public static void clearSpoofedSlots() {
+    public static void clearSpoofed() {
         for (Map.Entry<Slot, Flags> entry : slotFlags.entrySet()) {
             Flags value = entry.getValue();
             if (value.spoofed) {
@@ -97,7 +93,7 @@ public class SlotOptions {
         return slot != null && slotFlags.containsKey(slot) && slotFlags.get(slot).background;
     }
 
-    public static RenderColor getBackgroundColor(Slot slot) {
+    public static RenderColor getBackground(Slot slot) {
         if (hasBackground(slot)) {
             return slotFlags.get(slot).color;
         }
@@ -105,13 +101,7 @@ public class SlotOptions {
     }
 
     public static void setBackground(Slot slot, RenderColor color) {
-        if (slot != null) {
-            if (slotFlags.containsKey(slot)) {
-                slotFlags.get(slot).setBackground(true).setBackgroundColor(color);
-            } else {
-                slotFlags.put(slot, new Flags().setBackground(true).setBackgroundColor(color));
-            }
-        }
+        getOrInit(slot).setBackground(true).setBackgroundColor(color);
     }
 
     public static void clearBackground(Slot slot) {
@@ -120,11 +110,41 @@ public class SlotOptions {
         }
     }
 
-    public static void clearBackgrounds() {
+    public static void clearBackground() {
         for (Map.Entry<Slot, Flags> entry : slotFlags.entrySet()) {
             Flags value = entry.getValue();
             if (value.background) {
                 entry.setValue(value.setBackground(false));
+            }
+        }
+    }
+
+    public static boolean hasCount(Slot slot) {
+        return slot != null && slotFlags.containsKey(slot) && slotFlags.get(slot).count != null;
+    }
+
+    public static String getCount(Slot slot) {
+        if (hasCount(slot)) {
+            return slotFlags.get(slot).count;
+        }
+        return "";
+    }
+
+    public static void setCount(Slot slot, String count) {
+        getOrInit(slot).setCount(count);
+    }
+
+    public static void clearCount(Slot slot) {
+        if (slot != null && slotFlags.containsKey(slot)) {
+            slotFlags.get(slot).setCount(null);
+        }
+    }
+
+    public static void clearCount() {
+        for (Map.Entry<Slot, Flags> entry : slotFlags.entrySet()) {
+            Flags value = entry.getValue();
+            if (value.count != null) {
+                entry.setValue(value.setCount(null));
             }
         }
     }
@@ -140,6 +160,7 @@ public class SlotOptions {
         public ItemStack replacement = ItemStack.EMPTY;
         public boolean background = false;
         public RenderColor color = RenderColor.fromHex(0xffffff);
+        public String count = null;
 
         public Flags() {
         }
@@ -168,31 +189,10 @@ public class SlotOptions {
             this.color = color;
             return this;
         }
-    }
 
-    public static class SpoofedSlot {
-        public int slotId;
-        public ItemStack replacementStack;
-
-        public SpoofedSlot(Slot slot, ItemStack replacementStack) {
-            this.slotId = slot.id;
-            this.replacementStack = replacementStack;
-        }
-
-        public boolean isSlot(Slot slot) {
-            return slot != null && slot.id == slotId;
-        }
-    }
-
-    public static class DisabledSlot {
-        public int slotId;
-
-        public DisabledSlot(Slot slot) {
-            this.slotId = slot.id;
-        }
-
-        public boolean isSlot(Slot slot) {
-            return slot != null && slot.id == slotId;
+        public Flags setCount(String count) {
+            this.count = count;
+            return this;
         }
     }
 }

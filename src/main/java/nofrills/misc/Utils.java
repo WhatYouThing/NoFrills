@@ -25,7 +25,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
@@ -667,10 +666,7 @@ public class Utils {
      * Returns every slot that is part of the container screen handler, excluding the player inventory slots.
      */
     public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
-        Inventory inventory = handler.getInventory();
-        List<Slot> slots = new ArrayList<>(handler.slots);
-        slots.removeIf(slot -> inventory.getStack(slot.id).equals(ItemStack.EMPTY));
-        return slots;
+        return handler.slots.stream().filter(slot -> slot.id < handler.getRows() * 9).toList();
     }
 
     public static ItemStack getHeldItem() {

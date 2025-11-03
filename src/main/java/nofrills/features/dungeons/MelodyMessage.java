@@ -21,17 +21,21 @@ public class MelodyMessage {
     public static final SettingBool progress = new SettingBool(false, "progress", instance.key());
     public static final SettingString progressMsg = new SettingString("/pc Melody {percent}", "progressMsg", instance.key());
 
-    private static int lastCount = 0;
+    private static int lastCount = 4;
 
     private static boolean isMelody(String title) {
         return TerminalSolvers.getTerminalType(title).equals(TerminalSolvers.TerminalType.Melody);
+    }
+
+    private static void resetCount() {
+        lastCount = 4;
     }
 
     @EventHandler
     private static void onScreenOpen(ScreenOpenEvent event) {
         if (instance.isActive() && Utils.isOnDungeonFloor("7") && isMelody(event.screen.getTitle().getString())) {
             Utils.sendMessage(msg.value());
-            lastCount = 0;
+            resetCount();
         }
     }
 
@@ -48,7 +52,7 @@ public class MelodyMessage {
                 if (item.equals(Items.RED_TERRACOTTA) || item.equals(Items.LIME_TERRACOTTA)) {
                     count++;
                 } // go from last slot to first, count every terracotta item, find the terminal progress from the first lime terracotta
-                if (item.equals(Items.LIME_TERRACOTTA) && count != lastCount) {
+                if (item.equals(Items.LIME_TERRACOTTA) && count < lastCount) {
                     String percent = switch (count) {
                         case 1 -> "75%";
                         case 2 -> "50%";
@@ -67,6 +71,6 @@ public class MelodyMessage {
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
-        lastCount = 0;
+        resetCount();
     }
 }

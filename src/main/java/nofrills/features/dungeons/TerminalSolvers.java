@@ -103,9 +103,9 @@ public class TerminalSolvers {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("7")) {
+        if (instance.isActive() && Utils.isOnDungeonFloor("7") && !event.isInventory && event.slot != null) {
             TerminalType type = getTerminalType(event.title);
-            if (event.isInventory || event.slot == null || !isTypeEnabled(type)) return;
+            if (!isTypeEnabled(type)) return;
             if (type.equals(TerminalType.Panes)) {
                 solveSlot(event.slot, event.stack.getItem().equals(Items.RED_STAINED_GLASS_PANE));
             }
@@ -250,16 +250,16 @@ public class TerminalSolvers {
                 }
                 case InOrder -> {
                     for (Slot slot : Utils.getContainerSlots((GenericContainerScreenHandler) event.handler)) {
-                        if (SlotOptions.isSpoofed(slot) && !SlotOptions.getSpoofed(slot).getItem().equals(SlotOptions.BACKGROUND.getItem())) {
+                        if (SlotOptions.isSpoofed(slot)) {
                             ItemStack spoofed = SlotOptions.getSpoofed(slot);
+                            if (spoofed.getItem().equals(SlotOptions.BACKGROUND.getItem())) continue;
                             Item item = spoofed.getItem();
                             for (int i = 0; i < optionStacks.size(); i++) {
                                 if (item.equals(optionStacks.get(i).getItem())) {
                                     event.drawFill(slot.id, switch (i) {
                                         case 0 -> colorFirst;
                                         case 1 -> colorSecond;
-                                        case 2 -> colorThird;
-                                        default -> RenderColor.white; // emotional support default case
+                                        default -> colorThird;
                                     });
                                 }
                             }

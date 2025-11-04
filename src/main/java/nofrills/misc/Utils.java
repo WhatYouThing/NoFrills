@@ -111,7 +111,8 @@ public class Utils {
     }
 
     public static void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
-        Vec3d coords = mc.cameraEntity.getPos();
+        if (mc.getCameraEntity() == null) return;
+        Vec3d coords = mc.getCameraEntity().getEntityPos();
         mc.getSoundManager().play(new PositionedSoundInstance(event, category, volume, pitch, soundRandom, coords.getX(), coords.getY(), coords.getZ()));
     }
 
@@ -255,7 +256,7 @@ public class Utils {
         if (handler != null) {
             PlayerListEntry listEntry = handler.getPlayerListEntry(entity.getUuid());
             if (listEntry != null) {
-                String displayName = listEntry.getProfile().getName();
+                String displayName = listEntry.getProfile().name();
                 if (displayName != null) {
                     String name = Formatting.strip(displayName);
                     return !name.isEmpty() && !name.contains(" ");
@@ -286,6 +287,20 @@ public class Utils {
         return entity.getDimensions(EntityPose.STANDING).getBoxAt(entity.getLerpedPos(tickProgress));
     }
 
+    /**
+     * Enable/disable glowing for a specific entity.
+     */
+    public static void setGlowing(Entity ent, boolean shouldGlow, RenderColor color) {
+        ((EntityRendering) ent).nofrills_mod$setGlowingColored(shouldGlow, color);
+    }
+
+    /**
+     * Checks if an entity is drawing the glow effect. Does not account for vanilla/server applied glows.
+     */
+    public static boolean isGlowing(Entity ent) {
+        return ((EntityRendering) ent).nofrills_mod$getGlowing();
+    }
+
     @SuppressWarnings("unchecked")
     public static List<Entity> getEntities() {
         if (mc.world != null) { // only powerful wizards may cast such obscene spells
@@ -309,11 +324,11 @@ public class Utils {
     }
 
     public static List<Entity> getOtherEntities(Entity from, double distX, double distY, double distZ, Predicate<? super Entity> filter) {
-        return getOtherEntities(from, Box.of(from.getPos(), distX, distY, distZ), filter);
+        return getOtherEntities(from, Box.of(from.getEntityPos(), distX, distY, distZ), filter);
     }
 
     public static List<Entity> getOtherEntities(Entity from, double dist, Predicate<? super Entity> filter) {
-        return getOtherEntities(from, Box.of(from.getPos(), dist, dist, dist), filter);
+        return getOtherEntities(from, Box.of(from.getEntityPos(), dist, dist, dist), filter);
     }
 
     public static void sendPingPacket() {
@@ -421,14 +436,14 @@ public class Utils {
     public static GameProfile getTextures(ItemStack stack) {
         ProfileComponent profile = stack.getComponents().get(DataComponentTypes.PROFILE);
         if (!stack.isEmpty() && profile != null) {
-            return profile.gameProfile();
+            return profile.getGameProfile();
         }
         return null;
     }
 
     public static String getTextureUrl(GameProfile profile) {
         if (profile != null) {
-            MinecraftSessionService service = mc.getSessionService();
+            MinecraftSessionService service = mc.getApiServices().sessionService();
             Property property = service.getPackedTextures(profile);
             MinecraftProfileTextures textures = service.unpackTextures(property);
             if (textures.skin() != null) {
@@ -571,7 +586,7 @@ public class Utils {
      */
     public static boolean isInZone(double x1, double y1, double z1, double x2, double y2, double z2) {
         Box area = new Box(x1, y1, z1, x2, y2, z2);
-        return area.contains(mc.player.getPos());
+        return area.contains(mc.player.getEntityPos());
     }
 
     /**
@@ -604,7 +619,7 @@ public class Utils {
         Vec3d end = pos.add(rot.x * maxDistance, rot.y * maxDistance, rot.z * maxDistance);
         RaycastContext context = new RaycastContext(pos, end, RaycastContext.ShapeType.OUTLINE, net.minecraft.world.RaycastContext.FluidHandling.ANY, entity);
         ((RaycastOptions) context).nofrills_mod$setConsiderAllFull(true);
-        return entity.getWorld().raycast(context);
+        return entity.getEntityWorld().raycast(context);
     }
 
     /**
@@ -613,10 +628,10 @@ public class Utils {
     public static Entity findNametagOwner(Entity armorStand, List<Entity> otherEntities) {
         Entity entity = null;
         float lowestDist = 2.0f;
-        double maxY = armorStand.getPos().getY();
+        double maxY = armorStand.getEntityPos().getY();
         for (Entity ent : otherEntities) {
-            float dist = horizontalDistance(ent.getPos(), armorStand.getPos());
-            if (!(ent instanceof ArmorStandEntity) && ent.getPos().getY() < maxY && dist < lowestDist) {
+            float dist = horizontalDistance(ent.getEntityPos(), armorStand.getEntityPos());
+            if (!(ent instanceof ArmorStandEntity) && ent.getEntityPos().getY() < maxY && dist < lowestDist) {
                 entity = ent;
                 lowestDist = dist;
             }

@@ -21,8 +21,7 @@ public class Fullbright {
         if (instance.isActive() && mc.player != null) {
             if (mode.value().equals(modes.Potion)) {
                 mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 840));
-            }
-            if (noEffect.value() && !mode.value().equals(modes.Potion)) {
+            } else if (noEffect.value()) {
                 mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
             }
         }

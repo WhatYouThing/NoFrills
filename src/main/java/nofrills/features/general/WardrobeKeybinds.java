@@ -1,6 +1,7 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.Item;
@@ -62,18 +63,18 @@ public class WardrobeKeybinds {
         return -1;
     }
 
-    private static int getTargetSlot(int key, int page) {
+    private static int getTargetSlot(InputEvent event, int page) {
         return switch (style.value()) {
             case Simple -> {
-                if (key >= GLFW.GLFW_KEY_1 && key <= GLFW.GLFW_KEY_9) {
-                    yield key - 48 + (page - 1) * 9;
+                if (event.key >= GLFW.GLFW_KEY_1 && event.key <= GLFW.GLFW_KEY_9) {
+                    yield event.key - 48 + (page - 1) * 9;
                 }
                 yield -1;
             }
             case Hotbar -> {
                 for (int i = 1; i <= 9; i++) {
                     KeyBinding binding = mc.options.hotbarKeys[i - 1]; // could crash if someone is doing some voodoo
-                    if (binding.matchesKey(key, 0) || binding.matchesMouse(key)) {
+                    if ((event.isKeyboard && binding.matchesKey(event.keyInput)) || (event.isMouse && binding.matchesMouse(new Click(0, 0, event.mouseInput)))) {
                         yield i + (page - 1) * 9;
                     }
                 }
@@ -82,7 +83,7 @@ public class WardrobeKeybinds {
             case Custom -> {
                 for (int i = 1; i <= 9; i++) {
                     SettingKeybind binding = customKeys.get(i - 1);
-                    if (binding.value() == key) {
+                    if (binding.value() == event.key) {
                         yield i + (page - 1) * 9;
                     }
                 }
@@ -109,7 +110,7 @@ public class WardrobeKeybinds {
         if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
             int page = getWardrobePage(container.getTitle().getString());
             if (page == -1) return;
-            int target = getTargetSlot(event.key, page);
+            int target = getTargetSlot(event, page);
             for (Slot slot : Utils.getContainerSlots(container.getScreenHandler())) {
                 if (isEquipButton(slot, target)) {
                     if (event.action == GLFW.GLFW_PRESS) {

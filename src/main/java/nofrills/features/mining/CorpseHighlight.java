@@ -8,7 +8,6 @@ import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
-import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
 public class CorpseHighlight {
@@ -23,7 +22,7 @@ public class CorpseHighlight {
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInArea("Mineshaft")) {
             for (Entity ent : Utils.getEntities()) {
-                if (ent instanceof ArmorStandEntity stand && !stand.isInvisible() && !Rendering.Entities.isDrawingGlow(stand)) {
+                if (ent instanceof ArmorStandEntity stand && !stand.isInvisible() && !Utils.isGlowing(stand)) {
                     ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
                     if (!helmet.isEmpty()) {
                         String pieceName = Utils.toPlain(helmet.getName());
@@ -35,7 +34,7 @@ public class CorpseHighlight {
                             default -> null;
                         };
                         if (color != null) {
-                            Rendering.Entities.drawGlow(stand, true, color);
+                            Utils.setGlowing(stand, true, color);
                         }
                     }
                 }

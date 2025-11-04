@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.10-SNAPSHOT'
+    id 'fabric-loom' version '1.11-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -36,7 +36,6 @@ dependencies {
     include "meteordevelopment:orbit:${project.orbit_version}"
     modImplementation("io.wispforest:owo-lib:${project.owolib_version}")
     include "io.wispforest:owo-lib:${project.owolib_version}"
-    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
 }
 
 loom {

@@ -5,13 +5,12 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.sound.SoundSystem;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -61,7 +60,7 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void onBeforeOpenScreen(Screen screen, CallbackInfo ci) {
-        if (NoLoadingScreen.instance.isActive() && screen instanceof DownloadingTerrainScreen) {
+        if (NoLoadingScreen.instance.isActive() && screen instanceof LevelLoadingScreen) {
             mc.setScreen(null);
             ci.cancel();
         }
@@ -130,8 +129,12 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "onWindowFocusChanged", at = @At("TAIL"))
     private void onFocusChanged(boolean focused, CallbackInfo ci) {
-        if (this.getSoundSystem() != null && UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.muteSounds.value()) {
-            this.getSoundSystem().updateSoundVolume(SoundCategory.MASTER, !focused ? 0.0f : mc.options.getSoundVolumeOption(SoundCategory.MASTER).getValue().floatValue());
+        SoundSystem system = this.getSoundSystem();
+        if (system != null && system.started && UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.muteSounds.value()) {
+            system.sources.forEach((source, sourceManager) -> {
+                float volume = !focused ? 0.0f : mc.options.getSoundVolumeOption(source.getCategory()).getValue().floatValue();
+                sourceManager.run(src -> src.setVolume(volume));
+            });
         }
     }
 }

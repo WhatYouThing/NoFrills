@@ -26,6 +26,7 @@ import nofrills.features.general.PriceTooltips;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
+import nofrills.misc.Rendering;
 import nofrills.misc.ShardData;
 import nofrills.misc.Utils;
 
@@ -452,7 +453,7 @@ public class ShardTracker {
             this.delete.positioning(Positioning.relative(100, 0)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             this.delete.renderer((context, btn, delta) -> {
                 context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
-                context.drawBorder(btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xffffffff);
+                Rendering.drawBorder(context, btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xffffffff);
             });
             this.child(this.inputName);
             this.child(this.inputObtained);

@@ -80,12 +80,12 @@ public class SecretChime {
 
     private static boolean isSecretItem(int id, boolean distCheck) {
         return mc.world != null && mc.player != null && id != lastItemId && mc.world.getEntityById(id) instanceof ItemEntity item
-                && secretItems.contains(Utils.getMarketId(item.getStack())) && (!distCheck || mc.player.getEyePos().distanceTo(item.getPos()) <= 10.0);
+                && secretItems.contains(Utils.getMarketId(item.getStack())) && (!distCheck || mc.player.getEyePos().distanceTo(item.getEntityPos()) <= 10.0);
     }
 
     private static boolean isSecretBat(int id) {
         return mc.world != null && mc.player != null && mc.world.getEntityById(id) instanceof BatEntity bat
-                && batCache.has(bat) && mc.player.getEyePos().distanceTo(bat.getPos()) <= 10.0;
+                && batCache.has(bat) && mc.player.getEyePos().distanceTo(bat.getEntityPos()) <= 10.0;
     }
 
     private static boolean isEssence(BlockState state, BlockPos pos) {

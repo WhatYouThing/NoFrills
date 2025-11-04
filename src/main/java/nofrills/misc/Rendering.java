@@ -5,9 +5,9 @@ import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
@@ -40,7 +40,7 @@ public final class Rendering {
         Vec3d camPos = camera.getPos().negate();
         matrices.translate(camPos.x, camPos.y, camPos.z);
         VertexConsumer buffer = throughWalls ? consumer.getBuffer(Layers.BoxOutlineNoCull) : consumer.getBuffer(Layers.BoxOutline);
-        VertexRendering.drawBox(matrices, buffer, box, color.r, color.g, color.b, color.a);
+        VertexRendering.drawBox(matrices.peek(), buffer, box, color.r, color.g, color.b, color.a);
         matrices.pop();
     }
 
@@ -82,48 +82,15 @@ public final class Rendering {
         matrices.pop();
     }
 
-    public static class Entities {
-        /**
-         * Enable/disable filled box rendering for an entity.
-         */
-        public static void drawFilled(Entity entity, boolean shouldRender, RenderColor color) {
-            ((EntityRendering) entity).nofrills_mod$setRenderBoxFilled(shouldRender, color);
-        }
+    public static void drawBorder(DrawContext context, int x, int y, int width, int height, RenderColor color) {
+        drawBorder(context, x, y, width, height, color.argb);
+    }
 
-        /**
-         * Check if a filled box is currently being rendered for the entity.
-         */
-        public static boolean isDrawingFilled(Entity entity) {
-            return ((EntityRendering) entity).nofrills_mod$getRenderingFilled();
-        }
-
-        /**
-         * Enable/disable outline box rendering for an entity.
-         */
-        public static void drawOutline(Entity entity, boolean shouldRender, RenderColor color) {
-            ((EntityRendering) entity).nofrills_mod$setRenderBoxOutline(shouldRender, color);
-        }
-
-        /**
-         * Check if an outline box is currently being rendered for the entity.
-         */
-        public static boolean isDrawingOutline(Entity entity) {
-            return ((EntityRendering) entity).nofrills_mod$getRenderingOutline();
-        }
-
-        /**
-         * Enable/disable glowing for a specific entity.
-         */
-        public static void drawGlow(Entity ent, boolean shouldGlow, RenderColor color) {
-            ((EntityRendering) ent).nofrills_mod$setGlowingColored(shouldGlow, color);
-        }
-
-        /**
-         * Checks if an entity is drawing the glow effect. Does not account for vanilla/server applied glows.
-         */
-        public static boolean isDrawingGlow(Entity ent) {
-            return ((EntityRendering) ent).nofrills_mod$getGlowing();
-        }
+    public static void drawBorder(DrawContext context, int x, int y, int width, int height, int argb) {
+        context.fill(x, y, x + width, y + 1, argb);
+        context.fill(x, y + height - 1, x + width, y + height, argb);
+        context.fill(x, y + 1, x + 1, y + height - 1, argb);
+        context.fill(x + width - 1, y + 1, x + width, y + height - 1, argb);
     }
 
     public static class Pipelines {
@@ -187,14 +154,6 @@ public final class Rendering {
                 false,
                 false,
                 Pipelines.outlineNoCull,
-                Parameters.lines.build(false)
-        );
-        public static final RenderLayer.MultiPhase GuiLine = RenderLayer.of(
-                "nofrills_gui_line",
-                262144,
-                false,
-                false,
-                RenderPipelines.DEBUG_LINE_STRIP,
                 Parameters.lines.build(false)
         );
     }

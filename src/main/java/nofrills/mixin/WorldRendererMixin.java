@@ -1,18 +1,15 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.state.WorldRenderState;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.*;
-import net.minecraft.util.math.Box;
 import nofrills.events.WorldRenderEvent;
 import nofrills.features.general.NoRender;
-import nofrills.misc.EntityRendering;
-import nofrills.misc.RenderColor;
-import nofrills.misc.Rendering;
-import nofrills.misc.Utils;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
@@ -31,16 +28,16 @@ public abstract class WorldRendererMixin {
     @Final
     private VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(1536 * 20));
 
-    // the compiler sometimes claims that the inject target wasn't found, but it works fine regardless
     @SuppressWarnings("mapping")
+    // the compiler sometimes claims that the inject target wasn't found, but it works fine regardless
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4fStack;popMatrix()Lorg/joml/Matrix4fStack;"))
-    private void onRenderWorld(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci) {
+    private void onRenderWorld(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix, GpuBufferSlice fogBuffer, Vector4f fogColor, boolean renderSky, CallbackInfo ci) {
         eventBus.post(new WorldRenderEvent(immediate, tickCounter, camera, new MatrixStack()));
         immediate.draw();
     }
 
-    @Inject(method = "renderEntity", at = @At("HEAD"), cancellable = true)
-    private void onBeforeRenderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
+    @Inject(method = "fillEntityRenderStates", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;getAndUpdateRenderState(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/entity/state/EntityRenderState;"), cancellable = true)
+    private void onBeforeRenderEntity(Camera camera, Frustum frustum, RenderTickCounter tickCounter, WorldRenderState renderStates, CallbackInfo ci, @Local Entity entity) {
         if (NoRender.instance.isActive()) {
             if (NoRender.deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()) {
                 ci.cancel();
@@ -58,30 +55,5 @@ public abstract class WorldRendererMixin {
                 ci.cancel();
             }
         }
-    }
-
-    @Inject(method = "renderEntity", at = @At("TAIL"))
-    private void onRenderEntity(Entity entity, double cameraX, double cameraY, double cameraZ, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, CallbackInfo ci) {
-        if (!entity.isAlive()) {
-            return;
-        }
-        EntityRendering rendering = (EntityRendering) entity;
-        if (!rendering.nofrills_mod$getRenderingOutline() && !rendering.nofrills_mod$getRenderingFilled()) {
-            return;
-        }
-        Box box = Utils.getLerpedBox(entity, tickProgress);
-        matrices.push();
-        matrices.translate(-cameraX, -cameraY, -cameraZ);
-        if (rendering.nofrills_mod$getRenderingOutline()) {
-            RenderColor color = rendering.nofrills_mod$getOutlineColors();
-            VertexConsumer buffer = vertexConsumers.getBuffer(Rendering.Layers.BoxOutline);
-            VertexRendering.drawBox(matrices, buffer, box, color.r, color.g, color.b, color.a);
-        }
-        if (rendering.nofrills_mod$getRenderingFilled()) {
-            RenderColor color = rendering.nofrills_mod$getFilledColors();
-            VertexConsumer buffer = vertexConsumers.getBuffer(Rendering.Layers.BoxFilled);
-            VertexRendering.drawFilledBox(matrices, buffer, box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ, color.r, color.g, color.b, color.a);
-        }
-        matrices.pop();
     }
 }

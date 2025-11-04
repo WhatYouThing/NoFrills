@@ -23,6 +23,7 @@ import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.KeybindButton;
 import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
@@ -168,7 +169,7 @@ public class CustomKeybinds {
             this.delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             this.delete.renderer((context, btn, delta) -> {
                 context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
-                context.drawBorder(btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xffffffff);
+                Rendering.drawBorder(context, btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xffffffff);
             });
             this.options.child(this.keybind);
             this.options.child(this.modifier);

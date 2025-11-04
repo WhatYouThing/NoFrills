@@ -1,2 +1,5 @@
 accessWidener v2 named
 accessible class net/minecraft/client/network/ClientPlayNetworkHandler$CommandRunResult
+accessible field net/minecraft/client/sound/SoundSystem started Z
+accessible field net/minecraft/client/sound/SoundSystem sources Ljava/util/Map;
+accessible field net/minecraft/entity/PlayerLikeEntity STANDING_DIMENSIONS Lnet/minecraft/entity/EntityDimensions;

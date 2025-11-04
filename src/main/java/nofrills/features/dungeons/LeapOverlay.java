@@ -7,13 +7,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.ColorHelper;
 import nofrills.config.*;
 import nofrills.events.SlotUpdateEvent;
-import nofrills.misc.RenderColor;
-import nofrills.misc.ScreenOptions;
-import nofrills.misc.SkyblockData;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -131,9 +127,9 @@ public class LeapOverlay {
         private final RenderColor classColor;
         private final float offsetX;
         private final float offsetY;
-        private final int background;
-        private final int backgroundHover;
-        private final int border;
+        private final RenderColor background;
+        private final RenderColor backgroundHover;
+        private final RenderColor border;
         public int minX = 0;
         public int minY = 0;
         public int maxX = 0;
@@ -146,11 +142,11 @@ public class LeapOverlay {
             this.dungeonClass = Text.of(dungeonClass);
             this.nameColor = LeapOverlay.nameColor;
             this.classColor = classColor;
-            background = ColorHelper.fromFloats(0.67f, 0.0f, 0.0f, 0.0f);
-            backgroundHover = ColorHelper.fromFloats(0.67f, this.classColor.r * 0.33f, this.classColor.g * 0.33f, this.classColor.b * 0.33f);
-            border = ColorHelper.fromFloats(1.0f, this.classColor.r, this.classColor.g, this.classColor.b);
-            offsetX = index == 0 || index == 2 ? 0.25f : 0.55f;
-            offsetY = index <= 1 ? 0.25f : 0.55f;
+            this.background = RenderColor.fromFloat(0.0f, 0.0f, 0.0f, 0.67f);
+            this.backgroundHover = RenderColor.fromFloat(this.classColor.r * 0.33f, this.classColor.g * 0.33f, this.classColor.b * 0.33f, 0.67f);
+            this.border = RenderColor.fromFloat(this.classColor.r, this.classColor.g, this.classColor.b, 1.0f);
+            this.offsetX = index == 0 || index == 2 ? 0.25f : 0.55f;
+            this.offsetY = index <= 1 ? 0.25f : 0.55f;
         }
 
         private int getX(DrawContext context, float xOffset) {
@@ -162,18 +158,18 @@ public class LeapOverlay {
         }
 
         public boolean isHovered(double mouseX, double mouseY) {
-            return mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY;
+            return mouseX >= this.minX && mouseX <= this.maxX && mouseY >= this.minY && mouseY <= this.maxY;
         }
 
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-            minX = getX(context, this.offsetX);
-            minY = getY(context, this.offsetY);
-            maxX = getX(context, this.offsetX + 0.2f);
-            maxY = getY(context, this.offsetY + 0.2f);
-            context.fill(minX, minY, maxX, maxY, hovered ? backgroundHover : background); // for some reason its ARGB rather than RGBA
+            this.minX = getX(context, this.offsetX);
+            this.minY = getY(context, this.offsetY);
+            this.maxX = getX(context, this.offsetX + 0.2f);
+            this.maxY = getY(context, this.offsetY + 0.2f);
+            context.fill(minX, minY, maxX, maxY, hovered ? backgroundHover.argb : background.argb);
             if (slotId != -1) {
-                context.drawBorder(minX, minY, maxX - minX, maxY - minY, border);
+                Rendering.drawBorder(context, minX, minY, maxX - minX, maxY - minY, border);
             }
             float textScale = (float) (scale.value() / mc.options.getGuiScale().getValue());
             int textX = minX + (maxX - minX) / 2;

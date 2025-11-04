@@ -2,7 +2,6 @@ package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
@@ -21,7 +20,7 @@ public class KeyHighlight {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && event.entity instanceof ArmorStandEntity) {
+        if (instance.isActive() && Utils.isInDungeons()) {
             if (event.namePlain.equals("Wither Key") || event.namePlain.equals("Blood Key")) {
                 keys.add(event.entity);
             }
@@ -31,10 +30,8 @@ public class KeyHighlight {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
-            if (!keys.empty()) {
-                for (Entity ent : keys.get()) {
-                    event.drawFilledWithBeam(Box.of(ent.getPos().add(0, 1.5, 0), 1, 1, 1), 256, true, color.value());
-                }
+            for (Entity ent : keys.get()) {
+                event.drawFilledWithBeam(Box.of(ent.getEntityPos().add(0, 1.5, 0), 1, 1, 1), 256, true, color.value());
             }
         }
     }

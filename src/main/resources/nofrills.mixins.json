@@ -35,7 +35,6 @@
     "MinecraftClientMixin",
     "MouseMixin",
     "NbtComponentAccessor",
-    "ParticleManagerMixin",
     "PlayerEntityMixin",
     "PlayerListHudAccessor",
     "RaycastContextMixin",

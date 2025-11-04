@@ -10,7 +10,6 @@ import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
 import nofrills.features.farming.PlotBorders;
@@ -635,9 +634,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void close() {
-        if (AutoSave.instance.isActive()) {
-            Config.saveAsync();
-        }
+        if (AutoSave.instance.isActive()) AutoSave.save();
         if (this.uiAdapter != null) {
             this.uiAdapter.dispose();
         }

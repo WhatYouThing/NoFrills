@@ -7,7 +7,6 @@ import io.wispforest.owo.ui.core.OwoUIAdapter;
 import io.wispforest.owo.ui.core.Surface;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import nofrills.features.misc.AutoSave;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
@@ -72,9 +71,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void close() {
-        if (AutoSave.instance.isActive()) {
-            Config.saveAsync();
-        }
+        if (AutoSave.instance.isActive()) AutoSave.save();
         super.close();
     }
 }

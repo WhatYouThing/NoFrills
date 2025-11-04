@@ -8,7 +8,6 @@ import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.events.ServerJoinEvent;
@@ -55,8 +54,8 @@ public class SkyblockData {
             "Archer",
             "Tank"
     );
-    public static final SettingString dungeonClass = new SettingString("Berserker", "dungeonClass", "misc");
     private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
+    public static String dungeonClass = "Berserk";
     public static double dungeonPower = 0;
     private static String location = "";
     private static String area = "";
@@ -74,7 +73,7 @@ public class SkyblockData {
                 String selectedHub = Utils.format("You have selected the {} Dungeon Class!", name);
                 String milestone = Utils.format("{} Milestone", name);
                 if (msg.startsWith(tag) || msg.equals(selectedHub) || msg.equals(selected) || msg.startsWith(milestone)) {
-                    dungeonClass.set(name);
+                    dungeonClass = name;
                     break;
                 }
             }

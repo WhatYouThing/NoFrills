@@ -229,7 +229,7 @@ public class Utils {
      * Returns true if the player is anywhere on their garden
      */
     public static boolean isInGarden() {
-        return isInZone(Symbols.zone + " The Garden", true) || isOnGardenPlot();
+        return isInArea("Garden");
     }
 
     /**

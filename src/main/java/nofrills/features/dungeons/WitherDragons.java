@@ -54,7 +54,7 @@ public class WitherDragons {
     }
 
     private static boolean isArcherTeam() {
-        return switch (SkyblockData.dungeonClass.value()) {
+        return switch (SkyblockData.dungeonClass) {
             case "Archer", "Tank" -> true;
             default -> false;
         };

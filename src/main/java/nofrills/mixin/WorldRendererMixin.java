@@ -1,9 +1,9 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.state.WorldRenderState;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
@@ -36,24 +36,15 @@ public abstract class WorldRendererMixin {
         immediate.draw();
     }
 
-    @Inject(method = "fillEntityRenderStates", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;getAndUpdateRenderState(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/entity/state/EntityRenderState;"), cancellable = true)
-    private void onBeforeRenderEntity(Camera camera, Frustum frustum, RenderTickCounter tickCounter, WorldRenderState renderStates, CallbackInfo ci, @Local Entity entity) {
+    @ModifyExpressionValue(method = "fillEntityRenderStates", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderManager;shouldRender(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/Frustum;DDD)Z"))
+    private boolean onBeforeRenderEntity(boolean original, @Local Entity entity) {
         if (NoRender.instance.isActive()) {
-            if (NoRender.deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()) {
-                ci.cancel();
-            }
-            if (NoRender.fallingBlocks.value() && entity instanceof FallingBlockEntity) {
-                ci.cancel();
-            }
-            if (NoRender.treeBits.value() && NoRender.isTreeBlock(entity)) {
-                ci.cancel();
-            }
-            if (NoRender.lightning.value() && entity instanceof LightningEntity) {
-                ci.cancel();
-            }
-            if (NoRender.expOrbs.value() && entity instanceof ExperienceOrbEntity) {
-                ci.cancel();
-            }
+            if (NoRender.deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()) return false;
+            if (NoRender.fallingBlocks.value() && entity instanceof FallingBlockEntity) return false;
+            if (NoRender.treeBits.value() && NoRender.isTreeBlock(entity)) return false;
+            if (NoRender.lightning.value() && entity instanceof LightningEntity) return false;
+            if (NoRender.expOrbs.value() && entity instanceof ExperienceOrbEntity) return false;
         }
+        return original;
     }
 }

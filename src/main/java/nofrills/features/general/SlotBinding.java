@@ -102,8 +102,7 @@ public class SlotBinding {
                         String name = getHotbarName(i);
                         if (data.value().has(name)) {
                             JsonArray array = data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray();
-                            JsonPrimitive primitive = new JsonPrimitive(focusedSlot.id);
-                            if (array.contains(primitive)) {
+                            if (array.contains(new JsonPrimitive(focusedSlot.id))) {
                                 mc.interactionManager.clickSlot(syncId, focusedSlot.id, i - 1, SlotActionType.SWAP, mc.player);
                                 data.value().get(name).getAsJsonObject().addProperty("last", focusedSlot.id);
                                 event.cancel();
@@ -124,14 +123,15 @@ public class SlotBinding {
                                 data.value().get(hotbarName).getAsJsonObject().add("binds", new JsonArray());
                                 data.value().get(hotbarName).getAsJsonObject().addProperty("last", 0);
                             }
+                            data.save();
                             sendSuccess(Utils.format("Cleared every bind from hotbar slot {}.", toHotbarNumber(focusedSlot.id)));
                         } else if (isValid(focusedSlot.id)) {
                             for (int i = 1; i <= 8; i++) {
                                 String name = getHotbarName(i);
                                 if (data.value().has(name)) {
                                     JsonArray array = data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray();
-                                    JsonPrimitive primitive = new JsonPrimitive(focusedSlot.id);
-                                    if (array.remove(primitive)) {
+                                    if (array.remove(new JsonPrimitive(focusedSlot.id))) {
+                                        data.save();
                                         sendSuccess(Utils.format("Successfully unbound slot from hotbar slot {}.", i));
                                         break;
                                     }
@@ -147,8 +147,7 @@ public class SlotBinding {
                                 String name = getHotbarName(i);
                                 if (data.value().has(name)) {
                                     JsonArray array = data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray();
-                                    JsonPrimitive primitive = new JsonPrimitive(slot);
-                                    if (array.remove(primitive)) {
+                                    if (array.remove(new JsonPrimitive(slot))) {
                                         sendAlert(Utils.format("The target is already bound to hotbar slot {}, replacing the bind.", i));
                                         break;
                                     }
@@ -161,6 +160,7 @@ public class SlotBinding {
                                 data.value().add(hotbarName, object);
                             }
                             data.value().get(hotbarName).getAsJsonObject().get("binds").getAsJsonArray().add(slot);
+                            data.save();
                             sendSuccess("Slots bound successfully!");
                         } else {
                             sendError("Invalid slot binding combination detected, doing nothing.");

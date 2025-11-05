@@ -58,6 +58,7 @@ public class ShardTracker {
         list.add(new Settings.Toggle("Filter Direct", filterDirect, "Hides every Direct/Bazaar shard while inside of the Fusion Machine."));
         Settings.BigButton clearButton = new Settings.BigButton("Clear Shard List", btn -> {
             data.value().add("shards", new JsonArray());
+            data.save();
             mc.setScreen(buildSettings());
         });
         clearButton.button.verticalSizing(Sizing.fixed(18));
@@ -80,6 +81,7 @@ public class ShardTracker {
             object.addProperty("obtained", 0L);
             object.addProperty("source", "Direct");
             data.value().get("shards").getAsJsonArray().add(object);
+            data.save();
             mc.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
@@ -133,6 +135,7 @@ public class ShardTracker {
             Utils.info("§cSuccessfully read the fusion tree data, but an unknown error occurred while importing. Try updating the mod to the newest version.");
             return;
         }
+        data.save();
         Utils.info("§aShard list imported successfully.");
     }
 
@@ -313,6 +316,7 @@ public class ShardTracker {
                         );
                     }
                     tracked.addProperty("obtained", obtained + shard.quantity);
+                    data.save();
                     refreshDisplay();
                 }
             }
@@ -321,10 +325,7 @@ public class ShardTracker {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && boxApply.value() && event.title.equals("Hunting Box")) {
-            if (event.isInventory || !data.value().has("shards")) {
-                return;
-            }
+        if (instance.isActive() && boxApply.value() && event.title.equals("Hunting Box") && !event.isInventory && data.value().has("shards")) {
             JsonArray shards = data.value().get("shards").getAsJsonArray();
             if (!shards.isEmpty()) {
                 for (String line : Utils.getLoreLines(event.stack)) {
@@ -333,6 +334,7 @@ public class ShardTracker {
                         JsonObject tracked = getTrackedShard(name);
                         if (tracked != null) {
                             tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack, event.title));
+                            data.save();
                             refreshDisplay();
                         }
                         break;
@@ -411,6 +413,7 @@ public class ShardTracker {
             this.inputName.onChanged().subscribe(value -> {
                 getData().addProperty("name", Utils.toLower(value));
                 this.inputName.borderColor = ShardData.getColorHex(Utils.toLower(value));
+                data.save();
                 refreshDisplay();
             });
             this.inputObtained = new FlatTextbox(Sizing.fixed(50));
@@ -421,6 +424,7 @@ public class ShardTracker {
                 Optional<Long> value = Utils.parseLong(text);
                 if (value.isPresent()) {
                     getData().addProperty("obtained", value.get());
+                    data.save();
                     refreshDisplay();
                 }
             });
@@ -432,6 +436,7 @@ public class ShardTracker {
                 Optional<Long> value = Utils.parseLong(text);
                 if (value.isPresent()) {
                     getData().addProperty("needed", value.get());
+                    data.save();
                     refreshDisplay();
                 }
             });
@@ -440,6 +445,7 @@ public class ShardTracker {
             this.inputSource.onChanged().subscribe(value -> {
                 getData().addProperty("source", value);
                 this.inputSource.setMessage(this.getSourceInputLabel(value));
+                data.save();
                 refreshDisplay();
             });
             this.inputSource.margins(Insets.of(1, 0, 0, 0));
@@ -447,6 +453,7 @@ public class ShardTracker {
             this.inputSource.tooltip(Text.literal("The source that this shard is obtained from. Click to rotate."));
             this.delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.value().get("shards").getAsJsonArray().remove(this.index);
+                data.save();
                 mc.setScreen(buildSettings());
             });
             this.delete.positioning(Positioning.relative(100, 0)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));

@@ -61,11 +61,13 @@ public class PartyCommands {
             lists.value().add(list, new JsonArray());
         }
         lists.value().get(list).getAsJsonArray().add(name);
+        lists.save();
     }
 
     public static void removeFromList(String name, String list) {
         if (lists.value().has(list)) {
             lists.value().get(list).getAsJsonArray().remove(new JsonPrimitive(name));
+            lists.save();
         }
     }
 

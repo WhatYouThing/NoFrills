@@ -32,20 +32,14 @@ public class StarredMobHighlight {
         return index != -1 && index == name.lastIndexOf(Utils.Symbols.star);
     }
 
-    private static void renderOutline(Entity entity, RenderColor color) {
-        List<Entity> otherEntities = Utils.getOtherEntities(entity, 0.5, 2, 0.5, StarredMobHighlight::isDungeonMob);
-        if (!otherEntities.isEmpty()) {
-            Entity closest = Utils.findNametagOwner(entity, otherEntities);
-            if (closest != null) {
-                cache.add(closest);
-            }
-        }
-    }
-
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && isStarred(event.namePlain)) {
-            renderOutline(event.entity, color.value());
+            List<Entity> otherEntities = Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, StarredMobHighlight::isDungeonMob);
+            Entity closest = Utils.findNametagOwner(event.entity, otherEntities);
+            if (closest != null && !MinibossHighlight.cache.has(closest)) {
+                cache.add(closest);
+            }
         }
     }
 

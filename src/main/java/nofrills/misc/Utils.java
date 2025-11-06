@@ -7,7 +7,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.hud.MessageIndicator;
@@ -46,11 +45,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.world.entity.ClientEntityManager;
-import net.minecraft.world.entity.EntityIndex;
-import net.minecraft.world.entity.EntityLookup;
+import net.minecraft.world.entity.SimpleEntityLookup;
 import nofrills.events.WorldTickEvent;
-import nofrills.mixin.*;
+import nofrills.mixin.HandledScreenAccessor;
+import nofrills.mixin.PlayerListHudAccessor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -286,14 +284,10 @@ public class Utils {
         return entity.getDimensions(EntityPose.STANDING).getBoxAt(entity.getLerpedPos(tickProgress));
     }
 
-    @SuppressWarnings("unchecked")
     public static List<Entity> getEntities() {
-        if (mc.world != null) { // only powerful wizards may cast such obscene spells
-            ClientEntityManager<Entity> manager = ((ClientWorldAccessor) mc.world).getManager();
-            EntityLookup<?> lookup = ((ClientEntityManagerAccessor<?>) manager).getLookup();
-            EntityIndex<?> index = ((SimpleEntityLookupAccessor<?>) lookup).getIndex();
-            Int2ObjectMap<?> map = ((EntityIndexAccessor<?>) index).getEntityMap();
-            return (List<Entity>) new ArrayList<>(map.values());
+        if (mc.world != null) {
+            SimpleEntityLookup<Entity> lookup = (SimpleEntityLookup<Entity>) mc.world.entityManager.getLookup();
+            return new ArrayList<>(lookup.index.idToEntity.values());
         }
         return new ArrayList<>();
     }
@@ -342,7 +336,7 @@ public class Utils {
         if (stack != null && !stack.isEmpty()) {
             NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
             if (data != null) {
-                return ((NbtComponentAccessor) (Object) data).get(); // casting a spell
+                return data.nbt;
             }
         }
         return null;

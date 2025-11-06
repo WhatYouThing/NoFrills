@@ -8,7 +8,6 @@ import nofrills.events.EntityUpdatedEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.SkyblockData;
-import nofrills.mixin.CreeperEntityAccessor;
 
 public class GhostVision {
     public static final Feature instance = new Feature("ghostVision");
@@ -20,7 +19,7 @@ public class GhostVision {
     private static void onEntity(EntityUpdatedEvent event) {
         if (instance.isActive() && event.entity instanceof CreeperEntity creeper && SkyblockData.getArea().equals("Dwarven Mines")) {
             if (creeper.getPos().getY() < 100 && creeper.isCharged()) {
-                creeper.getDataTracker().set(CreeperEntityAccessor.getChargedFlag(), false);
+                creeper.getDataTracker().set(CreeperEntity.CHARGED, false);
                 Rendering.Entities.drawFilled(creeper, true, fill.value());
                 Rendering.Entities.drawOutline(creeper, true, outline.value());
             }

@@ -64,14 +64,10 @@ public class DungeonChestValue {
             String id = getLootID(event.stack, name);
             if (id.isEmpty()) {
                 if (name.equals("Open Reward Chest")) {
-                    for (String line : Utils.getLoreLines(event.stack)) {
-                        if (line.endsWith(" Coins")) {
-                            Optional<Integer> cost = Utils.parseInt(line.replace(" Coins", "").replaceAll(",", ""));
-                            if (cost.isPresent()) {
-                                currentValue -= cost.get();
-                                break;
-                            }
-                        }
+                    Optional<String> cost = Utils.getLoreLines(event.stack).stream().filter(line -> line.endsWith(" Coins")).findFirst();
+                    if (cost.isPresent()) {
+                        String value = cost.get().replace(" Coins", "").replaceAll(",", "");
+                        currentValue -= Utils.parseInt(value).orElse(0);
                     }
                 }
                 return;

@@ -1,2 +1,8 @@
 accessWidener v2 named
 accessible class net/minecraft/client/network/ClientPlayNetworkHandler$CommandRunResult
+accessible field net/minecraft/component/type/NbtComponent nbt Lnet/minecraft/nbt/NbtCompound;
+accessible field net/minecraft/client/world/ClientWorld entityManager Lnet/minecraft/world/entity/ClientEntityManager;
+accessible field net/minecraft/world/entity/SimpleEntityLookup index Lnet/minecraft/world/entity/EntityIndex;
+accessible field net/minecraft/world/entity/EntityIndex idToEntity Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
+accessible field net/minecraft/entity/mob/CreeperEntity CHARGED Lnet/minecraft/entity/data/TrackedData;
+accessible field net/minecraft/client/sound/SoundManager soundSystem Lnet/minecraft/client/sound/SoundSystem;

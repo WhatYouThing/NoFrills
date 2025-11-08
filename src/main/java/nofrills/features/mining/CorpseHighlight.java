@@ -26,7 +26,7 @@ public class CorpseHighlight {
                 if (ent instanceof ArmorStandEntity stand && !stand.isInvisible() && !Rendering.Entities.isDrawingGlow(stand)) {
                     ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
                     if (!helmet.isEmpty()) {
-                        String pieceName = Utils.toPlainString(helmet.getName());
+                        String pieceName = Utils.toPlain(helmet.getName());
                         RenderColor color = switch (pieceName) {
                             case "Lapis Armor Helmet" -> lapisColor.value();
                             case "Mineral Helmet" -> mineralColor.value();

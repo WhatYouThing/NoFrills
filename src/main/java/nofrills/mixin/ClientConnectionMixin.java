@@ -1,7 +1,7 @@
 package nofrills.mixin;
 
+import io.netty.channel.ChannelFutureListener;
 import net.minecraft.network.ClientConnection;
-import net.minecraft.network.PacketCallbacks;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
@@ -16,9 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static nofrills.Main.eventBus;
 
 @Mixin(ClientConnection.class)
@@ -29,17 +26,15 @@ public abstract class ClientConnectionMixin {
             eventBus.post(new ServerTickEvent());
         }
         if (packet instanceof PlayerListS2CPacket listPacket) {
-            List<PlayerListS2CPacket.Entry> entries = new ArrayList<>(listPacket.getEntries());
-            entries.removeIf(entry -> entry.displayName() == null);
-            SkyblockData.updateTabList(listPacket, entries);
+            SkyblockData.updateTabList(listPacket, listPacket.getEntries());
         }
         if (eventBus.post(new ReceivePacketEvent(packet)).isCancelled()) {
             ci.cancel();
         }
     }
 
-    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/PacketCallbacks;)V", at = @At("HEAD"), cancellable = true)
-    private void onPacketSend(Packet<?> packet, @Nullable PacketCallbacks callbacks, CallbackInfo ci) {
+    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At("HEAD"), cancellable = true)
+    private void onPacketSend(Packet<?> packet, @Nullable ChannelFutureListener channelFutureListener, boolean flush, CallbackInfo ci) {
         if (eventBus.post(new SendPacketEvent(packet)).isCancelled()) {
             ci.cancel();
         }

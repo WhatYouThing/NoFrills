@@ -1,11 +1,12 @@
 package nofrills.misc;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.hud.MessageIndicator;
@@ -23,7 +24,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
@@ -45,12 +45,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.world.entity.ClientEntityManager;
-import net.minecraft.world.entity.EntityIndex;
-import net.minecraft.world.entity.EntityLookup;
+import net.minecraft.world.entity.SimpleEntityLookup;
 import nofrills.events.WorldTickEvent;
-import nofrills.features.dungeons.LeapOverlay;
-import nofrills.mixin.*;
+import nofrills.mixin.HandledScreenAccessor;
+import nofrills.mixin.PlayerListHudAccessor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -77,6 +75,11 @@ public class Utils {
             "SNOW_BLASTER",
             "SNOW_HOWITZER"
     );
+    private static final HashSet<String> modernIslands = Sets.newHashSet(
+            "The Park",
+            "Galatea",
+            "Catacombs"
+    );
     private static Screen newScreen = null;
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
@@ -85,12 +88,24 @@ public class Utils {
         mc.inGameHud.setTitleTicks(fadeInTicks, stayTicks, fadeOutTicks);
     }
 
-    public static void showTitleCustom(String title, int stayTicks, int yOffset, float scale, int color) {
+    public static void showTitleCustom(String title, int stayTicks, int yOffset, float scale, RenderColor color) {
         ((TitleRendering) mc.inGameHud).nofrills_mod$setRenderTitle(title, stayTicks, yOffset, scale, color);
     }
 
     public static boolean isRenderingCustomTitle() {
         return ((TitleRendering) mc.inGameHud).nofrills_mod$isRenderingTitle();
+    }
+
+    public static boolean isNearlyEqual(double a, double b, double eps) {
+        return Math.abs(a - b) < eps;
+    }
+
+    public static boolean isNearlyEqual(double a, double b) {
+        return isNearlyEqual(a, b, 1e-9);
+    }
+
+    public static boolean isNearlyEqual(float a, float b) {
+        return isNearlyEqual(a, b, 1e-5);
     }
 
     public static void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
@@ -135,7 +150,10 @@ public class Utils {
     }
 
     public static void infoRaw(MutableText message) {
-        mc.inGameHud.getChatHud().addMessage(getTag().append(message.withColor(0xffffff)).append("§r"), null, noFrillsIndicator);
+        if (message.getStyle() == null || message.getStyle().getColor() == null) {
+            message = message.withColor(0xffffff);
+        }
+        mc.inGameHud.getChatHud().addMessage(getTag().append(message), null, noFrillsIndicator);
     }
 
     public static void infoFormat(String message, Object... values) {
@@ -209,14 +227,14 @@ public class Utils {
      * Returns true if the player is anywhere on their garden
      */
     public static boolean isInGarden() {
-        return isInZone(Symbols.zone + " The Garden", true) || isOnGardenPlot();
+        return isInArea("Garden");
     }
 
     /**
-     * Returns true if the player is currently on a 1.21+ Skyblock island (currently only Park and Galatea)
+     * Returns true if the current island is running on a modern Minecraft version and/or running under prediction-based Watchdog.
      */
     public static boolean isOnModernIsland() {
-        return isInArea("The Park") || isInArea("Galatea");
+        return modernIslands.contains(SkyblockData.getArea());
     }
 
     public static boolean isInstanceOver() {
@@ -266,14 +284,10 @@ public class Utils {
         return entity.getDimensions(EntityPose.STANDING).getBoxAt(entity.getLerpedPos(tickProgress));
     }
 
-    @SuppressWarnings("unchecked")
     public static List<Entity> getEntities() {
-        if (mc.world != null) { // only powerful wizards may cast such obscene spells
-            ClientEntityManager<Entity> manager = ((ClientWorldAccessor) mc.world).getManager();
-            EntityLookup<?> lookup = ((ClientEntityManagerAccessor<?>) manager).getLookup();
-            EntityIndex<?> index = ((SimpleEntityLookupAccessor<?>) lookup).getIndex();
-            Int2ObjectMap<?> map = ((EntityIndexAccessor<?>) index).getEntityMap();
-            return (List<Entity>) new ArrayList<>(map.values());
+        if (mc.world != null) {
+            SimpleEntityLookup<Entity> lookup = (SimpleEntityLookup<Entity>) mc.world.entityManager.getLookup();
+            return new ArrayList<>(lookup.index.idToEntity.values());
         }
         return new ArrayList<>();
     }
@@ -322,7 +336,7 @@ public class Utils {
         if (stack != null && !stack.isEmpty()) {
             NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
             if (data != null) {
-                return ((NbtComponentAccessor) (Object) data).get(); // casting a spell
+                return data.nbt;
             }
         }
         return null;
@@ -343,6 +357,59 @@ public class Utils {
      */
     public static String getSkyblockId(ItemStack stack) {
         return getSkyblockId(getCustomData(stack));
+    }
+
+    /**
+     * Returns the Bazaar/Auction ID tied to the item.
+     */
+    public static String getMarketId(ItemStack stack) {
+        NbtCompound data = getCustomData(stack);
+        String id = getSkyblockId(data);
+        String shardId = ShardData.getId(stack);
+        if (!shardId.isEmpty()) {
+            return shardId;
+        }
+        switch (id) {
+            case "PET" -> {
+                String petInfo = data.getString("petInfo").orElse("");
+                if (!petInfo.isEmpty()) {
+                    JsonObject petData = JsonParser.parseString(petInfo).getAsJsonObject();
+                    return Utils.format("{}_PET_{}", petData.get("type").getAsString(), petData.get("tier").getAsString());
+                }
+                return "UNKNOWN_PET";
+            }
+            case "RUNE", "UNIQUE_RUNE" -> {
+                NbtCompound runeData = data.getCompound("runes").orElse(null);
+                if (runeData != null) {
+                    String runeId = (String) runeData.getKeys().toArray()[0];
+                    return Utils.format("{}_{}_RUNE", runeId, runeData.getInt(runeId).orElse(0));
+                }
+                return "EMPTY_RUNE";
+            }
+            case "ENCHANTED_BOOK" -> {
+                NbtCompound enchantData = data.getCompound("enchantments").orElse(null);
+                if (enchantData != null) {
+                    Set<String> enchants = enchantData.getKeys();
+                    if (enchants.size() == 1) {
+                        String enchantId = (String) enchantData.getKeys().toArray()[0];
+                        int enchantLevel = enchantData.getInt(enchantId).orElse(0);
+                        return Utils.format("ENCHANTMENT_{}_{}", Utils.toUpper(enchantId), enchantLevel);
+                    }
+                }
+                return "ENCHANTMENT_UNKNOWN";
+            }
+            case "POTION" -> {
+                String potion = data.getString("potion").orElse("");
+                if (!potion.isEmpty()) {
+                    return Utils.format("{}_{}_POTION",
+                            Utils.toUpper(potion),
+                            data.getInt("potion_level").orElse(0)
+                    );
+                }
+                return "UNKNOWN_POTION";
+            }
+        }
+        return id;
     }
 
     public static GameProfile getTextures(ItemStack stack) {
@@ -385,7 +452,7 @@ public class Utils {
         LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
         if (lore != null) {
             for (Text line : lore.lines()) {
-                lines.add(toPlainString(line).trim());
+                lines.add(toPlain(line).trim());
             }
         }
         return lines;
@@ -458,12 +525,11 @@ public class Utils {
     }
 
     private static int getVersionNumber(String version) {
-        try {
-            String[] numbers = version.split("\\.");
-            return Integer.parseInt(numbers[0]) * 1000 + Integer.parseInt(numbers[1]) * 100 + Integer.parseInt(numbers[2]);
-        } catch (RuntimeException ignored) {
-            return 0;
+        String[] numbers = version.split("\\.");
+        if (numbers.length >= 3) {
+            return parseInt(numbers[0]).orElse(0) * 1000 + parseInt(numbers[1]).orElse(0) * 100 + parseInt(numbers[2]).orElse(0);
         }
+        return 0;
     }
 
     public static void checkUpdate(boolean notifyIfMatch) {
@@ -525,7 +591,7 @@ public class Utils {
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
     public static HitResult raycastFullBlock(Entity entity, double maxDistance, float tickDelta) {
-        Vec3d height = entity.getLerpedPos(tickDelta).add(0, isOnModernIsland() ? 1.27 : 1.54, 0);
+        Vec3d height = entity.getLerpedPos(tickDelta).add(0, isOnModernIsland() && !isInDungeons() ? 1.27 : 1.54, 0);
         Vec3d camPos = entity.getCameraPosVec(tickDelta);
         Vec3d rot = entity.getRotationVec(tickDelta);
         Vec3d pos = new Vec3d(camPos.getX(), height.getY(), camPos.getZ());
@@ -563,9 +629,9 @@ public class Utils {
     public static List<String> getTabListLines() {
         List<String> lines = new ArrayList<>();
         if (mc.getNetworkHandler() != null) {
-            for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
+            for (PlayerListEntry entry : new ArrayList<>(mc.getNetworkHandler().getPlayerList())) {
                 if (entry.getDisplayName() != null) {
-                    lines.add(toPlainString(entry.getDisplayName()).trim());
+                    lines.add(toPlain(entry.getDisplayName()).trim());
                 }
             }
         }
@@ -594,10 +660,7 @@ public class Utils {
      * Returns every slot that is part of the container screen handler, excluding the player inventory slots.
      */
     public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
-        Inventory inventory = handler.getInventory();
-        List<Slot> slots = new ArrayList<>(handler.slots);
-        slots.removeIf(slot -> inventory.getStack(slot.id).equals(ItemStack.EMPTY));
-        return slots;
+        return handler.slots.stream().filter(slot -> slot.id < handler.getRows() * 9).toList();
     }
 
     public static ItemStack getHeldItem() {
@@ -653,11 +716,38 @@ public class Utils {
         return string.toUpperCase(Locale.ROOT);
     }
 
-    public static String toPlainString(Text text) {
+    /**
+     * Gets the string out of a Text object and removes any formatting codes.
+     */
+    public static String toPlain(Text text) {
         if (text != null) {
             return Formatting.strip(text.getString());
         }
         return "";
+    }
+
+    public static Optional<Integer> parseInt(String value) {
+        try {
+            return Optional.of(Integer.parseInt(value));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Double> parseDouble(String value) {
+        try {
+            return Optional.of(Double.parseDouble(value));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
+    }
+
+    public static Optional<Long> parseLong(String value) {
+        try {
+            return Optional.of(Long.parseLong(value));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
     }
 
     /**
@@ -707,10 +797,6 @@ public class Utils {
 
     public static String formatSeparator(float number) {
         return formatSeparator((double) number);
-    }
-
-    public static boolean isLeapMenu(String title) {
-        return LeapOverlay.instance.isActive() && Utils.isInDungeons() && title.equals(LeapOverlay.leapMenuName);
     }
 
     public static void setScreen(Screen screen) {

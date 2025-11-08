@@ -26,7 +26,7 @@ public class FusionKeybinds {
 
     private static boolean isBindValid(ItemStack stack, String title, int key) {
         if (!stack.isEmpty()) {
-            String name = Utils.toPlainString(stack.getName());
+            String name = Utils.toPlain(stack.getName());
             if (title.equals("Fusion Box")) {
                 return name.equals("Repeat Previous Fusion") && key == repeat.value();
             }

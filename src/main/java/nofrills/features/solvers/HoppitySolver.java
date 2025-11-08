@@ -37,7 +37,7 @@ public class HoppitySolver {
     private static final EntityCache eggCache = new EntityCache();
     private static final HashMap<Integer, Vec3d> farGuesses = new HashMap<>();
     private static final HashSet<String> textureList = Sets.newHashSet(
-        "a49333d85b8a315d0336eb2df37d8a714ca24c51b8c6074f1b5b927deb516c24",
+            "a49333d85b8a315d0336eb2df37d8a714ca24c51b8c6074f1b5b927deb516c24",
             "7ae6d2d31d8167bcaf95293b68a4acd872d66e751db5a34f2cbc6766a0356d0a",
             "e5e36165819fd2850f98552edcd763ff986313119283c126ace0c4cc495e76a8"
     );
@@ -163,7 +163,8 @@ public class HoppitySolver {
                     event.drawTracer(guess, guessTracerColor.value());
                 }
             }
-        } catch (ConcurrentModificationException ignored) {}
+        } catch (ConcurrentModificationException ignored) {
+        }
         for (Entity egg : eggCache.get()) {
             BlockPos pos = BlockPos.ofFloored(egg.getEyePos());
             Box box = Box.enclosing(pos, pos);

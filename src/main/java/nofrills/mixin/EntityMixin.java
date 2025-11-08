@@ -6,7 +6,6 @@ import net.minecraft.entity.EntityPose;
 import nofrills.features.tweaks.AntiSwim;
 import nofrills.misc.EntityRendering;
 import nofrills.misc.RenderColor;
-import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,9 +19,6 @@ public abstract class EntityMixin implements EntityRendering {
     @Shadow
     @Final
     private static int SWIMMING_FLAG_INDEX;
-    @Shadow
-    @Final
-    private static int SPRINTING_FLAG_INDEX;
     @Unique
     boolean outlineRender = false;
     @Unique
@@ -35,12 +31,6 @@ public abstract class EntityMixin implements EntityRendering {
     private boolean glowRender = false;
     @Unique
     private RenderColor glowColor;
-
-    @Shadow
-    public abstract void setSprinting(boolean sprinting);
-
-    @Shadow
-    public abstract boolean isTouchingWater();
 
     @Override
     public void nofrills_mod$setRenderBoxOutline(boolean render, RenderColor color) {
@@ -117,12 +107,6 @@ public abstract class EntityMixin implements EntityRendering {
     private boolean getFlag(boolean original, int index) {
         if (index == SWIMMING_FLAG_INDEX && AntiSwim.active()) {
             return false;
-        }
-        if (index == SPRINTING_FLAG_INDEX && Utils.isSelf(this) && AntiSwim.active()) {
-            if (original && isTouchingWater()) {
-                setSprinting(false);
-                return false;
-            }
         }
         return original;
     }

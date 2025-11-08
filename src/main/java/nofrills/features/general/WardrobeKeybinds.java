@@ -57,10 +57,7 @@ public class WardrobeKeybinds {
 
     private static int getWardrobePage(String title) {
         if (title.startsWith("Wardrobe (") && title.endsWith(")")) {
-            try {
-                return Integer.parseInt(title.replace("Wardrobe (", "").split("/")[0]);
-            } catch (NumberFormatException ignored) {
-            }
+            return Utils.parseInt(title.replace("Wardrobe (", "").split("/")[0]).orElse(-1);
         }
         return -1;
     }
@@ -97,7 +94,7 @@ public class WardrobeKeybinds {
     private static boolean isEquipButton(Slot slot, int target) {
         ItemStack stack = slot.getStack();
         Item item = stack.getItem();
-        String name = Utils.toPlainString(stack.getName());
+        String name = Utils.toPlain(stack.getName());
         if (!stack.isEmpty() && target != -1 && name.startsWith(Utils.format("Slot {}:", target))) {
             if (noUnequip.value() && item.equals(Items.LIME_DYE)) {
                 return false;

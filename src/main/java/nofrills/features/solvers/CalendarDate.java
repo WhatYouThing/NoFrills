@@ -18,13 +18,16 @@ public class CalendarDate {
 
     private static int parseTime(String time, String unit) {
         int index = time.indexOf(unit);
-        return index != -1 ? Integer.parseInt(time.substring(Math.max(0, time.lastIndexOf(" ", index)), index).trim()) : 0;
+        if (index != -1) {
+            return Utils.parseInt(time.substring(Math.max(0, time.lastIndexOf(" ", index)), index).trim()).orElse(0);
+        }
+        return 0;
     }
 
     private static String parseDate(Calendar calendar) {
         return Utils.format("{} {}",
                 calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()),
-                DateFormat.getInstance().format(calendar.getTime())
+                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault()).format(calendar.getTime())
         );
     }
 
@@ -37,7 +40,7 @@ public class CalendarDate {
         if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
             if (container.getTitle().getString().equals("Calendar and Events")) {
                 for (Text line : event.lines) {
-                    String l = Utils.toPlainString(line);
+                    String l = Utils.toPlain(line);
                     if (l.startsWith("Starts in: ")) {
                         String time = l.substring(l.indexOf(":")).trim();
                         Calendar calendar = Calendar.getInstance();
@@ -51,7 +54,7 @@ public class CalendarDate {
                         }
                         event.addLine(Text.of(""));
                         event.addLine(Utils.getShortTag().append(buildLine("§eDate of Event", calendar)));
-                        String stackName = Utils.toPlainString(event.stack.getName());
+                        String stackName = Utils.toPlain(event.stack.getName());
                         if (stackName.endsWith("Spooky Festival")) {
                             calendar.add(Calendar.HOUR, -1);
                             event.addLine(Utils.getShortTag().append(buildLine("§6Fear Mongerer Arrives", calendar)));

@@ -1,5 +1,6 @@
 package nofrills.features.solvers;
 
+import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
@@ -18,6 +19,7 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static nofrills.Main.mc;
@@ -32,6 +34,11 @@ public class DianaSolver {
     public static final SettingColor enemyColor = new SettingColor(RenderColor.fromArgb(0xaaff5555), "enemyColor", instance);
     public static final SettingColor startColor = new SettingColor(RenderColor.fromArgb(0xaa55ff55), "startColor", instance);
 
+    private static final HashSet<String> spoonDrawer = Sets.newHashSet(
+            "ANCESTRAL_SPADE",
+            "ARCHAIC_SPADE",
+            "DEIFIC_SPADE"
+    );
     private static final CurveSolver solver = new CurveSolver();
     private static final List<Burrow> burrowsList = new ArrayList<>();
     private static int ticks = 0;
@@ -41,13 +48,14 @@ public class DianaSolver {
     }
 
     private static boolean isHoldingSpoon() {
-        return Utils.getSkyblockId(Utils.getHeldItem()).equals("ANCESTRAL_SPADE");
+        return spoonDrawer.contains(Utils.getSkyblockId(Utils.getHeldItem()));
     }
 
     private static void onSpooningStart() {
         solver.resetFitter();
         solver.resetSolvedPos();
         ticks = 20;
+
     }
 
     private static BurrowType getTypeFromPacket(ParticleS2CPacket packet) {
@@ -84,7 +92,10 @@ public class DianaSolver {
                     ticks = 20;
                     if (solver.getSolvedPos() != null) {
                         Burrow guess = new Burrow(solver.getSolvedPos(), BurrowType.Guess);
-                        burrowsList.removeIf(burrow -> burrow.type.equals(BurrowType.Guess) || burrow.equals(guess));
+                        if (getBurrowsList().stream().anyMatch(burrow -> burrow.equals(guess) && !burrow.type.equals(BurrowType.Guess))) {
+                            return;
+                        }
+                        burrowsList.removeIf(burrow -> burrow.type.equals(BurrowType.Guess));
                         burrowsList.add(guess);
                     }
                 }
@@ -92,18 +103,7 @@ public class DianaSolver {
                 BlockPos pos = BlockPos.ofFloored(event.pos.subtract(0, 0.5, 0));
                 Burrow nearby = new Burrow(pos, type);
                 if (mc.world.getBlockState(pos).getBlock().equals(Blocks.GRASS_BLOCK)) {
-                    for (Burrow burrow : getBurrowsList()) {
-                        if (burrow.type.equals(BurrowType.Guess)) {
-                            if (burrow.getVec().distanceTo(nearby.getVec()) <= 4.0) {
-                                burrowsList.remove(burrow);
-                                break;
-                            }
-                        } else {
-                            if (burrow.equals(nearby)) {
-                                return;
-                            }
-                        }
-                    }
+                    burrowsList.removeIf(burrow -> burrow.equals(nearby) || (burrow.isGuess() && burrow.isNear(nearby)));
                     burrowsList.add(nearby);
                 }
             }
@@ -112,36 +112,22 @@ public class DianaSolver {
 
     @EventHandler
     private static void onUseItem(InteractItemEvent event) {
-        if (instance.isActive() && isHoldingSpoon()) {
+        if (instance.isActive() && isHoldingSpoon() && ticks == 0) {
             onSpooningStart();
         }
     }
 
     @EventHandler
-    private static void onUseBlock(InteractBlockEvent event) {
-        if (instance.isActive() && isHoldingSpoon()) {
-            Burrow target = new Burrow(event.blockHitResult.getBlockPos(), BurrowType.None);
-            List<Burrow> burrowsList = getBurrowsList();
-            for (Burrow burrow : burrowsList) {
-                if (burrow.equals(target)) {
-                    burrow.startTicking();
-                    return;
-                }
-            }
-            onSpooningStart();
+    private static void onInteractBlock(InteractBlockEvent event) {
+        if (instance.isActive()) {
+            burrowsList.removeIf(burrow -> burrow.isGuess() && burrow.pos.equals(event.blockHitResult.getBlockPos()));
         }
     }
 
     @EventHandler
     private static void onAttackBlock(AttackBlockEvent event) {
-        if (instance.isActive() && isHoldingSpoon()) {
-            Burrow target = new Burrow(event.blockHitResult.getBlockPos(), BurrowType.None);
-            for (Burrow burrow : getBurrowsList()) {
-                if (burrow.equals(target)) {
-                    burrow.startTicking();
-                    return;
-                }
-            }
+        if (instance.isActive()) {
+            burrowsList.removeIf(burrow -> burrow.isGuess() && burrow.pos.equals(event.blockPos));
         }
     }
 
@@ -155,7 +141,7 @@ public class DianaSolver {
             }
         }
         for (Burrow burrow : getBurrowsList()) {
-            if (burrow.ticks > 0) {
+            if (burrow.ticks > 0 && !burrow.isGuess()) {
                 burrow.tick();
                 if (burrow.ticks == 0) {
                     burrowsList.remove(burrow);
@@ -166,34 +152,32 @@ public class DianaSolver {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (!instance.isActive()) return;
-        for (Burrow burrow : getBurrowsList()) {
-            if (burrow.ticks > 0) {
-                continue;
-            }
-            MutableText label = switch (burrow.type) {
-                case Guess -> Text.literal("Guess");
-                case Treasure -> Text.literal("Treasure");
-                case Enemy -> Text.literal("Enemy");
-                case Start -> Text.literal("Start");
-                default -> Text.literal("Unknown");
-            };
-            Vec3d pos = burrow.getVec();
-            if (burrow.type.equals(BurrowType.Guess)) {
-                event.drawBeam(pos, 256, true, guessColor.value());
-                event.drawText(pos, label, 0.1f, true, RenderColor.white);
-                if (guessTracer.value()) {
-                    event.drawTracer(pos, guessTracerColor.value());
-                }
-            } else {
-                RenderColor color = switch (burrow.type) {
-                    case Treasure -> treasureColor.value();
-                    case Enemy -> enemyColor.value();
-                    case Start -> startColor.value();
-                    default -> RenderColor.white;
+        if (instance.isActive()) {
+            for (Burrow burrow : getBurrowsList()) {
+                MutableText label = switch (burrow.type) {
+                    case Guess -> Text.literal("Guess");
+                    case Treasure -> Text.literal("Treasure");
+                    case Enemy -> Text.literal("Enemy");
+                    case Start -> Text.literal("Start");
+                    default -> Text.literal("Unknown");
                 };
-                event.drawBeam(pos, 256, true, color);
-                event.drawText(pos, label, 0.1f, true, RenderColor.white);
+                Vec3d pos = burrow.getVec();
+                if (burrow.type.equals(BurrowType.Guess)) {
+                    event.drawBeam(pos, 256, true, guessColor.value());
+                    event.drawText(pos, label, 0.1f, true, RenderColor.white);
+                    if (guessTracer.value()) {
+                        event.drawTracer(pos, guessTracerColor.value());
+                    }
+                } else {
+                    RenderColor color = switch (burrow.type) {
+                        case Treasure -> treasureColor.value();
+                        case Enemy -> enemyColor.value();
+                        case Start -> startColor.value();
+                        default -> RenderColor.white;
+                    };
+                    event.drawBeam(pos, 256, true, color);
+                    event.drawText(pos, label, 0.1f, true, RenderColor.white);
+                }
             }
         }
     }
@@ -217,7 +201,7 @@ public class DianaSolver {
     public static class Burrow {
         public BlockPos pos;
         public BurrowType type;
-        public int ticks = 0;
+        public int ticks = 30;
 
         public Burrow(BlockPos pos, BurrowType type) {
             this.pos = pos;
@@ -232,12 +216,16 @@ public class DianaSolver {
             if (this.ticks > 0) this.ticks--;
         }
 
-        public void startTicking() {
-            this.ticks = 20;
-        }
-
         public Vec3d getVec() {
             return this.pos.toCenterPos().add(0, 0.5, 0);
+        }
+
+        public boolean isGuess() {
+            return this.type.equals(BurrowType.Guess);
+        }
+
+        public boolean isNear(Burrow other) {
+            return this.getVec().distanceTo(other.getVec()) <= 4.0;
         }
 
         @Override

@@ -51,17 +51,24 @@ public class Main implements ModInitializer {
         NoFrillsCommand.init(dispatcher);
     }
 
+    public static void injectRenderDoc() {
+        try {
+            String path = System.getProperty("nofrills.renderdoc.library_path");
+            if (path != null) {
+                System.load(path);
+                LOGGER.info("Loaded RenderDoc lib: {}", path);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
     @Override
     public void onInitialize() {
         long start = Util.getMeasuringTimeMs();
 
         mc = MinecraftClient.getInstance();
 
-        String renderdocPath = System.getProperty("nofrills.renderdoc.library_path");
-        if (renderdocPath != null) {
-            System.load(renderdocPath);
-            LOGGER.info("Loaded RenderDoc lib: {}", renderdocPath);
-        }
+        injectRenderDoc();
 
         Config.load();
 
@@ -80,6 +87,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(HudManager.class);
         eventBus.subscribe(SpookyChests.class);
         eventBus.subscribe(ExperimentSolver.class);
+        eventBus.subscribe(BeaconTuningSolver.class);
         eventBus.subscribe(CalendarDate.class);
         eventBus.subscribe(HitsShieldDisplay.class);
         eventBus.subscribe(ChaliceHighlight.class);
@@ -91,7 +99,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(PillarAlert.class);
         eventBus.subscribe(BossHighlight.class);
         eventBus.subscribe(ScathaMining.class);
-        eventBus.subscribe(SafePickobulus.class);
         eventBus.subscribe(GhostVision.class);
         eventBus.subscribe(CorpseHighlight.class);
         eventBus.subscribe(BetterSkyMall.class);
@@ -155,6 +162,11 @@ public class Main implements ModInitializer {
         eventBus.subscribe(EggHitsDisplay.class);
         eventBus.subscribe(BeaconTracer.class);
         eventBus.subscribe(CocoonAlert.class);
+        eventBus.subscribe(PageKeybinds.class);
+        eventBus.subscribe(SecretChime.class);
+        eventBus.subscribe(MelodyMessage.class);
+        eventBus.subscribe(QuickClose.class);
+        eventBus.subscribe(DungeonChestValue.class);
         eventBus.subscribe(DianaSolver.class);
         eventBus.subscribe(HoppitySolver.class);
 

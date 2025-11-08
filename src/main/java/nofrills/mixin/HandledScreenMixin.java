@@ -1,32 +1,29 @@
 package nofrills.mixin;
 
-import com.google.gson.JsonElement;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
+import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.features.dungeons.LeapOverlay;
 import nofrills.features.dungeons.TerminalSolvers;
 import nofrills.features.general.NoRender;
 import nofrills.features.general.SlotBinding;
-import nofrills.features.kuudra.KuudraChestValue;
-import nofrills.features.misc.TooltipScale;
 import nofrills.features.tweaks.MiddleClickFix;
-import nofrills.hud.LeapMenuButton;
-import nofrills.misc.*;
+import nofrills.misc.RenderColor;
+import nofrills.misc.ScreenOptions;
+import nofrills.misc.SlotOptions;
+import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,6 +31,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -42,7 +40,6 @@ import java.util.List;
 
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_CAPTURED;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen implements ScreenOptions {
@@ -57,7 +54,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Shadow
     protected int x;
     @Unique
-    List<LeapMenuButton> leapButtons = new ArrayList<>();
+    List<LeapOverlay.LeapButton> leapButtons = new ArrayList<>();
     @Unique
     boolean sentLeapMsg = false;
 
@@ -65,109 +62,47 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         super(title);
     }
 
-    @Unique
-    private boolean isStackNameEmpty(Slot slot) {
-        if (title.getString().startsWith("Ultrasequencer (")) {
-            return false;
-        }
-        if (slot != null) {
-            return slot.getStack().getName().getString().trim().isEmpty();
-        }
-        return false;
-    }
-
-    @Unique
-    private boolean isLeapMenu() {
-        return Utils.isLeapMenu(title.getString());
-    }
-
-    @Unique
-    private boolean isSlotBindingActive() {
-        return SlotBinding.instance.isActive() && mc.currentScreen instanceof InventoryScreen;
-    }
-
-    @Unique
-    private boolean shouldIgnoreBackground(Slot slot) {
-        return NoRender.instance.isActive() && NoRender.emptyTooltips.value() && isStackNameEmpty(slot);
-    }
-
-    @Unique
-    private void drawLine(DrawContext context, int firstSlot, int secondSlot, RenderColor color) {
-        context.draw(drawer -> {
-            Slot slot1 = handler.getSlot(firstSlot);
-            Slot slot2 = handler.getSlot(secondSlot);
-            Matrix4f mat = context.getMatrices().peek().getPositionMatrix();
-            VertexConsumer consumer = drawer.getBuffer(Rendering.Layers.GuiLine);
-            consumer.vertex(mat, slot1.x + 8, slot1.y + 8, 1.0f).color(color.argb);
-            consumer.vertex(mat, slot2.x + 8, slot2.y + 8, 1.0f).color(color.argb);
-        });
-    }
-
-    @Unique
-    private void drawBorder(DrawContext context, int slotId, RenderColor color) {
-        Slot slot = handler.getSlot(slotId);
-        context.drawBorder(slot.x, slot.y, 16, 16, color.argb);
-    }
-
     @Override
     public void nofrills_mod$addLeapButton(int slotId, String name, String dungeonClass, RenderColor classColor) {
-        leapButtons.add(new LeapMenuButton(slotId, leapButtons.size(), name, dungeonClass, classColor));
+        leapButtons.add(new LeapOverlay.LeapButton(slotId, leapButtons.size(), name, dungeonClass, classColor));
     }
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        if (isLeapMenu() || shouldIgnoreBackground(slot) || SlotOptions.isSlotDisabled(slot)) {
+        if (LeapOverlay.isLeapMenu(this.title.getString()) || NoRender.shouldHideTooltip(slot, this.title.getString()) || SlotOptions.isDisabled(slot)) {
             ci.cancel();
             return;
         }
-        if (eventBus.post(new SlotClickEvent(slot, slot != null ? slot.id : slotId, button, actionType, this.title.getString())).isCancelled()) {
+        if (eventBus.post(new SlotClickEvent(slot, slot != null ? slot.id : slotId, button, actionType, this.title.getString(), this.handler)).isCancelled()) {
             ci.cancel();
         }
     }
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("TAIL"))
     private void onClickSlotTail(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-        if (SlotOptions.isSlotSpoofed(slot)) {
+        if (SlotOptions.isSpoofed(slot)) {
             this.handler.setCursorStack(ItemStack.EMPTY); // prevents the real item from showing at the cursor
         }
     }
 
     @Inject(method = "drawSlotHighlightBack", at = @At("HEAD"), cancellable = true)
     private void onDrawHighlight(DrawContext context, CallbackInfo ci) {
-        if (shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot)) {
+        if (NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isDisabled(focusedSlot)) {
             ci.cancel();
         }
     }
 
     @Inject(method = "drawSlotHighlightFront", at = @At("HEAD"), cancellable = true)
     private void onDrawHighlightFront(DrawContext context, CallbackInfo ci) {
-        if (shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot)) {
+        if (NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isDisabled(focusedSlot)) {
             ci.cancel();
         }
     }
 
     @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), cancellable = true)
     private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (TerminalSolvers.shouldHideTooltips(this.title.getString()) || shouldIgnoreBackground(focusedSlot) || SlotOptions.isSlotDisabled(focusedSlot)) {
+        if (TerminalSolvers.shouldHideTooltips(this.title.getString()) || NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isDisabled(focusedSlot) || SlotBinding.isBinding()) {
             ci.cancel();
-            return;
-        }
-        if (SlotBinding.instance.isActive() && SlotBinding.lastSlot != -1) {
-            ci.cancel();
-            return;
-        }
-        if (TooltipScale.instance.isActive()) {
-            context.getMatrices().push();
-            float scale = (float) TooltipScale.scale.value();
-            context.getMatrices().translate(x - x * scale, y - y * scale, 0);
-            context.getMatrices().scale(scale, scale, 1);
-        }
-    }
-
-    @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V", shift = At.Shift.AFTER))
-    private void onAfterDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (TooltipScale.instance.isActive()) {
-            context.getMatrices().pop();
         }
     }
 
@@ -181,24 +116,32 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @ModifyExpressionValue(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
     private ItemStack onDrawStack(ItemStack original, DrawContext context, Slot slot) {
-        if (SlotOptions.isSlotSpoofed(slot)) {
-            return SlotOptions.getSpoofedStack(slot);
+        if (SlotOptions.isSpoofed(slot)) {
+            return SlotOptions.getSpoofed(slot);
         }
         return original;
     }
 
+    @ModifyArg(method = "drawSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawStackOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V"), index = 4)
+    private @Nullable String onDrawStackCount(@Nullable String stackCountText, @Local(argsOnly = true) Slot slot) {
+        if (SlotOptions.hasCount(slot)) {
+            return SlotOptions.getCount(slot);
+        }
+        return stackCountText;
+    }
+
     @ModifyExpressionValue(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/screen/slot/Slot;getStack()Lnet/minecraft/item/ItemStack;"))
     private ItemStack onDrawSpoofedTooltip(ItemStack original) {
-        if (SlotOptions.isSlotSpoofed(focusedSlot)) {
-            return SlotOptions.getSpoofedStack(focusedSlot);
+        if (SlotOptions.isSpoofed(focusedSlot)) {
+            return SlotOptions.getSpoofed(focusedSlot);
         }
         return original;
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (isLeapMenu()) {
-            for (LeapMenuButton button : leapButtons) {
+        if (LeapOverlay.isLeapMenu(this.title.getString())) {
+            for (LeapOverlay.LeapButton button : leapButtons) {
                 if (button.slotId != -1) {
                     button.hovered = button.isHovered(mouseX, mouseY);
                 }
@@ -208,71 +151,35 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         }
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(method = "renderBackground", at = @At("HEAD"), cancellable = true)
+    private void onRenderBackground(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (LeapOverlay.isLeapMenu(this.title.getString())) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "drawSlot", at = @At("HEAD"))
+    private void onRenderSlot(DrawContext context, Slot slot, CallbackInfo ci) {
+        if (SlotOptions.hasBackground(slot)) {
+            context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackground(slot).argb);
+        }
+    }
+
+    @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;drawSlotHighlightBack(Lnet/minecraft/client/gui/DrawContext;)V"))
+    private void onBeforeHighlightRender(DrawContext context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        eventBus.post(new ScreenRenderEvent.Before(context, mouseX, mouseY, deltaTicks, this.title.getString(), this.handler, this.focusedSlot));
+    }
+
+    @SuppressWarnings("mapping")
+    @Inject(method = "renderMain", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix3x2fStack;popMatrix()Lorg/joml/Matrix3x2fStack;"))
     private void onAfterRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        context.getMatrices().push();
-        context.getMatrices().translate(this.x, this.y, 0.0f);
-        context.getMatrices().translate(0.0f, 0.0f, 100.0f);
-        if (isSlotBindingActive() && focusedSlot != null) {
-            if (SlotBinding.isHotbar(focusedSlot.id)) {
-                String name = "hotbar" + SlotBinding.toHotbarNumber(focusedSlot.id);
-                if (SlotBinding.data.value().has(name)) {
-                    for (JsonElement element : SlotBinding.data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
-                        if (SlotBinding.lines.value()) {
-                            drawLine(context, focusedSlot.id, element.getAsInt(), SlotBinding.bound.value());
-                        }
-                        if (SlotBinding.borders.value()) {
-                            drawBorder(context, element.getAsInt(), SlotBinding.bound.value());
-                        }
-                    }
-                }
-            } else if (SlotBinding.isValid(focusedSlot.id)) {
-                for (int i = 1; i <= 8; i++) {
-                    String name = "hotbar" + i;
-                    if (SlotBinding.data.value().has(name)) {
-                        for (JsonElement element : SlotBinding.data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
-                            if (element.getAsInt() == focusedSlot.id) {
-                                if (SlotBinding.lines.value()) {
-                                    drawLine(context, focusedSlot.id, i + 35, SlotBinding.bound.value());
-                                }
-                                if (SlotBinding.borders.value()) {
-                                    drawBorder(context, i + 35, SlotBinding.bound.value());
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (SlotBinding.lastSlot != -1) {
-                drawBorder(context, SlotBinding.lastSlot, SlotBinding.binding.value());
-                drawBorder(context, focusedSlot.id, SlotBinding.binding.value());
-                drawLine(context, SlotBinding.lastSlot, focusedSlot.id, SlotBinding.binding.value());
-            }
-        }
-        if (KuudraChestValue.instance.isActive() && KuudraChestValue.currentValue > 0.0) {
-            Slot targetSlot = this.handler.getSlot(4);
-            String value = Utils.format("Chest Value: {}", String.format("%,.1f", KuudraChestValue.currentValue));
-            int width = mc.textRenderer.getWidth(value);
-            int baseX = targetSlot.x + 8;
-            int baseY = targetSlot.y + 8;
-            context.getMatrices().push();
-            context.getMatrices().translate(0, 0, 420);
-            context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, RenderColor.green.hex);
-            context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, RenderColor.darkGray.argb);
-            context.getMatrices().pop();
-        }
-        for (Slot slot : this.handler.slots) {
-            if (SlotOptions.hasBackground(slot)) {
-                context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackgroundColor(slot).argb);
-            }
-        }
-        context.getMatrices().pop();
+        eventBus.post(new ScreenRenderEvent.After(context, mouseX, mouseY, delta, this.title.getString(), this.handler, this.focusedSlot));
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (isLeapMenu() && button == GLFW.GLFW_MOUSE_BUTTON_1) {
-            for (LeapMenuButton leapButton : leapButtons) {
+        if (LeapOverlay.isLeapMenu(this.title.getString()) && button == GLFW.GLFW_MOUSE_BUTTON_1) {
+            for (LeapOverlay.LeapButton leapButton : leapButtons) {
                 if (leapButton.slotId != -1 && leapButton.isHovered(mouseX, mouseY)) {
                     mc.interactionManager.clickSlot(handler.syncId, leapButton.slotId, 0, SlotActionType.PICKUP, mc.player);
                     this.handler.setCursorStack(ItemStack.EMPTY);
@@ -297,12 +204,12 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
 
     @Inject(method = "init", at = @At("TAIL"))
     private void onInit(CallbackInfo ci) {
-        if (isLeapMenu()) {
+        if (LeapOverlay.isLeapMenu(this.title.getString())) {
             int x = mc.getWindow().getWidth() / 2;
             int y = mc.getWindow().getHeight() / 2;
             this.x = x;
             this.y = y;
-            InputUtil.setCursorParameters(mc.getWindow().getHandle(), GLFW_CURSOR_CAPTURED, x, y);
+            InputUtil.setCursorParameters(mc.getWindow().getHandle(), InputUtil.GLFW_CURSOR_NORMAL, x, y);
         }
     }
 }

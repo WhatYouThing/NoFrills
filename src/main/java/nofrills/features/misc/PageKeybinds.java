@@ -22,16 +22,13 @@ public class PageKeybinds {
     public static final SettingKeybind previous = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "previous", instance.key());
 
     private static ButtonType getButtonType(ItemStack stack) {
-        if (stack.isEmpty() || !Utils.getSkyblockId(stack).isEmpty()) return ButtonType.None;
-        Item item = stack.getItem();
-        String name = Utils.toPlainString(stack.getName());
-        if (item.equals(Items.ARROW)) {
-            if (name.equals("Next Page")) return ButtonType.Next;
-            if (name.equals("Previous Page")) return ButtonType.Previous;
-        }
-        if (item.equals(Items.PLAYER_HEAD)) {
-            if (name.startsWith("Next Page")) return ButtonType.Next;
-            if (name.endsWith("Previous Page")) return ButtonType.Previous;
+        if (!stack.isEmpty() && Utils.getSkyblockId(stack).isEmpty()) {
+            Item item = stack.getItem();
+            String name = Utils.toPlain(stack.getName());
+            if (item.equals(Items.ARROW) || item.equals(Items.PLAYER_HEAD)) {
+                if (name.startsWith("Next Page") || name.endsWith("Next Page")) return ButtonType.Next;
+                if (name.startsWith("Previous Page") || name.endsWith("Previous Page")) return ButtonType.Previous;
+            }
         }
         return ButtonType.None;
     }
@@ -43,7 +40,14 @@ public class PageKeybinds {
                 ButtonType type = getButtonType(slot.getStack());
                 if ((type.equals(ButtonType.Next) && next.value() == event.key) || (type.equals(ButtonType.Previous) && previous.value() == event.key)) {
                     if (event.action == GLFW.GLFW_PRESS) {
-                        mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
+                        int loreSize = Utils.getLoreLines(slot.getStack()).size();
+                        mc.interactionManager.clickSlot(
+                                container.getScreenHandler().syncId,
+                                slot.id,
+                                loreSize > 1 ? GLFW.GLFW_MOUSE_BUTTON_LEFT : GLFW.GLFW_MOUSE_BUTTON_3,
+                                loreSize > 1 ? SlotActionType.PICKUP : SlotActionType.CLONE,
+                                mc.player
+                        );
                     }
                     event.cancel();
                     break;

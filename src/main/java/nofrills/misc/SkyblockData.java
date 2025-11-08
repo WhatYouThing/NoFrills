@@ -8,7 +8,6 @@ import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.events.ServerJoinEvent;
@@ -55,8 +54,8 @@ public class SkyblockData {
             "Archer",
             "Tank"
     );
-    public static final SettingString dungeonClass = new SettingString("Berserker", "dungeonClass", "misc");
     private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
+    public static String dungeonClass = "Berserk";
     public static double dungeonPower = 0;
     private static String location = "";
     private static String area = "";
@@ -74,7 +73,7 @@ public class SkyblockData {
                 String selectedHub = Utils.format("You have selected the {} Dungeon Class!", name);
                 String milestone = Utils.format("{} Milestone", name);
                 if (msg.startsWith(tag) || msg.equals(selectedHub) || msg.equals(selected) || msg.startsWith(milestone)) {
-                    dungeonClass.set(name);
+                    dungeonClass = name;
                     break;
                 }
             }
@@ -134,7 +133,8 @@ public class SkyblockData {
 
     public static void updateTabList(PlayerListS2CPacket packet, List<PlayerListS2CPacket.Entry> entries) {
         for (PlayerListS2CPacket.Entry entry : entries) {
-            String name = Utils.toPlainString(entry.displayName()).trim();
+            if (entry.displayName() == null) continue;
+            String name = Utils.toPlain(entry.displayName()).trim();
             if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
                 area = name.split(":", 2)[1].trim();
                 break;
@@ -143,37 +143,40 @@ public class SkyblockData {
     }
 
     public static void updateObjective(ScoreboardObjectiveUpdateS2CPacket packet) {
-        Scoreboard scoreboard = mc.player.getScoreboard();
-        ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
-        if (objective != null) {
-            inSkyblock = Utils.toPlainString(objective.getDisplayName()).contains("SKYBLOCK");
+        if (mc.player != null) {
+            Scoreboard scoreboard = mc.player.getScoreboard();
+            ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
+            if (objective != null) {
+                inSkyblock = Utils.toPlain(objective.getDisplayName()).contains("SKYBLOCK");
+            }
         }
     }
 
     public static void updateScoreboard(TeamS2CPacket packet) {
-        List<String> currentLines = new ArrayList<>();
-        Scoreboard scoreboard = mc.player.getScoreboard();
-        ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
-        for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
-            if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
-                Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
-                if (team != null) {
-                    String line = Formatting.strip(team.getPrefix().getString() + team.getSuffix().getString());
-                    if (!line.trim().isEmpty()) {
-                        String cleanLine = line.trim();
-                        if (cleanLine.startsWith(Utils.Symbols.zone) || cleanLine.startsWith(Utils.Symbols.zoneRift)) {
-                            location = cleanLine;
+        if (mc.player != null) {
+            List<String> currentLines = new ArrayList<>();
+            Scoreboard scoreboard = mc.player.getScoreboard();
+            ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
+            for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
+                if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {
+                    Team team = scoreboard.getScoreHolderTeam(scoreHolder.getNameForScoreboard());
+                    if (team != null) {
+                        String line = Formatting.strip(team.getPrefix().getString() + team.getSuffix().getString()).trim();
+                        if (!line.isEmpty()) {
+                            if (line.startsWith(Utils.Symbols.zone) || line.startsWith(Utils.Symbols.zoneRift)) {
+                                location = line;
+                            }
+                            if (Utils.isInKuudra() && !instanceOver) {
+                                instanceOver = line.startsWith("Instance Shutdown");
+                            }
+                            currentLines.add(line);
                         }
-                        if (Utils.isInKuudra() && !instanceOver) {
-                            instanceOver = cleanLine.startsWith("Instance Shutdown");
-                        }
-                        currentLines.add(cleanLine);
                     }
                 }
             }
+            lines = currentLines;
+            SlayerUtil.updateQuestState(currentLines);
         }
-        lines = currentLines;
-        SlayerUtil.updateQuestState(currentLines);
     }
 
     @EventHandler

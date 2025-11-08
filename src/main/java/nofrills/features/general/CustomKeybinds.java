@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
@@ -18,8 +19,10 @@ import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
 import nofrills.events.InputEvent;
 import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.KeybindButton;
+import nofrills.hud.clickgui.components.ToggleButton;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
@@ -45,7 +48,10 @@ public class CustomKeybinds {
             JsonObject object = new JsonObject();
             object.addProperty("key", GLFW.GLFW_KEY_UNKNOWN);
             object.addProperty("command", "");
+            object.addProperty("enabled", true);
+            object.addProperty("modifier", Modifier.Any.name());
             data.value().get("binds").getAsJsonArray().add(object);
+            data.save();
             mc.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
@@ -65,12 +71,41 @@ public class CustomKeybinds {
         return settings;
     }
 
+    private static Modifier getModifierType(String modifier) {
+        for (Modifier value : Modifier.values()) {
+            if (value.name().equals(modifier)) {
+                return value;
+            }
+        }
+        return Modifier.Any;
+    }
+
+    private static int getRequiredModifier(Modifier modifier) {
+        return switch (modifier) {
+            case Any -> -1;
+            case None -> 0;
+            case Shift -> GLFW.GLFW_MOD_SHIFT;
+            case Alt -> GLFW.GLFW_MOD_ALT;
+            case Ctrl -> GLFW.GLFW_MOD_CONTROL;
+        };
+    }
+
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && ((allowInGui.value() && mc.currentScreen instanceof HandledScreen) || mc.currentScreen == null)) {
             if (data.value().has("binds")) {
                 for (JsonElement entry : data.value().get("binds").getAsJsonArray()) {
                     JsonObject bind = entry.getAsJsonObject();
+                    if (!bind.has("enabled") || !bind.get("enabled").getAsBoolean()) {
+                        continue;
+                    }
+                    if (bind.has("modifier")) {
+                        String modifier = bind.get("modifier").getAsString();
+                        int required = getRequiredModifier(getModifierType(modifier));
+                        if (required != -1 && event.modifiers != required) {
+                            continue;
+                        }
+                    }
                     String command = bind.get("command").getAsString();
                     if (bind.get("key").getAsInt() == event.key && !command.isEmpty()) {
                         if (event.action == GLFW.GLFW_PRESS) {
@@ -84,36 +119,76 @@ public class CustomKeybinds {
         }
     }
 
+    public enum Modifier {
+        Any,
+        None,
+        Shift,
+        Ctrl,
+        Alt
+    }
+
     public static class Setting extends FlowLayout {
         public int index;
         public FlatTextbox input;
+        public FlowLayout options;
         public KeybindButton keybind;
+        public EnumButton<Modifier> modifier;
         public ButtonComponent delete;
+        public ToggleButton toggle;
 
         public Setting(int index) {
-            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
             this.padding(Insets.of(5, 5, 4, 5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.index = index;
-            this.input = new FlatTextbox(Sizing.fixed(160));
+            this.input = new FlatTextbox(Sizing.fixed(240));
             this.input.margins(Insets.of(0, 0, 0, 6));
             this.input.text(getData().get("command").getAsString());
-            this.input.onChanged().subscribe(value -> getData().addProperty("command", value));
+            this.input.tooltip(Text.literal("The message/command that this keybind will send."));
+            this.input.onChanged().subscribe(value -> {
+                getData().addProperty("command", value);
+                data.save();
+            });
+            this.options = Containers.horizontalFlow(Sizing.content(), Sizing.content());
             this.keybind = new KeybindButton();
-            this.keybind.verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
+            this.keybind.verticalSizing(Sizing.fixed(18)).horizontalSizing(Sizing.fixed(100)).margins(Insets.of(3, 0, 1, 0));
             this.keybind.bind(getData().get("key").getAsInt());
-            this.keybind.onBound().subscribe(key -> getData().addProperty("key", key));
+            this.keybind.tooltip(Text.literal("The key bound to this command."));
+            this.keybind.onBound().subscribe(key -> {
+                getData().addProperty("key", key);
+                data.save();
+            });
+            this.modifier = new EnumButton<>(getData().has("modifier") ? getData().get("modifier").getAsString() : "Any", Modifier.Any, Modifier.class);
+            this.modifier.onChanged().subscribe(value -> {
+                getData().addProperty("modifier", value);
+                data.save();
+            });
+            this.modifier.margins(Insets.of(3, 0, 5, 0));
+            this.modifier.sizing(Sizing.fixed(80), Sizing.fixed(18));
+            this.modifier.tooltip(Text.literal("The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held."));
+            this.toggle = new ToggleButton(getData().has("enabled") && getData().get("enabled").getAsBoolean());
+            this.toggle.onToggled().subscribe(value -> {
+                this.getData().addProperty("enabled", value);
+                data.save();
+            });
+            this.toggle.verticalSizing(Sizing.fixed(18)).horizontalSizing(Sizing.fixed(54));
+            this.toggle.tooltip(Text.literal("The toggle for the keybind, allows you to disable it without having to delete it."));
+            this.toggle.margins(Insets.of(3, 0, 5, 0));
             this.delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.value().get("binds").getAsJsonArray().remove(this.index);
+                data.save();
                 mc.setScreen(buildSettings());
             });
-            this.delete.positioning(Positioning.relative(100, 0)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
+            this.delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             this.delete.renderer((context, btn, delta) -> {
                 context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
                 context.drawBorder(btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xffffffff);
             });
+            this.options.child(this.keybind);
+            this.options.child(this.modifier);
+            this.options.child(this.toggle);
             this.child(this.input);
-            this.child(this.keybind);
+            this.child(this.options);
             this.child(this.delete);
         }
 

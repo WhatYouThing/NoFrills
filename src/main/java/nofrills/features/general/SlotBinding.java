@@ -3,6 +3,7 @@ package nofrills.features.general;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.screen.slot.Slot;
@@ -11,6 +12,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.*;
 import nofrills.events.InputEvent;
+import nofrills.events.ScreenRenderEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -23,23 +25,24 @@ public class SlotBinding {
     public final static SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "keybind", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
     public static final SettingBool lines = new SettingBool(false, "lines", instance.key());
+    public static final SettingDouble lineWidth = new SettingDouble(2.0, "lineWidth", instance.key());
     public static final SettingBool borders = new SettingBool(false, "borders", instance.key());
     public static final SettingColor binding = new SettingColor(RenderColor.fromHex(0x00ff00), "bindingColor", instance.key());
     public static final SettingColor bound = new SettingColor(RenderColor.fromHex(0x00ffff), "boundColor", instance.key());
 
     public static int lastSlot = -1;
 
-    private static void success(String message) {
+    private static void sendSuccess(String message) {
         Utils.infoFormat("§a{}", message);
         Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1.0f, 1.0f);
     }
 
-    private static void error(String message) {
-        Utils.infoFormat("§4{}", message);
+    private static void sendError(String message) {
+        Utils.infoFormat("§c{}", message);
         Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
     }
 
-    private static void alert(String message) {
+    private static void sendAlert(String message) {
         Utils.infoFormat("§e{}", message);
     }
 
@@ -67,6 +70,14 @@ public class SlotBinding {
         return slotId % 9 + 1;
     }
 
+    public static boolean isBinding() {
+        return instance.isActive() && lastSlot != -1;
+    }
+
+    private static String getHotbarName(int slot) {
+        return Utils.format("hotbar{}", slot);
+    }
+
     @EventHandler
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.currentScreen instanceof InventoryScreen inventory) {
@@ -75,7 +86,7 @@ public class SlotBinding {
                 int syncId = inventory.getScreenHandler().syncId;
                 if (isHotbar(focusedSlot.id)) {
                     int hotbarNumber = toHotbarNumber(focusedSlot.id);
-                    String hotbarName = "hotbar" + hotbarNumber;
+                    String hotbarName = getHotbarName(hotbarNumber);
                     if (data.value().has(hotbarName)) {
                         JsonObject object = data.value().get(hotbarName).getAsJsonObject();
                         JsonArray binds = object.get("binds").getAsJsonArray();
@@ -88,15 +99,13 @@ public class SlotBinding {
                     }
                 } else if (isValid(focusedSlot.id)) {
                     for (int i = 1; i <= 8; i++) {
-                        String name = "hotbar" + i;
+                        String name = getHotbarName(i);
                         if (data.value().has(name)) {
                             JsonArray array = data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray();
-                            for (JsonElement element : array.deepCopy()) {
-                                if (element.getAsInt() == focusedSlot.id) {
-                                    mc.interactionManager.clickSlot(syncId, focusedSlot.id, i - 1, SlotActionType.SWAP, mc.player);
-                                    data.value().get(name).getAsJsonObject().addProperty("last", focusedSlot.id);
-                                    event.cancel();
-                                }
+                            if (array.contains(new JsonPrimitive(focusedSlot.id))) {
+                                mc.interactionManager.clickSlot(syncId, focusedSlot.id, i - 1, SlotActionType.SWAP, mc.player);
+                                data.value().get(name).getAsJsonObject().addProperty("last", focusedSlot.id);
+                                event.cancel();
                             }
                         }
                     }
@@ -109,23 +118,22 @@ public class SlotBinding {
                 if (event.action == GLFW.GLFW_RELEASE) {
                     if (focusedSlot != null && lastSlot == focusedSlot.id) {
                         if (isHotbar(focusedSlot.id)) {
-                            String hotbarName = "hotbar" + toHotbarNumber(focusedSlot.id);
+                            String hotbarName = getHotbarName(toHotbarNumber(focusedSlot.id));
                             if (data.value().has(hotbarName)) {
                                 data.value().get(hotbarName).getAsJsonObject().add("binds", new JsonArray());
                                 data.value().get(hotbarName).getAsJsonObject().addProperty("last", 0);
                             }
-                            success(Utils.format("Cleared every bind from hotbar slot {}.", toHotbarNumber(focusedSlot.id)));
+                            data.save();
+                            sendSuccess(Utils.format("Cleared every bind from hotbar slot {}.", toHotbarNumber(focusedSlot.id)));
                         } else if (isValid(focusedSlot.id)) {
                             for (int i = 1; i <= 8; i++) {
-                                String name = "hotbar" + i;
+                                String name = getHotbarName(i);
                                 if (data.value().has(name)) {
                                     JsonArray array = data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray();
-                                    for (JsonElement element : array.deepCopy()) {
-                                        if (element.getAsInt() == focusedSlot.id) {
-                                            array.remove(element);
-                                            success(Utils.format("Successfully unbound slot from hotbar slot {}.", i));
-                                            break;
-                                        }
+                                    if (array.remove(new JsonPrimitive(focusedSlot.id))) {
+                                        data.save();
+                                        sendSuccess(Utils.format("Successfully unbound slot from hotbar slot {}.", i));
+                                        break;
                                     }
                                 }
                             }
@@ -133,17 +141,15 @@ public class SlotBinding {
                     } else if (lastSlot != -1 && focusedSlot != null) {
                         if (isValid(lastSlot) && isValid(focusedSlot.id) && isBindValid(lastSlot, focusedSlot.id)) {
                             int hotbar = isHotbar(lastSlot) ? lastSlot : focusedSlot.id;
-                            String hotbarName = "hotbar" + toHotbarNumber(hotbar);
+                            String hotbarName = getHotbarName(toHotbarNumber(hotbar));
                             int slot = isHotbar(lastSlot) ? focusedSlot.id : lastSlot;
                             for (int i = 1; i <= 8; i++) {
-                                String name = "hotbar" + i;
+                                String name = getHotbarName(i);
                                 if (data.value().has(name)) {
                                     JsonArray array = data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray();
-                                    for (JsonElement element : array.deepCopy()) {
-                                        if (element.getAsInt() == slot) {
-                                            array.remove(element);
-                                            alert(Utils.format("The target is already bound to hotbar slot {}, replacing the bind.", i));
-                                        }
+                                    if (array.remove(new JsonPrimitive(slot))) {
+                                        sendAlert(Utils.format("The target is already bound to hotbar slot {}, replacing the bind.", i));
+                                        break;
                                     }
                                 }
                             }
@@ -154,13 +160,54 @@ public class SlotBinding {
                                 data.value().add(hotbarName, object);
                             }
                             data.value().get(hotbarName).getAsJsonObject().get("binds").getAsJsonArray().add(slot);
-                            success("Slots bound successfully!");
+                            data.save();
+                            sendSuccess("Slots bound successfully!");
                         } else {
-                            error("Invalid slot binding combination detected, doing nothing.");
+                            sendError("Invalid slot binding combination detected, doing nothing.");
                         }
                     }
                     lastSlot = -1;
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onRender(ScreenRenderEvent.Before event) {
+        if (instance.isActive() && mc.currentScreen instanceof InventoryScreen && event.focusedSlot != null) {
+            if (isHotbar(event.focusedSlot.id)) {
+                String name = getHotbarName(toHotbarNumber(event.focusedSlot.id));
+                if (data.value().has(name)) {
+                    for (JsonElement element : data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
+                        if (lines.value()) {
+                            event.drawLine(event.focusedSlot.id, element.getAsInt(), lineWidth.value(), bound.value());
+                        }
+                        if (borders.value()) {
+                            event.drawBorder(element.getAsInt(), bound.value());
+                        }
+                    }
+                }
+            } else if (isValid(event.focusedSlot.id)) {
+                for (int i = 1; i <= 8; i++) {
+                    String name = getHotbarName(i);
+                    if (data.value().has(name)) {
+                        for (JsonElement element : data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
+                            if (element.getAsInt() == event.focusedSlot.id) {
+                                if (lines.value()) {
+                                    event.drawLine(event.focusedSlot.id, i + 35, lineWidth.value(), bound.value());
+                                }
+                                if (borders.value()) {
+                                    event.drawBorder(i + 35, bound.value());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (lastSlot != -1) {
+                event.drawBorder(lastSlot, binding.value());
+                event.drawBorder(event.focusedSlot.id, binding.value());
+                event.drawLine(lastSlot, event.focusedSlot.id, lineWidth.value(), binding.value());
             }
         }
     }

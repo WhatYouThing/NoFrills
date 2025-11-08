@@ -60,7 +60,7 @@ public class ExperimentSolver {
 
     private static boolean isStatus(ItemStack stack) {
         Item item = stack.getItem();
-        String name = Utils.toPlainString(stack.getName());
+        String name = Utils.toPlain(stack.getName());
         return item.equals(Items.CLOCK)
                 || item.equals(Items.BOOKSHELF)
                 || (item.equals(Items.GLOWSTONE) && !name.equals("Enchanted Book"))
@@ -107,16 +107,16 @@ public class ExperimentSolver {
     private static void showChronoSolution() {
         if (!chronoSolution.isEmpty()) {
             for (Slot solution : chronoSolution.getFirst().slots) {
-                SlotOptions.spoofSlot(solution, SlotOptions.first);
-                SlotOptions.disableSlot(solution, false);
+                SlotOptions.setSpoofed(solution, SlotOptions.FIRST);
+                SlotOptions.setDisabled(solution, false);
             }
         }
         if (chronoSolution.size() > 1) {
             Solution first = chronoSolution.getFirst();
             for (Slot solution : chronoSolution.get(1).slots) {
                 if (first.slots.stream().noneMatch(slot -> slot.id == solution.id)) {
-                    SlotOptions.spoofSlot(solution, SlotOptions.second);
-                    SlotOptions.disableSlot(solution, true);
+                    SlotOptions.setSpoofed(solution, SlotOptions.SECOND);
+                    SlotOptions.setDisabled(solution, true);
                 }
             }
         }
@@ -125,13 +125,13 @@ public class ExperimentSolver {
     private static void showUltraSolution() {
         if (!ultraSolution.isEmpty()) {
             Solution first = ultraSolution.getFirst();
-            SlotOptions.spoofSlot(first.slot, SlotOptions.stackWithQuantity(SlotOptions.first, first.stack.getCount()));
-            SlotOptions.disableSlot(first.slot, false);
+            SlotOptions.setSpoofed(first.slot, SlotOptions.stackWithCount(SlotOptions.FIRST, first.stack.getCount()));
+            SlotOptions.setDisabled(first.slot, false);
         }
         if (ultraSolution.size() > 1) {
             Solution second = ultraSolution.get(1);
-            SlotOptions.spoofSlot(second.slot, SlotOptions.stackWithQuantity(SlotOptions.second, second.stack.getCount()));
-            SlotOptions.disableSlot(second.slot, true);
+            SlotOptions.setSpoofed(second.slot, SlotOptions.stackWithCount(SlotOptions.SECOND, second.stack.getCount()));
+            SlotOptions.setDisabled(second.slot, true);
         }
     }
 
@@ -157,7 +157,7 @@ public class ExperimentSolver {
         if (chronomatron.value() && experimentType.equals(ExperimentType.Chronomatron)) {
             if (rememberPhase) {
                 for (Slot slot : getContainerSlots(event.handler)) {
-                    SlotOptions.disableSlot(slot, true);
+                    SlotOptions.setDisabled(slot, true);
                 }
                 if (isTerracotta(event.stack)) {
                     if (chronoSolution.isEmpty()) {
@@ -182,10 +182,10 @@ public class ExperimentSolver {
                 showUltraSolution();
             } else if (item.equals(Items.GLOWSTONE)) {
                 List<Solution> solution = new ArrayList<>();
-                SlotOptions.clearSpoofedSlots();
-                SlotOptions.clearDisabledSlots();
+                SlotOptions.clearSpoofed();
+                SlotOptions.clearDisabled();
                 for (Slot slot : getContainerSlots(event.handler)) {
-                    SlotOptions.disableSlot(slot, true);
+                    SlotOptions.setDisabled(slot, true);
                     if (isDye(slot.getStack())) {
                         solution.add(new Solution(slot.getStack(), slot));
                     }
@@ -210,7 +210,7 @@ public class ExperimentSolver {
                 }
                 superSolution.rewards.put(eventSlot, event.stack);
                 superSolution.slot = eventSlot;
-                SlotOptions.spoofSlot(eventSlot, event.stack);
+                SlotOptions.setSpoofed(eventSlot, event.stack);
             }
         }
     }
@@ -235,8 +235,8 @@ public class ExperimentSolver {
                     Solution first = chronoSolution.getFirst();
                     if (first.slots.stream().anyMatch(slot -> slot.id == slotId)) {
                         for (Slot slot : first.slots) {
-                            SlotOptions.clearSpoof(slot);
-                            SlotOptions.disableSlot(slot, true);
+                            SlotOptions.clearSpoofed(slot);
+                            SlotOptions.setDisabled(slot, true);
                         }
                         chronoSolution.removeFirst();
                     }
@@ -247,8 +247,8 @@ public class ExperimentSolver {
                 if (!ultraSolution.isEmpty()) {
                     if (ultraSolution.getFirst().slot.id == slotId) {
                         Solution first = ultraSolution.getFirst();
-                        SlotOptions.spoofSlot(first.slot, SlotOptions.stackWithQuantity(Items.GRAY_CONCRETE.getDefaultStack(), first.stack.getCount()));
-                        SlotOptions.disableSlot(first.slot, true);
+                        SlotOptions.setSpoofed(first.slot, SlotOptions.stackWithCount(Items.GRAY_CONCRETE.getDefaultStack(), first.stack.getCount()));
+                        SlotOptions.setDisabled(first.slot, true);
                         ultraSolution.removeFirst();
                     }
                 }

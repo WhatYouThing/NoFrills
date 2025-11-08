@@ -21,10 +21,11 @@
   "mixins": [
     "nofrills.mixins.json"
   ],
+  "accessWidener" : "nofrills.accesswidener",
   "depends": {
-    "fabricloader": ">=0.16.14",
+    "fabricloader": ">=0.17.2",
     "fabric-api": "*",
-    "minecraft": "1.21.5",
+    "minecraft": ">=1.21.6",
     "java": ">=21"
   }
 }

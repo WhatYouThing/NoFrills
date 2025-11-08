@@ -48,7 +48,7 @@ public abstract class MinecraftClientMixin {
     @Final
     SoundSystem getSoundSystem() {
         if (mc.getSoundManager() != null) {
-            return ((SoundManagerAccessor) mc.getSoundManager()).getSoundSystem();
+            return mc.getSoundManager().soundSystem;
         }
         return null;
     }

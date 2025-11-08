@@ -74,4 +74,16 @@ public class KeybindButton extends ButtonComponent {
         }
         return true;
     }
+
+    public interface KeybindChanged {
+        static EventStream<KeybindChanged> newStream() {
+            return new EventStream<>(subscribers -> (keycode) -> {
+                for (var subscriber : subscribers) {
+                    subscriber.onBind(keycode);
+                }
+            });
+        }
+
+        void onBind(int keycode);
+    }
 }

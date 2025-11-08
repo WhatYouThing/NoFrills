@@ -1,13 +1,11 @@
 package nofrills.mixin;
 
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.BufferAllocator;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.entity.LightningEntity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.util.math.Box;
 import nofrills.events.WorldRenderEvent;
 import nofrills.features.general.NoRender;
@@ -16,6 +14,7 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -35,7 +34,7 @@ public abstract class WorldRendererMixin {
     // the compiler sometimes claims that the inject target wasn't found, but it works fine regardless
     @SuppressWarnings("mapping")
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lorg/joml/Matrix4fStack;popMatrix()Lorg/joml/Matrix4fStack;"))
-    private void onRenderWorld(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, Matrix4f positionMatrix, Matrix4f projectionMatrix, CallbackInfo ci) {
+    private void onRenderWorld(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci) {
         eventBus.post(new WorldRenderEvent(immediate, tickCounter, camera, new MatrixStack()));
         immediate.draw();
     }
@@ -53,6 +52,9 @@ public abstract class WorldRendererMixin {
                 ci.cancel();
             }
             if (NoRender.lightning.value() && entity instanceof LightningEntity) {
+                ci.cancel();
+            }
+            if (NoRender.expOrbs.value() && entity instanceof ExperienceOrbEntity) {
                 ci.cancel();
             }
         }

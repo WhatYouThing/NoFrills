@@ -11,11 +11,17 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import nofrills.features.tweaks.OldSafewalk;
 import nofrills.features.tweaks.OldSneak;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity {
+    @Shadow
+    @Final
+    public static EntityDimensions STANDING_DIMENSIONS;
+
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
     }
@@ -23,7 +29,7 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @ModifyReturnValue(method = "getBaseDimensions", at = @At("RETURN"))
     private EntityDimensions getDimensions(EntityDimensions original, EntityPose pose) {
         if (pose == EntityPose.CROUCHING && OldSneak.active()) {
-            return EntityDimensions.changing(0.6F, 1.8F).withEyeHeight(1.54F);
+            return STANDING_DIMENSIONS.withEyeHeight(1.54F);
         }
         return original;
     }

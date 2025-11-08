@@ -24,6 +24,7 @@ import nofrills.events.ServerJoinEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.features.general.PriceTooltips;
 import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.misc.ShardData;
 import nofrills.misc.Utils;
@@ -31,9 +32,7 @@ import nofrills.misc.Utils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 import static nofrills.Main.mc;
@@ -59,6 +58,7 @@ public class ShardTracker {
         list.add(new Settings.Toggle("Filter Direct", filterDirect, "Hides every Direct/Bazaar shard while inside of the Fusion Machine."));
         Settings.BigButton clearButton = new Settings.BigButton("Clear Shard List", btn -> {
             data.value().add("shards", new JsonArray());
+            data.save();
             mc.setScreen(buildSettings());
         });
         clearButton.button.verticalSizing(Sizing.fixed(18));
@@ -81,6 +81,7 @@ public class ShardTracker {
             object.addProperty("obtained", 0L);
             object.addProperty("source", "Direct");
             data.value().get("shards").getAsJsonArray().add(object);
+            data.save();
             mc.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
@@ -134,6 +135,7 @@ public class ShardTracker {
             Utils.info("§cSuccessfully read the fusion tree data, but an unknown error occurred while importing. Try updating the mod to the newest version.");
             return;
         }
+        data.save();
         Utils.info("§aShard list imported successfully.");
     }
 
@@ -262,6 +264,14 @@ public class ShardTracker {
             msg = msg.substring(0, msg.indexOf(" Shard (")).trim();
             return new Shard(msg, 1, ShardSource.TreeGift);
         }
+        if (msg.startsWith("You bought ") && msg.endsWith("!")) {
+            msg = Utils.toLower(msg.replace("You bought ", "").replace("!", "").trim());
+            for (HashSet<String> set : ShardData.shardSetList) {
+                if (set.contains(msg)) {
+                    return new Shard(msg, 1, ShardSource.Bought);
+                }
+            }
+        }
         return null;
     }
 
@@ -306,6 +316,7 @@ public class ShardTracker {
                         );
                     }
                     tracked.addProperty("obtained", obtained + shard.quantity);
+                    data.save();
                     refreshDisplay();
                 }
             }
@@ -314,18 +325,16 @@ public class ShardTracker {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && boxApply.value() && event.title.equals("Hunting Box")) {
-            if (event.isInventory || !data.value().has("shards")) {
-                return;
-            }
+        if (instance.isActive() && boxApply.value() && event.title.equals("Hunting Box") && !event.isInventory && data.value().has("shards")) {
             JsonArray shards = data.value().get("shards").getAsJsonArray();
             if (!shards.isEmpty()) {
                 for (String line : Utils.getLoreLines(event.stack)) {
                     if (line.startsWith("Owned: ")) {
-                        String name = Utils.toLower(Utils.toPlainString(event.stack.getName()));
+                        String name = Utils.toLower(Utils.toPlain(event.stack.getName()));
                         JsonObject tracked = getTrackedShard(name);
                         if (tracked != null) {
                             tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack, event.title));
+                            data.save();
                             refreshDisplay();
                         }
                         break;
@@ -356,7 +365,8 @@ public class ShardTracker {
         Charmed,
         Fused,
         Absorbed,
-        TreeGift
+        TreeGift,
+        Bought
     }
 
     public enum TrackerSource {
@@ -372,19 +382,13 @@ public class ShardTracker {
         public ShardSource source;
 
         public Shard(String name, int quantity, ShardSource source) {
-            this.name = name;
+            this.name = Utils.toLower(name);
             this.quantity = quantity;
             this.source = source;
         }
 
         public static Shard of(String name, String quantity, ShardSource source) {
-            String shardName = Utils.toLower(name);
-            try {
-                int amount = Integer.parseInt(quantity);
-                return new Shard(shardName, amount, source);
-            } catch (NumberFormatException ignored) {
-            }
-            return new Shard(shardName, 1, source);
+            return new Shard(Utils.toLower(name), Utils.parseInt(quantity).orElse(1), source);
         }
     }
 
@@ -393,7 +397,7 @@ public class ShardTracker {
         public FlatTextbox inputName;
         public FlatTextbox inputObtained;
         public FlatTextbox inputNeeded;
-        public ButtonComponent inputSource;
+        public EnumButton<TrackerSource> inputSource;
         public ButtonComponent delete;
 
         public Setting(int index) {
@@ -409,55 +413,47 @@ public class ShardTracker {
             this.inputName.onChanged().subscribe(value -> {
                 getData().addProperty("name", Utils.toLower(value));
                 this.inputName.borderColor = ShardData.getColorHex(Utils.toLower(value));
+                data.save();
                 refreshDisplay();
             });
             this.inputObtained = new FlatTextbox(Sizing.fixed(50));
             this.inputObtained.margins(Insets.of(0, 0, 0, 5));
             this.inputObtained.tooltip(Text.literal("The amount of this shard that you currently have."));
             this.inputObtained.text(String.valueOf(getData().get("obtained").getAsLong()));
-            this.inputObtained.onChanged().subscribe(value -> {
-                try {
-                    getData().addProperty("obtained", Long.valueOf(value));
+            this.inputObtained.onChanged().subscribe(text -> {
+                Optional<Long> value = Utils.parseLong(text);
+                if (value.isPresent()) {
+                    getData().addProperty("obtained", value.get());
+                    data.save();
                     refreshDisplay();
-                } catch (NumberFormatException ignored) {
                 }
             });
             this.inputNeeded = new FlatTextbox(Sizing.fixed(50));
             this.inputNeeded.margins(Insets.of(0, 0, 0, 5));
             this.inputNeeded.tooltip(Text.literal("The amount of this shard that you want to obtain. Set to 0 for no target amount."));
             this.inputNeeded.text(String.valueOf(getData().get("needed").getAsLong()));
-            this.inputNeeded.onChanged().subscribe(value -> {
-                try {
-                    getData().addProperty("needed", Long.valueOf(value));
+            this.inputNeeded.onChanged().subscribe(text -> {
+                Optional<Long> value = Utils.parseLong(text);
+                if (value.isPresent()) {
+                    getData().addProperty("needed", value.get());
+                    data.save();
                     refreshDisplay();
-                } catch (NumberFormatException ignored) {
                 }
             });
-            this.inputSource = Components.button(this.getSourceInputLabel(getTrackedSource(getData().get("source").getAsString())), button -> {
-                TrackerSource[] values = TrackerSource.values();
-                TrackerSource source = getTrackedSource(getData().get("source").getAsString());
-                for (int i = 0; i < values.length; i++) {
-                    if (values[i].equals(source)) {
-                        TrackerSource newSource = i == values.length - 1 ? values[0] : values[i + 1];
-                        getData().addProperty("source", newSource.name());
-                        this.inputSource.setMessage(this.getSourceInputLabel(newSource));
-                        refreshDisplay();
-                        return;
-                    }
-                }
-                getData().addProperty("source", TrackerSource.Direct.name());
-                this.inputSource.setMessage(this.getSourceInputLabel(TrackerSource.Direct));
+            this.inputSource = new EnumButton<>(getData().get("source").getAsString(), TrackerSource.Direct, TrackerSource.class);
+            this.inputSource.setMessage(this.getSourceInputLabel(getData().get("source").getAsString()));
+            this.inputSource.onChanged().subscribe(value -> {
+                getData().addProperty("source", value);
+                this.inputSource.setMessage(this.getSourceInputLabel(value));
+                data.save();
                 refreshDisplay();
-            });
-            this.inputSource.renderer((context, button, delta) -> {
-                context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
-                context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
             });
             this.inputSource.margins(Insets.of(1, 0, 0, 0));
             this.inputSource.sizing(Sizing.fixed(48), Sizing.fixed(18));
             this.inputSource.tooltip(Text.literal("The source that this shard is obtained from. Click to rotate."));
             this.delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.value().get("shards").getAsJsonArray().remove(this.index);
+                data.save();
                 mc.setScreen(buildSettings());
             });
             this.delete.positioning(Positioning.relative(100, 0)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
@@ -476,8 +472,8 @@ public class ShardTracker {
             return data.value().get("shards").getAsJsonArray().get(this.index).getAsJsonObject();
         }
 
-        public MutableText getSourceInputLabel(TrackerSource source) {
-            return Text.literal(Utils.format("{}{}", getSourceColor(source.name()), source.name()));
+        public MutableText getSourceInputLabel(String source) {
+            return Text.literal(Utils.format("{}{}", getSourceColor(source), source));
         }
     }
 }

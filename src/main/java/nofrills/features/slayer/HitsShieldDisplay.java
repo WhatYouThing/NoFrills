@@ -24,7 +24,7 @@ public class HitsShieldDisplay {
             Entity nameEntity = SlayerUtil.getNameEntity();
             Entity boss = SlayerUtil.getBossEntity();
             if (nameEntity == null || boss == null) return;
-            String name = Utils.toPlainString(nameEntity.getName());
+            String name = Utils.toPlain(nameEntity.getName());
             if (name.endsWith("Hits") || name.endsWith("Hit")) {
                 String[] parts = name.split(" ");
                 String hits = Utils.format("{} {}", parts[parts.length - 2], parts[parts.length - 1]);

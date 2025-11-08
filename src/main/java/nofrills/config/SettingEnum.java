@@ -1,47 +1,33 @@
 package nofrills.config;
 
-import com.google.gson.JsonObject;
-
-public class SettingEnum<T extends Enum<T>> {
+public class SettingEnum<T extends Enum<T>> extends SettingGeneric {
     public final T[] values;
-    private final String key;
-    private final String parent;
-    private final T defaultValue;
+    private T current;
 
     public SettingEnum(T defaultValue, Class<T> values, String key, String parentKey) {
-        this.defaultValue = defaultValue;
+        super(defaultValue, key, parentKey);
         this.values = values.getEnumConstants();
-        this.key = key;
-        this.parent = parentKey;
+        this.current = this.toConstant(this.get().getAsString());
     }
 
     public SettingEnum(T defaultValue, Class<T> values, String key, Feature instance) {
         this(defaultValue, values, key, instance.key());
     }
 
-    public T value() {
-        if (Config.get().has(this.parent)) {
-            JsonObject data = Config.get().getAsJsonObject(this.parent);
-            if (data.has(this.key)) {
-                String value = data.get(this.key).getAsString();
-                for (T constant : values) {
-                    if (constant.name().equals(value)) {
-                        return constant;
-                    }
-                }
+    public T toConstant(String value) {
+        for (T constant : this.values) {
+            if (constant.name().equals(value)) {
+                return constant;
             }
         }
-        return this.defaultValue;
+        return this.values[0];
     }
 
-    public void set(T value) {
-        if (!Config.get().has(this.parent)) {
-            Config.get().add(this.parent, new JsonObject());
+    public T value() {
+        String value = this.get().getAsString();
+        if (!this.current.name().equals(value)) {
+            this.current = this.toConstant(value);
         }
-        Config.get().get(this.parent).getAsJsonObject().addProperty(this.key, String.valueOf(value));
-    }
-
-    public void reset() {
-        this.set(this.defaultValue);
+        return this.current;
     }
 }

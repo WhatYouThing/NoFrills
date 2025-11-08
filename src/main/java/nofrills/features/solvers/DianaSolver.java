@@ -119,17 +119,16 @@ public class DianaSolver {
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive() && Utils.isInArea("Hub")) {
             BurrowType type = getTypeFromPacket(event.packet);
-            if (type.equals(BurrowType.Guess) && ticks > 0 && solver.getLastDist(event.pos) <= 4.0) {
+            if (type.equals(BurrowType.Guess) && ticks > 0 && solver.getLastDist(event.pos) < 4.0) {
                 solver.addPos(event.pos);
                 ticks = 10;
                 Vec3d pos = solver.getSolvedPos();
                 if (pos != null) {
                     Burrow guess = new Burrow(pos, BurrowType.Guess);
-                    if (getBurrowsList().stream().anyMatch(burrow -> burrow.equals(guess) && !burrow.isGuess())) {
-                        return;
-                    }
                     burrowsList.removeIf(Burrow::isGuess);
-                    burrowsList.add(guess);
+                    if (getBurrowsList().stream().noneMatch(burrow -> burrow.equals(guess) && !burrow.isGuess())) {
+                        burrowsList.add(guess);
+                    }
                 }
             }
             if (!type.equals(BurrowType.None) && isHoldingSpoon()) {
@@ -145,7 +144,7 @@ public class DianaSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && warpKey.key() == event.key && Utils.isInArea("Hub")) {
+        if (instance.isActive() && mc.currentScreen == null && warpKey.key() == event.key && Utils.isInArea("Hub")) {
             if (event.action == GLFW.GLFW_PRESS) {
                 Optional<Burrow> burrow = getBurrowsList().stream().filter(Burrow::isGuess).findFirst();
                 if (burrow.isPresent()) {
@@ -166,21 +165,21 @@ public class DianaSolver {
 
     @EventHandler
     private static void onUseItem(InteractItemEvent event) {
-        if (instance.isActive() && isHoldingSpoon() && Utils.isInArea("Hub") && ticks == 0) {
+        if (instance.isActive() && Utils.isInArea("Hub") && isHoldingSpoon() && ticks == 0) {
             onSpooningStart();
         }
     }
 
     @EventHandler
     private static void onInteractBlock(InteractBlockEvent event) {
-        if (instance.isActive() && Utils.isInArea("Hub")) {
+        if (instance.isActive() && Utils.isInArea("Hub") && isHoldingSpoon()) {
             burrowsList.removeIf(burrow -> burrow.isGuess() && burrow.pos.equals(event.blockHitResult.getBlockPos()));
         }
     }
 
     @EventHandler
     private static void onAttackBlock(AttackBlockEvent event) {
-        if (instance.isActive() && Utils.isInArea("Hub")) {
+        if (instance.isActive() && Utils.isInArea("Hub") && isHoldingSpoon()) {
             burrowsList.removeIf(burrow -> burrow.isGuess() && burrow.pos.equals(event.blockPos));
         }
     }

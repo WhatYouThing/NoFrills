@@ -318,13 +318,23 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Spooky Chests", SpookyChests.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, SpookyChests.color, "The color of the spooky chest highlight.")
                         ))),
-                        new Module("Diana Solver", DianaSolver.instance, "Guesses the position of the burrow when using the Ancestral Spade. Also highlights nearby burrows.", new Settings(List.of(
+                        new Module("Diana Solver", DianaSolver.instance, "Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.", new Settings(List.of(
+                                new Settings.Separator("Burrows"),
                                 new Settings.Toggle("Guess Tracer", DianaSolver.guessTracer, "Draws a tracer towards the guessed burrow."),
                                 new Settings.ColorPicker("Guess Color", true, DianaSolver.guessColor, "The color of the guessed burrow beacon."),
                                 new Settings.ColorPicker("Tracer Color", true, DianaSolver.guessTracerColor, "The color of the guessed burrow tracer."),
                                 new Settings.ColorPicker("Treasure Color", true, DianaSolver.treasureColor, "The color of the treasure burrow beacon."),
                                 new Settings.ColorPicker("Enemy Color", true, DianaSolver.enemyColor, "The color of the enemy burrow beacon."),
-                                new Settings.ColorPicker("Start Color", true, DianaSolver.startColor, "The color of the start burrow beacon.")
+                                new Settings.ColorPicker("Start Color", true, DianaSolver.startColor, "The color of the start burrow beacon."),
+                                new Settings.Separator("Warps"),
+                                new Settings.Keybind("Warp Keybind", DianaSolver.warpKey, "The keybind to warp to the location closest to the guessed burrow."),
+                                new Settings.Toggle("Hub Warp", DianaSolver.hubToggle, "Consider Hub a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Stonks Warp", DianaSolver.stonksToggle, "Consider Stonks Auction as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Museum Warp", DianaSolver.museumToggle, "Consider Museum as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Castle Warp", DianaSolver.castleToggle, "Consider Castle as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Wizard Tower Warp", DianaSolver.wizardToggle, "Consider Wizard Tower as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Dark Auction Warp", DianaSolver.daToggle, "Consider Dark Auction as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Crypt Warp", DianaSolver.cryptToggle, "Consider Crypt as a valid warp location when using the Warp Keybind.")
                         ))),
                         new Module("Hoppity Solver", HoppitySolver.instance, "Guesses the position of the egg when using the Egglocator.", new Settings(List.of(
                                 new Settings.Toggle("Guess Tracer", HoppitySolver.guessTracer, "Draws a tracer towards the guessed egg."),

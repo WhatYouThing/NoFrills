@@ -74,7 +74,7 @@ public final class Rendering {
         matrices.push();
         matrices.translate(-camPos.getX(), -camPos.getY(), -camPos.getZ());
         MatrixStack.Entry entry = matrices.peek();
-        VertexConsumer buffer = consumer.getBuffer(Layers.BoxOutlineNoCull);
+        VertexConsumer buffer = consumer.getBuffer(Layers.GuiLine);
         Vec3d point = camPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw())); // taken from Skyblocker's RenderHelper, my brain cannot handle OpenGL
         Vector3f normal = pos.toVector3f().sub((float) point.getX(), (float) point.getY(), (float) point.getZ()).normalize(new Vector3f(1.0f, 1.0f, 1.0f));
         buffer.vertex(entry, (float) point.getX(), (float) point.getY(), (float) point.getZ()).color(color.r, color.g, color.b, color.a).normal(entry, normal);
@@ -146,6 +146,13 @@ public final class Rendering {
         public static final RenderPipeline outlineCull = RenderPipelines.register(RenderPipeline.builder(outlineSnippet)
                 .withLocation(Identifier.of("nofrills", "pipeline/nofrills_outline_cull"))
                 .build());
+        public static final RenderPipeline lineNoCull = RenderPipelines.register(RenderPipeline.builder(outlineSnippet)
+                .withLocation(Identifier.of("nofrills", "pipeline/nofrills_line_no_cull"))
+                .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.DEBUG_LINE_STRIP)
+                .withVertexShader("core/position_color")
+                .withFragmentShader("core/position_color")
+                .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                .build());
     }
 
     public static class Parameters {
@@ -191,10 +198,10 @@ public final class Rendering {
         );
         public static final RenderLayer.MultiPhase GuiLine = RenderLayer.of(
                 "nofrills_gui_line",
-                262144,
+                RenderLayer.DEFAULT_BUFFER_SIZE,
                 false,
                 false,
-                RenderPipelines.DEBUG_LINE_STRIP,
+                Pipelines.lineNoCull,
                 Parameters.lines.build(false)
         );
     }

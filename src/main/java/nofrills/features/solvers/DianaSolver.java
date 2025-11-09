@@ -191,11 +191,10 @@ public class DianaSolver {
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
         if (instance.isActive() && Utils.isInHub() && isDugMessage(event.messagePlain) && !burrowsList.isEmpty()) {
-            Vec3d playerPos = mc.player.getPos();
             List<Burrow> burrows = getBurrowsList();
-            burrows.sort(Comparator.comparingDouble(burrow -> burrow.getVec().distanceTo(playerPos)));
+            burrows.sort(Comparator.comparingDouble(Burrow::distanceTo));
             Burrow burrow = burrows.getFirst();
-            if (burrow.getVec().distanceTo(playerPos) < 8.0) burrowsList.remove(burrow);
+            if (burrow.distanceTo() < 8.0) burrowsList.remove(burrow);
         }
     }
 
@@ -208,13 +207,12 @@ public class DianaSolver {
                     solver.resetFitter();
                 }
             }
-            if (isHoldingSpoon()) {
-                for (Burrow burrow : getBurrowsList()) {
-                    if (burrow.ticks > 0 && !burrow.isGuess()) {
-                        burrow.tick();
-                        if (burrow.ticks == 0) {
-                            burrowsList.remove(burrow);
-                        }
+            boolean hasSpoon = isHoldingSpoon();
+            for (Burrow burrow : getBurrowsList()) {
+                if (burrow.ticks > 0 && !burrow.isGuess() && (hasSpoon || burrow.distanceTo() > 32.0)) {
+                    burrow.tick();
+                    if (burrow.ticks == 0) {
+                        burrowsList.remove(burrow);
                     }
                 }
             }
@@ -235,7 +233,7 @@ public class DianaSolver {
                 Vec3d pos = burrow.getVec();
                 Vec3d textPos = pos.subtract(0.0, 0.25, 0.0);
                 if (burrow.type.equals(BurrowType.Guess)) {
-                    float distScale = (float) (1 + mc.player.getPos().distanceTo(pos) * 0.1f);
+                    float distScale = (float) (1 + burrow.distanceTo() * 0.1f);
                     float scale = Math.max(0.05f * distScale, 0.05f);
                     event.drawBeam(pos, 256, true, guessColor.value());
                     event.drawText(textPos, label, scale, true, RenderColor.white);
@@ -306,6 +304,10 @@ public class DianaSolver {
 
         public Vec3d getVec() {
             return this.pos.toCenterPos().add(0, 0.5, 0);
+        }
+
+        public double distanceTo() {
+            return mc.player.getPos().distanceTo(this.getVec());
         }
 
         public boolean isGuess() {

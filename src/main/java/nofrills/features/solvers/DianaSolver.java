@@ -2,7 +2,6 @@ package nofrills.features.solvers;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
@@ -20,10 +19,7 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static nofrills.Main.mc;
 
@@ -77,6 +73,14 @@ public class DianaSolver {
         ticks = 10;
     }
 
+    private static boolean isDugMessage(String msg) {
+        return !msg.contains(":") && (msg.startsWith("You dug out a Griffin Burrow!")
+                || msg.startsWith("You finished the Griffin burrow chain!")
+                || (msg.contains("You dug out ") && msg.endsWith(" coins!"))
+                || msg.startsWith("RARE DROP! You dug out ")
+        );
+    }
+
     private static DianaWarp findWarp(Vec3d pos) {
         double lowestDist = mc.player.getPos().distanceTo(pos);
         DianaWarp closestWarp = null;
@@ -98,13 +102,11 @@ public class DianaSolver {
         float offsetX = packet.getOffsetX();
         float offsetY = packet.getOffsetY();
         float offsetZ = packet.getOffsetZ();
-        if (type.equals(ParticleTypes.DRIPPING_LAVA)) {
-            if (count == 2 && speed == -0.5f && offsetX == 0.0f && offsetY == 0.0f && offsetZ == 0.0f) {
-                return BurrowType.Guess;
-            }
-            if (count == 2 && speed == 0.01f && offsetX == 0.35f && offsetY == 0.1f && offsetZ == 0.35f) {
-                return BurrowType.Treasure;
-            }
+        if (type.equals(ParticleTypes.FIREWORK) && count == 1 && speed == 0.0f && offsetX == 0.0f && offsetY == 0.0f && offsetZ == 0.0f) {
+            return BurrowType.Guess;
+        }
+        if (type.equals(ParticleTypes.DRIPPING_LAVA) && count == 2 && speed == 0.01f && offsetX == 0.35f && offsetY == 0.1f && offsetZ == 0.35f) {
+            return BurrowType.Treasure;
         }
         if (type.equals(ParticleTypes.CRIT) && count == 3 && speed == 0.01f && offsetX == 0.5f && offsetY == 0.1f && offsetZ == 0.5f) {
             return BurrowType.Enemy;
@@ -117,7 +119,7 @@ public class DianaSolver {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (instance.isActive() && Utils.isInArea("Hub")) {
+        if (instance.isActive() && Utils.isInHub()) {
             BurrowType type = getTypeFromPacket(event.packet);
             if (type.equals(BurrowType.Guess) && ticks > 0 && solver.getLastDist(event.pos) < 4.0) {
                 solver.addPos(event.pos);
@@ -131,20 +133,18 @@ public class DianaSolver {
                     }
                 }
             }
-            if (!type.equals(BurrowType.None) && isHoldingSpoon()) {
+            if (!type.equals(BurrowType.None) && !type.equals(BurrowType.Guess) && isHoldingSpoon()) {
                 BlockPos pos = BlockPos.ofFloored(event.pos.subtract(0, 0.5, 0));
                 Burrow nearby = new Burrow(pos, type);
-                if (mc.world.getBlockState(pos).getBlock().equals(Blocks.GRASS_BLOCK)) {
-                    burrowsList.removeIf(burrow -> burrow.equals(nearby) || (burrow.isGuess() && burrow.isNear(nearby)));
-                    burrowsList.add(nearby);
-                }
+                burrowsList.removeIf(burrow -> burrow.equals(nearby) || (burrow.isGuess() && burrow.isNear(nearby)));
+                burrowsList.add(nearby);
             }
         }
     }
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.currentScreen == null && warpKey.key() == event.key && Utils.isInArea("Hub")) {
+        if (instance.isActive() && mc.currentScreen == null && warpKey.key() == event.key && Utils.isInHub()) {
             if (event.action == GLFW.GLFW_PRESS) {
                 Optional<Burrow> burrow = getBurrowsList().stream().filter(Burrow::isGuess).findFirst();
                 if (burrow.isPresent()) {
@@ -153,7 +153,7 @@ public class DianaSolver {
                         Utils.infoFormat("§aWarping to {}.", warp.name);
                         Utils.sendMessage(Utils.format("/warp {}", warp.id));
                     } else {
-                        Utils.info("§7No closest warp found for the guess burrow, not warping.");
+                        Utils.info("§7No close warp found for the guess burrow, not warping.");
                     }
                 } else {
                     Utils.info("§7No guess burrow exists, not warping.");
@@ -165,39 +165,56 @@ public class DianaSolver {
 
     @EventHandler
     private static void onUseItem(InteractItemEvent event) {
-        if (instance.isActive() && Utils.isInArea("Hub") && isHoldingSpoon() && ticks == 0) {
+        if (instance.isActive() && Utils.isInHub() && isHoldingSpoon() && ticks == 0) {
             onSpooningStart();
         }
     }
 
     @EventHandler
     private static void onInteractBlock(InteractBlockEvent event) {
-        if (instance.isActive() && Utils.isInArea("Hub") && isHoldingSpoon()) {
-            burrowsList.removeIf(burrow -> burrow.isGuess() && burrow.pos.equals(event.blockHitResult.getBlockPos()));
+        if (instance.isActive() && Utils.isInHub() && isHoldingSpoon()) {
+            BlockPos pos = event.blockHitResult.getBlockPos();
+            burrowsList.removeIf(burrow -> burrow.isGuess() && burrow.pos.equals(pos));
+            if (ticks == 0 && burrowsList.stream().noneMatch(burrow -> burrow.pos.equals(pos))) {
+                onSpooningStart();
+            }
         }
     }
 
     @EventHandler
     private static void onAttackBlock(AttackBlockEvent event) {
-        if (instance.isActive() && Utils.isInArea("Hub") && isHoldingSpoon()) {
+        if (instance.isActive() && Utils.isInHub() && isHoldingSpoon()) {
             burrowsList.removeIf(burrow -> burrow.isGuess() && burrow.pos.equals(event.blockPos));
         }
     }
 
     @EventHandler
+    private static void onChat(ChatMsgEvent event) {
+        if (instance.isActive() && Utils.isInHub() && isDugMessage(event.messagePlain) && !burrowsList.isEmpty()) {
+            Vec3d playerPos = mc.player.getPos();
+            List<Burrow> burrows = getBurrowsList();
+            burrows.sort(Comparator.comparingDouble(burrow -> burrow.getVec().distanceTo(playerPos)));
+            Burrow burrow = burrows.getFirst();
+            if (burrow.getVec().distanceTo(playerPos) < 8.0) burrowsList.remove(burrow);
+        }
+    }
+
+    @EventHandler
     private static void onTick(ServerTickEvent event) {
-        if (instance.isActive() && Utils.isInArea("Hub")) {
+        if (instance.isActive() && Utils.isInHub()) {
             if (ticks > 0) {
                 ticks--;
                 if (ticks == 0) {
                     solver.resetFitter();
                 }
             }
-            for (Burrow burrow : getBurrowsList()) {
-                if (burrow.ticks > 0 && !burrow.isGuess()) {
-                    burrow.tick();
-                    if (burrow.ticks == 0) {
-                        burrowsList.remove(burrow);
+            if (isHoldingSpoon()) {
+                for (Burrow burrow : getBurrowsList()) {
+                    if (burrow.ticks > 0 && !burrow.isGuess()) {
+                        burrow.tick();
+                        if (burrow.ticks == 0) {
+                            burrowsList.remove(burrow);
+                        }
                     }
                 }
             }
@@ -206,7 +223,7 @@ public class DianaSolver {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && Utils.isInArea("Hub")) {
+        if (instance.isActive() && Utils.isInHub()) {
             for (Burrow burrow : getBurrowsList()) {
                 MutableText label = switch (burrow.type) {
                     case Guess -> Text.literal("Guess");
@@ -217,8 +234,9 @@ public class DianaSolver {
                 };
                 Vec3d pos = burrow.getVec();
                 if (burrow.type.equals(BurrowType.Guess)) {
+                    float scale = (float) Math.max(0.1f * (1 + mc.player.getPos().distanceTo(pos) * 0.075f), 0.1f);
                     event.drawBeam(pos, 256, true, guessColor.value());
-                    event.drawText(pos, label, 0.1f, true, RenderColor.white);
+                    event.drawText(pos, label, scale, true, RenderColor.white);
                     if (guessTracer.value()) {
                         event.drawTracer(pos, guessTracerColor.value());
                     }
@@ -269,7 +287,7 @@ public class DianaSolver {
     public static class Burrow {
         public BlockPos pos;
         public BurrowType type;
-        public int ticks = 30;
+        public int ticks = 60;
 
         public Burrow(BlockPos pos, BurrowType type) {
             this.pos = pos;

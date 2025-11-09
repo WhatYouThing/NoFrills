@@ -181,7 +181,7 @@ public class Utils {
     }
 
     public static boolean isInDungeons() {
-        return isInZone(Symbols.zone + " The Catacombs", false);
+        return isInArea("Catacombs");
     }
 
     /**
@@ -228,6 +228,10 @@ public class Utils {
      */
     public static boolean isInGarden() {
         return isInArea("Garden");
+    }
+
+    public static boolean isInHub() {
+        return isInArea("Hub");
     }
 
     /**

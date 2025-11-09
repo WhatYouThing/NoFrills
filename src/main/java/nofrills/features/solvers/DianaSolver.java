@@ -233,10 +233,12 @@ public class DianaSolver {
                     default -> Text.literal("Unknown");
                 };
                 Vec3d pos = burrow.getVec();
+                Vec3d textPos = pos.subtract(0.0, 0.25, 0.0);
                 if (burrow.type.equals(BurrowType.Guess)) {
-                    float scale = (float) Math.max(0.1f * (1 + mc.player.getPos().distanceTo(pos) * 0.075f), 0.1f);
+                    float distScale = (float) (1 + mc.player.getPos().distanceTo(pos) * 0.1f);
+                    float scale = Math.max(0.05f * distScale, 0.05f);
                     event.drawBeam(pos, 256, true, guessColor.value());
-                    event.drawText(pos, label, scale, true, RenderColor.white);
+                    event.drawText(textPos, label, scale, true, RenderColor.white);
                     if (guessTracer.value()) {
                         event.drawTracer(pos, guessTracerColor.value());
                     }
@@ -248,7 +250,7 @@ public class DianaSolver {
                         default -> RenderColor.white;
                     };
                     event.drawBeam(pos, 256, true, color);
-                    event.drawText(pos, label, 0.1f, true, RenderColor.white);
+                    event.drawText(textPos, label, 0.05f, true, RenderColor.white);
                 }
             }
         }
@@ -287,7 +289,7 @@ public class DianaSolver {
     public static class Burrow {
         public BlockPos pos;
         public BurrowType type;
-        public int ticks = 60;
+        public int ticks = 40;
 
         public Burrow(BlockPos pos, BurrowType type) {
             this.pos = pos;

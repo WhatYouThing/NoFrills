@@ -33,6 +33,10 @@ public class CurveSolver {
         return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) : mc.player.getEyePos().distanceTo(pos);
     }
 
+    public boolean isWithinDist(Vec3d pos, double eyeDist, double lastDist) {
+        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) <= lastDist : mc.player.getEyePos().distanceTo(pos) <= eyeDist;
+    }
+
     public Vec3d getSolvedPos() {
         return this.lastPos;
     }

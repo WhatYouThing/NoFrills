@@ -121,7 +121,7 @@ public class DianaSolver {
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive() && Utils.isInHub()) {
             BurrowType type = getTypeFromPacket(event.packet);
-            if (type.equals(BurrowType.Guess) && ticks > 0 && solver.getLastDist(event.pos) < 4.0) {
+            if (type.equals(BurrowType.Guess) && ticks > 0 && solver.isWithinDist(event.pos, 8.0, 4.0)) {
                 solver.addPos(event.pos);
                 ticks = 10;
                 Vec3d pos = solver.getSolvedPos();
@@ -203,17 +203,13 @@ public class DianaSolver {
         if (instance.isActive() && Utils.isInHub()) {
             if (ticks > 0) {
                 ticks--;
-                if (ticks == 0) {
-                    solver.resetFitter();
-                }
+                if (ticks == 0) solver.resetFitter();
             }
             boolean hasSpoon = isHoldingSpoon();
             for (Burrow burrow : getBurrowsList()) {
-                if (burrow.ticks > 0 && !burrow.isGuess() && (hasSpoon || burrow.distanceTo() > 32.0)) {
-                    burrow.tick();
-                    if (burrow.ticks == 0) {
-                        burrowsList.remove(burrow);
-                    }
+                if (burrow.ticks > 0 && !burrow.isGuess()) {
+                    if (hasSpoon) burrow.tick();
+                    if (burrow.ticks == 0 || burrow.distanceTo() > 36.0) burrowsList.remove(burrow);
                 }
             }
         }
@@ -223,24 +219,25 @@ public class DianaSolver {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInHub()) {
             for (Burrow burrow : getBurrowsList()) {
-                MutableText label = switch (burrow.type) {
-                    case Guess -> Text.literal("Guess");
-                    case Treasure -> Text.literal("Treasure");
-                    case Enemy -> Text.literal("Enemy");
-                    case Start -> Text.literal("Start");
-                    default -> Text.literal("Unknown");
-                };
                 Vec3d pos = burrow.getVec();
                 Vec3d textPos = pos.subtract(0.0, 0.25, 0.0);
+                double dist = burrow.distanceTo();
+                float distScale = (float) (1 + dist * 0.1f);
+                float scale = Math.max(0.05f * distScale, 0.05f);
                 if (burrow.type.equals(BurrowType.Guess)) {
-                    float distScale = (float) (1 + burrow.distanceTo() * 0.1f);
-                    float scale = Math.max(0.05f * distScale, 0.05f);
+                    MutableText label = Text.literal(Utils.format("Guess §e{}m", (int) Math.floor(dist)));
                     event.drawBeam(pos, 256, true, guessColor.value());
-                    event.drawText(textPos, label, scale, true, RenderColor.white);
+                    event.drawText(textPos, label, scale, true, RenderColor.fromHex(guessColor.value().hex));
                     if (guessTracer.value()) {
                         event.drawTracer(pos, guessTracerColor.value());
                     }
                 } else {
+                    MutableText label = switch (burrow.type) {
+                        case Treasure -> Text.literal("Treasure");
+                        case Enemy -> Text.literal("Enemy");
+                        case Start -> Text.literal("Start");
+                        default -> Text.literal("Unknown");
+                    };
                     RenderColor color = switch (burrow.type) {
                         case Treasure -> treasureColor.value();
                         case Enemy -> enemyColor.value();
@@ -248,7 +245,7 @@ public class DianaSolver {
                         default -> RenderColor.white;
                     };
                     event.drawBeam(pos, 256, true, color);
-                    event.drawText(textPos, label, 0.05f, true, RenderColor.white);
+                    event.drawText(textPos, label, scale, true, RenderColor.fromHex(color.hex));
                 }
             }
         }
@@ -287,7 +284,7 @@ public class DianaSolver {
     public static class Burrow {
         public BlockPos pos;
         public BurrowType type;
-        public int ticks = 40;
+        public int ticks = 60;
 
         public Burrow(BlockPos pos, BurrowType type) {
             this.pos = pos;

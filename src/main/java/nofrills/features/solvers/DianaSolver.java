@@ -2,17 +2,12 @@ package nofrills.features.solvers;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingColor;
-import nofrills.config.SettingKeybind;
+import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.misc.CurveSolver;
 import nofrills.misc.RenderColor;
@@ -26,6 +21,7 @@ import static nofrills.Main.mc;
 public class DianaSolver {
     public static final Feature instance = new Feature("dianaSolver");
 
+    public static final SettingEnum<GuessMode> guessMode = new SettingEnum<>(GuessMode.Lava, GuessMode.class, "guessMode", instance);
     public static final SettingBool guessTracer = new SettingBool(true, "guessTracer", instance);
     public static final SettingColor guessColor = new SettingColor(RenderColor.fromArgb(0xaaffffff), "guessColor", instance);
     public static final SettingColor guessTracerColor = new SettingColor(RenderColor.fromArgb(0xff00ff00), "guessTracerColor", instance);
@@ -76,7 +72,7 @@ public class DianaSolver {
     private static boolean isDugMessage(String msg) {
         return !msg.contains(":") && (msg.startsWith("You dug out a Griffin Burrow!")
                 || msg.startsWith("You finished the Griffin burrow chain!")
-                || (msg.contains("You dug out ") && msg.endsWith(" coins!"))
+                || (msg.startsWith("Wow! You dug out ") && msg.endsWith(" coins!"))
                 || msg.startsWith("RARE DROP! You dug out ")
         );
     }
@@ -95,32 +91,23 @@ public class DianaSolver {
         return closestWarp;
     }
 
-    private static BurrowType getTypeFromPacket(ParticleS2CPacket packet) {
-        ParticleType<?> type = packet.getParameters().getType();
-        int count = packet.getCount();
-        float speed = packet.getSpeed();
-        float offsetX = packet.getOffsetX();
-        float offsetY = packet.getOffsetY();
-        float offsetZ = packet.getOffsetZ();
-        if (type.equals(ParticleTypes.FIREWORK) && count == 1 && speed == 0.0f && offsetX == 0.0f && offsetY == 0.0f && offsetZ == 0.0f) {
+    private static BurrowType getTypeFromPacket(SpawnParticleEvent event) {
+        GuessMode mode = guessMode.value();
+        if (event.matchParameters(ParticleTypes.DRIPPING_LAVA, 2, -0.5, 0.0, 0.0, 0.0) && mode.equals(GuessMode.Lava))
             return BurrowType.Guess;
-        }
-        if (type.equals(ParticleTypes.DRIPPING_LAVA) && count == 2 && speed == 0.01f && offsetX == 0.35f && offsetY == 0.1f && offsetZ == 0.35f) {
-            return BurrowType.Treasure;
-        }
-        if (type.equals(ParticleTypes.CRIT) && count == 3 && speed == 0.01f && offsetX == 0.5f && offsetY == 0.1f && offsetZ == 0.5f) {
-            return BurrowType.Enemy;
-        }
-        if (type.equals(ParticleTypes.ENCHANTED_HIT) && count == 4 && speed == 0.01f && offsetX == 0.5f && offsetY == 0.1f && offsetZ == 0.5f) {
-            return BurrowType.Start;
-        }
+        if (event.matchParameters(ParticleTypes.FIREWORK, 1, 0.0, 0.0, 0.0, 0.0) && mode.equals(GuessMode.Firework))
+            return BurrowType.Guess;
+        if (event.matchParameters(ParticleTypes.DRIPPING_LAVA, 2, 0.01, 0.35, 0.1, 0.35)) return BurrowType.Treasure;
+        if (event.matchParameters(ParticleTypes.CRIT, 3, 0.01, 0.5, 0.1, 0.5)) return BurrowType.Enemy;
+        if (event.matchParameters(ParticleTypes.ENCHANTED_HIT, 4, 0.01, 0.5, 0.1, 0.5f)) return BurrowType.Start;
         return BurrowType.None;
     }
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive() && Utils.isInHub()) {
-            BurrowType type = getTypeFromPacket(event.packet);
+            BurrowType type = getTypeFromPacket(event);
+            if (type.equals(BurrowType.None)) return;
             if (type.equals(BurrowType.Guess) && ticks > 0 && solver.isWithinDist(event.pos, 8.0, 4.0)) {
                 solver.addPos(event.pos);
                 ticks = 10;
@@ -133,7 +120,7 @@ public class DianaSolver {
                     }
                 }
             }
-            if (!type.equals(BurrowType.None) && !type.equals(BurrowType.Guess) && isHoldingSpoon()) {
+            if (!type.equals(BurrowType.Guess) && isHoldingSpoon()) {
                 BlockPos pos = BlockPos.ofFloored(event.pos.subtract(0, 0.5, 0));
                 Burrow nearby = new Burrow(pos, type);
                 burrowsList.removeIf(burrow -> burrow.equals(nearby) || (burrow.isGuess() && burrow.isNear(nearby)));
@@ -265,6 +252,11 @@ public class DianaSolver {
         Enemy,
         Start,
         None
+    }
+
+    public enum GuessMode {
+        Lava,
+        Firework
     }
 
     public static class DianaWarp {

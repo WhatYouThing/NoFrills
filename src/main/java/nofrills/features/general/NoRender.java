@@ -60,14 +60,11 @@ public class NoRender {
             ParticleTypes.GUST_EMITTER_LARGE
     );
 
-    public static FogData getEmptyFog() {
-        FogData data = new FogData();
-        data.renderDistanceStart = 512;
-        data.renderDistanceEnd = 512;
-        data.environmentalStart = 512;
-        data.environmentalEnd = 512;
-        data.skyEnd = 512;
-        data.cloudEnd = 512;
+    public static FogData getFogAsEmpty(FogData data) {
+        data.renderDistanceStart = Float.MAX_VALUE;
+        data.renderDistanceEnd = Float.MAX_VALUE;
+        data.environmentalStart = Float.MAX_VALUE;
+        data.environmentalEnd = Float.MAX_VALUE;
         return data;
     }
 

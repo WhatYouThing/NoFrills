@@ -168,6 +168,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Fire Overlay", NoRender.fireOverlay, "Removes the fire overlay."),
                                 new Settings.Toggle("Break Particles", NoRender.breakParticles, "Removes the particles that appear when breaking blocks."),
                                 new Settings.Toggle("Boss Bar", NoRender.bossBar, "Hides the boss health bar that appears at the top of the screen."),
+                                new Settings.Toggle("Fog", NoRender.fog, "Hides the terrain/biome fog."),
                                 new Settings.Toggle("Effect Display", NoRender.effectDisplay, "Removes the potion effect display from the inventory and the top right of the screen."),
                                 new Settings.Toggle("Dead Entities", NoRender.deadEntities, "Hides entities that are in their death animation, and their health bars (if applicable)."),
                                 new Settings.Toggle("Dead Poof", NoRender.deadPoof, "Tries to hide the death \"poof\" particles that appear after a dead entity is deleted."),

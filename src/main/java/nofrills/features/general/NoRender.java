@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.render.fog.FogData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
@@ -29,6 +30,7 @@ public class NoRender {
     public static final SettingBool fireOverlay = new SettingBool(false, "fireOverlay", instance.key());
     public static final SettingBool breakParticles = new SettingBool(false, "breakParticles", instance.key());
     public static final SettingBool bossBar = new SettingBool(false, "bossBar", instance.key());
+    public static final SettingBool fog = new SettingBool(false, "fog", instance.key());
     public static final SettingBool effectDisplay = new SettingBool(false, "effectDisplay", instance.key());
     public static final SettingBool deadEntities = new SettingBool(false, "deadEntities", instance.key());
     public static final SettingBool deadPoof = new SettingBool(false, "deadPoof", instance.key());
@@ -45,20 +47,29 @@ public class NoRender {
             Pattern.compile(".* 0/.*" + Utils.Symbols.heart),
             Pattern.compile(".* 0/.*" + Utils.Symbols.heart + " " + Utils.Symbols.vampLow)
     );
-
     private static final HashSet<Block> treeBlocks = Sets.newHashSet(
             Blocks.MANGROVE_WOOD,
             Blocks.MANGROVE_LEAVES,
             Blocks.STRIPPED_SPRUCE_WOOD,
             Blocks.AZALEA_LEAVES
     );
-
     private static final HashSet<ParticleType<?>> explosionParticles = Sets.newHashSet(
             ParticleTypes.EXPLOSION,
             ParticleTypes.EXPLOSION_EMITTER,
             ParticleTypes.GUST,
             ParticleTypes.GUST_EMITTER_LARGE
     );
+
+    public static FogData getEmptyFog() {
+        FogData data = new FogData();
+        data.renderDistanceStart = 512;
+        data.renderDistanceEnd = 512;
+        data.environmentalStart = 512;
+        data.environmentalEnd = 512;
+        data.skyEnd = 512;
+        data.cloudEnd = 512;
+        return data;
+    }
 
     public static boolean isTreeBlock(Entity entity) {
         if (entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {

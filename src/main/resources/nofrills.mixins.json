@@ -17,6 +17,7 @@
     "EntityAttributeInstanceMixin",
     "EntityMixin",
     "EntityRendererMixin",
+    "FogRendererMixin",
     "GameOptionsMixin",
     "GameRendererMixin",
     "HandledScreenAccessor",

@@ -162,7 +162,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(EggHitsDisplay.class);
         eventBus.subscribe(BeaconTracer.class);
         eventBus.subscribe(CocoonAlert.class);
-        eventBus.subscribe(PageKeybinds.class);
+        eventBus.subscribe(GuiKeybinds.class);
         eventBus.subscribe(SecretChime.class);
         eventBus.subscribe(MelodyMessage.class);
         eventBus.subscribe(QuickClose.class);

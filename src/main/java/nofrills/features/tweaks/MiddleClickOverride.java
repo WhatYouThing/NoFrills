@@ -59,9 +59,10 @@ public class MiddleClickOverride {
             "The Hex",
             "Enchant Item",
             "Auction",
+            "Cosmetic",
             "Trap",
             "Gemstone",
-            "Heart of the ",
+            "Heart of the",
             "Widgets"
     );
 

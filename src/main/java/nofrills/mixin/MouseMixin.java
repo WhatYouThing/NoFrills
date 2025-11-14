@@ -3,6 +3,7 @@ package nofrills.mixin;
 import net.minecraft.client.Mouse;
 import nofrills.events.InputEvent;
 import nofrills.features.farming.SpaceFarmer;
+import nofrills.features.tweaks.NoCursorReset;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -24,6 +25,13 @@ public abstract class MouseMixin {
     private void onMouseMove(double timeDelta, CallbackInfo ci) {
         if (SpaceFarmer.instance.isActive() && SpaceFarmer.spaceHeld && mc.options.attackKey.isPressed()) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "onCursorPos", at = @At("TAIL"))
+    private void onCursorPos(long window, double x, double y, CallbackInfo ci) {
+        if (NoCursorReset.instance.isActive()) {
+            NoCursorReset.updateCursorPos(x, y);
         }
     }
 }

@@ -33,6 +33,7 @@ import nofrills.features.solvers.ExperimentSolver;
 import nofrills.features.solvers.SpookyChests;
 import nofrills.features.tweaks.DoubleUseFix;
 import nofrills.features.tweaks.MiddleClickOverride;
+import nofrills.features.tweaks.NoCursorReset;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.*;
@@ -170,6 +171,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(MelodyMessage.class);
         eventBus.subscribe(QuickClose.class);
         eventBus.subscribe(DungeonChestValue.class);
+        eventBus.subscribe(NoCursorReset.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

@@ -376,7 +376,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", true, MinibossHighlight.color, "The color of the miniboss highlight.")
                         ))),
                         new Module("Key Highlight", KeyHighlight.instance, "Highlights nearby Wither and Blood keys.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, KeyHighlight.color, "The color of the key highlight.")
+                                new Settings.Toggle("Highlight", KeyHighlight.highlight, "Renders a highlight + beam on top of Wither Keys."),
+                                new Settings.Toggle("Tracer", KeyHighlight.tracer, "Renders a tracer towards the Wither Key."),
+                                new Settings.ColorPicker("Highlight Color", true, KeyHighlight.color, "The color of the highlight."),
+                                new Settings.ColorPicker("Tracer Color", true, KeyHighlight.tracerColor, "The color of the tracer.")
                         ))),
                         new Module("Spirit Bow Highlight", SpiritBowHighlight.instance, "Highlights the Spirit Bow in the F4/M4 boss fight.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")

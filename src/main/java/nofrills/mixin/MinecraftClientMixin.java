@@ -68,13 +68,6 @@ public abstract class MinecraftClientMixin {
         }
     }
 
-    @Inject(method = "setScreen", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Mouse;unlockCursor()V", shift = At.Shift.AFTER))
-    private void onAfterSetScreenCursor(Screen screen, CallbackInfo ci) {
-        if (NoCursorReset.instance.isActive()) {
-            NoCursorReset.setCursorPos(screen);
-        }
-    }
-
     @Inject(method = "setScreen", at = @At("TAIL"))
     private void onOpenScreen(Screen screen, CallbackInfo ci) {
         if (this.world == null) return;

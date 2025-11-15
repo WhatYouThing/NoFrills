@@ -30,8 +30,8 @@ public class GuiKeybinds {
             Item item = stack.getItem();
             if (item.equals(Items.ARROW) || item.equals(Items.PLAYER_HEAD)) {
                 String name = Utils.toPlain(stack.getName());
-                if (name.contains("Next Page")) return ButtonType.Next;
-                if (name.contains("Previous Page")) return ButtonType.Previous;
+                if (name.contains("Next Page") || name.contains("Scroll Right")) return ButtonType.Next;
+                if (name.contains("Previous Page") || name.contains("Scroll Left")) return ButtonType.Previous;
                 if (name.equals("Scroll Up")) return ButtonType.Up;
                 if (name.equals("Scroll Down")) return ButtonType.Down;
                 if (name.endsWith("Back")) return ButtonType.Back;

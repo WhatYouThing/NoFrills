@@ -181,7 +181,7 @@ public class Utils {
     }
 
     public static boolean isInDungeons() {
-        return isInZone(Symbols.zone + " The Catacombs", false);
+        return isInArea("Catacombs");
     }
 
     /**
@@ -205,7 +205,7 @@ public class Utils {
     }
 
     public static boolean isInKuudra() {
-        return SkyblockData.getArea().equals("Kuudra");
+        return isInArea("Kuudra");
     }
 
     public static boolean isInChateau() {

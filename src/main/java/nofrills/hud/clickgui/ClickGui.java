@@ -468,6 +468,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Quick Close", QuickClose.instance, "Quickly close Dungeon secret and/or loot chests by pressing any of the movement keys (WASD)."),
                         new Module("Chest Value", DungeonChestValue.instance, "Calculates the value of your Dungeons loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
                                 new Settings.ColorPicker("Background", true, DungeonChestValue.background, "The color of the background of the value text.")
+                        ))),
+                        new Module("Tick Timers", TickTimers.instance, "Displays a timer for various things during the F7/M7 boss fight.\nUses the Tick Timers HUD element found in the HUD editor.", new Settings(List.of(
+                                new Settings.Toggle("Storm Timer", TickTimers.storm, "Shows a timer for the pads in 2nd phase."),
+                                new Settings.Toggle("Terminal Start Timer", TickTimers.terminalStart, "Shows a timer for the 3rd phase starting."),
+                                new Settings.Toggle("Goldor Timer", TickTimers.goldor, "Shows a timer for Goldor's death tick in 3rd phase.")
                         )))
                 )),
                 new Category("Kuudra", List.of(

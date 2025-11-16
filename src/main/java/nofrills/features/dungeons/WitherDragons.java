@@ -49,7 +49,7 @@ public class WitherDragons {
     private static final EntityCache dragonCache = new EntityCache();
     private static boolean splitDone = false;
 
-    private static boolean isDragonPhase() {
+    public static boolean isDragonPhase() {
         return mc.player != null && mc.player.getPos().getY() < 50 && Utils.isInDungeonBoss("7");
     }
 
@@ -175,7 +175,7 @@ public class WitherDragons {
                 for (Dragon drag : dragons) {
                     if (!drag.hasEntity()) {
                         for (Entity collar : drag.cache.get()) {
-                            if (dragon.distanceTo(collar) <= 8.0) {
+                            if (Utils.horizontalDistance(dragon, collar) <= 8.0) {
                                 drag.setEntity(dragon);
                                 break;
                             }
@@ -191,7 +191,7 @@ public class WitherDragons {
                     if (drag.isCollar(stand)) {
                         drag.cache.add(stand);
                         for (Entity dragon : dragonCache.get()) {
-                            if (dragon.distanceTo(stand) <= 8.0) {
+                            if (Utils.horizontalDistance(dragon, stand) <= 8.0) {
                                 drag.setEntity((EnderDragonEntity) dragon);
                                 break;
                             }

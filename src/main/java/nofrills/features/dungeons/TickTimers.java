@@ -38,7 +38,7 @@ public class TickTimers {
             if (timer.currentTicks == 0) continue;
             String duration = Utils.formatDecimal(timer.currentTicks / 20.0);
             String label = switch (timer.type) {
-                case Storm -> "§9Pad";
+                case Storm -> "§3Pad";
                 case TerminalStart -> "§eTerminals";
                 case Goldor -> "§6Death Tick";
             };

@@ -173,6 +173,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(DungeonChestValue.class);
         eventBus.subscribe(NoCursorReset.class);
         eventBus.subscribe(TickTimers.class);
+        eventBus.subscribe(RelicHighlight.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

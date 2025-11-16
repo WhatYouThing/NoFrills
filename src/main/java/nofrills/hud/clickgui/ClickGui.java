@@ -473,7 +473,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Storm Timer", TickTimers.storm, "Shows a timer for the pads in 2nd phase."),
                                 new Settings.Toggle("Terminal Start Timer", TickTimers.terminalStart, "Shows a timer for the 3rd phase starting."),
                                 new Settings.Toggle("Goldor Timer", TickTimers.goldor, "Shows a timer for Goldor's death tick in 3rd phase.")
-                        )))
+                        ))),
+                        new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic.")
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(

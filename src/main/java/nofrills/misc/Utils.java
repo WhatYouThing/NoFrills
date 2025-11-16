@@ -587,6 +587,10 @@ public class Utils {
         return MathHelper.sqrt(x * x + z * z);
     }
 
+    public static float horizontalDistance(Entity from, Entity to) {
+        return horizontalDistance(from.getPos(), to.getPos());
+    }
+
     /**
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */

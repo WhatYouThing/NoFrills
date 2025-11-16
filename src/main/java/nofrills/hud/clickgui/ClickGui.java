@@ -550,7 +550,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt.")
                 )),
                 new Category("Mining", List.of(
-                        new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your pickaxe ability cooldown is finished.\nBecomes more reliable when the pickaxe ability tablist widget is present."),
+                        new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability cooldown is finished.\n\nIf present, uses the Pickaxe Ability tablist widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe. Might be inaccurate in some cases."),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
                                 new Settings.ColorPicker("Lapis Color", false, CorpseHighlight.lapisColor, "The color of the Lapis corpse."),
                                 new Settings.ColorPicker("Mineral Color", false, CorpseHighlight.mineralColor, "The color of the Tungsten corpse."),

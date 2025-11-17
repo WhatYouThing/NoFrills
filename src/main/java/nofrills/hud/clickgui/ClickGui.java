@@ -409,7 +409,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve Select", TerminalSolvers.select, "Solves the \"Select all\" terminal."),
                                 new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal.")
                         ))),
-                        new Module("Terracotta Timers", TerracottaTimer.instance, "Renders timers on screen and for every dead terracotta in F6/M6."),
+                        new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.\nAlso displays timers for the 1st Gyro and Sadan's last giant, useful if you are Mage.", new Settings(List.of(
+                                new Settings.Toggle("Mage Check", TerracottaTimer.mageCheck, "If enabled, prevents the 1st Gyro and last giant timers from appearing if you are not Mage.")
+                        ))),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(
                                 new Settings.Toggle("Spawn Alert", WitherDragons.alert, "Alerts you when a dragon is about to spawn.\nThis option also calculates the priority on the initial spawn based on your selected class."),
                                 new Settings.SliderDouble("Split Power", 0, 32, 0.1, WitherDragons.power, "The required Power blessing level to consider a split possible.\nLeaving this option at 0 is recommended for party finder teams."),

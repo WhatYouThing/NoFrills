@@ -12,18 +12,18 @@ import nofrills.misc.Utils;
 public class MimicMessage {
     public static final Feature instance = new Feature("mimicMessage");
 
-    public static final SettingString msg = new SettingString("/pc Mimic killed, +2 score!", "msg", instance);
+    public static final SettingString msg = new SettingString("/pc Mimic Killed!", "msg", instance);
 
     private static int mimicId = -1;
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && event.entity instanceof ZombieEntity zombie && zombie.isBaby()) {
-            GameProfile textures = Utils.getTextures(Utils.getEntityArmor(zombie).getFirst()); // gets the helmet textures
+            GameProfile textures = Utils.getTextures(Utils.getEntityArmor(zombie).getFirst());
             if (mimicId == -1 && Utils.isTextureEqual(textures, "e19c12543bc7792605ef68e1f8749ae8f2a381d9085d4d4b780ba1282d3597a0")) {
                 mimicId = zombie.getId();
             }
-            if (zombie.getHealth() <= 0.0f && mimicId == zombie.getId()) {
+            if (zombie.getHealth() == 0.0f && mimicId == zombie.getId()) {
                 Utils.sendMessage(msg.value());
             }
         }

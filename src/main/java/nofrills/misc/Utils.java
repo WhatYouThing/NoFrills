@@ -634,7 +634,7 @@ public class Utils {
         List<String> lines = new ArrayList<>();
         if (mc.getNetworkHandler() != null) {
             for (PlayerListEntry entry : new ArrayList<>(mc.getNetworkHandler().getPlayerList())) {
-                if (entry.getDisplayName() != null) {
+                if (entry != null && entry.getDisplayName() != null) {
                     lines.add(toPlain(entry.getDisplayName()).trim());
                 }
             }

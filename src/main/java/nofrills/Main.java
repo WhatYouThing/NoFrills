@@ -174,6 +174,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(NoCursorReset.class);
         eventBus.subscribe(TickTimers.class);
         eventBus.subscribe(RelicHighlight.class);
+        eventBus.subscribe(GemstoneDesyncFix.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

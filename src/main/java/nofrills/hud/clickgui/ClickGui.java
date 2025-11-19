@@ -270,10 +270,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Old Island Only", OldSafewalk.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\n- Fixes the rare disconnects that occur while doing Tarantula slayer."),
-                        new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", BreakResetFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", BreakResetFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
                         new Module("No Confirm Screen", NoConfirmScreen.instance, "Removes the \"Confirm Command Execution\" screen and allows the command to run anyways."),
                         new Module("No Cursor Reset", NoCursorReset.instance, "Retains your cursor position between container screens.", new Settings(List.of(
                                 new Settings.SliderInt("Clear Time", 0, 1200, 5, NoCursorReset.clearTicks, "The amount of ticks until your last cursor position is forgotten. Set to 0 to always remember.")
@@ -575,6 +571,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Temple Skip", TempleSkip.instance, "Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, TempleSkip.color, "The color of the skip highlight.")
+                        ))),
+                        new Module("Gemstone Desync Fix", GemstoneDesyncFix.instance, "Fixes adjacent gemstone blocks not correctly updating when mining.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", GemstoneDesyncFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", GemstoneDesyncFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        ))),
+                        new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress, also known as HSM.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", BreakResetFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", BreakResetFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         )))
                 )),
                 new Category("Farming", List.of(

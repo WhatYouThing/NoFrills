@@ -19,6 +19,11 @@ public class PlainLabel extends LabelComponent {
     }
 
     @Override
+    public boolean onMouseDown(double mouseX, double mouseY, int button) {
+        return false;
+    }
+
+    @Override
     public Component tooltip(Text tooltip) {
         this.plainTooltip = tooltip.getString().replaceAll("\n", " ");
         return super.tooltip(tooltip);

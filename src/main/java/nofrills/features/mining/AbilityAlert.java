@@ -7,7 +7,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.ChatMsgEvent;
-import nofrills.events.ServerTickEvent;
+import nofrills.events.WorldTickEvent;
 import nofrills.misc.Utils;
 
 import static nofrills.Main.mc;
@@ -19,6 +19,10 @@ public class AbilityAlert {
 
     private static boolean isMiningTool(ItemStack stack) {
         return !stack.isEmpty() && !Utils.getRightClickAbility(stack).isEmpty() && Utils.hasEitherStat(stack, "Mining Speed");
+    }
+
+    private static boolean isUsedMessage(String msg) {
+        return msg.startsWith("You used your ") && msg.endsWith(" Pickaxe Ability!");
     }
 
     private static ItemStack getMiningTool() {
@@ -49,8 +53,7 @@ public class AbilityAlert {
 
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
-        String msg = event.messagePlain;
-        if (instance.isActive() && !Utils.isInDungeons() && msg.startsWith("You used your ") && msg.endsWith(" Pickaxe Ability!")) {
+        if (instance.isActive() && !Utils.isInDungeons() && isUsedMessage(event.messagePlain)) {
             ToolData data = new ToolData();
             if (!data.tool.isEmpty() && !data.ability.isEmpty() && data.widget.isEmpty()) {
                 for (String line : Utils.getLoreLines(data.tool).reversed()) {
@@ -64,7 +67,7 @@ public class AbilityAlert {
     }
 
     @EventHandler
-    private static void onServerTick(ServerTickEvent event) {
+    private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && !Utils.isInDungeons()) {
             ToolData data = new ToolData();
             if (!data.tool.isEmpty() && !data.ability.isEmpty() && !data.widget.isEmpty()) {

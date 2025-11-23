@@ -48,6 +48,7 @@ public class VacuumSolver {
     }
 
     private static void onVacuumStart() {
+        currentPos = null;
         solver.resetFitter();
         ticks = 40;
     }

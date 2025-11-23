@@ -34,6 +34,7 @@ public class RadarSolver {
     }
 
     private static void onRadarStart() {
+        currentPos = null;
         solver.resetFitter();
         ticks = 40;
     }

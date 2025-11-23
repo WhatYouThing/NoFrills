@@ -75,6 +75,7 @@ public class HoppitySolver {
     }
 
     private static void onLocatingStart() {
+        currentEgg = null;
         solver.resetFitter();
         ticks = 40;
     }

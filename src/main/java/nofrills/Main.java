@@ -17,10 +17,7 @@ import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
 import nofrills.features.farming.PlotBorders;
 import nofrills.features.farming.SpaceFarmer;
-import nofrills.features.fishing.CapTracker;
-import nofrills.features.fishing.MuteDrake;
-import nofrills.features.fishing.RareAnnounce;
-import nofrills.features.fishing.RareGlow;
+import nofrills.features.fishing.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
 import nofrills.features.kuudra.*;
@@ -174,6 +171,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(GemstoneDesyncFix.class);
         eventBus.subscribe(DianaSolver.class);
         eventBus.subscribe(HoppitySolver.class);
+        eventBus.subscribe(RadarSolver.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

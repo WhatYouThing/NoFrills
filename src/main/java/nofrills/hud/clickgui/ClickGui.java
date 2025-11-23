@@ -14,10 +14,7 @@ import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
 import nofrills.features.farming.PlotBorders;
 import nofrills.features.farming.SpaceFarmer;
-import nofrills.features.fishing.CapTracker;
-import nofrills.features.fishing.MuteDrake;
-import nofrills.features.fishing.RareAnnounce;
-import nofrills.features.fishing.RareGlow;
+import nofrills.features.fishing.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
 import nofrills.features.kuudra.*;
@@ -366,6 +363,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Replace Message", RareAnnounce.replace, "Replaces the catch message of rare sea creatures with colored versions."),
                                 new Settings.Toggle("Send Message", RareAnnounce.sendMsg, "Sends a specific message once you catch a rare sea creature."),
                                 new Settings.TextInput("Message", RareAnnounce.msg, "The message to send. Replaces {spawnmsg} with the catch message, and {name} with the sea creature name.")
+                        ))),
+                        new Module("Radar Solver", RadarSolver.instance, "Guesses the exact position of the Fishing hotspots when using the Hotspot Radar.", new Settings(List.of(
+                                new Settings.Toggle("Tracer", RadarSolver.tracer, "Draws a tracer towards the guess."),
+                                new Settings.ColorPicker("Color", true, RadarSolver.color, "The color of the guess highlight."),
+                                new Settings.ColorPicker("Tracer Color", true, RadarSolver.tracerColor, "The color of the guess tracer.")
                         )))
                 )),
                 new Category("Hunting", List.of(

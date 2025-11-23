@@ -205,7 +205,7 @@ public class Utils {
     }
 
     public static boolean isInKuudra() {
-        return SkyblockData.getArea().equals("Kuudra");
+        return isInArea("Kuudra");
     }
 
     public static boolean isInChateau() {
@@ -591,6 +591,10 @@ public class Utils {
         return MathHelper.sqrt(x * x + z * z);
     }
 
+    public static float horizontalDistance(Entity from, Entity to) {
+        return horizontalDistance(from.getPos(), to.getPos());
+    }
+
     /**
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
@@ -634,7 +638,7 @@ public class Utils {
         List<String> lines = new ArrayList<>();
         if (mc.getNetworkHandler() != null) {
             for (PlayerListEntry entry : new ArrayList<>(mc.getNetworkHandler().getPlayerList())) {
-                if (entry.getDisplayName() != null) {
+                if (entry != null && entry.getDisplayName() != null) {
                     lines.add(toPlain(entry.getDisplayName()).trim());
                 }
             }

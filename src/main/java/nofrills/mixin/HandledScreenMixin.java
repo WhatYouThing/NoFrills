@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -200,16 +199,5 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             return true;
         }
         return original;
-    }
-
-    @Inject(method = "init", at = @At("TAIL"))
-    private void onInit(CallbackInfo ci) {
-        if (LeapOverlay.isLeapMenu(this.title.getString())) {
-            int x = mc.getWindow().getWidth() / 2;
-            int y = mc.getWindow().getHeight() / 2;
-            this.x = x;
-            this.y = y;
-            InputUtil.setCursorParameters(mc.getWindow().getHandle(), InputUtil.GLFW_CURSOR_NORMAL, x, y);
-        }
     }
 }

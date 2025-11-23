@@ -20,6 +20,7 @@ import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.features.misc.UnfocusedTweaks;
+import nofrills.features.tweaks.NoCursorReset;
 import nofrills.features.tweaks.NoDropSwing;
 import nofrills.features.tweaks.NoLoadingScreen;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +62,7 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void onBeforeOpenScreen(Screen screen, CallbackInfo ci) {
         if (NoLoadingScreen.instance.isActive() && screen instanceof DownloadingTerrainScreen) {
-            mc.setScreen(null);
+            this.setScreen(null);
             ci.cancel();
         }
     }
@@ -72,9 +73,8 @@ public abstract class MinecraftClientMixin {
         if (screen != null) {
             eventBus.post(new ScreenOpenEvent(screen));
         } else {
-            if (ShardTracker.instance.isActive()) {
-                ShardTracker.refreshDisplay();
-            }
+            if (ShardTracker.instance.isActive()) ShardTracker.refreshDisplay();
+            if (NoCursorReset.instance.isActive()) NoCursorReset.startTicking();
         }
     }
 

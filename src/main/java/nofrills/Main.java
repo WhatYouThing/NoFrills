@@ -30,6 +30,7 @@ import nofrills.features.slayer.*;
 import nofrills.features.solvers.*;
 import nofrills.features.tweaks.DoubleUseFix;
 import nofrills.features.tweaks.MiddleClickOverride;
+import nofrills.features.tweaks.NoCursorReset;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.*;
@@ -167,6 +168,10 @@ public class Main implements ModInitializer {
         eventBus.subscribe(MelodyMessage.class);
         eventBus.subscribe(QuickClose.class);
         eventBus.subscribe(DungeonChestValue.class);
+        eventBus.subscribe(NoCursorReset.class);
+        eventBus.subscribe(TickTimers.class);
+        eventBus.subscribe(RelicHighlight.class);
+        eventBus.subscribe(GemstoneDesyncFix.class);
         eventBus.subscribe(DianaSolver.class);
         eventBus.subscribe(HoppitySolver.class);
 

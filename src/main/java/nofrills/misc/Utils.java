@@ -13,6 +13,7 @@ import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -332,6 +333,10 @@ public class Utils {
 
     public static float getTextScale(Vec3d pos, float base) {
         return getTextScale(pos, base, 0.1f);
+    }
+
+    public static boolean matchesKey(KeyBinding binding, int key) {
+        return binding.matchesKey(key, 0) || binding.matchesMouse(key);
     }
 
     public static void sendPingPacket() {

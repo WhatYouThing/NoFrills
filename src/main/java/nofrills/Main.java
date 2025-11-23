@@ -17,6 +17,7 @@ import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
 import nofrills.features.farming.PlotBorders;
 import nofrills.features.farming.SpaceFarmer;
+import nofrills.features.farming.VacuumSolver;
 import nofrills.features.fishing.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
@@ -172,6 +173,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(DianaSolver.class);
         eventBus.subscribe(HoppitySolver.class);
         eventBus.subscribe(RadarSolver.class);
+        eventBus.subscribe(VacuumSolver.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

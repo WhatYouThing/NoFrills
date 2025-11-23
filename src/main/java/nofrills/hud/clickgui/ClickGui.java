@@ -14,6 +14,7 @@ import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
 import nofrills.features.farming.PlotBorders;
 import nofrills.features.farming.SpaceFarmer;
+import nofrills.features.farming.VacuumSolver;
 import nofrills.features.fishing.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
@@ -337,10 +338,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Dark Auction Warp", DianaSolver.daToggle, "Consider Dark Auction as a valid warp location when using the Warp Keybind."),
                                 new Settings.Toggle("Crypt Warp", DianaSolver.cryptToggle, "Consider Crypt as a valid warp location when using the Warp Keybind.")
                         ))),
-                        new Module("Hoppity Solver", HoppitySolver.instance, "Guesses the exact position of the Hoppity egg when using the Egglocator.", new Settings(List.of(
-                                new Settings.Toggle("Tracer", HoppitySolver.tracer, "Draws a tracer towards the guessed egg."),
-                                new Settings.ColorPicker("Color", true, HoppitySolver.color, "The color of the guessed egg highlight."),
-                                new Settings.ColorPicker("Tracer Color", true, HoppitySolver.tracerColor, "The color of the guessed egg tracer.")
+                        new Module("Hoppity Solver", HoppitySolver.instance, "Guesses Hoppity egg positions when using your Egglocator.", new Settings(List.of(
+                                new Settings.Toggle("Tracer", HoppitySolver.tracer, "Draws a tracer towards the guess."),
+                                new Settings.ColorPicker("Color", true, HoppitySolver.color, "The color of the guess highlight."),
+                                new Settings.ColorPicker("Tracer Color", true, HoppitySolver.tracerColor, "The color of the guess tracer.")
                         ))),
                         new Module("Moonglade Beacon", BeaconTuningSolver.instance, "Solves the beacon tuning mini-game on Galatea.")
                 )),
@@ -364,7 +365,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Send Message", RareAnnounce.sendMsg, "Sends a specific message once you catch a rare sea creature."),
                                 new Settings.TextInput("Message", RareAnnounce.msg, "The message to send. Replaces {spawnmsg} with the catch message, and {name} with the sea creature name.")
                         ))),
-                        new Module("Radar Solver", RadarSolver.instance, "Guesses the exact position of the Fishing hotspots when using the Hotspot Radar.", new Settings(List.of(
+                        new Module("Radar Solver", RadarSolver.instance, "Guesses Fishing Hotspot positions when using your Hotspot Radar.", new Settings(List.of(
                                 new Settings.Toggle("Tracer", RadarSolver.tracer, "Draws a tracer towards the guess."),
                                 new Settings.ColorPicker("Color", true, RadarSolver.color, "The color of the guess highlight."),
                                 new Settings.ColorPicker("Tracer Color", true, RadarSolver.tracerColor, "The color of the guess tracer.")
@@ -616,6 +617,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Current Color", true, PlotBorders.currentColor, "The color of the current plot border."),
                                 new Settings.Toggle("All Plots", PlotBorders.all, "Adds borders to every plot if no other border should apply."),
                                 new Settings.ColorPicker("All Color", true, PlotBorders.allColor, "The color of the border for every plot.")
+                        ))),
+                        new Module("Vacuum Solver", VacuumSolver.instance, "Guesses Pest positions when using the Pest Tracker ability on your vacuum.", new Settings(List.of(
+                                new Settings.Toggle("Tracer", VacuumSolver.tracer, "Draws a tracer towards the guess."),
+                                new Settings.ColorPicker("Color", true, VacuumSolver.color, "The color of the guess highlight."),
+                                new Settings.ColorPicker("Tracer Color", true, VacuumSolver.tracerColor, "The color of the guess tracer.")
                         )))
                 ))
         );

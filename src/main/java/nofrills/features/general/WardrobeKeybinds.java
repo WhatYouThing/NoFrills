@@ -73,7 +73,7 @@ public class WardrobeKeybinds {
             case Hotbar -> {
                 for (int i = 1; i <= 9; i++) {
                     KeyBinding binding = mc.options.hotbarKeys[i - 1]; // could crash if someone is doing some voodoo
-                    if (binding.matchesKey(key, 0) || binding.matchesMouse(key)) {
+                    if (Utils.matchesKey(binding, key)) {
                         yield i + (page - 1) * 9;
                     }
                 }

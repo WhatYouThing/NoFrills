@@ -20,4 +20,8 @@ public class SettingColor extends SettingGeneric {
         }
         return this.color;
     }
+
+    public RenderColor valueWithAlpha(float alpha) {
+        return RenderColor.fromHex(this.value().hex, alpha);
+    }
 }

@@ -340,10 +340,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Dark Auction Warp", DianaSolver.daToggle, "Consider Dark Auction as a valid warp location when using the Warp Keybind."),
                                 new Settings.Toggle("Crypt Warp", DianaSolver.cryptToggle, "Consider Crypt as a valid warp location when using the Warp Keybind.")
                         ))),
-                        new Module("Hoppity Solver", HoppitySolver.instance, "Guesses the position of the egg when using the Egglocator.", new Settings(List.of(
-                                new Settings.Toggle("Guess Tracer", HoppitySolver.guessTracer, "Draws a tracer towards the guessed egg."),
-                                new Settings.ColorPicker("Guess Color", true, HoppitySolver.guessColor, "The color of the guessed egg beacon."),
-                                new Settings.ColorPicker("Tracer Color", true, HoppitySolver.guessTracerColor, "The color of the guessed egg tracer.")
+                        new Module("Hoppity Solver", HoppitySolver.instance, "Guesses the exact position of the Hoppity egg when using the Egglocator.", new Settings(List.of(
+                                new Settings.Toggle("Tracer", HoppitySolver.tracer, "Draws a tracer towards the guessed egg."),
+                                new Settings.ColorPicker("Color", true, HoppitySolver.color, "The color of the guessed egg highlight."),
+                                new Settings.ColorPicker("Tracer Color", true, HoppitySolver.tracerColor, "The color of the guessed egg tracer.")
                         ))),
                         new Module("Moonglade Beacon", BeaconTuningSolver.instance, "Solves the beacon tuning mini-game on Galatea.")
                 )),

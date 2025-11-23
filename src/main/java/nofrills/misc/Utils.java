@@ -314,6 +314,26 @@ public class Utils {
         return getOtherEntities(from, Box.of(from.getPos(), dist, dist, dist), filter);
     }
 
+    public static float getTextScale(double dist, float base, float scaling) {
+        float distScale = (float) (1 + dist * scaling);
+        return Math.max(base * distScale, base);
+    }
+
+    public static float getTextScale(double dist, float base) {
+        return getTextScale(dist, base, 0.1f);
+    }
+
+    public static float getTextScale(Vec3d pos, float base, float scaling) {
+        if (mc.player != null) {
+            return getTextScale(mc.player.getPos().distanceTo(pos), base, scaling);
+        }
+        return 0.0f;
+    }
+
+    public static float getTextScale(Vec3d pos, float base) {
+        return getTextScale(pos, base, 0.1f);
+    }
+
     public static void sendPingPacket() {
         ClientPlayNetworkHandler handler = mc.getNetworkHandler();
         if (handler != null) {

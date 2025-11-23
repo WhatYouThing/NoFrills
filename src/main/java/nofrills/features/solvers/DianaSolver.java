@@ -65,7 +65,6 @@ public class DianaSolver {
 
     private static void onSpooningStart() {
         solver.resetFitter();
-        solver.resetSolvedPos();
         ticks = 10;
     }
 
@@ -209,12 +208,11 @@ public class DianaSolver {
                 Vec3d pos = burrow.getVec();
                 Vec3d textPos = pos.subtract(0.0, 0.25, 0.0);
                 double dist = burrow.distanceTo();
-                float distScale = (float) (1 + dist * 0.1f);
-                float scale = Math.max(0.05f * distScale, 0.05f);
+                float scale = Utils.getTextScale(textPos, 0.05f);
                 if (burrow.type.equals(BurrowType.Guess)) {
                     MutableText label = Text.literal(Utils.format("Guess §e{}m", (int) Math.floor(dist)));
                     event.drawBeam(pos, 256, true, guessColor.value());
-                    event.drawText(textPos, label, scale, true, RenderColor.fromHex(guessColor.value().hex));
+                    event.drawText(textPos, label, scale, true, guessColor.valueWithAlpha(1.0f));
                     if (guessTracer.value()) {
                         event.drawTracer(pos, guessTracerColor.value());
                     }
@@ -241,7 +239,6 @@ public class DianaSolver {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         solver.resetFitter();
-        solver.resetSolvedPos();
         burrowsList.clear();
         ticks = 0;
     }

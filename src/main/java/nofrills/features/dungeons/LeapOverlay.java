@@ -41,41 +41,29 @@ public class LeapOverlay {
         return instance.isActive() && Utils.isInDungeons() && title.equals(leapMenuName);
     }
 
-    private static RenderColor getColor(String className) {
-        return switch (className) {
-            case "Healer" -> healer.value();
-            case "Mage" -> mage.value();
-            case "Berserk" -> bers.value();
-            case "Archer" -> arch.value();
-            case "Tank" -> tank.value();
-            case "Empty" -> deadColor;
-            default -> nameColor;
-        };
-    }
-
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && event.isFinal && event.title.equals(leapMenuName) && Utils.isInDungeons()) {
             List<LeapTarget> targets = new ArrayList<>();
             for (Slot slot : Utils.getContainerSlots(event.handler)) {
                 ItemStack stack = slot.getStack();
+                if (!stack.getItem().equals(Items.PLAYER_HEAD)) continue;
                 List<String> lore = Utils.getLoreLines(stack);
                 String name = Utils.toPlain(stack.getName());
                 String dungeonClass = DungeonUtil.getPlayerClass(name);
-                if (!stack.isEmpty() && stack.getItem().equals(Items.PLAYER_HEAD) && !lore.isEmpty() && !dungeonClass.isEmpty()) {
+                if (!stack.isEmpty() && !lore.isEmpty() && !dungeonClass.isEmpty()) {
                     String line = lore.getFirst();
                     if (line.equals("Click to teleport!")) {
-                        targets.add(new LeapTarget(slot.id, name, dungeonClass, false, false));
+                        targets.add(new LeapTarget(slot.id, name, dungeonClass, false));
                     } else if (line.equals("This player is currently dead!")) {
-                        targets.add(new LeapTarget(-1, name, dungeonClass, false, true));
+                        targets.add(new LeapTarget(-1, name, dungeonClass, true));
                     }
                 }
             }
             targets.sort(Comparator.comparing(target -> target.dungeonClass + target.name));
             if (targets.size() < 4) {
-                int missing = 4 - targets.size();
-                for (int i = 1; i <= missing; i++) {
-                    targets.add(new LeapTarget(-1, "", "", true, false));
+                for (int i = 1; i <= 4 - targets.size(); i++) {
+                    targets.add(LeapTarget.empty());
                 }
             }
             for (LeapTarget target : targets) {
@@ -88,15 +76,17 @@ public class LeapOverlay {
         public int slotId;
         public String name;
         public String dungeonClass;
-        public boolean empty;
         public boolean dead;
 
-        public LeapTarget(int slotId, String name, String dungeonClass, boolean empty, boolean dead) {
+        public LeapTarget(int slotId, String name, String dungeonClass, boolean dead) {
             this.slotId = slotId;
             this.name = name;
             this.dungeonClass = dungeonClass;
-            this.empty = empty;
             this.dead = dead;
+        }
+
+        public static LeapTarget empty() {
+            return new LeapTarget(-1, "", "Empty", false);
         }
     }
 
@@ -119,16 +109,24 @@ public class LeapOverlay {
 
         public LeapButton(LeapTarget target, int index) {
             this.slotId = target.slotId;
-            this.player = target.empty ? Text.literal("Empty") : Text.literal(target.name);
+            this.player = Text.literal(target.name);
             this.dungeonClass = Text.literal(target.dungeonClass);
             this.dead = target.dead;
-            this.nameColor = target.empty ? LeapOverlay.deadColor : LeapOverlay.nameColor;
-            this.classColor = getColor(target.dungeonClass);
-            background = ColorHelper.fromFloats(0.67f, 0.0f, 0.0f, 0.0f);
-            backgroundHover = ColorHelper.fromFloats(0.67f, this.classColor.r * 0.33f, this.classColor.g * 0.33f, this.classColor.b * 0.33f);
-            border = ColorHelper.fromFloats(1.0f, this.classColor.r, this.classColor.g, this.classColor.b);
-            offsetX = index == 0 || index == 2 ? 0.25f : 0.55f;
-            offsetY = index <= 1 ? 0.25f : 0.55f;
+            this.nameColor = LeapOverlay.nameColor;
+            this.classColor = switch (target.dungeonClass) {
+                case "Healer" -> healer.value();
+                case "Mage" -> mage.value();
+                case "Berserk" -> bers.value();
+                case "Archer" -> arch.value();
+                case "Tank" -> tank.value();
+                case "Empty" -> deadColor;
+                default -> nameColor;
+            };
+            this.background = ColorHelper.fromFloats(0.67f, 0.0f, 0.0f, 0.0f);
+            this.backgroundHover = ColorHelper.fromFloats(0.67f, this.classColor.r * 0.33f, this.classColor.g * 0.33f, this.classColor.b * 0.33f);
+            this.border = ColorHelper.fromFloats(1.0f, this.classColor.r, this.classColor.g, this.classColor.b);
+            this.offsetX = index == 0 || index == 2 ? 0.25f : 0.55f;
+            this.offsetY = index <= 1 ? 0.25f : 0.55f;
         }
 
         private int getX(DrawContext context, float xOffset) {
@@ -140,7 +138,7 @@ public class LeapOverlay {
         }
 
         public boolean isHovered(double mouseX, double mouseY) {
-            return this.slotId != -1 && mouseX >= minX && mouseX <= maxX && mouseY >= minY && mouseY <= maxY;
+            return this.slotId != -1 && mouseX >= this.minX && mouseX <= this.maxX && mouseY >= this.minY && mouseY <= this.maxY;
         }
 
         public void drawText(DrawContext context, Text text, int x, int y, float scale, RenderColor color) {
@@ -153,24 +151,21 @@ public class LeapOverlay {
 
         @Override
         public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-            minX = getX(context, this.offsetX);
-            minY = getY(context, this.offsetY);
-            maxX = getX(context, this.offsetX + 0.2f);
-            maxY = getY(context, this.offsetY + 0.2f);
-            context.fill(minX, minY, maxX, maxY, this.isHovered(mouseX, mouseY) ? backgroundHover : background); // for some reason its ARGB rather than RGBA
-            if (slotId != -1) {
-                context.drawBorder(minX, minY, maxX - minX, maxY - minY, border);
-            }
+            this.minX = getX(context, this.offsetX);
+            this.minY = getY(context, this.offsetY);
+            this.maxX = getX(context, this.offsetX + 0.2f);
+            this.maxY = getY(context, this.offsetY + 0.2f);
+            context.fill(this.minX, this.minY, this.maxX, this.maxY, this.isHovered(mouseX, mouseY) ? this.backgroundHover : this.background);
+            if (this.slotId != -1)
+                context.drawBorder(this.minX, this.minY, this.maxX - this.minX, this.maxY - this.minY, this.border);
             float textScale = (float) (scale.value() / mc.options.getGuiScale().getValue());
-            int textX = minX + (maxX - minX) / 2;
-            int playerTextY = (int) (minY + (maxY - minY) * 0.25);
-            int classTextY = (int) (minY + (maxY - minY) * 0.5);
-            int deadTextY = (int) (minY + (maxY - minY) * 0.75);
+            int textX = this.minX + (this.maxX - this.minX) / 2;
+            int playerTextY = (int) (this.minY + (this.maxY - this.minY) * 0.25);
+            int classTextY = (int) (this.minY + (this.maxY - this.minY) * 0.5);
+            int deadTextY = (int) (this.minY + (this.maxY - this.minY) * 0.75);
             this.drawText(context, this.player, textX, playerTextY, textScale, this.nameColor);
             this.drawText(context, this.dungeonClass, textX, classTextY, textScale, this.classColor);
-            if (this.dead) {
-                this.drawText(context, Text.literal("DEAD"), textX, deadTextY, textScale, deadColor);
-            }
+            if (this.dead) this.drawText(context, Text.literal("DEAD"), textX, deadTextY, textScale, deadColor);
         }
     }
 }

@@ -83,6 +83,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(NoFrillsAPI.class);
         eventBus.subscribe(KuudraUtil.class);
         eventBus.subscribe(SlayerUtil.class);
+        eventBus.subscribe(DungeonUtil.class);
         eventBus.subscribe(HudManager.class);
         eventBus.subscribe(SpookyChests.class);
         eventBus.subscribe(ExperimentSolver.class);

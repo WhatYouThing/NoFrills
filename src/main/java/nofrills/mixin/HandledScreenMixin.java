@@ -18,7 +18,6 @@ import nofrills.features.dungeons.TerminalSolvers;
 import nofrills.features.general.NoRender;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.tweaks.MiddleClickFix;
-import nofrills.misc.RenderColor;
 import nofrills.misc.ScreenOptions;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
@@ -62,8 +61,8 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     }
 
     @Override
-    public void nofrills_mod$addLeapButton(int slotId, String name, String dungeonClass, RenderColor classColor) {
-        leapButtons.add(new LeapOverlay.LeapButton(slotId, leapButtons.size(), name, dungeonClass, classColor));
+    public void nofrills_mod$addLeapButton(LeapOverlay.LeapTarget target) {
+        leapButtons.add(new LeapOverlay.LeapButton(target, leapButtons.size()));
     }
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
@@ -141,9 +140,6 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (LeapOverlay.isLeapMenu(this.title.getString())) {
             for (LeapOverlay.LeapButton button : leapButtons) {
-                if (button.slotId != -1) {
-                    button.hovered = button.isHovered(mouseX, mouseY);
-                }
                 button.render(context, mouseX, mouseY, delta);
             }
             ci.cancel();
@@ -179,12 +175,12 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (LeapOverlay.isLeapMenu(this.title.getString()) && button == GLFW.GLFW_MOUSE_BUTTON_1) {
             for (LeapOverlay.LeapButton leapButton : leapButtons) {
-                if (leapButton.slotId != -1 && leapButton.isHovered(mouseX, mouseY)) {
+                if (leapButton.isHovered(mouseX, mouseY)) {
                     mc.interactionManager.clickSlot(handler.syncId, leapButton.slotId, 0, SlotActionType.PICKUP, mc.player);
                     this.handler.setCursorStack(ItemStack.EMPTY);
                     if (LeapOverlay.send.value() && !LeapOverlay.message.value().isEmpty() && !sentLeapMsg) {
-                        sentLeapMsg = true;
                         Utils.sendMessage(LeapOverlay.message.value().replace("{name}", leapButton.player.getString()));
+                        sentLeapMsg = true;
                     }
                     cir.setReturnValue(true);
                 }

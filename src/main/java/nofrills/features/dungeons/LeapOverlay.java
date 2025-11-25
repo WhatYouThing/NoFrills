@@ -62,7 +62,8 @@ public class LeapOverlay {
             }
             targets.sort(Comparator.comparing(target -> target.dungeonClass + target.name));
             if (targets.size() < 4) {
-                for (int i = 1; i <= 4 - targets.size(); i++) {
+                int missing = 4 - targets.size();
+                for (int i = 1; i <= missing; i++) {
                     targets.add(LeapTarget.empty());
                 }
             }

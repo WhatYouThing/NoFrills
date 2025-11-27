@@ -6,7 +6,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Feature;
-import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.WorldTickEvent;
@@ -17,7 +16,7 @@ import static nofrills.Main.mc;
 public class AbilityAlert {
     public static final Feature instance = new Feature("abilityAlert");
 
-    public static final SettingInt override = new SettingInt(0, "override",instance);
+    public static final SettingInt override = new SettingInt(0, "override", instance);
 
     private static int ticks = 0;
 

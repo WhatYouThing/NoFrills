@@ -10,8 +10,9 @@ import nofrills.events.EntityNamedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.misc.EntityCache;
-import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
+
+import static nofrills.Main.mc;
 
 
 public class ScathaMining {
@@ -24,7 +25,7 @@ public class ScathaMining {
     private static int spawnCooldown = 0;
 
     private static boolean active() {
-        return SkyblockData.getArea().equals("Crystal Hollows") && instance.isActive();
+        return instance.isActive() && Utils.isInArea("Crystal Hollows");
     }
 
     private static wormType getWormType(String name) {
@@ -37,10 +38,10 @@ public class ScathaMining {
 
     private static void alertSpawn(boolean scatha) {
         if (scatha) {
-            Utils.showTitle("§cScatha", "§7GOLD GOLD GOLD!", 5, 20, 5);
+            Utils.showTitle("§cScatha", "", 5, 20, 5);
             Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1.0f, 1.0f);
         } else {
-            Utils.showTitle("§eWorm", "§7Drops Hytale", 5, 20, 5);
+            Utils.showTitle("§eWorm", "", 5, 20, 5);
             Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
         }
     }
@@ -50,6 +51,9 @@ public class ScathaMining {
         if (active()) {
             wormType type = getWormType(event.namePlain);
             if (!type.equals(wormType.None) && !wormsCache.has(event.entity)) {
+                if (Math.abs(event.entity.getBlockPos().getY() - mc.player.getBlockPos().getY()) > 4) {
+                    return;
+                }
                 if (alert.value()) {
                     alertSpawn(type.equals(wormType.Scatha));
                 }
@@ -71,8 +75,8 @@ public class ScathaMining {
             spawnCooldown--;
             if (spawnCooldown == 0) {
                 if (cooldown.value()) {
-                    Utils.showTitle("§a§lWORM COOLDOWN ENDED", "", 5, 20, 5);
-                    Utils.info("§a§lWorm spawn cooldown ended!");
+                    Utils.showTitle("§a§lCOOLDOWN ENDED", "", 5, 20, 5);
+                    Utils.info("§aWorm spawn cooldown ended!");
                     Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.MASTER, 1.0f, 0.0f);
                 }
                 wormsCache.removeDead();

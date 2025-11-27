@@ -4,7 +4,7 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.ActionResult;
 import nofrills.features.tweaks.NoAbilityPlace;
-import nofrills.misc.Utils;
+import nofrills.features.tweaks.NoSkullPlace;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -15,8 +15,7 @@ public abstract class BlockItemMixin {
 
     @Inject(method = "place(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/util/ActionResult;", at = @At("HEAD"), cancellable = true)
     private void onPlace(ItemPlacementContext context, CallbackInfoReturnable<ActionResult> cir) {
-        if (NoAbilityPlace.active() && context.getStack().getItem() instanceof BlockItem && Utils.hasRightClickAbility(context.getStack())) {
-            cir.setReturnValue(ActionResult.FAIL);
-        }
+        if (NoSkullPlace.active() && NoSkullPlace.isSkull(context)) cir.setReturnValue(ActionResult.SUCCESS);
+        if (NoAbilityPlace.active() && NoAbilityPlace.hasAbility(context)) cir.setReturnValue(ActionResult.SUCCESS);
     }
 }

@@ -66,16 +66,6 @@ import static nofrills.Main.*;
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     private static final Random soundRandom = Random.create(0);
-    private static final HashSet<String> abilityWhitelist = Sets.newHashSet(
-            "ABINGOPHONE",
-            "SUPERBOOM_TNT",
-            "INFINITE_SUPERBOOM_TNT",
-            "ARROW_SWAPPER",
-            "PUMPKIN_LAUNCHER",
-            "SNOW_CANNON",
-            "SNOW_BLASTER",
-            "SNOW_HOWITZER"
-    );
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "The Park",
             "Galatea",
@@ -500,15 +490,6 @@ public class Utils {
     }
 
     public static boolean hasRightClickAbility(ItemStack stack) {
-        String id = getSkyblockId(stack);
-        if (!id.isEmpty()) {
-            if (id.startsWith("ABIPHONE")) {
-                return true;
-            }
-            if (abilityWhitelist.contains(id)) {
-                return true;
-            }
-        }
         return !getRightClickAbility(stack).isEmpty();
     }
 

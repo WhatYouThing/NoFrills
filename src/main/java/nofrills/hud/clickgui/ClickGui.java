@@ -268,6 +268,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Confirm Screen", NoConfirmScreen.instance, "Removes the \"Confirm Command Execution\" screen and allows the command to run anyways."),
                         new Module("No Cursor Reset", NoCursorReset.instance, "Retains your cursor position between container screens.", new Settings(List.of(
                                 new Settings.SliderInt("Clear Time", 0, 1200, 5, NoCursorReset.clearTicks, "The amount of ticks until your last cursor position is forgotten. Set to 0 to always remember.")
+                        ))),
+                        new Module("No Skull Place", NoSkullPlace.instance, "Prevents skull block items from being placeable client side, similarly to 1.8.9.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", NoSkullPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", NoSkullPlace.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         )))
                 )),
                 new Category("Misc", List.of(

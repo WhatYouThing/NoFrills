@@ -15,9 +15,7 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.ScreenOptions;
 import nofrills.misc.Utils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static nofrills.Main.mc;
 
@@ -45,20 +43,20 @@ public class LeapOverlay {
     private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && event.isFinal && event.title.equals(leapMenuName) && Utils.isInDungeons()) {
             List<LeapTarget> targets = new ArrayList<>();
+            HashMap<String, Integer> alive = new HashMap<>(4);
             for (Slot slot : Utils.getContainerSlots(event.handler)) {
                 ItemStack stack = slot.getStack();
                 if (!stack.getItem().equals(Items.PLAYER_HEAD)) continue;
                 List<String> lore = Utils.getLoreLines(stack);
                 String name = Utils.toPlain(stack.getName());
                 String dungeonClass = DungeonUtil.getPlayerClass(name);
-                if (!stack.isEmpty() && !lore.isEmpty() && !dungeonClass.isEmpty()) {
-                    String line = lore.getFirst();
-                    if (line.equals("Click to teleport!")) {
-                        targets.add(new LeapTarget(slot.id, name, dungeonClass, false));
-                    } else if (line.equals("This player is currently dead!")) {
-                        targets.add(new LeapTarget(-1, name, dungeonClass, true));
-                    }
+                if (!lore.isEmpty() && !dungeonClass.isEmpty() && lore.getFirst().equals("Click to teleport!")) {
+                    alive.put(name, slot.id);
                 }
+            }
+            for (Map.Entry<String, String> entry : DungeonUtil.getClassCache().entrySet()) {
+                int slotId = alive.getOrDefault(entry.getKey(), -1);
+                targets.add(new LeapTarget(slotId, entry.getKey(), entry.getValue(), slotId == -1));
             }
             targets.sort(Comparator.comparing(target -> target.dungeonClass + target.name));
             if (targets.size() < 4) {

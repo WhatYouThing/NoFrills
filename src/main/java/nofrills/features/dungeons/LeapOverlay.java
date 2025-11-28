@@ -55,8 +55,12 @@ public class LeapOverlay {
                 }
             }
             for (Map.Entry<String, String> entry : DungeonUtil.getClassCache().entrySet()) {
-                int slotId = alive.getOrDefault(entry.getKey(), -1);
-                targets.add(new LeapTarget(slotId, entry.getKey(), entry.getValue(), slotId == -1));
+                String name = entry.getKey();
+                String dungeonClass = entry.getValue();
+                if (!name.equalsIgnoreCase(mc.player.getName().getString())) {
+                    int slotId = alive.getOrDefault(name, -1);
+                    targets.add(new LeapTarget(slotId, name, dungeonClass, slotId == -1));
+                }
             }
             targets.sort(Comparator.comparing(target -> target.dungeonClass + target.name));
             if (targets.size() < 4) {

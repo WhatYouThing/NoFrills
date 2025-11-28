@@ -59,9 +59,10 @@ public class MiddleClickOverride {
             "The Hex",
             "Enchant Item",
             "Auction",
+            "Cosmetic",
             "Trap",
             "Gemstone",
-            "Heart of the ",
+            "Heart of the",
             "Widgets"
     );
 
@@ -97,7 +98,7 @@ public class MiddleClickOverride {
             if (event.slot != null && event.button == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.actionType.equals(SlotActionType.PICKUP)) {
                 String title = container.getTitle().getString();
                 ItemStack stack = event.slot.getStack();
-                if (!SlotOptions.isSlotDisabled(event.slot) && !stack.isEmpty() && !isBlacklisted(title) && experimentCheck()) {
+                if (!SlotOptions.isDisabled(event.slot) && !stack.isEmpty() && !isBlacklisted(title) && experimentCheck()) {
                     if (Utils.getSkyblockId(stack).isEmpty() || isWhitelisted(title) || isTransaction(stack)) {
                         mc.interactionManager.clickSlot(container.getScreenHandler().syncId, event.slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
                         event.cancel();

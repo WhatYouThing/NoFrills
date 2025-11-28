@@ -1,79 +1,65 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.ChatMsgEvent;
-import nofrills.events.ServerTickEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.Utils;
-
-import java.util.Optional;
 
 import static nofrills.Main.mc;
 
 public class AbilityAlert {
     public static final Feature instance = new Feature("abilityAlert");
 
-    public static int ticks = 0;
-    public static String cooldownLine = "";
+    private static int ticks = 0;
+
+    private static boolean isMiningTool(ItemStack stack) {
+        return !stack.isEmpty() && !Utils.getRightClickAbility(stack).isEmpty() && Utils.hasEitherStat(stack, "Mining Speed");
+    }
+
+    private static boolean isUsedMessage(String msg) {
+        return msg.startsWith("You used your ") && msg.endsWith(" Pickaxe Ability!");
+    }
 
     private static ItemStack getMiningTool() {
         if (mc.player != null) {
+            PlayerInventory inv = mc.player.getInventory();
             for (int i = 0; i <= 8; i++) {
-                ItemStack stack = mc.player.getInventory().getStack(i);
-                if (!Utils.getRightClickAbility(stack).isEmpty() && Utils.hasEitherStat(stack, "Mining Speed")) {
-                    return stack;
-                }
+                ItemStack stack = inv.getStack(i);
+                if (isMiningTool(stack)) return stack;
             }
         }
         return ItemStack.EMPTY;
     }
 
-    private static String updateCooldownLine() {
-        String ability = Utils.getRightClickAbility(getMiningTool());
-        if (!ability.isEmpty()) {
-            for (String line : Utils.getTabListLines()) {
-                int index = line.indexOf(":");
-                if (index != -1 && ability.contains(line.substring(0, index))) {
-                    return line;
-                }
+    private static String getMiningAbility(ItemStack tool) {
+        String ability = Utils.getRightClickAbility(tool);
+        return !ability.isEmpty() ? ability.substring(ability.indexOf(":") + 1).replace("RIGHT CLICK", "").trim() : "";
+    }
+
+    private static String getCooldownLine(String ability) {
+        for (String line : Utils.getTabListLines()) {
+            int index = line.indexOf(":");
+            if (index != -1 && ability.contains(line.substring(0, index))) {
+                return line;
             }
         }
         return "";
     }
 
-    private static void showAlert(String ability) {
-        Utils.showTitle("§6" + Utils.toUpper(ability) + "!", "", 0, 50, 10);
-        Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
-    }
-
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
-        if (instance.isActive() && event.messagePlain.endsWith(" is now available!") && cooldownLine.isEmpty() && ticks == 0 && !Utils.isInDungeons()) {
-            String ability = event.messagePlain.replace(" is now available!", "").trim();
-            ItemStack tool = getMiningTool();
-            if (!tool.isEmpty() && Utils.getRightClickAbility(tool).contains(ability)) {
-                showAlert(ability);
-            }
-        }
-    }
-
-    @EventHandler
-    private static void onWorldTick(WorldTickEvent event) {
-        if (instance.isActive()) {
-            cooldownLine = updateCooldownLine();
-            if (!cooldownLine.isEmpty()) {
-                String duration = cooldownLine.substring(cooldownLine.indexOf(":") + 2);
-                if (ticks > 1 && duration.equals("Available")) {
-                    ticks = 1;
-                }
-                if (ticks == 0 && duration.endsWith("s")) {
-                    Optional<Integer> durationTicks = Utils.parseInt(duration.replace("s", ""));
-                    if (durationTicks.isPresent() && durationTicks.get() > 5) {
-                        ticks = durationTicks.get() * 20;
+        if (instance.isActive() && !Utils.isInDungeons() && isUsedMessage(event.messagePlain)) {
+            ToolData data = new ToolData();
+            if (!data.tool.isEmpty() && !data.ability.isEmpty() && data.widget.isEmpty()) {
+                for (String line : Utils.getLoreLines(data.tool).reversed()) {
+                    if (line.startsWith("Cooldown: ")) {
+                        String duration = line.substring(line.indexOf(":") + 2).replace("s", "");
+                        ticks = Utils.parseInt(duration).orElse(0) * 20;
                     }
                 }
             }
@@ -81,12 +67,40 @@ public class AbilityAlert {
     }
 
     @EventHandler
-    private static void onServerTick(ServerTickEvent event) {
-        if (instance.isActive() && ticks > 0) {
-            ticks--;
-            if (ticks == 0 && !cooldownLine.isEmpty()) {
-                showAlert(cooldownLine.substring(0, cooldownLine.indexOf(":")));
+    private static void onTick(WorldTickEvent event) {
+        if (instance.isActive() && !Utils.isInDungeons()) {
+            ToolData data = new ToolData();
+            if (!data.tool.isEmpty() && !data.ability.isEmpty() && !data.widget.isEmpty()) {
+                String duration = data.widget.substring(data.widget.indexOf(":") + 2);
+                if (ticks > 1 && duration.equals("Available")) {
+                    ticks = 1; // instantly skips cooldown if the server does, such as if the player enters a mineshaft
+                }
+                if (ticks == 0 && duration.endsWith("s")) {
+                    int durationTicks = Utils.parseInt(duration.replace("s", "")).orElse(0);
+                    if (durationTicks >= 5) {
+                        ticks = durationTicks * 20;
+                    }
+                }
             }
+            if (ticks > 0) {
+                ticks--;
+                if (ticks == 0 && !data.ability.isEmpty()) {
+                    Utils.showTitle("§6" + Utils.toUpper(data.ability) + "!", "", 0, 50, 10);
+                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+                }
+            }
+        }
+    }
+
+    public static class ToolData {
+        public ItemStack tool;
+        public String ability;
+        public String widget;
+
+        public ToolData() {
+            this.tool = getMiningTool();
+            this.ability = !this.tool.isEmpty() ? getMiningAbility(this.tool) : "";
+            this.widget = !this.ability.isEmpty() ? getCooldownLine(this.ability) : "";
         }
     }
 }

@@ -8,7 +8,6 @@ import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
-import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.events.ServerJoinEvent;
@@ -48,15 +47,8 @@ public class SkyblockData {
             new InstanceType("t4", "KUUDRA_FIERY"),
             new InstanceType("t5", "KUUDRA_INFERNAL")
     );
-    public static final List<String> dungeonClasses = List.of(
-            "Healer",
-            "Mage",
-            "Berserk",
-            "Archer",
-            "Tank"
-    );
-    public static final SettingString dungeonClass = new SettingString("Berserker", "dungeonClass", "misc");
     private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
+    public static String dungeonClass = "Berserk";
     public static double dungeonPower = 0;
     private static String location = "";
     private static String area = "";
@@ -68,13 +60,13 @@ public class SkyblockData {
     private static void updateDungeonClass(String msg) {
         if (mc.player != null) {
             String playerName = mc.player.getName().getString();
-            for (String name : dungeonClasses) {
+            for (String name : DungeonUtil.getDungeonClasses()) {
                 String tag = Utils.format("[{}]", name);
                 String selected = Utils.format("{} selected the {} Class!", playerName, name);
                 String selectedHub = Utils.format("You have selected the {} Dungeon Class!", name);
                 String milestone = Utils.format("{} Milestone", name);
                 if (msg.startsWith(tag) || msg.equals(selectedHub) || msg.equals(selected) || msg.startsWith(milestone)) {
-                    dungeonClass.set(name);
+                    dungeonClass = name;
                     break;
                 }
             }

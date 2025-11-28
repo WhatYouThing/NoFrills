@@ -48,7 +48,8 @@ public class ShardData {
             "yog",
             "boreal owl",
             "newt",
-            "miner zombie"
+            "miner zombie",
+            "cretan bull"
     );
     public static final HashSet<String> uncommonShards = Sets.newHashSet(
             "bramble",
@@ -132,7 +133,8 @@ public class ShardData {
             "inferno koi",
             "wither",
             "gecko",
-            "hummingbird"
+            "hummingbird",
+            "minotaur"
     );
     public static final HashSet<String> epicShards = Sets.newHashSet(
             "terra",
@@ -166,7 +168,9 @@ public class ShardData {
             "xyz",
             "leatherback",
             "cavernshade",
-            "dragonfly"
+            "dragonfly",
+            "king minos",
+            "sphinx"
     );
     public static final HashSet<String> legendaryShards = Sets.newHashSet(
             "tenebris",
@@ -229,6 +233,7 @@ public class ShardData {
                             case "stridersurfer" -> "SHARD_STRIDER_SURFER";
                             case "bogged" -> "SHARD_SEA_ARCHER";
                             case "loch emperor" -> "SHARD_SEA_EMPEROR";
+                            case "end stone protector" -> "SHARD_ENDSTONE_PROTECTOR";
                             default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
                         };
                     }
@@ -240,7 +245,8 @@ public class ShardData {
 
     private static boolean isShard(ItemStack stack) {
         String id = Utils.getSkyblockId(stack);
-        if (id.equals("ATTRIBUTE_SHARD")) {
+        String name = Utils.toPlain(stack.getName());
+        if (id.equals("ATTRIBUTE_SHARD") || name.contains(" Shard")) {
             return true;
         }
         if (id.isEmpty()) {

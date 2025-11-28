@@ -10,25 +10,19 @@ import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
 import nofrills.features.farming.PlotBorders;
 import nofrills.features.farming.SpaceFarmer;
-import nofrills.features.fishing.CapTracker;
-import nofrills.features.fishing.MuteDrake;
-import nofrills.features.fishing.RareAnnounce;
-import nofrills.features.fishing.RareGlow;
+import nofrills.features.farming.VacuumSolver;
+import nofrills.features.fishing.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
 import nofrills.features.kuudra.*;
 import nofrills.features.mining.*;
 import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
-import nofrills.features.solvers.BeaconTuningSolver;
-import nofrills.features.solvers.CalendarDate;
-import nofrills.features.solvers.ExperimentSolver;
-import nofrills.features.solvers.SpookyChests;
+import nofrills.features.solvers.*;
 import nofrills.features.tweaks.*;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.components.FlatTextbox;
@@ -169,6 +163,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Fire Overlay", NoRender.fireOverlay, "Removes the fire overlay."),
                                 new Settings.Toggle("Break Particles", NoRender.breakParticles, "Removes the particles that appear when breaking blocks."),
                                 new Settings.Toggle("Boss Bar", NoRender.bossBar, "Hides the boss health bar that appears at the top of the screen."),
+                                new Settings.Toggle("Fog", NoRender.fog, "Hides terrain and ambient fog."),
                                 new Settings.Toggle("Effect Display", NoRender.effectDisplay, "Removes the potion effect display from the inventory and the top right of the screen."),
                                 new Settings.Toggle("Dead Entities", NoRender.deadEntities, "Hides entities that are in their death animation, and their health bars (if applicable)."),
                                 new Settings.Toggle("Dead Poof", NoRender.deadPoof, "Tries to hide the death \"poof\" particles that appear after a dead entity is deleted."),
@@ -270,11 +265,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Old Island Only", OldSafewalk.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\n- Fixes the rare disconnects that occur while doing Tarantula slayer."),
-                        new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", BreakResetFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", BreakResetFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("No Confirm Screen", NoConfirmScreen.instance, "Removes the \"Confirm Command Execution\" screen and allows the command to run anyways.")
+                        new Module("No Confirm Screen", NoConfirmScreen.instance, "Removes the \"Confirm Command Execution\" screen and allows the command to run anyways."),
+                        new Module("No Cursor Reset", NoCursorReset.instance, "Retains your cursor position between container screens.", new Settings(List.of(
+                                new Settings.SliderInt("Clear Time", 0, 1200, 5, NoCursorReset.clearTicks, "The amount of ticks until your last cursor position is forgotten. Set to 0 to always remember.")
+                        )))
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(
@@ -306,9 +300,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("No Vanilla Limit", UnfocusedTweaks.noVanilla, "Fully disables the vanilla \"Reduce FPS\" option."),
                                 new Settings.SliderInt("FPS Limit", 0, 200, 1, UnfocusedTweaks.fpsLimit, "The max FPS the game will render at while unfocused. Set to 0 to disable.")
                         ))),
-                        new Module("Page Keybinds", PageKeybinds.instance, "Adds next/previous page keybinds to applicable Skyblock GUIs.", new Settings(List.of(
-                                new Settings.Keybind("Next Page", PageKeybinds.next, "The keybind to go to the next page of the GUI."),
-                                new Settings.Keybind("Previous Page", PageKeybinds.previous, "The keybind to go to the previous page of the GUI.")
+                        new Module("GUI Keybinds", GuiKeybinds.instance, "Adds navigation keybinds to applicable Skyblock GUIs.", new Settings(List.of(
+                                new Settings.Keybind("Next Page", GuiKeybinds.next, "The keybind to go to the next page of the GUI."),
+                                new Settings.Keybind("Previous Page", GuiKeybinds.previous, "The keybind to go to the previous page of the GUI."),
+                                new Settings.Keybind("Scroll Up", GuiKeybinds.up, "The keybind to scroll up in the GUI."),
+                                new Settings.Keybind("Scroll Down", GuiKeybinds.down, "The keybind to scroll down in the GUI."),
+                                new Settings.Keybind("Go Back", GuiKeybinds.back, "The keybind to go back to the previous GUI.")
                         ))),
                         new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking.")
                 )),
@@ -321,6 +318,30 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Calendar Date", CalendarDate.instance, "Calculates the exact starting dates of events in the calendar."),
                         new Module("Spooky Chests", SpookyChests.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, SpookyChests.color, "The color of the spooky chest highlight.")
+                        ))),
+                        new Module("Diana Solver", DianaSolver.instance, "Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.", new Settings(List.of(
+                                new Settings.Separator("Burrows"),
+                                new Settings.Dropdown<>("Guess Mode", DianaSolver.guessMode, "Which spade particle to use for calculating the burrow position.\nThis option shouldn't have any difference in most cases."),
+                                new Settings.Toggle("Guess Tracer", DianaSolver.guessTracer, "Draws a tracer towards the guessed burrow."),
+                                new Settings.ColorPicker("Tracer Color", true, DianaSolver.guessTracerColor, "The color of the guessed burrow tracer."),
+                                new Settings.ColorPicker("Guess Color", true, DianaSolver.guessColor, "The color of the guessed burrow beacon."),
+                                new Settings.ColorPicker("Treasure Color", true, DianaSolver.treasureColor, "The color of the treasure burrow beacon."),
+                                new Settings.ColorPicker("Enemy Color", true, DianaSolver.enemyColor, "The color of the enemy burrow beacon."),
+                                new Settings.ColorPicker("Start Color", true, DianaSolver.startColor, "The color of the start burrow beacon."),
+                                new Settings.Separator("Warps"),
+                                new Settings.Keybind("Warp Keybind", DianaSolver.warpKey, "The keybind to warp to the location closest to the guessed burrow."),
+                                new Settings.Toggle("Hub Warp", DianaSolver.hubToggle, "Consider Hub a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Stonks Warp", DianaSolver.stonksToggle, "Consider Stonks Auction as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Museum Warp", DianaSolver.museumToggle, "Consider Museum as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Castle Warp", DianaSolver.castleToggle, "Consider Castle as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Wizard Tower Warp", DianaSolver.wizardToggle, "Consider Wizard Tower as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Dark Auction Warp", DianaSolver.daToggle, "Consider Dark Auction as a valid warp location when using the Warp Keybind."),
+                                new Settings.Toggle("Crypt Warp", DianaSolver.cryptToggle, "Consider Crypt as a valid warp location when using the Warp Keybind.")
+                        ))),
+                        new Module("Hoppity Solver", HoppitySolver.instance, "Guesses Hoppity egg positions when using your Egglocator.", new Settings(List.of(
+                                new Settings.Toggle("Tracer", HoppitySolver.tracer, "Draws a tracer towards the guess."),
+                                new Settings.ColorPicker("Color", true, HoppitySolver.color, "The color of the guess highlight."),
+                                new Settings.ColorPicker("Tracer Color", true, HoppitySolver.tracerColor, "The color of the guess tracer.")
                         ))),
                         new Module("Moonglade Beacon", BeaconTuningSolver.instance, "Solves the beacon tuning mini-game on Galatea.")
                 )),
@@ -343,6 +364,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Replace Message", RareAnnounce.replace, "Replaces the catch message of rare sea creatures with colored versions."),
                                 new Settings.Toggle("Send Message", RareAnnounce.sendMsg, "Sends a specific message once you catch a rare sea creature."),
                                 new Settings.TextInput("Message", RareAnnounce.msg, "The message to send. Replaces {spawnmsg} with the catch message, and {name} with the sea creature name.")
+                        ))),
+                        new Module("Radar Solver", RadarSolver.instance, "Guesses Fishing Hotspot positions when using your Hotspot Radar.", new Settings(List.of(
+                                new Settings.Toggle("Tracer", RadarSolver.tracer, "Draws a tracer towards the guess."),
+                                new Settings.ColorPicker("Color", true, RadarSolver.color, "The color of the guess highlight."),
+                                new Settings.ColorPicker("Tracer Color", true, RadarSolver.tracerColor, "The color of the guess tracer.")
                         )))
                 )),
                 new Category("Hunting", List.of(
@@ -373,7 +399,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", true, MinibossHighlight.color, "The color of the miniboss highlight.")
                         ))),
                         new Module("Key Highlight", KeyHighlight.instance, "Highlights nearby Wither and Blood keys.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, KeyHighlight.color, "The color of the key highlight.")
+                                new Settings.Toggle("Highlight", KeyHighlight.highlight, "Renders a highlight + beam on top of Wither Keys."),
+                                new Settings.Toggle("Tracer", KeyHighlight.tracer, "Renders a tracer towards the Wither Key."),
+                                new Settings.ColorPicker("Highlight Color", true, KeyHighlight.color, "The color of the highlight."),
+                                new Settings.ColorPicker("Tracer Color", true, KeyHighlight.tracerColor, "The color of the tracer.")
                         ))),
                         new Module("Spirit Bow Highlight", SpiritBowHighlight.instance, "Highlights the Spirit Bow in the F4/M4 boss fight.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")
@@ -398,12 +427,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve In Order", TerminalSolvers.inOrder, "Solves the \"Click in order\" Among Us task."),
                                 new Settings.Toggle("Solve Starts With", TerminalSolvers.startsWith, "Solves the \"What starts with\" terminal."),
                                 new Settings.Toggle("Solve Select", TerminalSolvers.select, "Solves the \"Select all\" terminal."),
-                                new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal."),
-                                new Settings.Toggle("Instant Click", TerminalSolvers.instant, "Instantly marks items as clicked instead of waiting until the terminal is updated.\nThis option makes terminals more responsive on high ping, but it also can show false positives."),
-                                new Settings.Toggle("Announce Melody", TerminalSolvers.melody, "Sends a message once you get the torture terminal."),
-                                new Settings.TextInput("Melody Message", TerminalSolvers.melodyMsg, "The message to send.")
+                                new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal.")
                         ))),
-                        new Module("Terracotta Timers", TerracottaTimer.instance, "Renders timers on screen and for every dead terracotta in F6/M6."),
+                        new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.\nAlso displays timers for the 1st Gyro and Sadan's last giant, useful if you are Mage.", new Settings(List.of(
+                                new Settings.Toggle("Mage Check", TerracottaTimer.mageCheck, "If enabled, prevents the 1st Gyro and last giant timers from appearing if you are not Mage.")
+                        ))),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(
                                 new Settings.Toggle("Spawn Alert", WitherDragons.alert, "Alerts you when a dragon is about to spawn.\nThis option also calculates the priority on the initial spawn based on your selected class."),
                                 new Settings.SliderDouble("Split Power", 0, 32, 0.1, WitherDragons.power, "The required Power blessing level to consider a split possible.\nLeaving this option at 0 is recommended for party finder teams."),
@@ -412,7 +440,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Kill Areas", WitherDragons.boxes, "Renders the kill areas of every alive dragon."),
                                 new Settings.Toggle("Tracers", WitherDragons.tracers, "Draws tracer lines to spawning dragons."),
                                 new Settings.Toggle("Stack Waypoints", WitherDragons.stack, "Renders waypoints for stacking your Last Breath arrows."),
-                                new Settings.Dropdown<>("Waypoint Type", WitherDragons.stackType, "The type of the arrow stack waypoints."),
+                                new Settings.Dropdown<>("Waypoint Type", WitherDragons.stackType, "The type of the arrow stack waypoints.\n\nSimple: Highlights the exact spawn position of a spawning dragon.\nAdvanced: Highlights each individual hitbox of a spawning dragon."),
                                 new Settings.Toggle("Spawn Timer", WitherDragons.timer, "Renders timers for exactly when a dragon should finish spawning."),
                                 new Settings.Toggle("Dragon Health", WitherDragons.health, "Renders the exact health of the dragons.")
                         ))),
@@ -420,7 +448,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", false, SecretBatHighlight.color, "The color of the secret bat glow.")
                         ))),
                         new Module("Livid Solver", LividSolver.instance, "Finds and highlights the correct Livid in F5/M5.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, LividSolver.color, "The color of the correct Livid outline.")
+                                new Settings.Toggle("Highlight", LividSolver.highlight, "Renders an outline for the correct Livid."),
+                                new Settings.Toggle("Tracer", LividSolver.tracer, "Renders a tracer towards the correct Livid."),
+                                new Settings.ColorPicker("Highlight Color", true, LividSolver.color, "The color of the outline."),
+                                new Settings.ColorPicker("Tracer Color", true, LividSolver.tracerColor, "The color of the tracer.")
                         ))),
                         new Module("Prince Message", PrinceMessage.instance, "Sends a message when you gain bonus score from the Prince Shard.", new Settings(List.of(
                                 new Settings.TextInput("Message", PrinceMessage.msg, "The message to send.")
@@ -428,7 +459,44 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Mimic Message", MimicMessage.instance, "Sends a message once you kill the Mimic. Should work even if it's instantly killed.", new Settings(List.of(
                                 new Settings.TextInput("Message", MimicMessage.msg, "The message to send.")
                         ))),
-                        new Module("Spirit Bear Timer", SpiritBearTimer.instance, "Renders a timer on screen for when the Spirit Bear is going to spawn in F4/M4.")
+                        new Module("Spirit Bear Timer", SpiritBearTimer.instance, "Renders a timer on screen for when the Spirit Bear is going to spawn in F4/M4."),
+                        new Module("Secret Chime", SecretChime.instance, "Plays sounds upon collecting specific secrets.", new Settings(List.of(
+                                new Settings.Toggle("Items", SecretChime.itemsToggle, "Play a chime upon picking up a secret item."),
+                                new Settings.TextInput("Items Sound", SecretChime.itemsSound, "The identifier of the sound to play."),
+                                new Settings.SliderDouble("Items Volume", 0.0, 5.0, 0.1, SecretChime.itemsVolume, "The volume of the sound."),
+                                new Settings.SliderDouble("Items Pitch", 0.0, 2.0, 0.05, SecretChime.itemsPitch, "The pitch of the sound."),
+                                new Settings.Toggle("Chests", SecretChime.chestToggle, "Play a chime upon opening a secret chest."),
+                                new Settings.TextInput("Chests Sound", SecretChime.chestSound, "The identifier of the sound to play."),
+                                new Settings.SliderDouble("Chests Volume", 0.0, 5.0, 0.1, SecretChime.chestVolume, "The volume of the sound."),
+                                new Settings.SliderDouble("Chests Pitch", 0.0, 2.0, 0.05, SecretChime.chestPitch, "The pitch of the sound."),
+                                new Settings.Toggle("Essence", SecretChime.essenceToggle, "Play a chime upon collecting a Wither Essence secret."),
+                                new Settings.TextInput("Essence Sound", SecretChime.essenceSound, "The identifier of the sound to play."),
+                                new Settings.SliderDouble("Essence Volume", 0.0, 5.0, 0.1, SecretChime.essenceVolume, "The volume of the sound."),
+                                new Settings.SliderDouble("Essence Pitch", 0.0, 2.0, 0.05, SecretChime.essencePitch, "The pitch of the sound."),
+                                new Settings.Toggle("Bats", SecretChime.batToggle, "Play a chime upon killing a secret bat."),
+                                new Settings.TextInput("Bats Sound", SecretChime.batSound, "The identifier of the sound to play."),
+                                new Settings.SliderDouble("Bats Volume", 0.0, 5.0, 0.1, SecretChime.batVolume, "The volume of the sound."),
+                                new Settings.SliderDouble("Bats Pitch", 0.0, 2.0, 0.05, SecretChime.batPitch, "The pitch of the sound."),
+                                new Settings.Toggle("Levers", SecretChime.leverToggle, "Play a chime upon interacting with a lever."),
+                                new Settings.TextInput("Levers Sound", SecretChime.leverSound, "The identifier of the sound to play."),
+                                new Settings.SliderDouble("Levers Volume", 0.0, 5.0, 0.1, SecretChime.leverVolume, "The volume of the sound."),
+                                new Settings.SliderDouble("Levers Pitch", 0.0, 2.0, 0.05, SecretChime.leverPitch, "The pitch of the sound.")
+                        ))),
+                        new Module("Melody Message", MelodyMessage.instance, "Send start and progress messages when you get the Melody terminal in F7/M7.", new Settings(List.of(
+                                new Settings.TextInput("Message", MelodyMessage.msg, "The message to send when the terminal is opened."),
+                                new Settings.Toggle("Send Progress", MelodyMessage.progress, "Send messages when you make progress in the terminal."),
+                                new Settings.TextInput("% Message", MelodyMessage.progressMsg, "The message to send when you make progress.\nReplaces {percent} with your progress percentage (25%/50%/75%).")
+                        ))),
+                        new Module("Quick Close", QuickClose.instance, "Quickly close Dungeon secret and/or loot chests by pressing any of the movement keys (WASD)."),
+                        new Module("Chest Value", DungeonChestValue.instance, "Calculates the value of your Dungeons loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
+                                new Settings.ColorPicker("Background", true, DungeonChestValue.background, "The color of the background of the value text.")
+                        ))),
+                        new Module("Tick Timers", TickTimers.instance, "Displays a timer for various things during the F7/M7 boss fight.\nUses the Tick Timers HUD element found in the HUD editor.", new Settings(List.of(
+                                new Settings.Toggle("Storm Timer", TickTimers.storm, "Shows a timer for the pads in 2nd phase."),
+                                new Settings.Toggle("Terminal Start Timer", TickTimers.terminalStart, "Shows a timer for the 3rd phase starting."),
+                                new Settings.Toggle("Goldor Timer", TickTimers.goldor, "Shows a timer for Goldor's death tick in 3rd phase.")
+                        ))),
+                        new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic.")
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(
@@ -458,6 +526,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Pre Message", PreMessage.instance, "Announces if no supply spawns at your pre spot (or your next pickup spot)."),
                         new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop."),
                         new Module("Chest Value", KuudraChestValue.instance, "Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
+                                new Settings.ColorPicker("Background", true, KuudraChestValue.background, "The color of the background of the value text."),
                                 new Settings.SliderInt("Pet Bonus", 0, 20, 1, KuudraChestValue.petBonus, "The extra Crimson Essence percentage granted by your Kuudra pet.\nUsed to calculate the value of the essence with the extra perk included.")
                         )))
                 )),
@@ -503,7 +572,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt.")
                 )),
                 new Category("Mining", List.of(
-                        new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your pickaxe ability cooldown is finished.\nBecomes more reliable when the pickaxe ability tablist widget is present."),
+                        new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability cooldown is finished.\n\nIf present, uses the Pickaxe Ability tablist widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe. Might be inaccurate in some cases."),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
                                 new Settings.ColorPicker("Lapis Color", false, CorpseHighlight.lapisColor, "The color of the Lapis corpse."),
                                 new Settings.ColorPicker("Mineral Color", false, CorpseHighlight.mineralColor, "The color of the Tungsten corpse."),
@@ -526,6 +595,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Temple Skip", TempleSkip.instance, "Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, TempleSkip.color, "The color of the skip highlight.")
+                        ))),
+                        new Module("Gemstone Desync Fix", GemstoneDesyncFix.instance, "Fixes adjacent gemstone blocks not correctly updating when mining.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", GemstoneDesyncFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", GemstoneDesyncFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        ))),
+                        new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress, also known as HSM.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", BreakResetFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", BreakResetFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         )))
                 )),
                 new Category("Farming", List.of(
@@ -540,6 +617,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Current Color", true, PlotBorders.currentColor, "The color of the current plot border."),
                                 new Settings.Toggle("All Plots", PlotBorders.all, "Adds borders to every plot if no other border should apply."),
                                 new Settings.ColorPicker("All Color", true, PlotBorders.allColor, "The color of the border for every plot.")
+                        ))),
+                        new Module("Vacuum Solver", VacuumSolver.instance, "Guesses Pest positions when using the Pest Tracker ability on your vacuum.", new Settings(List.of(
+                                new Settings.Toggle("Tracer", VacuumSolver.tracer, "Draws a tracer towards the guess."),
+                                new Settings.ColorPicker("Color", true, VacuumSolver.color, "The color of the guess highlight."),
+                                new Settings.ColorPicker("Tracer Color", true, VacuumSolver.tracerColor, "The color of the guess tracer.")
                         )))
                 ))
         );
@@ -606,9 +688,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void close() {
-        if (AutoSave.instance.isActive()) {
-            Config.saveAsync();
-        }
+        if (AutoSave.instance.isActive()) AutoSave.save();
         if (this.uiAdapter != null) {
             this.uiAdapter.dispose();
         }

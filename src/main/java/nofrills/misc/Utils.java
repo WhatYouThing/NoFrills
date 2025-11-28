@@ -7,13 +7,13 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -25,7 +25,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
@@ -47,11 +46,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.world.entity.ClientEntityManager;
-import net.minecraft.world.entity.EntityIndex;
-import net.minecraft.world.entity.EntityLookup;
+import net.minecraft.world.entity.SimpleEntityLookup;
 import nofrills.events.WorldTickEvent;
-import nofrills.mixin.*;
+import nofrills.mixin.HandledScreenAccessor;
+import nofrills.mixin.PlayerListHudAccessor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -152,7 +150,10 @@ public class Utils {
     }
 
     public static void infoRaw(MutableText message) {
-        mc.inGameHud.getChatHud().addMessage(getTag().append(message.withColor(0xffffff)).append("§r"), null, noFrillsIndicator);
+        if (message.getStyle() == null || message.getStyle().getColor() == null) {
+            message = message.withColor(0xffffff);
+        }
+        mc.inGameHud.getChatHud().addMessage(getTag().append(message), null, noFrillsIndicator);
     }
 
     public static void infoFormat(String message, Object... values) {
@@ -180,7 +181,7 @@ public class Utils {
     }
 
     public static boolean isInDungeons() {
-        return isInZone(Symbols.zone + " The Catacombs", false);
+        return isInArea("Catacombs");
     }
 
     /**
@@ -204,7 +205,7 @@ public class Utils {
     }
 
     public static boolean isInKuudra() {
-        return SkyblockData.getArea().equals("Kuudra");
+        return isInArea("Kuudra");
     }
 
     public static boolean isInChateau() {
@@ -226,7 +227,11 @@ public class Utils {
      * Returns true if the player is anywhere on their garden
      */
     public static boolean isInGarden() {
-        return isInZone(Symbols.zone + " The Garden", true) || isOnGardenPlot();
+        return isInArea("Garden");
+    }
+
+    public static boolean isInHub() {
+        return isInArea("Hub");
     }
 
     /**
@@ -283,14 +288,10 @@ public class Utils {
         return entity.getDimensions(EntityPose.STANDING).getBoxAt(entity.getLerpedPos(tickProgress));
     }
 
-    @SuppressWarnings("unchecked")
     public static List<Entity> getEntities() {
-        if (mc.world != null) { // only powerful wizards may cast such obscene spells
-            ClientEntityManager<Entity> manager = ((ClientWorldAccessor) mc.world).getManager();
-            EntityLookup<?> lookup = ((ClientEntityManagerAccessor<?>) manager).getLookup();
-            EntityIndex<?> index = ((SimpleEntityLookupAccessor<?>) lookup).getIndex();
-            Int2ObjectMap<?> map = ((EntityIndexAccessor<?>) index).getEntityMap();
-            return (List<Entity>) new ArrayList<>(map.values());
+        if (mc.world != null) {
+            SimpleEntityLookup<Entity> lookup = (SimpleEntityLookup<Entity>) mc.world.entityManager.getLookup();
+            return new ArrayList<>(lookup.index.idToEntity.values());
         }
         return new ArrayList<>();
     }
@@ -311,6 +312,30 @@ public class Utils {
 
     public static List<Entity> getOtherEntities(Entity from, double dist, Predicate<? super Entity> filter) {
         return getOtherEntities(from, Box.of(from.getPos(), dist, dist, dist), filter);
+    }
+
+    public static float getTextScale(double dist, float base, float scaling) {
+        float distScale = (float) (1 + dist * scaling);
+        return Math.max(base * distScale, base);
+    }
+
+    public static float getTextScale(double dist, float base) {
+        return getTextScale(dist, base, 0.1f);
+    }
+
+    public static float getTextScale(Vec3d pos, float base, float scaling) {
+        if (mc.player != null) {
+            return getTextScale(mc.player.getPos().distanceTo(pos), base, scaling);
+        }
+        return 0.0f;
+    }
+
+    public static float getTextScale(Vec3d pos, float base) {
+        return getTextScale(pos, base, 0.1f);
+    }
+
+    public static boolean matchesKey(KeyBinding binding, int key) {
+        return binding.matchesKey(key, 0) || binding.matchesMouse(key);
     }
 
     public static void sendPingPacket() {
@@ -339,7 +364,7 @@ public class Utils {
         if (stack != null && !stack.isEmpty()) {
             NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
             if (data != null) {
-                return ((NbtComponentAccessor) (Object) data).get(); // casting a spell
+                return data.nbt;
             }
         }
         return null;
@@ -590,6 +615,10 @@ public class Utils {
         return MathHelper.sqrt(x * x + z * z);
     }
 
+    public static float horizontalDistance(Entity from, Entity to) {
+        return horizontalDistance(from.getPos(), to.getPos());
+    }
+
     /**
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
@@ -633,7 +662,7 @@ public class Utils {
         List<String> lines = new ArrayList<>();
         if (mc.getNetworkHandler() != null) {
             for (PlayerListEntry entry : new ArrayList<>(mc.getNetworkHandler().getPlayerList())) {
-                if (entry.getDisplayName() != null) {
+                if (entry != null && entry.getDisplayName() != null) {
                     lines.add(toPlain(entry.getDisplayName()).trim());
                 }
             }
@@ -663,10 +692,7 @@ public class Utils {
      * Returns every slot that is part of the container screen handler, excluding the player inventory slots.
      */
     public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
-        Inventory inventory = handler.getInventory();
-        List<Slot> slots = new ArrayList<>(handler.slots);
-        slots.removeIf(slot -> inventory.getStack(slot.id).equals(ItemStack.EMPTY));
-        return slots;
+        return handler.slots.stream().filter(slot -> slot.id < handler.getRows() * 9).toList();
     }
 
     public static ItemStack getHeldItem() {

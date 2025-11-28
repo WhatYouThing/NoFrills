@@ -1,5 +1,7 @@
 package nofrills.config;
 
+import org.lwjgl.glfw.GLFW;
+
 public class SettingKeybind extends SettingInt {
     public SettingKeybind(int defaultValue, String key, String parentKey) {
         super(defaultValue, key, parentKey);
@@ -11,5 +13,9 @@ public class SettingKeybind extends SettingInt {
 
     public int key() {
         return this.value();
+    }
+
+    public boolean bound() {
+        return this.value() != GLFW.GLFW_KEY_UNKNOWN;
     }
 }

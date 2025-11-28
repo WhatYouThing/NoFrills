@@ -63,7 +63,7 @@ public final class Rendering {
      * Draws a simulated beacon beam for the current frame. Automatically performs the required matrix stack translation.
      */
     public static void drawBeam(MatrixStack matrices, VertexConsumerProvider.Immediate consumer, Camera camera, Vec3d pos, int height, boolean throughWalls, RenderColor color) {
-        drawFilled(matrices, consumer, camera, Box.of(pos, 0.35, 0, 0.35).stretch(0, height, 0), throughWalls, color);
+        drawFilled(matrices, consumer, camera, Box.of(pos, 0.5, 0, 0.5).stretch(0, height, 0), throughWalls, color);
     }
 
     /**
@@ -74,9 +74,9 @@ public final class Rendering {
         matrices.push();
         matrices.translate(-camPos.getX(), -camPos.getY(), -camPos.getZ());
         MatrixStack.Entry entry = matrices.peek();
-        VertexConsumer buffer = consumer.getBuffer(Layers.BoxOutlineNoCull);
+        VertexConsumer buffer = consumer.getBuffer(Layers.GuiLine);
         Vec3d point = camPos.add(Vec3d.fromPolar(camera.getPitch(), camera.getYaw())); // taken from Skyblocker's RenderHelper, my brain cannot handle OpenGL
-        Vector3f normal = pos.toVector3f().sub((float) point.getX(), (float) point.getY(), (float) point.getZ()).normalize();
+        Vector3f normal = pos.toVector3f().sub((float) point.getX(), (float) point.getY(), (float) point.getZ()).normalize(new Vector3f(1.0f, 1.0f, 1.0f));
         buffer.vertex(entry, (float) point.getX(), (float) point.getY(), (float) point.getZ()).color(color.r, color.g, color.b, color.a).normal(entry, normal);
         buffer.vertex(entry, (float) pos.getX(), (float) pos.getY(), (float) pos.getZ()).color(color.r, color.g, color.b, color.a).normal(entry, normal);
         matrices.pop();
@@ -146,6 +146,13 @@ public final class Rendering {
         public static final RenderPipeline outlineCull = RenderPipelines.register(RenderPipeline.builder(outlineSnippet)
                 .withLocation(Identifier.of("nofrills", "pipeline/nofrills_outline_cull"))
                 .build());
+        public static final RenderPipeline lineNoCull = RenderPipelines.register(RenderPipeline.builder(outlineSnippet)
+                .withLocation(Identifier.of("nofrills", "pipeline/nofrills_line_no_cull"))
+                .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.DEBUG_LINE_STRIP)
+                .withVertexShader("core/position_color")
+                .withFragmentShader("core/position_color")
+                .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                .build());
     }
 
     public static class Parameters {
@@ -191,10 +198,10 @@ public final class Rendering {
         );
         public static final RenderLayer.MultiPhase GuiLine = RenderLayer.of(
                 "nofrills_gui_line",
-                262144,
+                RenderLayer.DEFAULT_BUFFER_SIZE,
                 false,
                 false,
-                RenderPipelines.DEBUG_LINE_STRIP,
+                Pipelines.lineNoCull,
                 Parameters.lines.build(false)
         );
     }

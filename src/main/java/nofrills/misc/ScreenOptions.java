@@ -1,5 +1,7 @@
 package nofrills.misc;
 
+import nofrills.features.dungeons.LeapOverlay;
+
 public interface ScreenOptions {
-    void nofrills_mod$addLeapButton(int slotId, String name, String dungeonClass, RenderColor classColor);
+    void nofrills_mod$addLeapButton(LeapOverlay.LeapTarget target);
 }

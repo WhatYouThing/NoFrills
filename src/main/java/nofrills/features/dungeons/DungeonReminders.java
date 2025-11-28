@@ -20,11 +20,11 @@ public class DungeonReminders {
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
-            if (wish.value() && SkyblockData.dungeonClass.value().equals("Healer") && event.messagePlain.equals("⚠ Maxor is enraged! ⚠")) {
+            if (wish.value() && SkyblockData.dungeonClass.equals("Healer") && event.messagePlain.equals("⚠ Maxor is enraged! ⚠")) {
                 Utils.showTitleCustom("WISH!", 40, -20, 4.0f, RenderColor.fromHex(0x00ff00));
                 Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
             }
-            if (SkyblockData.dungeonClass.value().equals("Mage")) {
+            if (SkyblockData.dungeonClass.equals("Mage")) {
                 if (bloodCamp.value() && event.messagePlain.equals("[BOSS] The Watcher: Let's see how you can handle this.")) {
                     Utils.showTitleCustom("CAMP BLOOD!", 40, -20, 4.0f, RenderColor.fromHex(0xff4646));
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);

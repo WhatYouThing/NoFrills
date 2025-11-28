@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import nofrills.config.Feature;
+import nofrills.config.SettingColor;
 import nofrills.config.SettingInt;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenRenderEvent;
@@ -21,8 +22,9 @@ import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 public class KuudraChestValue {
     public static final Feature instance = new Feature("kuudraChestValue");
 
+    public static final SettingColor background = new SettingColor(RenderColor.fromHex(0x202020, 0.8f), "background", instance);
     public static final SettingInt petBonus = new SettingInt(0, "petBonus", instance.key());
-    public static final RenderColor background = RenderColor.fromHex(0x202020, 0.75f);
+
     private static double currentValue = 0.0;
 
     private static int getLootQuantity(ItemStack stack, String name) {
@@ -73,7 +75,7 @@ public class KuudraChestValue {
             int width = mc.textRenderer.getWidth(value);
             int baseX = targetSlot.x + 8;
             int baseY = targetSlot.y + 8;
-            event.context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, background.argb);
+            event.context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, background.value().argb);
             event.context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, RenderColor.green.argb);
         }
     }

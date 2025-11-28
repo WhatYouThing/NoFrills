@@ -27,6 +27,7 @@ public class HudManager {
     public static LagMeter lagMeterElement = new LagMeter("§cLast server tick was 0.00s ago");
     public static Power powerElement = new Power("§bPower: §f0");
     public static ShardTrackerDisplay shardTrackerElement = new ShardTrackerDisplay();
+    public static TickTimer tickTimerElement = new TickTimer("§bTick Timers");
 
     public static boolean isEditingHud() {
         return mc.currentScreen instanceof HudEditorScreen;

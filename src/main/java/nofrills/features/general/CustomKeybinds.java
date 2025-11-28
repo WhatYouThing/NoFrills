@@ -51,6 +51,7 @@ public class CustomKeybinds {
             object.addProperty("enabled", true);
             object.addProperty("modifier", Modifier.Any.name());
             data.value().get("binds").getAsJsonArray().add(object);
+            data.save();
             mc.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
@@ -144,25 +145,38 @@ public class CustomKeybinds {
             this.input.margins(Insets.of(0, 0, 0, 6));
             this.input.text(getData().get("command").getAsString());
             this.input.tooltip(Text.literal("The message/command that this keybind will send."));
-            this.input.onChanged().subscribe(value -> getData().addProperty("command", value));
+            this.input.onChanged().subscribe(value -> {
+                getData().addProperty("command", value);
+                data.save();
+            });
             this.options = Containers.horizontalFlow(Sizing.content(), Sizing.content());
             this.keybind = new KeybindButton();
             this.keybind.verticalSizing(Sizing.fixed(18)).horizontalSizing(Sizing.fixed(100)).margins(Insets.of(3, 0, 1, 0));
             this.keybind.bind(getData().get("key").getAsInt());
             this.keybind.tooltip(Text.literal("The key bound to this command."));
-            this.keybind.onBound().subscribe(key -> getData().addProperty("key", key));
+            this.keybind.onBound().subscribe(key -> {
+                getData().addProperty("key", key);
+                data.save();
+            });
             this.modifier = new EnumButton<>(getData().has("modifier") ? getData().get("modifier").getAsString() : "Any", Modifier.Any, Modifier.class);
-            this.modifier.onChanged().subscribe(value -> getData().addProperty("modifier", value));
+            this.modifier.onChanged().subscribe(value -> {
+                getData().addProperty("modifier", value);
+                data.save();
+            });
             this.modifier.margins(Insets.of(3, 0, 5, 0));
             this.modifier.sizing(Sizing.fixed(80), Sizing.fixed(18));
             this.modifier.tooltip(Text.literal("The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held."));
             this.toggle = new ToggleButton(getData().has("enabled") && getData().get("enabled").getAsBoolean());
-            this.toggle.onToggled().subscribe(value -> this.getData().addProperty("enabled", value));
+            this.toggle.onToggled().subscribe(value -> {
+                this.getData().addProperty("enabled", value);
+                data.save();
+            });
             this.toggle.verticalSizing(Sizing.fixed(18)).horizontalSizing(Sizing.fixed(54));
-            this.toggle.tooltip(Text.literal("The toggle for the keybind, allows you to disable the keybind without having to delete it."));
+            this.toggle.tooltip(Text.literal("The toggle for the keybind, allows you to disable it without having to delete it."));
             this.toggle.margins(Insets.of(3, 0, 5, 0));
             this.delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.value().get("binds").getAsJsonArray().remove(this.index);
+                data.save();
                 mc.setScreen(buildSettings());
             });
             this.delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));

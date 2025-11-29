@@ -32,7 +32,7 @@ public class Armor extends HudElement {
     private Alignment lastAlign;
 
     public Armor(double x, double y) {
-        super(Containers.verticalFlow(Sizing.content(), Sizing.content()));
+        super(Containers.horizontalFlow(Sizing.content(), Sizing.content()));
         this.content = this.getAlignment(align.value());
         this.lastAlign = align.value();
         this.layout.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
@@ -68,8 +68,8 @@ public class Armor extends HudElement {
 
     private FlowLayout getAlignment(Alignment alignment) {
         return switch (alignment) {
-            case Horizontal -> Containers.horizontalFlow(Sizing.content(), Sizing.content());
-            case Vertical -> Containers.verticalFlow(Sizing.content(), Sizing.content());
+            case Horizontal -> Containers.horizontalFlow(Sizing.fixed(64), Sizing.fixed(16));
+            case Vertical -> Containers.verticalFlow(Sizing.fixed(16), Sizing.fixed(64));
         };
     }
 

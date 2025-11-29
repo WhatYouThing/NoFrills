@@ -269,7 +269,9 @@ public class Utils {
     }
 
     public static boolean isBaseHealth(LivingEntity entity, float health) {
-        return entity.getHealth() >= health && entity.getHealth() % health == 0;
+        float current = entity.getHealth();
+        float difference = current - health;
+        return current >= health && (current % health == 0 || (current - difference) % health == 0);
     }
 
     /**

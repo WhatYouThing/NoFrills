@@ -16,7 +16,7 @@ public class SimpleTextElement extends HudElement {
     public LabelComponent label;
 
     public SimpleTextElement(Text text) {
-        super(Containers.verticalFlow(Sizing.content(), Sizing.content()));
+        super(Containers.horizontalFlow(Sizing.content(), Sizing.content()));
         this.text = text;
         this.defaultText = text;
         this.label = new PlainLabel(text);

@@ -22,6 +22,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: latest
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
       - name: build
         run: ./gradlew build
       - name: capture build artifacts

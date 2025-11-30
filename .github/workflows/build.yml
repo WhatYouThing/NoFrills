@@ -35,6 +35,6 @@ jobs:
         if: ${{ success() }}
         run: |
           cd .github/upload
-          npm run start -- ${{ github.sha }} ${{ github.event.head_commit.message }}
+          npm run start -- ${{ github.sha }} "${{ github.event.head_commit.message }}"
         env:
           NF_API_BETA_AUTH: ${{ secrets.NF_API_BETA_AUTH }}

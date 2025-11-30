@@ -1,20 +1,21 @@
-import { readdirSync, readFileSync } from "fs";
+import * as fs from "fs";
+import * as path from "path";
 
-const hash = process.argv[2];
-const commitMessage = process.argv[3];
+const file = fs.readdirSync("../../build/libs", { withFileTypes: true }).at(0);
+const bytes = fs.readFileSync(`${file.parentPath}/${file.name}`);
+const form = new FormData();
 
-const file = readdirSync("../../build/libs", { withFileTypes: true }).at(0);
-const bytes = readFileSync(`${file.parentPath}/${file.name}`);
+form.set("bytes", new Blob([bytes], { type: "application/java-archive" }), path.basename(jar));
+form.set("hash", process.argv[2]);
+form.set("version", file.name.split("-").at(1));
+form.set("message", process.argv[3]);
+
 fetch("https://whatyouth.ing/api/nofrills/v1/misc/post-beta-build", {
     method: "POST",
     headers: {
-        "Content-Type": "application/octet-stream",
         "nf-beta-auth": process.env.NF_API_BETA_AUTH,
-        "nf-beta-hash": hash,
-        "nf-beta-msg": commitMessage,
-        "nf-beta-ver": file.name.split("-").at(1)
     },
-    body: bytes
+    body: form
 }).then(res => {
     console.log(`Response code: ${res.status}`);
 });

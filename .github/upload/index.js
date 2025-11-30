@@ -1,6 +1,6 @@
 import * as fs from "fs";
 
-const file = fs.readdirSync(`${__dirname}/build/libs`, { withFileTypes: true }).at(0);
+const file = fs.readdirSync("../../build/libs", { withFileTypes: true }).at(0);
 const bytes = fs.readFileSync(`${file.parentPath}/${file.name}`);
 const body = {
     "bytes": bytes,

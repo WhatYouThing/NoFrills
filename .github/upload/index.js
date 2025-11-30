@@ -1,9 +1,17 @@
 import * as fs from "fs";
 
-const file = fs.readdirSync("../../build/libs", { withFileTypes: true }).at(0);
-const bytes = fs.readFileSync(`${file.parentPath}/${file.name}`);
+function getFileBytes() {
+  const file = fs.readdirSync("../../build/libs", { withFileTypes: true }).at(0);
+  const buffer = fs.readFileSync(`${file.parentPath}/${file.name}`);
+  let bytes = [];
+  buffer.forEach((byte) => {
+    bytes.push(byte);
+  })
+  return bytes;
+}
+
 const body = {
-  "bytes": bytes,
+  "bytes": getFileBytes(),
   "hash": process.argv[2],
   "version": file.name.split("-").at(1),
   "message": process.argv[3]

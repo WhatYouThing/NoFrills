@@ -5,7 +5,7 @@ const commitMessage = process.argv[3];
 
 async function main() {
     const file = readdirSync("../../build/libs", { withFileTypes: true }).at(0);
-    await fetch(`https://whatyouth.ing/api/nofrills/v1/misc/post-beta-build`, {
+    const res = await fetch(`https://whatyouth.ing/api/nofrills/v1/misc/post-beta-build`, {
         method: "POST",
         headers: {
             "nf-auth": process.env.NF_API_BETA_AUTH,
@@ -14,7 +14,9 @@ async function main() {
             "nf-beta-ver": file.name.split("-").at(1)
         },
         body: readFileSync(`${file.parentPath}/${file.name}`)
-    })
+    });
+    console.log(`Build path: ${file.parentPath}/${file.name}`);
+    console.log(`Response code: ${res.status}`);
 }
 
 await main();

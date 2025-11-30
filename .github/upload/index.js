@@ -1,7 +1,8 @@
 import * as fs from "fs";
 
+const file = fs.readdirSync("../../build/libs", { withFileTypes: true }).at(0);
+
 function getFileBytes() {
-  const file = fs.readdirSync("../../build/libs", { withFileTypes: true }).at(0);
   const buffer = fs.readFileSync(`${file.parentPath}/${file.name}`);
   let bytes = [];
   buffer.forEach((byte) => {

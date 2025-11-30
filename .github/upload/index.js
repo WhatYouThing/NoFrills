@@ -5,7 +5,7 @@ const file = fs.readdirSync("../../build/libs", { withFileTypes: true }).at(0);
 const bytes = fs.readFileSync(`${file.parentPath}/${file.name}`);
 const form = new FormData();
 
-form.set("bytes", new Blob([bytes], { type: "application/java-archive" }), path.basename(jar));
+form.set("bytes", new Blob([bytes], { type: "application/java-archive" }), path.basename(`${file.parentPath}/${file.name}`));
 form.set("hash", process.argv[2]);
 form.set("version", file.name.split("-").at(1));
 form.set("message", process.argv[3]);

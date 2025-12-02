@@ -1,7 +1,6 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.item.Item;
@@ -74,7 +73,7 @@ public class WardrobeKeybinds {
             case Hotbar -> {
                 for (int i = 1; i <= 9; i++) {
                     KeyBinding binding = mc.options.hotbarKeys[i - 1]; // could crash if someone is doing some voodoo
-                    if ((event.isKeyboard && binding.matchesKey(event.keyInput)) || (event.isMouse && binding.matchesMouse(new Click(0, 0, event.mouseInput)))) {
+                    if (Utils.matchesKey(binding, event.keyInput, event.mouseInput)) {
                         yield i + (page - 1) * 9;
                     }
                 }

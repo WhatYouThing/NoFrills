@@ -9,10 +9,14 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.input.KeyInput;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -65,16 +69,6 @@ import static nofrills.Main.*;
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     private static final Random soundRandom = Random.create(0);
-    private static final HashSet<String> abilityWhitelist = Sets.newHashSet(
-            "ABINGOPHONE",
-            "SUPERBOOM_TNT",
-            "INFINITE_SUPERBOOM_TNT",
-            "ARROW_SWAPPER",
-            "PUMPKIN_LAUNCHER",
-            "SNOW_CANNON",
-            "SNOW_BLASTER",
-            "SNOW_HOWITZER"
-    );
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "The Park",
             "Galatea",
@@ -182,7 +176,7 @@ public class Utils {
     }
 
     public static boolean isInDungeons() {
-        return isInZone(Symbols.zone + " The Catacombs", false);
+        return isInArea("Catacombs");
     }
 
     /**
@@ -206,7 +200,7 @@ public class Utils {
     }
 
     public static boolean isInKuudra() {
-        return SkyblockData.getArea().equals("Kuudra");
+        return isInArea("Kuudra");
     }
 
     public static boolean isInChateau() {
@@ -229,6 +223,10 @@ public class Utils {
      */
     public static boolean isInGarden() {
         return isInArea("Garden");
+    }
+
+    public static boolean isInHub() {
+        return isInArea("Hub");
     }
 
     /**
@@ -275,7 +273,9 @@ public class Utils {
     }
 
     public static boolean isBaseHealth(LivingEntity entity, float health) {
-        return entity.getHealth() >= health && entity.getHealth() % health == 0;
+        float current = entity.getHealth();
+        float difference = current - health;
+        return current >= health && (current % health == 0 || (current - difference) % health == 0);
     }
 
     /**
@@ -324,6 +324,38 @@ public class Utils {
 
     public static List<Entity> getOtherEntities(Entity from, double dist, Predicate<? super Entity> filter) {
         return getOtherEntities(from, Box.of(from.getEntityPos(), dist, dist, dist), filter);
+    }
+
+    public static float getTextScale(double dist, float base, float scaling) {
+        float distScale = (float) (1 + dist * scaling);
+        return Math.max(base * distScale, base);
+    }
+
+    public static float getTextScale(double dist, float base) {
+        return getTextScale(dist, base, 0.1f);
+    }
+
+    public static float getTextScale(Vec3d pos, float base, float scaling) {
+        if (mc.player != null) {
+            return getTextScale(mc.player.getEntityPos().distanceTo(pos), base, scaling);
+        }
+        return 0.0f;
+    }
+
+    public static float getTextScale(Vec3d pos, float base) {
+        return getTextScale(pos, base, 0.1f);
+    }
+
+    public static boolean matchesKey(KeyBinding binding, KeyInput keyInput, MouseInput mouseInput) {
+        return (keyInput != null && binding.matchesKey(keyInput)) || (mouseInput != null && binding.matchesMouse(new Click(0, 0, mouseInput)));
+    }
+
+    public static boolean matchesKey(KeyBinding binding, KeyInput keyInput) {
+        return matchesKey(binding, keyInput, null);
+    }
+
+    public static boolean matchesKey(KeyBinding binding, MouseInput mouseInput) {
+        return matchesKey(binding, null, mouseInput);
     }
 
     public static void sendPingPacket() {
@@ -487,15 +519,6 @@ public class Utils {
     }
 
     public static boolean hasRightClickAbility(ItemStack stack) {
-        String id = getSkyblockId(stack);
-        if (!id.isEmpty()) {
-            if (id.startsWith("ABIPHONE")) {
-                return true;
-            }
-            if (abilityWhitelist.contains(id)) {
-                return true;
-            }
-        }
         return !getRightClickAbility(stack).isEmpty();
     }
 
@@ -603,6 +626,10 @@ public class Utils {
         return MathHelper.sqrt(x * x + z * z);
     }
 
+    public static float horizontalDistance(Entity from, Entity to) {
+        return horizontalDistance(from.getEntityPos(), to.getEntityPos());
+    }
+
     /**
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
@@ -646,7 +673,7 @@ public class Utils {
         List<String> lines = new ArrayList<>();
         if (mc.getNetworkHandler() != null) {
             for (PlayerListEntry entry : new ArrayList<>(mc.getNetworkHandler().getPlayerList())) {
-                if (entry.getDisplayName() != null) {
+                if (entry != null && entry.getDisplayName() != null) {
                     lines.add(toPlain(entry.getDisplayName()).trim());
                 }
             }

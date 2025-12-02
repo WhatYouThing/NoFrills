@@ -1,9 +1,5 @@
-name: build
-
-on:
-  push:
-    branches:
-      - main
+name: pull_build
+on: [ pull_request ]
 
 jobs:
   build:
@@ -18,10 +14,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '21'
-      - name: nodejs setup
-        uses: actions/setup-node@v4
-        with:
-          node-version: latest
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
       - name: build
@@ -31,10 +23,3 @@ jobs:
         with:
           name: Artifacts
           path: build/libs/
-      - name: post beta
-        if: ${{ success() }}
-        run: |
-          cd .github/upload
-          npm run start -- ${{ github.sha }} "${{ github.event.head_commit.message }}"
-        env:
-          NF_API_BETA_AUTH: ${{ secrets.NF_API_BETA_AUTH }}

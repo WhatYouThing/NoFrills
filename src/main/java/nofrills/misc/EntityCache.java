@@ -42,8 +42,11 @@ public class EntityCache {
         this.entities.add(ent);
     }
 
+    /**
+     * Removes an entity handle from the object. Does nothing if the entity is not on the list.
+     */
     public void remove(Entity ent) {
-        this.entities.removeIf(ent::equals);
+        this.entities.remove(ent);
     }
 
     public void clear() {

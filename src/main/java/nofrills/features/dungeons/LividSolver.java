@@ -7,7 +7,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
+import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.events.BlockUpdateEvent;
 import nofrills.events.EntityUpdatedEvent;
@@ -23,7 +25,10 @@ import java.util.List;
 public class LividSolver {
     public static final Feature instance = new Feature("lividSolver");
 
+    public static final SettingBool highlight = new SettingBool(true, "highlight", instance);
+    public static final SettingBool tracer = new SettingBool(false, "tracer", instance);
     public static final SettingColor color = new SettingColor(RenderColor.fromArgb(0xff00ff00), "color", instance.key());
+    public static final SettingColor tracerColor = new SettingColor(RenderColor.fromArgb(0xff00ff00), "tracerColor", instance.key());
 
     private static final HashMap<Block, Livid> lividData = buildLividData();
     private static final EntityCache lividCache = new EntityCache();
@@ -68,7 +73,7 @@ public class LividSolver {
         if (instance.isActive() && Utils.isInDungeonBoss("5") && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
             String name = Utils.toPlain(player.getName());
             if (!lividCache.has(event.entity) && lividData.values().stream().anyMatch(livid -> livid.name.equals(name))) {
-                lividCache.add(player);
+                lividCache.add(event.entity);
             }
         }
     }
@@ -77,12 +82,18 @@ public class LividSolver {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInDungeonBoss("5")) {
             List<Entity> livids = lividCache.get();
-            if (livids.size() > 1) {
-                for (Entity livid : livids) {
-                    if (Utils.toPlain(livid.getName()).equals(currentName)) {
-                        event.drawOutline(Utils.getLerpedBox(livid, event.tickCounter.getTickProgress(true)), false, color.value());
-                        break;
+            if (livids.size() <= 1) return;
+            for (Entity livid : livids) {
+                if (Utils.toPlain(livid.getName()).equals(currentName)) {
+                    float delta = event.tickCounter.getTickProgress(true);
+                    if (highlight.value()) {
+                        Box box = Utils.getLerpedBox(livid, delta);
+                        event.drawOutline(box, false, color.value());
                     }
+                    if (tracer.value()) {
+                        event.drawTracer(livid.getLerpedPos(delta), tracerColor.value());
+                    }
+                    break;
                 }
             }
         }

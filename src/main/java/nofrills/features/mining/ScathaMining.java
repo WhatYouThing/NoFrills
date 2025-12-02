@@ -3,6 +3,7 @@ package nofrills.features.mining;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ChatMsgEvent;
@@ -10,8 +11,9 @@ import nofrills.events.EntityNamedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.misc.EntityCache;
-import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
+
+import static nofrills.Main.mc;
 
 
 public class ScathaMining {
@@ -24,23 +26,32 @@ public class ScathaMining {
     private static int spawnCooldown = 0;
 
     private static boolean active() {
-        return SkyblockData.getArea().equals("Crystal Hollows") && instance.isActive();
+        return instance.isActive() && Utils.isInArea("Crystal Hollows");
     }
 
-    private static wormType getWormType(String name) {
+    private static WormType getWormType(String name) {
         if (name.endsWith(Utils.Symbols.heart)) {
-            if (name.startsWith("[Lv10] Scatha ")) return wormType.Scatha;
-            if (name.startsWith("[Lv5] Worm ")) return wormType.Worm;
+            if (name.startsWith("[Lv10] Scatha ")) return WormType.Scatha;
+            if (name.startsWith("[Lv5] Worm ")) return WormType.Worm;
         }
-        return wormType.None;
+        return WormType.None;
+    }
+
+    private static boolean isWithinRadius(BlockPos wormPos) {
+        if (mc.player != null) {
+            BlockPos playerPos = mc.player.getBlockPos();
+            return Math.abs(wormPos.getY() - playerPos.getY()) <= 4 &&
+                    (Math.abs(wormPos.getX() - playerPos.getX()) <= 2 || Math.abs(wormPos.getZ() - playerPos.getZ()) <= 2);
+        }
+        return false;
     }
 
     private static void alertSpawn(boolean scatha) {
         if (scatha) {
-            Utils.showTitle("§cScatha", "§7GOLD GOLD GOLD!", 5, 20, 5);
+            Utils.showTitle("§cScatha", "", 5, 20, 5);
             Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1.0f, 1.0f);
         } else {
-            Utils.showTitle("§eWorm", "§7Drops Hytale", 5, 20, 5);
+            Utils.showTitle("§eWorm", "", 5, 20, 5);
             Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
         }
     }
@@ -48,10 +59,10 @@ public class ScathaMining {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (active()) {
-            wormType type = getWormType(event.namePlain);
-            if (!type.equals(wormType.None) && !wormsCache.has(event.entity)) {
+            WormType type = getWormType(event.namePlain);
+            if (!type.equals(WormType.None) && !wormsCache.has(event.entity) && isWithinRadius(event.entity.getBlockPos())) {
                 if (alert.value()) {
-                    alertSpawn(type.equals(wormType.Scatha));
+                    alertSpawn(type.equals(WormType.Scatha));
                 }
                 wormsCache.add(event.entity);
             }
@@ -70,9 +81,9 @@ public class ScathaMining {
         if (spawnCooldown > 0) {
             spawnCooldown--;
             if (spawnCooldown == 0) {
-                if (cooldown.value()) {
-                    Utils.showTitle("§a§lWORM COOLDOWN ENDED", "", 5, 20, 5);
-                    Utils.info("§a§lWorm spawn cooldown ended!");
+                if (active() && cooldown.value()) {
+                    Utils.showTitle("§a§lCOOLDOWN ENDED", "", 5, 20, 5);
+                    Utils.info("§aWorm spawn cooldown ended!");
                     Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.MASTER, 1.0f, 0.0f);
                 }
                 wormsCache.removeDead();
@@ -86,7 +97,7 @@ public class ScathaMining {
         wormsCache.clear();
     }
 
-    private enum wormType {
+    private enum WormType {
         Scatha,
         Worm,
         None

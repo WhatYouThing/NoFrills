@@ -9,7 +9,7 @@ import nofrills.misc.Utils;
 public class PrinceMessage {
     public static final Feature instance = new Feature("princeMessage");
 
-    public static final SettingString msg = new SettingString("/pc Prince Shard activated, +1 score!", "msg", instance);
+    public static final SettingString msg = new SettingString("/pc Prince Killed!", "msg", instance);
 
     @EventHandler
     private static void onMsg(ChatMsgEvent event) {

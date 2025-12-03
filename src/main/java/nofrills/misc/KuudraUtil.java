@@ -60,7 +60,7 @@ public class KuudraUtil {
                 int cubesFound = 0;
                 for (Entity ent : Utils.getEntities()) {
                     if (ent instanceof MagmaCubeEntity cube && cube.getSize() == 30) {
-                        double y = ent.getPos().getY();
+                        double y = cube.getEntityPos().getY();
                         cubesFound++;
                         if (y > maxY) {
                             kuudra = cube;

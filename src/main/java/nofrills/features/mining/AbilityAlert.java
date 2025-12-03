@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Feature;
+import nofrills.config.SettingInt;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.Utils;
@@ -14,6 +15,8 @@ import static nofrills.Main.mc;
 
 public class AbilityAlert {
     public static final Feature instance = new Feature("abilityAlert");
+
+    public static final SettingInt override = new SettingInt(0, "override", instance);
 
     private static int ticks = 0;
 
@@ -56,10 +59,14 @@ public class AbilityAlert {
         if (instance.isActive() && !Utils.isInDungeons() && isUsedMessage(event.messagePlain)) {
             ToolData data = new ToolData();
             if (!data.tool.isEmpty() && !data.ability.isEmpty() && data.widget.isEmpty()) {
-                for (String line : Utils.getLoreLines(data.tool).reversed()) {
-                    if (line.startsWith("Cooldown: ")) {
-                        String duration = line.substring(line.indexOf(":") + 2).replace("s", "");
-                        ticks = Utils.parseInt(duration).orElse(0) * 20;
+                if (override.value() > 0) {
+                    ticks = override.value();
+                } else {
+                    for (String line : Utils.getLoreLines(data.tool).reversed()) {
+                        if (line.startsWith("Cooldown: ")) {
+                            String duration = line.substring(line.indexOf(":") + 2).replace("s", "");
+                            ticks = Utils.parseInt(duration).orElse(0) * 20;
+                        }
                     }
                 }
             }

@@ -4,6 +4,7 @@ import io.wispforest.owo.ui.component.TextBoxComponent;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.client.gui.DrawContext;
+import nofrills.misc.Rendering;
 
 public class FlatTextbox extends TextBoxComponent {
     public int borderColor = 0xff5ca0bf;
@@ -18,7 +19,7 @@ public class FlatTextbox extends TextBoxComponent {
     @Override
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         context.fill(this.x(), this.y(), this.getX() + this.width() + 4, this.y() + this.height(), 0xff101010);
-        context.drawBorder(this.x(), this.y(), this.width() + 4, this.height(), this.borderColor);
+        Rendering.drawBorder(context, this.x(), this.y(), this.width() + 4, this.height(), this.borderColor);
         super.renderWidget(context, mouseX, mouseY, deltaTicks);
     }
 

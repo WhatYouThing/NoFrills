@@ -9,6 +9,7 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.GlowingMushroom;
@@ -28,6 +29,7 @@ import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.misc.RenderColor;
+import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -53,18 +55,18 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode != GLFW.GLFW_KEY_LEFT && keyCode != GLFW.GLFW_KEY_RIGHT && keyCode != GLFW.GLFW_KEY_PAGE_DOWN && keyCode != GLFW.GLFW_KEY_PAGE_UP) {
-            return super.keyPressed(keyCode, scanCode, modifiers);
+    public boolean keyPressed(KeyInput input) {
+        if (input.key() != GLFW.GLFW_KEY_LEFT && input.key() != GLFW.GLFW_KEY_RIGHT && input.key() != GLFW.GLFW_KEY_PAGE_DOWN && input.key() != GLFW.GLFW_KEY_PAGE_UP) {
+            return super.keyPressed(input);
         } else {
             for (Category category : this.categories) {
                 for (Module module : category.features) {
                     if (module.isInBoundingBox(this.mouseX, this.mouseY)) {
-                        return category.scroll.onMouseScroll(0, 0, keyCode == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+                        return category.scroll.onMouseScroll(0, 0, input.key() == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
                     }
                 }
             }
-            return this.mainScroll.onMouseScroll(0, 0, keyCode == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+            return this.mainScroll.onMouseScroll(0, 0, input.key() == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
         }
     }
 
@@ -268,6 +270,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Confirm Screen", NoConfirmScreen.instance, "Removes the \"Confirm Command Execution\" screen and allows the command to run anyways."),
                         new Module("No Cursor Reset", NoCursorReset.instance, "Retains your cursor position between container screens.", new Settings(List.of(
                                 new Settings.SliderInt("Clear Time", 0, 1200, 5, NoCursorReset.clearTicks, "The amount of ticks until your last cursor position is forgotten. Set to 0 to always remember.")
+                        ))),
+                        new Module("No Skull Place", NoSkullPlace.instance, "Prevents skull block items from being placeable client side, similarly to 1.8.9.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", NoSkullPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", NoSkullPlace.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         )))
                 )),
                 new Category("Misc", List.of(
@@ -572,7 +578,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt.")
                 )),
                 new Category("Mining", List.of(
-                        new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability cooldown is finished.\n\nIf present, uses the Pickaxe Ability tablist widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe. Might be inaccurate in some cases."),
+                        new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new Settings(List.of(
+                                new Settings.SliderInt("Override Ticks", 0, 300, 1, AbilityAlert.override, "Overrides your pickaxe ability cooldown to a custom value in ticks.\nOnly applies if the Pickaxe Ability widget isn't present.\nSet to 0 to disable.")
+                        ))),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
                                 new Settings.ColorPicker("Lapis Color", false, CorpseHighlight.lapisColor, "The color of the Lapis corpse."),
                                 new Settings.ColorPicker("Mineral Color", false, CorpseHighlight.mineralColor, "The color of the Tungsten corpse."),
@@ -596,14 +604,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Temple Skip", TempleSkip.instance, "Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, TempleSkip.color, "The color of the skip highlight.")
                         ))),
-                        new Module("Gemstone Desync Fix", GemstoneDesyncFix.instance, "Fixes adjacent gemstone blocks not correctly updating when mining.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", GemstoneDesyncFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", GemstoneDesyncFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress, also known as HSM.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", BreakResetFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", BreakResetFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        )))
+                        new Module("Gemstone Desync Fix", GemstoneDesyncFix.instance, "Fixes adjacent gemstone blocks not correctly updating when mining."),
+                        new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress, also known as HSM.")
                 )),
                 new Category("Farming", List.of(
                         new Module("Space Farmer", SpaceFarmer.instance, "Allows you to farm by holding space bar, sneak and press space to activate.\nThis feature will also lock your view once you start holding space."),
@@ -637,7 +639,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         hudEditorButton.positioning(Positioning.relative(100, 100));
         hudEditorButton.renderer((context, button, delta) -> {
             context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
-            context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
+            Rendering.drawBorder(context, button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
         });
         root.child(hudEditorButton);
         FlatTextbox searchBox = new FlatTextbox(Sizing.fixed(200));

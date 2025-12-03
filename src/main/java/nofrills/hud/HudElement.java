@@ -3,6 +3,7 @@ package nofrills.hud;
 import io.wispforest.owo.ui.container.DraggableContainer;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.util.Window;
 import net.minecraft.util.Identifier;
 import nofrills.config.SettingDouble;
@@ -39,20 +40,20 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     @Override
-    public boolean onMouseDown(double mouseX, double mouseY, int button) {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+    public boolean onMouseDown(Click click, boolean doubled) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             this.toggling = true;
         }
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
             mc.setScreen(this.options);
             return true;
         }
-        return super.onMouseDown(mouseX, mouseY, button);
+        return super.onMouseDown(click, doubled);
     }
 
     @Override
-    public boolean onMouseDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
-        boolean result = super.onMouseDrag(mouseX, mouseY, deltaX, deltaY, button);
+    public boolean onMouseDrag(Click click, double deltaX, double deltaY) {
+        boolean result = super.onMouseDrag(click, deltaX, deltaY);
         Window window = mc.getWindow();
         this.savePosition(this.xOffset / window.getScaledWidth(), this.yOffset / window.getScaledHeight());
         return result;

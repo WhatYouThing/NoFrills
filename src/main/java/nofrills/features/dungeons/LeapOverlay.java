@@ -7,17 +7,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.ColorHelper;
 import nofrills.config.*;
 import nofrills.events.SlotUpdateEvent;
-import nofrills.misc.DungeonUtil;
-import nofrills.misc.RenderColor;
-import nofrills.misc.ScreenOptions;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static nofrills.Main.mc;
 
@@ -45,19 +39,23 @@ public class LeapOverlay {
     private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && event.isFinal && event.title.equals(leapMenuName) && Utils.isInDungeons()) {
             List<LeapTarget> targets = new ArrayList<>();
+            HashMap<String, Integer> alive = new HashMap<>(4);
             for (Slot slot : Utils.getContainerSlots(event.handler)) {
                 ItemStack stack = slot.getStack();
                 if (!stack.getItem().equals(Items.PLAYER_HEAD)) continue;
                 List<String> lore = Utils.getLoreLines(stack);
                 String name = Utils.toPlain(stack.getName());
                 String dungeonClass = DungeonUtil.getPlayerClass(name);
-                if (!stack.isEmpty() && !lore.isEmpty() && !dungeonClass.isEmpty()) {
-                    String line = lore.getFirst();
-                    if (line.equals("Click to teleport!")) {
-                        targets.add(new LeapTarget(slot.id, name, dungeonClass, false));
-                    } else if (line.equals("This player is currently dead!")) {
-                        targets.add(new LeapTarget(-1, name, dungeonClass, true));
-                    }
+                if (!lore.isEmpty() && !dungeonClass.isEmpty() && lore.getFirst().equals("Click to teleport!")) {
+                    alive.put(name, slot.id);
+                }
+            }
+            for (Map.Entry<String, String> entry : DungeonUtil.getClassCache().entrySet()) {
+                String name = entry.getKey();
+                String dungeonClass = entry.getValue();
+                if (!name.equalsIgnoreCase(mc.player.getName().getString())) {
+                    int slotId = alive.getOrDefault(name, -1);
+                    targets.add(new LeapTarget(slotId, name, dungeonClass, slotId == -1));
                 }
             }
             targets.sort(Comparator.comparing(target -> target.dungeonClass + target.name));
@@ -100,9 +98,9 @@ public class LeapOverlay {
         private final RenderColor classColor;
         private final float offsetX;
         private final float offsetY;
-        private final int background;
-        private final int backgroundHover;
-        private final int border;
+        private final RenderColor background;
+        private final RenderColor backgroundHover;
+        private final RenderColor border;
         public int minX = 0;
         public int minY = 0;
         public int maxX = 0;
@@ -123,9 +121,9 @@ public class LeapOverlay {
                 case "Empty" -> deadColor;
                 default -> nameColor;
             };
-            this.background = ColorHelper.fromFloats(0.67f, 0.0f, 0.0f, 0.0f);
-            this.backgroundHover = ColorHelper.fromFloats(0.67f, this.classColor.r * 0.33f, this.classColor.g * 0.33f, this.classColor.b * 0.33f);
-            this.border = ColorHelper.fromFloats(1.0f, this.classColor.r, this.classColor.g, this.classColor.b);
+            this.background = RenderColor.fromFloat(0.0f, 0.0f, 0.0f, 0.67f);
+            this.backgroundHover = RenderColor.fromFloat(this.classColor.r * 0.33f, this.classColor.g * 0.33f, this.classColor.b * 0.33f, 0.67f);
+            this.border = RenderColor.fromFloat(this.classColor.r, this.classColor.g, this.classColor.b, 1.0f);
             this.offsetX = index == 0 || index == 2 ? 0.25f : 0.55f;
             this.offsetY = index <= 1 ? 0.25f : 0.55f;
         }
@@ -156,9 +154,9 @@ public class LeapOverlay {
             this.minY = getY(context, this.offsetY);
             this.maxX = getX(context, this.offsetX + 0.2f);
             this.maxY = getY(context, this.offsetY + 0.2f);
-            context.fill(this.minX, this.minY, this.maxX, this.maxY, this.isHovered(mouseX, mouseY) ? this.backgroundHover : this.background);
+            context.fill(minX, minY, maxX, maxY, this.isHovered(mouseX, mouseY) ? backgroundHover.argb : background.argb);
             if (this.slotId != -1)
-                context.drawBorder(this.minX, this.minY, this.maxX - this.minX, this.maxY - this.minY, this.border);
+                Rendering.drawBorder(context, minX, minY, maxX - minX, maxY - minY, border);
             float textScale = (float) (scale.value() / mc.options.getGuiScale().getValue());
             int textX = this.minX + (this.maxX - this.minX) / 2;
             int playerTextY = (int) (this.minY + (this.maxY - this.minY) * 0.25);

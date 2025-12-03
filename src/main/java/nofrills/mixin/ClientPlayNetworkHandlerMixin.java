@@ -16,8 +16,8 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.network.packet.s2c.play.*;
 import nofrills.events.*;
 import nofrills.features.general.NoRender;
+import nofrills.features.mining.BreakResetFix;
 import nofrills.features.tweaks.AnimationFix;
-import nofrills.features.tweaks.BreakResetFix;
 import nofrills.features.tweaks.NoConfirmScreen;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -77,14 +77,14 @@ public class ClientPlayNetworkHandlerMixin {
         }
     }
 
-    @Inject(method = "onPlaySound", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "onPlaySound", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
     private void onPlaySound(PlaySoundS2CPacket packet, CallbackInfo ci) {
         if (eventBus.post(new PlaySoundEvent(packet)).isCancelled()) {
             ci.cancel();
         }
     }
 
-    @Inject(method = "onParticle", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/util/thread/ThreadExecutor;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "onParticle", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER), cancellable = true)
     private void onParticle(ParticleS2CPacket packet, CallbackInfo ci) {
         if (eventBus.post(new SpawnParticleEvent(packet)).isCancelled()) {
             ci.cancel();

@@ -77,7 +77,7 @@ public class DianaSolver {
     }
 
     private static DianaWarp findWarp(Vec3d pos) {
-        double lowestDist = mc.player.getPos().distanceTo(pos);
+        double lowestDist = mc.player.getEntityPos().distanceTo(pos);
         DianaWarp closestWarp = null;
         for (DianaWarp warp : warps) {
             Vec3d warpPos = warp.pos.toCenterPos();
@@ -293,7 +293,7 @@ public class DianaSolver {
         }
 
         public double distanceTo() {
-            return mc.player.getPos().distanceTo(this.getVec());
+            return mc.player.getEntityPos().distanceTo(this.getVec());
         }
 
         public boolean isGuess() {

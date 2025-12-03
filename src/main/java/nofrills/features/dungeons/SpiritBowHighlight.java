@@ -34,7 +34,7 @@ public class SpiritBowHighlight {
             if (!spiritBows.empty()) {
                 for (Entity ent : spiritBows.get()) {
                     BlockPos ground = Utils.findGround(ent.getBlockPos(), 4);
-                    Vec3d pos = ent.getPos();
+                    Vec3d pos = ent.getEntityPos();
                     Vec3d posAdjust = new Vec3d(pos.x, ground.up(1).getY() + 1, pos.z);
                     event.drawFilled(Box.of(posAdjust, 0.8, 1.75, 0.8), true, color.value());
                 }

@@ -3,8 +3,6 @@ package nofrills.features.hunting;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.BatEntity;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityUpdatedEvent;
@@ -25,8 +23,7 @@ public class CinderbatHighlight {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInArea("Crimson Isle")) {
             for (Entity bat : cinderbatList.get()) {
-                Vec3d pos = bat.getLerpedPos(event.tickCounter.getTickProgress(true)).add(0, 0.45, 0);
-                event.drawOutline(Box.of(pos, 2.5, 2.5, 2.5), false, color.value());
+                event.drawOutline(Utils.getLerpedBox(bat, event.tickCounter.getTickProgress(true)), false, color.value());
             }
         }
     }

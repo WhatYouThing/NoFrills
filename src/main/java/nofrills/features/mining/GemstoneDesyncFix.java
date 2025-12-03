@@ -1,14 +1,16 @@
 package nofrills.features.mining;
 
+import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.StainedGlassBlock;
 import net.minecraft.block.StainedGlassPaneBlock;
 import nofrills.config.Feature;
-import nofrills.config.SettingBool;
 import nofrills.events.BlockUpdateEvent;
-import nofrills.misc.Utils;
+import nofrills.misc.SkyblockData;
+
+import java.util.HashSet;
 
 import static net.minecraft.block.HorizontalConnectingBlock.*;
 import static nofrills.Main.mc;
@@ -16,20 +18,15 @@ import static nofrills.Main.mc;
 public class GemstoneDesyncFix {
     public static final Feature instance = new Feature("gemstoneDesyncFix");
 
-    public static final SettingBool skyblockCheck = new SettingBool(false, "skyblockCheck", instance.key());
-    public static final SettingBool modernCheck = new SettingBool(false, "modernCheck", instance.key());
+    private static final HashSet<String> islands = Sets.newHashSet(
+            "Dwarven Mines",
+            "Crystal Hollows",
+            "Mineshaft",
+            "Crimson Isle"
+    );
 
     public static boolean active() {
-        boolean isActive = instance.isActive();
-        if (isActive) {
-            if (skyblockCheck.value() && !Utils.isInSkyblock()) {
-                return false;
-            }
-            if (modernCheck.value() && Utils.isOnModernIsland()) {
-                return false;
-            }
-        }
-        return isActive;
+        return instance.isActive() && islands.contains(SkyblockData.getArea());
     }
 
     public static boolean isStainedGlass(BlockState state) {

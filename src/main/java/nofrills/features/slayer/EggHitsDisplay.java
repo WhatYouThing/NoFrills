@@ -38,7 +38,7 @@ public class EggHitsDisplay {
         if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.tarantula)) {
             for (Entity ent : cache.get()) {
                 String name = Utils.toPlain(ent.getName());
-                event.drawText(ent.getPos(), Text.literal(name.substring(name.indexOf(" ") + 1)), scale.valueFloat(), true, color.value());
+                event.drawText(ent.getEntityPos(), Text.literal(name.substring(name.indexOf(" ") + 1)), scale.valueFloat(), true, color.value());
             }
         }
     }

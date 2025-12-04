@@ -1,14 +1,12 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.Mouse;
+import net.minecraft.client.input.MouseInput;
 import nofrills.events.InputEvent;
 import nofrills.features.farming.SpaceFarmer;
 import nofrills.features.tweaks.NoCursorReset;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -18,13 +16,10 @@ import static nofrills.Main.mc;
 
 @Mixin(Mouse.class)
 public abstract class MouseMixin {
-    @Shadow
-    @Final
-    private MinecraftClient client;
 
     @Inject(method = "onMouseButton", at = @At("HEAD"), cancellable = true)
-    private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        if (eventBus.post(new InputEvent(button, mods, action)).isCancelled()) {
+    private void onMouseButton(long window, MouseInput input, int action, CallbackInfo ci) {
+        if (eventBus.post(new InputEvent(input, action)).isCancelled()) {
             ci.cancel();
         }
     }

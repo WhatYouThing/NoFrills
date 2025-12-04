@@ -9,6 +9,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import nofrills.misc.RenderColor;
+import nofrills.misc.Rendering;
 import org.joml.Matrix3x2f;
 
 import static nofrills.Main.mc;
@@ -51,7 +52,7 @@ public class ScreenRenderEvent {
 
     public void drawBorder(int slotId, RenderColor color) {
         Slot slot = this.handler.getSlot(slotId);
-        this.context.drawBorder(slot.x, slot.y, 16, 16, color.argb);
+        Rendering.drawBorder(this.context, slot.x, slot.y, 16, 16, color.argb);
     }
 
     public void drawLabel(int slotId, Text text) {

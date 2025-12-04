@@ -33,7 +33,6 @@
     "MinecraftClientMixin",
     "MouseMixin",
     "PaneBlockMixin",
-    "ParticleManagerMixin",
     "PlayerEntityMixin",
     "PlayerListHudAccessor",
     "RaycastContextMixin",

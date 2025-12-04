@@ -37,7 +37,7 @@ public class BeaconTracer {
     private static void onBlock(BlockUpdateEvent event) {
         if (isActive() && beaconEntity != null && event.newState.getBlock().equals(Blocks.BEACON)) {
             Vec3d pos = new Vec3d(event.pos.getX(), event.pos.getY(), event.pos.getZ());
-            if (Utils.horizontalDistance(beaconEntity.getPos(), pos) <= 4.0) {
+            if (Utils.horizontalDistance(beaconEntity.getEntityPos(), pos) <= 4.0) {
                 beaconPos = event.pos;
                 beaconEntity = null;
             }
@@ -50,7 +50,7 @@ public class BeaconTracer {
             ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
             Entity boss = SlayerUtil.getBossEntity();
             if (!helmet.getItem().equals(Items.BEACON) || boss == null) return;
-            if (Utils.horizontalDistance(boss.getPos(), event.entity.getPos()) <= 4.0) {
+            if (Utils.horizontalDistance(boss.getEntityPos(), event.entity.getEntityPos()) <= 4.0) {
                 beaconEntity = event.entity;
             }
         }

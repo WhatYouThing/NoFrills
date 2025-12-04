@@ -11,7 +11,6 @@ import nofrills.config.SettingColor;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.misc.RenderColor;
-import nofrills.misc.Rendering;
 import nofrills.misc.SeaCreatureData;
 import nofrills.misc.Utils;
 
@@ -21,7 +20,7 @@ public class RareGlow {
     public static final SettingColor color = new SettingColor(new RenderColor(255, 170, 0, 255), "color", instance.key());
 
     private static boolean isValidMob(Entity ent) {
-        return !Rendering.Entities.isDrawingGlow(ent) && Utils.isMob(ent) && !(ent instanceof GiantEntity);
+        return !Utils.isGlowing(ent) && Utils.isMob(ent) && !(ent instanceof GiantEntity);
     }
 
     @EventHandler
@@ -32,7 +31,7 @@ public class RareGlow {
                 for (SeaCreatureData.SeaCreature creature : SeaCreatureData.list) {
                     for (String texture : creature.textures) {
                         if (Utils.isTextureEqual(textures, texture)) {
-                            Rendering.Entities.drawGlow(event.entity, true, color.value());
+                            Utils.setGlowing(event.entity, true, color.value());
                             return;
                         }
                     }
@@ -48,11 +47,11 @@ public class RareGlow {
                 if (creature.rare && creature.glow && event.entity.age <= 20 && event.namePlain.contains(creature.name)) {
                     Entity owner = Utils.findNametagOwner(event.entity, Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, RareGlow::isValidMob));
                     if (owner != null) {
-                        Rendering.Entities.drawGlow(owner, true, color.value());
+                        Utils.setGlowing(owner, true, color.value());
                         if (owner.hasVehicle()) {
-                            Rendering.Entities.drawGlow(owner.getVehicle(), true, color.value());
+                            Utils.setGlowing(owner.getVehicle(), true, color.value());
                         } else if (owner.hasPassengers()) {
-                            Rendering.Entities.drawGlow(owner.getFirstPassenger(), true, color.value());
+                            Utils.setGlowing(owner.getFirstPassenger(), true, color.value());
                         }
                     }
                 }

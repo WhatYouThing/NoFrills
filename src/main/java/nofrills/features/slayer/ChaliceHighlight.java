@@ -38,7 +38,7 @@ public class ChaliceHighlight {
         if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.vampire)) {
             for (Entity ent : chaliceData.get()) {
                 BlockPos blockPos = Utils.findGround(ent.getBlockPos(), 4);
-                Vec3d pos = ent.getPos();
+                Vec3d pos = ent.getEntityPos();
                 Vec3d posAdjust = new Vec3d(pos.x, blockPos.up(1).getY() + 0.5, pos.z);
                 event.drawFilledWithBeam(Box.of(posAdjust, 1, 1.25, 1), 256, true, color.value());
             }

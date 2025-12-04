@@ -24,7 +24,7 @@ public class PreMessage {
                 missingTicks--;
                 if (missingTicks == 0) {
                     KuudraUtil.PickupSpot preSpot = null;
-                    Vec3d selfPos = mc.player.getPos();
+                    Vec3d selfPos = mc.player.getEntityPos();
                     for (KuudraUtil.PickupSpot pickupSpot : KuudraUtil.pickupSpots) {
                         if (pickupSpot.spot.distanceTo(selfPos) < pickupSpot.playerDist) {
                             preSpot = pickupSpot;
@@ -35,7 +35,7 @@ public class PreMessage {
                         boolean preFound = false, secondaryFound = false;
                         for (Entity ent : Utils.getEntities()) {
                             if (ent instanceof GiantEntity) {
-                                Vec3d entPos = ent.getPos();
+                                Vec3d entPos = ent.getEntityPos();
                                 Vec3d supplyPos = new Vec3d(entPos.getX(), 76, entPos.getZ());
                                 if (preSpot.spot.distanceTo(supplyPos) < preSpot.supplyDist) {
                                     preFound = true;

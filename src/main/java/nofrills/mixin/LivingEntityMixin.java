@@ -3,10 +3,7 @@ package nofrills.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.AttributeContainer;
+import net.minecraft.entity.*;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
@@ -17,6 +14,7 @@ import net.minecraft.world.World;
 import nofrills.features.general.Fullbright;
 import nofrills.features.general.Viewmodel;
 import nofrills.features.tweaks.NoDropSwing;
+import nofrills.features.tweaks.OldSneak;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,9 +30,6 @@ public abstract class LivingEntityMixin extends Entity {
 
     @Shadow
     public abstract boolean isHolding(Item item);
-
-    @Shadow
-    public abstract AttributeContainer getAttributes();
 
     @ModifyExpressionValue(method = "getHandSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/effect/StatusEffectUtil;hasHaste(Lnet/minecraft/entity/LivingEntity;)Z"))
     private boolean hasHaste(boolean original) {
@@ -67,10 +62,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @WrapWithCondition(method = "dropItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(LivingEntity instance, Hand hand) {
-        if (NoDropSwing.active() && instance == mc.player) {
-            return false;
-        }
-        return this.getWorld().isClient;
+        return !(NoDropSwing.active() && instance == mc.player);
     }
 
     @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
@@ -79,6 +71,14 @@ public abstract class LivingEntityMixin extends Entity {
             if (Fullbright.noEffect.value() && !Fullbright.mode.value().equals(Fullbright.modes.Potion)) {
                 return false;
             }
+        }
+        return original;
+    }
+
+    @ModifyReturnValue(method = "getBaseDimensions", at = @At("RETURN"))
+    private EntityDimensions getDimensions(EntityDimensions original, EntityPose pose) {
+        if (pose == EntityPose.CROUCHING && OldSneak.active()) {
+            return PlayerLikeEntity.STANDING_DIMENSIONS.withEyeHeight(1.54F);
         }
         return original;
     }

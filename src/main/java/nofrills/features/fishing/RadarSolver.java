@@ -62,7 +62,7 @@ public class RadarSolver {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && currentPos != null) {
-            if (mc.player.getPos().distanceTo(currentPos) <= 16.0) {
+            if (mc.player.getEntityPos().distanceTo(currentPos) <= 16.0) {
                 currentPos = null;
                 return;
             }

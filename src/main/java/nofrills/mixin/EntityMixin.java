@@ -20,53 +20,9 @@ public abstract class EntityMixin implements EntityRendering {
     @Final
     private static int SWIMMING_FLAG_INDEX;
     @Unique
-    boolean outlineRender = false;
-    @Unique
-    private RenderColor outlineColors;
-    @Unique
-    private boolean filledRender = false;
-    @Unique
-    private RenderColor filledColors;
-    @Unique
     private boolean glowRender = false;
     @Unique
     private RenderColor glowColor;
-
-    @Override
-    public void nofrills_mod$setRenderBoxOutline(boolean render, RenderColor color) {
-        if (render) {
-            outlineColors = color;
-        }
-        outlineRender = render;
-    }
-
-    @Override
-    public boolean nofrills_mod$getRenderingOutline() {
-        return outlineRender;
-    }
-
-    @Override
-    public RenderColor nofrills_mod$getOutlineColors() {
-        return outlineColors;
-    }
-
-    @Override
-    public void nofrills_mod$setRenderBoxFilled(boolean render, RenderColor color) {
-        if (render) {
-            filledColors = color;
-        }
-        filledRender = render;
-    }
-
-    @Override
-    public boolean nofrills_mod$getRenderingFilled() {
-        return filledRender;
-    }
-
-    @Override
-    public RenderColor nofrills_mod$getFilledColors() {
-        return filledColors;
-    }
 
     @Override
     public void nofrills_mod$setGlowingColored(boolean glowing, RenderColor color) {

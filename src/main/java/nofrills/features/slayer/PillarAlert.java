@@ -27,7 +27,7 @@ public class PillarAlert {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && !pillarData.isEmpty() && firePillarRegex.matcher(event.namePlain).matches()) {
-            if (Utils.horizontalDistance(event.entity.getPos(), pillarData.getLast()) <= 3) {
+            if (Utils.horizontalDistance(event.entity.getEntityPos(), pillarData.getLast()) <= 3) {
                 Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, RenderColor.fromHex(0xffff00));
                 pillarClearTicks = 60;
             }
@@ -61,7 +61,7 @@ public class PillarAlert {
             if (spawner == null) return;
             Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             if (pillarData.isEmpty()) {
-                if (Utils.horizontalDistance(pos, spawner.getPos()) <= 1.5) {
+                if (Utils.horizontalDistance(pos, spawner.getEntityPos()) <= 1.5) {
                     pillarData.add(pos);
                     pillarClearTicks = 60;
                 }

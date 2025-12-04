@@ -1,7 +1,7 @@
 package nofrills.mixin;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.HeldItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -32,7 +32,7 @@ public class HeldItemRendererMixin {
     private float lastEquipProgressOffHand;
 
     @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;push()V", shift = At.Shift.AFTER))
-    private void onBeforeRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+    private void onBeforeRenderItem(AbstractClientPlayerEntity player, float tickProgress, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, OrderedRenderCommandQueue orderedRenderCommandQueue, int light, CallbackInfo ci) {
         if (Viewmodel.instance.isActive()) {
             if (!Viewmodel.applyToHand.value() && item.isEmpty()) return;
             if (hand == Hand.MAIN_HAND) {
@@ -43,8 +43,8 @@ public class HeldItemRendererMixin {
         }
     }
 
-    @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemDisplayContext;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V"))
-    private void onRenderItem(AbstractClientPlayerEntity player, float tickDelta, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
+    @Inject(method = "renderFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/item/HeldItemRenderer;renderItem(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ItemDisplayContext;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/command/OrderedRenderCommandQueue;I)V"))
+    private void onRenderItem(AbstractClientPlayerEntity player, float tickProgress, float pitch, Hand hand, float swingProgress, ItemStack item, float equipProgress, MatrixStack matrices, OrderedRenderCommandQueue orderedRenderCommandQueue, int light, CallbackInfo ci) {
         if (Viewmodel.instance.isActive()) {
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Viewmodel.rotX.value()));
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Viewmodel.rotY.value()));
@@ -54,7 +54,7 @@ public class HeldItemRendererMixin {
     }
 
     @Inject(method = "renderArmHoldingItem", at = @At("HEAD"))
-    private void onBeforeRenderHand(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
+    private void onBeforeRenderHand(MatrixStack matrices, OrderedRenderCommandQueue queue, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
         if (Viewmodel.instance.isActive() && Viewmodel.applyToHand.value()) {
             if (arm == Arm.RIGHT) {
                 matrices.translate(Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
@@ -64,8 +64,8 @@ public class HeldItemRendererMixin {
         }
     }
 
-    @Inject(method = "renderArmHoldingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;getRenderer(Lnet/minecraft/entity/Entity;)Lnet/minecraft/client/render/entity/EntityRenderer;"))
-    private void onRenderHand(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
+    @Inject(method = "renderArmHoldingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderManager;getPlayerRenderer(Lnet/minecraft/client/network/AbstractClientPlayerEntity;)Lnet/minecraft/client/render/entity/PlayerEntityRenderer;"))
+    private void onRenderHand(MatrixStack matrices, OrderedRenderCommandQueue queue, int light, float equipProgress, float swingProgress, Arm arm, CallbackInfo ci) {
         if (Viewmodel.instance.isActive() && Viewmodel.applyToHand.value()) {
             matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) Viewmodel.rotX.value()));
             matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) Viewmodel.rotY.value()));

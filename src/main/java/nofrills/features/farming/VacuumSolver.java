@@ -65,7 +65,7 @@ public class VacuumSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && Utils.matchesKey(mc.options.attackKey, event.key) && event.action == GLFW.GLFW_PRESS) {
+        if (instance.isActive() && Utils.matchesKey(mc.options.attackKey, event.keyInput, event.mouseInput) && event.action == GLFW.GLFW_PRESS) {
             if (Utils.isInGarden() && isHoldingVacuum()) onVacuumStart();
         }
     }
@@ -73,7 +73,7 @@ public class VacuumSolver {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && currentPos != null) {
-            if (mc.player.getPos().distanceTo(currentPos) <= 16.0) {
+            if (mc.player.getEntityPos().distanceTo(currentPos) <= 16.0) {
                 currentPos = null;
                 return;
             }

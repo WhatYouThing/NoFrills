@@ -34,6 +34,7 @@
     "MouseMixin",
     "PaneBlockMixin",
     "PlayerEntityMixin",
+    "PlayerLikeEntityMixin",
     "PlayerListHudAccessor",
     "RaycastContextMixin",
     "SnowBlockMixin",

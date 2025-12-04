@@ -272,7 +272,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Skull Place", NoSkullPlace.instance, "Prevents skull block items from being placeable client side, similarly to 1.8.9.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", NoSkullPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", NoSkullPlace.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        )))
+                        ))),
+                        new Module("Instant Sneak", InstantSneak.instance, "Removes the smooth sneaking animation.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(

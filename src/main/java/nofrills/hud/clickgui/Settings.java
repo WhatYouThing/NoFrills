@@ -35,6 +35,10 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
         Rendering.drawBorder(context, button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
     };
+    public static final ButtonComponent.Renderer buttonRendererWhite = (context, button, delta) -> {
+        context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
+        Rendering.drawBorder(context, button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xffffffff);
+    };
     public List<FlowLayout> settings;
     public Text title = Text.empty();
     public ScrollContainer<FlowLayout> scroll;

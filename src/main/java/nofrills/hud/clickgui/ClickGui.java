@@ -210,7 +210,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Swing Y", 0, 2, 0.01, Viewmodel.swingY, "The Y multiplier for swing animation offset."),
                                 new Settings.SliderDouble("Swing Z", 0, 2, 0.01, Viewmodel.swingZ, "The Z multiplier for swing animation offset.")
                         ))),
-                        new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings())
+                        new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings()),
+                        new Module("Chat Rules", ChatRules.instance, "Create custom rules that activate when a matching message is sent in chat.", ChatRules.buildSettings())
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),
@@ -274,7 +275,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Skull Place", NoSkullPlace.instance, "Prevents skull block items from being placeable client side, similarly to 1.8.9.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", NoSkullPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", NoSkullPlace.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        )))
+                        ))),
+                        new Module("Instant Sneak", InstantSneak.instance, "Removes the smooth sneaking animation.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(
@@ -336,6 +338,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Start Color", true, DianaSolver.startColor, "The color of the start burrow beacon."),
                                 new Settings.Separator("Warps"),
                                 new Settings.Keybind("Warp Keybind", DianaSolver.warpKey, "The keybind to warp to the location closest to the guessed burrow."),
+                                new Settings.Toggle("Warp Message", DianaSolver.warpMsg, "Shows a message in chat with the location name if the closest warp is successful."),
                                 new Settings.Toggle("Hub Warp", DianaSolver.hubToggle, "Consider Hub a valid warp location when using the Warp Keybind."),
                                 new Settings.Toggle("Stonks Warp", DianaSolver.stonksToggle, "Consider Stonks Auction as a valid warp location when using the Warp Keybind."),
                                 new Settings.Toggle("Museum Warp", DianaSolver.museumToggle, "Consider Museum as a valid warp location when using the Warp Keybind."),
@@ -436,7 +439,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.\nAlso displays timers for the 1st Gyro and Sadan's last giant, useful if you are Mage.", new Settings(List.of(
-                                new Settings.Toggle("Mage Check", TerracottaTimer.mageCheck, "If enabled, prevents the 1st Gyro and last giant timers from appearing if you are not Mage.")
+                                new Settings.Toggle("Mage Check", TerracottaTimer.mageCheck, "If enabled, prevents the 1st Gyro and last giant timers from appearing if you are not Mage."),
+                                new Settings.ColorPicker("Text Color", true, TerracottaTimer.color, "The color of the timer text.")
                         ))),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(
                                 new Settings.Toggle("Spawn Alert", WitherDragons.alert, "Alerts you when a dragon is about to spawn.\nThis option also calculates the priority on the initial spawn based on your selected class."),

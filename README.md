@@ -43,8 +43,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Double Use Fix**: Fixes Blaze Daggers and Fishing Rods being able to activate twice at once.
     - **Old Safewalk**: Allows you to walk onto short blocks (such as carpet) while sneaking.
     - **Disconnect Fix**: Patches any known kick/disconnect issues.
-    - **Break Reset Fix**: Fixes item updates resetting your block breaking progress.
     - **No Confirm Screen**: Removes the "Confirm Command Execution" screen and allows the command to run anyways.
+    - **No Cursor Reset**: Retains your cursor position between container screens.
+    - **No Skull Place**: Prevents skull block items from being placeable client side, similarly to 1.8.9.
 
 - **Misc**
 
@@ -57,7 +58,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Command Tooltip**: Reveals the command that the hovered chat message would run when clicked.
     - **Auto Save**: Automatically saves your settings after closing the settings/HUD editor screen.
     - **Unfocused Tweaks**: Various optimizations for when you are tabbed out of Minecraft.
-    - **Page Keybinds**: Adds next/previous page keybinds to applicable Skyblock GUIs.
+    - **GUI Keybinds**: Adds navigation keybinds to applicable Skyblock GUIs.
     - **Force Nametag**: Makes player nametags always visible, even if they are invisible and/or sneaking.
 
 - **Solvers**
@@ -65,6 +66,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Experimentation Table**: Solves the Experimentation Table mini-games and prevents wrong clicks.
     - **Calendar Date**: Calculates the exact starting dates of events in the calendar.
     - **Spooky Chests**: Highlights nearby trick or treat chests during the Spooky Festival.
+    - **Diana Solver**: Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.
+    - **Hoppity Solver**: Guesses Hoppity egg positions when using your Egglocator.
     - **Moonglade Beacon**: Solves the beacon tuning mini-game on Galatea.
 
 - **Fishing**
@@ -73,6 +76,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Mute Drake**: Prevents the Reindrake from blowing up your ears with gifts.
     - **Rare Glow**: Applies a glow effect to nearby rare/profitable sea creatures.
     - **Rare Alert**: Alerts you, and/or your party when you catch a rare sea creature.
+    - **Radar Solver**: Guesses Fishing Hotspot positions when using your Hotspot Radar.
 
 - **Hunting**
 
@@ -95,13 +99,19 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Leap Overlay**: Renders a custom overlay in place of the Spirit Leap menu.
     - **Terminal Solvers**: Solves terminals and prevents wrong clicks in F7/M7. Also hides item tooltips in every
       terminal.
-    - **Terracotta Timers**: Renders timers on screen and for every dead terracotta in F6/M6.
+    - **Terracotta Timers**: Renders respawn timers for the dead terracottas in F6/M6.
     - **Wither Dragons**: Features for the last phase of M7.
     - **Secret Bat Highlight**: Applies a glow effect to secret bats.
     - **Livid Solver**: Finds and highlights the correct Livid in F5/M5.
     - **Prince Message**: Sends a message when you gain bonus score from the Prince Shard.
     - **Mimic Message**: Sends a message once you kill the Mimic. Should work even if it's instantly killed.
     - **Spirit Bear Timer**: Renders a timer on screen for when the Spirit Bear is going to spawn in F4/M4.
+    - **Secret Chime**: Plays sounds upon collecting specific secrets.
+    - **Melody Message**: Send start and progress messages when you get the Melody terminal in F7/M7.
+    - **Quick Close**: Quickly close Dungeon secret and/or loot chests by pressing any of the movement keys (WASD).
+    - **Chest Value**: Calculates the value of your Dungeons loot. Requires connectivity to the NoFrills API.
+    - **Tick Timers**: Displays a timer for various things during the F7/M7 boss fight.
+    - **Relic Highlight**: Highlights the correct placement position of your M7 king relic.
 
 - **Kuudra**
 
@@ -132,19 +142,22 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Mining**
 
-    - **Ability Alert**: Alerts you when your pickaxe ability cooldown is finished.
+    - **Ability Alert**: Alerts you when your Pickaxe Ability is available.
     - **Corpse Highlight**: Highlights corpses in the Glacite Mineshafts.
     - **Better Sky Mall**: Compacts Sky Mall messages, and fully hides them if you are not mining.
     - **Ghost Vision**: Makes Ghosts easier to see in the Dwarven Mines.
     - **Scatha Mining**: Scatha mining features.
     - **End Node Highlight**: Highlights Ender Nodes.
     - **Temple Skip**: Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.
+    - **Gemstone Desync Fix**: Fixes adjacent gemstone blocks not correctly updating when mining.
+    - **Break Reset Fix**: Fixes item updates resetting your block breaking progress, also known as HSM.
 
 - **Farming**
 
     - **Space Farmer**: Allows you to farm by holding space bar, sneak and press space to activate.
     - **Glowing Mushrooms**: Highlights Glowing Mushrooms.
     - **Plot Borders**: Renders borders for plots.
+    - **Vacuum Solver**: Guesses Pest positions when using the Pest Tracker ability on your vacuum.
 
 </details>
 

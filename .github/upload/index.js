@@ -15,7 +15,8 @@ const body = {
   "bytes": getFileBytes(),
   "hash": process.argv[2],
   "version": file.name.split("-").at(1),
-  "message": process.argv[3]
+  "message": process.argv[3],
+  "branch": process.argv[4]
 };
 
 (async () => {

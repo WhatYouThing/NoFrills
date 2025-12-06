@@ -3,10 +3,12 @@ package nofrills.features.dungeons;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FlowerPotBlock;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.config.SettingColor;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SkyblockData;
@@ -19,6 +21,7 @@ public class TerracottaTimer {
     public static final Feature instance = new Feature("terracottaTimer");
 
     public static final SettingBool mageCheck = new SettingBool(false, "mageCheck", instance);
+    public static final SettingColor color = new SettingColor(RenderColor.fromHex(0xffff00), "color", instance);
 
     private static final List<SpawningTerracotta> terracottas = new ArrayList<>();
     private static int gyroTicks = 0;
@@ -39,7 +42,7 @@ public class TerracottaTimer {
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && gyroTicks > 0 && Utils.isInDungeonBoss("6")) {
             if (mageCheck.value() && !SkyblockData.dungeonClass.equals("Mage")) return;
-            Utils.showTitleCustom("GYRO: " + Utils.formatDecimal(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, RenderColor.fromHex(0xffff00));
+            Utils.showTitleCustom("GYRO: " + Utils.formatDecimal(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, color.value());
         }
     }
 
@@ -51,8 +54,8 @@ public class TerracottaTimer {
                     terracottas.add(new SpawningTerracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300));
                 }
             }
-            if (event.pos.getY() == 67 && event.newState.isAir() && event.oldState.getBlock().equals(Blocks.GRAY_STAINED_GLASS)) {
-                gyroTicks = 195;
+            if (gyroTicks == 0 && event.oldState.isAir() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
+                gyroTicks = 235;
             }
         }
     }
@@ -62,7 +65,8 @@ public class TerracottaTimer {
         if (instance.isActive() && !terracottas.isEmpty() && Utils.isInDungeonBoss("6")) {
             for (SpawningTerracotta terra : new ArrayList<>(terracottas)) {
                 if (terra.pos != null) {
-                    event.drawText(terra.pos.toCenterPos(), Text.of(Utils.formatDecimal(terra.ticks / 20.0f) + "s"), 0.035f, true, RenderColor.fromHex(0xffff00));
+                    MutableText text = Text.literal(Utils.formatDecimal(terra.ticks / 20.0f) + "s");
+                    event.drawText(terra.pos.toCenterPos(), text, 0.035f, true, color.value());
                 }
             }
         }

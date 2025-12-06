@@ -29,6 +29,7 @@ public class DianaSolver {
     public static final SettingColor enemyColor = new SettingColor(RenderColor.fromArgb(0xaaff5555), "enemyColor", instance);
     public static final SettingColor startColor = new SettingColor(RenderColor.fromArgb(0xaa55ff55), "startColor", instance);
     public static final SettingKeybind warpKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "warpKey", instance);
+    public static final SettingBool warpMsg = new SettingBool(false, "warpMsg", instance);
     public static final SettingBool hubToggle = new SettingBool(true, "hubToggle", instance);
     public static final SettingBool stonksToggle = new SettingBool(true, "stonksToggle", instance);
     public static final SettingBool museumToggle = new SettingBool(true, "museumToggle", instance);
@@ -136,7 +137,7 @@ public class DianaSolver {
                 if (burrow.isPresent()) {
                     DianaWarp warp = findWarp(burrow.get().getVec());
                     if (warp != null) {
-                        Utils.infoFormat("§aWarping to {}.", warp.name);
+                        if (warpMsg.value()) Utils.infoFormat("§aWarping to {}.", warp.name);
                         Utils.sendMessage(Utils.format("/warp {}", warp.id));
                     } else {
                         Utils.info("§7No close warp found for the guess burrow, not warping.");

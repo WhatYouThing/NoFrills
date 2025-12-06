@@ -27,6 +27,10 @@ public class KuudraChestValue {
 
     private static double currentValue = 0.0;
 
+    private static boolean isLootChest(String title) {
+        return (title.startsWith("Free ") || title.startsWith("Paid ")) && title.endsWith(" Chest");
+    }
+
     private static int getLootQuantity(ItemStack stack, String name) {
         String[] parts = name.split(" ");
         String last = parts[parts.length - 1];
@@ -51,7 +55,7 @@ public class KuudraChestValue {
 
     @EventHandler
     private static void onSlot(SlotUpdateEvent event) {
-        if (instance.isActive() && Utils.isInKuudra() && event.title.endsWith("Chest")) {
+        if (instance.isActive() && isLootChest(event.title) && Utils.isInLootArea()) {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }

@@ -56,7 +56,7 @@ public class DungeonChestValue {
 
     @EventHandler
     private static void onSlot(SlotUpdateEvent event) {
-        if (instance.isActive() && chestNames.contains(event.title) && (Utils.isInDungeons() || Utils.isInArea("Dungeon Hub"))) {
+        if (instance.isActive() && chestNames.contains(event.title) && Utils.isInLootArea()) {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }

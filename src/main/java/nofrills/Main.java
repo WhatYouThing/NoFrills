@@ -175,6 +175,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(HoppitySolver.class);
         eventBus.subscribe(RadarSolver.class);
         eventBus.subscribe(VacuumSolver.class);
+        eventBus.subscribe(ChatRules.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

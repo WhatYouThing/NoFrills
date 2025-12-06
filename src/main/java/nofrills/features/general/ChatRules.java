@@ -220,7 +220,7 @@ public class ChatRules {
             });
             ButtonComponent editButton = Components.button(Text.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildRuleSettings()));
             editButton.verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
-            editButton.horizontalSizing(Sizing.fixed(50));
+            editButton.horizontalSizing(Sizing.fixed(49));
             editButton.renderer(Settings.buttonRendererWhite);
             ButtonComponent delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.value().get("rules").getAsJsonArray().remove(this.index);

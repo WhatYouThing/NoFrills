@@ -74,6 +74,12 @@ public class Utils {
             "Galatea",
             "Catacombs"
     );
+    private static final HashSet<String> lootIslands = Sets.newHashSet(
+            "Catacombs",
+            "Kuudra",
+            "Dungeon Hub",
+            "Crimson Isle"
+    );
     private static Screen newScreen = null;
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
@@ -184,6 +190,13 @@ public class Utils {
      */
     public static boolean isOnDungeonFloor(String floor) {
         return isInDungeons() && SkyblockData.getLocation().endsWith(floor + ")");
+    }
+
+    /**
+     * Returns true if the current island has either loot chests or the Croesus NPC.
+     */
+    public static boolean isInLootArea() {
+        return lootIslands.contains(SkyblockData.getArea());
     }
 
     /**

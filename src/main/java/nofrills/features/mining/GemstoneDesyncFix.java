@@ -22,7 +22,8 @@ public class GemstoneDesyncFix {
             "Dwarven Mines",
             "Crystal Hollows",
             "Mineshaft",
-            "Crimson Isle"
+            "Crimson Isle",
+            "The Rift"
     );
 
     public static boolean active() {

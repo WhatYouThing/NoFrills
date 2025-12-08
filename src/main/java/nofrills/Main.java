@@ -177,6 +177,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(VacuumSolver.class);
         eventBus.subscribe(ChatRules.class);
         eventBus.subscribe(BreakResetFix.class);
+        eventBus.subscribe(SkillTracker.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

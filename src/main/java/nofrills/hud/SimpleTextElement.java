@@ -25,7 +25,11 @@ public class SimpleTextElement extends HudElement {
     }
 
     public void setText(String text) {
-        this.label.text(Text.of(text));
+        this.label.text(Text.literal(text));
+    }
+
+    public void setText(Text text) {
+        this.label.text(text);
     }
 
     public void updateAlignment(SettingEnum<alignment> setting) {

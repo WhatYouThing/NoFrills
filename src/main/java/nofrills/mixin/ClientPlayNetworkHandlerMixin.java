@@ -117,21 +117,21 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/message/MessageHandler;onGameMessage(Lnet/minecraft/text/Text;Z)V"), cancellable = true)
     private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
+        String msg = Utils.toPlain(packet.content());
         if (!packet.overlay()) {
-            String msg = Utils.toPlain(packet.content());
-            ChatMsgEvent event = eventBus.post(new ChatMsgEvent(packet.content(), msg));
-            if (event.isCancelled()) {
+            if (eventBus.post(new ChatMsgEvent(packet.content(), msg)).isCancelled()) {
                 ci.cancel();
             }
             if (msg.startsWith("Party > ") && msg.contains(": ")) {
                 int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");
                 String[] clean = msg.replace(msg.substring(0, nameStart + 1), "").split(":", 2);
                 String author = clean[0].trim(), content = clean[1].trim();
-                boolean self = author.equalsIgnoreCase(mc.getSession().getUsername());
-                if (eventBus.post(new PartyChatMsgEvent(content, author, self)).isCancelled() && !ci.isCancelled()) {
+                if (eventBus.post(new PartyChatMsgEvent(content, author)).isCancelled() && !ci.isCancelled()) {
                     ci.cancel();
                 }
             }
+        } else if (eventBus.post(new OverlayMsgEvent(packet.content(), msg)).isCancelled()) {
+            ci.cancel();
         }
     }
 }

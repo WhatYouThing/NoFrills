@@ -32,6 +32,7 @@ public class HudManager {
     public static final SeaCreatures seaCreatures = new SeaCreatures("Sea Creatures: §70");
     public static final FishingBobber bobber = new FishingBobber("Bobber: §7Inactive");
     public static final ShardTrackerDisplay shardTracker = new ShardTrackerDisplay();
+    public static final SkillTrackerDisplay skillTrackerElement = new SkillTrackerDisplay("");
 
     public static boolean isEditingHud() {
         return mc.currentScreen instanceof HudEditorScreen;

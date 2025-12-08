@@ -231,7 +231,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Created Date", InfoTooltips.createdDate, "Displays the exact date at which an item was created."),
                                 new Settings.Toggle("Hex Color", InfoTooltips.hexColor, "Displays the color of an item. Only applies to armor pieces that use leather armor as their base."),
                                 new Settings.Toggle("Museum Donated", InfoTooltips.museumDonated, "Displays if the item has been donated to the Museum.")
-                        )))
+                        ))),
+                        new Module("Chat Rules", ChatRules.instance, "Create custom rules that activate when a matching message is sent in chat.", ChatRules.buildSettings()),
+                        new Module("Skill Tracker", SkillTracker.instance, "")
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),

@@ -94,7 +94,9 @@ public class PlotBorders {
             }
             if (infested.value()) {
                 for (String plot : infestedPlots) {
-                    event.drawOutline(plotData.get(plot).boundingBox, true, infestedColor.value());
+                    if (plotData.containsKey(plot)) {
+                        event.drawOutline(plotData.get(plot).boundingBox, true, infestedColor.value());
+                    }
                 }
             }
         }

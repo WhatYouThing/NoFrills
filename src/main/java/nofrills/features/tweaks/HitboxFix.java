@@ -4,8 +4,8 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.misc.Utils;
 
-public class OldSneak {
-    public static final Feature instance = new Feature("oldSneak");
+public class HitboxFix {
+    public static final Feature instance = new Feature("hitboxFix");
 
     public static final SettingBool skyblockCheck = new SettingBool(false, "skyblockCheck", instance.key());
     public static final SettingBool modernCheck = new SettingBool(true, "modernCheck", instance.key());

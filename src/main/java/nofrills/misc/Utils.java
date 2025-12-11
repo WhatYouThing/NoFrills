@@ -68,8 +68,7 @@ public class Utils {
     private static final Random soundRandom = Random.create(0);
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "The Park",
-            "Galatea",
-            "Catacombs"
+            "Galatea"
     );
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",

@@ -1,26 +1,25 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import nofrills.features.tweaks.AntiSwim;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec3d;
+import nofrills.features.tweaks.HitboxFix;
 import nofrills.misc.EntityRendering;
 import nofrills.misc.RenderColor;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
 public abstract class EntityMixin implements EntityRendering {
-    @Shadow
-    @Final
-    private static int SWIMMING_FLAG_INDEX;
     @Unique
     boolean outlineRender = false;
+    @Shadow
+    private Vec3d pos;
     @Unique
     private RenderColor outlineColors;
     @Unique
@@ -31,6 +30,9 @@ public abstract class EntityMixin implements EntityRendering {
     private boolean glowRender = false;
     @Unique
     private RenderColor glowColor;
+
+    @Shadow
+    public abstract boolean isPlayer();
 
     @Override
     public void nofrills_mod$setRenderBoxOutline(boolean render, RenderColor color) {
@@ -95,26 +97,11 @@ public abstract class EntityMixin implements EntityRendering {
         return original;
     }
 
-    @ModifyReturnValue(method = "getPose", at = @At("RETURN"))
-    private EntityPose getPose(EntityPose original) {
-        if (original == EntityPose.SWIMMING && AntiSwim.active()) {
-            return EntityPose.STANDING;
+    @ModifyExpressionValue(method = "adjustMovementForCollisions(Lnet/minecraft/util/math/Vec3d;)Lnet/minecraft/util/math/Vec3d;", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;getBoundingBox()Lnet/minecraft/util/math/Box;"))
+    private Box onGetBoundingBox(Box original) {
+        if (this.isPlayer() && HitboxFix.active()) {
+            return PlayerEntity.STANDING_DIMENSIONS.getBoxAt(this.pos);
         }
         return original;
-    }
-
-    @ModifyReturnValue(method = "getFlag", at = @At("RETURN"))
-    private boolean getFlag(boolean original, int index) {
-        if (index == SWIMMING_FLAG_INDEX && AntiSwim.active()) {
-            return false;
-        }
-        return original;
-    }
-
-    @Inject(method = "setFlag", at = @At("HEAD"), cancellable = true)
-    private void setFlag(int index, boolean value, CallbackInfo ci) {
-        if (index == SWIMMING_FLAG_INDEX && value && AntiSwim.active()) {
-            ci.cancel();
-        }
     }
 }

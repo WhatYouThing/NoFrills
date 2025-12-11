@@ -219,9 +219,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", NoAbilityPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", NoAbilityPlace.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Anti Swim", AntiSwim.instance, "Prevents the crawling and the swimming animations from activating.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", AntiSwim.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", AntiSwim.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        new Module("Hitbox Fix", HitboxFix.instance, "Fixes lagbacks on old islands caused by the smaller crouching/swimming collision hitbox.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", HitboxFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", HitboxFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Enchant Fix", EnchantFix.instance, "Fixes client side issues with certain vanilla enchants.\n\n- Fixes Efficiency being lag and ping dependent\n- Fixes Aqua Affinity not working", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", EnchantFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
@@ -237,9 +237,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", NoPearlCooldown.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", NoPearlCooldown.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Old Sneak", OldSneak.instance, "Restores the old sneaking eye height and hitbox size.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", OldSneak.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", OldSneak.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        new Module("Old Eye Height", OldEyeHeight.instance, "Allows you to restore the 1.8 sneaking eye height and/or disable the swimming eye height.", new Settings(List.of(
+                                new Settings.Toggle("Sneaking", OldEyeHeight.sneaking, "If enabled, the 1.8 sneaking eye height will be restored."),
+                                new Settings.Toggle("Swimming", OldEyeHeight.swimming, "If enabled, the swimming eye height will be disabled."),
+                                new Settings.Toggle("Skyblock Only", OldEyeHeight.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", OldEyeHeight.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Riding Camera Fix", RidingCameraFix.instance, "Removes the floaty camera movement effect while riding entities.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", RidingCameraFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
@@ -253,17 +255,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", AnimationFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", AnimationFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Sneak Lag Fix", SneakLagFix.instance, "Fixes lag backs that occur when you sneak while walking.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", SneakLagFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", SneakLagFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
                         new Module("Double Use Fix", DoubleUseFix.instance, "Fixes Blaze Daggers and Fishing Rods being able to activate twice at once.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", DoubleUseFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", DoubleUseFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("Old Safewalk", OldSafewalk.instance, "Allows you to walk onto short blocks (such as carpet) while sneaking.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", OldSafewalk.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", OldSafewalk.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\n- Fixes the rare disconnects that occur while doing Tarantula slayer."),
                         new Module("No Confirm Screen", NoConfirmScreen.instance, "Removes the \"Confirm Command Execution\" screen and allows the command to run anyways."),

@@ -26,19 +26,19 @@ public class SkillTrackerDisplay extends SimpleTextElement {
 
     private final Identifier identifier = Identifier.of("nofrills", "skill-tracker-element");
 
-    public SkillTrackerDisplay(String text, double x, double y) {
-        super(Text.literal(text));
+    public SkillTrackerDisplay(double x, double y) {
+        super(SkillTracker.getText());
         this.x = new SettingDouble(x, "x", instance.key());
         this.y = new SettingDouble(y, "y", instance.key());
         this.options = new HudSettings(List.of(
                 new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
                 new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text.")
         ));
-        this.options.setTitle(Text.of("Day Element"));
+        this.options.setTitle(Text.of("Skill Tracker Element"));
     }
 
-    public SkillTrackerDisplay(String text) {
-        this(text, HudManager.getDefaultX(), HudManager.getDefaultY());
+    public SkillTrackerDisplay() {
+        this(HudManager.getDefaultX(), HudManager.getDefaultY());
     }
 
     @Override
@@ -48,7 +48,6 @@ public class SkillTrackerDisplay extends SimpleTextElement {
         } else if (!instance.isActive()) {
             return;
         }
-        this.label.text(SkillTracker.getText());
         this.updateShadow(shadow);
         this.updateAlignment(align);
         super.draw(context, mouseX, mouseY, partialTicks, delta);

@@ -56,6 +56,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
@@ -549,6 +553,26 @@ public class Utils {
                 .collect(Collectors.joining(" ")).trim();
     }
 
+    public static void atomicWrite(Path path, String content) throws IOException {
+        Path parent = path.getParent();
+        String fileName = path.getFileName().toString();
+        Path tempPath = parent.resolve(Utils.format("{}-Temp-{}.{}",
+                fileName.substring(0, fileName.indexOf(".")),
+                Util.getMeasuringTimeMs(),
+                fileName.substring(fileName.indexOf(".") + 1)
+        ));
+        if (!Files.exists(parent)) {
+            Files.createDirectory(parent);
+        }
+        Files.writeString(tempPath, content);
+        try {
+            Files.move(tempPath, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException ignored) {
+            Files.move(tempPath, path, StandardCopyOption.REPLACE_EXISTING);
+        }
+        Files.deleteIfExists(tempPath);
+    }
+
     private static int getVersionNumber(String version) {
         String[] numbers = version.split("\\.");
         if (numbers.length >= 3) {
@@ -826,6 +850,27 @@ public class Utils {
 
     public static String formatSeparator(float number) {
         return formatSeparator((double) number);
+    }
+
+    public static String ticksToTime(long ticks) {
+        if (ticks < 20) {
+            return "0s";
+        }
+        StringBuilder builder = new StringBuilder();
+        long current = ticks;
+        String[] units = new String[]{"h", "m", "s"};
+        int[] durations = new int[]{72000, 1200, 20};
+        for (int i = 0; i <= 2; i++) {
+            int amount = 0;
+            while (current >= durations[i]) {
+                amount++;
+                current -= durations[i];
+            }
+            if (amount > 0) {
+                builder.append(amount).append(units[i]);
+            }
+        }
+        return builder.toString();
     }
 
     public static void setScreen(Screen screen) {

@@ -29,7 +29,7 @@ public class HudManager {
     public static ShardTrackerDisplay shardTrackerElement = new ShardTrackerDisplay();
     public static TickTimer tickTimerElement = new TickTimer("§bTick Timers");
     public static Armor armorElement = new Armor();
-    public static SkillTrackerDisplay skillTrackerElement = new SkillTrackerDisplay("");
+    public static SkillTrackerDisplay skillTrackerElement = new SkillTrackerDisplay();
 
     public static boolean isEditingHud() {
         return mc.currentScreen instanceof HudEditorScreen;

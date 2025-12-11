@@ -39,15 +39,7 @@ public class SimpleTextElement extends HudElement {
         this.layout.child(this.label);
     }
 
-    public void setText(String text) {
-        this.label.text(Text.literal(text));
-    }
-
-    public void setText(Text text) {
-        this.label.text(text);
-    }
-
-    public void updateAlignment(SettingEnum<alignment> setting) {
+    public void updateAlignment(SettingEnum<TextAlignment> setting) {
         HorizontalAlignment alignment = switch (setting.value()) {
             case Left -> HorizontalAlignment.LEFT;
             case Center -> HorizontalAlignment.CENTER;
@@ -56,6 +48,7 @@ public class SimpleTextElement extends HudElement {
         this.label.horizontalTextAlignment(alignment);
         this.layout.horizontalAlignment(alignment);
     }
+
     @Override
     public boolean shouldRender() {
         boolean shouldRender = super.shouldRender();

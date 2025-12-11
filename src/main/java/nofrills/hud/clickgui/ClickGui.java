@@ -233,7 +233,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Museum Donated", InfoTooltips.museumDonated, "Displays if the item has been donated to the Museum.")
                         ))),
                         new Module("Chat Rules", ChatRules.instance, "Create custom rules that activate when a matching message is sent in chat.", ChatRules.buildSettings()),
-                        new Module("Skill Tracker", SkillTracker.instance, "")
+                        new Module("Skill Tracker", SkillTracker.instance, "Tracks the experience you gain for specific skills, similarly to SBE on 1.8.9.\nThis feature will be inaccurate if your tracked skills are not maxed (Catacombs excluded).", SkillTracker.buildSettings())
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),

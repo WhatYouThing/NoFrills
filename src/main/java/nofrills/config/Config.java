@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
+import nofrills.misc.Utils;
 
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
@@ -20,6 +21,10 @@ public class Config {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static JsonObject data = new JsonObject();
     private static int hash = 0;
+
+    public static Path getFolderPath() {
+        return folderPath;
+    }
 
     public static void load() {
         if (Files.exists(filePath)) {
@@ -46,6 +51,7 @@ public class Config {
                 Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING);
             }
             Files.deleteIfExists(tempPath);
+            Utils.atomicWrite(filePath, data.toString());
         } catch (Exception exception) {
             LOGGER.error("Unable to save NoFrills config file!", exception);
         }

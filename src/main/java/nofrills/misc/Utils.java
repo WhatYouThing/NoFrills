@@ -813,7 +813,7 @@ public class Utils {
     }
 
     public static String formatSeparator(long number) {
-        return String.format("%,d", number);
+        return new Formatter().format(Locale.ENGLISH, "%,d", number).toString();
     }
 
     public static String formatSeparator(int number) {
@@ -821,7 +821,7 @@ public class Utils {
     }
 
     public static String formatSeparator(double number) {
-        return String.format("%,.1f", number);
+        return new Formatter().format(Locale.ENGLISH, "%,.1f", number).toString();
     }
 
     public static String formatSeparator(float number) {

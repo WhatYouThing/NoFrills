@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SlotOptions {
     public static final ItemStack BACKGROUND = stackWithName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
+    public static final ItemStack SOLID_BACKGROUND = stackWithName(Items.GRAY_CONCRETE.getDefaultStack(), " ");
     public static final ItemStack FIRST = stackWithName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
     public static final ItemStack SECOND = stackWithName(Items.ORANGE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
     public static final ItemStack THIRD = stackWithName(Items.RED_CONCRETE.getDefaultStack(), Utils.Symbols.format + "cClick after.");

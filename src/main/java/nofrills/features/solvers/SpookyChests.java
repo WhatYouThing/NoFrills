@@ -40,7 +40,7 @@ public class SpookyChests {
     private static void clickChest(Entity ent) {
         List<Entity> chests = new ArrayList<>(chestList.get());
         chests.sort(Comparator.comparingDouble(chest -> Utils.horizontalDistance(ent, chest)));
-        if (!chests.isEmpty() && Utils.horizontalDistance(ent, chests.getFirst()) <= 2.0) {
+        if (!chests.isEmpty() && Utils.horizontalDistance(ent, chests.getFirst()) <= 1.5) {
             clickedList.add(chests.getFirst());
         }
     }

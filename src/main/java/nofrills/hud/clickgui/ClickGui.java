@@ -307,7 +307,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Keybind("Scroll Down", GuiKeybinds.down, "The keybind to scroll down in the GUI."),
                                 new Settings.Keybind("Go Back", GuiKeybinds.back, "The keybind to go back to the previous GUI.")
                         ))),
-                        new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking.")
+                        new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking."),
+                        new Module("Hotbar Scroll Lock", HotbarScrollLock.instance, "Prevents your hotbar going from the first to the last slot when scrolling, and vice versa.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experimentation Table", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(

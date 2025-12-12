@@ -209,7 +209,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Swing Z", 0, 2, 0.01, Viewmodel.swingZ, "The Z multiplier for swing animation offset.")
                         ))),
                         new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings()),
-                        new Module("Chat Rules", ChatRules.instance, "Create custom rules that activate when a matching message is sent in chat.", ChatRules.buildSettings())
+                        new Module("Chat Rules", ChatRules.instance, "Create custom rules that activate when a matching message is sent in chat.", ChatRules.buildSettings()),
+                        new Module("Chat Tweaks", ChatTweaks.instance, "Various features/improvements for the chat hud.", new Settings(List.of(
+                                new Settings.Keybind("Copy Key", ChatTweaks.copyKey, "The message copy keybind. Copies the hovered message to clipboard when pressed."),
+                                new Settings.Toggle("Trim On Copy", ChatTweaks.trimOnCopy, "Trims copied chat messages to remove any leading/trailing space characters."),
+                                new Settings.Toggle("Message On Copy", ChatTweaks.msgOnCopy, "Sends a feedback message in chat after copying any message."),
+                                new Settings.SliderInt("Feedback Limit", 0, 512, 1, ChatTweaks.copyMsgLength, "The max length of the copied message within the feedback message.\nHelps to prevent the chat from filling up when copying large messages."),
+                                new Settings.Toggle("Keep History", ChatTweaks.keepHistory, "Prevents the chat history from clearing on disconnect."),
+                                new Settings.Toggle("Extra Lines", ChatTweaks.extraLines, "Overrides the chat line limit. Allows you to keep more messages in the chat history."),
+                                new Settings.SliderInt("Lines", 100, 5000, 10, ChatTweaks.lines, "The chat line limit override.")
+                        )))
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),

@@ -8,3 +8,8 @@ accessible field net/minecraft/world/entity/SimpleEntityLookup index Lnet/minecr
 accessible field net/minecraft/world/entity/EntityIndex idToEntity Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
 accessible field net/minecraft/entity/mob/CreeperEntity CHARGED Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/client/sound/SoundManager soundSystem Lnet/minecraft/client/sound/SoundSystem;
+accessible method net/minecraft/client/gui/hud/ChatHud toChatLineX (D)D
+accessible method net/minecraft/client/gui/hud/ChatHud toChatLineY (D)D
+accessible method net/minecraft/client/gui/hud/ChatHud getMessageLineIndex (DD)I
+accessible field net/minecraft/client/gui/hud/ChatHud visibleMessages Ljava/util/List;
+accessible field net/minecraft/entity/PlayerLikeEntity STANDING_DIMENSIONS Lnet/minecraft/entity/EntityDimensions;

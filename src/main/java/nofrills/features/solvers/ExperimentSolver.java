@@ -2,13 +2,11 @@ package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -35,6 +33,7 @@ public class ExperimentSolver {
     private static final List<Solution> ultraSolution = new ArrayList<>();
     private static final RenderColor superColorFound = RenderColor.fromHex(0x00ff00, 0.5f);
     private static final RenderColor superColorPotential = RenderColor.fromHex(0xffff00, 0.5f);
+    private static final RenderColor superColorPowerup = RenderColor.fromHex(0xff00ff, 0.5f);
     private static Solution superSolution = new Solution();
     private static boolean rememberPhase = true;
 
@@ -97,13 +96,6 @@ public class ExperimentSolver {
         return stack.getItem().toString().endsWith("stained_glass_pane");
     }
 
-    private static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
-        Inventory inventory = handler.getInventory();
-        List<Slot> slots = new ArrayList<>(handler.slots);
-        slots.removeIf(slot -> inventory.getStack(slot.id).isEmpty());
-        return slots;
-    }
-
     private static void showChronoSolution() {
         if (!chronoSolution.isEmpty()) {
             for (Slot solution : chronoSolution.getFirst().slots) {
@@ -144,7 +136,7 @@ public class ExperimentSolver {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (!instance.isActive() || event.isInventory) {
+        if (!instance.isActive() || event.isInventory || event.slot == null) {
             return;
         }
         ExperimentType experimentType = getExperimentType();
@@ -152,18 +144,17 @@ public class ExperimentSolver {
             return;
         }
         Item item = event.stack.getItem();
-        Slot eventSlot = event.handler.getSlot(event.slotId);
         updatePhase(event.stack);
         if (chronomatron.value() && experimentType.equals(ExperimentType.Chronomatron)) {
             if (rememberPhase) {
-                for (Slot slot : getContainerSlots(event.handler)) {
+                for (Slot slot : Utils.getContainerSlots(event.handler)) {
                     SlotOptions.setDisabled(slot, true);
                 }
                 if (isTerracotta(event.stack)) {
                     if (chronoSolution.isEmpty()) {
                         chronoSolution.add(new Solution(new ArrayList<>()));
                     }
-                    chronoSolution.getLast().slots.add(eventSlot);
+                    chronoSolution.getLast().slots.add(event.slot);
                 } else if (isStainedGlass(event.stack)) {
                     if (!chronoSolution.isEmpty() && chronoSolution.getLast().slots.stream().anyMatch(slot -> slot.id == event.slotId)) {
                         chronoSolution.add(new Solution(new ArrayList<>()));
@@ -179,12 +170,16 @@ public class ExperimentSolver {
         if (ultrasequencer.value() && experimentType.equals(ExperimentType.Ultrasequencer)) {
             if (item.equals(Items.CLOCK)) {
                 ultraSolution.sort(Comparator.comparingInt(s -> s.stack.getCount()));
+                for (Solution solution : ultraSolution) {
+                    SlotOptions.setSpoofed(solution.slot, SlotOptions.stackWithCount(SlotOptions.SOLID_BACKGROUND, solution.stack.getCount()));
+                    SlotOptions.setDisabled(solution.slot, true);
+                }
                 showUltraSolution();
             } else if (item.equals(Items.GLOWSTONE)) {
                 List<Solution> solution = new ArrayList<>();
                 SlotOptions.clearSpoofed();
                 SlotOptions.clearDisabled();
-                for (Slot slot : getContainerSlots(event.handler)) {
+                for (Slot slot : Utils.getContainerSlots(event.handler)) {
                     SlotOptions.setDisabled(slot, true);
                     if (isDye(slot.getStack())) {
                         solution.add(new Solution(slot.getStack(), slot));
@@ -194,23 +189,27 @@ public class ExperimentSolver {
                 ultraSolution.addAll(solution);
             }
         }
-        if (superpairs.value() && experimentType.equals(ExperimentType.Superpairs) && !isStatus(event.stack) && !isPowerup(event.stack)) {
+        if (superpairs.value() && experimentType.equals(ExperimentType.Superpairs) && !isStatus(event.stack)) {
+            if (isPowerup(event.stack)) {
+                SlotOptions.setBackground(event.slot, superColorPowerup);
+                return;
+            }
             if (!isStainedGlass(event.stack) && !isStainedGlassPane(event.stack) && !item.equals(Items.AIR)) {
-                if (superSolution.slot != null && superSolution.slot != eventSlot) {
+                if (superSolution.slot != null && superSolution.slot != event.slot) {
                     if (matchSuperStacks(event.stack, superSolution.slot.getStack())) {
-                        SlotOptions.setBackground(eventSlot, superColorFound);
+                        SlotOptions.setBackground(event.slot, superColorFound);
                         SlotOptions.setBackground(superSolution.slot, superColorFound);
                     }
                 }
                 for (Map.Entry<Slot, ItemStack> solution : superSolution.rewards.entrySet()) {
-                    if (!SlotOptions.hasBackground(eventSlot) && !eventSlot.equals(solution.getKey()) && matchSuperStacks(event.stack, solution.getValue())) {
-                        SlotOptions.setBackground(eventSlot, superColorPotential);
+                    if (!SlotOptions.hasBackground(event.slot) && !event.slot.equals(solution.getKey()) && matchSuperStacks(event.stack, solution.getValue())) {
+                        SlotOptions.setBackground(event.slot, superColorPotential);
                         SlotOptions.setBackground(solution.getKey(), superColorPotential);
                     }
                 }
-                superSolution.rewards.put(eventSlot, event.stack);
-                superSolution.slot = eventSlot;
-                SlotOptions.setSpoofed(eventSlot, event.stack);
+                superSolution.rewards.put(event.slot, event.stack);
+                superSolution.slot = event.slot;
+                SlotOptions.setSpoofed(event.slot, event.stack);
             }
         }
     }
@@ -247,7 +246,7 @@ public class ExperimentSolver {
                 if (!ultraSolution.isEmpty()) {
                     if (ultraSolution.getFirst().slot.id == slotId) {
                         Solution first = ultraSolution.getFirst();
-                        SlotOptions.setSpoofed(first.slot, SlotOptions.stackWithCount(Items.GRAY_CONCRETE.getDefaultStack(), first.stack.getCount()));
+                        SlotOptions.setSpoofed(first.slot, SlotOptions.stackWithCount(SlotOptions.SOLID_BACKGROUND, first.stack.getCount()));
                         SlotOptions.setDisabled(first.slot, true);
                         ultraSolution.removeFirst();
                     }

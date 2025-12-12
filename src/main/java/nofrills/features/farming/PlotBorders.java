@@ -33,6 +33,7 @@ public class PlotBorders {
 
     private static HashMap<String, Plot> buildPlotList() {
         HashMap<String, Plot> map = new HashMap<>();
+        map.put("0", new Plot(0, 0));
         map.put("1", new Plot(0, -96));
         map.put("2", new Plot(-96, 0));
         map.put("3", new Plot(96, 0));
@@ -94,7 +95,9 @@ public class PlotBorders {
             }
             if (infested.value()) {
                 for (String plot : infestedPlots) {
-                    event.drawOutline(plotData.get(plot).boundingBox, true, infestedColor.value());
+                    if (plotData.containsKey(plot)) {
+                        event.drawOutline(plotData.get(plot).boundingBox, true, infestedColor.value());
+                    }
                 }
             }
         }

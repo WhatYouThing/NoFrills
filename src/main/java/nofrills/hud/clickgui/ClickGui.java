@@ -211,7 +211,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Swing Z", 0, 2, 0.01, Viewmodel.swingZ, "The Z multiplier for swing animation offset.")
                         ))),
                         new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings()),
-                        new Module("Chat Rules", ChatRules.instance, "Create custom rules that activate when a matching message is sent in chat.", ChatRules.buildSettings())
+                        new Module("Chat Rules", ChatRules.instance, "Create custom rules that activate when a matching message is sent in chat.", ChatRules.buildSettings()),
+                        new Module("Chat Tweaks", ChatTweaks.instance, "Various features/improvements for the chat hud.", new Settings(List.of(
+                                new Settings.Keybind("Copy Key", ChatTweaks.copyKey, "The message copy keybind. Copies the hovered message to clipboard when pressed."),
+                                new Settings.Toggle("Trim On Copy", ChatTweaks.trimOnCopy, "Trims copied chat messages to remove any leading/trailing space characters."),
+                                new Settings.Toggle("Message On Copy", ChatTweaks.msgOnCopy, "Sends a feedback message in chat after copying any message."),
+                                new Settings.SliderInt("Feedback Limit", 0, 512, 1, ChatTweaks.copyMsgLength, "The max length of the copied message within the feedback message.\nHelps to prevent the chat from filling up when copying large messages."),
+                                new Settings.Toggle("Keep History", ChatTweaks.keepHistory, "Prevents the chat history from clearing on disconnect."),
+                                new Settings.Toggle("Extra Lines", ChatTweaks.extraLines, "Overrides the chat line limit. Allows you to keep more messages in the chat history."),
+                                new Settings.SliderInt("Lines", 100, 5000, 10, ChatTweaks.lines, "The chat line limit override.")
+                        )))
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),
@@ -221,9 +230,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", NoAbilityPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", NoAbilityPlace.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Anti Swim", AntiSwim.instance, "Prevents the crawling and the swimming animations from activating.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", AntiSwim.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", AntiSwim.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        new Module("Hitbox Fix", HitboxFix.instance, "Fixes lagbacks on old islands caused by the smaller crouching/swimming collision hitbox.", new Settings(List.of(
+                                new Settings.Toggle("Skyblock Only", HitboxFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", HitboxFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Enchant Fix", EnchantFix.instance, "Fixes client side issues with certain vanilla enchants.\n\n- Fixes Efficiency being lag and ping dependent\n- Fixes Aqua Affinity not working", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", EnchantFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
@@ -239,9 +248,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", NoPearlCooldown.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", NoPearlCooldown.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Old Sneak", OldSneak.instance, "Restores the old sneaking eye height and hitbox size.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", OldSneak.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", OldSneak.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        new Module("Old Eye Height", OldEyeHeight.instance, "Allows you to restore the 1.8 sneaking eye height and/or disable the swimming eye height.", new Settings(List.of(
+                                new Settings.Toggle("Sneaking", OldEyeHeight.sneaking, "If enabled, the 1.8 sneaking eye height will be restored."),
+                                new Settings.Toggle("Swimming", OldEyeHeight.swimming, "If enabled, the swimming eye height will be disabled."),
+                                new Settings.Toggle("Skyblock Only", OldEyeHeight.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", OldEyeHeight.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Riding Camera Fix", RidingCameraFix.instance, "Removes the floaty camera movement effect while riding entities.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", RidingCameraFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
@@ -255,17 +266,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", AnimationFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", AnimationFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Sneak Lag Fix", SneakLagFix.instance, "Fixes lag backs that occur when you sneak while walking.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", SneakLagFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", SneakLagFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
                         new Module("Double Use Fix", DoubleUseFix.instance, "Fixes Blaze Daggers and Fishing Rods being able to activate twice at once.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", DoubleUseFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", DoubleUseFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("Old Safewalk", OldSafewalk.instance, "Allows you to walk onto short blocks (such as carpet) while sneaking.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", OldSafewalk.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", OldSafewalk.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Disconnect Fix", DisconnectFix.instance, "Patches any known kick/disconnect issues.\n\n- Fixes the rare disconnects that occur while doing Tarantula slayer."),
                         new Module("No Confirm Screen", NoConfirmScreen.instance, "Removes the \"Confirm Command Execution\" screen and allows the command to run anyways."),
@@ -315,7 +318,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Keybind("Scroll Down", GuiKeybinds.down, "The keybind to scroll down in the GUI."),
                                 new Settings.Keybind("Go Back", GuiKeybinds.back, "The keybind to go back to the previous GUI.")
                         ))),
-                        new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking.")
+                        new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking."),
+                        new Module("Hotbar Scroll Lock", HotbarScrollLock.instance, "Prevents your hotbar going from the first to the last slot when scrolling, and vice versa.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experimentation Table", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
@@ -325,6 +329,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Calendar Date", CalendarDate.instance, "Calculates the exact starting dates of events in the calendar."),
                         new Module("Spooky Chests", SpookyChests.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(
+                                new Settings.Toggle("Chest Tracer", SpookyChests.tracer, "Draws tracers towards unopened trick or treat chests."),
                                 new Settings.ColorPicker("Color", true, SpookyChests.color, "The color of the spooky chest highlight.")
                         ))),
                         new Module("Diana Solver", DianaSolver.instance, "Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.", new Settings(List.of(
@@ -583,7 +588,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new Settings(List.of(
-                                new Settings.SliderInt("Override Ticks", 0, 300, 1, AbilityAlert.override, "Overrides your pickaxe ability cooldown to a custom value in ticks.\nOnly applies if the Pickaxe Ability widget isn't present.\nSet to 0 to disable.")
+                                new Settings.SliderInt("Override Ticks", 0, 6000, 1, AbilityAlert.override, "Overrides your pickaxe ability cooldown to a custom value in ticks.\nOnly applies if the Pickaxe Ability widget isn't present.\nSet to 0 to disable.")
                         ))),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
                                 new Settings.ColorPicker("Lapis Color", false, CorpseHighlight.lapisColor, "The color of the Lapis corpse."),

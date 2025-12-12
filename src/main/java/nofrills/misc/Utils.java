@@ -71,8 +71,7 @@ public class Utils {
     private static final Random soundRandom = Random.create(0);
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "The Park",
-            "Galatea",
-            "Catacombs"
+            "Galatea"
     );
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",
@@ -840,7 +839,7 @@ public class Utils {
     }
 
     public static String formatSeparator(long number) {
-        return String.format("%,d", number);
+        return new Formatter().format(Locale.ENGLISH, "%,d", number).toString();
     }
 
     public static String formatSeparator(int number) {
@@ -848,7 +847,7 @@ public class Utils {
     }
 
     public static String formatSeparator(double number) {
-        return String.format("%,.1f", number);
+        return new Formatter().format(Locale.ENGLISH, "%,.1f", number).toString();
     }
 
     public static String formatSeparator(float number) {

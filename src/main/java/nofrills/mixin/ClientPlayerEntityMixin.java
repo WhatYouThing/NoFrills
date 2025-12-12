@@ -1,13 +1,16 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.Box;
 import nofrills.features.hunting.InstantFog;
+import nofrills.features.tweaks.HitboxFix;
 import nofrills.features.tweaks.RidingCameraFix;
-import nofrills.features.tweaks.SneakLagFix;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -34,10 +37,10 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         }
     }
 
-    @ModifyReturnValue(method = "shouldSlowDown", at = @At("RETURN"))
-    private boolean onShouldSlowDown(boolean original) {
-        if (SneakLagFix.active()) {
-            return this.isSneaking() && !this.getAbilities().flying;
+    @ModifyExpressionValue(method = "wouldCollideAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getBoundingBox()Lnet/minecraft/util/math/Box;"))
+    private Box onGetBoundingBox(Box original) {
+        if (HitboxFix.active()) {
+            return PlayerEntity.STANDING_DIMENSIONS.getBoxAt(this.getEntityPos());
         }
         return original;
     }

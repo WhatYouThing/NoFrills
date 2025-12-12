@@ -53,12 +53,14 @@ public class EntityCache {
         this.entities.clear();
     }
 
-    public void removeDead() {
+    public EntityCache removeDead() {
         this.entities.removeIf(entity -> !exists(entity));
+        return this;
     }
 
-    public void removeIf(Predicate<Entity> filter) {
+    public EntityCache removeIf(Predicate<Entity> filter) {
         this.entities.removeIf(filter);
+        return this;
     }
 
     /**

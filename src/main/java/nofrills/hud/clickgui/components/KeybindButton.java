@@ -16,8 +16,6 @@ public class KeybindButton extends ButtonComponent {
     private final List<Integer> keybindBlacklist = List.of(
             GLFW.GLFW_KEY_UNKNOWN,
             GLFW.GLFW_MOUSE_BUTTON_LEFT,
-            GLFW.GLFW_MOUSE_BUTTON_RIGHT,
-            GLFW.GLFW_MOUSE_BUTTON_MIDDLE,
             GLFW.GLFW_KEY_ESCAPE
     );
     public Text unbound = Text.literal("Not Bound").withColor(0xffffff);

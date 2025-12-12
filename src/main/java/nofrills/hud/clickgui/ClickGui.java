@@ -317,6 +317,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Calendar Date", CalendarDate.instance, "Calculates the exact starting dates of events in the calendar."),
                         new Module("Spooky Chests", SpookyChests.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(
+                                new Settings.Toggle("Chest Tracer", SpookyChests.tracer, "Draws tracers towards unopened trick or treat chests."),
                                 new Settings.ColorPicker("Color", true, SpookyChests.color, "The color of the spooky chest highlight.")
                         ))),
                         new Module("Diana Solver", DianaSolver.instance, "Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.", new Settings(List.of(

@@ -39,7 +39,6 @@
     "PlayerEntityMixin",
     "PlayerListHudAccessor",
     "RaycastContextMixin",
-    "SnowBlockMixin",
     "StatusEffectsDisplayMixin",
     "WorldMixin",
     "WorldRendererMixin"

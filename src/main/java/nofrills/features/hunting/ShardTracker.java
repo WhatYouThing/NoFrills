@@ -23,6 +23,7 @@ import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.features.general.PriceTooltips;
+import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
@@ -46,8 +47,7 @@ public class ShardTracker {
     public static final SettingBool filterDirect = new SettingBool(false, "filterDirect", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
 
-    public static final MutableText displayNone = Text.literal("§bShard Tracker\n§7None tracked.");
-    public static MutableText display = displayNone;
+    public static final MutableText displayNone = Text.literal("Shard Tracker\n§7None tracked.");
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
@@ -203,15 +203,15 @@ public class ShardTracker {
             }
             if (!lines.isEmpty()) {
                 StringBuilder builder = new StringBuilder();
-                builder.append("§bShard Tracker");
+                builder.append("Shard Tracker");
                 for (String line : lines) {
                     builder.append("\n").append(line);
                 }
-                display = Text.literal(builder.toString());
+                HudManager.shardTrackerElement.setText(builder.toString());
                 return;
             }
         }
-        display = displayNone;
+        HudManager.shardTrackerElement.setDefaultText();
     }
 
     private static Shard getShardFromMsg(String msg) { // parses various messages about obtaining shards, do not touch

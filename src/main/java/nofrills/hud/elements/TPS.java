@@ -1,14 +1,9 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import io.wispforest.owo.ui.core.Surface;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
-import nofrills.config.SettingDouble;
-import nofrills.config.SettingEnum;
-import nofrills.hud.HudManager;
 import nofrills.hud.HudSettings;
 import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
@@ -18,46 +13,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TPS extends SimpleTextElement {
-    public final Feature instance = new Feature("tpsElement");
-
-    public final SettingDouble x;
-    public final SettingDouble y;
-    public final SettingBool shadow = new SettingBool(true, "shadow", instance.key());
-    public final SettingEnum<alignment> align = new SettingEnum<>(alignment.Left, alignment.class, "align", instance.key());
     public final SettingBool average = new SettingBool(false, "average", instance.key());
-
-    private final Identifier identifier = Identifier.of("nofrills", "tps-element");
-
     public int clientTicks = 20;
     public int serverTicks = 0;
     public List<Integer> tpsList = new ArrayList<>();
 
-    public TPS(String text, double x, double y) {
-        super(Text.literal(text));
-        this.x = new SettingDouble(x, "x", instance.key());
-        this.y = new SettingDouble(y, "y", instance.key());
+    public TPS(String text) {
+        super(Text.literal(text), new Feature("tpsElement"), "TPS Element");
         this.options = new HudSettings(List.of(
-                new Settings.Toggle("Shadow", shadow, "Adds a shadow to the element's text."),
-                new Settings.Dropdown<>("Alignment", align, "The alignment of the element's text."),
+                new Settings.Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."),
+                new Settings.Dropdown<>("Alignment", this.textAlignment, "The alignment of the element's text."),
                 new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
-        this.options.setTitle(Text.of("TPS Element"));
-    }
-
-    public TPS(String text) {
-        this(text, HudManager.getDefaultX(), HudManager.getDefaultY());
+        this.options.setTitle(this.elementLabel);
     }
 
     @Override
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
-        if (HudManager.isEditingHud()) {
-            super.layout.surface(instance.isActive() ? Surface.BLANK : this.disabledSurface);
-        } else if (!instance.isActive()) {
-            return;
+        if (this.shouldRender()) {
+            super.draw(context, mouseX, mouseY, partialTicks, delta);
         }
-        this.updateShadow(shadow);
-        this.updateAlignment(align);
-        super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
     public void setTps(int tps) {
@@ -70,9 +45,9 @@ public class TPS extends SimpleTextElement {
             for (int previous : this.tpsList) {
                 avg += previous;
             }
-            this.setText(Utils.format("§bTPS: §f{} §7{}", tps, Utils.formatDecimal(avg / (double) tpsList.size())));
+            this.setText(Utils.format("TPS: §f{} §7{}", tps, Utils.formatDecimal(avg / (double) tpsList.size())));
         } else {
-            this.setText(Utils.format("§bTPS: §f{}", tps));
+            this.setText(Utils.format("TPS: §f{}", tps));
         }
     }
 
@@ -80,27 +55,6 @@ public class TPS extends SimpleTextElement {
         this.clientTicks = 20;
         this.serverTicks = 0;
         this.tpsList.clear();
-        this.setText("§bTPS: §f0");
-    }
-
-    @Override
-    public void updatePosition() {
-        this.updatePosition(x, y);
-    }
-
-    @Override
-    public void toggle() {
-        instance.setActive(!instance.isActive());
-    }
-
-    @Override
-    public void savePosition(double x, double y) {
-        this.x.set(x);
-        this.y.set(y);
-    }
-
-    @Override
-    public Identifier getIdentifier() {
-        return this.identifier;
+        this.setText("TPS: §f0");
     }
 }

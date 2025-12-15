@@ -6,6 +6,7 @@ import nofrills.config.SettingBool;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
+import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -30,21 +31,6 @@ public class TickTimers {
 
     public static void clearTimer(TimerType type) {
         timerList.removeIf(timer -> timer.type.equals(type));
-    }
-
-    public static String getText() {
-        StringBuilder text = new StringBuilder("§bTick Timers");
-        for (Timer timer : getTimerList()) {
-            if (timer.currentTicks == 0) continue;
-            String duration = Utils.formatDecimal(timer.currentTicks / 20.0);
-            String label = switch (timer.type) {
-                case Storm -> "§3Pad";
-                case TerminalStart -> "§eTerminals";
-                case Goldor -> "§6Death Tick";
-            };
-            text.append(Utils.format("\n{}: §f{}s", label, duration));
-        }
-        return text.toString();
     }
 
     @EventHandler
@@ -77,12 +63,22 @@ public class TickTimers {
     @EventHandler
     private static void onTick(ServerTickEvent event) {
         if (instance.isActive() && Utils.isOnDungeonFloor("7")) {
+            StringBuilder text = new StringBuilder("Tick Timers");
             for (Timer timer : getTimerList()) {
                 timer.tick();
-                if (timer.currentTicks == 0 && !timer.repeating) {
-                    timerList.remove(timer);
+                if (timer.currentTicks == 0) {
+                    if (!timer.repeating) timerList.remove(timer);
+                } else {
+                    String duration = Utils.formatDecimal(timer.currentTicks / 20.0);
+                    String label = switch (timer.type) {
+                        case Storm -> "§3Pad";
+                        case TerminalStart -> "§eTerminals";
+                        case Goldor -> "§6Death Tick";
+                    };
+                    text.append(Utils.format("\n{}: §f{}s", label, duration));
                 }
             }
+            HudManager.tickTimerElement.setText(text.toString());
         }
     }
 

@@ -66,8 +66,8 @@ public class SlayerUtil {
 
     public static void updateQuestState(List<String> lines) {
         bossAlive = lines.contains("Slay the boss!");
-        for (SlayerBoss boss : bossList) {
-            for (String line : lines) {
+        for (String line : lines) {
+            for (SlayerBoss boss : bossList) {
                 if (line.startsWith(boss.bossName)) {
                     currentBoss = boss;
                     return;

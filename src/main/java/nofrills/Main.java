@@ -178,6 +178,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ChatRules.class);
         eventBus.subscribe(BreakResetFix.class);
         eventBus.subscribe(ChatTweaks.class);
+        eventBus.subscribe(SpawnAlert.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

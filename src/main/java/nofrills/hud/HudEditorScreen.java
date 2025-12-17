@@ -35,6 +35,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
         for (HudElement element : HudManager.getElements()) {
             root.child(element);
         }
+        HudManager.armorElement.updateArmor();
     }
 
     @Override

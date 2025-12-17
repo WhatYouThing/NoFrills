@@ -5,7 +5,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
-import nofrills.hud.HudSettings;
 import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
@@ -23,13 +22,10 @@ public class FishingBobber extends SimpleTextElement {
 
     public FishingBobber(String text) {
         super(Text.literal(text), new Feature("bobberElement"), "Bobber Element");
-        this.options = new HudSettings(List.of(
-                new Settings.Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."),
-                new Settings.Dropdown<>("Alignment", this.textAlignment, "The alignment of the element's text."),
+        this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Inactive", this.inactive, "Hides the element if your fishing bobber is inactive."),
                 new Settings.Toggle("Bobber Timer", this.timer, "Tracks how long your fishing bobber has existed for, useful for Slugfish.")
         ));
-        this.options.setTitle(this.elementLabel);
     }
 
     @Override

@@ -2,6 +2,7 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
@@ -10,7 +11,11 @@ import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
+import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.PlainLabel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimpleTextElement extends HudElement {
     public final SettingEnum<TextAlignment> textAlignment;
@@ -44,6 +49,19 @@ public class SimpleTextElement extends HudElement {
             this.layout.horizontalAlignment(alignment);
         }
         return shouldRender;
+    }
+
+    @Override
+    public HudSettings getBaseSettings() {
+        return this.getBaseSettings(new ArrayList<>());
+    }
+
+    @Override
+    public HudSettings getBaseSettings(List<FlowLayout> extra) {
+        List<FlowLayout> list = new ArrayList<>(extra);
+        list.add(new Settings.Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."));
+        list.add(new Settings.Dropdown<>("Alignment", this.textAlignment, "The alignment of the element's text."));
+        return super.getBaseSettings(list);
     }
 
     public void setText(String text) {

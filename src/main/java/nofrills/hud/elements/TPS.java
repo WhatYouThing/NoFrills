@@ -4,7 +4,6 @@ import io.wispforest.owo.ui.core.OwoUIDrawContext;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
-import nofrills.hud.HudSettings;
 import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
@@ -20,12 +19,9 @@ public class TPS extends SimpleTextElement {
 
     public TPS(String text) {
         super(Text.literal(text), new Feature("tpsElement"), "TPS Element");
-        this.options = new HudSettings(List.of(
-                new Settings.Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."),
-                new Settings.Dropdown<>("Alignment", this.textAlignment, "The alignment of the element's text."),
+        this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
-        this.options.setTitle(this.elementLabel);
     }
 
     @Override

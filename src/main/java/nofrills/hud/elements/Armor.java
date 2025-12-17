@@ -8,10 +8,10 @@ import io.wispforest.owo.ui.core.OwoUIDrawContext;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.VerticalAlignment;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingEnum;
 import nofrills.hud.HudElement;
-import nofrills.hud.HudSettings;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
@@ -21,6 +21,12 @@ import static nofrills.Main.mc;
 
 public class Armor extends HudElement {
     public final SettingEnum<Alignment> align = new SettingEnum<>(Alignment.Horizontal, Alignment.class, "align", instance.key());
+    private final List<ItemStack> defaultArmor = List.of(
+            Items.LEATHER_HELMET.getDefaultStack(),
+            Items.LEATHER_CHESTPLATE.getDefaultStack(),
+            Items.LEATHER_LEGGINGS.getDefaultStack(),
+            Items.LEATHER_BOOTS.getDefaultStack()
+    );
     private FlowLayout content;
     private Alignment lastAlign;
 
@@ -30,10 +36,9 @@ public class Armor extends HudElement {
         this.lastAlign = align.value();
         this.layout.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         this.layout.child(this.content);
-        this.options = new HudSettings(List.of(
+        this.options = this.getBaseSettings(List.of(
                 new Settings.Dropdown<>("Alignment", align, "The alignment direction of the element.")
         ));
-        this.options.setTitle(this.elementLabel);
     }
 
     @Override
@@ -60,7 +65,7 @@ public class Armor extends HudElement {
     public void updateArmor() {
         if (mc.player != null) {
             this.content.clearChildren();
-            for (ItemStack armor : Utils.getEntityArmor(mc.player)) {
+            for (ItemStack armor : this.isEditingHud() ? this.defaultArmor : Utils.getEntityArmor(mc.player)) {
                 this.content.child(Components.item(armor));
             }
         }

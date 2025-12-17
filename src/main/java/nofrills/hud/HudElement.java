@@ -10,10 +10,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
+import nofrills.hud.clickgui.Settings;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static nofrills.Main.mc;
@@ -24,11 +28,13 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     public final SettingBool added;
     public final SettingDouble xPos;
     public final SettingDouble yPos;
+    public final SettingBool useBackground;
+    public final SettingColor background;
     public final Identifier identifier;
+    public final Surface disabledSurface = Surface.flat(0x55ff0000);
     public FlowLayout layout;
     public HudSettings options;
     public boolean toggling = false;
-    public Surface disabledSurface = Surface.flat(0x55ff0000);
 
     public HudElement(FlowLayout layout, Feature instance, String label) {
         super(Sizing.content(), Sizing.content(), layout);
@@ -37,6 +43,8 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         this.added = new SettingBool(false, "added", instance);
         this.xPos = new SettingDouble(0.5, "x", instance);
         this.yPos = new SettingDouble(0.5, "y", instance);
+        this.useBackground = new SettingBool(false, "useBackground", instance);
+        this.background = new SettingColor(RenderColor.fromArgb(0x40000000), "background", instance);
         this.identifier = Identifier.of("nofrills", Utils.toLower(label.replaceAll(" ", "-")));
         this.positioning(Positioning.absolute(0, 0));
         this.layout = layout;
@@ -102,13 +110,33 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         return this.instance.isActive() && this.isAdded();
     }
 
+    public Surface getBackground() {
+        if (this.useBackground.value()) {
+            return Surface.flat(this.background.value().argb);
+        }
+        return Surface.BLANK;
+    }
+
     public boolean shouldRender() {
         if (!this.isAdded()) {
             return false;
         }
         boolean active = this.instance.isActive();
-        this.layout.surface(active ? Surface.BLANK : this.disabledSurface);
+        this.layout.surface(active ? this.getBackground() : this.disabledSurface);
         return active || HudManager.isEditingHud();
+    }
+
+    public HudSettings getBaseSettings() {
+        return this.getBaseSettings(new ArrayList<>());
+    }
+
+    public HudSettings getBaseSettings(List<FlowLayout> extra) {
+        List<FlowLayout> list = new ArrayList<>(extra);
+        list.add(new Settings.Toggle("Use Background", this.useBackground, "Draw a background for this element."));
+        list.add(new Settings.ColorPicker("Background", true, this.background, "The color of the background."));
+        HudSettings settings = new HudSettings(list);
+        settings.setTitle(this.elementLabel);
+        return settings;
     }
 
     public boolean isEditingHud() {

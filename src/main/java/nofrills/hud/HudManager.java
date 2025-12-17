@@ -22,13 +22,14 @@ public class HudManager {
     public static final TPS tpsElement = new TPS("TPS: §f20.00");
     public static final Ping pingElement = new Ping("Ping: §f0ms");
     public static final Day dayElement = new Day("Day: §f0");
-    public static final SeaCreatures seaCreaturesElement = new SeaCreatures("Sea Creatures: §70");
-    public static final FishingBobber bobberElement = new FishingBobber("Bobber: §7Inactive");
+    public static final Armor armorElement = new Armor();
+    public static final Inventory inventoryElement = new Inventory();
     public static final LagMeter lagMeterElement = new LagMeter("Last server tick was 0.00s ago");
     public static final Power powerElement = new Power("Power: §f0");
-    public static final ShardTrackerDisplay shardTrackerElement = new ShardTrackerDisplay();
     public static final TickTimer tickTimerElement = new TickTimer("Tick Timers");
-    public static final Armor armorElement = new Armor();
+    public static final SeaCreatures seaCreaturesElement = new SeaCreatures("Sea Creatures: §70");
+    public static final FishingBobber bobberElement = new FishingBobber("Bobber: §7Inactive");
+    public static final ShardTrackerDisplay shardTrackerElement = new ShardTrackerDisplay();
 
     public static boolean isEditingHud() {
         return mc.currentScreen instanceof HudEditorScreen;
@@ -126,6 +127,9 @@ public class HudManager {
         }
         if (armorElement.isActive()) {
             armorElement.updateArmor();
+        }
+        if (inventoryElement.isActive()) {
+            inventoryElement.updateInventory();
         }
     }
 

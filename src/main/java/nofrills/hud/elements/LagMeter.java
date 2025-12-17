@@ -5,7 +5,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
-import nofrills.hud.HudSettings;
 import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
@@ -18,12 +17,9 @@ public class LagMeter extends SimpleTextElement {
 
     public LagMeter(String text) {
         super(Text.literal(text), new Feature("lagMeterElement"), "Lag Meter Element");
-        this.options = new HudSettings(List.of(
-                new Settings.Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."),
-                new Settings.Dropdown<>("Alignment", this.textAlignment, "The alignment of the element's text."),
+        this.options = this.getBaseSettings(List.of(
                 new Settings.SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
         ));
-        this.options.setTitle(this.elementLabel);
     }
 
     @Override

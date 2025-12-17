@@ -158,7 +158,7 @@ public class Utils {
 
     public static String getCoordsFormatted(String format) {
         BlockPos pos = mc.player.getBlockPos();
-        return Utils.format(format, pos.getX(), pos.getY(), pos.getZ());
+        return format(format, pos.getX(), pos.getY(), pos.getZ());
 
     }
 
@@ -407,7 +407,7 @@ public class Utils {
                 String petInfo = data.getString("petInfo").orElse("");
                 if (!petInfo.isEmpty()) {
                     JsonObject petData = JsonParser.parseString(petInfo).getAsJsonObject();
-                    return Utils.format("{}_PET_{}", petData.get("type").getAsString(), petData.get("tier").getAsString());
+                    return format("{}_PET_{}", petData.get("type").getAsString(), petData.get("tier").getAsString());
                 }
                 return "UNKNOWN_PET";
             }
@@ -415,7 +415,7 @@ public class Utils {
                 NbtCompound runeData = data.getCompound("runes").orElse(null);
                 if (runeData != null) {
                     String runeId = (String) runeData.getKeys().toArray()[0];
-                    return Utils.format("{}_{}_RUNE", runeId, runeData.getInt(runeId).orElse(0));
+                    return format("{}_{}_RUNE", runeId, runeData.getInt(runeId).orElse(0));
                 }
                 return "EMPTY_RUNE";
             }
@@ -426,7 +426,7 @@ public class Utils {
                     if (enchants.size() == 1) {
                         String enchantId = (String) enchantData.getKeys().toArray()[0];
                         int enchantLevel = enchantData.getInt(enchantId).orElse(0);
-                        return Utils.format("ENCHANTMENT_{}_{}", Utils.toUpper(enchantId), enchantLevel);
+                        return format("ENCHANTMENT_{}_{}", toUpper(enchantId), enchantLevel);
                     }
                 }
                 return "ENCHANTMENT_UNKNOWN";
@@ -434,8 +434,8 @@ public class Utils {
             case "POTION" -> {
                 String potion = data.getString("potion").orElse("");
                 if (!potion.isEmpty()) {
-                    return Utils.format("{}_{}_POTION",
-                            Utils.toUpper(potion),
+                    return format("{}_{}_POTION",
+                            toUpper(potion),
                             data.getInt("potion_level").orElse(0)
                     );
                 }
@@ -565,7 +565,7 @@ public class Utils {
                     if (line.startsWith("mod_version=")) {
                         String newest = line.replace("mod_version=", "");
                         if (getVersionNumber(newest) > getVersionNumber(version)) {
-                            infoLink(Utils.format("§a§lNew version available! §aClick here to open the Modrinth releases page. §7Current: {}, Newest: {}", version, newest), "https://modrinth.com/mod/nofrills/versions");
+                            infoLink(format("§a§lNew version available! §aClick here to open the Modrinth releases page. §7Current: {}, Newest: {}", version, newest), "https://modrinth.com/mod/nofrills/versions");
                             return;
                         }
                     }
@@ -782,17 +782,15 @@ public class Utils {
      * Formats the string by replacing each set of curly brackets "{}" with one of the values in order, similarly to Rust's format macro.
      */
     public static String format(String string, Object... values) {
-        int lastIndex = 0;
-        Iterator<Object> iterator = Arrays.stream(values).iterator();
-        while (iterator.hasNext()) {
-            Object value = iterator.next();
-            int bracket = string.indexOf("{}", lastIndex);
-            if (bracket != -1) {
-                string = string.substring(0, bracket) + (value + "") + string.substring(bracket + 2);
-                lastIndex = bracket + 2;
+        StringBuilder builder = new StringBuilder();
+        String[] sections = string.split("\\{}");
+        for (int i = 0; i < sections.length; i++) {
+            builder.append(sections[i]);
+            if (i < values.length) {
+                builder.append(values[i]);
             }
         }
-        return string;
+        return builder.toString();
     }
 
     public static String formatDecimal(double number) {

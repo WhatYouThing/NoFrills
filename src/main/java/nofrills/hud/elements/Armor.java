@@ -1,12 +1,10 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.ItemComponent;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.HorizontalAlignment;
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import io.wispforest.owo.ui.core.Sizing;
-import io.wispforest.owo.ui.core.VerticalAlignment;
+import io.wispforest.owo.ui.core.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import nofrills.config.Feature;
@@ -21,12 +19,6 @@ import static nofrills.Main.mc;
 
 public class Armor extends HudElement {
     public final SettingEnum<Alignment> align = new SettingEnum<>(Alignment.Horizontal, Alignment.class, "align", instance.key());
-    private final List<ItemStack> defaultArmor = List.of(
-            Items.LEATHER_HELMET.getDefaultStack(),
-            Items.LEATHER_CHESTPLATE.getDefaultStack(),
-            Items.LEATHER_LEGGINGS.getDefaultStack(),
-            Items.LEATHER_BOOTS.getDefaultStack()
-    );
     private FlowLayout content;
     private Alignment lastAlign;
 
@@ -56,18 +48,38 @@ public class Armor extends HudElement {
     }
 
     private FlowLayout getAlignment(Alignment alignment) {
-        return switch (alignment) {
-            case Horizontal -> Containers.horizontalFlow(Sizing.fixed(64), Sizing.fixed(16));
-            case Vertical -> Containers.verticalFlow(Sizing.fixed(16), Sizing.fixed(64));
+        FlowLayout container = switch (alignment) {
+            case Horizontal -> Containers.horizontalFlow(Sizing.fixed(72), Sizing.fixed(18));
+            case Vertical -> Containers.verticalFlow(Sizing.fixed(18), Sizing.fixed(72));
         };
+        for (int i = 0; i <= 3; i++) {
+            ItemComponent component = Components.item(ItemStack.EMPTY);
+            component.showOverlay(true).margins(Insets.of(1));
+            container.child(component);
+        }
+        return container;
+    }
+
+    private List<ItemStack> getArmorItems() {
+        if (this.isEditingHud()) {
+            return List.of(
+                    Items.LEATHER_HELMET.getDefaultStack(),
+                    Items.LEATHER_CHESTPLATE.getDefaultStack(),
+                    Items.LEATHER_LEGGINGS.getDefaultStack(),
+                    Items.LEATHER_BOOTS.getDefaultStack()
+            );
+        }
+        if (mc.player != null) {
+            return Utils.getEntityArmor(mc.player);
+        }
+        return List.of(ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY, ItemStack.EMPTY);
     }
 
     public void updateArmor() {
-        if (mc.player != null) {
-            this.content.clearChildren();
-            for (ItemStack armor : this.isEditingHud() ? this.defaultArmor : Utils.getEntityArmor(mc.player)) {
-                this.content.child(Components.item(armor));
-            }
+        List<ItemStack> armor = this.getArmorItems();
+        List<Component> children = this.content.children();
+        for (int i = 0; i <= 3; i++) {
+            ((ItemComponent) children.get(i)).stack(armor.get(i));
         }
     }
 

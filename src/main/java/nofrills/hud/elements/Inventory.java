@@ -8,6 +8,7 @@ import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.OwoUIDrawContext;
 import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.hud.HudElement;
 
@@ -20,7 +21,13 @@ public class Inventory extends HudElement {
         super(new Feature("inventoryElement"), "Inventory Element");
         this.content = Containers.verticalFlow(Sizing.fixed(162), Sizing.fixed(54));
         for (int i = 0; i <= 2; i++) {
-            this.content.child(Containers.horizontalFlow(Sizing.fixed(162), Sizing.fixed(18)));
+            FlowLayout container = Containers.horizontalFlow(Sizing.fixed(162), Sizing.fixed(18));
+            for (int j = 0; j <= 8; j++) {
+                ItemComponent component = Components.item(ItemStack.EMPTY);
+                component.showOverlay(true).margins(Insets.of(1));
+                container.child(component);
+            }
+            this.content.child(container);
         }
         this.layout.child(this.content);
         this.options = this.getBaseSettings();
@@ -39,11 +46,8 @@ public class Inventory extends HudElement {
             for (int i = 0; i <= 2; i++) {
                 int row = (i + 1) * 9;
                 FlowLayout child = (FlowLayout) this.content.children().get(i);
-                child.clearChildren();
-                for (int slot = row; slot < row + 9; slot++) {
-                    ItemComponent itemComponent = Components.item(inv.getStack(slot)).showOverlay(true);
-                    itemComponent.margins(Insets.of(1));
-                    child.child(itemComponent);
+                for (int j = 0; j <= 8; j++) {
+                    ((ItemComponent) child.children().get(j)).stack(inv.getStack(row + j));
                 }
             }
         }

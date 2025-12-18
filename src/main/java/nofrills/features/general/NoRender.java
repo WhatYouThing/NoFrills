@@ -6,7 +6,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.fog.FogData;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleType;
@@ -41,11 +40,11 @@ public class NoRender {
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
     public static final SettingBool vignette = new SettingBool(false, "vignette", instance.key());
     public static final SettingBool expOrbs = new SettingBool(false, "expOrbs", instance.key());
+    public static final SettingBool stuckArrows = new SettingBool(false, "stuckArrows", instance.key());
 
     private static final List<Pattern> deadPatterns = List.of(
             Pattern.compile(".* 0" + Utils.Symbols.heart),
-            Pattern.compile(".* 0/.*" + Utils.Symbols.heart),
-            Pattern.compile(".* 0/.*" + Utils.Symbols.heart + " " + Utils.Symbols.vampLow)
+            Pattern.compile(".* 0/.*" + Utils.Symbols.heart)
     );
     private static final HashSet<Block> treeBlocks = Sets.newHashSet(
             Blocks.MANGROVE_WOOD,
@@ -96,9 +95,10 @@ public class NoRender {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && deadEntities.value() && event.entity instanceof ArmorStandEntity) {
+        if (instance.isActive() && deadEntities.value()) {
+            String name = event.namePlain.contains(Utils.Symbols.vampLow) ? event.namePlain.replaceAll(Utils.Symbols.vampLow, "") : event.namePlain;
             for (Pattern pattern : deadPatterns) {
-                if (pattern.matcher(event.namePlain).matches()) {
+                if (pattern.matcher(name).matches()) {
                     event.entity.setCustomNameVisible(false);
                     break;
                 }

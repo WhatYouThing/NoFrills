@@ -23,9 +23,9 @@ public class GhostVision {
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (instance.isActive() && event.entity instanceof CreeperEntity creeper && Utils.isInArea("Dwarven Mines") && !cache.has(event.entity)) {
-            if (creeper.getEntity().getY() < 100 && creeper.isCharged()) {
-                creeper.getDataTracker().set(CreeperEntity.CHARGED, false);
+        if (instance.isActive() && event.entity instanceof CreeperEntity creeper && Utils.isInArea("Dwarven Mines")) {
+            if (creeper.getEntity().getY() < 100) {
+                if (creeper.isCharged()) creeper.getDataTracker().set(CreeperEntity.CHARGED, false);
                 cache.add(event.entity);
             }
         }

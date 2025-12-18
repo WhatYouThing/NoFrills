@@ -175,7 +175,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Tree Bits", NoRender.treeBits, "Hides the flying wood and leaves blocks that appear when chopping trees on the Galatea."),
                                 new Settings.Toggle("Nausea", NoRender.nausea, "Prevents the nausea screen wobble and/or green overlay from rendering."),
                                 new Settings.Toggle("Vignette", NoRender.vignette, "Prevents the dark vignette overlay from rendering."),
-                                new Settings.Toggle("Exp Orbs", NoRender.expOrbs, "Prevents experience orbs from rendering.")
+                                new Settings.Toggle("Exp Orbs", NoRender.expOrbs, "Prevents experience orbs from rendering."),
+                                new Settings.Toggle("Stuck Arrows", NoRender.stuckArrows, "Prevents arrows stuck to entities from rendering.")
                         ))),
                         new Module("Pearl Refill", PearlRefill.instance, "Easily refill your Ender Pearls from your sacks with a keybind.", new Settings(List.of(
                                 new Settings.Keybind("Keybind", PearlRefill.keybind, "The key that activates the feature.")
@@ -257,10 +258,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Riding Camera Fix", RidingCameraFix.instance, "Removes the floaty camera movement effect while riding entities.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", RidingCameraFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", RidingCameraFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("Snow Fix", SnowFix.instance, "Adjusts snow layer collision to reduce lagbacks.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", SnowFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", SnowFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Animation Fix", AnimationFix.instance, "Fixes the ancient bug where certain animations can play twice, such as unsneaking.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", AnimationFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
@@ -584,7 +581,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", true, BeaconTracer.color, "The color of the tracer.")
                         ))),
                         new Module("Mute Enderman", MuteEnderman.instance, "Prevents the angry Enderman sounds from playing."),
-                        new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt.")
+                        new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt."),
+                        new Module("Spawn Alert", SpawnAlert.instance, "Alerts you when your slayer boss is spawned.")
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new Settings(List.of(

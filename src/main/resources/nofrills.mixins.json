@@ -38,8 +38,8 @@
     "PlayerLikeEntityMixin",
     "PlayerListHudAccessor",
     "RaycastContextMixin",
-    "SnowBlockMixin",
     "StatusEffectsDisplayMixin",
+    "StuckObjectsFeatureRendererMixin",
     "WorldMixin",
     "WorldRendererMixin"
   ],

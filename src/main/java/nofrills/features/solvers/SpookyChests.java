@@ -2,6 +2,7 @@ package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -38,10 +39,14 @@ public class SpookyChests {
     }
 
     private static void clickChest(Entity ent) {
-        List<Entity> chests = new ArrayList<>(chestList.get());
-        chests.sort(Comparator.comparingDouble(chest -> Utils.horizontalDistance(ent, chest)));
-        if (!chests.isEmpty() && Utils.horizontalDistance(ent, chests.getFirst()) <= 1.5) {
-            clickedList.add(chests.getFirst());
+        if (ent instanceof ArmorStandEntity) {
+            List<Entity> chests = new ArrayList<>(chestList.get());
+            EntityCache clicked = clickedList.removeDead();
+            chests.removeIf(clicked::has);
+            chests.sort(Comparator.comparingDouble(chest -> Utils.horizontalDistance(ent, chest)));
+            if (!chests.isEmpty() && Utils.horizontalDistance(ent, chests.getFirst()) <= 1.5) {
+                clickedList.add(chests.getFirst());
+            }
         }
     }
 
@@ -70,8 +75,9 @@ public class SpookyChests {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !chestList.empty()) {
+            EntityCache clicked = clickedList.removeDead();
             for (Entity chest : chestList.get()) {
-                if (clickedList.removeDead().has(chest)) {
+                if (clicked.has(chest)) {
                     continue;
                 }
                 BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);

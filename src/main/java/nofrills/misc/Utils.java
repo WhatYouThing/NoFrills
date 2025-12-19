@@ -624,8 +624,7 @@ public class Utils {
         Vec3d rot = entity.getRotationVec(tickDelta);
         Vec3d pos = new Vec3d(camPos.getX(), height.getY(), camPos.getZ());
         Vec3d end = pos.add(rot.x * maxDistance, rot.y * maxDistance, rot.z * maxDistance);
-        RaycastContext context = new RaycastContext(pos, end, RaycastContext.ShapeType.OUTLINE, net.minecraft.world.RaycastContext.FluidHandling.ANY, entity);
-        ((RaycastOptions) context).nofrills_mod$setConsiderAllFull(true);
+        EtherwarpRaycastContext context = new EtherwarpRaycastContext(pos, end, RaycastContext.ShapeType.OUTLINE, net.minecraft.world.RaycastContext.FluidHandling.ANY, entity);
         return entity.getWorld().raycast(context);
     }
 

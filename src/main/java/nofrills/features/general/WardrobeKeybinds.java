@@ -110,17 +110,19 @@ public class WardrobeKeybinds {
             int page = getWardrobePage(container.getTitle().getString());
             if (page == -1) return;
             int target = getTargetSlot(event.key, page);
-            for (Slot slot : Utils.getContainerSlots(container.getScreenHandler())) {
-                if (isEquipButton(slot, target)) {
-                    if (event.action == GLFW.GLFW_PRESS) {
-                        mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_LEFT, SlotActionType.PICKUP, mc.player);
-                        if (sound.value()) {
-                            Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR, SoundCategory.MASTER, 0.69f, 1.0f);
+            if (target != -1) {
+                for (Slot slot : Utils.getContainerSlots(container.getScreenHandler())) {
+                    if (isEquipButton(slot, target)) {
+                        if (event.action == GLFW.GLFW_PRESS) {
+                            mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_LEFT, SlotActionType.PICKUP, mc.player);
+                            if (sound.value()) {
+                                Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR, SoundCategory.MASTER, 0.69f, 1.0f);
+                            }
                         }
+                        break;
                     }
-                    event.cancel();
-                    break;
                 }
+                event.cancel();
             }
         }
     }

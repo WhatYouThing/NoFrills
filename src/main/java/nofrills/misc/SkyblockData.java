@@ -197,7 +197,7 @@ public class SkyblockData {
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
         if (showPing && event.packet instanceof PingResultS2CPacket pingPacket) {
-            Utils.infoFormat("§aPing: §f{}§7ms", Util.getMeasuringTimeMs() - pingPacket.startTime());
+            Utils.infoFormat("§aPing: §f{}ms", Util.getMeasuringTimeMs() - pingPacket.startTime());
             showPing = false;
         }
     }

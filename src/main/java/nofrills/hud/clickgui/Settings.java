@@ -61,24 +61,14 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     private static int getSettingsHeight(List<Component> children) {
         int height = 0;
         for (Component child : children) {
-            if (child instanceof ColorPicker picker) {
-                if (picker.sliderList.size() == 4) {
-                    height += 90;
-                } else {
-                    height += 70;
-                }
-                continue;
-            }
-            if (child instanceof Description description) {
-                PlainLabel label = (PlainLabel) description.children().getLast();
-                height += (10 + label.getTextHeight());
-                continue;
-            }
-            if (child instanceof CustomKeybinds.Setting) {
-                height += 51;
-                continue;
-            }
-            height += 30;
+            int childHeight = switch (child) {
+                case ColorPicker picker -> picker.sliderList.size() == 4 ? 90 : 70;
+                case Description description -> 10 + ((PlainLabel) description.children().getLast()).getTextHeight();
+                case Separator ignored -> 20;
+                case CustomKeybinds.Setting ignored -> 51;
+                default -> 30;
+            };
+            height += childHeight;
         }
         return (int) Math.clamp(height, 30, mc.getWindow().getScaledHeight() * 0.8);
     }
@@ -414,11 +404,11 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.CENTER);
             this.verticalAlignment(VerticalAlignment.CENTER);
-            this.verticalSizing(Sizing.fixed(30));
+            this.verticalSizing(Sizing.fixed(20));
             MutableText text = Text.literal(name);
             int textWidth = mc.textRenderer.getWidth(text) / 2;
             PlainLabel label = new PlainLabel(text.withColor(0xffffff));
-            label.verticalTextAlignment(VerticalAlignment.CENTER).verticalSizing(Sizing.fixed(30));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).verticalSizing(Sizing.fixed(20));
             this.surface((context, component) -> {
                 int centerX = component.x() + component.width() / 2;
                 int centerY = component.y() + component.height() / 2;

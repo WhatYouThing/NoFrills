@@ -270,7 +270,9 @@ public class NoFrillsCommand {
                 Utils.setScreen(ShardTracker.buildSettings());
                 return SINGLE_SUCCESS;
             }))),
-            new ModCommand("loadSlotBindingPreset", "Loads your saved Slot Binding preset by name.", literal("loadSlotBindingPreset").executes(context -> {
+            new ModCommand("slotBinding", "Commands for managing the Slot Binding feature.", literal("slotBinding").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(literal("loadPreset").executes(context -> {
                 Utils.infoFormat("§7No Slot Binding preset name provided.");
                 return SINGLE_SUCCESS;
             }).then(argument("presetName", StringArgumentType.greedyString()).executes(context -> {
@@ -280,24 +282,24 @@ public class NoFrillsCommand {
                     for (JsonElement element : data.get("presets").getAsJsonArray()) {
                         JsonObject preset = element.getAsJsonObject();
                         if (name.equalsIgnoreCase(preset.get("name").getAsString())) {
-                            SlotBinding.data.edit(object -> {
-                                for (int i = 1; i <= 8; i++) {
-                                    String hotbarName = SlotBinding.getHotbarName(i);
-                                    if (preset.has(hotbarName)) {
-                                        object.add(hotbarName, preset.get(hotbarName).getAsJsonObject().deepCopy());
-                                    } else {
-                                        object.remove(hotbarName);
-                                    }
-                                }
-                            });
+                            SlotBinding.loadPreset(preset);
                             Utils.infoFormat("§aSuccessfully loaded Slot Binding preset: {}.", name);
                             return SINGLE_SUCCESS;
                         }
                     }
                 }
-                Utils.infoFormat("§7Could not find the provided Slot Binding preset.");
+                Utils.info("§7Could not find the provided Slot Binding preset.");
                 return SINGLE_SUCCESS;
-            }))),
+            }))).then(literal("savePreset").executes(context -> {
+                SlotBinding.savePreset("New preset");
+                Utils.infoFormat("§aSuccessfully saved Slot Binding preset: New preset.");
+                return SINGLE_SUCCESS;
+            }).then(argument("presetName", StringArgumentType.greedyString()).executes(context -> {
+                String name = StringArgumentType.getString(context, "presetName");
+                SlotBinding.savePreset(name);
+                Utils.infoFormat("§aSuccessfully saved Slot Binding preset: {}.", name);
+                return SINGLE_SUCCESS;
+            }))))
     };
 
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {

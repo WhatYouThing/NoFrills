@@ -43,7 +43,50 @@ public class SlotBinding {
     public static final SettingColor binding = new SettingColor(RenderColor.fromHex(0x00ff00), "bindingColor", instance.key());
     public static final SettingColor bound = new SettingColor(RenderColor.fromHex(0x00ffff), "boundColor", instance.key());
 
-    public static int lastSlot = -1;
+    private static final BoundSlot emptySlot = new BoundSlot(-1);
+    public static BoundSlot lastSlot = emptySlot;
+
+    public static boolean isBinding() {
+        return instance.isActive() && lastSlot.isValid();
+    }
+
+    public static List<BoundSlot> getHotbarSlots() {
+        List<BoundSlot> list = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            BoundSlot slot = new BoundSlot(i);
+            if (slot.hasData()) {
+                list.add(slot);
+            }
+        }
+        return list;
+    }
+
+    public static void savePreset(String name) {
+        if (!data.value().has("presets")) {
+            data.value().add("presets", new JsonArray());
+        }
+        data.edit(object -> {
+            JsonObject preset = new JsonObject();
+            preset.addProperty("name", name);
+            for (BoundSlot slot : getHotbarSlots()) {
+                preset.add(slot.getName(), object.get(slot.getName()).getAsJsonObject().deepCopy());
+            }
+            object.get("presets").getAsJsonArray().add(preset);
+        });
+    }
+
+    public static void loadPreset(JsonObject preset) {
+        data.edit(object -> {
+            for (int i = 1; i <= 8; i++) {
+                BoundSlot slot = new BoundSlot(i);
+                if (preset.has(slot.getName())) {
+                    object.add(slot.getName(), preset.get(slot.getName()).getAsJsonObject().deepCopy());
+                } else {
+                    object.remove(slot.getName());
+                }
+            }
+        });
+    }
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
@@ -52,20 +95,7 @@ public class SlotBinding {
         list.add(new Settings.Description("Deleting Binds", "Press and release the keybind over a slot to clear every bound slot."));
         list.add(new Settings.Separator("Presets"));
         Settings.BigButton button = new Settings.BigButton("Save New Preset", btn -> {
-            if (!data.value().has("presets")) {
-                data.value().add("presets", new JsonArray());
-            }
-            data.edit(object -> {
-                JsonObject preset = new JsonObject();
-                preset.addProperty("name", "New preset");
-                for (int i = 1; i <= 8; i++) {
-                    String hotbarName = getHotbarName(i);
-                    if (object.has(hotbarName)) {
-                        preset.add(hotbarName, object.get(hotbarName).getAsJsonObject().deepCopy());
-                    }
-                }
-                object.get("presets").getAsJsonArray().add(preset);
-            });
+            savePreset("New preset");
             mc.setScreen(buildSettings());
         });
         button.button.tooltip(Text.literal("Saves your current slot binding configuration as a preset.\nCan be loaded at any time to quickly change your binds."));
@@ -98,8 +128,8 @@ public class SlotBinding {
         Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1.0f, 1.0f);
     }
 
-    private static void sendError(String message) {
-        Utils.infoFormat("§c{}", message);
+    private static void sendError() {
+        Utils.info("§cInvalid slot binding combination detected, doing nothing.");
         Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
     }
 
@@ -107,122 +137,78 @@ public class SlotBinding {
         Utils.infoFormat("§e{}", message);
     }
 
-    public static boolean isHotbar(int slotId) {
-        return slotId >= 36 && slotId <= 43;
-    }
-
-    public static boolean isValid(int slotId) {
-        return isHotbar(slotId) || (slotId >= 9 && slotId <= 35) || (slotId >= 5 && slotId <= 8);
-    }
-
-    public static boolean isBindValid(int slot1, int slot2) {
-        return isHotbar(slot1) || isHotbar(slot2);
-    }
-
-    public static int toHotbarNumber(int slotId) {
-        return slotId % 9 + 1;
-    }
-
-    public static boolean isBinding() {
-        return instance.isActive() && lastSlot != -1;
-    }
-
-    public static String getHotbarName(int slot) {
-        return Utils.format("hotbar{}", slot);
-    }
-
     @EventHandler
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.currentScreen instanceof InventoryScreen inventory) {
-            Slot focusedSlot = Utils.getFocusedSlot();
-            if (event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.action == GLFW.GLFW_PRESS && event.modifiers == GLFW.GLFW_MOD_SHIFT && focusedSlot != null) {
+            BoundSlot focused = new BoundSlot(Utils.getFocusedSlot());
+            if (event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.action == GLFW.GLFW_PRESS && event.modifiers == GLFW.GLFW_MOD_SHIFT && focused.isValid()) {
                 int syncId = inventory.getScreenHandler().syncId;
-                if (isHotbar(focusedSlot.id)) {
-                    int hotbarNumber = toHotbarNumber(focusedSlot.id);
-                    String hotbarName = getHotbarName(hotbarNumber);
-                    if (data.value().has(hotbarName)) {
-                        JsonObject object = data.value().get(hotbarName).getAsJsonObject();
-                        JsonArray binds = object.get("binds").getAsJsonArray();
-                        int last = object.get("last").getAsInt();
-                        int first = !binds.isEmpty() ? binds.get(0).getAsInt() : 0;
-                        if (last != 0 || first != 0) {
-                            mc.interactionManager.clickSlot(syncId, last != 0 ? last : first, hotbarNumber - 1, SlotActionType.SWAP, mc.player);
-                            event.cancel();
-                        }
+                if (focused.isHotbar() && focused.hasData()) {
+                    JsonObject object = data.value().get(focused.getName()).getAsJsonObject();
+                    JsonArray binds = object.get("binds").getAsJsonArray();
+                    int last = object.get("last").getAsInt();
+                    int first = !binds.isEmpty() ? binds.get(0).getAsInt() : 0;
+                    if (last != 0 || first != 0) {
+                        mc.interactionManager.clickSlot(syncId, last != 0 ? last : first, focused.toHotbar() - 1, SlotActionType.SWAP, mc.player);
+                        event.cancel();
                     }
-                } else if (isValid(focusedSlot.id)) {
-                    for (int i = 1; i <= 8; i++) {
-                        String name = getHotbarName(i);
-                        if (data.value().has(name)) {
-                            JsonArray array = data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray();
-                            if (array.contains(new JsonPrimitive(focusedSlot.id))) {
-                                mc.interactionManager.clickSlot(syncId, focusedSlot.id, i - 1, SlotActionType.SWAP, mc.player);
-                                data.edit(value -> value.get(name).getAsJsonObject().addProperty("last", focusedSlot.id));
-                                event.cancel();
-                            }
+                } else {
+                    for (BoundSlot slot : getHotbarSlots()) {
+                        JsonArray array = data.value().get(slot.getName()).getAsJsonObject().get("binds").getAsJsonArray();
+                        if (array.contains(new JsonPrimitive(focused.id))) {
+                            mc.interactionManager.clickSlot(syncId, focused.id, slot.toHotbar() - 1, SlotActionType.SWAP, mc.player);
+                            data.edit(value -> value.get(slot.getName()).getAsJsonObject().addProperty("last", focused.id));
+                            event.cancel();
                         }
                     }
                 }
             }
             if (keybind.value() == event.key) {
-                if (event.action == GLFW.GLFW_PRESS && focusedSlot != null) {
-                    lastSlot = focusedSlot.id;
+                if (event.action == GLFW.GLFW_PRESS && focused.isValid()) {
+                    lastSlot = focused;
                 }
                 if (event.action == GLFW.GLFW_RELEASE) {
-                    if (focusedSlot != null && lastSlot == focusedSlot.id) {
-                        if (isHotbar(focusedSlot.id)) {
-                            String hotbarName = getHotbarName(toHotbarNumber(focusedSlot.id));
-                            if (data.value().has(hotbarName)) {
+                    if (focused.isValid() && lastSlot.equals(focused)) {
+                        if (focused.isHotbar() && focused.hasData()) {
+                            data.edit(value -> {
+                                value.get(focused.getName()).getAsJsonObject().add("binds", new JsonArray());
+                                value.get(focused.getName()).getAsJsonObject().addProperty("last", 0);
+                            });
+                            sendSuccess(Utils.format("Cleared every bind from hotbar slot {}.", focused.toHotbar()));
+                        } else {
+                            for (BoundSlot slot : getHotbarSlots()) {
                                 data.edit(value -> {
-                                    value.get(hotbarName).getAsJsonObject().add("binds", new JsonArray());
-                                    value.get(hotbarName).getAsJsonObject().addProperty("last", 0);
+                                    JsonArray array = value.get(slot.getName()).getAsJsonObject().get("binds").getAsJsonArray();
+                                    if (array.remove(new JsonPrimitive(focused.id))) {
+                                        sendSuccess(Utils.format("Successfully unbound slot from hotbar slot {}.", slot.toHotbar()));
+                                    }
                                 });
                             }
-                            sendSuccess(Utils.format("Cleared every bind from hotbar slot {}.", toHotbarNumber(focusedSlot.id)));
-                        } else if (isValid(focusedSlot.id)) {
-                            for (int i = 1; i <= 8; i++) {
-                                int slot = i;
-                                String name = getHotbarName(slot);
-                                if (data.value().has(name)) {
-                                    data.edit(value -> {
-                                        JsonArray array = value.get(name).getAsJsonObject().get("binds").getAsJsonArray();
-                                        if (array.remove(new JsonPrimitive(focusedSlot.id))) {
-                                            sendSuccess(Utils.format("Successfully unbound slot from hotbar slot {}.", slot));
-                                        }
-                                    });
+                        }
+                    } else if (lastSlot.isValid() && focused.canBindTo(lastSlot.id)) {
+                        BoundSlot hotbar = lastSlot.isHotbar() ? lastSlot : focused;
+                        BoundSlot slot = lastSlot.isHotbar() ? focused : lastSlot;
+                        data.edit(value -> {
+                            for (BoundSlot hotbarSlot : getHotbarSlots()) {
+                                JsonArray array = value.get(hotbarSlot.getName()).getAsJsonObject().get("binds").getAsJsonArray();
+                                if (array.remove(new JsonPrimitive(slot.id))) {
+                                    sendAlert(Utils.format("The target is already bound to hotbar slot {}, replacing the bind.", slot.toHotbar()));
+                                    break;
                                 }
                             }
-                        }
-                    } else if (lastSlot != -1 && focusedSlot != null) {
-                        if (isValid(lastSlot) && isValid(focusedSlot.id) && isBindValid(lastSlot, focusedSlot.id)) {
-                            int hotbar = isHotbar(lastSlot) ? lastSlot : focusedSlot.id;
-                            String hotbarName = getHotbarName(toHotbarNumber(hotbar));
-                            int slot = isHotbar(lastSlot) ? focusedSlot.id : lastSlot;
-                            data.edit(value -> {
-                                for (int i = 1; i <= 8; i++) {
-                                    String name = getHotbarName(i);
-                                    if (value.has(name)) {
-                                        JsonArray array = value.get(name).getAsJsonObject().get("binds").getAsJsonArray();
-                                        if (array.remove(new JsonPrimitive(slot))) {
-                                            sendAlert(Utils.format("The target is already bound to hotbar slot {}, replacing the bind.", i));
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (!value.has(hotbarName)) {
-                                    JsonObject object = new JsonObject();
-                                    object.addProperty("last", 0);
-                                    object.add("binds", new JsonArray());
-                                    value.add(hotbarName, object);
-                                }
-                                value.get(hotbarName).getAsJsonObject().get("binds").getAsJsonArray().add(slot);
-                                sendSuccess("Slots bound successfully!");
-                            });
-                        } else {
-                            sendError("Invalid slot binding combination detected, doing nothing.");
-                        }
+                            if (!value.has(hotbar.getName())) {
+                                JsonObject object = new JsonObject();
+                                object.addProperty("last", 0);
+                                object.add("binds", new JsonArray());
+                                value.add(hotbar.getName(), object);
+                            }
+                            value.get(hotbar.getName()).getAsJsonObject().get("binds").getAsJsonArray().add(slot.id);
+                            sendSuccess("Slots bound successfully!");
+                        });
+                    } else {
+                        sendError();
                     }
-                    lastSlot = -1;
+                    lastSlot = emptySlot;
                 }
             }
         }
@@ -231,40 +217,88 @@ public class SlotBinding {
     @EventHandler
     private static void onRender(ScreenRenderEvent.Before event) {
         if (instance.isActive() && mc.currentScreen instanceof InventoryScreen && event.focusedSlot != null) {
-            if (isHotbar(event.focusedSlot.id)) {
-                String name = getHotbarName(toHotbarNumber(event.focusedSlot.id));
-                if (data.value().has(name)) {
-                    for (JsonElement element : data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
-                        if (lines.value()) {
-                            event.drawLine(event.focusedSlot.id, element.getAsInt(), lineWidth.value(), bound.value());
-                        }
-                        if (borders.value()) {
-                            event.drawBorder(element.getAsInt(), bound.value());
-                        }
+            BoundSlot focused = new BoundSlot(event.focusedSlot);
+            if (focused.isHotbar() && focused.hasData()) {
+                for (JsonElement element : data.value().get(focused.getName()).getAsJsonObject().get("binds").getAsJsonArray()) {
+                    if (lines.value()) {
+                        event.drawLine(focused.id, element.getAsInt(), lineWidth.value(), bound.value());
+                    }
+                    if (borders.value()) {
+                        event.drawBorder(element.getAsInt(), bound.value());
                     }
                 }
-            } else if (isValid(event.focusedSlot.id)) {
-                for (int i = 1; i <= 8; i++) {
-                    String name = getHotbarName(i);
-                    if (data.value().has(name)) {
-                        for (JsonElement element : data.value().get(name).getAsJsonObject().get("binds").getAsJsonArray()) {
-                            if (element.getAsInt() == event.focusedSlot.id) {
-                                if (lines.value()) {
-                                    event.drawLine(event.focusedSlot.id, i + 35, lineWidth.value(), bound.value());
-                                }
-                                if (borders.value()) {
-                                    event.drawBorder(i + 35, bound.value());
-                                }
+            } else if (focused.isValid()) {
+                for (BoundSlot slot : getHotbarSlots()) {
+                    for (JsonElement element : data.value().get(slot.getName()).getAsJsonObject().get("binds").getAsJsonArray()) {
+                        if (element.getAsInt() == focused.id) {
+                            if (lines.value()) {
+                                event.drawLine(focused.id, slot.toHotbar() + 35, lineWidth.value(), bound.value());
+                            }
+                            if (borders.value()) {
+                                event.drawBorder(slot.toHotbar() + 35, bound.value());
                             }
                         }
                     }
                 }
             }
-            if (lastSlot != -1) {
-                event.drawBorder(lastSlot, binding.value());
-                event.drawBorder(event.focusedSlot.id, binding.value());
-                event.drawLine(lastSlot, event.focusedSlot.id, lineWidth.value(), binding.value());
+            if (lastSlot.isValid()) {
+                event.drawBorder(lastSlot.id, binding.value());
+                event.drawBorder(focused.id, binding.value());
+                event.drawLine(lastSlot.id, event.focusedSlot.id, lineWidth.value(), binding.value());
             }
+        }
+    }
+
+    public static class BoundSlot {
+        public int id;
+
+        public BoundSlot(int id) {
+            this.id = id;
+        }
+
+        public BoundSlot(Slot slot) {
+            this(slot != null ? slot.id : -1);
+        }
+
+        public boolean isHotbar(int id) {
+            return id >= 36 && id <= 43;
+        }
+
+        public boolean isHotbar() {
+            return this.isHotbar(this.id);
+        }
+
+        public boolean isInventory() {
+            return this.id >= 9 && this.id <= 35;
+        }
+
+        public boolean isArmor() {
+            return this.id >= 5 && this.id <= 8;
+        }
+
+        public boolean isValid() {
+            return this.isHotbar() || this.isInventory() || this.isArmor();
+        }
+
+        public boolean canBindTo(int other) {
+            return this.isHotbar() || this.isHotbar(other);
+        }
+
+        public int toHotbar() {
+            return this.id > 9 ? this.id % 9 + 1 : this.id;
+        }
+
+        public String getName() {
+            return "hotbar" + this.toHotbar();
+        }
+
+        public boolean hasData() {
+            return data.value().has(this.getName());
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            return object instanceof BoundSlot boundSlot && this.id == boundSlot.id;
         }
     }
 
@@ -281,19 +315,7 @@ public class SlotBinding {
             input.tooltip(Text.literal("The name of this slot binding preset."));
             input.text(this.getData(data.value()).get("name").getAsString());
             input.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("name", value)));
-            ButtonComponent loadButton = Components.button(Text.literal("Load").withColor(0xffffff), button -> {
-                data.edit(object -> {
-                    JsonObject preset = this.getData(object);
-                    for (int i = 1; i <= 8; i++) {
-                        String hotbarName = getHotbarName(i);
-                        if (preset.has(hotbarName)) {
-                            object.add(hotbarName, preset.get(hotbarName).getAsJsonObject().deepCopy());
-                        } else {
-                            object.remove(hotbarName);
-                        }
-                    }
-                });
-            });
+            ButtonComponent loadButton = Components.button(Text.literal("Load").withColor(0xffffff), button -> loadPreset(this.getData(data.value())));
             loadButton.horizontalSizing(Sizing.fixed(42)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             loadButton.renderer(Settings.buttonRenderer);
             ButtonComponent deleteButton = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {

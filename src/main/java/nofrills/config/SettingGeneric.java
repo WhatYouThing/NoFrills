@@ -50,7 +50,7 @@ public class SettingGeneric {
     }
 
     public void save() {
-        this.set(this.value);
+        this.set(this.value, false);
     }
 
     public JsonElement get() {
@@ -58,13 +58,19 @@ public class SettingGeneric {
         return this.value;
     }
 
-    public void set(JsonElement value) {
+    public void set(JsonElement value, boolean recompute) {
         if (!Config.get().has(this.parent)) {
             Config.get().add(this.parent, new JsonObject());
         }
         this.value = value;
         Config.get().get(this.parent).getAsJsonObject().add(this.key, this.value);
-        Config.computeHash();
+        if (recompute) {
+            Config.computeHash();
+        }
+    }
+
+    public void set(JsonElement value) {
+        this.set(value, true);
     }
 
     public void set(Object value) {

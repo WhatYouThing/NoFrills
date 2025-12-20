@@ -2,6 +2,7 @@ package nofrills.commands;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
@@ -19,6 +20,7 @@ import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.general.PearlRefill;
+import nofrills.features.general.SlotBinding;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGui;
@@ -267,7 +269,35 @@ public class NoFrillsCommand {
             })).then(literal("settings").executes(context -> {
                 Utils.setScreen(ShardTracker.buildSettings());
                 return SINGLE_SUCCESS;
-            })))
+            }))),
+            new ModCommand("loadSlotBindingPreset", "Loads your saved Slot Binding preset by name.", literal("loadSlotBindingPreset").executes(context -> {
+                Utils.infoFormat("§7No Slot Binding preset name provided.");
+                return SINGLE_SUCCESS;
+            }).then(argument("presetName", StringArgumentType.greedyString()).executes(context -> {
+                String name = StringArgumentType.getString(context, "presetName");
+                JsonObject data = SlotBinding.data.value();
+                if (data.has("presets")) {
+                    for (JsonElement element : data.get("presets").getAsJsonArray()) {
+                        JsonObject preset = element.getAsJsonObject();
+                        if (name.equalsIgnoreCase(preset.get("name").getAsString())) {
+                            SlotBinding.data.edit(object -> {
+                                for (int i = 1; i <= 8; i++) {
+                                    String hotbarName = SlotBinding.getHotbarName(i);
+                                    if (preset.has(hotbarName)) {
+                                        object.add(hotbarName, preset.get(hotbarName).getAsJsonObject().deepCopy());
+                                    } else {
+                                        object.remove(hotbarName);
+                                    }
+                                }
+                            });
+                            Utils.infoFormat("§aSuccessfully loaded Slot Binding preset: {}.", name);
+                            return SINGLE_SUCCESS;
+                        }
+                    }
+                }
+                Utils.infoFormat("§7Could not find the provided Slot Binding preset.");
+                return SINGLE_SUCCESS;
+            }))),
     };
 
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {

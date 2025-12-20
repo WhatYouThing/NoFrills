@@ -28,6 +28,7 @@ import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
@@ -277,16 +278,11 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             }).then(argument("presetName", StringArgumentType.greedyString()).executes(context -> {
                 String name = StringArgumentType.getString(context, "presetName");
-                JsonObject data = SlotBinding.data.value();
-                if (data.has("presets")) {
-                    for (JsonElement element : data.get("presets").getAsJsonArray()) {
-                        JsonObject preset = element.getAsJsonObject();
-                        if (name.equalsIgnoreCase(preset.get("name").getAsString())) {
-                            SlotBinding.loadPreset(preset);
-                            Utils.infoFormat("§aSuccessfully loaded Slot Binding preset: {}.", name);
-                            return SINGLE_SUCCESS;
-                        }
-                    }
+                Optional<JsonObject> preset = SlotBinding.findPresetByName(name);
+                if (preset.isPresent()) {
+                    SlotBinding.loadPreset(preset.get());
+                    Utils.infoFormat("§aSuccessfully loaded Slot Binding preset: {}.", name);
+                    return SINGLE_SUCCESS;
                 }
                 Utils.info("§7Could not find the provided Slot Binding preset.");
                 return SINGLE_SUCCESS;
@@ -298,6 +294,19 @@ public class NoFrillsCommand {
                 String name = StringArgumentType.getString(context, "presetName");
                 SlotBinding.savePreset(name);
                 Utils.infoFormat("§aSuccessfully saved Slot Binding preset: {}.", name);
+                return SINGLE_SUCCESS;
+            }))).then(literal("deletePreset").executes(context -> {
+                Utils.infoFormat("§7No Slot Binding preset name provided.");
+                return SINGLE_SUCCESS;
+            }).then(argument("presetName", StringArgumentType.greedyString()).executes(context -> {
+                String name = StringArgumentType.getString(context, "presetName");
+                Optional<JsonObject> preset = SlotBinding.findPresetByName(name);
+                if (preset.isPresent()) {
+                    SlotBinding.data.edit(object -> object.get("presets").getAsJsonArray().remove(preset.get()));
+                    Utils.infoFormat("§aSuccessfully deleted Slot Binding preset: {}.", name);
+                    return SINGLE_SUCCESS;
+                }
+                Utils.info("§7Could not find the provided Slot Binding preset.");
                 return SINGLE_SUCCESS;
             }))))
     };

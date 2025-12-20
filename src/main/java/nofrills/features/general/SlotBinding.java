@@ -29,6 +29,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static nofrills.Main.mc;
 
@@ -86,6 +87,18 @@ public class SlotBinding {
                 }
             }
         });
+    }
+
+    public static Optional<JsonObject> findPresetByName(String name) {
+        if (data.value().has("presets")) {
+            for (JsonElement element : data.value().get("presets").getAsJsonArray()) {
+                JsonObject preset = element.getAsJsonObject();
+                if (name.equalsIgnoreCase(preset.get("name").getAsString())) {
+                    return Optional.of(preset);
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     public static List<FlowLayout> getSettingsList() {

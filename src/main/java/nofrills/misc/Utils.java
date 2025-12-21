@@ -102,7 +102,7 @@ public class Utils {
     }
 
     public static void playSound(SoundEvent event, float volume, float pitch) {
-        mc.getSoundManager().play(PositionedSoundInstance.master(event, volume, pitch));
+        mc.getSoundManager().play(PositionedSoundInstance.master(event, pitch, volume));
     }
 
     public static void playSound(RegistryEntry.Reference<SoundEvent> event, float volume, float pitch) {

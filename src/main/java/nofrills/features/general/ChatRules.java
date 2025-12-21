@@ -10,7 +10,6 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -90,7 +89,7 @@ public class ChatRules {
                     if (!rule.title.isEmpty())
                         Utils.showTitle(rule.title.replaceAll("&", "§"), "", rule.titleFadeIn, rule.titleStay, rule.titleFadeOut);
                     if (!rule.sound.isEmpty())
-                        Utils.playSound(SoundEvent.of(Identifier.of(rule.sound)), SoundCategory.MASTER, rule.soundVolume, rule.soundPitch);
+                        Utils.playSound(SoundEvent.of(Identifier.of(rule.sound)), rule.soundVolume, rule.soundPitch);
                     if (rule.cancel) event.cancel();
                     break;
                 }

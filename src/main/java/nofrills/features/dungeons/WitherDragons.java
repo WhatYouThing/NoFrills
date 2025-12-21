@@ -8,7 +8,6 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -92,7 +91,7 @@ public class WitherDragons {
 
     private static void announceSpawn(Dragon drag, boolean split) {
         Utils.showTitleCustom(Utils.toUpper(drag.name) + " IS SPAWNING!", 60, -20, 4.0f, drag.color);
-        Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+        Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
         if (split) {
             Utils.infoRaw(Text.literal(drag.name + " is your priority dragon.").withColor(drag.color.hex));
         } else if (splitDone) {

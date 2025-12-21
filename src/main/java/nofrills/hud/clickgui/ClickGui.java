@@ -133,9 +133,15 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Duration", 1, 600, 1, ChatWaypoints.allDuration, "The duration (in seconds) that all chat waypoints should be rendered for."),
                                 new Settings.ColorPicker("Color", true, ChatWaypoints.allColor, "The color used for the all chat waypoints.")
                         ))),
-                        new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you're targeting with the Ether Transmission ability.", new Settings(List.of(
+                        new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(List.of(
+                                new Settings.Separator("Sound"),
+                                new Settings.Toggle("Warp Sound", EtherwarpOverlay.doSound, "Plays a custom sound effect as soon as you start teleporting to the target block.\nMakes the ability more responsive on high ping."),
+                                new Settings.TextInput("Sound", EtherwarpOverlay.sound, "The identifier of the sound to play."),
+                                new Settings.SliderDouble("Volume", 0.0, 5.0, 0.1, EtherwarpOverlay.volume, "The volume of the sound."),
+                                new Settings.SliderDouble("Pitch", 0.0, 2.0, 0.05, EtherwarpOverlay.pitch, "The pitch of the sound."),
+                                new Settings.Toggle("Cancel Sound", EtherwarpOverlay.cancelSound, "Prevents the intended Ether Transmission sound effect from playing."),
+                                new Settings.Separator("Highlight"),
                                 new Settings.Dropdown<>("Highlight Style", EtherwarpOverlay.highlightStyle, "The style of the highlight"),
-                                new Settings.Separator("Colors"),
                                 new Settings.ColorPicker("Correct Fill", true, EtherwarpOverlay.fillCorrect, "The fill color used when your Etherwarp target is considered valid."),
                                 new Settings.ColorPicker("Wrong Fill", true, EtherwarpOverlay.fillWrong, "The fill color used when your Etherwarp target is considered invalid."),
                                 new Settings.ColorPicker("Correct Outline", true, EtherwarpOverlay.outlineCorrect, "The outline color used when your Etherwarp target is considered valid."),

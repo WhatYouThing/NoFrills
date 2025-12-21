@@ -15,7 +15,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import nofrills.config.*;
@@ -138,12 +137,12 @@ public class SlotBinding {
 
     private static void sendSuccess(String message) {
         Utils.infoFormat("§a{}", message);
-        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1.0f, 1.0f);
+        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
     }
 
     private static void sendError() {
         Utils.info("§cInvalid slot binding combination detected, doing nothing.");
-        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
+        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.0f);
     }
 
     private static void sendAlert(String message) {

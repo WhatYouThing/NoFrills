@@ -31,7 +31,6 @@ import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
@@ -44,7 +43,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.entity.SimpleEntityLookup;
 import nofrills.events.WorldTickEvent;
@@ -65,7 +63,6 @@ import static nofrills.Main.*;
 
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
-    private static final Random soundRandom = Random.create(0);
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "The Park",
             "Galatea"
@@ -104,13 +101,12 @@ public class Utils {
         return isNearlyEqual(a, b, 1e-5);
     }
 
-    public static void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
-        Vec3d coords = mc.cameraEntity.getPos();
-        mc.getSoundManager().play(new PositionedSoundInstance(event, category, volume, pitch, soundRandom, coords.getX(), coords.getY(), coords.getZ()));
+    public static void playSound(SoundEvent event, float volume, float pitch) {
+        mc.getSoundManager().play(PositionedSoundInstance.master(event, volume, pitch));
     }
 
-    public static void playSound(RegistryEntry.Reference<SoundEvent> event, SoundCategory category, float volume, float pitch) {
-        playSound(event.value(), category, volume, pitch);
+    public static void playSound(RegistryEntry.Reference<SoundEvent> event, float volume, float pitch) {
+        playSound(event.value(), volume, pitch);
     }
 
     public static void sendMessage(String message) {

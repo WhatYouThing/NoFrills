@@ -25,6 +25,7 @@ public class HudManager {
     public static final Armor armorElement = new Armor();
     public static final Inventory inventoryElement = new Inventory();
     public static final LagMeter lagMeterElement = new LagMeter("Last server tick was 0.00s ago");
+    public static final BossHealth bossHealthElement = new BossHealth();
     public static final Power powerElement = new Power("Power: §f0");
     public static final TickTimer tickTimerElement = new TickTimer("Tick Timers");
     public static final SeaCreatures seaCreaturesElement = new SeaCreatures("Sea Creatures: §70");

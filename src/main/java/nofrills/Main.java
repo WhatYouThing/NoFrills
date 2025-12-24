@@ -89,7 +89,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ExperimentSolver.class);
         eventBus.subscribe(BeaconTuningSolver.class);
         eventBus.subscribe(CalendarDate.class);
-        eventBus.subscribe(HitsShieldDisplay.class);
+        eventBus.subscribe(BossHealthDisplay.class);
         eventBus.subscribe(ChaliceHighlight.class);
         eventBus.subscribe(IceAlert.class);
         eventBus.subscribe(StakeAlert.class);

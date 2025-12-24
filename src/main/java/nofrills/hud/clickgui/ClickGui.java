@@ -135,7 +135,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(List.of(
                                 new Settings.Separator("Sound"),
-                                new Settings.Toggle("Warp Sound", EtherwarpOverlay.doSound, "Plays a custom sound effect as soon as you start teleporting to the target block.\nMakes the ability more responsive on high ping."),
+                                new Settings.Toggle("Warp Sound", EtherwarpOverlay.doSound, "Plays a custom sound effect as soon as you start teleporting to the target block.\nMakes the ability more responsive on high ping, but may produce false positives."),
                                 new Settings.TextInput("Sound", EtherwarpOverlay.sound, "The identifier of the sound to play."),
                                 new Settings.SliderDouble("Volume", 0.0, 5.0, 0.1, EtherwarpOverlay.volume, "The volume of the sound."),
                                 new Settings.SliderDouble("Pitch", 0.0, 2.0, 0.05, EtherwarpOverlay.pitch, "The pitch of the sound."),
@@ -512,8 +512,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.TextInput("Message", FreshTimer.message, "The message to send.")
                         ))),
                         new Module("Kuudra Health", KuudraHealth.instance, "Shows Kuudra's exact health on screen.", new Settings(List.of(
-                                new Settings.Toggle("Show DPS", KuudraHealth.dps, "Calculates your team's DPS. Only applies in the last phase of Infernal tier."),
-                                new Settings.ColorPicker("Color", false, KuudraHealth.color, "The color of the text.")
+                                new Settings.Toggle("Show DPS", KuudraHealth.dps, "Calculates your team's DPS. Only applies in the last phase of Infernal tier.")
                         ))),
                         new Module("Kuudra Hitbox", KuudraHitbox.instance, "Renders a hitbox for Kuudra.", new Settings(List.of(
                                 new Settings.Toggle("Through Walls", KuudraHitbox.walls, "Makes the hitbox render through walls, because even YouTube ranks can get away with ESP in Kuudra."),
@@ -561,10 +560,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Mania", MuteVampire.mania, "Mutes the loud Mania sounds while in the Chateau."),
                                 new Settings.Toggle("Killer Springs", MuteVampire.springs, "Mutes the Wither sound spam that occurs when your boss spawns a Killer Spring.")
                         ))),
-                        new Module("Hits Shield Display", HitsShieldDisplay.instance, "Renders the needed hits for the Voidgloom Seraph hits shield phase.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, HitsShieldDisplay.color, "The color of the text."),
-                                new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, HitsShieldDisplay.scale, "The scale of the text.")
-                        ))),
+                        new Module("Boss Health Display", BossHealthDisplay.instance, "Shows the health of your slayer boss through the Boss Health HUD element."),
                         new Module("Egg Hits Display", EggHitsDisplay.instance, "Renders the needed hits for the Tarantula Broodfather egg sack phase.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, EggHitsDisplay.color, "The color of the text."),
                                 new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, EggHitsDisplay.scale, "The scale of the text.")

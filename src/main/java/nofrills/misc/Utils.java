@@ -9,6 +9,7 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -46,6 +47,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.entity.SimpleEntityLookup;
 import nofrills.events.WorldTickEvent;
+import nofrills.mixin.BossBarHudAccessor;
 import nofrills.mixin.HandledScreenAccessor;
 import nofrills.mixin.PlayerListHudAccessor;
 import org.apache.commons.io.IOUtils;
@@ -677,6 +679,10 @@ public class Utils {
             }
         }
         return list;
+    }
+
+    public static List<ClientBossBar> getBossBars() {
+        return ((BossBarHudAccessor) mc.inGameHud.getBossBarHud()).getBossBars().values().stream().toList();
     }
 
     /**

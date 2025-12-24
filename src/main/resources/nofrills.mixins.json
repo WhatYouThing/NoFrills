@@ -37,6 +37,7 @@
     "PaneBlockMixin",
     "PlayerLikeEntityMixin",
     "PlayerListHudAccessor",
+    "SoundSystemMixin",
     "StatusEffectsDisplayMixin",
     "StuckObjectsFeatureRendererMixin",
     "WorldMixin",

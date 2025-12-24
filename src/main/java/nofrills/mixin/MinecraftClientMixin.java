@@ -8,7 +8,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.sound.SoundSystem;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Hand;
@@ -23,10 +22,8 @@ import nofrills.features.tweaks.NoCursorReset;
 import nofrills.features.tweaks.NoDropSwing;
 import nofrills.features.tweaks.NoLoadingScreen;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -43,15 +40,6 @@ public abstract class MinecraftClientMixin {
 
     @Shadow
     public abstract void setScreen(@Nullable Screen screen);
-
-    @Unique
-    @Final
-    SoundSystem getSoundSystem() {
-        if (mc.getSoundManager() != null) {
-            return mc.getSoundManager().soundSystem;
-        }
-        return null;
-    }
 
     @WrapWithCondition(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(ClientPlayerEntity instance, Hand hand) {
@@ -129,16 +117,5 @@ public abstract class MinecraftClientMixin {
             return mc.options.getMaxFps().getValue();
         }
         return original;
-    }
-
-    @Inject(method = "onWindowFocusChanged", at = @At("TAIL"))
-    private void onFocusChanged(boolean focused, CallbackInfo ci) {
-        SoundSystem system = this.getSoundSystem();
-        if (system != null && system.started && UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.muteSounds.value()) {
-            system.sources.forEach((source, sourceManager) -> {
-                float volume = !focused ? 0.0f : mc.options.getSoundVolumeOption(source.getCategory()).getValue().floatValue();
-                sourceManager.run(src -> src.setVolume(volume));
-            });
-        }
     }
 }

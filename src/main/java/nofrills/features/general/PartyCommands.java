@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.*;
 import nofrills.events.PartyChatMsgEvent;
@@ -30,7 +29,7 @@ public class PartyCommands {
 
     private static void showDowntimeReminder() {
         Utils.showTitle("§6§lDOWNTIME", "", 5, 60, 5);
-        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
+        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.0f);
         downtimeNeeded = false;
     }
 

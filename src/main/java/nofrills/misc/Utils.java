@@ -10,6 +10,7 @@ import com.mojang.authlib.properties.Property;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Click;
+import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.input.KeyInput;
@@ -34,7 +35,6 @@ import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
@@ -47,10 +47,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.entity.SimpleEntityLookup;
 import nofrills.events.WorldTickEvent;
+import nofrills.mixin.BossBarHudAccessor;
 import nofrills.mixin.HandledScreenAccessor;
 import nofrills.mixin.PlayerListHudAccessor;
 import org.apache.commons.io.IOUtils;
@@ -68,7 +68,6 @@ import static nofrills.Main.*;
 
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
-    private static final Random soundRandom = Random.create(0);
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "The Park",
             "Galatea"
@@ -107,14 +106,12 @@ public class Utils {
         return isNearlyEqual(a, b, 1e-5);
     }
 
-    public static void playSound(SoundEvent event, SoundCategory category, float volume, float pitch) {
-        if (mc.getCameraEntity() == null) return;
-        Vec3d coords = mc.getCameraEntity().getEntityPos();
-        mc.getSoundManager().play(new PositionedSoundInstance(event, category, volume, pitch, soundRandom, coords.getX(), coords.getY(), coords.getZ()));
+    public static void playSound(SoundEvent event, float volume, float pitch) {
+        mc.getSoundManager().play(PositionedSoundInstance.master(event, pitch, volume));
     }
 
-    public static void playSound(RegistryEntry.Reference<SoundEvent> event, SoundCategory category, float volume, float pitch) {
-        playSound(event.value(), category, volume, pitch);
+    public static void playSound(RegistryEntry.Reference<SoundEvent> event, float volume, float pitch) {
+        playSound(event.value(), volume, pitch);
     }
 
     public static void sendMessage(String message) {
@@ -203,6 +200,9 @@ public class Utils {
      */
     public static boolean isInDungeonBoss(String floor) {
         return isOnDungeonFloor(floor) && switch (floor) {
+            case "1" -> isInZone(-72, 146, -40, -14, 55, 49);
+            case "2" -> isInZone(-40, 99, -40, 24, 54, 54);
+            case "3" -> isInZone(-40, 118, -40, 42, 64, 73);
             case "4" -> isInZone(50, 112, 81, -40, 53, -40);
             case "5" -> isInZone(50, 112, 118, -40, 53, -8);
             case "6" -> isInZone(22, 110, 134, -40, 51, -8);
@@ -708,6 +708,10 @@ public class Utils {
             }
         }
         return list;
+    }
+
+    public static List<ClientBossBar> getBossBars() {
+        return ((BossBarHudAccessor) mc.inGameHud.getBossBarHud()).getBossBars().values().stream().toList();
     }
 
     /**

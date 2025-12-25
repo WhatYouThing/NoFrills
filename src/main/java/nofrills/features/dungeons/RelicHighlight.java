@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.events.WorldRenderEvent;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -23,7 +24,7 @@ public class RelicHighlight {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && WitherDragons.isDragonPhase()) {
+        if (instance.isActive() && DungeonUtil.isInDragonPhase() && mc.player != null) {
             ItemStack stack = mc.player.getInventory().getStack(8);
             if (!stack.isEmpty() && stack.getItem().equals(Items.PLAYER_HEAD)) {
                 String name = Utils.toPlain(stack.getName());

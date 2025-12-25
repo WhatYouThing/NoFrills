@@ -53,26 +53,26 @@ public class KuudraUtil {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (Utils.isInKuudra()) {
-            if (kuudraEntity == null || !kuudraEntity.isAlive()) {
-                MagmaCubeEntity kuudra = null;
-                double maxY = 0;
-                int cubesFound = 0;
-                for (Entity ent : Utils.getEntities()) {
-                    if (ent instanceof MagmaCubeEntity cube && cube.getSize() == 30) {
-                        double y = cube.getEntityPos().getY();
-                        cubesFound++;
-                        if (y > maxY) {
-                            kuudra = cube;
-                            maxY = y;
-                        }
+        if (Utils.isInKuudra() && !EntityCache.exists(kuudraEntity)) {
+            MagmaCubeEntity kuudra = null;
+            double maxY = 0;
+            int cubesFound = 0;
+            for (Entity ent : Utils.getEntities()) {
+                if (ent instanceof MagmaCubeEntity cube && cube.getSize() == 30) {
+                    double y = ent.getEntityPos().getY();
+                    cubesFound++;
+                    if (y > maxY) {
+                        kuudra = cube;
+                        maxY = y;
                     }
                 }
-                if (kuudra != null) {
-                    if (cubesFound == 2 || getCurrentPhase() == phase.Lair) {
-                        kuudraEntity = kuudra;
-                    }
-                }
+            }
+            if (kuudra == null) {
+                kuudraEntity = null;
+                return;
+            }
+            if (cubesFound == 2 || getCurrentPhase().equals(phase.Lair)) {
+                kuudraEntity = kuudra;
             }
         }
     }

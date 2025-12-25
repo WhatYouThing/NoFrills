@@ -86,18 +86,25 @@ public class SlayerUtil {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        entities.entrySet().removeIf(entry -> !EntityCache.exists(entry.getValue()));
+        if (!entities.isEmpty()) {
+            entities.entrySet().removeIf(entry -> !EntityCache.exists(entry.getValue()));
+        }
         if (currentBoss != null) {
             Entity spawner = getSpawnerEntity();
-            if (spawner != null && !currentBoss.equals(blaze)) {
-                for (Entity entity : Utils.getOtherEntities(spawner, 0.5, 2.0, 0.5, predicate)) {
-                    if (entity instanceof ArmorStandEntity stand) {
-                        String name = Utils.toPlain(stand.getName());
-                        if (isTimer(name)) entities.put("timer", entity);
-                        if (isName(name)) entities.put("name", entity);
-                    } else {
-                        if (currentBoss.predicate.test(entity)) entities.put("boss", entity);
+            if (spawner == null) return;
+            for (Entity entity : Utils.getOtherEntities(spawner, 0.5, 2.0, 0.5, predicate)) {
+                if (entity instanceof ArmorStandEntity stand) {
+                    String name = Utils.toPlain(stand.getName());
+                    if (isTimer(name)) {
+                        entities.put("timer", entity);
                     }
+                    if (isName(name)) {
+                        entities.put("name", entity);
+                    }
+                    continue;
+                }
+                if (currentBoss.predicate.test(entity)) {
+                    entities.put("boss", entity);
                 }
             }
         }

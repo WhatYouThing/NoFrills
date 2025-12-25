@@ -1,7 +1,6 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import nofrills.config.Feature;
@@ -49,10 +48,10 @@ public class ScathaMining {
     private static void alertSpawn(boolean scatha) {
         if (scatha) {
             Utils.showTitle("§cScatha", "", 5, 20, 5);
-            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, SoundCategory.MASTER, 1.0f, 1.0f);
+            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
         } else {
             Utils.showTitle("§eWorm", "", 5, 20, 5);
-            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, SoundCategory.MASTER, 1.0f, 0.0f);
+            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.0f);
         }
     }
 
@@ -84,7 +83,7 @@ public class ScathaMining {
                 if (active() && cooldown.value()) {
                     Utils.showTitle("§a§lCOOLDOWN ENDED", "", 5, 20, 5);
                     Utils.info("§aWorm spawn cooldown ended!");
-                    Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP, SoundCategory.MASTER, 1.0f, 0.0f);
+                    Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP, 1.0f, 0.0f);
                 }
                 wormsCache.removeDead();
             }

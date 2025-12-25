@@ -13,7 +13,6 @@ import net.minecraft.entity.passive.BatEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -75,7 +74,7 @@ public class SecretChime {
     private static boolean clickedThisTick = false;
 
     private static void playSound(SettingString sound, SettingDouble volume, SettingDouble pitch) {
-        Utils.playSound(SoundEvent.of(Identifier.of(sound.value())), SoundCategory.MASTER, volume.valueFloat(), pitch.valueFloat());
+        Utils.playSound(SoundEvent.of(Identifier.of(sound.value())), volume.valueFloat(), pitch.valueFloat());
     }
 
     private static boolean isSecretItem(int id, boolean distCheck) {

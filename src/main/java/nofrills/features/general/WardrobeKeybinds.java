@@ -8,7 +8,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -116,7 +115,7 @@ public class WardrobeKeybinds {
                         if (event.action == GLFW.GLFW_PRESS) {
                             mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_LEFT, SlotActionType.PICKUP, mc.player);
                             if (sound.value()) {
-                                Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR, SoundCategory.MASTER, 0.69f, 1.0f);
+                                Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR, 0.69f, 1.0f);
                             }
                         }
                         break;

@@ -1,7 +1,6 @@
 package nofrills.features.fishing;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
@@ -32,7 +31,7 @@ public class RareAnnounce {
                         Utils.showTitle(creature.color + "§l" + Utils.toUpper(creature.name), "", 5, 20, 5);
                     }
                     if (sound.value()) {
-                        Utils.playSound(SoundEvents.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, SoundCategory.MASTER, 1, 1);
+                        Utils.playSound(SoundEvents.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, 1, 1);
                     }
                     if (sendMsg.value() && !msg.value().isEmpty()) {
                         Utils.sendMessage(msg.value().replace("{name}", creature.name).replace("{spawnmsg}", creature.spawnMsg));

@@ -3,7 +3,6 @@ package nofrills.features.solvers;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -56,7 +55,7 @@ public class SpookyChests {
             String name = Utils.toLower(event.namePlain);
             if (name.equals("trick or treat?") || name.equals("party chest")) {
                 Utils.showTitle("§6§lCHEST SPAWNED!", "", 5, 20, 5);
-                Utils.playSound(SoundEvents.BLOCK_VAULT_ACTIVATE, SoundCategory.MASTER, 1.0f, 1.0f);
+                Utils.playSound(SoundEvents.BLOCK_VAULT_ACTIVATE, 1.0f, 1.0f);
                 chestList.add(event.entity);
             }
         }

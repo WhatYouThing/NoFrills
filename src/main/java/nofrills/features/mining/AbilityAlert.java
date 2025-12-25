@@ -2,7 +2,6 @@ package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
@@ -100,7 +99,7 @@ public class AbilityAlert {
                 ticks--;
                 if (ticks == 0) {
                     Utils.showTitle("§6" + Utils.toUpper(toolData.ability) + "!", "", 0, 50, 10);
-                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
                 }
             }
         }

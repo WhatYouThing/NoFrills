@@ -5,7 +5,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
@@ -61,7 +60,7 @@ public class LividSolver {
                 Livid livid = lividData.get(event.newState.getBlock());
                 if (!currentName.equals(livid.name)) {
                     Utils.showTitle(livid.title + "!", "", 0, 50, 10);
-                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.MASTER, 1, 0);
+                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
                     currentName = livid.name;
                 }
             }

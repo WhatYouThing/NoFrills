@@ -35,6 +35,10 @@ public class DungeonUtil {
         return mc.world != null && mc.world.getMapState(mapId) != null;
     }
 
+    public static boolean isInDragonPhase() {
+        return mc.player != null && mc.player.getEntityPos().getY() < 50 && Utils.isInDungeonBoss("7");
+    }
+
     public static String getPlayerClass(String name) {
         return classCache.getOrDefault(name, "");
     }

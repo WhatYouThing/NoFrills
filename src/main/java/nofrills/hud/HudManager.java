@@ -67,8 +67,9 @@ public class HudManager {
         pingElement.reset();
         tpsElement.reset();
         fpsElement.reset();
-        lagMeterElement.setTickTime(0); // temporarily disables the element, as the server doesn't send tick packets for a few seconds after joining
+        lagMeterElement.setTickTime(0);
         bobberElement.hologram = null;
+        bossHealthElement.setHidden();
     }
 
     @EventHandler

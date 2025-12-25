@@ -7,7 +7,7 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.misc.Utils;
 
 public class BossHealth extends SimpleTextElement {
-    private boolean active = false;
+    private boolean visible = false;
 
     public BossHealth() {
         super(Text.literal("Boss Health: §fN/A"), new Feature("bossHealthElement"), "Boss Health Element");
@@ -18,7 +18,7 @@ public class BossHealth extends SimpleTextElement {
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
-        } else if (!this.isEditingHud() && (!this.active || Utils.isInstanceOver())) {
+        } else if (!this.isEditingHud() && !this.visible) {
             return;
         }
         super.draw(context, mouseX, mouseY, partialTicks, delta);
@@ -26,10 +26,18 @@ public class BossHealth extends SimpleTextElement {
 
     public void setHealth(String health) {
         this.setText(Utils.format("Boss Health: {}", health));
-        this.active = true;
+        this.visible = true;
     }
 
-    public void setInactive() {
-        this.active = false;
+    public void setHidden() {
+        this.setVisible(false);
+    }
+
+    public boolean isVisible() {
+        return this.visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }

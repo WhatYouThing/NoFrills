@@ -8,14 +8,16 @@ import nofrills.hud.HudManager;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
-public class BossHealthDisplay {
-    public static final Feature instance = new Feature("bossHealthDisplay");
+public class SlayerBossHealth {
+    public static final Feature instance = new Feature("slayerBossHealth");
 
     @EventHandler
     private static void onRender(WorldTickEvent event) {
         if (instance.isActive()) {
             if (!SlayerUtil.bossAlive) {
-                HudManager.bossHealthElement.setInactive();
+                if (HudManager.bossHealthElement.isVisible()) {
+                    HudManager.bossHealthElement.setHidden();
+                }
                 return;
             }
             Entity nameEntity = SlayerUtil.getNameEntity();

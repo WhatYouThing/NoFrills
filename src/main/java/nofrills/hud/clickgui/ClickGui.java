@@ -500,7 +500,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Terminal Start Timer", TickTimers.terminalStart, "Shows a timer for the 3rd phase starting."),
                                 new Settings.Toggle("Goldor Timer", TickTimers.goldor, "Shows a timer for Goldor's death tick in 3rd phase.")
                         ))),
-                        new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic.")
+                        new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
+                        new Module("Boss Health Display", DungeonBossHealth.instance, "Shows the health of the dungeon bosses through the Boss Health HUD element.")
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(
@@ -511,7 +512,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Send Message", FreshTimer.send, "Send a message once Fresh Tools activates."),
                                 new Settings.TextInput("Message", FreshTimer.message, "The message to send.")
                         ))),
-                        new Module("Kuudra Health", KuudraHealth.instance, "Shows Kuudra's exact health on screen.", new Settings(List.of(
+                        new Module("Kuudra Health", KuudraHealth.instance, "Shows Kuudra's exact health through the Boss Health HUD element.", new Settings(List.of(
                                 new Settings.Toggle("Show DPS", KuudraHealth.dps, "Calculates your team's DPS. Only applies in the last phase of Infernal tier.")
                         ))),
                         new Module("Kuudra Hitbox", KuudraHitbox.instance, "Renders a hitbox for Kuudra.", new Settings(List.of(
@@ -560,7 +561,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Mania", MuteVampire.mania, "Mutes the loud Mania sounds while in the Chateau."),
                                 new Settings.Toggle("Killer Springs", MuteVampire.springs, "Mutes the Wither sound spam that occurs when your boss spawns a Killer Spring.")
                         ))),
-                        new Module("Boss Health Display", BossHealthDisplay.instance, "Shows the health of your slayer boss through the Boss Health HUD element."),
+                        new Module("Boss Health Display", SlayerBossHealth.instance, "Shows the health of your slayer boss through the Boss Health HUD element."),
                         new Module("Egg Hits Display", EggHitsDisplay.instance, "Renders the needed hits for the Tarantula Broodfather egg sack phase.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, EggHitsDisplay.color, "The color of the text."),
                                 new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, EggHitsDisplay.scale, "The scale of the text.")

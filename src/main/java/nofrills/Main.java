@@ -89,7 +89,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ExperimentSolver.class);
         eventBus.subscribe(BeaconTuningSolver.class);
         eventBus.subscribe(CalendarDate.class);
-        eventBus.subscribe(BossHealthDisplay.class);
+        eventBus.subscribe(SlayerBossHealth.class);
         eventBus.subscribe(ChaliceHighlight.class);
         eventBus.subscribe(IceAlert.class);
         eventBus.subscribe(StakeAlert.class);
@@ -179,6 +179,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(BreakResetFix.class);
         eventBus.subscribe(ChatTweaks.class);
         eventBus.subscribe(SpawnAlert.class);
+        eventBus.subscribe(DungeonBossHealth.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

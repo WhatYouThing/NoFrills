@@ -39,6 +39,12 @@ public class KuudraHealth {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInKuudra()) {
+            if (Utils.isInstanceOver()) {
+                if (HudManager.bossHealthElement.isVisible()) {
+                    HudManager.bossHealthElement.setHidden();
+                }
+                return;
+            }
             MagmaCubeEntity kuudra = KuudraUtil.getKuudraEntity();
             KuudraUtil.phase phase = KuudraUtil.getCurrentPhase();
             if (kuudra == null) {

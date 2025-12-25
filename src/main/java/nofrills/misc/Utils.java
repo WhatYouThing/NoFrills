@@ -197,6 +197,9 @@ public class Utils {
      */
     public static boolean isInDungeonBoss(String floor) {
         return isOnDungeonFloor(floor) && switch (floor) {
+            case "1" -> isInZone(-72, 146, -40, -14, 55, 49);
+            case "2" -> isInZone(-40, 99, -40, 24, 54, 54);
+            case "3" -> isInZone(-40, 118, -40, 42, 64, 73);
             case "4" -> isInZone(50, 112, 81, -40, 53, -40);
             case "5" -> isInZone(50, 112, 118, -40, 53, -8);
             case "6" -> isInZone(22, 110, 134, -40, 51, -8);

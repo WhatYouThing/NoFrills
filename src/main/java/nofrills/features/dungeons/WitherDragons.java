@@ -22,8 +22,6 @@ import nofrills.misc.*;
 
 import java.util.List;
 
-import static nofrills.Main.mc;
-
 public class WitherDragons {
     public static final Feature instance = new Feature("witherDragons");
 
@@ -47,10 +45,6 @@ public class WitherDragons {
     );
     private static final EntityCache dragonCache = new EntityCache();
     private static boolean splitDone = false;
-
-    public static boolean isDragonPhase() {
-        return mc.player != null && mc.player.getPos().getY() < 50 && Utils.isInDungeonBoss("7");
-    }
 
     private static boolean isArcherTeam() {
         return switch (SkyblockData.dungeonClass) {
@@ -101,7 +95,7 @@ public class WitherDragons {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && isDragonPhase()) {
+        if (instance.isActive() && DungeonUtil.isInDragonPhase()) {
             for (Dragon drag : dragons) {
                 if (boxes.value() && (drag.isSpawning() || drag.hasEntity())) {
                     event.drawOutline(drag.area, true, drag.color);
@@ -137,7 +131,7 @@ public class WitherDragons {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (instance.isActive() && isDragonParticle(event.packet) && isDragonPhase()) {
+        if (instance.isActive() && isDragonParticle(event.packet) && DungeonUtil.isInDragonPhase()) {
             for (Dragon drag : dragons) {
                 if (drag.spawnTicks == 0 && drag.area.contains(event.pos) && !isPurpleInArea(drag)) {
                     drag.startTicking();
@@ -168,7 +162,7 @@ public class WitherDragons {
     // we can use their "collar" entities to accurately find each dragon regardless of where they are
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (instance.isActive() && isDragonPhase()) {
+        if (instance.isActive() && DungeonUtil.isInDragonPhase()) {
             if (event.entity instanceof EnderDragonEntity dragon) {
                 dragonCache.add(dragon);
                 for (Dragon drag : dragons) {
@@ -204,7 +198,7 @@ public class WitherDragons {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (instance.isActive() && isDragonPhase()) {
+        if (instance.isActive() && DungeonUtil.isInDragonPhase()) {
             for (Dragon drag : dragons) {
                 drag.tick();
             }
@@ -373,7 +367,7 @@ public class WitherDragons {
 
         public void setEntity(EnderDragonEntity ent) {
             this.entity = ent;
-            this.health = ent.getHealth();
+            this.health = ent.getHealth(); // store the health value on update, required as the client appears to reset it on the next tick
             if (glow.value() && !Rendering.Entities.isDrawingGlow(ent)) {
                 Rendering.Entities.drawGlow(ent, true, this.color);
             }

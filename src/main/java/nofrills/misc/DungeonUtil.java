@@ -39,6 +39,15 @@ public class DungeonUtil {
         return mc.player != null && mc.player.getPos().getY() < 50 && Utils.isInDungeonBoss("7");
     }
 
+    public static boolean isInBossRoom() {
+        for (int i = 1; i <= 7; i++) {
+            if (Utils.isInDungeonBoss(String.valueOf(i))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static String getPlayerClass(String name) {
         return classCache.getOrDefault(name, "");
     }

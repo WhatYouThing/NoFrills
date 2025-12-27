@@ -32,6 +32,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     public final SettingColor background;
     public final Identifier identifier;
     public final Surface disabledSurface = Surface.flat(0x55ff0000);
+    public MutableText elementDesc = Text.empty();
     public FlowLayout layout;
     public HudSettings options;
     public boolean toggling = false;
@@ -137,6 +138,10 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         HudSettings settings = new HudSettings(list);
         settings.setTitle(this.elementLabel);
         return settings;
+    }
+
+    public void setDesc(String description) {
+        this.elementDesc = Text.literal(description);
     }
 
     public boolean isEditingHud() {

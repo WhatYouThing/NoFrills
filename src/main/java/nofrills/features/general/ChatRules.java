@@ -45,11 +45,13 @@ public class ChatRules {
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
         Settings.BigButton button = new Settings.BigButton("Add New Chat Rule", btn -> {
-            if (!data.value().has("rules")) {
-                data.value().add("rules", new JsonArray());
-            }
-            data.value().get("rules").getAsJsonArray().add(new Rule().toObject());
-            data.save();
+            data.edit(object -> {
+                if (!object.has("rules")) {
+                    object.add("rules", new JsonArray());
+                }
+                object.get("rules").getAsJsonArray().add(new Rule().toObject());
+            });
+            Config.computeHash();
             mc.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
@@ -222,8 +224,8 @@ public class ChatRules {
             editButton.horizontalSizing(Sizing.fixed(49));
             editButton.renderer(Settings.buttonRendererWhite);
             ButtonComponent delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
-                data.value().get("rules").getAsJsonArray().remove(this.index);
-                data.save();
+                data.edit(object -> object.get("rules").getAsJsonArray().remove(this.index));
+                Config.computeHash();
                 mc.setScreen(buildSettings());
             });
             delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18));
@@ -240,8 +242,8 @@ public class ChatRules {
         }
 
         public void save() {
-            data.value().get("rules").getAsJsonArray().set(this.index, this.rule.toObject());
-            data.save();
+            data.edit(object -> object.get("rules").getAsJsonArray().set(this.index, this.rule.toObject()));
+            Config.computeHash();
         }
 
         public FlowLayout buildMatchTextSetting() {

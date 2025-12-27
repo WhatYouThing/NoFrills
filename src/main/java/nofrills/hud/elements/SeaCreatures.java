@@ -19,6 +19,7 @@ public class SeaCreatures extends SimpleTextElement {
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
         ));
+        this.setDesc("Displays the amount of nearby sea creatures. Used by the Cap Tracker feature.");
     }
 
     @Override

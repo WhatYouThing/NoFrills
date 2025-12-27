@@ -57,8 +57,7 @@ public class ShardTracker {
         list.add(new Settings.Toggle("Filter Fuse", filterFuse, "Hides every Fuse/Cycle shard while outside of the Fusion Machine."));
         list.add(new Settings.Toggle("Filter Direct", filterDirect, "Hides every Direct/Bazaar shard while inside of the Fusion Machine."));
         Settings.BigButton clearButton = new Settings.BigButton("Clear Shard List", btn -> {
-            data.value().add("shards", new JsonArray());
-            data.save();
+            data.edit(object -> object.add("shards", new JsonArray()));
             mc.setScreen(buildSettings());
         });
         clearButton.button.verticalSizing(Sizing.fixed(18));
@@ -72,16 +71,17 @@ public class ShardTracker {
         importButton.button.tooltip(Text.literal("Pastes the list of shards that you need to get."));
         list.add(importButton);
         Settings.BigButton button = new Settings.BigButton("Add New Shard", btn -> {
-            if (!data.value().has("shards")) {
-                data.value().add("shards", new JsonArray());
-            }
-            JsonObject object = new JsonObject();
-            object.addProperty("name", "");
-            object.addProperty("needed", 0L);
-            object.addProperty("obtained", 0L);
-            object.addProperty("source", "Direct");
-            data.value().get("shards").getAsJsonArray().add(object);
-            data.save();
+            data.edit(object -> {
+                if (!object.has("shards")) {
+                    object.add("shards", new JsonArray());
+                }
+                JsonObject obj = new JsonObject();
+                obj.addProperty("name", "");
+                obj.addProperty("needed", 0L);
+                obj.addProperty("obtained", 0L);
+                obj.addProperty("source", "Direct");
+                object.get("shards").getAsJsonArray().add(obj);
+            });
             mc.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
@@ -103,10 +103,6 @@ public class ShardTracker {
     }
 
     public static void importTreeData() {
-        if (!data.value().has("shards")) {
-            data.value().add("shards", new JsonArray());
-        }
-        JsonArray shards = data.value().get("shards").getAsJsonArray();
         String clipboard = mc.keyboard.getClipboard();
         JsonArray treeData = parseTreeData(clipboard);
         if (treeData == null) {
@@ -114,28 +110,33 @@ public class ShardTracker {
             return;
         }
         try {
-            for (JsonElement element : treeData) {
-                JsonObject shardData = element.getAsJsonObject();
-                String name = Utils.toLower(shardData.get("name").getAsString());
-                long needed = shardData.get("needed").getAsLong();
-                String source = shardData.get("source").getAsString();
-                JsonObject tracked = getTrackedShard(name);
-                if (tracked != null && tracked.get("source").getAsString().equals(source)) {
-                    tracked.addProperty("needed", tracked.get("needed").getAsLong() + needed);
-                    continue; // add the needed amount to the shard if its already being tracked under the same source
+            data.edit(object -> {
+                if (!object.has("shards")) {
+                    object.add("shards", new JsonArray());
                 }
-                JsonObject object = new JsonObject();
-                object.addProperty("name", name);
-                object.addProperty("needed", needed);
-                object.addProperty("obtained", 0L);
-                object.addProperty("source", source);
-                shards.add(object);
-            }
+                JsonArray shards = object.get("shards").getAsJsonArray();
+                for (JsonElement element : treeData) {
+                    JsonObject shardData = element.getAsJsonObject();
+                    String name = Utils.toLower(shardData.get("name").getAsString());
+                    long needed = shardData.get("needed").getAsLong();
+                    String source = shardData.get("source").getAsString();
+                    JsonObject tracked = getTrackedShard(name);
+                    if (tracked != null && tracked.get("source").getAsString().equals(source)) {
+                        tracked.addProperty("needed", tracked.get("needed").getAsLong() + needed);
+                        continue; // add the needed amount to the shard if its already being tracked under the same source
+                    }
+                    JsonObject obj = new JsonObject();
+                    obj.addProperty("name", name);
+                    obj.addProperty("needed", needed);
+                    obj.addProperty("obtained", 0L);
+                    obj.addProperty("source", source);
+                    shards.add(obj);
+                }
+            });
         } catch (Exception ignored) {
             Utils.info("§cSuccessfully read the fusion tree data, but an unknown error occurred while importing. Try updating the mod to the newest version.");
             return;
         }
-        data.save();
         Utils.info("§aShard list imported successfully.");
     }
 
@@ -207,11 +208,11 @@ public class ShardTracker {
                 for (String line : lines) {
                     builder.append("\n").append(line);
                 }
-                HudManager.shardTrackerElement.setText(builder.toString());
+                HudManager.shardTracker.setText(builder.toString());
                 return;
             }
         }
-        HudManager.shardTrackerElement.setDefaultText();
+        HudManager.shardTracker.setDefaultText();
     }
 
     private static Shard getShardFromMsg(String msg) { // parses various messages about obtaining shards, do not touch
@@ -315,8 +316,7 @@ public class ShardTracker {
                                 Utils.formatSeparator(needed)
                         );
                     }
-                    tracked.addProperty("obtained", obtained + shard.quantity);
-                    data.save();
+                    data.edit(object -> tracked.addProperty("obtained", obtained + shard.quantity));
                     refreshDisplay();
                 }
             }
@@ -333,8 +333,7 @@ public class ShardTracker {
                         String name = Utils.toLower(Utils.toPlain(event.stack.getName()));
                         JsonObject tracked = getTrackedShard(name);
                         if (tracked != null) {
-                            tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack, event.title));
-                            data.save();
+                            data.edit(object -> tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack, event.title)));
                             refreshDisplay();
                         }
                         break;
@@ -411,9 +410,8 @@ public class ShardTracker {
             this.inputName.text(getData().get("name").getAsString());
             this.inputName.borderColor = ShardData.getColorHex(getData().get("name").getAsString());
             this.inputName.onChanged().subscribe(value -> {
-                getData().addProperty("name", Utils.toLower(value));
+                data.edit(object -> getData(object).addProperty("name", Utils.toLower(value)));
                 this.inputName.borderColor = ShardData.getColorHex(Utils.toLower(value));
-                data.save();
                 refreshDisplay();
             });
             this.inputObtained = new FlatTextbox(Sizing.fixed(50));
@@ -423,8 +421,7 @@ public class ShardTracker {
             this.inputObtained.onChanged().subscribe(text -> {
                 Optional<Long> value = Utils.parseLong(text);
                 if (value.isPresent()) {
-                    getData().addProperty("obtained", value.get());
-                    data.save();
+                    data.edit(object -> getData(object).addProperty("obtained", value.get()));
                     refreshDisplay();
                 }
             });
@@ -435,25 +432,22 @@ public class ShardTracker {
             this.inputNeeded.onChanged().subscribe(text -> {
                 Optional<Long> value = Utils.parseLong(text);
                 if (value.isPresent()) {
-                    getData().addProperty("needed", value.get());
-                    data.save();
+                    data.edit(object -> getData(object).addProperty("needed", value.get()));
                     refreshDisplay();
                 }
             });
             this.inputSource = new EnumButton<>(getData().get("source").getAsString(), TrackerSource.Direct, TrackerSource.class);
             this.inputSource.setMessage(this.getSourceInputLabel(getData().get("source").getAsString()));
             this.inputSource.onChanged().subscribe(value -> {
-                getData().addProperty("source", value);
+                data.edit(object -> getData(object).addProperty("source", value));
                 this.inputSource.setMessage(this.getSourceInputLabel(value));
-                data.save();
                 refreshDisplay();
             });
             this.inputSource.margins(Insets.of(1, 0, 0, 0));
             this.inputSource.sizing(Sizing.fixed(48), Sizing.fixed(18));
             this.inputSource.tooltip(Text.literal("The source that this shard is obtained from. Click to rotate."));
             this.delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
-                data.value().get("shards").getAsJsonArray().remove(this.index);
-                data.save();
+                data.edit(object -> object.get("shards").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });
             this.delete.positioning(Positioning.relative(100, 0)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
@@ -468,8 +462,12 @@ public class ShardTracker {
             this.child(this.delete);
         }
 
+        public JsonObject getData(JsonObject object) {
+            return object.get("shards").getAsJsonArray().get(this.index).getAsJsonObject();
+        }
+
         public JsonObject getData() {
-            return data.value().get("shards").getAsJsonArray().get(this.index).getAsJsonObject();
+            return this.getData(data.value());
         }
 
         public MutableText getSourceInputLabel(String source) {

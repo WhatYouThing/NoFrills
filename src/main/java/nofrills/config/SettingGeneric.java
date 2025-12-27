@@ -49,10 +49,6 @@ public class SettingGeneric {
         }
     }
 
-    public void save() {
-        this.set(this.value, false);
-    }
-
     public JsonElement get() {
         this.update();
         return this.value;

@@ -5,18 +5,14 @@ import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.features.dungeons.TickTimers;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
-
-import java.util.List;
 
 public class TickTimer extends SimpleTextElement {
 
     public TickTimer(String text) {
         super(Text.literal(text), new Feature("tickTimerElement"), "Tick Timer Element");
-        this.options = this.getBaseSettings(List.of(
-                new Settings.Description("Usage", "This element is used by the Tick Timers feature to display the current tick timer. Only appears while in Dungeons.")
-        ));
+        this.options = this.getBaseSettings();
+        this.setDesc("Displays timers while in Dungeons. Used by the Tick Timers feature.");
     }
 
     @Override

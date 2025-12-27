@@ -26,6 +26,7 @@ public class FishingBobber extends SimpleTextElement {
                 new Settings.Toggle("Hide If Inactive", this.inactive, "Hides the element if your fishing bobber is inactive."),
                 new Settings.Toggle("Bobber Timer", this.timer, "Tracks how long your fishing bobber has existed for, useful for Slugfish.")
         ));
+        this.setDesc("Displays the fishing hologram timer, and optionally the existence time of your bobber.");
     }
 
     @Override

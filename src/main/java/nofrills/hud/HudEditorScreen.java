@@ -35,7 +35,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
         for (HudElement element : HudManager.getElements()) {
             root.child(element);
         }
-        HudManager.armorElement.updateArmor();
+        HudManager.armor.updateArmor();
     }
 
     @Override
@@ -63,6 +63,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
                 FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
                 layout.padding(Insets.of(5));
                 PlainLabel label = new PlainLabel(element.elementLabel);
+                label.tooltip(element.elementDesc);
                 label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
                 ToggleButton toggle = new ToggleButton(element.isAdded());
                 toggle.onToggled().subscribe(element.added::set);

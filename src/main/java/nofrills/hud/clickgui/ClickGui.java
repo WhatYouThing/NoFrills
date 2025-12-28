@@ -528,7 +528,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Chest Value", KuudraChestValue.instance, "Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
                                 new Settings.ColorPicker("Background", true, KuudraChestValue.background, "The color of the background of the value text."),
                                 new Settings.SliderInt("Pet Bonus", 0, 20, 1, KuudraChestValue.petBonus, "The extra Crimson Essence percentage granted by your Kuudra pet.\nUsed to calculate the value of the essence with the extra perk included.")
-                        )))
+                        ))),
+                        new Module("Crate Priority", CratePriority.instance, "Shows which crates to pull and/or grab after you collect your Pre.\nThis feature requires the full party to be using some kind of Pre message feature.")
                 )),
                 new Category("Slayer", List.of(
                         new Module("Boss Highlight", BossHighlight.instance, "Highlights your slayer boss.", new Settings(List.of(

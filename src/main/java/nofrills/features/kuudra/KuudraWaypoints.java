@@ -55,7 +55,7 @@ public class KuudraWaypoints {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && Utils.isInKuudra() && supply.value() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.phase.Collect)) {
+        if (instance.isActive() && Utils.isInKuudra() && supply.value() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
             for (Entity ent : Utils.getEntities()) {
                 if (ent instanceof GiantEntity) {
                     supplies.add(ent);
@@ -67,7 +67,7 @@ public class KuudraWaypoints {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInKuudra()) {
-            if (!supplies.empty() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.phase.Collect)) {
+            if (!supplies.empty() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
                 for (Entity supply : supplies.get()) {
                     float delta = event.tickCounter.getTickProgress(true);
                     Vec3d pos = supply.getLerpedPos(delta);

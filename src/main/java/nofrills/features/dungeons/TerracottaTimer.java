@@ -51,7 +51,8 @@ public class TerracottaTimer {
         if (instance.isActive() && Utils.isInDungeonBoss("6")) {
             if (event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
                 if (terracottas.stream().noneMatch(terra -> terra.pos.equals(event.pos))) {
-                    terracottas.add(new SpawningTerracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300));
+                    SpawningTerracotta terracotta = new SpawningTerracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300);
+                    terracottas.add(terracotta);
                 }
             }
             if (gyroTicks == 0 && event.oldState.isAir() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
@@ -64,10 +65,9 @@ public class TerracottaTimer {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !terracottas.isEmpty() && Utils.isInDungeonBoss("6")) {
             for (SpawningTerracotta terra : new ArrayList<>(terracottas)) {
-                if (terra.pos != null) {
-                    MutableText text = Text.literal(Utils.formatDecimal(terra.ticks / 20.0f) + "s");
-                    event.drawText(terra.pos.toCenterPos(), text, 0.035f, true, color.value());
-                }
+                if (terra == null || terra.pos == null) continue;
+                MutableText text = Text.literal(Utils.formatDecimal(terra.ticks / 20.0f) + "s");
+                event.drawText(terra.pos.toCenterPos(), text, 0.035f, true, color.value());
             }
         }
     }

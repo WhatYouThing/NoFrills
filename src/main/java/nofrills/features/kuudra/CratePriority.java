@@ -12,7 +12,7 @@ public class CratePriority {
     public static final Feature instance = new Feature("cratePriority");
 
     private static void announce(String message) {
-        Utils.showTitle(Utils.toUpper(message), "", 0, 50, 10);
+        Utils.showTitle("§e§l" + Utils.toUpper(message), "", 0, 50, 10);
         Utils.infoFormat("§eCrate Priority: {}", message);
     }
 

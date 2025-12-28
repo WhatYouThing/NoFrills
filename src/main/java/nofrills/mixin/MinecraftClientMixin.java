@@ -8,8 +8,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
@@ -22,6 +24,7 @@ import nofrills.features.tweaks.NoCursorReset;
 import nofrills.features.tweaks.NoDropSwing;
 import nofrills.features.tweaks.NoLoadingScreen;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,6 +40,9 @@ public abstract class MinecraftClientMixin {
     @Shadow
     @Nullable
     public ClientWorld world;
+    @Shadow
+    @Final
+    private SoundManager soundManager;
 
     @Shadow
     public abstract void setScreen(@Nullable Screen screen);
@@ -117,5 +123,14 @@ public abstract class MinecraftClientMixin {
             return mc.options.getMaxFps().getValue();
         }
         return original;
+    }
+
+    @Inject(method = "onWindowFocusChanged", at = @At("TAIL"))
+    private void onAfterFocusChanged(boolean focused, CallbackInfo ci) {
+        if (this.soundManager != null && UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.muteSounds.value()) {
+            for (SoundCategory category : SoundCategory.values()) {
+                this.soundManager.updateSoundVolume(category);
+            }
+        }
     }
 }

@@ -31,6 +31,7 @@ public class Inventory extends HudElement {
         }
         this.layout.child(this.content);
         this.options = this.getBaseSettings();
+        this.setDesc("Displays the contents of your inventory.");
     }
 
     @Override

@@ -56,18 +56,20 @@ public class PartyCommands {
     }
 
     public static void addToList(String name, String list) {
-        if (!lists.value().has(list)) {
-            lists.value().add(list, new JsonArray());
-        }
-        lists.value().get(list).getAsJsonArray().add(name);
-        lists.save();
+        lists.edit(object -> {
+            if (!object.has(list)) {
+                object.add(list, new JsonArray());
+            }
+            object.get(list).getAsJsonArray().add(name);
+        });
     }
 
     public static void removeFromList(String name, String list) {
-        if (lists.value().has(list)) {
-            lists.value().get(list).getAsJsonArray().remove(new JsonPrimitive(name));
-            lists.save();
-        }
+        lists.edit(object -> {
+            if (object.has(list)) {
+                object.get(list).getAsJsonArray().remove(new JsonPrimitive(name));
+            }
+        });
     }
 
     @EventHandler

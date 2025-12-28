@@ -31,6 +31,7 @@ public class Armor extends HudElement {
         this.options = this.getBaseSettings(List.of(
                 new Settings.Dropdown<>("Alignment", align, "The alignment direction of the element.")
         ));
+        this.setDesc("Displays your current armor set.");
     }
 
     @Override

@@ -43,16 +43,17 @@ public class CustomKeybinds {
         Settings.Toggle allowInGuiToggle = new Settings.Toggle("Allow in GUI", allowInGui, "Allow keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
         list.add(allowInGuiToggle);
         Settings.BigButton button = new Settings.BigButton("Add New Custom Keybind", btn -> {
-            if (!data.value().has("binds")) {
-                data.value().add("binds", new JsonArray());
-            }
-            JsonObject object = new JsonObject();
-            object.addProperty("key", GLFW.GLFW_KEY_UNKNOWN);
-            object.addProperty("command", "");
-            object.addProperty("enabled", true);
-            object.addProperty("modifier", Modifier.Any.name());
-            data.value().get("binds").getAsJsonArray().add(object);
-            data.save();
+            data.edit(object -> {
+                if (!object.has("binds")) {
+                    object.add("binds", new JsonArray());
+                }
+                JsonObject obj = new JsonObject();
+                obj.addProperty("key", GLFW.GLFW_KEY_UNKNOWN);
+                obj.addProperty("command", "");
+                obj.addProperty("enabled", true);
+                obj.addProperty("modifier", Modifier.Any.name());
+                object.get("binds").getAsJsonArray().add(obj);
+            });
             mc.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
@@ -141,43 +142,36 @@ public class CustomKeybinds {
             super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
             this.padding(Insets.of(5, 5, 4, 5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
+
             this.index = index;
             this.input = new FlatTextbox(Sizing.fixed(240));
             this.input.margins(Insets.of(0, 0, 0, 6));
-            this.input.text(getData().get("command").getAsString());
+            this.input.text(this.getData(data.value()).get("command").getAsString());
             this.input.tooltip(Text.literal("The message/command that this keybind will send."));
-            this.input.onChanged().subscribe(value -> {
-                getData().addProperty("command", value);
-                data.save();
-            });
+            this.input.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("command", value)));
+
             this.options = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+
             this.keybind = new KeybindButton();
             this.keybind.verticalSizing(Sizing.fixed(18)).horizontalSizing(Sizing.fixed(100)).margins(Insets.of(3, 0, 1, 0));
-            this.keybind.bind(getData().get("key").getAsInt());
+            this.keybind.bind(this.getData(data.value()).get("key").getAsInt());
             this.keybind.tooltip(Text.literal("The key bound to this command."));
-            this.keybind.onBound().subscribe(key -> {
-                getData().addProperty("key", key);
-                data.save();
-            });
-            this.modifier = new EnumButton<>(getData().has("modifier") ? getData().get("modifier").getAsString() : "Any", Modifier.Any, Modifier.class);
-            this.modifier.onChanged().subscribe(value -> {
-                getData().addProperty("modifier", value);
-                data.save();
-            });
+            this.keybind.onBound().subscribe(key -> data.edit(object -> this.getData(object).addProperty("key", key)));
+
+            this.modifier = new EnumButton<>(this.getData(data.value()).has("modifier") ? this.getData(data.value()).get("modifier").getAsString() : "Any", Modifier.Any, Modifier.class);
+            this.modifier.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("modifier", value)));
             this.modifier.margins(Insets.of(3, 0, 5, 0));
             this.modifier.sizing(Sizing.fixed(80), Sizing.fixed(18));
             this.modifier.tooltip(Text.literal("The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held."));
-            this.toggle = new ToggleButton(getData().has("enabled") && getData().get("enabled").getAsBoolean());
-            this.toggle.onToggled().subscribe(value -> {
-                this.getData().addProperty("enabled", value);
-                data.save();
-            });
+
+            this.toggle = new ToggleButton(this.getData(data.value()).has("enabled") && this.getData(data.value()).get("enabled").getAsBoolean());
+            this.toggle.onToggled().subscribe(value -> data.edit(object -> this.getData(object).addProperty("enabled", value)));
             this.toggle.verticalSizing(Sizing.fixed(18)).horizontalSizing(Sizing.fixed(54));
             this.toggle.tooltip(Text.literal("The toggle for the keybind, allows you to disable it without having to delete it."));
             this.toggle.margins(Insets.of(3, 0, 5, 0));
+
             this.delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
-                data.value().get("binds").getAsJsonArray().remove(this.index);
-                data.save();
+                data.edit(object -> object.get("binds").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });
             this.delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
@@ -185,6 +179,7 @@ public class CustomKeybinds {
                 context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
                 Rendering.drawBorder(context, btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xffffffff);
             });
+
             this.options.child(this.keybind);
             this.options.child(this.modifier);
             this.options.child(this.toggle);
@@ -193,8 +188,8 @@ public class CustomKeybinds {
             this.child(this.delete);
         }
 
-        public JsonObject getData() {
-            return data.value().get("binds").getAsJsonArray().get(this.index).getAsJsonObject();
+        public JsonObject getData(JsonObject object) {
+            return object.get("binds").getAsJsonArray().get(this.index).getAsJsonObject();
         }
     }
 }

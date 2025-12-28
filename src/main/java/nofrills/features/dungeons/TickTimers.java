@@ -78,7 +78,7 @@ public class TickTimers {
                     text.append(Utils.format("\n{}: §f{}s", label, duration));
                 }
             }
-            HudManager.tickTimerElement.setText(text.toString());
+            HudManager.tickTimer.setText(text.toString());
         }
     }
 

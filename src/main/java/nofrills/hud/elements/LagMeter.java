@@ -20,6 +20,7 @@ public class LagMeter extends SimpleTextElement {
         this.options = this.getBaseSettings(List.of(
                 new Settings.SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
         ));
+        this.setDesc("Displays the time since the last received server tick.");
     }
 
     @Override

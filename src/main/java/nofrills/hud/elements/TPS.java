@@ -22,6 +22,7 @@ public class TPS extends SimpleTextElement {
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
+        this.setDesc("Displays the real time TPS of the server, and optionally the average TPS.");
     }
 
     @Override

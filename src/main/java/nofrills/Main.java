@@ -178,6 +178,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ChatTweaks.class);
         eventBus.subscribe(SpawnAlert.class);
         eventBus.subscribe(CratePriority.class);
+        eventBus.subscribe(MuteEnderman.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

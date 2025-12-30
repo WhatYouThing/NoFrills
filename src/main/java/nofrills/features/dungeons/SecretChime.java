@@ -13,14 +13,13 @@ import net.minecraft.entity.passive.BatEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingDouble;
 import nofrills.config.SettingString;
 import nofrills.events.*;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
 
@@ -74,16 +73,16 @@ public class SecretChime {
     private static boolean clickedThisTick = false;
 
     private static void playSound(SettingString sound, SettingDouble volume, SettingDouble pitch) {
-        Utils.playSound(SoundEvent.of(Identifier.of(sound.value())), volume.valueFloat(), pitch.valueFloat());
+        Utils.playSound(sound.value(), volume.valueFloat(), pitch.valueFloat());
     }
 
     private static boolean isSecretItem(int id, boolean distCheck) {
-        return mc.world != null && mc.player != null && id != lastItemId && mc.world.getEntityById(id) instanceof ItemEntity item
+        return mc.player != null && id != lastItemId && Utils.getEntityById(id) instanceof ItemEntity item
                 && secretItems.contains(Utils.getMarketId(item.getStack())) && (!distCheck || mc.player.getEyePos().distanceTo(item.getPos()) <= 10.0);
     }
 
     private static boolean isSecretBat(int id) {
-        return mc.world != null && mc.player != null && mc.world.getEntityById(id) instanceof BatEntity bat
+        return mc.player != null && Utils.getEntityById(id) instanceof BatEntity bat
                 && batCache.has(bat) && mc.player.getEyePos().distanceTo(bat.getPos()) <= 10.0;
     }
 
@@ -156,7 +155,7 @@ public class SecretChime {
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && event.entity instanceof BatEntity bat && batToggle.value()) {
-            if (SecretBatHighlight.isSecretBat(bat)) {
+            if (DungeonUtil.isSecretBat(bat)) {
                 batCache.add(bat);
             }
             if (!bat.isAlive() && isSecretBat(bat.getId())) {

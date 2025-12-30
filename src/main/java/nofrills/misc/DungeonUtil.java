@@ -3,6 +3,8 @@ package nofrills.misc;
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.type.MapIdComponent;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.BatEntity;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 
@@ -44,6 +46,13 @@ public class DungeonUtil {
             if (Utils.isInDungeonBoss(String.valueOf(i))) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    public static boolean isSecretBat(Entity entity) {
+        if (entity instanceof BatEntity bat) {
+            return Utils.isBaseHealth(bat, 100.0f) && !Utils.isInDungeonBoss("4");
         }
         return false;
     }

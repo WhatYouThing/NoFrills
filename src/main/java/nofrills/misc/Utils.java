@@ -38,6 +38,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -109,6 +110,10 @@ public class Utils {
 
     public static void playSound(RegistryEntry.Reference<SoundEvent> event, float volume, float pitch) {
         playSound(event.value(), volume, pitch);
+    }
+
+    public static void playSound(String event, float volume, float pitch) {
+        playSound(SoundEvent.of(Identifier.of(event)), volume, pitch);
     }
 
     public static void sendMessage(String message) {
@@ -300,6 +305,16 @@ public class Utils {
             return new ArrayList<>(lookup.index.idToEntity.values());
         }
         return new ArrayList<>();
+    }
+
+    public static Entity getEntityById(int id) {
+        if (mc.world != null) {
+            SimpleEntityLookup<Entity> lookup = (SimpleEntityLookup<Entity>) mc.world.entityManager.getLookup();
+            if (id < lookup.index.size()) {
+                return lookup.index.get(id);
+            }
+        }
+        return null;
     }
 
     public static List<Entity> getOtherEntities(Entity except, Box box, Predicate<? super Entity> filter) {

@@ -393,7 +393,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 )),
                 new Category("Dungeons", List.of(
                         new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(
-                                new Settings.Toggle("Sharpshooter", DeviceSolvers.sharpshooter, "Highlights hit targets as red while doing the 4th device.")
+                                new Settings.Toggle("Sharpshooter", DeviceSolvers.sharpshooter, "Highlights hit targets as red while doing the 4th device."),
+                                new Settings.Toggle("Arrow Align", DeviceSolvers.arrowAlign, "Shows the amount of needed clicks while doing the 3rd device.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, StarredMobHighlight.color, "The color of the starred mob highlight.")

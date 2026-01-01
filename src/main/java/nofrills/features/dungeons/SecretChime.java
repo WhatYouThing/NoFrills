@@ -8,6 +8,7 @@ import net.minecraft.block.LeverBlock;
 import net.minecraft.block.PlayerSkullBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.command.BlockDataObject;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.passive.BatEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -88,12 +89,16 @@ public class SecretChime {
         return false;
     }
 
-    private static void playItemChime() {
-        playSound(itemsSound, itemsVolume, itemsPitch);
+    private static void playItemChime(Entity entity) {
+        if (mc.player != null && entity.distanceTo(mc.player) <= 8.0) {
+            playSound(itemsSound, itemsVolume, itemsPitch);
+        }
     }
 
-    private static void playBatChime() {
-        playSound(batSound, batVolume, batPitch);
+    private static void playBatChime(Entity entity) {
+        if (mc.player != null && entity.distanceTo(mc.player) <= 10.0) {
+            playSound(batSound, batVolume, batPitch);
+        }
     }
 
     @EventHandler
@@ -122,15 +127,15 @@ public class SecretChime {
                     entityCache.add(item);
                 }
                 if (!item.isAlive() && entityCache.has(item)) {
-                    playItemChime();
+                    playItemChime(item);
                 }
             }
             if (batToggle.value() && event.entity instanceof BatEntity bat) {
                 if (DungeonUtil.isSecretBat(bat)) {
                     entityCache.add(bat);
                 }
-                if (!bat.isAlive() && mc.player != null && mc.player.getEyePos().distanceTo(bat.getEntityPos()) <= 10.0) {
-                    playBatChime();
+                if (!bat.isAlive() && entityCache.has(bat)) {
+                    playBatChime(bat);
                 }
             }
         }
@@ -140,10 +145,10 @@ public class SecretChime {
     private static void onRemoved(EntityRemovedEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
             if (itemsToggle.value() && event.entity instanceof ItemEntity && entityCache.removeDead().has(event.entity)) {
-                playItemChime();
+                playItemChime(event.entity);
             }
             if (batToggle.value() && event.entity instanceof BatEntity && entityCache.removeDead().has(event.entity)) {
-                playBatChime();
+                playBatChime(event.entity);
             }
         }
     }

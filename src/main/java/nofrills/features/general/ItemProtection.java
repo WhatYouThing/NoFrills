@@ -45,6 +45,9 @@ public class ItemProtection {
 
     public static ProtectType getProtectType(ItemStack stack) {
         NbtCompound customData = Utils.getCustomData(stack);
+        if (customData == null) {
+            return ProtectType.None;
+        }
         String id = Utils.getMarketId(stack);
         if (protectUUID.value() && data.value().has("uuids")) {
             String uuid = customData.getString("uuid", "");
@@ -81,6 +84,10 @@ public class ItemProtection {
 
     private static void addUUID(ItemStack stack) {
         NbtCompound customData = Utils.getCustomData(stack);
+        if (customData == null) {
+            Utils.infoRaw(Text.literal("§cItem ").append(stack.getName()).append(" §chas no custom data, unable to protect."));
+            return;
+        }
         String uuid = customData.getString("uuid", "");
         if (uuid.isEmpty()) {
             Utils.infoRaw(Text.literal("§cItem ").append(stack.getName()).append(" §chas no UUID, unable to protect."));

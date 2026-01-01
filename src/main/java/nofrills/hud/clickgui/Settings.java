@@ -495,4 +495,27 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.child(this.button);
         }
     }
+
+    public static class DoubleInput extends FlowLayout {
+        public SettingDouble setting;
+
+        public DoubleInput(String name, SettingDouble setting, String tooltip) {
+            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            this.padding(Insets.of(5));
+            this.horizontalAlignment(HorizontalAlignment.LEFT);
+            this.setting = setting;
+            PlainLabel label = new PlainLabel(Text.literal(name).withColor(0xffffff));
+            FlatTextbox text = new FlatTextbox(Sizing.fixed(150));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            label.tooltip(Text.literal(tooltip));
+            text.onChanged().subscribe(change -> Utils.parseDouble(change).ifPresent(value -> this.setting.set(value)));
+            text.text(String.valueOf(this.setting.value()));
+            this.child(label);
+            this.child(text);
+            this.child(buildResetButton(btn -> {
+                this.setting.reset();
+                text.setText(String.valueOf(this.setting.value()));
+            }));
+        }
+    }
 }

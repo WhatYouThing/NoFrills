@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.dungeons.DungeonChestValue;
+import nofrills.features.general.ItemProtection;
 import nofrills.features.general.PriceTooltips;
 import nofrills.features.kuudra.KuudraChestValue;
 
@@ -27,7 +28,8 @@ public class NoFrillsAPI {
     private static int refreshTicks = 0;
 
     private static boolean shouldRefresh() {
-        return PriceTooltips.instance.isActive() || KuudraChestValue.instance.isActive() || DungeonChestValue.instance.isActive();
+        return PriceTooltips.instance.isActive() || KuudraChestValue.instance.isActive()
+                || DungeonChestValue.instance.isActive() || ItemProtection.isProtectingValue();
     }
 
     private static void refreshItemPricing() {

@@ -213,6 +213,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Keep History", ChatTweaks.keepHistory, "Prevents the chat history from clearing on disconnect."),
                                 new Settings.Toggle("Extra Lines", ChatTweaks.extraLines, "Overrides the chat line limit. Allows you to keep more messages in the chat history."),
                                 new Settings.SliderInt("Lines", 100, 5000, 10, ChatTweaks.lines, "The chat line limit override.")
+                        ))),
+                        new Module("Item Protection", ItemProtection.instance, "Prevent yourself from accidentally dropping and/or selling items.", new Settings(List.of(
+                                new Settings.Keybind("UUID Protect Key", ItemProtection.uuidKey, "The keybind to protect a specific item by UUID."),
+                                new Settings.Keybind("ID Protect Key", ItemProtection.skyblockIdKey, "The keybind to protect a specific item by Skyblock ID."),
+                                new Settings.Toggle("Protect UUID", ItemProtection.protectUUID, "Protect items protected by UUID."),
+                                new Settings.Toggle("Protect ID", ItemProtection.protectSkyblockId, "Protect items protected by Skyblock ID."),
+                                new Settings.Toggle("Protect Starred", ItemProtection.protectStarred, "Protect any Dungeon item with stars on it."),
+                                new Settings.Toggle("Protect Rarity Upgraded", ItemProtection.protectRarityUpgraded, "Protect any item that is Recombobulated."),
+                                new Settings.Toggle("Protect Value", ItemProtection.protectValue, "Protect any item that has a high enough NPC/Auction/Bazaar value."),
+                                new Settings.DoubleInput("Minimum Value", ItemProtection.protectValueMin, "The minimum item value.")
                         )))
                 )),
                 new Category("Tweaks", List.of(

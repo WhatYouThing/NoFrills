@@ -81,6 +81,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SlotOptions.class);
         eventBus.subscribe(Utils.class);
         eventBus.subscribe(NoFrillsAPI.class);
+        eventBus.subscribe(ItemProtection.class);
         eventBus.subscribe(KuudraUtil.class);
         eventBus.subscribe(SlayerUtil.class);
         eventBus.subscribe(DungeonUtil.class);

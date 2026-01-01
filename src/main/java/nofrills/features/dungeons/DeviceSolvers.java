@@ -211,7 +211,7 @@ public class DeviceSolvers {
         public static void render(WorldRenderEvent event) {
             for (Map.Entry<ItemFrameEntity, Integer> entry : solutionMap.entrySet()) {
                 ItemFrameEntity frame = entry.getKey();
-                Vec3d pos = frame.getEyePos().add(0.1, 0.2, 0.0);
+                Vec3d pos = frame.getEyePos().add(0.0, 0.2, 0.0);
                 int clicks = getNeededClicks(frame.getRotation(), entry.getValue());
                 if (clicks > 0) {
                     event.drawText(pos, Text.literal(String.valueOf(clicks)), 0.04f, true, RenderColor.white);

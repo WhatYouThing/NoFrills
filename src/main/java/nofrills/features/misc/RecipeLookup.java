@@ -25,7 +25,7 @@ public class RecipeLookup {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (keybind.value() == event.key && event.action == GLFW.GLFW_PRESS) {
+        if (instance.isActive() && keybind.value() == event.key && event.action == GLFW.GLFW_PRESS) {
             if (mc.currentScreen instanceof InventoryScreen || mc.currentScreen instanceof GenericContainerScreen) {
                 Slot focused = Utils.getFocusedSlot();
                 if (focused != null) {

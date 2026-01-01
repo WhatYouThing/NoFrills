@@ -9,6 +9,7 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
@@ -46,7 +47,7 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V", shift = At.Shift.AFTER))
     private void onPostTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
-        if (ent instanceof LivingEntity) {
+        if (ent instanceof LivingEntity || ent instanceof ItemEntity) {
             if (ent instanceof ArmorStandEntity) {
                 for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
                     if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) && entry.value() != null && ent.getCustomName() != null) {

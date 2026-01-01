@@ -23,7 +23,7 @@ public class FreshTimer {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInKuudra()) {
-            if (freshTicks > 0 && KuudraUtil.getCurrentPhase() == KuudraUtil.phase.Build) {
+            if (freshTicks > 0 && KuudraUtil.getCurrentPhase() == KuudraUtil.Phase.Build) {
                 Utils.showTitleCustom(Utils.format("FRESH: {}s", Utils.formatDecimal(freshTicks / 20f)), 1, 25, 2.5f, RenderColor.fromHex(0x55ff55));
             }
         }

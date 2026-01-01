@@ -81,6 +81,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SlotOptions.class);
         eventBus.subscribe(Utils.class);
         eventBus.subscribe(NoFrillsAPI.class);
+        eventBus.subscribe(ItemProtection.class);
         eventBus.subscribe(KuudraUtil.class);
         eventBus.subscribe(SlayerUtil.class);
         eventBus.subscribe(DungeonUtil.class);
@@ -177,6 +178,8 @@ public class Main implements ModInitializer {
         eventBus.subscribe(BreakResetFix.class);
         eventBus.subscribe(ChatTweaks.class);
         eventBus.subscribe(SpawnAlert.class);
+        eventBus.subscribe(CratePriority.class);
+        eventBus.subscribe(MuteEnderman.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

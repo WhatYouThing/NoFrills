@@ -70,8 +70,8 @@ public class BossHealth extends SimpleTextElement {
         }
         if (kuudra.value() && Utils.isInKuudra() && !Utils.isInstanceOver()) {
             MagmaCubeEntity kuudra = KuudraUtil.getKuudraEntity();
-            KuudraUtil.phase phase = KuudraUtil.getCurrentPhase();
-            if (phase.equals(KuudraUtil.phase.DPS)) {
+            KuudraUtil.Phase phase = KuudraUtil.getCurrentPhase();
+            if (phase.equals(KuudraUtil.Phase.DPS)) {
                 if (kuudra == null) {
                     List<ClientBossBar> bossBars = Utils.getBossBars();
                     if (!bossBars.isEmpty()) {
@@ -82,7 +82,7 @@ public class BossHealth extends SimpleTextElement {
                 this.setHealth(Utils.format("§e{}%", Utils.formatDecimal(kuudra.getHealth() / kuudra.getMaxHealth())));
                 return;
             }
-            if (phase.equals(KuudraUtil.phase.Lair)) {
+            if (phase.equals(KuudraUtil.Phase.Lair)) {
                 float currentHealth = kuudra == null ? 0.0f : (kuudra.getHealth() - 1024.0f) * 10000.0f;
                 this.kuudraTicks++;
                 if (this.kuudraTicks >= 20) {

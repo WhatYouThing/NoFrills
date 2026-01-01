@@ -16,6 +16,7 @@
     "ClientWorldMixin",
     "DataTrackerMixin",
     "DrawContextMixin",
+    "EndermanEntityMixin",
     "EntityAttributeInstanceMixin",
     "EntityMixin",
     "EntityRendererMixin",

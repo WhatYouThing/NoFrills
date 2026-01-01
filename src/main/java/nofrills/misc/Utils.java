@@ -41,6 +41,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -112,6 +113,10 @@ public class Utils {
 
     public static void playSound(RegistryEntry.Reference<SoundEvent> event, float volume, float pitch) {
         playSound(event.value(), volume, pitch);
+    }
+
+    public static void playSound(String event, float volume, float pitch) {
+        playSound(SoundEvent.of(Identifier.of(event)), volume, pitch);
     }
 
     public static void sendMessage(String message) {

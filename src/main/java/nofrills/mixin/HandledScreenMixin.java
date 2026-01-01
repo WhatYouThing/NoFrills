@@ -72,7 +72,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
             ci.cancel();
             return;
         }
-        if (eventBus.post(new SlotClickEvent(slot, slot != null ? slot.id : slotId, button, actionType, this.title.getString(), this.handler)).isCancelled()) {
+        if (eventBus.post(new SlotClickEvent(slot, slotId, button, actionType, this.title.getString(), this.handler)).isCancelled()) {
             ci.cancel();
         }
     }

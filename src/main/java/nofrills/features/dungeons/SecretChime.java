@@ -11,16 +11,13 @@ import net.minecraft.command.BlockDataObject;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.passive.BatEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
-import net.minecraft.network.packet.s2c.play.ItemPickupAnimationS2CPacket;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingDouble;
 import nofrills.config.SettingString;
 import nofrills.events.*;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
 
@@ -68,23 +65,12 @@ public class SecretChime {
             "TREASURE_TALISMAN",
             "REVIVE_STONE"
     );
-    private static final EntityCache batCache = new EntityCache();
+    private static final EntityCache entityCache = new EntityCache();
     private static final int[] essenceUUID = new int[]{-520885975, -2036449846, -1794878266, 1726902051};
-    private static int lastItemId = -1;
     private static boolean clickedThisTick = false;
 
     private static void playSound(SettingString sound, SettingDouble volume, SettingDouble pitch) {
-        Utils.playSound(SoundEvent.of(Identifier.of(sound.value())), volume.valueFloat(), pitch.valueFloat());
-    }
-
-    private static boolean isSecretItem(int id, boolean distCheck) {
-        return mc.world != null && mc.player != null && id != lastItemId && mc.world.getEntityById(id) instanceof ItemEntity item
-                && secretItems.contains(Utils.getMarketId(item.getStack())) && (!distCheck || mc.player.getEyePos().distanceTo(item.getEntityPos()) <= 10.0);
-    }
-
-    private static boolean isSecretBat(int id) {
-        return mc.world != null && mc.player != null && mc.world.getEntityById(id) instanceof BatEntity bat
-                && batCache.has(bat) && mc.player.getEyePos().distanceTo(bat.getEntityPos()) <= 10.0;
+        Utils.playSound(sound.value(), volume.valueFloat(), pitch.valueFloat());
     }
 
     private static boolean isEssence(BlockState state, BlockPos pos) {
@@ -102,37 +88,12 @@ public class SecretChime {
         return false;
     }
 
-    private static void playItemChime(int id) {
+    private static void playItemChime() {
         playSound(itemsSound, itemsVolume, itemsPitch);
-        lastItemId = id;
     }
 
     private static void playBatChime() {
         playSound(batSound, batVolume, batPitch);
-        batCache.removeDead();
-    }
-
-    @EventHandler
-    private static void onPacket(ReceivePacketEvent event) {
-        if (instance.isActive() && Utils.isInDungeons()) {
-            if (event.packet instanceof EntitiesDestroyS2CPacket packet) {
-                for (int id : packet.getEntityIds()) {
-                    if (isSecretItem(id, true) && itemsToggle.value()) {
-                        playItemChime(id);
-                        break;
-                    }
-                    if (isSecretBat(id) && batToggle.value()) {
-                        playBatChime();
-                        break;
-                    }
-                }
-            }
-            if (event.packet instanceof ItemPickupAnimationS2CPacket packet) {
-                if (isSecretItem(packet.getEntityId(), false) && itemsToggle.value()) {
-                    playItemChime(packet.getEntityId());
-                }
-            }
-        }
     }
 
     @EventHandler
@@ -155,11 +116,33 @@ public class SecretChime {
 
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && event.entity instanceof BatEntity bat && batToggle.value()) {
-            if (SecretBatHighlight.isSecretBat(bat)) {
-                batCache.add(bat);
+        if (instance.isActive() && Utils.isInDungeons()) {
+            if (itemsToggle.value() && event.entity instanceof ItemEntity item) {
+                if (secretItems.contains(Utils.getMarketId(item.getStack()))) {
+                    entityCache.add(item);
+                }
+                if (!item.isAlive() && entityCache.has(item)) {
+                    playItemChime();
+                }
             }
-            if (!bat.isAlive() && isSecretBat(bat.getId())) {
+            if (batToggle.value() && event.entity instanceof BatEntity bat) {
+                if (DungeonUtil.isSecretBat(bat)) {
+                    entityCache.add(bat);
+                }
+                if (!bat.isAlive() && mc.player != null && mc.player.getEyePos().distanceTo(bat.getEntityPos()) <= 10.0) {
+                    playBatChime();
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onRemoved(EntityRemovedEvent event) {
+        if (instance.isActive() && Utils.isInDungeons()) {
+            if (itemsToggle.value() && event.entity instanceof ItemEntity && entityCache.removeDead().has(event.entity)) {
+                playItemChime();
+            }
+            if (batToggle.value() && event.entity instanceof BatEntity && entityCache.removeDead().has(event.entity)) {
                 playBatChime();
             }
         }
@@ -175,7 +158,6 @@ public class SecretChime {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         clickedThisTick = false;
-        lastItemId = -1;
-        batCache.clear();
+        entityCache.clear();
     }
 }

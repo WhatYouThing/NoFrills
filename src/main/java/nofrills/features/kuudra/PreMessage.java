@@ -10,8 +10,6 @@ import nofrills.events.ServerTickEvent;
 import nofrills.misc.KuudraUtil;
 import nofrills.misc.Utils;
 
-import static nofrills.Main.mc;
-
 public class PreMessage {
     public static final Feature instance = new Feature("preMessage");
 
@@ -19,19 +17,13 @@ public class PreMessage {
 
     @EventHandler
     private static void onTick(ServerTickEvent event) {
-        if (instance.isActive() && Utils.isInKuudra() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.phase.Collect)) {
+        if (instance.isActive() && Utils.isInKuudra() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
             if (missingTicks > 0) {
                 missingTicks--;
                 if (missingTicks == 0) {
-                    KuudraUtil.PickupSpot preSpot = null;
-                    Vec3d selfPos = mc.player.getEntityPos();
-                    for (KuudraUtil.PickupSpot pickupSpot : KuudraUtil.pickupSpots) {
-                        if (pickupSpot.spot.distanceTo(selfPos) < pickupSpot.playerDist) {
-                            preSpot = pickupSpot;
-                            Utils.info("§eYour Pre: " + pickupSpot.name);
-                        }
-                    }
+                    KuudraUtil.PickupSpot preSpot = KuudraUtil.getPreSpot();
                     if (preSpot != null) {
+                        Utils.infoFormat("§eYour Pre: {}", preSpot.name);
                         boolean preFound = false, secondaryFound = false;
                         for (Entity ent : Utils.getEntities()) {
                             if (ent instanceof GiantEntity) {

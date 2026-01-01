@@ -307,16 +307,6 @@ public class Utils {
         return new ArrayList<>();
     }
 
-    public static Entity getEntityById(int id) {
-        if (mc.world != null) {
-            SimpleEntityLookup<Entity> lookup = (SimpleEntityLookup<Entity>) mc.world.entityManager.getLookup();
-            if (id < lookup.index.size()) {
-                return lookup.index.get(id);
-            }
-        }
-        return null;
-    }
-
     public static List<Entity> getOtherEntities(Entity except, Box box, Predicate<? super Entity> filter) {
         List<Entity> entities = new ArrayList<>();
         for (Entity ent : getEntities()) {

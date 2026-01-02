@@ -18,10 +18,7 @@ import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.ScreenOpenEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.SlotUpdateEvent;
+import nofrills.events.*;
 import nofrills.features.general.PriceTooltips;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.Settings;
@@ -346,6 +343,13 @@ public class ShardTracker {
 
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
+        if (instance.isActive()) {
+            refreshDisplay();
+        }
+    }
+
+    @EventHandler
+    private static void onScreenClose(ScreenCloseEvent event) {
         if (instance.isActive()) {
             refreshDisplay();
         }

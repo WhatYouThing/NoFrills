@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
+import nofrills.events.ScreenCloseEvent;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.dungeons.LeapOverlay;
@@ -45,6 +46,13 @@ public class NoCursorReset {
     private static void onScreen(ScreenOpenEvent event) {
         if (isActive(event.screen)) {
             if (cursorX >= 0.0 && cursorY >= 0.0) GLFW.glfwSetCursorPos(mc.getWindow().getHandle(), cursorX, cursorY);
+            startTicking();
+        }
+    }
+
+    @EventHandler
+    private static void onScreenClose(ScreenCloseEvent event) {
+        if (instance.isActive()) {
             startTicking();
         }
     }

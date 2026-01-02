@@ -217,12 +217,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Item Protection", ItemProtection.instance, "Prevent yourself from accidentally dropping and/or selling items.", new Settings(List.of(
                                 new Settings.Keybind("UUID Protect Key", ItemProtection.uuidKey, "The keybind to protect a specific item by UUID."),
                                 new Settings.Keybind("ID Protect Key", ItemProtection.skyblockIdKey, "The keybind to protect a specific item by Skyblock ID."),
-                                new Settings.Toggle("Protect UUID", ItemProtection.protectUUID, "Protect items protected by UUID."),
-                                new Settings.Toggle("Protect ID", ItemProtection.protectSkyblockId, "Protect items protected by Skyblock ID."),
-                                new Settings.Toggle("Protect Starred", ItemProtection.protectStarred, "Protect any Dungeon item with stars on it."),
-                                new Settings.Toggle("Protect Rarity Upgraded", ItemProtection.protectRarityUpgraded, "Protect any item that is Recombobulated."),
-                                new Settings.Toggle("Protect Value", ItemProtection.protectValue, "Protect any item that has a high enough NPC/Auction/Bazaar value."),
-                                new Settings.DoubleInput("Minimum Value", ItemProtection.protectValueMin, "The minimum item value.")
+                                new Settings.Toggle("Protect By UUID", ItemProtection.protectUUID, "Protects items that you have protected by UUID."),
+                                new Settings.Toggle("Protect By ID", ItemProtection.protectSkyblockId, "Protects items that you have protected by Skyblock ID."),
+                                new Settings.Toggle("Protect Starred", ItemProtection.protectStarred, "Protects any item with Dungeon stars on it."),
+                                new Settings.Toggle("Protect Rarity Upgraded", ItemProtection.protectRarityUpgraded, "Protects any item that is Recombobulated."),
+                                new Settings.Toggle("Protect By Value", ItemProtection.protectValue, "Protects any item that has a high enough NPC/Auction/Bazaar value."),
+                                new Settings.DoubleInput("Minimum Value", ItemProtection.protectValueMin, "The minimum item value for an item to be protected by value.")
                         )))
                 )),
                 new Category("Tweaks", List.of(

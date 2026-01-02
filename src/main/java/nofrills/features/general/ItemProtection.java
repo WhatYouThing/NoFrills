@@ -82,6 +82,11 @@ public class ItemProtection {
         return ProtectType.None;
     }
 
+    private static boolean isSellStack(ItemStack stack) {
+        return (stack.getItem().equals(Items.HOPPER) && Utils.toPlain(stack.getName()).equals("Sell Item"))
+                || Utils.getLoreLines(stack).contains("Click to buyback!");
+    }
+
     private static void addUUID(ItemStack stack) {
         NbtCompound customData = Utils.getCustomData(stack);
         if (customData == null) {
@@ -172,14 +177,8 @@ public class ItemProtection {
 
     @EventHandler
     private static void onSlot(SlotUpdateEvent event) {
-        if (instance.isActive() && !event.isInventory && !event.stack.isEmpty()) {
-            if (event.stack.getItem().equals(Items.HOPPER) && Utils.toPlain(event.stack.getName()).equals("Sell Item")) {
-                isSellGUI = true;
-                return;
-            }
-            if (Utils.getLoreLines(event.stack).contains("Click to buyback!")) {
-                isSellGUI = true;
-            }
+        if (instance.isActive() && !event.isInventory && !event.stack.isEmpty() && isSellStack(event.stack)) {
+            isSellGUI = true;
         }
     }
 

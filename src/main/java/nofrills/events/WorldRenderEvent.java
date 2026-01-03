@@ -66,10 +66,11 @@ public class WorldRenderEvent {
     }
 
     public void drawTracer(Vec3d pos, float width, RenderColor color) {
-        GizmoDrawing.line(this.state.cameraRenderState.pos, pos, color.argb, width).ignoreOcclusion();
+        Vec3d point = this.camera.getCameraPos().add(Vec3d.fromPolar(this.camera.getPitch(), this.camera.getYaw()));
+        GizmoDrawing.line(point, pos, color.argb, width);
     }
 
     public void drawTracer(Vec3d pos, RenderColor color) {
-        this.drawTracer(pos, 3.0f, color);
+        this.drawTracer(pos, 4.0f, color);
     }
 }

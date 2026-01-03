@@ -74,6 +74,5 @@ public final class Rendering {
                 .layeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
                 .translucent()
                 .build());
-
     }
 }

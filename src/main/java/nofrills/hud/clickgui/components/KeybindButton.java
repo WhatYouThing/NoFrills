@@ -5,7 +5,7 @@ import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.util.EventSource;
 import io.wispforest.owo.util.EventStream;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.Text;
+import net.minecraft.text.MutableText;
 import nofrills.misc.Rendering;
 import org.lwjgl.glfw.GLFW;
 
@@ -18,12 +18,12 @@ public class KeybindButton extends ButtonComponent {
             GLFW.GLFW_MOUSE_BUTTON_LEFT,
             GLFW.GLFW_KEY_ESCAPE
     );
-    public Text unbound = Text.literal("Not Bound").withColor(0xffffff);
-    public Text binding = Text.literal("Press Key...").withColor(0xffffff);
+    public MutableText unbound = net.minecraft.text.Text.literal("Not Bound").withColor(0xffffff);
+    public MutableText binding = net.minecraft.text.Text.literal("Press Key...").withColor(0xffffff);
     public boolean isBinding = false;
 
     public KeybindButton() {
-        super(Text.empty(), button -> {
+        super(net.minecraft.text.Text.empty(), button -> {
         });
         this.onPress(button -> {
             if (this.isBinding) {
@@ -41,7 +41,7 @@ public class KeybindButton extends ButtonComponent {
         this.setMessage(this.unbound);
     }
 
-    public Text getKeyLabel(int keycode) {
+    public net.minecraft.text.Text getKeyLabel(int keycode) {
         InputUtil.Key input = InputUtil.Type.KEYSYM.createFromCode(keycode);
         if (input.getLocalizedText().getString().equals(input.getTranslationKey())) { // fall back to a mouse key if the keyboard key has no translation
             return InputUtil.Type.MOUSE.createFromCode(keycode).getLocalizedText();

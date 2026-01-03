@@ -3,10 +3,10 @@ package nofrills.hud.clickgui;
 import com.google.common.collect.Lists;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.input.KeyInput;
@@ -51,7 +51,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, Containers::verticalFlow);
+        return OwoUIAdapter.create(this, UIContainers::verticalFlow);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     @Override
     protected void build(FlowLayout root) {
         root.surface(Surface.VANILLA_TRANSLUCENT);
-        FlowLayout parent = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+        FlowLayout parent = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
         this.categories = Lists.newArrayList(
                 new Category("General", List.of(
                         new Module("Auto Sprint", AutoSprint.instance, "Essentially Toggle Sprint, but always active.", new Settings(List.of(
@@ -636,10 +636,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         for (Category category : this.categories) {
             parent.child(category);
         }
-        this.mainScroll = Containers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
+        this.mainScroll = UIContainers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
         this.mainScroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
         root.child(this.mainScroll);
-        ButtonComponent hudEditorButton = Components.button(Text.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
+        ButtonComponent hudEditorButton = UIComponents.button(Text.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
         hudEditorButton.margins(Insets.of(0, 3, 0, 3));
         hudEditorButton.positioning(Positioning.relative(100, 100));
         hudEditorButton.renderer((context, button, delta) -> {
@@ -671,7 +671,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         }
                         if (feature.options != null) {
                             for (FlowLayout setting : feature.options.settings) {
-                                for (Component child : setting.children()) {
+                                for (UIComponent child : setting.children()) {
                                     if (child instanceof PlainLabel label) {
                                         if (matchSearch(label.getText(), value) || matchSearch(label.getTooltip(), value)) {
                                             return false;

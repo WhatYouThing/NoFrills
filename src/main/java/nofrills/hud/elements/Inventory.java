@@ -1,11 +1,11 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.ItemComponent;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.Insets;
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
 import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
@@ -19,11 +19,11 @@ public class Inventory extends HudElement {
 
     public Inventory() {
         super(new Feature("inventoryElement"), "Inventory Element");
-        this.content = Containers.verticalFlow(Sizing.fixed(162), Sizing.fixed(54));
+        this.content = UIContainers.verticalFlow(Sizing.fixed(162), Sizing.fixed(54));
         for (int i = 0; i <= 2; i++) {
-            FlowLayout container = Containers.horizontalFlow(Sizing.fixed(162), Sizing.fixed(18));
+            FlowLayout container = UIContainers.horizontalFlow(Sizing.fixed(162), Sizing.fixed(18));
             for (int j = 0; j <= 8; j++) {
-                ItemComponent component = Components.item(ItemStack.EMPTY);
+                ItemComponent component = UIComponents.item(ItemStack.EMPTY);
                 component.showOverlay(true).margins(Insets.of(1));
                 container.child(component);
             }
@@ -35,7 +35,7 @@ public class Inventory extends HudElement {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (this.shouldRender()) {
             super.draw(context, mouseX, mouseY, partialTicks, delta);
         }

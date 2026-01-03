@@ -89,7 +89,7 @@ public abstract class MinecraftClientMixin {
         }
     }
 
-    @Inject(method = "doAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;attackBlock(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"), cancellable = true)
+    @Inject(method = "doAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;attackBlock(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;)Z"))
     private void onAttackBlock(CallbackInfoReturnable<Boolean> cir, @Local BlockHitResult blockHitResult, @Local BlockPos blockPos) {
         eventBus.post(new AttackBlockEvent(blockHitResult, blockPos));
     }
@@ -126,7 +126,7 @@ public abstract class MinecraftClientMixin {
     private void onAfterFocusChanged(boolean focused, CallbackInfo ci) {
         if (this.soundManager != null && UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.muteSounds.value()) {
             for (SoundCategory category : SoundCategory.values()) {
-                this.soundManager.updateSoundVolume(category);
+                this.soundManager.refreshSoundVolumes(category);
             }
         }
     }

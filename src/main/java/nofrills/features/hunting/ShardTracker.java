@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
@@ -451,7 +451,7 @@ public class ShardTracker {
             this.inputSource.margins(Insets.of(1, 0, 0, 0));
             this.inputSource.sizing(Sizing.fixed(48), Sizing.fixed(18));
             this.inputSource.tooltip(Text.literal("The source that this shard is obtained from. Click to rotate."));
-            this.delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            this.delete = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("shards").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });

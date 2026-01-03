@@ -4,9 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
@@ -219,11 +219,11 @@ public class ChatRules {
                 rule.enabled = toggle;
                 this.save();
             });
-            ButtonComponent editButton = Components.button(Text.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildRuleSettings()));
+            ButtonComponent editButton = UIComponents.button(Text.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildRuleSettings()));
             editButton.verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             editButton.horizontalSizing(Sizing.fixed(49));
             editButton.renderer(Settings.buttonRendererWhite);
-            ButtonComponent delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            ButtonComponent delete = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("rules").getAsJsonArray().remove(this.index));
                 Config.computeHash();
                 mc.setScreen(buildSettings());
@@ -247,7 +247,7 @@ public class ChatRules {
         }
 
         public FlowLayout buildMatchTextSetting() {
-            FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Text.literal("Match Text"));
@@ -265,7 +265,7 @@ public class ChatRules {
         }
 
         public FlowLayout buildMatchTypeSetting() {
-            FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Text.literal("Match Type"));
@@ -283,7 +283,7 @@ public class ChatRules {
         }
 
         public FlowLayout buildCaseSensitiveSetting() {
-            FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Text.literal("Case Sensitive"));
@@ -300,7 +300,7 @@ public class ChatRules {
         }
 
         public FlowLayout buildCancelSetting() {
-            FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Text.literal("Cancel Message"));
@@ -317,7 +317,7 @@ public class ChatRules {
         }
 
         public FlowLayout buildTitleSetting() {
-            FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Text.literal("Title"));
@@ -368,7 +368,7 @@ public class ChatRules {
         }
 
         public FlowLayout buildSoundSetting() {
-            FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Text.literal("Sound"));

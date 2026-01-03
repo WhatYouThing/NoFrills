@@ -1,12 +1,12 @@
 package nofrills.hud.clickgui;
 
-import io.wispforest.owo.ui.base.BaseComponent;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
+import io.wispforest.owo.ui.base.BaseUIComponent;
 import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.input.KeyInput;
@@ -48,7 +48,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     }
 
     private static ButtonComponent buildResetButton(Consumer<ButtonComponent> onPress) {
-        ButtonComponent button = Components.button(Text.literal("Reset").withColor(0xffffff), onPress);
+        ButtonComponent button = UIComponents.button(Text.literal("Reset").withColor(0xffffff), onPress);
         button.positioning(Positioning.relative(100, 0));
         button.renderer((context, btn, delta) -> {
             context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
@@ -61,9 +61,9 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
-    private static int getSettingsHeight(List<Component> children) {
+    private static int getSettingsHeight(List<UIComponent> children) {
         int height = 0;
-        for (Component child : children) {
+        for (UIComponent child : children) {
             int childHeight = switch (child) {
                 case ColorPicker picker -> picker.sliderList.size() == 4 ? 90 : 70;
                 case Description description -> 10 + ((PlainLabel) description.children().getLast()).getTextHeight();
@@ -78,7 +78,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     private static boolean isBinding(List<FlowLayout> settings, int button) {
         for (FlowLayout setting : settings) {
-            for (Component child : setting.children()) {
+            for (UIComponent child : setting.children()) {
                 if (findKeybindButton(child, button)) {
                     return true;
                 }
@@ -87,14 +87,14 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         return false;
     }
 
-    private static boolean findKeybindButton(Component child, int button) {
+    private static boolean findKeybindButton(UIComponent child, int button) {
         if (child instanceof KeybindButton keybind) {
             if (keybind.isBinding) {
                 keybind.bind(button);
                 return true;
             }
         } else if (child instanceof FlowLayout layout) {
-            for (Component layoutChild : layout.children()) {
+            for (UIComponent layoutChild : layout.children()) {
                 if (findKeybindButton(layoutChild, button)) {
                     return true;
                 }
@@ -131,17 +131,17 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, Containers::verticalFlow);
+        return OwoUIAdapter.create(this, UIContainers::verticalFlow);
     }
 
     @Override
     protected void build(FlowLayout root) {
         root.surface(Surface.VANILLA_TRANSLUCENT);
         root.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
-        FlowLayout parent = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        FlowLayout parent = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
         parent.padding(Insets.of(5));
         Color textColor = Color.ofArgb(0xffffffff);
-        FlowLayout settings = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        FlowLayout settings = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
         settings.surface(Surface.flat(0xaa000000)).alignment(HorizontalAlignment.LEFT, VerticalAlignment.CENTER);
         int width = 300;
         List<FlowLayout> optionsMutable = new ArrayList<>(this.settings);
@@ -149,13 +149,13 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             option.horizontalSizing(Sizing.fixed(width));
             settings.child(option);
         }
-        this.scroll = Containers.verticalScroll(Sizing.content(), Sizing.fixed(getSettingsHeight(settings.children())), settings);
+        this.scroll = UIContainers.verticalScroll(Sizing.content(), Sizing.fixed(getSettingsHeight(settings.children())), settings);
         this.scroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
-        BaseComponent label = new PlainLabel(this.title)
+        BaseUIComponent label = new PlainLabel(this.title)
                 .color(textColor)
                 .horizontalTextAlignment(HorizontalAlignment.CENTER)
                 .verticalTextAlignment(VerticalAlignment.CENTER);
-        ParentComponent header = Containers.verticalFlow(Sizing.fixed(width), Sizing.content())
+        ParentUIComponent header = UIContainers.verticalFlow(Sizing.fixed(width), Sizing.content())
                 .child(label)
                 .alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
                 .padding(Insets.of(3))
@@ -286,7 +286,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             label.tooltip(Text.literal(tooltip));
             dropdown.surface(Surface.flat(0xff101010).and(Surface.outline(0xff5ca0bf)));
             for (T value : this.setting.values) {
-                ButtonComponent button = Components.button(Text.of(value.name()), btn -> {
+                ButtonComponent button = UIComponents.button(Text.of(value.name()), btn -> {
                     dropdown.setLabel(value.name());
                     this.setting.set(value);
                     dropdown.toggleExpansion();
@@ -318,15 +318,15 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             PlainLabel label = new PlainLabel(Text.literal(name).withColor(0xffffff));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
-            FlowLayout colorDisplay = Containers.verticalFlow(Sizing.fixed(20), Sizing.fixed(20));
+            FlowLayout colorDisplay = UIContainers.verticalFlow(Sizing.fixed(20), Sizing.fixed(20));
             colorDisplay.surface(Surface.flat(this.setting.value().argb)).margins(Insets.right(10));
-            FlowLayout colorSliders = Containers.verticalFlow(Sizing.content(), Sizing.content());
+            FlowLayout colorSliders = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
             for (int i = 0; i <= 3; i++) {
                 if (i == 3 && !alpha) {
                     continue;
                 }
                 int id = i;
-                FlowLayout row = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+                FlowLayout row = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
                 PlainLabel colorLabel = new PlainLabel(Text.literal(getColorLabel(id)).withColor(0xffffff));
                 colorLabel.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
                 FlatTextbox text = new FlatTextbox(Sizing.fixed(30));
@@ -492,7 +492,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.CENTER);
-            this.button = Components.button(Text.literal(name).withColor(0xffffff), onPress);
+            this.button = UIComponents.button(Text.literal(name).withColor(0xffffff), onPress);
             this.button.horizontalSizing(Sizing.fixed(290));
             this.button.renderer(buttonRenderer);
             this.child(this.button);

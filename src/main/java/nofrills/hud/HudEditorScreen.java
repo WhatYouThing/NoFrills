@@ -1,8 +1,8 @@
 package nofrills.hud;
 
 import io.wispforest.owo.ui.base.BaseOwoScreen;
-import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
@@ -26,7 +26,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, Containers::verticalFlow);
+        return OwoUIAdapter.create(this, UIContainers::verticalFlow);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
         if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && !clicked) {
             List<FlowLayout> list = new ArrayList<>();
             for (HudElement element : HudManager.getElements()) {
-                FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+                FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
                 layout.padding(Insets.of(5));
                 PlainLabel label = new PlainLabel(element.elementLabel);
                 label.tooltip(element.elementDesc);

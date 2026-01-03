@@ -1,6 +1,6 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import nofrills.config.Feature;
@@ -24,7 +24,7 @@ public class LagMeter extends SimpleTextElement {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
         } else if (!this.isEditingHud()) {

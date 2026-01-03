@@ -1,9 +1,9 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.component.Components;
 import io.wispforest.owo.ui.component.ItemComponent;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -35,7 +35,7 @@ public class Armor extends HudElement {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (this.shouldRender()) {
             if (!this.lastAlign.equals(align.value())) {
                 this.layout.clearChildren();
@@ -50,11 +50,11 @@ public class Armor extends HudElement {
 
     private FlowLayout getAlignment(Alignment alignment) {
         FlowLayout container = switch (alignment) {
-            case Horizontal -> Containers.horizontalFlow(Sizing.fixed(72), Sizing.fixed(18));
-            case Vertical -> Containers.verticalFlow(Sizing.fixed(18), Sizing.fixed(72));
+            case Horizontal -> UIContainers.horizontalFlow(Sizing.fixed(72), Sizing.fixed(18));
+            case Vertical -> UIContainers.verticalFlow(Sizing.fixed(18), Sizing.fixed(72));
         };
         for (int i = 0; i <= 3; i++) {
-            ItemComponent component = Components.item(ItemStack.EMPTY);
+            ItemComponent component = UIComponents.item(ItemStack.EMPTY);
             component.showOverlay(true).margins(Insets.of(1));
             container.child(component);
         }
@@ -78,7 +78,7 @@ public class Armor extends HudElement {
 
     public void updateArmor() {
         List<ItemStack> armor = this.getArmorItems();
-        List<Component> children = this.content.children();
+        List<UIComponent> children = this.content.children();
         for (int i = 0; i <= 3; i++) {
             ((ItemComponent) children.get(i)).stack(armor.get(i));
         }

@@ -1,10 +1,7 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.hud.ChatHud;
-import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
@@ -12,9 +9,6 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static nofrills.Main.mc;
 
@@ -30,10 +24,13 @@ public class ChatTweaks {
     public static final SettingInt lines = new SettingInt(1000, "lines", instance);
 
     private static String getHoveredMsg() {
+        /*
         ChatHud chatHud = mc.inGameHud.getChatHud();
-        double x = chatHud.toChatLineX(mc.mouse.getScaledX(mc.getWindow()));
-        double y = chatHud.toChatLineY(mc.mouse.getScaledY(mc.getWindow()));
-        int i = chatHud.getMessageLineIndex(x, y);
+        DrawnTextConsumer.ClickHandler clickHandler = new DrawnTextConsumer.ClickHandler(mc.textRenderer,
+                (int) mc.mouse.getScaledX(mc.getWindow()),
+                (int) mc.mouse.getScaledY(mc.getWindow())
+        );
+
         if (i >= 0 && i < chatHud.visibleMessages.size()) {
             StringBuilder builder = new StringBuilder();
             List<ChatHudLine.Visible> lines = new ArrayList<>();
@@ -55,6 +52,7 @@ public class ChatTweaks {
             }
             return Formatting.strip(builder.toString());
         }
+        */
         return "";
     }
 

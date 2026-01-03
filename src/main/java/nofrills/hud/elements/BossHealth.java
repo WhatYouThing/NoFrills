@@ -1,6 +1,6 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.mob.MagmaCubeEntity;
@@ -36,7 +36,7 @@ public class BossHealth extends SimpleTextElement {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
         } else if (!this.isEditingHud() && !this.visible) {

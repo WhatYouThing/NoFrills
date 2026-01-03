@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id 'fabric-loom' version '1.14-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -14,6 +14,11 @@ repositories {
     maven {
         name = "wispforest-maven"
         url = 'https://maven.wispforest.io/releases/'
+    }
+
+    maven {
+        name = "jitpack-maven"
+        url = 'https://jitpack.io'
     }
 
     maven {
@@ -43,7 +48,7 @@ dependencies {
     include "io.wispforest:owo-lib:${project.owolib_version}"
     modImplementation("de.topobyte:jama:${project.jama_version}")
     include "de.topobyte:jama:${project.jama_version}"
-    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
+    //modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
 }
 
 loom {

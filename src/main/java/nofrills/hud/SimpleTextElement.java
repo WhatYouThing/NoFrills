@@ -1,8 +1,8 @@
 package nofrills.hud;
 
 import io.wispforest.owo.ui.component.LabelComponent;
-import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
@@ -25,7 +25,7 @@ public class SimpleTextElement extends HudElement {
     public LabelComponent label;
 
     public SimpleTextElement(MutableText text, Feature instance, String label) {
-        super(Containers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
+        super(UIContainers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
         this.textAlignment = new SettingEnum<>(TextAlignment.Left, TextAlignment.class, "align", instance);
         this.textShadow = new SettingBool(true, "shadow", instance);
         this.text = text.withColor(this.getTextColor());

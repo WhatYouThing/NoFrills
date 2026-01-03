@@ -4,9 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Positioning;
@@ -150,7 +150,7 @@ public class CustomKeybinds {
             this.input.tooltip(Text.literal("The message/command that this keybind will send."));
             this.input.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("command", value)));
 
-            this.options = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            this.options = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
 
             this.keybind = new KeybindButton();
             this.keybind.verticalSizing(Sizing.fixed(18)).horizontalSizing(Sizing.fixed(100)).margins(Insets.of(3, 0, 1, 0));
@@ -170,7 +170,7 @@ public class CustomKeybinds {
             this.toggle.tooltip(Text.literal("The toggle for the keybind, allows you to disable it without having to delete it."));
             this.toggle.margins(Insets.of(3, 0, 5, 0));
 
-            this.delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            this.delete = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("binds").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });

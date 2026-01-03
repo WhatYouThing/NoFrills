@@ -1,7 +1,7 @@
 package nofrills.hud.clickgui.components;
 
 import io.wispforest.owo.ui.component.LabelComponent;
-import io.wispforest.owo.ui.core.Component;
+import io.wispforest.owo.ui.core.UIComponent;
 import net.minecraft.client.gui.Click;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -25,7 +25,7 @@ public class PlainLabel extends LabelComponent {
     }
 
     @Override
-    public Component tooltip(Text tooltip) {
+    public UIComponent tooltip(Text tooltip) {
         this.plainTooltip = tooltip.getString().replaceAll("\n", " ");
         return super.tooltip(tooltip);
     }

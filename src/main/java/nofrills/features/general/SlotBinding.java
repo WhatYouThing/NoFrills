@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
@@ -327,10 +327,10 @@ public class SlotBinding {
             input.tooltip(Text.literal("The name of this slot binding preset."));
             input.text(this.getData(data.value()).get("name").getAsString());
             input.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("name", value)));
-            ButtonComponent loadButton = Components.button(Text.literal("Load").withColor(0xffffff), button -> loadPreset(this.getData(data.value())));
+            ButtonComponent loadButton = UIComponents.button(Text.literal("Load").withColor(0xffffff), button -> loadPreset(this.getData(data.value())));
             loadButton.horizontalSizing(Sizing.fixed(42)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             loadButton.renderer(Settings.buttonRenderer);
-            ButtonComponent deleteButton = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            ButtonComponent deleteButton = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("presets").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });

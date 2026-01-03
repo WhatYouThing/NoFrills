@@ -1,9 +1,9 @@
 package nofrills.hud.clickgui;
 
-import io.wispforest.owo.ui.base.BaseComponent;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.base.BaseUIComponent;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.text.Text;
 import nofrills.hud.clickgui.components.PlainLabel;
@@ -24,7 +24,7 @@ public class Category extends FlowLayout {
         this.margins(Insets.of(5, 0, 3, 0));
         Color color = Color.ofArgb(0xff5ca0bf);
         Color textColor = Color.ofArgb(0xffffffff);
-        FlowLayout modules = Containers.verticalFlow(Sizing.content(), Sizing.content());
+        FlowLayout modules = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
         this.features = new ArrayList<>(children);
         for (Module module : this.features) {
             this.categoryWidth = Math.max(this.categoryWidth, mc.textRenderer.getWidth(module.activeText.getString()) + 10);
@@ -34,14 +34,14 @@ public class Category extends FlowLayout {
             module.horizontalSizing(Sizing.fixed(this.categoryWidth));
             modules.child(module);
         }
-        ScrollContainer<FlowLayout> scroll = Containers.verticalScroll(Sizing.content(), Sizing.fill(75), modules)
+        ScrollContainer<FlowLayout> scroll = UIContainers.verticalScroll(Sizing.content(), Sizing.fill(75), modules)
                 .scrollbarThiccness(2)
                 .scrollbar(ScrollContainer.Scrollbar.flat(color));
-        BaseComponent label = new PlainLabel(Text.literal(title))
+        BaseUIComponent label = new PlainLabel(Text.literal(title))
                 .color(textColor)
                 .horizontalTextAlignment(HorizontalAlignment.CENTER)
                 .verticalTextAlignment(VerticalAlignment.CENTER);
-        ParentComponent header = Containers.verticalFlow(Sizing.fixed(this.categoryWidth), Sizing.content())
+        ParentUIComponent header = UIContainers.verticalFlow(Sizing.fixed(this.categoryWidth), Sizing.content())
                 .child(label)
                 .alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)
                 .padding(Insets.of(3))

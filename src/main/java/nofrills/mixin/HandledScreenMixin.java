@@ -155,7 +155,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     }
 
     @Inject(method = "drawSlot", at = @At("HEAD"))
-    private void onRenderSlot(DrawContext context, Slot slot, CallbackInfo ci) {
+    private void onRenderSlot(DrawContext context, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         if (SlotOptions.hasBackground(slot)) {
             context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackground(slot).argb);
         }

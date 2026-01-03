@@ -28,8 +28,8 @@ public abstract class FogRendererMixin {
     @Final
     private static List<FogModifier> FOG_MODIFIERS;
 
-    @Inject(method = "applyFog(Lnet/minecraft/client/render/Camera;IZLnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;", at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/fog/FogData;renderDistanceEnd:F", shift = At.Shift.AFTER, ordinal = 0))
-    private void onGetFocused(Camera camera, int viewDistance, boolean thick, RenderTickCounter tickCounter, float skyDarkness, ClientWorld world, CallbackInfoReturnable<Vector4f> cir, @Local LocalRef<FogData> fogRef) {
+    @Inject(method = "applyFog(Lnet/minecraft/client/render/Camera;ILnet/minecraft/client/render/RenderTickCounter;FLnet/minecraft/client/world/ClientWorld;)Lorg/joml/Vector4f;", at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/fog/FogData;renderDistanceEnd:F", shift = At.Shift.AFTER, ordinal = 0))
+    private void onGetFocused(Camera camera, int viewDistance, RenderTickCounter renderTickCounter, float f, ClientWorld clientWorld, CallbackInfoReturnable<Vector4f> cir, @Local LocalRef<FogData> fogRef) {
         if (NoRender.instance.isActive() && NoRender.fog.value()) {
             CameraSubmersionType type = camera.getSubmersionType();
             Entity entity = camera.getFocusedEntity();

@@ -1,8 +1,8 @@
 package nofrills.hud;
 
-import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.DraggableContainer;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.util.Window;
@@ -59,11 +59,11 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     public HudElement(Feature instance, String label) {
-        this(Containers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
+        this(UIContainers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
     }
 
     @Override
-    protected void drawChildren(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta, List<? extends Component> children) {
+    protected void drawChildren(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta, List<? extends UIComponent> children) {
         try {
             super.drawChildren(context, mouseX, mouseY, partialTicks, delta, children);
         } catch (Exception ignored) {
@@ -97,7 +97,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     @Override
-    public Component childAt(int x, int y) {
+    public UIComponent childAt(int x, int y) {
         if (this.isInBoundingBox(x, y)) { // gets rid of the forehead
             return this;
         }

@@ -177,12 +177,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Description("Usage", "Run the \"/nf partyCommands\" command to see more information."),
                                 new Settings.TextInput("Prefixes", PartyCommands.prefixes, "List of valid prefixes for these commands, separated by space."),
                                 new Settings.Toggle("Self Commands", PartyCommands.self, "Allows you to trigger your own party commands and grants you whitelisted status, not recommended."),
-                                new Settings.Dropdown<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommand: !warp"),
-                                new Settings.Dropdown<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves to party leader on demand.\n\nCommand: !pt"),
+                                new Settings.Dropdown<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommands: !warp | !w"),
+                                new Settings.Dropdown<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves to party leader on demand.\n\nCommands: !ptme | !pt"),
                                 new Settings.Dropdown<>("All Invite", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand.\n\nCommand: !allinv"),
                                 new Settings.Dropdown<>("Downtime", PartyCommands.downtime, "Allows party members to schedule a downtime reminder for the end of your Kuudra/Dungeons run.\nThis command will also pause Auto Requeue if you have it enabled.\n\nCommand: !dt"),
                                 new Settings.Dropdown<>("Instance Queue", PartyCommands.queue, Utils.format("Allows party members to queue for any instance on demand.\n\nCommand List: {}", PartyCommands.listInstancesFormatted())),
-                                new Settings.Dropdown<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords")
+                                new Settings.Dropdown<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords"),
+                                new Settings.Dropdown<>("Kick", PartyCommands.kick, "Allows party members to kick specific players on demand.\n\nCommands: !kick | !k")
                         ))),
                         new Module("Viewmodel", Viewmodel.instance, "Easily customize the appearance of your held item.", new Settings(List.of(
                                 new Settings.Toggle("No Haste", Viewmodel.noHaste, "Prevents Haste and Mining Fatigue from affecting your swing speed."),

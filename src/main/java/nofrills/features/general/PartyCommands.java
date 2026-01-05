@@ -143,28 +143,22 @@ public class PartyCommands {
         }
 
         public boolean process(String author, String content, boolean whitelisted) {
-            if (whitelisted || this.behavior.value().equals(Behavior.Automatic)) {
-                this.onWhitelisted(author, content);
+            Behavior value = this.behavior.value();
+            if (whitelisted || value.equals(Behavior.Automatic)) {
+                this.onAutomatic(author, content);
                 return true;
             }
-            if (this.behavior.value().equals(Behavior.Manual)) {
+            if (value.equals(Behavior.Manual)) {
                 this.onManual(author, content);
-                return true;
-            }
-            if (this.behavior.value().equals(Behavior.Ignore)) {
-                this.onIgnored(author, content);
                 return true;
             }
             return false;
         }
 
-        public void onWhitelisted(String author, String msg) {
+        public void onAutomatic(String author, String msg) {
         }
 
         public void onManual(String author, String msg) {
-        }
-
-        public void onIgnored(String author, String msg) {
         }
     }
 
@@ -175,7 +169,7 @@ public class PartyCommands {
         }
 
         @Override
-        public void onWhitelisted(String author, String msg) {
+        public void onAutomatic(String author, String msg) {
             Utils.sendMessage("/party warp");
         }
 
@@ -192,7 +186,7 @@ public class PartyCommands {
         }
 
         @Override
-        public void onWhitelisted(String author, String msg) {
+        public void onAutomatic(String author, String msg) {
             Utils.sendMessage("/party transfer " + author);
         }
 
@@ -209,7 +203,7 @@ public class PartyCommands {
         }
 
         @Override
-        public void onWhitelisted(String author, String msg) {
+        public void onAutomatic(String author, String msg) {
             Utils.sendMessage("/party settings allinvite");
         }
 
@@ -226,7 +220,7 @@ public class PartyCommands {
         }
 
         @Override
-        public void onWhitelisted(String author, String msg) {
+        public void onAutomatic(String author, String msg) {
             if (SkyblockData.isInInstance()) {
                 if (!Utils.isInstanceOver()) {
                     Utils.info("§aScheduled downtime reminder.");
@@ -257,7 +251,7 @@ public class PartyCommands {
         }
 
         @Override
-        public void onWhitelisted(String author, String msg) {
+        public void onAutomatic(String author, String msg) {
             this.getType(msg).ifPresent(type -> Utils.sendMessage("/joininstance " + type.type));
         }
 
@@ -277,7 +271,7 @@ public class PartyCommands {
         }
 
         @Override
-        public void onWhitelisted(String author, String msg) {
+        public void onAutomatic(String author, String msg) {
             Utils.sendMessage("/pc " + Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
         }
 
@@ -302,7 +296,7 @@ public class PartyCommands {
         }
 
         @Override
-        public void onWhitelisted(String author, String msg) {
+        public void onAutomatic(String author, String msg) {
             this.getTarget(msg).ifPresent(target -> Utils.sendMessage(Utils.format("/party kick {}", target)));
         }
 

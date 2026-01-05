@@ -516,7 +516,15 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Terminal Start Timer", TickTimers.terminalStart, "Shows a timer for the 3rd phase starting."),
                                 new Settings.Toggle("Goldor Timer", TickTimers.goldor, "Shows a timer for Goldor's death tick in 3rd phase.")
                         ))),
-                        new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic.")
+                        new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
+                        new Module("Class Nametags", ClassNametags.instance, "Renders large nametags for your teammates, indicating their selected class and position.", new Settings(List.of(
+                                new Settings.SliderDouble("Text Scale", 0.0, 0.1, 0.01, ClassNametags.scale, "The scale of the text."),
+                                new Settings.ColorPicker("Healer Color", false, ClassNametags.healer, "The text color for Healer."),
+                                new Settings.ColorPicker("Mage Color", false, ClassNametags.mage, "The text color for Mage."),
+                                new Settings.ColorPicker("Bers Color", false, ClassNametags.bers, "The text color for Berserker."),
+                                new Settings.ColorPicker("Arch Color", false, ClassNametags.arch, "The text color for Archer."),
+                                new Settings.ColorPicker("Tank Color", false, ClassNametags.tank, "The text color for Tank.")
+                        )))
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(

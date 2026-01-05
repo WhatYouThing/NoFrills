@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.MutableText;
@@ -168,6 +169,11 @@ public class ItemProtection {
     @EventHandler
     private static void onSlotClick(SlotClickEvent event) {
         if (instance.isActive() && (event.slotId == -999 || isSellGUI || event.actionType.equals(SlotActionType.THROW))) {
+            if (isSellGUI && event.handler instanceof GenericContainerScreenHandler handler) {
+                if (event.slotId >= 0 && event.slotId < handler.getRows() * 9) {
+                    return;
+                }
+            }
             ItemStack stack = event.slot != null ? event.slot.getStack() : event.handler.getCursorStack();
             if (!stack.isEmpty() && !getProtectType(stack).equals(ProtectType.None)) {
                 event.cancel();

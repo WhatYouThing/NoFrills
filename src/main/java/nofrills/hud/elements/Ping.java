@@ -8,13 +8,14 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Ping extends SimpleTextElement {
     public final SettingBool average = new SettingBool(false, "average", instance.key());
     public int ticks = 20;
-    public List<Long> pingList = new ArrayList<>();
+    public long lastPing = 0;
+    public List<Long> pingList = new CopyOnWriteArrayList<>();
 
     public Ping(String text) {
         super(Text.literal(text), new Feature("pingElement"), "Ping Element");
@@ -27,29 +28,30 @@ public class Ping extends SimpleTextElement {
     @Override
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (this.shouldRender()) {
+            if (average.value() && !this.pingList.isEmpty()) {
+                long avg = 0;
+                for (long previous : this.pingList) {
+                    avg += previous;
+                }
+                this.setText(Utils.format("Ping: §f{}ms §7{}ms", this.lastPing, avg / this.pingList.size()));
+            } else {
+                this.setText(Utils.format("Ping: §f{}ms", this.lastPing));
+            }
             super.draw(context, mouseX, mouseY, partialTicks, delta);
         }
     }
 
     public void setPing(long ping) {
-        if (average.value()) {
-            if (this.pingList.size() > 30) {
-                this.pingList.removeFirst();
-            }
-            this.pingList.add(ping);
-            long avg = 0;
-            for (long previous : this.pingList) {
-                avg += previous;
-            }
-            this.setText(Utils.format("Ping: §f{}ms §7{}ms", ping, avg / pingList.size()));
-        } else {
-            this.setText(Utils.format("Ping: §f{}ms", ping));
+        if (this.pingList.size() > 30) {
+            this.pingList.removeFirst();
         }
+        this.lastPing = ping;
+        this.pingList.add(ping);
     }
 
     public void reset() {
         this.ticks = 20;
+        this.lastPing = 0;
         this.pingList.clear();
-        this.setText("Ping: §f0ms");
     }
 }

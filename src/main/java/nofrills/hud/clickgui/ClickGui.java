@@ -179,12 +179,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Description("Usage", "Run the \"/nf partyCommands\" command to see more information."),
                                 new Settings.TextInput("Prefixes", PartyCommands.prefixes, "List of valid prefixes for these commands, separated by space."),
                                 new Settings.Toggle("Self Commands", PartyCommands.self, "Allows you to trigger your own party commands and grants you whitelisted status, not recommended."),
-                                new Settings.Dropdown<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommand: !warp"),
-                                new Settings.Dropdown<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves to party leader on demand.\n\nCommand: !pt"),
+                                new Settings.Dropdown<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommands: !warp | !w"),
+                                new Settings.Dropdown<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves to party leader on demand.\n\nCommands: !ptme | !pt"),
                                 new Settings.Dropdown<>("All Invite", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand.\n\nCommand: !allinv"),
                                 new Settings.Dropdown<>("Downtime", PartyCommands.downtime, "Allows party members to schedule a downtime reminder for the end of your Kuudra/Dungeons run.\nThis command will also pause Auto Requeue if you have it enabled.\n\nCommand: !dt"),
                                 new Settings.Dropdown<>("Instance Queue", PartyCommands.queue, Utils.format("Allows party members to queue for any instance on demand.\n\nCommand List: {}", PartyCommands.listInstancesFormatted())),
-                                new Settings.Dropdown<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords")
+                                new Settings.Dropdown<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords"),
+                                new Settings.Dropdown<>("Kick", PartyCommands.kick, "Allows party members to kick specific players on demand.\n\nCommands: !kick | !k")
                         ))),
                         new Module("Viewmodel", Viewmodel.instance, "Easily customize the appearance of your held item.", new Settings(List.of(
                                 new Settings.Toggle("No Haste", Viewmodel.noHaste, "Prevents Haste and Mining Fatigue from affecting your swing speed."),
@@ -254,10 +255,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Old Island Only", NoPearlCooldown.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Old Eye Height", OldEyeHeight.instance, "Allows you to restore the 1.8 sneaking eye height and/or disable the swimming eye height.", new Settings(List.of(
-                                new Settings.Toggle("Sneaking", OldEyeHeight.sneaking, "If enabled, the 1.8 sneaking eye height will be restored."),
-                                new Settings.Toggle("Swimming", OldEyeHeight.swimming, "If enabled, the swimming eye height will be disabled."),
-                                new Settings.Toggle("Skyblock Only", OldEyeHeight.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", OldEyeHeight.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                                new Settings.Separator("Sneaking"),
+                                new Settings.Toggle("Enabled", OldEyeHeight.sneakEnabled, "If enabled, the sneaking eye height will be reverted."),
+                                new Settings.Toggle("Skyblock Only", OldEyeHeight.sneakSkyblockCheck, "Prevent the sneaking eye height from changing outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", OldEyeHeight.sneakModernCheck, "Prevent the sneaking eye height from changing on islands using modern Minecraft versions (such as Galatea)."),
+                                new Settings.Separator("Swimming"),
+                                new Settings.Toggle("Enabled", OldEyeHeight.swimEnabled, "If enabled, the swimming eye height will be disabled."),
+                                new Settings.Toggle("Skyblock Only", OldEyeHeight.swimSkyblockCheck, "Prevent the swimming eye height from changing outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", OldEyeHeight.swimModernCheck, "Prevent the swimming eye height from changing on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Riding Camera Fix", RidingCameraFix.instance, "Removes the floaty camera movement effect while riding entities.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", RidingCameraFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
@@ -513,7 +518,15 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Terminal Start Timer", TickTimers.terminalStart, "Shows a timer for the 3rd phase starting."),
                                 new Settings.Toggle("Goldor Timer", TickTimers.goldor, "Shows a timer for Goldor's death tick in 3rd phase.")
                         ))),
-                        new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic.")
+                        new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
+                        new Module("Class Nametags", ClassNametags.instance, "Renders large nametags for your teammates, indicating their selected class and position.", new Settings(List.of(
+                                new Settings.SliderDouble("Text Scale", 0.0, 0.1, 0.01, ClassNametags.scale, "The scale of the text."),
+                                new Settings.ColorPicker("Healer Color", false, ClassNametags.healer, "The text color for Healer."),
+                                new Settings.ColorPicker("Mage Color", false, ClassNametags.mage, "The text color for Mage."),
+                                new Settings.ColorPicker("Bers Color", false, ClassNametags.bers, "The text color for Berserker."),
+                                new Settings.ColorPicker("Arch Color", false, ClassNametags.arch, "The text color for Archer."),
+                                new Settings.ColorPicker("Tank Color", false, ClassNametags.tank, "The text color for Tank.")
+                        )))
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(

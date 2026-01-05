@@ -1,5 +1,6 @@
 package nofrills.features.general;
 
+import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -12,19 +13,33 @@ import nofrills.features.misc.AutoRequeue;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
 public class PartyCommands {
     public static final Feature instance = new Feature("partyCommands");
 
     public static final SettingString prefixes = new SettingString("! ?", "prefixes", instance.key());
     public static final SettingBool self = new SettingBool(false, "self", instance.key());
     public static final SettingJson lists = new SettingJson(new JsonObject(), "lists", instance.key());
-    public static final SettingEnum<behavior> warp = new SettingEnum<>(behavior.Disabled, behavior.class, "warp", instance.key());
-    public static final SettingEnum<behavior> transfer = new SettingEnum<>(behavior.Disabled, behavior.class, "transfer", instance.key());
-    public static final SettingEnum<behavior> allinv = new SettingEnum<>(behavior.Disabled, behavior.class, "allinv", instance.key());
-    public static final SettingEnum<behavior> downtime = new SettingEnum<>(behavior.Disabled, behavior.class, "downtime", instance.key());
-    public static final SettingEnum<behavior> queue = new SettingEnum<>(behavior.Disabled, behavior.class, "queue", instance.key());
-    public static final SettingEnum<behavior> coords = new SettingEnum<>(behavior.Disabled, behavior.class, "coords", instance.key());
+    public static final SettingEnum<Behavior> warp = new SettingEnum<>(Behavior.Disabled, Behavior.class, "warp", instance.key());
+    public static final SettingEnum<Behavior> transfer = new SettingEnum<>(Behavior.Disabled, Behavior.class, "transfer", instance.key());
+    public static final SettingEnum<Behavior> allinv = new SettingEnum<>(Behavior.Disabled, Behavior.class, "allinv", instance.key());
+    public static final SettingEnum<Behavior> downtime = new SettingEnum<>(Behavior.Disabled, Behavior.class, "downtime", instance.key());
+    public static final SettingEnum<Behavior> queue = new SettingEnum<>(Behavior.Disabled, Behavior.class, "queue", instance.key());
+    public static final SettingEnum<Behavior> coords = new SettingEnum<>(Behavior.Disabled, Behavior.class, "coords", instance.key());
+    public static final SettingEnum<Behavior> kick = new SettingEnum<>(Behavior.Disabled, Behavior.class, "kick", instance.key());
 
+    private static final List<Command> commands = List.of(
+            new WarpCommand(),
+            new TransferCommand(),
+            new AllInviteCommand(),
+            new DowntimeCommand(),
+            new QueueCommand(),
+            new CoordsCommand(),
+            new KickCommand()
+    );
     private static boolean downtimeNeeded = false;
 
     private static void showDowntimeReminder() {
@@ -75,71 +90,20 @@ public class PartyCommands {
     @EventHandler
     private static void onPartyMessage(PartyChatMsgEvent event) {
         if (instance.isActive() && !prefixes.value().isEmpty()) {
-            if (!self.value() && event.self) {
-                return;
-            }
             String msg = Utils.toLower(event.message);
             String author = Utils.toLower(event.sender);
+            if ((!self.value() && event.self) || isOnList(author, "blacklist")) {
+                return;
+            }
             for (String prefix : prefixes.value().split(" ")) {
                 if (msg.startsWith(Utils.toLower(prefix))) {
-                    if (isOnList(author, "blacklist")) {
-                        return;
-                    }
-                    boolean whitelisted = event.self || isOnList(author, "whitelist");
-                    String command = msg.replace(prefix, "");
-                    if (!warp.value().equals(behavior.Disabled) && command.startsWith("warp")) {
-                        if (whitelisted || warp.value().equals(behavior.Automatic)) {
-                            Utils.sendMessage("/party warp");
-                        } else if (!warp.value().equals(behavior.Ignore)) {
-                            Utils.infoButton("§aClick here to warp your party.", "/party warp");
-                        }
-                    }
-                    if (!transfer.value().equals(behavior.Disabled) && command.startsWith("pt")) {
-                        if (whitelisted || transfer.value().equals(behavior.Automatic)) {
-                            Utils.sendMessage("/party transfer " + author);
-                        } else if (!transfer.value().equals(behavior.Ignore)) {
-                            Utils.infoButton("§aClick here to promote §6" + event.sender + " §aas leader.", "/party transfer " + author);
-                        }
-                    }
-                    if (!allinv.value().equals(behavior.Disabled) && command.startsWith("allinv")) {
-                        if (whitelisted || allinv.value().equals(behavior.Automatic)) {
-                            Utils.sendMessage("/party settings allinvite");
-                        } else if (!allinv.value().equals(behavior.Ignore)) {
-                            Utils.infoButton("§aClick here to toggle all invite.", "/party settings allinvite");
-                        }
-                    }
-                    if (!downtime.value().equals(behavior.Disabled) && command.startsWith("dt")) {
-                        if (whitelisted || downtime.value().equals(behavior.Automatic)) {
-                            if (SkyblockData.isInInstance()) {
-                                if (!Utils.isInstanceOver()) {
-                                    Utils.info("§aScheduled downtime reminder.");
-                                    downtimeNeeded = true;
-                                }
-                                if (AutoRequeue.instance.isActive()) {
-                                    AutoRequeue.setPaused();
-                                }
-                            } else {
-                                showDowntimeReminder();
+                    String content = msg.replace(prefix, "");
+                    String name = content.split(" ")[0];
+                    for (Command command : commands) {
+                        if (command.isActive() && command.names.contains(name)) {
+                            if (command.process(author, content, event.self || isOnList(author, "whitelist"))) {
+                                return;
                             }
-                        }
-                    }
-                    if (!queue.value().equals(behavior.Disabled)) {
-                        for (SkyblockData.InstanceType instance : SkyblockData.instances) {
-                            if (command.equals(instance.name)) {
-                                if (whitelisted || queue.value().equals(behavior.Automatic)) {
-                                    Utils.sendMessage("/joininstance " + instance.type);
-                                } else if (!queue.value().equals(behavior.Ignore)) {
-                                    Utils.infoButton("§aClick to queue for §6" + Utils.uppercaseFirst(Utils.toLower(instance.type), true) + "§a.", "/joininstance " + instance.type);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    if (!coords.value().equals(behavior.Disabled) && command.startsWith("coords")) {
-                        if (whitelisted || coords.value().equals(behavior.Automatic)) {
-                            Utils.sendMessage("/pc " + Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
-                        } else if (!coords.value().equals(behavior.Ignore)) {
-                            Utils.infoButton("§aClick here to send your coordinates.", "/pc " + Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
                         }
                     }
                 }
@@ -154,10 +118,194 @@ public class PartyCommands {
         }
     }
 
-    public enum behavior {
+    public enum Behavior {
         Automatic,
         Manual,
         Ignore,
         Disabled
+    }
+
+    public static class Command {
+        public SettingEnum<Behavior> behavior;
+        public HashSet<String> names;
+
+        public Command(SettingEnum<Behavior> behavior, List<String> names) {
+            this.behavior = behavior;
+            this.names = Sets.newHashSet(names);
+        }
+
+        public Command(SettingEnum<Behavior> behavior, String... names) {
+            this(behavior, List.of(names));
+        }
+
+        public boolean isActive() {
+            return !this.behavior.value().equals(Behavior.Disabled);
+        }
+
+        public boolean process(String author, String content, boolean whitelisted) {
+            Behavior value = this.behavior.value();
+            if (whitelisted || value.equals(Behavior.Automatic)) {
+                this.onAutomatic(author, content);
+                return true;
+            }
+            if (value.equals(Behavior.Manual)) {
+                this.onManual(author, content);
+                return true;
+            }
+            return false;
+        }
+
+        public void onAutomatic(String author, String msg) {
+        }
+
+        public void onManual(String author, String msg) {
+        }
+    }
+
+    public static class WarpCommand extends Command {
+
+        public WarpCommand() {
+            super(warp, "warp", "w");
+        }
+
+        @Override
+        public void onAutomatic(String author, String msg) {
+            Utils.sendMessage("/party warp");
+        }
+
+        @Override
+        public void onManual(String author, String msg) {
+            Utils.infoButton("§aClick here to warp your party.", "/party warp");
+        }
+    }
+
+    public static class TransferCommand extends Command {
+
+        public TransferCommand() {
+            super(transfer, "pt", "ptme");
+        }
+
+        @Override
+        public void onAutomatic(String author, String msg) {
+            Utils.sendMessage("/party transfer " + author);
+        }
+
+        @Override
+        public void onManual(String author, String msg) {
+            Utils.infoButton("§aClick here to promote " + author + " as leader.", "/party transfer " + author);
+        }
+    }
+
+    public static class AllInviteCommand extends Command {
+
+        public AllInviteCommand() {
+            super(allinv, "allinv");
+        }
+
+        @Override
+        public void onAutomatic(String author, String msg) {
+            Utils.sendMessage("/party settings allinvite");
+        }
+
+        @Override
+        public void onManual(String author, String msg) {
+            Utils.infoButton("§aClick here to toggle all invite.", "/party settings allinvite");
+        }
+    }
+
+    public static class DowntimeCommand extends Command {
+
+        public DowntimeCommand() {
+            super(downtime, "dt");
+        }
+
+        @Override
+        public void onAutomatic(String author, String msg) {
+            if (SkyblockData.isInInstance()) {
+                if (!Utils.isInstanceOver()) {
+                    Utils.info("§aScheduled downtime reminder.");
+                    downtimeNeeded = true;
+                }
+                if (AutoRequeue.instance.isActive()) {
+                    AutoRequeue.setPaused();
+                }
+            } else {
+                showDowntimeReminder();
+            }
+        }
+    }
+
+    public static class QueueCommand extends Command {
+
+        public QueueCommand() {
+            super(queue, SkyblockData.instances.stream().map(type -> type.name).toList());
+        }
+
+        public Optional<SkyblockData.InstanceType> getType(String msg) {
+            for (SkyblockData.InstanceType type : SkyblockData.instances) {
+                if (msg.startsWith(type.name)) {
+                    return Optional.of(type);
+                }
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public void onAutomatic(String author, String msg) {
+            this.getType(msg).ifPresent(type -> Utils.sendMessage("/joininstance " + type.type));
+        }
+
+        @Override
+        public void onManual(String author, String msg) {
+            this.getType(msg).ifPresent(type -> Utils.infoButton(
+                    "§aClick here to queue for " + Utils.uppercaseFirst(Utils.toLower(type.type), true) + ".",
+                    "/joininstance " + type.type)
+            );
+        }
+    }
+
+    public static class CoordsCommand extends Command {
+
+        public CoordsCommand() {
+            super(coords, "coords");
+        }
+
+        @Override
+        public void onAutomatic(String author, String msg) {
+            Utils.sendMessage("/pc " + Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
+        }
+
+        @Override
+        public void onManual(String author, String msg) {
+            Utils.infoButton("§aClick here to send your coordinates.", "/pc " + Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
+        }
+    }
+
+    public static class KickCommand extends Command {
+
+        public KickCommand() {
+            super(kick, "kick", "k");
+        }
+
+        public Optional<String> getTarget(String msg) {
+            String[] parts = msg.split(" ");
+            if (parts.length > 1) {
+                return Optional.of(parts[1]);
+            }
+            return Optional.empty();
+        }
+
+        @Override
+        public void onAutomatic(String author, String msg) {
+            this.getTarget(msg).ifPresent(target -> Utils.sendMessage(Utils.format("/party kick {}", target)));
+        }
+
+        @Override
+        public void onManual(String author, String msg) {
+            this.getTarget(msg).ifPresent(target -> Utils.infoButton(
+                    "§aClick here to kick " + target + ".",
+                    Utils.format("/party kick {}", target))
+            );
+        }
     }
 }

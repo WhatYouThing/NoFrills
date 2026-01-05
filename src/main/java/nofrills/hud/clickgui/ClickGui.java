@@ -252,10 +252,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Old Island Only", NoPearlCooldown.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Old Eye Height", OldEyeHeight.instance, "Allows you to restore the 1.8 sneaking eye height and/or disable the swimming eye height.", new Settings(List.of(
-                                new Settings.Toggle("Sneaking", OldEyeHeight.sneaking, "If enabled, the 1.8 sneaking eye height will be restored."),
-                                new Settings.Toggle("Swimming", OldEyeHeight.swimming, "If enabled, the swimming eye height will be disabled."),
-                                new Settings.Toggle("Skyblock Only", OldEyeHeight.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", OldEyeHeight.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                                new Settings.Separator("Sneaking"),
+                                new Settings.Toggle("Enabled", OldEyeHeight.sneakEnabled, "If enabled, the sneaking eye height will be reverted."),
+                                new Settings.Toggle("Skyblock Only", OldEyeHeight.sneakSkyblockCheck, "Prevent the sneaking eye height from changing outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", OldEyeHeight.sneakModernCheck, "Prevent the sneaking eye height from changing on islands using modern Minecraft versions (such as Galatea)."),
+                                new Settings.Separator("Swimming"),
+                                new Settings.Toggle("Enabled", OldEyeHeight.swimEnabled, "If enabled, the swimming eye height will be disabled."),
+                                new Settings.Toggle("Skyblock Only", OldEyeHeight.swimSkyblockCheck, "Prevent the swimming eye height from changing outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", OldEyeHeight.swimModernCheck, "Prevent the swimming eye height from changing on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Riding Camera Fix", RidingCameraFix.instance, "Removes the floaty camera movement effect while riding entities.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", RidingCameraFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),

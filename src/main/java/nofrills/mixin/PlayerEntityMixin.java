@@ -30,9 +30,9 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     private EntityDimensions getDimensions(EntityDimensions original, EntityPose pose) {
         if (Utils.isSelf(this) && OldEyeHeight.active()) {
             return switch (pose) {
-                case CROUCHING -> OldEyeHeight.sneaking.value() ? original.withEyeHeight(1.54f) : original;
+                case CROUCHING -> OldEyeHeight.sneakActive() ? original.withEyeHeight(1.54f) : original;
                 case SWIMMING ->
-                        OldEyeHeight.swimming.value() ? original.withEyeHeight(STANDING_DIMENSIONS.eyeHeight()) : original;
+                        OldEyeHeight.swimActive() ? original.withEyeHeight(STANDING_DIMENSIONS.eyeHeight()) : original;
                 default -> original;
             };
         }

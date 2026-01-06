@@ -518,7 +518,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
                         new Module("Class Nametags", ClassNametags.instance, "Renders large nametags for your teammates, indicating their selected class and position.", new Settings(List.of(
-                                new Settings.SliderDouble("Text Scale", 0.0, 0.1, 0.01, ClassNametags.scale, "The scale of the text."),
+                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, ClassNametags.scale, "The scale of the text."),
                                 new Settings.ColorPicker("Healer Color", false, ClassNametags.healer, "The text color for Healer."),
                                 new Settings.ColorPicker("Mage Color", false, ClassNametags.mage, "The text color for Mage."),
                                 new Settings.ColorPicker("Bers Color", false, ClassNametags.bers, "The text color for Berserker."),

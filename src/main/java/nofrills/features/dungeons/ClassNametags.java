@@ -32,7 +32,7 @@ public class ClassNametags {
         if (instance.isActive() && mc.world != null && Utils.isInDungeons() && DungeonUtil.isDungeonStarted()) {
             for (AbstractClientPlayerEntity player : new ArrayList<>(mc.world.getPlayers())) {
                 if (player.equals(mc.player)) {
-                    //continue;
+                    continue;
                 }
                 String name = player.getName().getString();
                 String dungeonClass = DungeonUtil.getPlayerClass(name);

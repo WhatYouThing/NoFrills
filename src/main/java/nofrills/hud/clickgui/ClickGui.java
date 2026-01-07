@@ -254,11 +254,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Old Eye Height", OldEyeHeight.instance, "Allows you to restore the 1.8 sneaking eye height and/or disable the swimming eye height.", new Settings(List.of(
                                 new Settings.Separator("Sneaking"),
-                                new Settings.Toggle("Enabled", OldEyeHeight.sneakEnabled, "If enabled, the sneaking eye height will be reverted."),
+                                new Settings.Toggle("Sneaking", OldEyeHeight.sneakEnabled, "If enabled, the sneaking eye height will be reverted."),
                                 new Settings.Toggle("Skyblock Only", OldEyeHeight.sneakSkyblockCheck, "Prevent the sneaking eye height from changing outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", OldEyeHeight.sneakModernCheck, "Prevent the sneaking eye height from changing on islands using modern Minecraft versions (such as Galatea)."),
                                 new Settings.Separator("Swimming"),
-                                new Settings.Toggle("Enabled", OldEyeHeight.swimEnabled, "If enabled, the swimming eye height will be disabled."),
+                                new Settings.Toggle("Swimming", OldEyeHeight.swimEnabled, "If enabled, the swimming eye height will be disabled."),
                                 new Settings.Toggle("Skyblock Only", OldEyeHeight.swimSkyblockCheck, "Prevent the swimming eye height from changing outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", OldEyeHeight.swimModernCheck, "Prevent the swimming eye height from changing on islands using modern Minecraft versions (such as Galatea).")
                         ))),
@@ -598,6 +598,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Override Ticks", 0, 6000, 1, AbilityAlert.override, "Overrides your pickaxe ability cooldown to a custom value in ticks.\nOnly applies if the Pickaxe Ability widget isn't present.\nSet to 0 to disable.")
                         ))),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
+                                new Settings.Toggle("Hide Opened", CorpseHighlight.hideOpened, "Removes the highlight from corpses you've already opened."),
                                 new Settings.ColorPicker("Lapis Color", false, CorpseHighlight.lapisColor, "The color of the Lapis corpse."),
                                 new Settings.ColorPicker("Mineral Color", false, CorpseHighlight.mineralColor, "The color of the Tungsten corpse."),
                                 new Settings.ColorPicker("Yog Color", false, CorpseHighlight.yogColor, "The color of the Umber corpse."),

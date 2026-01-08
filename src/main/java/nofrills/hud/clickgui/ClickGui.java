@@ -224,6 +224,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Protect Rarity Upgraded", ItemProtection.protectRarityUpgraded, "Protects any item that is Recombobulated."),
                                 new Settings.Toggle("Protect By Value", ItemProtection.protectValue, "Protects any item that has a high enough NPC/Auction/Bazaar value."),
                                 new Settings.DoubleInput("Minimum Value", ItemProtection.protectValueMin, "The minimum item value for an item to be protected by value.")
+                        ))),
+                        new Module("Info Tooltips", InfoTooltips.instance, "Adds various information about an item to its tooltip.", new Settings(List.of(
+                                new Settings.Toggle("Dungeon Quality", InfoTooltips.dungeonQuality, "Displays the quality and the floor tier on applicable dungeon items."),
+                                new Settings.Toggle("Created Date", InfoTooltips.createdDate, "Displays the exact date at which an item was created."),
+                                new Settings.Toggle("Hex Color", InfoTooltips.hexColor, "Displays the color of an item. Only applies to armor pieces that use leather armor as their base."),
+                                new Settings.Toggle("Museum Donated", InfoTooltips.museumDonated, "Displays if the item has been donated to the Museum.")
                         )))
                 )),
                 new Category("Tweaks", List.of(

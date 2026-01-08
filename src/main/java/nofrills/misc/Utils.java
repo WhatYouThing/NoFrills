@@ -57,6 +57,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
@@ -785,6 +786,13 @@ public class Utils {
         } catch (NumberFormatException ignored) {
             return Optional.empty();
         }
+    }
+
+    public static String parseDate(Calendar calendar) {
+        return format("{} {}",
+                calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()),
+                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault()).format(calendar.getTime())
+        );
     }
 
     /**

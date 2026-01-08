@@ -140,12 +140,17 @@ public class KuudraUtil {
         public double playerDist;
         public PickupSpot secondary;
 
-        PickupSpot(String name, Vec3d spot, double supplyDist, double playerDist, PickupSpot secondary) {
+        public PickupSpot(String name, Vec3d spot, double supplyDist, double playerDist, PickupSpot secondary) {
             this.name = name;
             this.spot = spot;
             this.supplyDist = supplyDist;
             this.playerDist = playerDist;
             this.secondary = secondary;
+        }
+
+        public boolean matches(String msg) {
+            String name = Utils.toLower(this.name);
+            return msg.equals("no " + name + "!") || msg.equals("no " + name.replaceAll(" ", "") + "!");
         }
     }
 }

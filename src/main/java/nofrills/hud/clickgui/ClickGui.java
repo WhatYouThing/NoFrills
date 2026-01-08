@@ -474,6 +474,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", false, SecretBatHighlight.color, "The color of the secret bat glow.")
                         ))),
                         new Module("Livid Solver", LividSolver.instance, "Finds and highlights the correct Livid in F5/M5.", new Settings(List.of(
+                                new Settings.Toggle("Title", LividSolver.title, "Show a title on screen once the Livid color is identified."),
                                 new Settings.Toggle("Highlight", LividSolver.highlight, "Renders an outline for the correct Livid."),
                                 new Settings.Toggle("Tracer", LividSolver.tracer, "Renders a tracer towards the correct Livid."),
                                 new Settings.ColorPicker("Highlight Color", true, LividSolver.color, "The color of the outline."),

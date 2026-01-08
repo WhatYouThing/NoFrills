@@ -92,7 +92,7 @@ public class KuudraUtil {
     private static void updatePreSpot() {
         if (mc.player != null && preSpot == null && currentPhase.equals(Phase.Collect)) {
             Vec3d pos = mc.player.getPos();
-            for (KuudraUtil.PickupSpot pickupSpot : KuudraUtil.pickupSpots) {
+            for (PickupSpot pickupSpot : KuudraUtil.pickupSpots) {
                 if (pickupSpot.spot.distanceTo(pos) < pickupSpot.playerDist) {
                     preSpot = pickupSpot;
                     break;
@@ -125,27 +125,59 @@ public class KuudraUtil {
         Lair
     }
 
+    public enum SpotType {
+        X,
+        XCannon,
+        Square,
+        Slash,
+        Equals,
+        Triangle,
+        Shop,
+        None
+    }
+
     public static class PickupSpot {
-        public static final PickupSpot XCannon = new PickupSpot("X Cannon", new Vec3d(-143.0, 76.0, -125.0), 16, 0, null);
-        public static final PickupSpot Shop = new PickupSpot("Shop", new Vec3d(-81.0, 76.0, -143.0), 18, 0, null);
-        public static final PickupSpot Square = new PickupSpot("Square", new Vec3d(-143.0, 76.0, -80.0), 20, 0, null);
-        public static final PickupSpot Equals = new PickupSpot("Equals", new Vec3d(-65.5, 76.0, -87.5), 18, 15, null);
-        public static final PickupSpot X = new PickupSpot("X", new Vec3d(-142.5, 77.0, -151.0), 18, 30, PickupSpot.XCannon);
-        public static final PickupSpot Triangle = new PickupSpot("Triangle", new Vec3d(-67.5, 77.0, -122.5), 18, 15, PickupSpot.Shop);
-        public static final PickupSpot Slash = new PickupSpot("Slash", new Vec3d(-113.5, 77.0, -68.5), 18, 15, PickupSpot.Square);
+        public static final PickupSpot X = new PickupSpot("X", -142.5, 77.0, -151.0, 18, 30)
+                .withSecondary(SpotType.XCannon);
+        public static final PickupSpot XCannon = new PickupSpot("X Cannon", -143.0, 76.0, -125.0, 16, 0);
+        public static final PickupSpot Square = new PickupSpot("Square", -143.0, 76.0, -80.0, 20, 0);
+        public static final PickupSpot Slash = new PickupSpot("Slash", -113.5, 77.0, -68.5, 18, 15)
+                .withSecondary(SpotType.Square);
+        public static final PickupSpot Equals = new PickupSpot("Equals", -65.5, 76.0, -87.5, 18, 15);
+        public static final PickupSpot Triangle = new PickupSpot("Triangle", -67.5, 77.0, -122.5, 18, 15)
+                .withSecondary(SpotType.Shop);
+        public static final PickupSpot Shop = new PickupSpot("Shop", -81.0, 76.0, -143.0, 18, 0);
 
         public String name;
         public Vec3d spot;
         public double supplyDist;
         public double playerDist;
-        public PickupSpot secondary;
+        public SpotType secondary;
 
-        public PickupSpot(String name, Vec3d spot, double supplyDist, double playerDist, PickupSpot secondary) {
+        public PickupSpot(String name, double x, double y, double z, double supplyDist, double playerDist) {
             this.name = name;
-            this.spot = spot;
+            this.spot = new Vec3d(x, y, z);
             this.supplyDist = supplyDist;
             this.playerDist = playerDist;
-            this.secondary = secondary;
+            this.secondary = SpotType.None;
+        }
+
+        public static PickupSpot fromType(SpotType type) {
+            return switch (type) {
+                case X -> PickupSpot.X;
+                case XCannon -> PickupSpot.XCannon;
+                case Square -> PickupSpot.Square;
+                case Slash -> PickupSpot.Slash;
+                case Equals -> PickupSpot.Equals;
+                case Triangle -> PickupSpot.Triangle;
+                case Shop -> PickupSpot.Shop;
+                case None -> null;
+            };
+        }
+
+        public PickupSpot withSecondary(SpotType type) {
+            this.secondary = type;
+            return this;
         }
 
         public boolean matches(String msg) {

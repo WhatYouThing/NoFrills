@@ -181,6 +181,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(CratePriority.class);
         eventBus.subscribe(MuteEnderman.class);
         eventBus.subscribe(ClassNametags.class);
+        eventBus.subscribe(InfoTooltips.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

@@ -23,6 +23,7 @@ public class PreMessage {
                 if (missingTicks == 0) {
                     KuudraUtil.PickupSpot preSpot = KuudraUtil.getPreSpot();
                     if (preSpot != null) {
+                        KuudraUtil.PickupSpot secondary = KuudraUtil.PickupSpot.fromType(preSpot.secondary);
                         Utils.infoFormat("§eYour Pre: {}", preSpot.name);
                         boolean preFound = false, secondaryFound = false;
                         for (Entity ent : Utils.getEntities()) {
@@ -32,17 +33,15 @@ public class PreMessage {
                                 if (preSpot.spot.distanceTo(supplyPos) < preSpot.supplyDist) {
                                     preFound = true;
                                 }
-                                if (preSpot.secondary != null) {
-                                    if (preSpot.secondary.spot.distanceTo(supplyPos) < preSpot.secondary.supplyDist) {
-                                        secondaryFound = true;
-                                    }
+                                if (secondary != null && secondary.spot.distanceTo(supplyPos) < secondary.supplyDist) {
+                                    secondaryFound = true;
                                 }
                             }
                         }
                         if (!preFound) {
                             Utils.sendMessage("/pc No " + preSpot.name + "!");
-                        } else if (!secondaryFound && preSpot.secondary != null) {
-                            Utils.sendMessage("/pc No " + preSpot.secondary.name + "!");
+                        } else if (!secondaryFound && secondary != null) {
+                            Utils.sendMessage("/pc No " + secondary.name + "!");
                         }
                     }
                 }

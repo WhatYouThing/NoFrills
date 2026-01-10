@@ -20,7 +20,7 @@ import static nofrills.Main.mc;
 public class ClassNametags {
     public static final Feature instance = new Feature("classNametags");
 
-    public static final SettingDouble scale = new SettingDouble(0.05, "scale", instance.key());
+    public static final SettingDouble scale = new SettingDouble(0.5, "scale", instance.key());
     public static final SettingColor healer = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", instance.key());
     public static final SettingColor mage = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", instance.key());
     public static final SettingColor bers = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", instance.key());
@@ -47,7 +47,7 @@ public class ClassNametags {
                 if (!dungeonClass.isEmpty() && color != null) {
                     Vec3d pos = player.getLerpedPos(event.tickCounter.getTickProgress(true)).add(0.0, 3.25, 0.0);
                     MutableText text = Text.literal(Utils.format("§e[{}]§r {}", dungeonClass.substring(0, 1), name));
-                    event.drawText(pos, text, scale.valueFloat(), true, color);
+                    event.drawText(pos, text, scale.valueFloat() * 0.1f, true, color);
                 }
             }
         }

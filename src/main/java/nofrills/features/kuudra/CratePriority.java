@@ -13,60 +13,71 @@ public class CratePriority {
 
     private static void announce(String message) {
         Utils.showTitle("§e§l" + Utils.toUpper(message), "", 0, 50, 10);
-        Utils.infoFormat("§eCrate Priority: {}", message);
+        Utils.infoFormat("§eCrate Priority: {}.", message);
     }
 
-    private static boolean isSpot(String message, KuudraUtil.PickupSpot spot) {
-        return message.replaceAll(" ", "").contains(Utils.toLower(spot.name).replaceAll(" ", ""));
+    private static KuudraUtil.SpotType getPreType() {
+        KuudraUtil.PickupSpot spot = KuudraUtil.getPreSpot();
+        if (spot != null) {
+            if (spot.equals(Triangle)) return KuudraUtil.SpotType.Triangle;
+            if (spot.equals(X)) return KuudraUtil.SpotType.X;
+            if (spot.equals(Equals)) return KuudraUtil.SpotType.Equals;
+            if (spot.equals(Slash)) return KuudraUtil.SpotType.Slash;
+        }
+        return KuudraUtil.SpotType.None;
     }
 
     @EventHandler
     private static void onPartyMsg(PartyChatMsgEvent event) {
         if (instance.isActive() && Utils.isInKuudra() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
-            KuudraUtil.PickupSpot preSpot = KuudraUtil.getPreSpot();
+            KuudraUtil.SpotType type = getPreType();
             String msg = Utils.toLower(event.message);
-            if (!msg.startsWith("no ") || preSpot == null) return;
-            if (isSpot(msg, Shop)) {
-                if (preSpot.equals(Triangle)) announce("Grab X Cannon");
-                if (preSpot.equals(X)) announce("Grab X Cannon");
-                if (preSpot.equals(Equals)) announce("Grab Square");
-                if (preSpot.equals(Slash)) announce("Grab Square");
+            if (!msg.startsWith("no ") || type.equals(KuudraUtil.SpotType.None)) return;
+            if (Shop.matches(msg)) {
+                switch (type) {
+                    case Triangle, X -> announce("Grab X Cannon");
+                    case Equals, Slash -> announce("Grab Square, Place on Shop");
+                }
             }
-            if (isSpot(msg, Triangle)) {
-                if (preSpot.equals(Triangle)) announce("Pull Square, Grab Shop");
-                if (preSpot.equals(X)) announce("Grab X Cannon");
-                if (preSpot.equals(Equals)) announce("Grab X Cannon");
-                if (preSpot.equals(Slash)) announce("Grab Square");
+            if (Triangle.matches(msg)) {
+                switch (type) {
+                    case Triangle -> announce("Pull Square, Grab Shop");
+                    case X, Equals -> announce("Grab X Cannon");
+                    case Slash -> announce("Grab Square, Place on Triangle");
+                }
             }
-            if (isSpot(msg, Equals)) {
-                if (preSpot.equals(Triangle)) announce("Grab X Cannon");
-                if (preSpot.equals(X)) announce("Grab X Cannon");
-                if (preSpot.equals(Equals)) announce("Pull Square, Grab Shop");
-                if (preSpot.equals(Slash)) announce("Grab Square");
+            if (Equals.matches(msg)) {
+                switch (type) {
+                    case Triangle, X -> announce("Grab X Cannon");
+                    case Equals -> announce("Pull Square, Grab Shop");
+                    case Slash -> announce("Grab Square, Place on Equals");
+                }
             }
-            if (isSpot(msg, Slash)) {
-                if (preSpot.equals(Triangle)) announce("Grab Square");
-                if (preSpot.equals(X)) announce("Grab X Cannon");
-                if (preSpot.equals(Equals)) announce("Grab X Cannon");
-                if (preSpot.equals(Slash)) announce("Pull Square, Grab Shop");
+            if (Slash.matches(msg)) {
+                switch (type) {
+                    case Triangle -> announce("Grab Square, Place on Slash");
+                    case X, Equals -> announce("Grab X Cannon");
+                    case Slash -> announce("Pull Square, Grab Shop");
+                }
             }
-            if (isSpot(msg, Square)) {
-                if (preSpot.equals(Triangle)) announce("Grab Shop");
-                if (preSpot.equals(X)) announce("Grab X Cannon");
-                if (preSpot.equals(Equals)) announce("Grab Shop");
-                if (preSpot.equals(Slash)) announce("Grab X Cannon");
+            if (Square.matches(msg)) {
+                switch (type) {
+                    case Triangle, Equals -> announce("Grab Shop");
+                    case X, Slash -> announce("Grab X Cannon");
+                }
             }
-            if (isSpot(msg, XCannon)) {
-                if (preSpot.equals(Triangle)) announce("Grab Shop");
-                if (preSpot.equals(X)) announce("Grab Square");
-                if (preSpot.equals(Equals)) announce("Grab Shop");
-                if (preSpot.equals(Slash)) announce("Grab Square");
+            if (XCannon.matches(msg)) {
+                switch (type) {
+                    case Triangle, Equals -> announce("Grab Shop");
+                    case Slash, X -> announce("Grab Square, Place on X Cannon");
+                }
             }
-            if (isSpot(msg, X)) {
-                if (preSpot.equals(Triangle)) announce("Grab X Cannon");
-                if (preSpot.equals(X)) announce("Pull Square, Grab Shop");
-                if (preSpot.equals(Equals)) announce("Grab X Cannon");
-                if (preSpot.equals(Slash)) announce("Grab Square");
+            if (X.matches(msg)) {
+                switch (type) {
+                    case Triangle, Equals -> announce("Grab X Cannon");
+                    case X -> announce("Pull Square, Grab Shop");
+                    case Slash -> announce("Grab Square, Place on X");
+                }
             }
         }
     }

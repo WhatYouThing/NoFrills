@@ -63,7 +63,7 @@ public class BossHealth extends SimpleTextElement {
             if (DungeonUtil.isInBossRoom() && !DungeonUtil.isInDragonPhase()) {
                 List<ClientBossBar> bossBars = Utils.getBossBars();
                 if (!bossBars.isEmpty()) {
-                    this.setHealth(Utils.format("§c{}%", Utils.formatDecimal(bossBars.getFirst().getPercent() * 100)));
+                    this.setHealth(Utils.format("§a{}%", Utils.formatDecimal(bossBars.getFirst().getPercent() * 100)));
                     return;
                 }
             }

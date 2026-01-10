@@ -7,9 +7,7 @@ import nofrills.config.Feature;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.Utils;
 
-import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Locale;
 
 import static nofrills.Main.mc;
 
@@ -24,15 +22,8 @@ public class CalendarDate {
         return 0;
     }
 
-    private static String parseDate(Calendar calendar) {
-        return Utils.format("{} {}",
-                calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()),
-                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault()).format(calendar.getTime())
-        );
-    }
-
     private static Text buildLine(String prefix, Calendar calendar) {
-        return Text.literal(Utils.format("{}: §b{}", prefix, parseDate(calendar)));
+        return Text.literal(Utils.format("{}: §b{}", prefix, Utils.parseDate(calendar)));
     }
 
     @EventHandler

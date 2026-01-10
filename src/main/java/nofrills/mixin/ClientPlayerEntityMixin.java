@@ -56,7 +56,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
                 return; // items cannot be directly dropped while in an active dungeon due to the class ability
             }
             ItemStack stack = this.getInventory().getSelectedStack();
-            if (!stack.isEmpty() && !ItemProtection.getProtectType(stack).equals(ItemProtection.ProtectType.None)) {
+            if (!ItemProtection.getProtectType(stack).equals(ItemProtection.ProtectType.None)) {
                 cir.setReturnValue(false);
             }
         }

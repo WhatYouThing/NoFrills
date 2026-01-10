@@ -110,29 +110,4 @@ public class ClientPlayNetworkHandlerMixin {
     private void onScoreUpdate(TeamS2CPacket packet, CallbackInfo ci) {
         SkyblockData.updateScoreboard(packet);
     }
-
-    @Inject(method = "onGameJoin", at = @At("TAIL"))
-    private void onJoinGame(GameJoinS2CPacket packet, CallbackInfo ci) {
-        eventBus.post(new ServerJoinEvent());
-    }
-
-    @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/message/MessageHandler;onGameMessage(Lnet/minecraft/text/Text;Z)V"), cancellable = true)
-    private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
-        if (!packet.overlay()) {
-            String msg = Utils.toPlain(packet.content());
-            ChatMsgEvent event = eventBus.post(new ChatMsgEvent(packet.content(), msg));
-            if (event.isCancelled()) {
-                ci.cancel();
-            }
-            if (msg.startsWith("Party > ") && msg.contains(": ")) {
-                int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");
-                String[] clean = msg.replace(msg.substring(0, nameStart + 1), "").split(":", 2);
-                String author = clean[0].trim(), content = clean[1].trim();
-                boolean self = author.equalsIgnoreCase(mc.getSession().getUsername());
-                if (eventBus.post(new PartyChatMsgEvent(content, author, self)).isCancelled() && !ci.isCancelled()) {
-                    ci.cancel();
-                }
-            }
-        }
-    }
 }

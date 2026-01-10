@@ -116,7 +116,7 @@ public class SkyblockData {
      * Returns a list with every line that is currently displayed on the scoreboard.
      */
     public static List<String> getLines() {
-        return new ArrayList<>(lines); // return a copy to avoid a potential concurrent modification exception
+        return lines;
     }
 
     public static void showPing() {

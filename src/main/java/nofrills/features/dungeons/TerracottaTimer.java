@@ -16,6 +16,7 @@ import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Iterator;
 
 public class TerracottaTimer {
     public static final Feature instance = new Feature("terracottaTimer");
@@ -51,8 +52,7 @@ public class TerracottaTimer {
         if (instance.isActive() && Utils.isInDungeonBoss("6")) {
             if (event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
                 if (terracottas.stream().noneMatch(terra -> terra.pos.equals(event.pos))) {
-                    SpawningTerracotta terracotta = new SpawningTerracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300);
-                    terracottas.add(terracotta);
+                    terracottas.add(new SpawningTerracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300));
                 }
             }
             if (gyroTicks == 0 && event.oldState.isAir() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
@@ -64,8 +64,8 @@ public class TerracottaTimer {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !terracottas.isEmpty() && Utils.isInDungeonBoss("6")) {
-            for (SpawningTerracotta terra : new ArrayList<>(terracottas)) {
-                if (terra == null || terra.pos == null) continue;
+            for (SpawningTerracotta terra : terracottas) {
+                if (terra.pos == null) continue;
                 MutableText text = Text.literal(Utils.formatDecimal(terra.ticks / 20.0f) + "s");
                 event.drawText(terra.pos.toCenterPos(), text, 0.035f, true, color.value());
             }
@@ -83,10 +83,14 @@ public class TerracottaTimer {
             if (gyroTicks > 0) {
                 gyroTicks--;
             }
-            for (SpawningTerracotta terra : new ArrayList<>(terracottas)) {
+
+            for (Iterator<SpawningTerracotta> it = terracottas.iterator(); it.hasNext();) {
+                SpawningTerracotta terra = it.next();
+
                 terra.tick();
+
                 if (terra.ticks == 0) {
-                    terracottas.remove(terra);
+                    it.remove();
                 }
             }
         }

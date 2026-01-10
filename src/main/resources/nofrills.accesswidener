@@ -8,3 +8,8 @@ accessible field net/minecraft/entity/mob/CreeperEntity CHARGED Lnet/minecraft/e
 accessible field net/minecraft/client/gui/hud/ChatHud visibleMessages Ljava/util/List;
 accessible field net/minecraft/entity/PlayerLikeEntity STANDING_DIMENSIONS Lnet/minecraft/entity/EntityDimensions;
 accessible class net/minecraft/client/render/WorldRenderer$Gizmos
+accessible method net/minecraft/client/gui/hud/ChatHud getChatScale ()D
+accessible method net/minecraft/client/gui/hud/ChatHud getLineHeight ()I
+accessible method net/minecraft/client/gui/hud/ChatHud isChatHidden ()Z
+accessible method net/minecraft/client/gui/hud/ChatHud getWidth ()I
+accessible field net/minecraft/client/gui/hud/ChatHud scrolledLines I

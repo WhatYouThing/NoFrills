@@ -1,7 +1,11 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.hud.ChatHud;
+import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.math.MathHelper;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
@@ -9,6 +13,9 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static nofrills.Main.mc;
 
@@ -23,14 +30,35 @@ public class ChatTweaks {
     public static final SettingBool extraLines = new SettingBool(false, "extraLines", instance);
     public static final SettingInt lines = new SettingInt(1000, "lines", instance);
 
-    private static String getHoveredMsg() {
-        /*
+    private static double[] getChatLinePos() {
         ChatHud chatHud = mc.inGameHud.getChatHud();
-        DrawnTextConsumer.ClickHandler clickHandler = new DrawnTextConsumer.ClickHandler(mc.textRenderer,
-                (int) mc.mouse.getScaledX(mc.getWindow()),
-                (int) mc.mouse.getScaledY(mc.getWindow())
-        );
+        double x = mc.mouse.getScaledX(mc.getWindow());
+        double y = mc.mouse.getScaledY(mc.getWindow());
+        double d = mc.getWindow().getScaledHeight() - y - 40.0;
+        return new double[]{x / chatHud.getChatScale() - 4.0, d / (chatHud.getChatScale() * chatHud.getLineHeight())};
+    }
 
+    // imported function from previous version of the game
+    private static int getChatLineIndex(double x, double y) {
+        ChatHud chatHud = mc.inGameHud.getChatHud();
+        if (chatHud.isChatFocused() && !chatHud.isChatHidden()) {
+            if (!(x < -4.0) && !(x > MathHelper.floor(chatHud.getWidth() / chatHud.getChatScale()))) {
+                int i = Math.min(chatHud.getVisibleLineCount(), chatHud.visibleMessages.size());
+                if (y >= 0.0 && y < i) {
+                    int j = MathHelper.floor(y + chatHud.scrolledLines);
+                    if (j >= 0 && j < chatHud.visibleMessages.size()) {
+                        return j;
+                    }
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static String getHoveredMsg() {
+        ChatHud chatHud = mc.inGameHud.getChatHud();
+        double[] pos = getChatLinePos();
+        int i = getChatLineIndex(pos[0], pos[1]);
         if (i >= 0 && i < chatHud.visibleMessages.size()) {
             StringBuilder builder = new StringBuilder();
             List<ChatHudLine.Visible> lines = new ArrayList<>();
@@ -52,7 +80,6 @@ public class ChatTweaks {
             }
             return Formatting.strip(builder.toString());
         }
-        */
         return "";
     }
 

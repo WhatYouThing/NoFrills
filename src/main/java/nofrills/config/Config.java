@@ -1,5 +1,7 @@
 package nofrills.config;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
@@ -15,6 +17,7 @@ public class Config {
     private static final Path folderPath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills");
     private static final Path filePath = folderPath.resolve("Configuration.json");
     private static final Path tempPath = folderPath.resolve("Temp.json");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static JsonObject data = new JsonObject();
     private static int hash = 0;
 
@@ -36,7 +39,7 @@ public class Config {
             if (!Files.exists(folderPath)) {
                 Files.createDirectory(folderPath);
             }
-            Files.writeString(tempPath, data.toString());
+            Files.writeString(tempPath, GSON.toJson(data));
             try {
                 Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             } catch (AtomicMoveNotSupportedException ignored) {
@@ -49,7 +52,7 @@ public class Config {
     }
 
     public static void saveAsync() {
-        new Thread(Config::save).start();
+        Thread.startVirtualThread(Config::save);
     }
 
     public static int getHash() {

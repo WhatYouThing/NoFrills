@@ -33,22 +33,23 @@ public class ItemProtection {
     public static final SettingKeybind skyblockIdKey = new SettingKeybind(-1, "skyblockIdKey", instance);
     public static final SettingBool protectUUID = new SettingBool(false, "protectUUID", instance);
     public static final SettingBool protectSkyblockId = new SettingBool(false, "protectSkyblockId", instance);
+    public static final SettingBool protectMaxQuality = new SettingBool(false, "protectMaxQuality", instance);
     public static final SettingBool protectStarred = new SettingBool(false, "protectStarred", instance);
     public static final SettingBool protectRarityUpgraded = new SettingBool(false, "protectRarityUpgraded", instance);
     public static final SettingBool protectValue = new SettingBool(false, "protectValue", instance);
     public static final SettingDouble protectValueMin = new SettingDouble(1000000.0, "protectValueMin", instance);
 
     private static boolean isSellGUI = false;
+    private static boolean isSalvageGUI = false;
 
     public static boolean isProtectingValue() {
         return instance.isActive() && protectValue.value();
     }
 
     public static ProtectType getProtectType(ItemStack stack) {
+        if (stack.isEmpty()) return ProtectType.None;
         NbtCompound customData = Utils.getCustomData(stack);
-        if (customData == null) {
-            return ProtectType.None;
-        }
+        if (customData == null) return ProtectType.None;
         String id = Utils.getMarketId(stack);
         if (protectUUID.value() && data.value().has("uuids")) {
             String uuid = customData.getString("uuid", "");
@@ -61,7 +62,10 @@ public class ItemProtection {
                 return ProtectType.SkyblockID;
             }
         }
-        if (protectStarred.value() && customData.getInt("upgrade_level", 0) > 0) {
+        if (protectMaxQuality.value() && customData.getInt("baseStatBoostPercentage", 0) == 50) {
+            return ProtectType.MaxQuality;
+        }
+        if (protectStarred.value() && customData.getInt("upgrade_level", 0) > 0 && !customData.contains("boss_tier")) {
             return ProtectType.Starred;
         }
         if (protectRarityUpgraded.value() && customData.getInt("rarity_upgrades", 0) > 0) {
@@ -86,6 +90,11 @@ public class ItemProtection {
     private static boolean isSellStack(ItemStack stack) {
         return (stack.getItem().equals(Items.HOPPER) && Utils.toPlain(stack.getName()).equals("Sell Item"))
                 || Utils.getLoreLines(stack).contains("Click to buyback!");
+    }
+
+    private static boolean isSalvageButton(ItemStack stack) {
+        String name = Utils.toPlain(stack.getName());
+        return name.equals("Salvage Items") || name.equals("Confirm Salvage");
     }
 
     private static void addUUID(ItemStack stack) {
@@ -168,15 +177,27 @@ public class ItemProtection {
 
     @EventHandler
     private static void onSlotClick(SlotClickEvent event) {
-        if (instance.isActive() && (event.slotId == -999 || isSellGUI || event.actionType.equals(SlotActionType.THROW))) {
-            if (isSellGUI && event.handler instanceof GenericContainerScreenHandler handler) {
-                if (event.slotId >= 0 && event.slotId < handler.getRows() * 9) {
+        if (instance.isActive()) {
+            ItemStack stack = event.slot != null ? event.slot.getStack() : event.handler.getCursorStack();
+            if (event.handler instanceof GenericContainerScreenHandler handler) {
+                if (isSellGUI && event.slotId >= 0 && event.slotId < handler.getRows() * 9) {
                     return;
                 }
+                if (isSalvageGUI && isSalvageButton(stack)) {
+                    for (Slot slot : Utils.getContainerSlots(handler)) {
+                        ItemStack slotStack = slot.getStack();
+                        if (!getProtectType(slotStack).equals(ProtectType.None)) {
+                            Utils.infoRaw(Text.literal("§aPrevented salvage, ").append(slotStack.getName()).append(" §ais a protected item."));
+                            event.cancel();
+                            return;
+                        }
+                    }
+                }
             }
-            ItemStack stack = event.slot != null ? event.slot.getStack() : event.handler.getCursorStack();
-            if (!stack.isEmpty() && !getProtectType(stack).equals(ProtectType.None)) {
-                event.cancel();
+            if (event.slotId == -999 || isSellGUI || event.actionType.equals(SlotActionType.THROW)) {
+                if (!getProtectType(stack).equals(ProtectType.None)) {
+                    event.cancel();
+                }
             }
         }
     }
@@ -190,12 +211,23 @@ public class ItemProtection {
 
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
-        isSellGUI = false;
+        if (instance.isActive()) {
+            isSalvageGUI = event.screen.getTitle().getString().equals("Salvage Items");
+        }
+    }
+
+    @EventHandler
+    private static void onScreenClose(ScreenCloseEvent event) {
+        if (instance.isActive()) {
+            isSellGUI = false;
+            isSalvageGUI = false;
+        }
     }
 
     public enum ProtectType {
         UUID,
         SkyblockID,
+        MaxQuality,
         Starred,
         RarityUpgraded,
         Value,

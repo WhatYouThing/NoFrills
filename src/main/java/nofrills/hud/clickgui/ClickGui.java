@@ -222,10 +222,17 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Keybind("ID Protect Key", ItemProtection.skyblockIdKey, "The keybind to protect a specific item by Skyblock ID."),
                                 new Settings.Toggle("Protect By UUID", ItemProtection.protectUUID, "Protects items that you have protected by UUID."),
                                 new Settings.Toggle("Protect By ID", ItemProtection.protectSkyblockId, "Protects items that you have protected by Skyblock ID."),
+                                new Settings.Toggle("Protect Max Quality", ItemProtection.protectMaxQuality, "Protects Dungeon items with a rarity upgrade (50/50 quality)."),
                                 new Settings.Toggle("Protect Starred", ItemProtection.protectStarred, "Protects any item with Dungeon stars on it."),
                                 new Settings.Toggle("Protect Rarity Upgraded", ItemProtection.protectRarityUpgraded, "Protects any item that is Recombobulated."),
                                 new Settings.Toggle("Protect By Value", ItemProtection.protectValue, "Protects any item that has a high enough NPC/Auction/Bazaar value."),
                                 new Settings.DoubleInput("Minimum Value", ItemProtection.protectValueMin, "The minimum item value for an item to be protected by value.")
+                        ))),
+                        new Module("Info Tooltips", InfoTooltips.instance, "Adds various information about an item to its tooltip.", new Settings(List.of(
+                                new Settings.Toggle("Dungeon Quality", InfoTooltips.dungeonQuality, "Displays the quality and the floor tier on applicable dungeon items."),
+                                new Settings.Toggle("Created Date", InfoTooltips.createdDate, "Displays the exact date at which an item was created."),
+                                new Settings.Toggle("Hex Color", InfoTooltips.hexColor, "Displays the color of an item. Only applies to armor pieces that use leather armor as their base."),
+                                new Settings.Toggle("Museum Donated", InfoTooltips.museumDonated, "Displays if the item has been donated to the Museum.")
                         )))
                 )),
                 new Category("Tweaks", List.of(
@@ -256,11 +263,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Old Eye Height", OldEyeHeight.instance, "Allows you to restore the 1.8 sneaking eye height and/or disable the swimming eye height.", new Settings(List.of(
                                 new Settings.Separator("Sneaking"),
-                                new Settings.Toggle("Enabled", OldEyeHeight.sneakEnabled, "If enabled, the sneaking eye height will be reverted."),
+                                new Settings.Toggle("Sneaking", OldEyeHeight.sneakEnabled, "If enabled, the sneaking eye height will be reverted."),
                                 new Settings.Toggle("Skyblock Only", OldEyeHeight.sneakSkyblockCheck, "Prevent the sneaking eye height from changing outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", OldEyeHeight.sneakModernCheck, "Prevent the sneaking eye height from changing on islands using modern Minecraft versions (such as Galatea)."),
                                 new Settings.Separator("Swimming"),
-                                new Settings.Toggle("Enabled", OldEyeHeight.swimEnabled, "If enabled, the swimming eye height will be disabled."),
+                                new Settings.Toggle("Swimming", OldEyeHeight.swimEnabled, "If enabled, the swimming eye height will be disabled."),
                                 new Settings.Toggle("Skyblock Only", OldEyeHeight.swimSkyblockCheck, "Prevent the swimming eye height from changing outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", OldEyeHeight.swimModernCheck, "Prevent the swimming eye height from changing on islands using modern Minecraft versions (such as Galatea).")
                         ))),
@@ -470,6 +477,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", false, SecretBatHighlight.color, "The color of the secret bat glow.")
                         ))),
                         new Module("Livid Solver", LividSolver.instance, "Finds and highlights the correct Livid in F5/M5.", new Settings(List.of(
+                                new Settings.Toggle("Title", LividSolver.title, "Show a title on screen once the Livid color is identified."),
                                 new Settings.Toggle("Highlight", LividSolver.highlight, "Renders an outline for the correct Livid."),
                                 new Settings.Toggle("Tracer", LividSolver.tracer, "Renders a tracer towards the correct Livid."),
                                 new Settings.ColorPicker("Highlight Color", true, LividSolver.color, "The color of the outline."),
@@ -520,7 +528,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
                         new Module("Class Nametags", ClassNametags.instance, "Renders large nametags for your teammates, indicating their selected class and position.", new Settings(List.of(
-                                new Settings.SliderDouble("Text Scale", 0.0, 0.1, 0.01, ClassNametags.scale, "The scale of the text."),
+                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, ClassNametags.scale, "The scale of the text."),
                                 new Settings.ColorPicker("Healer Color", false, ClassNametags.healer, "The text color for Healer."),
                                 new Settings.ColorPicker("Mage Color", false, ClassNametags.mage, "The text color for Mage."),
                                 new Settings.ColorPicker("Bers Color", false, ClassNametags.bers, "The text color for Berserker."),
@@ -552,8 +560,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Pre Message", PreMessage.instance, "Announces if no supply spawns at your pre spot (or your next pickup spot)."),
                         new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop."),
                         new Module("Chest Value", KuudraChestValue.instance, "Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
-                                new Settings.ColorPicker("Background", true, KuudraChestValue.background, "The color of the background of the value text."),
-                                new Settings.SliderInt("Pet Bonus", 0, 20, 1, KuudraChestValue.petBonus, "The extra Crimson Essence percentage granted by your Kuudra pet.\nUsed to calculate the value of the essence with the extra perk included.")
+                                new Settings.SliderInt("Pet Bonus", 0, 20, 1, KuudraChestValue.petBonus, "The extra Crimson Essence percentage granted by your Kuudra pet.\nUsed to calculate the value of the essence with the extra perk included."),
+                                new Settings.Toggle("Use Salvage Value", KuudraChestValue.salvageValue, "Prices armor and equipment pieces based on the amount of essence gained from salvaging them.\nCan give a more accurate chest value compared to the default Lowest BIN value."),
+                                new Settings.ColorPicker("Background", true, KuudraChestValue.background, "The color of the background of the value text.")
                         ))),
                         new Module("Crate Priority", CratePriority.instance, "Shows which crates to pull and/or grab after you collect your Pre.\nThis feature requires the full party to be using some kind of Pre message feature.")
                 )),
@@ -600,6 +609,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Override Ticks", 0, 6000, 1, AbilityAlert.override, "Overrides your pickaxe ability cooldown to a custom value in ticks.\nOnly applies if the Pickaxe Ability widget isn't present.\nSet to 0 to disable.")
                         ))),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
+                                new Settings.Toggle("Hide Opened", CorpseHighlight.hideOpened, "Removes the highlight from corpses you've already opened."),
                                 new Settings.ColorPicker("Lapis Color", false, CorpseHighlight.lapisColor, "The color of the Lapis corpse."),
                                 new Settings.ColorPicker("Mineral Color", false, CorpseHighlight.mineralColor, "The color of the Tungsten corpse."),
                                 new Settings.ColorPicker("Yog Color", false, CorpseHighlight.yogColor, "The color of the Umber corpse."),

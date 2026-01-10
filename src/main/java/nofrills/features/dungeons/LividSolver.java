@@ -24,6 +24,7 @@ import java.util.List;
 public class LividSolver {
     public static final Feature instance = new Feature("lividSolver");
 
+    public static final SettingBool title = new SettingBool(true, "title", instance);
     public static final SettingBool highlight = new SettingBool(true, "highlight", instance);
     public static final SettingBool tracer = new SettingBool(false, "tracer", instance);
     public static final SettingColor color = new SettingColor(RenderColor.fromArgb(0xff00ff00), "color", instance.key());
@@ -32,6 +33,10 @@ public class LividSolver {
     private static final HashMap<Block, Livid> lividData = buildLividData();
     private static final EntityCache lividCache = new EntityCache();
     private static String currentName = "";
+
+    private static boolean active() {
+        return instance.isActive() && Utils.isInDungeonBoss("5");
+    }
 
     private static HashMap<Block, Livid> buildLividData() {
         HashMap<Block, Livid> map = new HashMap<>();
@@ -55,21 +60,21 @@ public class LividSolver {
 
     @EventHandler
     private static void onBlock(BlockUpdateEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("5") && event.pos.getY() >= 107 && event.pos.getY() <= 110) {
-            if (lividData.containsKey(event.newState.getBlock())) {
-                Livid livid = lividData.get(event.newState.getBlock());
-                if (!currentName.equals(livid.name)) {
+        if (active() && event.pos.getY() >= 107 && event.pos.getY() <= 110 && lividData.containsKey(event.newState.getBlock())) {
+            Livid livid = lividData.get(event.newState.getBlock());
+            if (!currentName.equals(livid.name)) {
+                if (title.value()) {
                     Utils.showTitle(livid.title + "!", "", 0, 50, 10);
                     Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
-                    currentName = livid.name;
                 }
+                currentName = livid.name;
             }
         }
     }
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("5") && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
+        if (active() && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
             String name = Utils.toPlain(player.getName());
             if (!lividCache.has(event.entity) && lividData.values().stream().anyMatch(livid -> livid.name.equals(name))) {
                 lividCache.add(event.entity);
@@ -79,7 +84,7 @@ public class LividSolver {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("5")) {
+        if (active()) {
             List<Entity> livids = lividCache.get();
             if (livids.size() <= 1) return;
             for (Entity livid : livids) {

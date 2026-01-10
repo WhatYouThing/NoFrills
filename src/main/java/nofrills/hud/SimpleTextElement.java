@@ -10,9 +10,11 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.PlainLabel;
+import nofrills.misc.RenderColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,7 @@ import java.util.List;
 public class SimpleTextElement extends HudElement {
     public final SettingEnum<TextAlignment> textAlignment;
     public final SettingBool textShadow;
+    public final SettingColor textColor;
     public MutableText text;
     public MutableText defaultText;
     public LabelComponent label;
@@ -28,6 +31,7 @@ public class SimpleTextElement extends HudElement {
         super(Containers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
         this.textAlignment = new SettingEnum<>(TextAlignment.Left, TextAlignment.class, "align", instance);
         this.textShadow = new SettingBool(true, "shadow", instance);
+        this.textColor = new SettingColor(RenderColor.fromHex(0x5ca0bf), "textColor", instance);
         this.text = text.withColor(this.getTextColor());
         this.defaultText = this.text.copy();
         this.label = new PlainLabel(this.text);
@@ -61,6 +65,7 @@ public class SimpleTextElement extends HudElement {
         List<FlowLayout> list = new ArrayList<>(extra);
         list.add(new Settings.Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."));
         list.add(new Settings.Dropdown<>("Alignment", this.textAlignment, "The alignment of the element's text."));
+        list.add(new Settings.ColorPicker("Text Color", false, this.textColor, "The base color of the element's text."));
         return super.getBaseSettings(list);
     }
 
@@ -77,7 +82,7 @@ public class SimpleTextElement extends HudElement {
     }
 
     public int getTextColor() {
-        return 0x5ca0bf;
+        return this.textColor.value().hex;
     }
 
     public enum TextAlignment {

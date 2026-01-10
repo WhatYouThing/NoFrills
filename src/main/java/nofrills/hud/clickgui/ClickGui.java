@@ -557,8 +557,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Pre Message", PreMessage.instance, "Announces if no supply spawns at your pre spot (or your next pickup spot)."),
                         new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop."),
                         new Module("Chest Value", KuudraChestValue.instance, "Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
-                                new Settings.ColorPicker("Background", true, KuudraChestValue.background, "The color of the background of the value text."),
-                                new Settings.SliderInt("Pet Bonus", 0, 20, 1, KuudraChestValue.petBonus, "The extra Crimson Essence percentage granted by your Kuudra pet.\nUsed to calculate the value of the essence with the extra perk included.")
+                                new Settings.SliderInt("Pet Bonus", 0, 20, 1, KuudraChestValue.petBonus, "The extra Crimson Essence percentage granted by your Kuudra pet.\nUsed to calculate the value of the essence with the extra perk included."),
+                                new Settings.Toggle("Use Salvage Value", KuudraChestValue.salvageValue, "Prices armor and equipment pieces based on the amount of essence gained from salvaging them.\nCan give a more accurate chest value compared to the default Lowest BIN value."),
+                                new Settings.ColorPicker("Background", true, KuudraChestValue.background, "The color of the background of the value text.")
                         ))),
                         new Module("Crate Priority", CratePriority.instance, "Shows which crates to pull and/or grab after you collect your Pre.\nThis feature requires the full party to be using some kind of Pre message feature.")
                 )),

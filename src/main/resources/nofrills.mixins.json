@@ -42,7 +42,8 @@
     "StatusEffectsDisplayMixin",
     "StuckObjectsFeatureRendererMixin",
     "WorldMixin",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "PacketApplyBatcherEntryMixin"
   ],
   "injectors": {
     "defaultRequire": 1

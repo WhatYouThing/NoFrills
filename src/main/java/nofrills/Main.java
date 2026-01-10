@@ -7,6 +7,8 @@ import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.util.Util;
@@ -32,6 +34,7 @@ import nofrills.features.tweaks.NoCursorReset;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.*;
+import nofrills.events.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,6 +184,34 @@ public class Main implements ModInitializer {
         eventBus.subscribe(CratePriority.class);
         eventBus.subscribe(MuteEnderman.class);
         eventBus.subscribe(ClassNametags.class);
+
+        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> eventBus.post(new ServerJoinEvent()));
+        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
+            if (overlay) {
+                return true;
+            }
+
+            String msg = Utils.toPlain(message);
+            ChatMsgEvent event = eventBus.post(new ChatMsgEvent(message, msg));
+
+            var allow = true;
+
+            if (event.isCancelled()) {
+                allow = false;
+            }
+
+            if (msg.startsWith("Party > ") && msg.contains(": ")) {
+                int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");
+                String[] clean = msg.replace(msg.substring(0, nameStart + 1), "").split(":", 2);
+                String author = clean[0].trim(), content = clean[1].trim();
+                boolean self = author.equalsIgnoreCase(mc.getSession().getUsername());
+                if (eventBus.post(new PartyChatMsgEvent(content, author, self)).isCancelled() && allow) {
+                    allow = false;
+                }
+            }
+
+            return allow;
+        });
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

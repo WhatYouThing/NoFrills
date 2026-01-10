@@ -20,19 +20,6 @@ import static nofrills.Main.eventBus;
 
 @Mixin(ClientConnection.class)
 public abstract class ClientConnectionMixin {
-    @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
-    private static void onPacketReceive(Packet<?> packet, PacketListener listener, CallbackInfo ci) {
-        if (packet instanceof CommonPingS2CPacket) {
-            eventBus.post(new ServerTickEvent());
-        }
-        if (packet instanceof PlayerListS2CPacket listPacket) {
-            SkyblockData.updateTabList(listPacket, listPacket.getEntries());
-        }
-        if (eventBus.post(new ReceivePacketEvent(packet)).isCancelled()) {
-            ci.cancel();
-        }
-    }
-
     @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At("HEAD"), cancellable = true)
     private void onPacketSend(Packet<?> packet, @Nullable ChannelFutureListener channelFutureListener, boolean flush, CallbackInfo ci) {
         if (eventBus.post(new SendPacketEvent(packet)).isCancelled()) {

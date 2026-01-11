@@ -119,7 +119,7 @@ public class ChatWaypoints {
                     waypointList.remove(waypoint);
                     continue;
                 }
-                if (waypoint.shouldClear() && waypoint.box.getCenter().distanceTo(mc.player.getPos()) <= 8.0) {
+                if (waypoint.shouldClear() && waypoint.box.getCenter().distanceTo(mc.player.getEntityPos()) <= 8.0) {
                     waypointList.remove(waypoint);
                     continue;
                 }

@@ -2,6 +2,7 @@ package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -172,10 +173,10 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (LeapOverlay.isLeapMenu(this.title.getString()) && button == GLFW.GLFW_MOUSE_BUTTON_1) {
+    private void onMouseClicked(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
+        if (LeapOverlay.isLeapMenu(this.title.getString()) && click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
             for (LeapOverlay.LeapButton leapButton : leapButtons) {
-                if (leapButton.isHovered(mouseX, mouseY)) {
+                if (leapButton.isHovered(click.x(), click.y())) {
                     mc.interactionManager.clickSlot(handler.syncId, leapButton.slotId, 0, SlotActionType.PICKUP, mc.player);
                     this.handler.setCursorStack(ItemStack.EMPTY);
                     if (LeapOverlay.send.value() && !LeapOverlay.message.value().isEmpty() && !sentLeapMsg) {

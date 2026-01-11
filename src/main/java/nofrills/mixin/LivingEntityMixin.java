@@ -63,10 +63,7 @@ public abstract class LivingEntityMixin extends Entity {
 
     @WrapWithCondition(method = "dropItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(LivingEntity instance, Hand hand) {
-        if (NoDropSwing.active() && instance == mc.player) {
-            return false;
-        }
-        return this.getWorld().isClient;
+        return !(NoDropSwing.active() && instance == mc.player);
     }
 
     @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))

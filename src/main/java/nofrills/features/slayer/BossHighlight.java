@@ -8,8 +8,8 @@ import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldRenderEvent;
+import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
-import nofrills.misc.Rendering;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
@@ -30,43 +30,14 @@ public class BossHighlight {
     public static final SettingColor crystalFill = new SettingColor(RenderColor.fromArgb(0x5500ffff), "crystalFill", instance.key());
     public static final SettingColor crystalOutline = new SettingColor(RenderColor.fromArgb(0xff00ffff), "crystalOutline", instance.key());
 
+    private static BlazeHighlight blazeHighlight = null;
+
     private static void highlightBlaze(Entity ent, String name) {
         String attunement = name.contains(" ") ? name.substring(0, name.indexOf(" ")) : "";
         List<Entity> other = Utils.getOtherEntities(ent, 1, 3, 1, SlayerUtil.currentBoss.predicate);
         Entity owner = Utils.findNametagOwner(ent, other);
         if (owner != null) {
-            applyHighlight(owner, getBlazeFillColor(attunement), getBlazeOutlineColor(attunement));
-        }
-    }
-
-    private static RenderColor getBlazeFillColor(String attunement) {
-        return switch (attunement) {
-            case "IMMUNE" -> null;
-            case "ASHEN" -> ashenFill.value();
-            case "SPIRIT" -> spiritFill.value();
-            case "AURIC" -> auricFill.value();
-            case "CRYSTAL" -> crystalFill.value();
-            default -> fillColor.value();
-        };
-    }
-
-    private static RenderColor getBlazeOutlineColor(String attunement) {
-        return switch (attunement) {
-            case "IMMUNE" -> null;
-            case "ASHEN" -> ashenOutline.value();
-            case "SPIRIT" -> spiritOutline.value();
-            case "AURIC" -> auricOutline.value();
-            case "CRYSTAL" -> crystalOutline.value();
-            default -> outlineColor.value();
-        };
-    }
-
-    private static void applyHighlight(Entity ent, RenderColor fillColor, RenderColor outlineColor) {
-        if (!highlightStyle.value().equals(style.Outline)) {
-            Rendering.Entities.drawFilled(ent, fillColor != null, fillColor);
-        }
-        if (!highlightStyle.value().equals(style.Filled)) {
-            Rendering.Entities.drawOutline(ent, outlineColor != null, outlineColor);
+            blazeHighlight = new BlazeHighlight(owner, attunement);
         }
     }
 
@@ -79,15 +50,17 @@ public class BossHighlight {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && !SlayerUtil.isFightingBoss(SlayerUtil.blaze)) {
-            Entity boss = SlayerUtil.getBossEntity();
-            if (boss == null) return;
+        if (instance.isActive() && SlayerUtil.bossAlive) {
+            Entity boss = blazeHighlight != null ? blazeHighlight.entity : SlayerUtil.getBossEntity();
+            RenderColor fill = blazeHighlight != null ? blazeHighlight.fill : fillColor.value();
+            RenderColor outline = blazeHighlight != null ? blazeHighlight.outline : outlineColor.value();
+            if (!EntityCache.exists(boss)) return;
             Box box = Utils.getLerpedBox(boss, event.tickCounter.getTickProgress(true));
-            if (!highlightStyle.value().equals(style.Outline)) {
-                event.drawFilled(box, false, fillColor.value());
+            if (!highlightStyle.value().equals(style.Outline) && fill != null) {
+                event.drawFilled(box, false, fill);
             }
-            if (!highlightStyle.value().equals(style.Filled)) {
-                event.drawOutline(box, false, outlineColor.value());
+            if (!highlightStyle.value().equals(style.Filled) && outline != null) {
+                event.drawOutline(box, false, outline);
             }
         }
     }
@@ -96,5 +69,31 @@ public class BossHighlight {
         Outline,
         Filled,
         Both
+    }
+
+    public static class BlazeHighlight {
+        public Entity entity;
+        public RenderColor fill;
+        public RenderColor outline;
+
+        public BlazeHighlight(Entity entity, String attunement) {
+            this.entity = entity;
+            this.fill = switch (attunement) {
+                case "IMMUNE" -> null;
+                case "ASHEN" -> ashenFill.value();
+                case "SPIRIT" -> spiritFill.value();
+                case "AURIC" -> auricFill.value();
+                case "CRYSTAL" -> crystalFill.value();
+                default -> fillColor.value();
+            };
+            this.outline = switch (attunement) {
+                case "IMMUNE" -> null;
+                case "ASHEN" -> ashenOutline.value();
+                case "SPIRIT" -> spiritOutline.value();
+                case "AURIC" -> auricOutline.value();
+                case "CRYSTAL" -> crystalOutline.value();
+                default -> outlineColor.value();
+            };
+        }
     }
 }

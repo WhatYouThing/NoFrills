@@ -6,7 +6,6 @@ import nofrills.config.SettingColor;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
-import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
 public class SecretBatHighlight {
@@ -16,8 +15,8 @@ public class SecretBatHighlight {
 
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && DungeonUtil.isSecretBat(event.entity) && !Rendering.Entities.isDrawingGlow(event.entity)) {
-            Rendering.Entities.drawGlow(event.entity, true, color.value());
+        if (instance.isActive() && Utils.isInDungeons() && DungeonUtil.isSecretBat(event.entity) && !Utils.isGlowing(event.entity)) {
+            Utils.setGlowing(event.entity, true, color.value());
         }
     }
 }

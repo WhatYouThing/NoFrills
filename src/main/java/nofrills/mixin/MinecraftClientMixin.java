@@ -5,10 +5,10 @@ import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.sound.SoundSystem;
+import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.sound.SoundCategory;
@@ -25,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -39,18 +38,12 @@ public abstract class MinecraftClientMixin {
     @Shadow
     @Nullable
     public ClientWorld world;
+    @Shadow
+    @Final
+    private SoundManager soundManager;
 
     @Shadow
     public abstract void setScreen(@Nullable Screen screen);
-
-    @Unique
-    @Final
-    SoundSystem getSoundSystem() {
-        if (mc.getSoundManager() != null) {
-            return mc.getSoundManager().soundSystem;
-        }
-        return null;
-    }
 
     @WrapWithCondition(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(ClientPlayerEntity instance, Hand hand) {
@@ -59,7 +52,7 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void onBeforeOpenScreen(Screen screen, CallbackInfo ci) {
-        if (NoLoadingScreen.instance.isActive() && screen instanceof DownloadingTerrainScreen) {
+        if (NoLoadingScreen.instance.isActive() && screen instanceof LevelLoadingScreen) {
             this.setScreen(null);
             ci.cancel();
         }
@@ -130,9 +123,11 @@ public abstract class MinecraftClientMixin {
     }
 
     @Inject(method = "onWindowFocusChanged", at = @At("TAIL"))
-    private void onFocusChanged(boolean focused, CallbackInfo ci) {
-        if (this.getSoundSystem() != null && UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.muteSounds.value()) {
-            this.getSoundSystem().updateSoundVolume(SoundCategory.MASTER, !focused ? 0.0f : mc.options.getSoundVolumeOption(SoundCategory.MASTER).getValue().floatValue());
+    private void onAfterFocusChanged(boolean focused, CallbackInfo ci) {
+        if (this.soundManager != null && UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.muteSounds.value()) {
+            for (SoundCategory category : SoundCategory.values()) {
+                this.soundManager.updateSoundVolume(category);
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package nofrills.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Mouse;
+import net.minecraft.client.input.MouseInput;
 import net.minecraft.entity.player.PlayerInventory;
 import nofrills.events.InputEvent;
 import nofrills.features.farming.SpaceFarmer;
@@ -20,8 +21,8 @@ import static nofrills.Main.mc;
 public abstract class MouseMixin {
 
     @Inject(method = "onMouseButton", at = @At("HEAD"), cancellable = true)
-    private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
-        if (eventBus.post(new InputEvent(button, mods, action)).isCancelled()) {
+    private void onMouseButton(long window, MouseInput input, int action, CallbackInfo ci) {
+        if (eventBus.post(new InputEvent(input, action)).isCancelled()) {
             ci.cancel();
         }
     }

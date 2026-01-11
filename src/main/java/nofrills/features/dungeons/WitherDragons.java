@@ -2,7 +2,6 @@ package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
@@ -62,14 +61,6 @@ public class WitherDragons {
                 && packet.getY() == 19 && packet.getOffsetX() == 2.0f && packet.getOffsetY() == 3.0f
                 && packet.getOffsetZ() == 2.0f && packet.getSpeed() == 0.0f && packet.getX() % 1 == 0.0
                 && packet.getZ() % 1 == 0.0;
-    }
-
-    private static boolean isPurpleInArea(Dragon dragon) {
-        if (Dragon.PURPLE.hasEntity()) {
-            Box box = Dragon.PURPLE.entity.getDimensions(EntityPose.STANDING).getBoxAt(Dragon.PURPLE.entity.getPos());
-            return dragon.area.intersects(box);
-        }
-        return false;
     }
 
     private static boolean isEitherPurple(Dragon first, Dragon second) {
@@ -133,7 +124,7 @@ public class WitherDragons {
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive() && isDragonParticle(event.packet) && DungeonUtil.isInDragonPhase()) {
             for (Dragon drag : dragons) {
-                if (drag.spawnTicks == 0 && drag.area.contains(event.pos) && !isPurpleInArea(drag)) {
+                if (drag.spawnTicks == 0 && drag.area.contains(event.pos)) {
                     drag.startTicking();
                     List<Dragon> spawning = dragons.stream().filter(Dragon::isSpawning).toList();
                     if (!splitDone && spawning.size() == 2) {
@@ -368,8 +359,8 @@ public class WitherDragons {
         public void setEntity(EnderDragonEntity ent) {
             this.entity = ent;
             this.health = ent.getHealth(); // store the health value on update, required as the client appears to reset it on the next tick
-            if (glow.value() && !Rendering.Entities.isDrawingGlow(ent)) {
-                Rendering.Entities.drawGlow(ent, true, this.color);
+            if (glow.value() && !Utils.isGlowing(ent)) {
+                Utils.setGlowing(ent, true, this.color);
             }
         }
 

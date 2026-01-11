@@ -2,6 +2,7 @@ package nofrills.hud.clickgui.components;
 
 import io.wispforest.owo.ui.component.LabelComponent;
 import io.wispforest.owo.ui.core.Component;
+import net.minecraft.client.gui.Click;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 
@@ -19,7 +20,7 @@ public class PlainLabel extends LabelComponent {
     }
 
     @Override
-    public boolean onMouseDown(double mouseX, double mouseY, int button) {
+    public boolean onMouseDown(Click click, boolean doubled) {
         return false;
     }
 

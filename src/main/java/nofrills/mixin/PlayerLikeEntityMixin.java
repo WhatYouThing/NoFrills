@@ -1,13 +1,9 @@
 package nofrills.mixin;
 
-
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
+import net.minecraft.entity.PlayerLikeEntity;
 import nofrills.features.tweaks.OldEyeHeight;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Final;
@@ -15,16 +11,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(PlayerEntity.class)
-public abstract class PlayerEntityMixin extends LivingEntity {
+@Mixin(PlayerLikeEntity.class)
+public class PlayerLikeEntityMixin {
 
     @Shadow
     @Final
     public static EntityDimensions STANDING_DIMENSIONS;
-
-    protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
-        super(entityType, world);
-    }
 
     @ModifyReturnValue(method = "getBaseDimensions", at = @At("RETURN"))
     private EntityDimensions getDimensions(EntityDimensions original, EntityPose pose) {

@@ -8,12 +8,15 @@ import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.client.gui.Click;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.*;
 import nofrills.features.general.CustomKeybinds;
 import nofrills.hud.clickgui.components.*;
 import nofrills.misc.RenderColor;
+import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -30,11 +33,11 @@ import static nofrills.Main.mc;
 public class Settings extends BaseOwoScreen<FlowLayout> {
     public static final ButtonComponent.Renderer buttonRenderer = (context, button, delta) -> {
         context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
-        context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
+        Rendering.drawBorder(context, button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
     };
     public static final ButtonComponent.Renderer buttonRendererWhite = (context, button, delta) -> {
         context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
-        context.drawBorder(button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xffffffff);
+        Rendering.drawBorder(context, button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xffffffff);
     };
     public List<FlowLayout> settings;
     public Text title = Text.empty();
@@ -49,7 +52,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         button.positioning(Positioning.relative(100, 0));
         button.renderer((context, btn, delta) -> {
             context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
-            context.drawBorder(btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xffffffff);
+            Rendering.drawBorder(context, btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xffffffff);
         });
         return button;
     }
@@ -101,15 +104,15 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (isBinding(this.settings, keyCode)) {
+    public boolean keyPressed(KeyInput input) {
+        if (isBinding(this.settings, input.key())) {
             return true;
         }
-        if (keyCode == GLFW.GLFW_KEY_PAGE_UP || keyCode == GLFW.GLFW_KEY_PAGE_DOWN) {
-            this.scroll.onMouseScroll(0, 0, keyCode == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+        if (input.key() == GLFW.GLFW_KEY_PAGE_UP || input.key() == GLFW.GLFW_KEY_PAGE_DOWN) {
+            this.scroll.onMouseScroll(0, 0, input.key() == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return super.keyPressed(input);
     }
 
     @Override
@@ -119,11 +122,11 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (isBinding(this.settings, button)) {
+    public boolean mouseClicked(Click click, boolean doubled) {
+        if (isBinding(this.settings, click.button())) {
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(click, doubled);
     }
 
     @Override

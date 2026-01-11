@@ -28,7 +28,7 @@ public class PreMessage {
                         boolean preFound = false, secondaryFound = false;
                         for (Entity ent : Utils.getEntities()) {
                             if (ent instanceof GiantEntity) {
-                                Vec3d entPos = ent.getPos();
+                                Vec3d entPos = ent.getEntityPos();
                                 Vec3d supplyPos = new Vec3d(entPos.getX(), 76, entPos.getZ());
                                 if (preSpot.spot.distanceTo(supplyPos) < preSpot.supplyDist) {
                                     preFound = true;

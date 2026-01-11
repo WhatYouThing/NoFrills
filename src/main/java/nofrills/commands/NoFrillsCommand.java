@@ -216,7 +216,7 @@ public class NoFrillsCommand {
                             ItemStack stack = living.getEquippedStack(slot);
                             GameProfile textures = Utils.getTextures(stack);
                             if (textures != null && stack.getItem() instanceof PlayerHeadItem) {
-                                Vec3d pos = living.getPos();
+                                Vec3d pos = living.getEntityPos();
                                 LOGGER.info(Utils.format("\n\tURL - {}\n\tSlot - {}\n\tEntity Name - {}\n\tHead Name - {}\n\tPosition - {} {} {}",
                                         Utils.getTextureUrl(textures),
                                         Utils.toUpper(slot.name()),
@@ -233,12 +233,12 @@ public class NoFrillsCommand {
                 Utils.info("Dumped head texture URL's to latest.log.");
                 return SINGLE_SUCCESS;
             })).then(literal("dumpPlayerTextures").executes(context -> {
-                MinecraftSessionService service = mc.getSessionService();
+                MinecraftSessionService service = mc.getApiServices().sessionService();
                 for (Entity ent : Utils.getEntities()) {
                     if (ent instanceof PlayerEntity player) {
                         if (player.getGameProfile() != null) {
                             MinecraftProfileTextures textures = service.getTextures(player.getGameProfile());
-                            Vec3d pos = player.getPos();
+                            Vec3d pos = player.getEntityPos();
                             if (textures.skin() == null) {
                                 continue;
                             }

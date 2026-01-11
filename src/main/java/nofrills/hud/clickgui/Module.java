@@ -2,6 +2,7 @@ package nofrills.hud.clickgui;
 
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.client.gui.Click;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.hud.clickgui.components.PlainLabel;
@@ -38,11 +39,11 @@ public class Module extends FlowLayout {
     }
 
     @Override
-    public boolean onMouseDown(double mouseX, double mouseY, int button) {
-        if (mouseY <= (double) this.label.fullSize().height()) {
-            if (button == GLFW.GLFW_MOUSE_BUTTON_1) {
+    public boolean onMouseDown(Click click, boolean doubled) {
+        if (click.y() <= (double) this.label.fullSize().height()) {
+            if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
                 this.active(!this.feature.isActive());
-            } else if (button == GLFW.GLFW_MOUSE_BUTTON_2 && this.options != null) {
+            } else if (click.button() == GLFW.GLFW_MOUSE_BUTTON_2 && this.options != null) {
                 mc.setScreen(this.options);
             }
             return true;

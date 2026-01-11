@@ -44,7 +44,7 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
     @ModifyExpressionValue(method = "wouldCollideAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getBoundingBox()Lnet/minecraft/util/math/Box;"))
     private Box onGetBoundingBox(Box original) {
         if (HitboxFix.active()) {
-            return PlayerEntity.STANDING_DIMENSIONS.getBoxAt(this.getPos());
+            return PlayerEntity.STANDING_DIMENSIONS.getBoxAt(this.getEntityPos());
         }
         return original;
     }

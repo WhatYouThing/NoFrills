@@ -120,7 +120,7 @@ public class PlotBorders {
         }
 
         public boolean isPlayerAbove() {
-            Vec3d pos = mc.player.getPos();
+            Vec3d pos = mc.player.getEntityPos();
             if (pos.getY() > 66 && pos.getY() < 142) {
                 return pos.getX() > boundingBox.minX && pos.getX() < boundingBox.maxX && pos.getZ() > boundingBox.minZ && pos.getZ() < boundingBox.maxZ;
             }

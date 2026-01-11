@@ -12,7 +12,6 @@ import nofrills.events.InteractEntityEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
-import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
 import java.util.HashSet;
@@ -83,11 +82,11 @@ public class CorpseHighlight {
         if (active()) {
             for (Entity ent : Utils.getEntities()) {
                 if (ent instanceof ArmorStandEntity stand && !stand.isInvisible()) {
-                    if (openedCorpses.contains(stand.getId()) || Rendering.Entities.isDrawingGlow(stand)) {
+                    if (openedCorpses.contains(stand.getId()) || Utils.isGlowing(stand)) {
                         continue;
                     }
                     RenderColor color = getCorpseColor(getCorpseType(stand));
-                    if (color != null) Rendering.Entities.drawGlow(stand, true, color);
+                    if (color != null) Utils.setGlowing(stand, true, color);
                 }
             }
         }
@@ -99,7 +98,7 @@ public class CorpseHighlight {
             CorpseType type = getCorpseType(stand);
             if (!type.equals(CorpseType.None) && hasKeyForCorpse(type)) {
                 openedCorpses.add(stand.getId());
-                Rendering.Entities.drawGlow(stand, false, RenderColor.white);
+                Utils.setGlowing(stand, false, RenderColor.white);
             }
         }
     }

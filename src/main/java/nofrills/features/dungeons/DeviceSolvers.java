@@ -141,7 +141,7 @@ public class DeviceSolvers {
         public static final HashMap<ItemFrameEntity, Integer> solutionMap = new HashMap<>();
 
         private static boolean isActive() {
-            return mc.player != null && area.getCenter().distanceTo(mc.player.getPos()) <= 8.0;
+            return mc.player != null && area.getCenter().distanceTo(mc.player.getEntityPos()) <= 8.0;
         }
 
         private static int getNeededClicks(int current, int target) {

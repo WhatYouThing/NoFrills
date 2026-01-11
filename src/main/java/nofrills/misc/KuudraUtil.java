@@ -47,7 +47,7 @@ public class KuudraUtil {
             int cubesFound = 0;
             for (Entity ent : Utils.getEntities()) {
                 if (ent instanceof MagmaCubeEntity cube && cube.getSize() == 30) {
-                    double y = ent.getPos().getY();
+                    double y = ent.getEntityPos().getY();
                     cubesFound++;
                     if (y > maxY) {
                         kuudra = cube;
@@ -91,7 +91,7 @@ public class KuudraUtil {
 
     private static void updatePreSpot() {
         if (mc.player != null && preSpot == null && currentPhase.equals(Phase.Collect)) {
-            Vec3d pos = mc.player.getPos();
+            Vec3d pos = mc.player.getEntityPos();
             for (PickupSpot pickupSpot : KuudraUtil.pickupSpots) {
                 if (pickupSpot.spot.distanceTo(pos) < pickupSpot.playerDist) {
                     preSpot = pickupSpot;

@@ -38,7 +38,7 @@ public class DungeonUtil {
     }
 
     public static boolean isInDragonPhase() {
-        return mc.player != null && mc.player.getPos().getY() < 50 && Utils.isInDungeonBoss("7");
+        return mc.player != null && mc.player.getEntityPos().getY() < 50 && Utils.isInDungeonBoss("7");
     }
 
     public static boolean isInBossRoom() {

@@ -137,7 +137,7 @@ public class SkyblockData {
 
     public static void updateObjective(ScoreboardObjectiveUpdateS2CPacket packet) {
         if (mc.player != null) {
-            Scoreboard scoreboard = mc.player.getScoreboard();
+            Scoreboard scoreboard = mc.player.networkHandler.getScoreboard();
             ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
             if (objective != null) {
                 inSkyblock = Utils.toPlain(objective.getDisplayName()).contains("SKYBLOCK");
@@ -148,7 +148,7 @@ public class SkyblockData {
     public static void updateScoreboard(TeamS2CPacket packet) {
         if (mc.player != null) {
             List<String> currentLines = new ArrayList<>();
-            Scoreboard scoreboard = mc.player.getScoreboard();
+            Scoreboard scoreboard = mc.player.networkHandler.getScoreboard();
             ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
             for (ScoreHolder scoreHolder : scoreboard.getKnownScoreHolders()) {
                 if (scoreboard.getScoreHolderObjectives(scoreHolder).containsKey(objective)) {

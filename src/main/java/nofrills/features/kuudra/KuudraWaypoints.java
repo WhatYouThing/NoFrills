@@ -83,7 +83,7 @@ public class KuudraWaypoints {
             if (!dropOffs.empty()) {
                 for (Entity drop : dropOffs.get()) {
                     if (hasName(drop, "BRING SUPPLY CHEST HERE")) {
-                        event.drawBeam(getGround(drop.getPos()), 256, true, dropColor.value());
+                        event.drawBeam(getGround(drop.getEntityPos()), 256, true, dropColor.value());
                     } else {
                         dropOffs.remove(drop);
                     }

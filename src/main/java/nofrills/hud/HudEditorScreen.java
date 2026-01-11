@@ -4,6 +4,7 @@ import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.container.Containers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import nofrills.features.misc.AutoSave;
@@ -52,12 +53,12 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {
         if (this.uiAdapter == null) {
             return false;
         }
-        boolean clicked = this.uiAdapter.mouseClicked(mouseX, mouseY, button);
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && !clicked) {
+        boolean clicked = this.uiAdapter.mouseClicked(click, doubled);
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && !clicked) {
             List<FlowLayout> list = new ArrayList<>();
             for (HudElement element : HudManager.getElements()) {
                 FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
@@ -80,8 +81,8 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+    public boolean mouseReleased(Click click) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             for (HudElement element : HudManager.getElements()) {
                 if (element.toggling && element.isAdded()) {
                     element.toggling = false;
@@ -90,17 +91,17 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
                 }
             }
         }
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(click);
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
         for (HudElement element : HudManager.getElements()) {
             if (element.toggling && element.isAdded()) {
                 element.toggling = false;
             }
         }
-        return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
+        return super.mouseDragged(click, deltaX, deltaY);
     }
 
     @Override

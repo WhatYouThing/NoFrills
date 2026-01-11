@@ -209,7 +209,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Custom Keybinds", CustomKeybinds.instance, "Create keybinds that run a custom command when pressed.", CustomKeybinds.buildSettings()),
                         new Module("Chat Rules", ChatRules.instance, "Create custom rules that activate when a matching message is sent in chat.", ChatRules.buildSettings()),
                         new Module("Chat Tweaks", ChatTweaks.instance, "Various features/improvements for the chat hud.", new Settings(List.of(
-                                new Settings.Keybind("Copy Key", ChatTweaks.copyKey, "The message copy keybind. Copies the hovered message to clipboard when pressed."),
+                                new Settings.Keybind("Copy Key", ChatTweaks.copyKey, "Copies the hovered message to clipboard when pressed."),
+                                new Settings.Keybind("Copy Line Key", ChatTweaks.copyLineKey, "Copies the hovered line of a message to clipboard when pressed."),
                                 new Settings.Toggle("Trim On Copy", ChatTweaks.trimOnCopy, "Trims copied chat messages to remove any leading/trailing space characters."),
                                 new Settings.Toggle("Message On Copy", ChatTweaks.msgOnCopy, "Sends a feedback message in chat after copying any message."),
                                 new Settings.SliderInt("Feedback Limit", 0, 512, 1, ChatTweaks.copyMsgLength, "The max length of the copied message within the feedback message.\nHelps to prevent the chat from filling up when copying large messages."),

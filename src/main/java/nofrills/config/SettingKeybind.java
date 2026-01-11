@@ -18,4 +18,8 @@ public class SettingKeybind extends SettingInt {
     public boolean bound() {
         return this.value() != GLFW.GLFW_KEY_UNKNOWN;
     }
+
+    public boolean isKey(int key) {
+        return key != GLFW.GLFW_KEY_UNKNOWN && key == this.value();
+    }
 }

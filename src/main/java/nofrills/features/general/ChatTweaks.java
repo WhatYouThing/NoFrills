@@ -22,6 +22,7 @@ public class ChatTweaks {
     public static final Feature instance = new Feature("chatTweaks");
 
     public static final SettingKeybind copyKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "copyKey", instance);
+    public static final SettingKeybind copyLineKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "copyLineKey", instance);
     public static final SettingBool trimOnCopy = new SettingBool(false, "trimOnCopy", instance);
     public static final SettingBool msgOnCopy = new SettingBool(false, "msgOnCopy", instance);
     public static final SettingInt copyMsgLength = new SettingInt(50, "copyMsgLength", instance);
@@ -29,7 +30,7 @@ public class ChatTweaks {
     public static final SettingBool extraLines = new SettingBool(false, "extraLines", instance);
     public static final SettingInt lines = new SettingInt(1000, "lines", instance);
 
-    private static String getHoveredMsg() {
+    private static String getHoveredMsg(boolean singleLine) {
         ChatHud chatHud = mc.inGameHud.getChatHud();
         double x = chatHud.toChatLineX(mc.mouse.getScaledX(mc.getWindow()));
         double y = chatHud.toChatLineY(mc.mouse.getScaledY(mc.getWindow()));
@@ -37,15 +38,19 @@ public class ChatTweaks {
         if (i >= 0 && i < chatHud.visibleMessages.size()) {
             StringBuilder builder = new StringBuilder();
             List<ChatHudLine.Visible> lines = new ArrayList<>();
-            for (int j = i + 1; j < chatHud.visibleMessages.size(); j++) {
-                ChatHudLine.Visible line = chatHud.visibleMessages.get(j);
-                if (line.endOfEntry()) break;
-                lines.addFirst(line);
-            }
-            for (int j = i; j >= 0; j--) {
-                ChatHudLine.Visible line = chatHud.visibleMessages.get(j);
-                lines.add(line);
-                if (line.endOfEntry()) break;
+            if (singleLine) {
+                lines.addFirst(chatHud.visibleMessages.get(i));
+            } else {
+                for (int index = i + 1; index < chatHud.visibleMessages.size(); index++) {
+                    ChatHudLine.Visible line = chatHud.visibleMessages.get(index);
+                    if (line.endOfEntry()) break;
+                    lines.addFirst(line);
+                }
+                for (int index = i; index >= 0; index--) {
+                    ChatHudLine.Visible line = chatHud.visibleMessages.get(index);
+                    lines.add(line);
+                    if (line.endOfEntry()) break;
+                }
             }
             for (ChatHudLine.Visible line : lines) {
                 line.content().accept((index, style, codePoint) -> {
@@ -60,17 +65,19 @@ public class ChatTweaks {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.currentScreen instanceof ChatScreen && copyKey.bound() && copyKey.key() == event.key) {
+        if (instance.isActive() && mc.currentScreen instanceof ChatScreen && (copyKey.isKey(event.key) || copyLineKey.isKey(event.key))) {
             if (event.action == GLFW.GLFW_PRESS) {
-                String message = getHoveredMsg();
+                String message = getHoveredMsg(copyLineKey.isKey(event.key));
                 if (message.isEmpty()) return;
                 mc.keyboard.setClipboard(trimOnCopy.value() ? message.trim() : message);
                 if (msgOnCopy.value()) {
+                    String type = copyLineKey.isKey(event.key) ? "Line" : "Message";
                     int length = copyMsgLength.value();
                     if (length == 0) {
-                        Utils.info("§aMessage copied to clipboard.");
+                        Utils.infoFormat("§a{} copied to clipboard.", type);
                     } else {
-                        Utils.infoFormat("§aMessage copied to clipboard: \"{}\".",
+                        Utils.infoFormat("§a{} copied to clipboard: \"§7{}§a\".",
+                                type,
                                 message.length() > length ? message.substring(0, length) + "..." : message
                         );
                     }

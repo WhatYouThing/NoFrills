@@ -56,6 +56,7 @@ public class SkyblockData {
     private static boolean instanceOver = false;
     private static List<String> lines = new ArrayList<>();
     private static boolean showPing = false;
+    private static boolean scoreboardDirty;
 
     private static void updateDungeonClass(String msg) {
         if (mc.player != null) {
@@ -146,6 +147,10 @@ public class SkyblockData {
     }
 
     public static void updateScoreboard(TeamS2CPacket packet) {
+        scoreboardDirty = true;
+    }
+
+    private static void updateScoreboardNonCached() {
         if (mc.player != null) {
             List<String> currentLines = new ArrayList<>();
             Scoreboard scoreboard = mc.player.networkHandler.getScoreboard();
@@ -169,6 +174,13 @@ public class SkyblockData {
             }
             lines = currentLines;
             SlayerUtil.updateQuestState(currentLines);
+        }
+    }
+
+    private static void updateScoreboard() {
+        if (scoreboardDirty) {
+            updateScoreboardNonCached();
+            scoreboardDirty = false;
         }
     }
 
@@ -209,6 +221,7 @@ public class SkyblockData {
         } else if (dungeonPower != 0) {
             dungeonPower = 0;
         }
+        updateScoreboard();
     }
 
     public static class InstanceType {

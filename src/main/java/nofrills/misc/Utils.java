@@ -827,6 +827,9 @@ public class Utils {
     public static String format(String string, Object... values) {
         StringBuilder builder = new StringBuilder();
         String[] sections = string.split("\\{}");
+        if (sections.length == 0) {
+            sections = new String[]{""};
+        }
         for (int i = 0; i < sections.length; i++) {
             builder.append(sections[i]);
             if (i < values.length) {

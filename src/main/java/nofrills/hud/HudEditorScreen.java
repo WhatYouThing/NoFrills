@@ -34,7 +34,9 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
         root.surface(Surface.VANILLA_TRANSLUCENT);
         root.allowOverflow(false);
         for (HudElement element : HudManager.getElements()) {
-            root.child(element);
+            if (element.isAdded()) {
+                root.child(element);
+            }
         }
         HudManager.armor.updateArmor();
     }

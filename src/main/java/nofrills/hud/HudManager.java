@@ -24,6 +24,7 @@ public class HudManager {
     public static final Day day = new Day("Day: §f0");
     public static final Armor armor = new Armor();
     public static final Inventory inventory = new Inventory();
+    public static final Quiver quiver = new Quiver("Quiver: §fN/A");
     public static final LagMeter lagMeter = new LagMeter("Last server tick was 0.00s ago");
     public static final BossHealth bossHealth = new BossHealth();
     public static final Power power = new Power("Power: §f0");
@@ -135,6 +136,9 @@ public class HudManager {
         }
         if (bossHealth.isActive()) {
             bossHealth.update();
+        }
+        if (quiver.isActive()) {
+            quiver.update();
         }
     }
 

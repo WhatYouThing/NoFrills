@@ -120,12 +120,12 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     public boolean shouldRender() {
-        if (!this.isAdded()) {
-            return false;
-        }
+        if (!this.isAdded()) return false;
         boolean active = this.instance.isActive();
         this.layout.surface(active ? this.getBackground() : this.disabledSurface);
-        return active || HudManager.isEditingHud();
+        if (HudManager.isEditingHud()) return true;
+        if (mc.getDebugHud().shouldShowDebugHud() || mc.options.playerListKey.isPressed()) return false;
+        return active;
     }
 
     public HudSettings getBaseSettings() {

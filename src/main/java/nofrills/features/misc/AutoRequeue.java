@@ -1,11 +1,7 @@
 package nofrills.features.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import nofrills.config.Feature;
-import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
 import nofrills.config.SettingKeybind;
 import nofrills.events.ChatMsgEvent;
@@ -22,26 +18,11 @@ public class AutoRequeue {
     public static final Feature instance = new Feature("autoRequeue");
 
     public static final SettingInt delay = new SettingInt(100, "delay", instance.key());
-    public static final SettingBool terrorCheck = new SettingBool(false, "terrorCheck", instance.key());
     public static final SettingKeybind pauseBind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "pauseBind", instance.key());
 
     public static boolean paused = false;
+    public static boolean message = false;
     public static int ticks = 0;
-
-    private static boolean isAnyoneInTerror() {
-        if (Utils.isInKuudra()) {
-            for (Entity ent : Utils.getEntities()) {
-                if (ent instanceof PlayerEntity player && Utils.isPlayer(player)) {
-                    for (ItemStack stack : Utils.getEntityArmor(player)) {
-                        if (Utils.getSkyblockId(stack).contains("TERROR")) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
     private static boolean isPartyMemberUpdateMsg(String msg) {
         if (msg.contains(":")) return false;
@@ -49,23 +30,25 @@ public class AutoRequeue {
                 || msg.equals("The party was disbanded because all invites expired and the party was empty.")
                 || msg.startsWith("You have been kicked from the party by ")
                 || msg.endsWith(" has been removed from the party.")
-                || msg.endsWith(" has left the party.");
+                || msg.endsWith(" has left the party.")
+                || msg.endsWith(" has disbanded the party!");
     }
 
     public static void setPaused() {
         if (!paused) {
-            Utils.info("§aAuto Requeue paused for the current instance.");
+            message = true;
             paused = true;
         }
     }
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && !paused && SkyblockData.isInstanceOver()) {
-            if (terrorCheck.value() && isAnyoneInTerror()) {
-                return;
+        if (instance.isActive()) {
+            if (message) {
+                Utils.info("§aAuto Requeue paused for the current instance.");
+                message = false;
             }
-            if (ticks != -1) {
+            if (ticks != -1 && !paused && SkyblockData.isInstanceOver()) {
                 if (ticks == 0) {
                     Utils.infoFormat("§aAutomatically requeuing in {} seconds.", Utils.formatDecimal(delay.value() / 20.0f));
                 }

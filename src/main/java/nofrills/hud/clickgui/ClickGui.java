@@ -310,8 +310,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Last Override", 1, 9, 1, HotbarSwap.override, "Specify a replacement hotbar slot in cases where you swap with the 9th (unused) hotbar slot.")
                         ))),
                         new Module("Auto Requeue", AutoRequeue.instance, "Automatically starts a new Dungeons/Kuudra run once finished.", new Settings(List.of(
-                                new Settings.SliderInt("Delay", 20, 400, 5, AutoRequeue.delay, "The delay (in ticks) until the new run is started."),
-                                new Settings.Toggle("Terror Check", AutoRequeue.terrorCheck, "Waits until everyone has switched off their Terror armor to start requeuing. Only applies in Kuudra."),
+                                new Settings.SliderInt("Delay", 0, 400, 5, AutoRequeue.delay, "The delay (in ticks) until the new run is started."),
                                 new Settings.Keybind("Pause Keybind", AutoRequeue.pauseBind, "A keybind that allows you to manually pause Auto Requeue on demand.")
                         ))),
                         new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(

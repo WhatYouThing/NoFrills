@@ -43,6 +43,7 @@ public class Quiver extends SimpleTextElement {
                     };
                     String quantity = info.substring(info.indexOf("(") + 1, info.indexOf(")"));
                     this.setText(Utils.format("Quiver: {}{} §7(§e{}§7)", arrowColor, arrowName, quantity));
+                    break;
                 }
             }
         }

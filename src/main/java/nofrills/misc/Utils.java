@@ -29,6 +29,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
@@ -127,6 +128,20 @@ public class Utils {
             } else {
                 mc.player.networkHandler.sendChatMessage(message);
             }
+        }
+    }
+
+    public static void refillItem(String refill_query, int amount) {
+        int total = 0;
+        PlayerInventory inv = mc.player.getInventory();
+        for (int i = 0; i <= 35; i++) {
+            ItemStack stack = inv.getStack(i);
+            if (Utils.getSkyblockId(stack).equalsIgnoreCase(refill_query) || Utils.getSkyblockId(stack).replace("_", " ").equalsIgnoreCase(refill_query)) {
+                total += stack.getCount();
+            }
+        }
+        if (total < amount) {
+            Utils.sendMessage(Utils.format("/gfs {} {}", refill_query, amount - total));
         }
     }
 

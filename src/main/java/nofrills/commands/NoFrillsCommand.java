@@ -19,7 +19,6 @@ import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
-import nofrills.features.general.PearlRefill;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.hud.HudEditorScreen;
@@ -190,9 +189,22 @@ public class NoFrillsCommand {
             }))),
             new ModCommand("queue", "Command that lets you queue for any Dungeon floor/Kuudra tier.", queueCommandBuilder),
             new ModCommand("getPearls", "Refills your Ender Pearls (up to 16) directly from your sacks.", literal("getPearls").executes(context -> {
-                PearlRefill.getPearls();
+                Utils.refillItem("ENDER_PEARL", 16);
                 return SINGLE_SUCCESS;
             })),
+            new ModCommand("refill", "Refills a specific item up to the specific amount by it's /gfs name", literal("refill").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(argument("query", StringArgumentType.greedyString()).executes(context -> {
+                String args = StringArgumentType.getString(context, "query");
+                String query = args.substring(0, args.lastIndexOf(" "));
+                try {
+                    int amount = Integer.parseInt(args.substring(args.lastIndexOf(" ")).trim());
+                    Utils.refillItem(query, amount);
+                } catch (NumberFormatException e) {
+                    Utils.info("Specify correct amount to refill.");
+                }
+                return SINGLE_SUCCESS;
+            }))),
             new ModCommand("ping", "Checks your current ping.", literal("ping").executes(context -> {
                 Utils.info("§7Pinging...");
                 SkyblockData.showPing();

@@ -172,9 +172,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Exp Orbs", NoRender.expOrbs, "Prevents experience orbs from rendering."),
                                 new Settings.Toggle("Stuck Arrows", NoRender.stuckArrows, "Prevents arrows stuck to entities from rendering.")
                         ))),
-                        new Module("Pearl Refill", PearlRefill.instance, "Easily refill your Ender Pearls from your sacks with a keybind.", new Settings(List.of(
-                                new Settings.Keybind("Keybind", PearlRefill.keybind, "The key that activates the feature.")
-                        ))),
                         new Module("Party Commands", PartyCommands.instance, "Provide various commands to your party members.", new Settings(List.of(
                                 new Settings.Description("Usage", "Run the \"/nf partyCommands\" command to see more information."),
                                 new Settings.TextInput("Prefixes", PartyCommands.prefixes, "List of valid prefixes for these commands, separated by space."),

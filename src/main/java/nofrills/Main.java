@@ -109,7 +109,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(FreshTimer.class);
         eventBus.subscribe(DrainMessage.class);
         eventBus.subscribe(RecipeLookup.class);
-        eventBus.subscribe(PearlRefill.class);
         eventBus.subscribe(LassoAlert.class);
         eventBus.subscribe(InvisibugHighlight.class);
         eventBus.subscribe(FusionKeybinds.class);

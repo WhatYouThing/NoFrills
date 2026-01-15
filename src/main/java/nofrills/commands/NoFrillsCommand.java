@@ -192,17 +192,22 @@ public class NoFrillsCommand {
                 Utils.refillItem("ENDER_PEARL", 16);
                 return SINGLE_SUCCESS;
             })),
-            new ModCommand("refill", "Refills a specific item up to the specific amount by it's /gfs name", literal("refill").executes(context -> {
+            new ModCommand("getSuperboom", "Refills your Superboom TNTs (up to 64) directly from your sacks.", literal("getSuperboom").executes(context -> {
+                Utils.refillItem("SUPERBOOM_TNT", 64);
+                return SINGLE_SUCCESS;
+            })),
+            new ModCommand("getLeaps", "Refills your Spirit Leaps (up to 16) directly from your sacks.", literal("getLeaps").executes(context -> {
+                Utils.refillItem("SPIRIT_LEAP", 16);
+                return SINGLE_SUCCESS;
+            })),
+            new ModCommand("refill", "Refills a specific item up to the specific amount from your sacks.", literal("refill").executes(context -> {
                 return SINGLE_SUCCESS;
             }).then(argument("query", StringArgumentType.greedyString()).executes(context -> {
                 String args = StringArgumentType.getString(context, "query");
-                String query = args.substring(0, args.lastIndexOf(" "));
-                try {
-                    int amount = Integer.parseInt(args.substring(args.lastIndexOf(" ")).trim());
-                    Utils.refillItem(query, amount);
-                } catch (NumberFormatException e) {
-                    Utils.info("Specify correct amount to refill.");
-                }
+                int index = args.lastIndexOf(" ");
+                Optional<Integer> amount = index != -1 ? Utils.parseInt(args.substring(index).trim()) : Optional.empty();
+                String query = amount.isPresent() ? args.substring(0, index) : args;
+                Utils.refillItem(query, amount.orElse(64));
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("ping", "Checks your current ping.", literal("ping").executes(context -> {

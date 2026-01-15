@@ -136,7 +136,8 @@ public class Utils {
         PlayerInventory inv = mc.player.getInventory();
         for (int i = 0; i <= 35; i++) {
             ItemStack stack = inv.getStack(i);
-            if (Utils.getSkyblockId(stack).equalsIgnoreCase(refill_query) || Utils.getSkyblockId(stack).replace("_", " ").equalsIgnoreCase(refill_query)) {
+            String id = Utils.getSkyblockId(stack);
+            if (id.replaceAll("_", " ").equalsIgnoreCase(refill_query.replaceAll("_", " "))) {
                 total += stack.getCount();
             }
         }

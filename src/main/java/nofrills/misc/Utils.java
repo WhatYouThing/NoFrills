@@ -738,9 +738,18 @@ public class Utils {
 
     /**
      * Returns every slot that is part of the container screen handler, excluding the player inventory slots.
+     *
+     * @param inverse if true, returns the slots that are part of the player inventory instead of the container itself.
      */
-    public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
+    public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler, boolean inverse) {
+        if (inverse) {
+            return handler.slots.stream().filter(slot -> slot.id >= handler.getRows() * 9).toList();
+        }
         return handler.slots.stream().filter(slot -> slot.id < handler.getRows() * 9).toList();
+    }
+
+    public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
+        return getContainerSlots(handler, false);
     }
 
     public static ItemStack getHeldItem() {

@@ -124,7 +124,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         boolean active = this.instance.isActive();
         this.layout.surface(active ? this.getBackground() : this.disabledSurface);
         if (HudManager.isEditingHud()) return true;
-        if (mc.getDebugHud().shouldShowDebugHud() || mc.options.playerListKey.isPressed()) return false;
+        if (mc.debugHudEntryList.isF3Enabled() || mc.options.playerListKey.isPressed()) return false;
         return active;
     }
 

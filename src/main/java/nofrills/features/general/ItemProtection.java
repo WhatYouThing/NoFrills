@@ -37,7 +37,7 @@ public class ItemProtection {
     public static final SettingBool protectStarred = new SettingBool(false, "protectStarred", instance);
     public static final SettingBool protectRarityUpgraded = new SettingBool(false, "protectRarityUpgraded", instance);
     public static final SettingBool protectValue = new SettingBool(false, "protectValue", instance);
-    public static final SettingDouble protectValueMin = new SettingDouble(1000000.0, "protectValueMin", instance);
+    public static final SettingDouble protectValueMin = new SettingDouble(5000000.0, "protectValueMin", instance);
 
     private static boolean isSellGUI = false;
     private static boolean isSalvageGUI = false;

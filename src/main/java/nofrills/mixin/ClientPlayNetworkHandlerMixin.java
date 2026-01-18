@@ -14,8 +14,10 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.network.packet.s2c.play.*;
 import nofrills.events.*;
+import nofrills.features.dungeons.DeviceSolvers;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.NoConfirmScreen;
@@ -33,7 +35,7 @@ import static nofrills.Main.mc;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
-    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"))
+    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"), cancellable = true)
     private void onPreTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
         if (ent.equals(mc.player) && AnimationFix.active()) {
             for (DataTracker.SerializedEntry<?> entry : new ArrayList<>(packet.trackedValues())) {
@@ -42,6 +44,9 @@ public class ClientPlayNetworkHandlerMixin {
                     break;
                 }
             }
+        }
+        if (ent instanceof ItemFrameEntity frame && DeviceSolvers.shouldPreventUpdate(frame)) {
+            ci.cancel();
         }
     }
 

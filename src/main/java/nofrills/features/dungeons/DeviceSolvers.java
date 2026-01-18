@@ -12,7 +12,9 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.config.SettingColor;
 import nofrills.events.BlockUpdateEvent;
+import nofrills.events.InteractEntityEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
@@ -29,7 +31,16 @@ public class DeviceSolvers {
     public static final Feature instance = new Feature("deviceSolvers");
 
     public static final SettingBool sharpshooter = new SettingBool(false, "sharpshooter", instance.key());
+    public static final SettingColor sharpTargetColor = new SettingColor(RenderColor.green, "sharpTargetColor", instance.key());
+    public static final SettingColor sharpHitColor = new SettingColor(RenderColor.red, "sharpHitColor", instance.key());
     public static final SettingBool arrowAlign = new SettingBool(false, "arrowAlign", instance.key());
+    public static final SettingBool alignBlockWrong = new SettingBool(false, "alignBlockWrong", instance.key());
+    public static final SettingBool alignBlockInvert = new SettingBool(false, "alignBlockInvert", instance);
+    public static final SettingBool alignInstantRotate = new SettingBool(false, "alignInstantRotate", instance.key());
+
+    public static boolean shouldPreventUpdate(ItemFrameEntity frame) {
+        return instance.isActive() && arrowAlign.value() && alignInstantRotate.value() && ArrowAlign.solutionMap.containsKey(frame);
+    }
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
@@ -60,6 +71,15 @@ public class DeviceSolvers {
             }
             if (sharpshooter.value()) {
                 Sharpshooter.render(event);
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onEntityInteract(InteractEntityEvent event) {
+        if (instance.isActive() && Utils.isInDungeonBoss("7")) {
+            if (arrowAlign.value()) {
+                ArrowAlign.interactEntity(event);
             }
         }
     }
@@ -115,11 +135,11 @@ public class DeviceSolvers {
         public static void render(WorldRenderEvent event) {
             if (!list.isEmpty()) {
                 for (BlockPos pos : list) {
-                    event.drawFilled(Box.enclosing(pos, pos), true, RenderColor.red);
+                    event.drawFilled(Box.enclosing(pos, pos), true, sharpHitColor.value());
                 }
             }
             if (next != null) {
-                event.drawFilled(Box.enclosing(next, next), true, RenderColor.green);
+                event.drawFilled(Box.enclosing(next, next), true, sharpTargetColor.value());
             }
         }
     }
@@ -140,7 +160,7 @@ public class DeviceSolvers {
         }; // solution set from Skyblocker, no idea how Odin formats its solutions which sure does prevent me from copying them
         public static final HashMap<ItemFrameEntity, Integer> solutionMap = new HashMap<>();
 
-        private static boolean isActive() {
+        public static boolean isActive() {
             return mc.player != null && area.getCenter().distanceTo(mc.player.getEntityPos()) <= 8.0;
         }
 
@@ -215,6 +235,28 @@ public class DeviceSolvers {
                 int clicks = getNeededClicks(frame.getRotation(), entry.getValue());
                 if (clicks > 0) {
                     event.drawText(pos, Text.literal(String.valueOf(clicks)), 0.04f, true, RenderColor.white);
+                }
+            }
+        }
+
+        public static boolean shouldBlock() {
+            if (alignBlockWrong.value()) {
+                if (alignBlockInvert.value()) {
+                    return mc.options.sneakKey.isPressed();
+                }
+                return !mc.options.sneakKey.isPressed();
+            }
+            return false;
+        }
+
+        public static void interactEntity(InteractEntityEvent event) {
+            if (event.entity instanceof ItemFrameEntity frame && solutionMap.containsKey(frame)) {
+                if (shouldBlock() && getNeededClicks(frame.getRotation(), solutionMap.get(frame)) == 0) {
+                    event.cancel();
+                    return;
+                }
+                if (alignInstantRotate.value()) {
+                    frame.setRotation(frame.getRotation() + 1); // automatically goes back to 0 if the current rotation is 7
                 }
             }
         }

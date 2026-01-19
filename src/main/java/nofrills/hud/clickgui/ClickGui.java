@@ -641,7 +641,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", true, TempleSkip.color, "The color of the skip highlight.")
                         ))),
                         new Module("Gemstone Desync Fix", GemstoneDesyncFix.instance, "Fixes adjacent gemstone blocks not correctly updating when mining."),
-                        new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress, also known as HSM.")
+                        new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress, also known as HSM."),
+                        new Module("Shaft Announce", ShaftAnnounce.instance, "Sends a message with the mineshaft ID and the list of corpses upon entering a Glacite Mineshaft.", new Settings(List.of(
+                                new Settings.TextInput("Message", ShaftAnnounce.msg, "The message to send.\n\nReplaces {id} with the ID of the mineshaft, for example: \"JASP_1\".\nReplaces {corpses} with the list of corpses in the mineshaft, for example: \"2x Lapis, 1x Umber\".")
+                        )))
                 )),
                 new Category("Farming", List.of(
                         new Module("Space Farmer", SpaceFarmer.instance, "Allows you to farm by holding space bar, sneak and press space to activate.\nThis feature will also lock your view once you start holding space."),

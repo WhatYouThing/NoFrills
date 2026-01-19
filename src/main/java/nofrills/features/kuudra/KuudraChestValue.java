@@ -42,6 +42,8 @@ public class KuudraChestValue {
                 map.put(armor + "_" + piece, 120);
             }
         }
+        map.put("RUNIC_STAFF", 600);
+        map.put("HOLLOW_WAND", 600);
         return map;
     }
 

@@ -29,7 +29,6 @@ public class CapTracker {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive()) {
-            seaCreatures.removeDead();
             int count = seaCreatures.size();
             if (count >= target.value() && notifyTicks == 0) {
                 if (sendMsg.value() && !msg.value().isEmpty()) {

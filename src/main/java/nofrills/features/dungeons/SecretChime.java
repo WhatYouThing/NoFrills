@@ -144,10 +144,10 @@ public class SecretChime {
     @EventHandler
     private static void onRemoved(EntityRemovedEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
-            if (itemsToggle.value() && event.entity instanceof ItemEntity && entityCache.removeDead().has(event.entity)) {
+            if (itemsToggle.value() && event.entity instanceof ItemEntity && entityCache.has(event.entity)) {
                 playItemChime(event.entity);
             }
-            if (batToggle.value() && event.entity instanceof BatEntity && entityCache.removeDead().has(event.entity)) {
+            if (batToggle.value() && event.entity instanceof BatEntity && entityCache.has(event.entity)) {
                 playBatChime(event.entity);
             }
         }

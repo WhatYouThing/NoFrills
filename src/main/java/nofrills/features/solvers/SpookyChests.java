@@ -40,8 +40,7 @@ public class SpookyChests {
     private static void clickChest(Entity ent) {
         if (ent instanceof ArmorStandEntity) {
             List<Entity> chests = new ArrayList<>(chestList.get());
-            EntityCache clicked = clickedList.removeDead();
-            chests.removeIf(clicked::has);
+            chests.removeIf(clickedList::has);
             chests.sort(Comparator.comparingDouble(chest -> Utils.horizontalDistance(ent, chest)));
             if (!chests.isEmpty() && Utils.horizontalDistance(ent, chests.getFirst()) <= 1.5) {
                 clickedList.add(chests.getFirst());
@@ -74,9 +73,8 @@ public class SpookyChests {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !chestList.empty()) {
-            EntityCache clicked = clickedList.removeDead();
             for (Entity chest : chestList.get()) {
-                if (clicked.has(chest)) {
+                if (clickedList.has(chest)) {
                     continue;
                 }
                 BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);

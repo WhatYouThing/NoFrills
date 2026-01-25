@@ -20,6 +20,7 @@ import nofrills.misc.Utils;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 public class LividSolver {
     public static final Feature instance = new Feature("lividSolver");
@@ -34,7 +35,7 @@ public class LividSolver {
     private static final EntityCache lividCache = new EntityCache();
     private static String currentName = "";
 
-    private static boolean active() {
+    private static boolean isActive() {
         return instance.isActive() && Utils.isInDungeonBoss("5");
     }
 
@@ -60,7 +61,7 @@ public class LividSolver {
 
     @EventHandler
     private static void onBlock(BlockUpdateEvent event) {
-        if (active() && event.pos.getY() >= 107 && event.pos.getY() <= 110 && lividData.containsKey(event.newState.getBlock())) {
+        if (isActive() && event.pos.getY() >= 107 && event.pos.getY() <= 110 && lividData.containsKey(event.newState.getBlock())) {
             Livid livid = lividData.get(event.newState.getBlock());
             if (!currentName.equals(livid.name)) {
                 if (title.value()) {
@@ -74,7 +75,7 @@ public class LividSolver {
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (active() && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
+        if (isActive() && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
             String name = Utils.toPlain(player.getName());
             if (!lividCache.has(event.entity) && lividData.values().stream().anyMatch(livid -> livid.name.equals(name))) {
                 lividCache.add(event.entity);
@@ -84,8 +85,8 @@ public class LividSolver {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (active()) {
-            List<Entity> livids = lividCache.get();
+        if (isActive()) {
+            CopyOnWriteArraySet<Entity> livids = lividCache.get();
             if (livids.size() <= 1) return;
             for (Entity livid : livids) {
                 if (Utils.toPlain(livid.getName()).equals(currentName)) {

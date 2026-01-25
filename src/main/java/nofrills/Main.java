@@ -79,6 +79,7 @@ public class Main implements ModInitializer {
 
         eventBus.subscribe(SkyblockData.class);
         eventBus.subscribe(SlotOptions.class);
+        eventBus.subscribe(EntityCache.class);
         eventBus.subscribe(Utils.class);
         eventBus.subscribe(NoFrillsAPI.class);
         eventBus.subscribe(ItemProtection.class);

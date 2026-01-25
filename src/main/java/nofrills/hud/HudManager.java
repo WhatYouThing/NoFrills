@@ -27,6 +27,7 @@ public class HudManager {
     public static final Quiver quiver = new Quiver("Quiver: §fN/A");
     public static final LagMeter lagMeter = new LagMeter("Last server tick was 0.00s ago");
     public static final BossHealth bossHealth = new BossHealth();
+    public static final DungeonScore dungeonScore = new DungeonScore();
     public static final Power power = new Power("Power: §f0");
     public static final TickTimer tickTimer = new TickTimer("Tick Timers");
     public static final SeaCreatures seaCreatures = new SeaCreatures("Sea Creatures: §70");
@@ -71,6 +72,7 @@ public class HudManager {
         lagMeter.setTickTime(0);
         bobber.hologram = null;
         bossHealth.reset();
+        dungeonScore.reset();
     }
 
     @EventHandler
@@ -140,6 +142,9 @@ public class HudManager {
         if (quiver.isActive()) {
             quiver.update();
         }
+        if (dungeonScore.isActive()) {
+            dungeonScore.update();
+        }
     }
 
     @EventHandler
@@ -152,6 +157,20 @@ public class HudManager {
         }
         if (bobber.isActive() && bobber.timer.value() && bobber.active) {
             bobber.timerTicks += 1;
+        }
+    }
+
+    @EventHandler
+    private static void onMessage(ChatMsgEvent event) {
+        if (dungeonScore.isActive()) {
+            dungeonScore.onMessage(event.messagePlain);
+        }
+    }
+
+    @EventHandler
+    private static void onPartyMessage(PartyChatMsgEvent event) {
+        if (dungeonScore.isActive()) {
+            dungeonScore.onPartyMessage(event.message);
         }
     }
 

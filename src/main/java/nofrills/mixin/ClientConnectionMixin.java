@@ -4,12 +4,8 @@ import io.netty.channel.ChannelFutureListener;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.listener.PacketListener;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.events.SendPacketEvent;
-import nofrills.events.ServerTickEvent;
-import nofrills.misc.SkyblockData;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,14 +16,9 @@ import static nofrills.Main.eventBus;
 
 @Mixin(ClientConnection.class)
 public abstract class ClientConnectionMixin {
+
     @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
     private static void onPacketReceive(Packet<?> packet, PacketListener listener, CallbackInfo ci) {
-        if (packet instanceof CommonPingS2CPacket) {
-            eventBus.post(new ServerTickEvent());
-        }
-        if (packet instanceof PlayerListS2CPacket listPacket) {
-            SkyblockData.updateTabList(listPacket, listPacket.getEntries());
-        }
         if (eventBus.post(new ReceivePacketEvent(packet)).isCancelled()) {
             ci.cancel();
         }

@@ -1,9 +1,8 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
-import net.minecraft.network.packet.s2c.play.ScoreboardObjectiveUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.TeamS2CPacket;
+import meteordevelopment.orbit.EventPriority;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
@@ -54,9 +53,11 @@ public class SkyblockData {
     private static String area = "";
     private static boolean inSkyblock = false;
     private static boolean instanceOver = false;
+    private static List<String> tabListLines = new ArrayList<>();
     private static List<String> lines = new ArrayList<>();
     private static boolean showPing = false;
-    private static boolean scoreboardDirty;
+    private static boolean tabListDirty = true;
+    private static boolean scoreboardDirty = true;
 
     private static void updateDungeonClass(String msg) {
         if (mc.player != null) {
@@ -113,11 +114,12 @@ public class SkyblockData {
         return instanceOver;
     }
 
-    /**
-     * Returns a list with every line that is currently displayed on the scoreboard.
-     */
+    public static List<String> getTabListLines() {
+        return tabListLines;
+    }
+
     public static List<String> getLines() {
-        return new ArrayList<>(lines); // return a copy to avoid a potential concurrent modification exception
+        return lines;
     }
 
     public static void showPing() {
@@ -125,18 +127,35 @@ public class SkyblockData {
         Utils.sendPingPacket();
     }
 
-    public static void updateTabList(PlayerListS2CPacket packet, List<PlayerListS2CPacket.Entry> entries) {
-        for (PlayerListS2CPacket.Entry entry : entries) {
-            if (entry.displayName() == null) continue;
-            String name = Utils.toPlain(entry.displayName()).trim();
-            if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
-                area = name.split(":", 2)[1].trim();
-                break;
+    public static void markTabListDirty() {
+        tabListDirty = true;
+    }
+
+    private static void updateTabListIfDirty() {
+        List<String> lines = new ArrayList<>();
+        if (mc.getNetworkHandler() != null) {
+            for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
+                if (entry != null && entry.getDisplayName() != null) {
+                    String name = Utils.toPlain(entry.getDisplayName()).trim();
+                    if (name.isEmpty()) continue;
+                    if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
+                        area = name.split(":", 2)[1].trim();
+                    }
+                    lines.add(name);
+                }
             }
+        }
+        tabListLines = lines;
+    }
+
+    private static void updateTabList() {
+        if (tabListDirty) {
+            updateTabListIfDirty();
+            tabListDirty = false;
         }
     }
 
-    public static void updateObjective(ScoreboardObjectiveUpdateS2CPacket packet) {
+    public static void updateObjective() {
         if (mc.player != null) {
             Scoreboard scoreboard = mc.player.networkHandler.getScoreboard();
             ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
@@ -146,11 +165,11 @@ public class SkyblockData {
         }
     }
 
-    public static void updateScoreboard(TeamS2CPacket packet) {
+    public static void markScoreboardDirty() {
         scoreboardDirty = true;
     }
 
-    private static void updateScoreboardNonCached() {
+    private static void updateScoreboardIfDirty() {
         if (mc.player != null) {
             List<String> currentLines = new ArrayList<>();
             Scoreboard scoreboard = mc.player.networkHandler.getScoreboard();
@@ -179,7 +198,7 @@ public class SkyblockData {
 
     private static void updateScoreboard() {
         if (scoreboardDirty) {
-            updateScoreboardNonCached();
+            updateScoreboardIfDirty();
             scoreboardDirty = false;
         }
     }
@@ -214,13 +233,14 @@ public class SkyblockData {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private static void onWorldTick(WorldTickEvent event) {
         if (Utils.isInDungeons()) {
             dungeonPower = updateDungeonPower();
         } else if (dungeonPower != 0) {
             dungeonPower = 0;
         }
+        updateTabList();
         updateScoreboard();
     }
 

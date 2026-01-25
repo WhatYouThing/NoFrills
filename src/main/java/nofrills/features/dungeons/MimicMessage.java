@@ -5,9 +5,13 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.mob.ZombieEntity;
 import nofrills.config.Feature;
 import nofrills.config.SettingString;
+import nofrills.events.EntityRemovedEvent;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.ServerJoinEvent;
+import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
+
+import static nofrills.Main.mc;
 
 public class MimicMessage {
     public static final Feature instance = new Feature("mimicMessage");
@@ -18,13 +22,22 @@ public class MimicMessage {
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && event.entity instanceof ZombieEntity zombie && zombie.isBaby()) {
+        if (mimicId == -1 && event.entity instanceof ZombieEntity zombie && zombie.isBaby() && Utils.isInDungeons()) {
             GameProfile textures = Utils.getTextures(Utils.getEntityArmor(zombie).getFirst());
-            if (mimicId == -1 && Utils.isTextureEqual(textures, "e19c12543bc7792605ef68e1f8749ae8f2a381d9085d4d4b780ba1282d3597a0")) {
+            if (Utils.isTextureEqual(textures, "e19c12543bc7792605ef68e1f8749ae8f2a381d9085d4d4b780ba1282d3597a0")) {
                 mimicId = zombie.getId();
             }
-            if (zombie.getHealth() == 0.0f && mimicId == zombie.getId()) {
+        }
+    }
+
+    @EventHandler
+    private static void onRemoved(EntityRemovedEvent event) {
+        if (mimicId != -1 && event.entity.getId() == mimicId && event.entity.distanceTo(mc.player) <= 64.0) {
+            if (instance.isActive()) {
                 Utils.sendMessage(msg.value());
+            }
+            if (HudManager.dungeonScore.isActive()) {
+                HudManager.dungeonScore.setMimicKilled();
             }
         }
     }

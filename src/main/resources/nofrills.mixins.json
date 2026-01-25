@@ -8,6 +8,7 @@
     "BossBarHudMixin",
     "CameraMixin",
     "ChatHudMixin",
+    "ClientCommonNetworkHandlerMixin",
     "ClientConnectionMixin",
     "ClientPlayerEntityMixin",
     "ClientPlayerInteractionManagerAccessor",

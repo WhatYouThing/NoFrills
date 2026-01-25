@@ -1,5 +1,6 @@
 package nofrills.misc;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -231,6 +232,10 @@ public class Utils {
             case "7" -> isInZone(134, 254, 147, -8, 0, -8);
             default -> false;
         };
+    }
+
+    public static boolean isInDungeonBoss(int floor) {
+        return isInDungeonBoss(String.valueOf(floor));
     }
 
     public static boolean isInKuudra() {
@@ -703,15 +708,7 @@ public class Utils {
     }
 
     public static List<String> getTabListLines() {
-        List<String> lines = new ArrayList<>();
-        if (mc.getNetworkHandler() != null) {
-            for (PlayerListEntry entry : new ArrayList<>(mc.getNetworkHandler().getPlayerList())) {
-                if (entry != null && entry.getDisplayName() != null) {
-                    lines.add(toPlain(entry.getDisplayName()).trim());
-                }
-            }
-        }
-        return lines;
+        return SkyblockData.getTabListLines();
     }
 
     /**
@@ -851,15 +848,13 @@ public class Utils {
      */
     public static String format(String string, Object... values) {
         StringBuilder builder = new StringBuilder();
-        String[] sections = string.split("\\{}");
-        if (sections.length == 0) {
-            sections = new String[]{""};
-        }
-        for (int i = 0; i < sections.length; i++) {
-            builder.append(sections[i]);
-            if (i < values.length) {
-                builder.append(values[i]);
+        int index = 0;
+        for (String section : Splitter.on("{}").split(string)) {
+            builder.append(section);
+            if (index < values.length) {
+                builder.append(values[index]);
             }
+            index++;
         }
         return builder.toString();
     }

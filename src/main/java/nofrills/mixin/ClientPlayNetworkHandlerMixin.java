@@ -35,6 +35,7 @@ import static nofrills.Main.mc;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
+
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"), cancellable = true)
     private void onPreTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
         if (ent.equals(mc.player) && AnimationFix.active()) {
@@ -108,12 +109,17 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onScoreboardObjectiveUpdate", at = @At("TAIL"))
     private void onObjectiveUpdate(ScoreboardObjectiveUpdateS2CPacket packet, CallbackInfo ci) {
-        SkyblockData.updateObjective(packet);
+        SkyblockData.updateObjective();
     }
 
     @Inject(method = "onTeam", at = @At("TAIL"))
     private void onScoreUpdate(TeamS2CPacket packet, CallbackInfo ci) {
-        SkyblockData.updateScoreboard(packet);
+        SkyblockData.markScoreboardDirty();
+    }
+
+    @Inject(method = "onPlayerList", at = @At("TAIL"))
+    private void onTabListUpdate(PlayerListS2CPacket packet, CallbackInfo ci) {
+        SkyblockData.markTabListDirty();
     }
 
     @Inject(method = "onGameJoin", at = @At("TAIL"))

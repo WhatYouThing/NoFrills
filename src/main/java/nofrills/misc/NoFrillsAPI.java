@@ -9,44 +9,63 @@ import nofrills.features.dungeons.DungeonChestValue;
 import nofrills.features.general.ItemProtection;
 import nofrills.features.general.PriceTooltips;
 import nofrills.features.kuudra.KuudraChestValue;
+import nofrills.hud.HudManager;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
 public class NoFrillsAPI {
-    public static final ConcurrentHashMap<String, Long> auctionPricing = new ConcurrentHashMap<>();
-    public static final ConcurrentHashMap<String, HashMap<String, Double>> bazaarPricing = new ConcurrentHashMap<>();
-    public static final ConcurrentHashMap<String, HashMap<String, Double>> npcPricing = new ConcurrentHashMap<>();
+    public static HashMap<String, Long> auctionPricing = new HashMap<>();
+    public static HashMap<String, HashMap<String, Double>> bazaarPricing = new HashMap<>();
+    public static HashMap<String, HashMap<String, Double>> npcPricing = new HashMap<>();
+    public static HashSet<String> electionPerks = new HashSet<>();
     private static int refreshTicks = 0;
 
-    private static boolean shouldRefresh() {
+    private static boolean shouldRefreshPricing() {
         return PriceTooltips.instance.isActive() || KuudraChestValue.instance.isActive()
                 || DungeonChestValue.instance.isActive() || ItemProtection.isProtectingValue();
     }
 
+    private static boolean shouldRefreshPerks() {
+        return HudManager.dungeonScore.isActive();
+    }
+
+    private static void logException(Exception exception) {
+        StringBuilder trace = new StringBuilder();
+        for (StackTraceElement element : exception.getStackTrace()) {
+            trace.append("\n\tat ").append(element.toString());
+        }
+        LOGGER.error("{}{}", exception.getMessage(), trace);
+    }
+
     private static void refreshItemPricing() {
-        new Thread(() -> {
+        Thread.startVirtualThread(() -> {
             try {
                 InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v2/economy/get-item-pricing/").toURL().openStream();
                 JsonObject json = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonObject();
+                HashMap<String, Long> auction = new HashMap<>();
                 for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("auction").asMap().entrySet()) {
-                    auctionPricing.put(entry.getKey(), entry.getValue().getAsLong());
+                    auction.put(entry.getKey(), entry.getValue().getAsLong());
                 }
+                auctionPricing = auction;
+                HashMap<String, HashMap<String, Double>> bazaar = new HashMap<>();
                 for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("bazaar").asMap().entrySet()) {
                     JsonObject object = entry.getValue().getAsJsonObject();
                     HashMap<String, Double> pricing = new HashMap<>();
                     pricing.put("buy", object.get("buy").getAsDouble());
                     pricing.put("sell", object.get("sell").getAsDouble());
-                    bazaarPricing.put(entry.getKey(), pricing);
+                    bazaar.put(entry.getKey(), pricing);
                 }
+                bazaarPricing = bazaar;
+                HashMap<String, HashMap<String, Double>> npc = new HashMap<>();
                 for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("npc").asMap().entrySet()) {
                     JsonObject object = entry.getValue().getAsJsonObject();
                     HashMap<String, Double> pricing = new HashMap<>();
@@ -57,25 +76,43 @@ public class NoFrillsAPI {
                         pricing.put("mote", object.get("mote").getAsDouble());
                     }
                     if (!pricing.isEmpty()) {
-                        npcPricing.put(entry.getKey(), pricing);
+                        npc.put(entry.getKey(), pricing);
                     }
                 }
-            } catch (IOException exception) {
-                StringBuilder trace = new StringBuilder();
-                for (StackTraceElement element : exception.getStackTrace()) {
-                    trace.append("\n\tat ").append(element.toString());
-                }
-                LOGGER.error("{}{}", exception.getMessage(), trace);
+                npcPricing = npc;
+            } catch (Exception exception) {
+                logException(exception);
             }
-        }).start();
+        });
+    }
+
+    private static void refreshElectionPerks() {
+        Thread.startVirtualThread(() -> {
+            try {
+                InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v1/election/get-active-perks").toURL().openStream();
+                JsonObject json = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonObject();
+                HashSet<String> perks = new HashSet<>();
+                for (JsonElement element : json.getAsJsonArray("perks")) {
+                    perks.add(element.getAsString());
+                }
+                electionPerks = perks;
+            } catch (IOException exception) {
+                logException(exception);
+            }
+        });
     }
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (shouldRefresh() && Utils.isInSkyblock()) {
+        if (Utils.isInSkyblock()) {
             if (refreshTicks == 0) {
                 if (mc.isWindowFocused()) { // prevent refreshing while afk to not send unnecessary requests
-                    refreshItemPricing();
+                    if (shouldRefreshPricing()) {
+                        refreshItemPricing();
+                    }
+                    if (shouldRefreshPerks()) {
+                        refreshElectionPerks();
+                    }
                     refreshTicks = 1200;
                 }
             } else {

@@ -332,7 +332,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking.", new Settings(List.of(
                                 new Settings.Toggle("Self Nametag", ForceNametag.self, "Forces your own player nametag to render. Only visible in the third person perspective.")
                         ))),
-                        new Module("Hotbar Scroll Lock", HotbarScrollLock.instance, "Prevents your hotbar going from the first to the last slot when scrolling, and vice versa.")
+                        new Module("Hotbar Scroll Lock", HotbarScrollLock.instance, "Prevents your hotbar going from the first to the last slot when scrolling, and vice versa."),
+                        new Module("Auto Tip", AutoTip.instance, "Automatically runs /tipall every 15 minutes while connected to Hypixel.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experimentation Table", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(

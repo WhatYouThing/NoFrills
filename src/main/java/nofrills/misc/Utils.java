@@ -18,6 +18,7 @@ import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.component.DataComponentTypes;
@@ -281,6 +282,11 @@ public class Utils {
 
     public static boolean isInSkyblock() {
         return SkyblockData.isInSkyblock();
+    }
+
+    public static boolean isOnHypixel() {
+        ServerInfo info = mc.getCurrentServerEntry();
+        return info != null && toLower(info.address).endsWith("hypixel.net");
     }
 
     /**

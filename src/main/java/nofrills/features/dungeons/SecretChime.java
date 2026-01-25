@@ -163,6 +163,5 @@ public class SecretChime {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         clickedThisTick = false;
-        entityCache.clear();
     }
 }

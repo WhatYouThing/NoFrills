@@ -7,7 +7,6 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityNamedEvent;
-import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
@@ -43,10 +42,5 @@ public class KeyHighlight {
                 if (tracer.value()) event.drawTracer(box.getCenter(), tracerColor.value());
             }
         }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        keyCache.clear();
     }
 }

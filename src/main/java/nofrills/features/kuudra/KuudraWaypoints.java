@@ -9,7 +9,6 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityNamedEvent;
-import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.EntityCache;
@@ -99,12 +98,5 @@ public class KuudraWaypoints {
                 }
             }
         }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        supplies.clear();
-        dropOffs.clear();
-        buildPiles.clear();
     }
 }

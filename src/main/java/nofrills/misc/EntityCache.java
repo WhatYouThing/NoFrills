@@ -1,8 +1,11 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.Entity;
 import nofrills.events.EntityRemovedEvent;
+import nofrills.events.EntityUpdatedEvent;
+import nofrills.events.ServerJoinEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +29,26 @@ public class EntityCache {
         return ent != null && mc.world != null && ent.isAlive() && mc.world.getEntityById(ent.getId()) != null;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     private static void onRemoved(EntityRemovedEvent event) {
         for (EntityCache instance : instances) {
             instance.remove(event.entity);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    private static void onUpdated(EntityUpdatedEvent event) {
+        if (event.entity.isRemoved()) {
+            for (EntityCache instance : instances) {
+                instance.remove(event.entity);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    private static void onJoin(ServerJoinEvent event) {
+        for (EntityCache instance : instances) {
+            instance.clear();
         }
     }
 

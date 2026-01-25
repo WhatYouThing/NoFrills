@@ -7,7 +7,6 @@ import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityUpdatedEvent;
-import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
@@ -40,10 +39,5 @@ public class GhostVision {
                 event.drawOutline(box, false, outline.value());
             }
         }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        cache.clear();
     }
 }

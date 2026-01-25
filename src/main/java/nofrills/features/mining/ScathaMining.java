@@ -92,7 +92,6 @@ public class ScathaMining {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         spawnCooldown = 0;
-        wormsCache.clear();
     }
 
     private enum WormType {

@@ -9,7 +9,10 @@ import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
-import nofrills.events.*;
+import nofrills.events.AttackEntityEvent;
+import nofrills.events.EntityNamedEvent;
+import nofrills.events.InteractEntityEvent;
+import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SkyblockData;
@@ -82,11 +85,5 @@ public class SpookyChests {
                 if (tracer.value()) event.drawTracer(pos.toCenterPos(), color.valueWithAlpha(1.0f));
             }
         }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        chestList.clear();
-        clickedList.clear();
     }
 }

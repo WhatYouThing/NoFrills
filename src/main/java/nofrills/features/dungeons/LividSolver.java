@@ -107,7 +107,6 @@ public class LividSolver {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         currentName = "";
-        lividCache.clear();
     }
 
     private static class Livid {

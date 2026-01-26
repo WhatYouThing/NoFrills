@@ -27,8 +27,8 @@ public class DungeonScore extends SimpleTextElement {
         if (score > 0) {
             int color = this.getScoreColor(score);
             String label = this.getScoreLabel(score);
-            MutableText text = Text.literal("Score: ").append(Text.literal(Utils.format("{} §7({})", score, label)).withColor(color));
-            this.setText(text);
+            MutableText text = Text.literal(Utils.format("{}{}§r §7({})", score >= 300 ? "§l" : "", score, label)).withColor(color);
+            this.setText(Text.literal("Score: ").append(text));
         } else {
             this.setDefaultText();
         }

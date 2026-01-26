@@ -66,7 +66,7 @@ public class DungeonUtil {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (Utils.isInDungeons()) {
-            if (currentFloor.isEmpty()) {
+            if (currentFloor.isEmpty() && SkyblockData.getLocation().contains("The Catacombs (")) {
                 String location = SkyblockData.getLocation();
                 currentFloor = location.substring(location.indexOf("(") + 1, location.indexOf(")"));
             }

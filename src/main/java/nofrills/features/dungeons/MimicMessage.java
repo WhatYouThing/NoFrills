@@ -8,7 +8,6 @@ import nofrills.config.SettingString;
 import nofrills.events.EntityRemovedEvent;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.ServerJoinEvent;
-import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
 
 import static nofrills.Main.mc;
@@ -36,8 +35,8 @@ public class MimicMessage {
             if (instance.isActive()) {
                 Utils.sendMessage(msg.value());
             }
-            if (HudManager.dungeonScore.isActive()) {
-                HudManager.dungeonScore.setMimicKilled();
+            if (ScoreCalculator.instance.isActive()) {
+                ScoreCalculator.mimicKilled();
             }
         }
     }

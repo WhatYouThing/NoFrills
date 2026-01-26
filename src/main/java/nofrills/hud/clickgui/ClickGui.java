@@ -546,6 +546,17 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Bers Color", false, ClassNametags.bers, "The text color for Berserker."),
                                 new Settings.ColorPicker("Arch Color", false, ClassNametags.arch, "The text color for Archer."),
                                 new Settings.ColorPicker("Tank Color", false, ClassNametags.tank, "The text color for Tank.")
+                        ))),
+                        new Module("Score Calculator", ScoreCalculator.instance, "Calculates the score in your dungeon runs.", new Settings(List.of(
+                                new Settings.Dropdown<>("Paul State", ScoreCalculator.paulState, "Allows you to force the state of Paul's EZPZ perk. Auto detects the perk automatically."),
+                                new Settings.Toggle("Send 270 Message", ScoreCalculator.sendMsg270, "If enabled, send a message upon reaching 270 (S) score."),
+                                new Settings.TextInput("270 Message", ScoreCalculator.msg270, "The message to send when 270 (S) score is reached."),
+                                new Settings.Toggle("Show 270 Title", ScoreCalculator.showTitle270, "If enabled, show a title on screen upon reaching 270 (S) score."),
+                                new Settings.TextInput("270 Title", ScoreCalculator.title270, "The title to show when 270 (S) score is reached."),
+                                new Settings.Toggle("Send 300 Message", ScoreCalculator.sendMsg300, "If enabled, send a message upon reaching 300 (S+) score."),
+                                new Settings.TextInput("300 Message", ScoreCalculator.msg300, "The message to send when 300 (S+) score is reached."),
+                                new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 (S+) score."),
+                                new Settings.TextInput("300 Title", ScoreCalculator.title300, "The title to show when 300 (S+) score is reached.")
                         )))
                 )),
                 new Category("Kuudra", List.of(

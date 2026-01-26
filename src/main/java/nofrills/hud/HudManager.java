@@ -72,7 +72,6 @@ public class HudManager {
         lagMeter.setTickTime(0);
         bobber.hologram = null;
         bossHealth.reset();
-        dungeonScore.reset();
     }
 
     @EventHandler
@@ -142,9 +141,6 @@ public class HudManager {
         if (quiver.isActive()) {
             quiver.update();
         }
-        if (dungeonScore.isActive()) {
-            dungeonScore.update();
-        }
     }
 
     @EventHandler
@@ -157,20 +153,6 @@ public class HudManager {
         }
         if (bobber.isActive() && bobber.timer.value() && bobber.active) {
             bobber.timerTicks += 1;
-        }
-    }
-
-    @EventHandler
-    private static void onMessage(ChatMsgEvent event) {
-        if (dungeonScore.isActive()) {
-            dungeonScore.onMessage(event.messagePlain);
-        }
-    }
-
-    @EventHandler
-    private static void onPartyMessage(PartyChatMsgEvent event) {
-        if (dungeonScore.isActive()) {
-            dungeonScore.onPartyMessage(event.message);
         }
     }
 

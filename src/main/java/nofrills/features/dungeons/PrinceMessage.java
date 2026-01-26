@@ -4,7 +4,6 @@ import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
-import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
 
 public class PrinceMessage {
@@ -18,8 +17,8 @@ public class PrinceMessage {
             if (instance.isActive()) {
                 Utils.sendMessage(msg.value());
             }
-            if (HudManager.dungeonScore.isActive()) {
-                HudManager.dungeonScore.setPrinceKilled();
+            if (ScoreCalculator.instance.isActive()) {
+                ScoreCalculator.princeKilled();
             }
         }
     }

@@ -92,12 +92,14 @@ public class SecretChime {
     private static void playItemChime(Entity entity) {
         if (mc.player != null && entity.distanceTo(mc.player) <= 8.0) {
             playSound(itemsSound, itemsVolume, itemsPitch);
+            entityCache.remove(entity);
         }
     }
 
     private static void playBatChime(Entity entity) {
         if (mc.player != null && entity.distanceTo(mc.player) <= 10.0) {
             playSound(batSound, batVolume, batPitch);
+            entityCache.remove(entity);
         }
     }
 

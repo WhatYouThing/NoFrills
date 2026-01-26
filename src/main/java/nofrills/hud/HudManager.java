@@ -74,6 +74,9 @@ public class HudManager {
         lagMeter.setTickTime(0);
         bobber.hologram = null;
         bossHealth.reset();
+        padTimer.pause();
+        terminalStartTimer.pause();
+        goldorTickTimer.pause();
     }
 
     @EventHandler

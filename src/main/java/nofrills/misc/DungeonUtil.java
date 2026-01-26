@@ -5,7 +5,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.BatEntity;
-import nofrills.events.ChatMsgEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 
@@ -25,7 +24,6 @@ public class DungeonUtil {
             "Tank"
     );
     private static String currentFloor = "";
-    private static boolean inBoss = false;
     private static int partyCount = 0;
 
     public static HashMap<String, String> getClassCache() {
@@ -45,7 +43,7 @@ public class DungeonUtil {
     }
 
     public static boolean isInBossRoom() {
-        return inBoss;
+        return Utils.isInDungeonBoss(currentFloor);
     }
 
     public static String getCurrentFloor() {
@@ -91,17 +89,9 @@ public class DungeonUtil {
     }
 
     @EventHandler
-    private static void onMessage(ChatMsgEvent event) {
-        if (event.messagePlain.startsWith("[BOSS] ") && Utils.isInDungeons()) {
-            inBoss = true;
-        }
-    }
-
-    @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         classCache.clear();
         currentFloor = "";
-        inBoss = false;
         partyCount = 0;
     }
 }

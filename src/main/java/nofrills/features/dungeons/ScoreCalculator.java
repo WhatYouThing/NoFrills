@@ -94,16 +94,13 @@ public class ScoreCalculator {
 
     private static int getTotalClearedRooms() {
         int rooms = getClearedRooms();
-        if (rooms > 0) {
-            if (!bloodDone) {
-                rooms += 1;
-            }
-            if (!DungeonUtil.isInBossRoom()) {
-                rooms += 1;
-            }
-            return rooms;
+        if (!bloodDone) {
+            rooms += 1;
         }
-        return 0;
+        if (!DungeonUtil.isInBossRoom()) {
+            rooms += 1;
+        }
+        return rooms;
     }
 
     private static double getSecretsNeeded() {

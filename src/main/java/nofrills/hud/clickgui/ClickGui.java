@@ -216,7 +216,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Extra Lines", ChatTweaks.extraLines, "Overrides the chat line limit. Allows you to keep more messages in the chat history."),
                                 new Settings.SliderInt("Lines", 100, 5000, 10, ChatTweaks.lines, "The chat line limit override.")
                         ))),
-                        new Module("Item Protection", ItemProtection.instance, "Prevent yourself from accidentally dropping and/or selling items.", new Settings(List.of(
+                        new Module("Item Protection", ItemProtection.instance, "Prevents you from accidentally dropping, selling or salvaging your important items.", new Settings(List.of(
                                 new Settings.Keybind("UUID Protect Key", ItemProtection.uuidKey, "The keybind to protect a specific item by UUID."),
                                 new Settings.Keybind("ID Protect Key", ItemProtection.skyblockIdKey, "The keybind to protect a specific item by Skyblock ID."),
                                 new Settings.Toggle("Protect By UUID", ItemProtection.protectUUID, "Protects items that you have protected by UUID."),
@@ -532,11 +532,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Quick Close", QuickClose.instance, "Quickly close Dungeon secret and/or loot chests by pressing any of the movement keys (WASD)."),
                         new Module("Chest Value", DungeonChestValue.instance, "Calculates the value of your Dungeons loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
                                 new Settings.ColorPicker("Background", true, DungeonChestValue.background, "The color of the background of the value text.")
-                        ))),
-                        new Module("Tick Timers", TickTimers.instance, "Displays a timer for various things during the F7/M7 boss fight.\nUses the Tick Timers HUD element found in the HUD editor.", new Settings(List.of(
-                                new Settings.Toggle("Storm Timer", TickTimers.storm, "Shows a timer for the pads in 2nd phase."),
-                                new Settings.Toggle("Terminal Start Timer", TickTimers.terminalStart, "Shows a timer for the 3rd phase starting."),
-                                new Settings.Toggle("Goldor Timer", TickTimers.goldor, "Shows a timer for Goldor's death tick in 3rd phase.")
                         ))),
                         new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
                         new Module("Class Nametags", ClassNametags.instance, "Renders large nametags for your teammates, indicating their selected class and position.", new Settings(List.of(

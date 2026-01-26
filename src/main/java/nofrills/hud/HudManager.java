@@ -28,8 +28,10 @@ public class HudManager {
     public static final LagMeter lagMeter = new LagMeter("Last server tick was 0.00s ago");
     public static final BossHealth bossHealth = new BossHealth();
     public static final DungeonScore dungeonScore = new DungeonScore();
+    public static final PadTimer padTimer = new PadTimer();
+    public static final TerminalStartTimer terminalStartTimer = new TerminalStartTimer();
+    public static final GoldorTickTimer goldorTickTimer = new GoldorTickTimer();
     public static final Power power = new Power("Power: §f0");
-    public static final TickTimer tickTimer = new TickTimer("Tick Timers");
     public static final SeaCreatures seaCreatures = new SeaCreatures("Sea Creatures: §70");
     public static final FishingBobber bobber = new FishingBobber("Bobber: §7Inactive");
     public static final ShardTrackerDisplay shardTracker = new ShardTrackerDisplay();
@@ -154,6 +156,17 @@ public class HudManager {
         if (bobber.isActive() && bobber.timer.value() && bobber.active) {
             bobber.timerTicks += 1;
         }
+        if (Utils.isOnDungeonFloor("7")) {
+            if (padTimer.isActive()) {
+                padTimer.tick();
+            }
+            if (terminalStartTimer.isActive()) {
+                terminalStartTimer.tick();
+            }
+            if (goldorTickTimer.isActive()) {
+                goldorTickTimer.tick();
+            }
+        }
     }
 
     @EventHandler
@@ -162,6 +175,33 @@ public class HudManager {
             if (event.namePlain.equals("!!!") || event.namePlain.indexOf(".") == 1) {
                 bobber.hologram = event.entity;
                 bobber.setTimer(event.namePlain);
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onMessage(ChatMsgEvent event) {
+        if (Utils.isOnDungeonFloor("7")) {
+            switch (event.messagePlain) {
+                case "[BOSS] Storm: Pathetic Maxor, just like expected." -> {
+                    if (padTimer.isActive()) {
+                        padTimer.start();
+                    }
+                }
+                case "[BOSS] Storm: I should have known that I stood no chance." -> {
+                    padTimer.pause();
+                    if (terminalStartTimer.isActive()) {
+                        terminalStartTimer.start();
+                    }
+                }
+                case "[BOSS] Goldor: Who dares trespass into my domain?" -> {
+                    if (goldorTickTimer.isActive()) {
+                        goldorTickTimer.start();
+                    }
+                }
+                case "The Core entrance is opening!" -> goldorTickTimer.pause();
+                default -> {
+                }
             }
         }
     }

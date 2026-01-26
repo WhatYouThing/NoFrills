@@ -167,7 +167,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(QuickClose.class);
         eventBus.subscribe(DungeonChestValue.class);
         eventBus.subscribe(NoCursorReset.class);
-        eventBus.subscribe(TickTimers.class);
         eventBus.subscribe(RelicHighlight.class);
         eventBus.subscribe(GemstoneDesyncFix.class);
         eventBus.subscribe(DianaSolver.class);

@@ -44,6 +44,16 @@ public class ScoreCalculator {
         return line.substring(line.indexOf(":") + 1).trim();
     }
 
+    private static void processAlert(SettingBool send, SettingString msg, SettingBool doTitle, SettingString title) {
+        if (send.value()) {
+            Utils.sendMessage(msg.value());
+        }
+        if (doTitle.value()) {
+            Utils.showTitle(title.value().replaceAll("&", "§"), "", 0, 30, 10);
+            Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
+        }
+    }
+
     private static boolean isEZPZ() {
         return switch (paulState.value()) {
             case Auto -> NoFrillsAPI.electionPerks.contains("EZPZ");
@@ -183,30 +193,17 @@ public class ScoreCalculator {
             int clearedRooms = getTotalClearedRooms();
             double secretsFound = getSecretsFound();
             double secretsNeeded = getSecretsNeeded();
-            if (totalRooms == 0 || secretsNeeded == 0) return;
             score = getSkillScore(clearedRooms, totalRooms)
                     + getExploreScore(clearedRooms, totalRooms, secretsFound, secretsNeeded)
                     + getSpeedScore()
                     + getBonusScore();
             if (score >= 300 && !sent300) {
-                if (sendMsg300.value()) {
-                    Utils.sendMessage(msg300.value());
-                }
-                if (showTitle300.value()) {
-                    Utils.showTitle(title300.value().replaceAll("&", "§"), "", 0, 30, 10);
-                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
-                }
+                processAlert(sendMsg300, msg300, showTitle300, title300);
                 sent300 = true;
                 sent270 = true;
             }
             if (score >= 270 && !sent270) {
-                if (sendMsg270.value()) {
-                    Utils.sendMessage(msg270.value());
-                }
-                if (showTitle270.value()) {
-                    Utils.showTitle(title270.value().replaceAll("&", "§"), "", 0, 30, 10);
-                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
-                }
+                processAlert(sendMsg270, msg270, showTitle270, title270);
                 sent270 = true;
             }
         }
@@ -218,7 +215,7 @@ public class ScoreCalculator {
             if (event.messagePlain.equals("[BOSS] The Watcher: You have proven yourself. You may pass.")) {
                 bloodDone = true;
             } else if (event.messagePlain.trim().startsWith(Utils.Symbols.skull)) {
-                if (event.messagePlain.endsWith("ghost.") || event.messagePlain.endsWith("died.")) {
+                if (event.messagePlain.endsWith(" ghost.") || event.messagePlain.endsWith(" died.")) {
                     deaths += 1;
                 }
             }

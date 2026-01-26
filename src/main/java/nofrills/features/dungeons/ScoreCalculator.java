@@ -8,6 +8,7 @@ import nofrills.config.SettingEnum;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.PartyChatMsgEvent;
+import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.NoFrillsAPI;
@@ -165,7 +166,6 @@ public class ScoreCalculator {
         for (String line : SkyblockData.getTabListLines()) {
             if (line.startsWith("Crypts: ")) {
                 bonus += Math.clamp(Utils.parseInt(getLineValue(line)).orElse(0), 0, 5);
-                break;
             }
         }
         return bonus;
@@ -209,9 +209,12 @@ public class ScoreCalculator {
     @EventHandler
     private static void onMsg(ChatMsgEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
-            if (event.messagePlain.equals("[BOSS] The Watcher: You have proven yourself. You may pass.")) {
+            String msg = event.messagePlain.trim();
+            if (msg.equals("[BOSS] The Watcher: You have proven yourself. You may pass.")) {
                 bloodDone = true;
-            } else if (event.messagePlain.trim().startsWith(Utils.Symbols.skull)) {
+                return;
+            }
+            if (msg.startsWith(Utils.Symbols.skull)) {
                 if (event.messagePlain.endsWith(" ghost.") || event.messagePlain.endsWith(" died.")) {
                     deaths += 1;
                 }
@@ -234,7 +237,7 @@ public class ScoreCalculator {
     }
 
     @EventHandler
-    private static void onJoin() {
+    private static void onJoin(ServerJoinEvent event) {
         score = 0;
         deaths = 0;
         bloodDone = false;

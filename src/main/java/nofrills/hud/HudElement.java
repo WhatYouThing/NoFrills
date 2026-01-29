@@ -82,20 +82,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         float scale = this.scale.valueFloat();
         if (scale != 1.0f && !this.isEditingHud()) {
             context.getMatrices().pushMatrix();
-            float originalX = (float) (this.xOffset - this.xOffset * scale);
-            float originalY = (float) (this.yOffset - this.yOffset * scale);
-            float alignX = switch (this.vScaleAlign.value()) {
-                case Left -> 0.0f;
-                case Middle -> this.height * 0.25f;
-                case Right -> this.height * 0.5f;
-            };
-            float alignY = switch (this.hScaleAlign.value()) {
-                case Top -> 0.0f;
-                case Middle -> this.width * 0.25f;
-                case Bottom -> this.width * 0.5f;
-            };
-            context.getMatrices().translate(originalX + alignX, originalY + alignY);
-            context.getMatrices().scale(scale, scale);
+            this.applyScaling(context, scale);
             super.draw(context, mouseX, mouseY, partialTicks, delta);
             context.getMatrices().popMatrix();
         } else {
@@ -135,6 +122,23 @@ public class HudElement extends DraggableContainer<FlowLayout> {
             return this;
         }
         return super.childAt(x, y);
+    }
+
+    public void applyScaling(OwoUIDrawContext context, float scale) {
+        float originalX = (float) (this.xOffset - this.xOffset * scale);
+        float originalY = (float) (this.yOffset - this.yOffset * scale);
+        float alignX = switch (this.vScaleAlign.value()) {
+            case Left -> 0.0f;
+            case Middle -> this.height * 0.25f;
+            case Right -> this.height * 0.5f;
+        };
+        float alignY = switch (this.hScaleAlign.value()) {
+            case Top -> 0.0f;
+            case Middle -> this.width * 0.25f;
+            case Bottom -> this.width * 0.5f;
+        };
+        context.getMatrices().translate(originalX + alignX, originalY + alignY);
+        context.getMatrices().scale(scale, scale);
     }
 
     public boolean isAdded() {

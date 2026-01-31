@@ -5,15 +5,19 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.BatEntity;
+import net.minecraft.item.map.MapState;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import static nofrills.Main.mc;
 
 public class DungeonUtil {
+    private static final List<String> teamCache = new ArrayList<>();
     private static final HashMap<String, String> classCache = new HashMap<>();
     private static final MapIdComponent mapId = new MapIdComponent(1024);
     private static final HashSet<String> dungeonClasses = Sets.newHashSet(
@@ -30,12 +34,16 @@ public class DungeonUtil {
         return classCache;
     }
 
+    public static List<String> getTeamCache() {
+        return teamCache;
+    }
+
     public static HashSet<String> getDungeonClasses() {
         return dungeonClasses;
     }
 
     public static boolean isDungeonStarted() {
-        return mc.world != null && mc.world.getMapState(mapId) != null;
+        return getMap() != null;
     }
 
     public static boolean isInDragonPhase() {
@@ -61,6 +69,14 @@ public class DungeonUtil {
         return classCache.getOrDefault(name, "");
     }
 
+    public static MapState getMap() {
+        return mc.world != null ? mc.world.getMapState(mapId) : null;
+    }
+
+    public static MapIdComponent getMapId() {
+        return mapId;
+    }
+
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (Utils.isInDungeons()) {
@@ -78,6 +94,7 @@ public class DungeonUtil {
                             if (line.contains("(" + dungeonClass) && line.endsWith(")")) {
                                 int start = line.lastIndexOf("]") + 2;
                                 String name = line.substring(start, line.indexOf(" ", start));
+                                teamCache.add(name);
                                 classCache.put(name, dungeonClass);
                                 break;
                             }
@@ -90,6 +107,7 @@ public class DungeonUtil {
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
+        teamCache.clear();
         classCache.clear();
         currentFloor = "";
         partyCount = 0;

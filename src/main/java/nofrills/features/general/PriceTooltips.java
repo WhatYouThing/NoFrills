@@ -28,38 +28,34 @@ public class PriceTooltips {
         return Utils.getMarketId(stack);
     }
 
-    public static int getStackQuantity(ItemStack stack, String title) {
-        if (title.endsWith("Sack")) {
-            for (String line : Utils.getLoreLines(stack)) {
-                if (line.startsWith("Stored: ") && line.contains("/")) {
-                    String count = line.substring(line.indexOf(":") + 1, line.indexOf("/")).trim();
-                    Optional<Integer> countInt = Utils.parseInt(count.replaceAll(",", ""));
-                    if (countInt.isPresent()) {
-                        return Math.max(1, countInt.get());
-                    }
+    public static int getStackQuantity(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            if (line.startsWith("Stored: ") && line.contains("/")) {
+                String count = line.substring(line.indexOf(":") + 1, line.indexOf("/")).trim();
+                Optional<Integer> countInt = Utils.parseInt(count.replaceAll(",", ""));
+                if (countInt.isPresent()) {
+                    return Math.max(1, countInt.get());
                 }
             }
-        }
-        if (title.equals("Hunting Box")) {
-            for (String line : Utils.getLoreLines(stack)) {
-                if (line.startsWith("Owned: ")) {
-                    int start = line.indexOf(":") + 2;
-                    int end = line.indexOf(" ", start);
-                    Optional<Integer> countInt = Utils.parseInt(line.substring(start, end).replaceAll(",", ""));
-                    if (countInt.isPresent()) {
-                        return Math.max(1, countInt.get());
-                    }
+            if (line.startsWith("Compost Available: ")) {
+                Optional<Integer> countInt = Utils.parseInt(line.substring(line.indexOf(":") + 2).replaceAll(",", ""));
+                if (countInt.isPresent()) {
+                    return countInt.get();
                 }
             }
-        }
-        if (title.equals("Attribute Menu")) {
-            for (String line : Utils.getLoreLines(stack)) {
-                if (line.startsWith("Syphon") && line.endsWith("more to level up!")) {
-                    String replaced = line.replace("Syphon", "").trim();
-                    Optional<Integer> countInt = Utils.parseInt(replaced.substring(0, replaced.indexOf(" ")).replaceAll(",", ""));
-                    if (countInt.isPresent()) {
-                        return Math.max(1, countInt.get());
-                    }
+            if (line.startsWith("Syphon") && line.endsWith("more to level up!")) {
+                String replaced = line.replace("Syphon", "").trim();
+                Optional<Integer> countInt = Utils.parseInt(replaced.substring(0, replaced.indexOf(" ")).replaceAll(",", ""));
+                if (countInt.isPresent()) {
+                    return Math.max(1, countInt.get());
+                }
+            }
+            if (line.startsWith("Owned: ")) {
+                int start = line.indexOf(":") + 2;
+                int end = line.indexOf(" ", start);
+                Optional<Integer> countInt = Utils.parseInt(line.substring(start, end).replaceAll(",", ""));
+                if (countInt.isPresent()) {
+                    return Math.max(1, countInt.get());
                 }
             }
         }
@@ -91,7 +87,7 @@ public class PriceTooltips {
         if (instance.isActive()) {
             String itemId = parseItemId(event.stack);
             if (itemId.isEmpty()) return;
-            int quantity = getStackQuantity(event.stack, event.title);
+            int quantity = getStackQuantity(event.stack);
             if (mote.value() && npcPricing.containsKey(itemId) && SkyblockData.getArea().equals("The Rift")) {
                 HashMap<String, Double> prices = npcPricing.get(itemId);
                 if (prices.containsKey("mote")) {

@@ -429,8 +429,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Separator("Arrow Align"),
                                 new Settings.Toggle("Solve Arrow Align", DeviceSolvers.arrowAlign, "Shows the amount of needed clicks while doing the 3rd device."),
                                 new Settings.Toggle("Block Wrong Clicks", DeviceSolvers.alignBlockWrong, "Prevents you from rotating the arrows that already have the correct rotation."),
-                                new Settings.Toggle("Inverted Block", DeviceSolvers.alignBlockInvert, "Prevents wrong rotations only while sneaking instead of only while not sneaking."),
-                                new Settings.Toggle("Instant Rotate", DeviceSolvers.alignInstantRotate, "Makes the item frame arrow rotation pingless.")
+                                new Settings.Toggle("Inverted Block", DeviceSolvers.alignBlockInvert, "Prevents wrong rotations only while sneaking instead of only while not sneaking.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, StarredMobHighlight.color, "The color of the starred mob highlight.")

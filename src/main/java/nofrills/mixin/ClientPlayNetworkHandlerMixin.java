@@ -14,10 +14,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.text.Text;
 import nofrills.events.*;
-import nofrills.features.dungeons.DeviceSolvers;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.NoConfirmScreen;
@@ -29,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
@@ -46,18 +46,16 @@ public class ClientPlayNetworkHandlerMixin {
                 }
             }
         }
-        if (ent instanceof ItemFrameEntity frame && DeviceSolvers.shouldPreventUpdate(frame)) {
-            ci.cancel();
-        }
     }
 
+    @SuppressWarnings("unchecked")
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V", shift = At.Shift.AFTER))
     private void onPostTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
         if (ent instanceof LivingEntity || ent instanceof ItemEntity) {
             if (ent instanceof ArmorStandEntity) {
                 for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
-                    if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) && entry.value() != null && ent.getCustomName() != null) {
-                        eventBus.post(new EntityNamedEvent(ent, Utils.toPlain(ent.getCustomName())));
+                    if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) && entry.value() != null) {
+                        ((Optional<Text>) entry.value()).ifPresent(value -> eventBus.post(new EntityNamedEvent(ent, Utils.toPlain(value))));
                         break;
                     }
                 }

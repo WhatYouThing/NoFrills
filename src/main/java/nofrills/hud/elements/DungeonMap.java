@@ -4,7 +4,6 @@ import com.mojang.blaze3d.textures.GpuTextureView;
 import io.wispforest.owo.ui.core.OwoUIDrawContext;
 import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.render.state.TextGuiElementRenderState;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.item.map.MapDecoration;
@@ -17,12 +16,13 @@ import net.minecraft.util.Atlases;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
+import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
 import nofrills.hud.HudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.DungeonUtil;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 
 import java.util.List;
@@ -31,25 +31,31 @@ import static nofrills.Main.mc;
 
 public class DungeonMap extends HudElement {
     private final SpriteAtlasTexture atlasTexture = mc.getAtlasManager().getAtlasTexture(Atlases.MAP_DECORATIONS);
-    private final SettingDouble selfMarkerScale;
-    private final SettingDouble otherMarkerScale;
-    private final SettingDouble markerNameScale;
+    private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
+    private final SettingDouble otherMarkerScale = new SettingDouble(5.0, "otherMarkerScale", this.instance);
+    private final SettingDouble markerNameScale = new SettingDouble(0.8, "markerNameScale", this.instance);
+    private final SettingColor healColor = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", instance.key());
+    private final SettingColor mageColor = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", instance.key());
+    private final SettingColor bersColor = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", instance.key());
+    private final SettingColor archColor = new SettingColor(RenderColor.fromHex(0x4a14b7), "archColor", instance.key());
+    private final SettingColor tankColor = new SettingColor(RenderColor.fromHex(0x768f46), "tankColor", instance.key());
     private MapParameters parameters = null;
 
     public DungeonMap() {
         super(new Feature("dungeonMapElement"), "Dungeon Map Element");
         this.layout.sizing(Sizing.fixed(128), Sizing.fixed(128));
-        this.selfMarkerScale = new SettingDouble(8.0, "selfMarkerScale", this.instance);
-        this.otherMarkerScale = new SettingDouble(5.0, "otherMarkerScale", this.instance);
-        this.markerNameScale = new SettingDouble(0.75, "markerNameScale", this.instance);
         this.options = this.getBaseSettings(List.of(
                 new Settings.SliderDouble("Self Marker Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),
                 new Settings.SliderDouble("Other Marker Scale", 0.0, 10.0, 0.01, this.otherMarkerScale, "The scale of the markers of your teammates."),
-                new Settings.SliderDouble("Marker Name Scale", 0.0, 1.0, 0.01, this.markerNameScale, "The scale of the name displayed below teammate markers.")
+                new Settings.SliderDouble("Marker Name Scale", 0.0, 1.0, 0.01, this.markerNameScale, "The scale of the name displayed below teammate markers."),
+                new Settings.ColorPicker("Healer Color", false, this.healColor, "The color used for the Healer marker name text."),
+                new Settings.ColorPicker("Mage Color", false, this.mageColor, "The color used for the Mage marker name text."),
+                new Settings.ColorPicker("Bers Color", false, this.bersColor, "The color used for the Berserk marker name text."),
+                new Settings.ColorPicker("Archer Color", false, this.archColor, "The color used for the Archer marker name text."),
+                new Settings.ColorPicker("Tank Color", false, this.tankColor, "The color used for the Tank marker name text.")
         ));
         this.setDesc("Displays the dungeon map while in Dungeons.");
     }
-
 
     @Override
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
@@ -120,12 +126,20 @@ public class DungeonMap extends HudElement {
 
     protected void drawMarkerLabel(OwoUIDrawContext context, String text, byte x, byte z, float scale) {
         float width = mc.textRenderer.getWidth(text);
+        int color = switch (DungeonUtil.getPlayerClass(text)) {
+            case "Healer" -> this.healColor.value().hex;
+            case "Mage" -> this.mageColor.value().hex;
+            case "Berserk" -> this.bersColor.value().hex;
+            case "Archer" -> this.archColor.value().hex;
+            case "Tank" -> this.tankColor.value().hex;
+            default -> 0xffffff;
+        };
         OrderedText orderedText = Text.literal(text).asOrderedText();
         Matrix3x2fStack matrices = context.getMatrices();
         matrices.pushMatrix();
         matrices.translate(x / 2.0F + 64.0F - width * scale / 2.0F, z / 2.0F + 64.0F + 8.0F);
         matrices.scale(scale, scale);
-        context.state.addText(new TextGuiElementRenderState(mc.textRenderer, orderedText, new Matrix3x2f(matrices), 0, 0, -1, Integer.MIN_VALUE, false, context.scissorStack.peekLast()));
+        context.drawText(mc.textRenderer, orderedText, 0, 0, color, true);
         matrices.popMatrix();
     }
 

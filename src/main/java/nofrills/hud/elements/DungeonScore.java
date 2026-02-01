@@ -6,6 +6,7 @@ import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.features.dungeons.ScoreCalculator;
 import nofrills.hud.SimpleTextElement;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
 public class DungeonScore extends SimpleTextElement {
@@ -20,7 +21,7 @@ public class DungeonScore extends SimpleTextElement {
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
-        } else if (!this.isEditingHud() && !Utils.isInDungeons()) {
+        } else if (!this.isEditingHud() && (!Utils.isInDungeons() || !DungeonUtil.isDungeonStarted())) {
             return;
         }
         int score = ScoreCalculator.getScore();

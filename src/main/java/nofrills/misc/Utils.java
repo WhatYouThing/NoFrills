@@ -136,10 +136,13 @@ public class Utils {
     public static void refillItem(String refill_query, int amount) {
         int total = 0;
         PlayerInventory inv = mc.player.getInventory();
+        String query = refill_query.replaceAll("_", " ");
         for (int i = 0; i <= 35; i++) {
             ItemStack stack = inv.getStack(i);
-            String id = Utils.getSkyblockId(stack);
-            if (id.replaceAll("_", " ").equalsIgnoreCase(refill_query.replaceAll("_", " "))) {
+            if (stack.isEmpty()) continue;
+            String id = Utils.getSkyblockId(stack).replaceAll("_", " ");
+            String name = Utils.toPlain(stack.getName());
+            if (query.equalsIgnoreCase(id) || query.equalsIgnoreCase(name)) {
                 total += stack.getCount();
             }
         }

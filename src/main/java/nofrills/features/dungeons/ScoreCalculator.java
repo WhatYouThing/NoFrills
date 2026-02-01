@@ -38,6 +38,10 @@ public class ScoreCalculator {
     private static boolean sent270 = false;
     private static boolean sent300 = false;
 
+    public static boolean shouldUpdatePaul() {
+        return instance.isActive() && paulState.value().equals(PaulState.Auto);
+    }
+
     private static String getLineValue(String line) {
         if (line.contains("%")) {
             line = line.substring(0, line.indexOf("%"));
@@ -72,7 +76,7 @@ public class ScoreCalculator {
                 }
             }
         }
-        return 1.0;
+        return 0.0;
     }
 
     private static double getSecretsFound() {
@@ -186,6 +190,7 @@ public class ScoreCalculator {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && DungeonUtil.isDungeonStarted()) {
+            if (getClearedPercent() == 0.0) return;
             int totalRooms = getTotalRooms();
             int clearedRooms = getTotalClearedRooms();
             double secretsFound = getSecretsFound();

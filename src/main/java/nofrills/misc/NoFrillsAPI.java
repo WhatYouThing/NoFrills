@@ -6,10 +6,10 @@ import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.dungeons.DungeonChestValue;
+import nofrills.features.dungeons.ScoreCalculator;
 import nofrills.features.general.ItemProtection;
 import nofrills.features.general.PriceTooltips;
 import nofrills.features.kuudra.KuudraChestValue;
-import nofrills.hud.HudManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +35,7 @@ public class NoFrillsAPI {
     }
 
     private static boolean shouldRefreshPerks() {
-        return HudManager.dungeonScore.isActive();
+        return ScoreCalculator.shouldUpdatePaul();
     }
 
     private static void logException(Exception exception) {

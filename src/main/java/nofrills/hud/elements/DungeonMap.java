@@ -4,6 +4,9 @@ import com.mojang.blaze3d.textures.GpuTextureView;
 import io.wispforest.owo.ui.core.OwoUIDrawContext;
 import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.render.state.TextGuiElementRenderState;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.item.map.MapDecoration;
@@ -23,6 +26,7 @@ import nofrills.hud.clickgui.Settings;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
+import org.joml.Matrix3x2f;
 import org.joml.Matrix3x2fStack;
 
 import java.util.List;
@@ -32,7 +36,7 @@ import static nofrills.Main.mc;
 public class DungeonMap extends HudElement {
     private final SpriteAtlasTexture atlasTexture = mc.getAtlasManager().getAtlasTexture(Atlases.MAP_DECORATIONS);
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
-    private final SettingDouble otherMarkerScale = new SettingDouble(5.0, "otherMarkerScale", this.instance);
+    private final SettingDouble otherMarkerScale = new SettingDouble(1.5, "otherMarkerScale", this.instance);
     private final SettingDouble markerNameScale = new SettingDouble(0.8, "markerNameScale", this.instance);
     private final SettingColor healColor = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", instance.key());
     private final SettingColor mageColor = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", instance.key());
@@ -45,9 +49,9 @@ public class DungeonMap extends HudElement {
         super(new Feature("dungeonMapElement"), "Dungeon Map Element");
         this.layout.sizing(Sizing.fixed(128), Sizing.fixed(128));
         this.options = this.getBaseSettings(List.of(
-                new Settings.SliderDouble("Self Marker Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),
-                new Settings.SliderDouble("Other Marker Scale", 0.0, 10.0, 0.01, this.otherMarkerScale, "The scale of the markers of your teammates."),
-                new Settings.SliderDouble("Marker Name Scale", 0.0, 1.0, 0.01, this.markerNameScale, "The scale of the name displayed below teammate markers."),
+                new Settings.SliderDouble("Self Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),
+                new Settings.SliderDouble("Player Scale", 0.0, 2.0, 0.01, this.otherMarkerScale, "The scale of the markers of your teammates."),
+                new Settings.SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.markerNameScale, "The scale of the name displayed below teammate markers."),
                 new Settings.ColorPicker("Healer Color", false, this.healColor, "The color used for the Healer marker name text."),
                 new Settings.ColorPicker("Mage Color", false, this.mageColor, "The color used for the Mage marker name text."),
                 new Settings.ColorPicker("Bers Color", false, this.bersColor, "The color used for the Berserk marker name text."),
@@ -79,15 +83,25 @@ public class DungeonMap extends HudElement {
             GpuTextureView textureView = mc.getTextureManager().getTexture(textureID).getGlTextureView();
             context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, textureView, 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
             int index = 1;
+            ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
             for (MapDecoration decor : mapState.decorations.values()) {
                 if (this.isMarkerSelf(decor)) {
                     byte[] pos = parameters.getPlayerMarkerPos(delta);
                     byte rot = parameters.getPlayerMarkerRot(delta);
                     this.drawMarker(context, decor, pos[0], pos[1], rot, this.selfMarkerScale.valueFloat());
                 } else {
-                    this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.otherMarkerScale.valueFloat());
                     if (index < team.size()) {
-                        this.drawMarkerLabel(context, team.get(index), decor.x(), decor.z(), this.markerNameScale.valueFloat());
+                        String name = team.get(index);
+                        PlayerListEntry entry = networkHandler != null ? networkHandler.getPlayerListEntry(name) : null;
+                        Identifier texture = entry != null ? entry.getSkinTextures().body().texturePath() : null;
+                        if (texture != null) {
+                            this.drawMarkerHead(context, texture, decor.x(), decor.z(), decor.rotation(), this.selfMarkerScale.valueFloat());
+                            this.drawMarkerLabel(context, name, decor.x(), decor.z(), this.markerNameScale.valueFloat());
+                        } else {
+                            this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.otherMarkerScale.valueFloat());
+                        }
+                    } else {
+                        this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.otherMarkerScale.valueFloat());
                     }
                     index += 1;
                 }
@@ -124,14 +138,25 @@ public class DungeonMap extends HudElement {
         matrices.popMatrix();
     }
 
+    protected void drawMarkerHead(OwoUIDrawContext context, Identifier texture, byte x, byte z, byte rot, float scale) {
+        Matrix3x2fStack matrices = context.getMatrices();
+        matrices.pushMatrix();
+        matrices.translate(x / 2.0F + 64.0F, z / 2.0F + 64.0F);
+        matrices.rotate((float) (Math.PI / 180.0) * rot * 360.0F / 16.0F);
+        matrices.scale(scale, scale);
+        matrices.translate(-0.125F * 24, -0.125F * 24);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, -1, -1, 8.0F, 16.0f, 8, 8, 8, -8, 64, 64, -1);
+        matrices.popMatrix();
+    }
+
     protected void drawMarkerLabel(OwoUIDrawContext context, String text, byte x, byte z, float scale) {
         float width = mc.textRenderer.getWidth(text);
         int color = switch (DungeonUtil.getPlayerClass(text)) {
-            case "Healer" -> this.healColor.value().hex;
-            case "Mage" -> this.mageColor.value().hex;
-            case "Berserk" -> this.bersColor.value().hex;
-            case "Archer" -> this.archColor.value().hex;
-            case "Tank" -> this.tankColor.value().hex;
+            case "Healer" -> this.healColor.value().argb;
+            case "Mage" -> this.mageColor.value().argb;
+            case "Berserk" -> this.bersColor.value().argb;
+            case "Archer" -> this.archColor.value().argb;
+            case "Tank" -> this.tankColor.value().argb;
             default -> 0xffffff;
         };
         OrderedText orderedText = Text.literal(text).asOrderedText();
@@ -139,7 +164,7 @@ public class DungeonMap extends HudElement {
         matrices.pushMatrix();
         matrices.translate(x / 2.0F + 64.0F - width * scale / 2.0F, z / 2.0F + 64.0F + 8.0F);
         matrices.scale(scale, scale);
-        context.drawText(mc.textRenderer, orderedText, 0, 0, color, true);
+        context.state.addText(new TextGuiElementRenderState(mc.textRenderer, orderedText, new Matrix3x2f(matrices), 0, 0, color, Integer.MIN_VALUE, true, context.scissorStack.peekLast()));
         matrices.popMatrix();
     }
 

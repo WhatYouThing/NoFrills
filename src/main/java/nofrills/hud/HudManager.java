@@ -2,7 +2,6 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.s2c.play.MapUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -88,11 +87,6 @@ public class HudManager {
             if (ping.isActive()) {
                 ping.setPing(Util.getMeasuringTimeMs() - pingPacket.startTime());
                 ping.ticks = 20;
-            }
-        }
-        if (event.packet instanceof MapUpdateS2CPacket mapPacket) {
-            if (dungeonMap.isActive() && Utils.isInSkyblock() && Utils.isInDungeons()) {
-                dungeonMap.loadMapParameters(mapPacket);
             }
         }
     }

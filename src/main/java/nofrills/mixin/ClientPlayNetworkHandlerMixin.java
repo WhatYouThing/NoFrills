@@ -20,6 +20,7 @@ import nofrills.events.*;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.NoConfirmScreen;
+import nofrills.hud.HudManager;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,7 +37,7 @@ import static nofrills.Main.mc;
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
 
-    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"), cancellable = true)
+    @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"))
     private void onPreTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
         if (ent.equals(mc.player) && AnimationFix.active()) {
             for (DataTracker.SerializedEntry<?> entry : new ArrayList<>(packet.trackedValues())) {
@@ -142,6 +143,13 @@ public class ClientPlayNetworkHandlerMixin {
                     ci.cancel();
                 }
             }
+        }
+    }
+
+    @Inject(method = "onMapUpdate", at = @At("TAIL"))
+    private void onAfterMapUpdate(MapUpdateS2CPacket packet, CallbackInfo ci) {
+        if (HudManager.dungeonMap.isActive()) {
+            HudManager.dungeonMap.onMapUpdate(packet);
         }
     }
 }

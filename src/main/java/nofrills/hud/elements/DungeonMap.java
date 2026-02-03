@@ -3,10 +3,13 @@ package nofrills.hud.elements;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import io.wispforest.owo.ui.core.OwoUIDrawContext;
 import io.wispforest.owo.ui.core.Sizing;
+import net.minecraft.block.MapColor;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.render.state.TextGuiElementRenderState;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.item.map.MapDecoration;
@@ -35,6 +38,7 @@ import static nofrills.Main.mc;
 
 public class DungeonMap extends HudElement {
     private final SpriteAtlasTexture atlasTexture = mc.getAtlasManager().getAtlasTexture(Atlases.MAP_DECORATIONS);
+    private final NativeImageBackedTexture mapTexture = new NativeImageBackedTexture(() -> "NoFrills Dungeon Map", new NativeImage(128, 128, true));
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
     private final SettingDouble otherMarkerScale = new SettingDouble(1.5, "otherMarkerScale", this.instance);
     private final SettingDouble markerNameScale = new SettingDouble(0.8, "markerNameScale", this.instance);
@@ -79,9 +83,7 @@ public class DungeonMap extends HudElement {
                 this.applyScaling(context, scale);
             }
             matrices.translate(this.x(), this.y());
-            Identifier textureID = mc.getMapTextureManager().getTextureId(DungeonUtil.getMapId(), mapState);
-            GpuTextureView textureView = mc.getTextureManager().getTexture(textureID).getGlTextureView();
-            context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, textureView, 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
+            context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, this.mapTexture.getGlTextureView(), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
             int index = 1;
             ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
             for (MapDecoration decor : mapState.decorations.values()) {
@@ -168,14 +170,28 @@ public class DungeonMap extends HudElement {
         matrices.popMatrix();
     }
 
-    public void loadMapParameters(MapUpdateS2CPacket packet) {
-        if (this.parameters == null && packet.mapId().equals(DungeonUtil.getMapId())) {
-            packet.decorations().ifPresent(decors -> {
-                for (MapDecoration decor : decors) {
+    public void onMapUpdate(MapUpdateS2CPacket packet) {
+        if (packet.mapId().equals(DungeonUtil.getMapId()) && Utils.isInDungeons()) {
+            if (this.parameters == null) {
+                for (MapDecoration decor : packet.decorations().orElse(List.of())) {
                     if (this.isMarkerSelf(decor)) {
                         this.parameters = this.getMapParameters().adjustCenter(decor);
+                        break;
                     }
                 }
+            }
+            packet.updateData().ifPresent(data -> {
+                byte[] colors = data.colors();
+                NativeImage nativeImage = this.mapTexture.getImage();
+                if (nativeImage != null) {
+                    for (int i = 0; i < 128; i++) {
+                        for (int j = 0; j < 128; j++) {
+                            int k = j + i * 128;
+                            nativeImage.setColorArgb(j, i, MapColor.getRenderColor(colors[k]));
+                        }
+                    }
+                }
+                this.mapTexture.upload();
             });
         }
     }

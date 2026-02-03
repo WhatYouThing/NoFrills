@@ -47,6 +47,7 @@ public class StarredMobHighlight {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
             for (Entity ent : cache.get()) {
+                if (!ent.isAlive()) continue;
                 event.drawOutline(Utils.getLerpedBox(ent, event.tickCounter.getTickProgress(true)), false, color.value());
             }
         }

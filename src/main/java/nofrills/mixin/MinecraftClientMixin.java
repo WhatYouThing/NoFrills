@@ -8,6 +8,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
@@ -45,6 +46,9 @@ public abstract class MinecraftClientMixin {
     @Shadow
     public abstract void setScreen(@Nullable Screen screen);
 
+    @Shadow
+    public abstract @Nullable ServerInfo getCurrentServerEntry();
+
     @WrapWithCondition(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
     private boolean onDropSwing(ClientPlayerEntity instance, Hand hand) {
         return !NoDropSwing.active();
@@ -53,6 +57,8 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void onBeforeOpenScreen(Screen screen, CallbackInfo ci) {
         if (NoLoadingScreen.instance.isActive() && screen instanceof LevelLoadingScreen) {
+            ServerInfo serverEntry = this.getCurrentServerEntry();
+            if (serverEntry == null || serverEntry.isLocal()) return;
             this.setScreen(null);
             ci.cancel();
         }

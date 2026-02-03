@@ -12,8 +12,6 @@ import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
-import java.util.List;
-
 public class KeyHighlight {
     public static final Feature instance = new Feature("witherKeyHighlight");
 
@@ -38,9 +36,7 @@ public class KeyHighlight {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
-            List<Entity> keys = keyCache.get();
-            if (!keys.isEmpty()) {
-                Entity key = keys.getFirst();
+            for (Entity key : keyCache.get()) {
                 Box box = Box.of(key.getEntityPos().add(0, 1.5, 0), 1, 1, 1);
                 if (highlight.value()) event.drawFilledWithBeam(box, 256, true, color.value());
                 if (tracer.value()) event.drawTracer(box.getCenter(), tracerColor.value());

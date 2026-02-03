@@ -85,7 +85,6 @@ public class ScathaMining {
                     Utils.info("§aWorm spawn cooldown ended!");
                     Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP, 1.0f, 0.0f);
                 }
-                wormsCache.removeDead();
             }
         }
     }
@@ -93,7 +92,6 @@ public class ScathaMining {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         spawnCooldown = 0;
-        wormsCache.clear();
     }
 
     private enum WormType {

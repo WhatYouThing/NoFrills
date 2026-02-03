@@ -200,6 +200,10 @@ public class NoFrillsCommand {
                 Utils.refillItem("SPIRIT_LEAP", 16);
                 return SINGLE_SUCCESS;
             })),
+            new ModCommand("getDraft", "Refills your Architect's First Drafts (up to 1) directly from your sacks.", literal("getDraft").executes(context -> {
+                Utils.refillItem("ARCHITECT_FIRST_DRAFT", 1);
+                return SINGLE_SUCCESS;
+            })),
             new ModCommand("refill", "Refills a specific item up to the specific amount from your sacks.", literal("refill").executes(context -> {
                 return SINGLE_SUCCESS;
             }).then(argument("query", StringArgumentType.greedyString()).executes(context -> {
@@ -270,6 +274,11 @@ public class NoFrillsCommand {
                     }
                 }
                 Utils.info("Dumped player texture URL's to latest.log.");
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpTabList").executes(context -> {
+                for (String line : Utils.getTabListLines()) {
+                    Utils.info(line);
+                }
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("shardTracker", "Commands for managing the Shard Tracker feature.", literal("shardTracker").executes(context -> {

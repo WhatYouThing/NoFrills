@@ -79,6 +79,7 @@ public class Main implements ModInitializer {
 
         eventBus.subscribe(SkyblockData.class);
         eventBus.subscribe(SlotOptions.class);
+        eventBus.subscribe(EntityCache.class);
         eventBus.subscribe(Utils.class);
         eventBus.subscribe(NoFrillsAPI.class);
         eventBus.subscribe(ItemProtection.class);
@@ -166,7 +167,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(QuickClose.class);
         eventBus.subscribe(DungeonChestValue.class);
         eventBus.subscribe(NoCursorReset.class);
-        eventBus.subscribe(TickTimers.class);
         eventBus.subscribe(RelicHighlight.class);
         eventBus.subscribe(GemstoneDesyncFix.class);
         eventBus.subscribe(DianaSolver.class);
@@ -183,6 +183,8 @@ public class Main implements ModInitializer {
         eventBus.subscribe(InfoTooltips.class);
         eventBus.subscribe(AnvilHelper.class);
         eventBus.subscribe(ShaftAnnounce.class);
+        eventBus.subscribe(AutoTip.class);
+        eventBus.subscribe(ScoreCalculator.class);
         eventBus.subscribe(SkillTracker.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);

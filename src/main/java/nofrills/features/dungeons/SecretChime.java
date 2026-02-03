@@ -92,12 +92,14 @@ public class SecretChime {
     private static void playItemChime(Entity entity) {
         if (mc.player != null && entity.distanceTo(mc.player) <= 8.0) {
             playSound(itemsSound, itemsVolume, itemsPitch);
+            entityCache.remove(entity);
         }
     }
 
     private static void playBatChime(Entity entity) {
         if (mc.player != null && entity.distanceTo(mc.player) <= 10.0) {
             playSound(batSound, batVolume, batPitch);
+            entityCache.remove(entity);
         }
     }
 
@@ -144,10 +146,10 @@ public class SecretChime {
     @EventHandler
     private static void onRemoved(EntityRemovedEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
-            if (itemsToggle.value() && event.entity instanceof ItemEntity && entityCache.removeDead().has(event.entity)) {
+            if (itemsToggle.value() && event.entity instanceof ItemEntity && entityCache.has(event.entity)) {
                 playItemChime(event.entity);
             }
-            if (batToggle.value() && event.entity instanceof BatEntity && entityCache.removeDead().has(event.entity)) {
+            if (batToggle.value() && event.entity instanceof BatEntity && entityCache.has(event.entity)) {
                 playBatChime(event.entity);
             }
         }
@@ -163,6 +165,5 @@ public class SecretChime {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         clickedThisTick = false;
-        entityCache.clear();
     }
 }

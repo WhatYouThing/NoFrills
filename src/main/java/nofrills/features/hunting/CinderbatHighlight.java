@@ -6,7 +6,6 @@ import net.minecraft.entity.passive.BatEntity;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityUpdatedEvent;
-import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
@@ -37,10 +36,5 @@ public class CinderbatHighlight {
                 }
             }
         }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        cinderbatList.clear();
     }
 }

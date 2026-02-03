@@ -13,17 +13,14 @@ import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
-import nofrills.events.BlockUpdateEvent;
-import nofrills.events.InteractEntityEvent;
-import nofrills.events.WorldRenderEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
 
@@ -36,11 +33,6 @@ public class DeviceSolvers {
     public static final SettingBool arrowAlign = new SettingBool(false, "arrowAlign", instance.key());
     public static final SettingBool alignBlockWrong = new SettingBool(false, "alignBlockWrong", instance.key());
     public static final SettingBool alignBlockInvert = new SettingBool(false, "alignBlockInvert", instance);
-    public static final SettingBool alignInstantRotate = new SettingBool(false, "alignInstantRotate", instance.key());
-
-    public static boolean shouldPreventUpdate(ItemFrameEntity frame) {
-        return instance.isActive() && arrowAlign.value() && alignInstantRotate.value() && ArrowAlign.solutionMap.containsKey(frame);
-    }
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
@@ -80,6 +72,15 @@ public class DeviceSolvers {
         if (instance.isActive() && Utils.isInDungeonBoss("7")) {
             if (arrowAlign.value()) {
                 ArrowAlign.interactEntity(event);
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onEntityUpdated(EntityUpdatedEvent event) {
+        if (instance.isActive() && Utils.isInDungeonBoss("7")) {
+            if (arrowAlign.value()) {
+                ArrowAlign.updateEntity(event);
             }
         }
     }
@@ -158,7 +159,8 @@ public class DeviceSolvers {
                 new int[]{-1, 1, 1, 3, -1, -1, 7, -1, 3, -1, -1, 7, -1, 3, -1, -1, 7, -1, 3, -1, -1, 7, -1, 1, -1},
                 new int[]{-1, 1, 3, -1, -1, -1, -1, 1, 1, -1, -1, 1, 7, -1, -1, -1, -1, 1, 1, -1, -1, 1, 7, -1, -1}
         }; // solution set from Skyblocker, no idea how Odin formats its solutions which sure does prevent me from copying them
-        public static final HashMap<ItemFrameEntity, Integer> solutionMap = new HashMap<>();
+        public static final ConcurrentHashMap<ItemFrameEntity, Integer> solutionMap = new ConcurrentHashMap<>();
+        public static final ConcurrentHashMap<ItemFrameEntity, Integer> clicksMap = new ConcurrentHashMap<>();
 
         public static boolean isActive() {
             return mc.player != null && area.getCenter().distanceTo(mc.player.getEntityPos()) <= 8.0;
@@ -215,6 +217,7 @@ public class DeviceSolvers {
             if (!isActive()) {
                 if (!solutionMap.isEmpty()) {
                     solutionMap.clear();
+                    clicksMap.clear();
                 }
                 return;
             }
@@ -232,7 +235,8 @@ public class DeviceSolvers {
             for (Map.Entry<ItemFrameEntity, Integer> entry : solutionMap.entrySet()) {
                 ItemFrameEntity frame = entry.getKey();
                 Vec3d pos = frame.getEyePos().add(0.0, 0.2, 0.0);
-                int clicks = getNeededClicks(frame.getRotation(), entry.getValue());
+                int rotation = clicksMap.containsKey(frame) ? clicksMap.get(frame) : frame.getRotation();
+                int clicks = getNeededClicks(rotation, entry.getValue());
                 if (clicks > 0) {
                     event.drawText(pos, Text.literal(String.valueOf(clicks)), 0.04f, true, RenderColor.white);
                 }
@@ -251,12 +255,19 @@ public class DeviceSolvers {
 
         public static void interactEntity(InteractEntityEvent event) {
             if (event.entity instanceof ItemFrameEntity frame && solutionMap.containsKey(frame)) {
-                if (shouldBlock() && getNeededClicks(frame.getRotation(), solutionMap.get(frame)) == 0) {
+                int rotation = clicksMap.containsKey(frame) ? clicksMap.get(frame) : frame.getRotation();
+                if (shouldBlock() && getNeededClicks(rotation, solutionMap.get(frame)) == 0) {
                     event.cancel();
                     return;
                 }
-                if (alignInstantRotate.value()) {
-                    frame.setRotation(frame.getRotation() + 1); // automatically goes back to 0 if the current rotation is 7
+                clicksMap.put(frame, (rotation + 1) % 8);
+            }
+        }
+
+        public static void updateEntity(EntityUpdatedEvent event) {
+            if (event.entity instanceof ItemFrameEntity frame && solutionMap.containsKey(frame)) {
+                if (clicksMap.containsKey(frame) && frame.getRotation() == clicksMap.get(frame)) {
+                    clicksMap.remove(frame);
                 }
             }
         }

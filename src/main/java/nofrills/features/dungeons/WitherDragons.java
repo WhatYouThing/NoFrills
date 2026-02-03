@@ -199,7 +199,6 @@ public class WitherDragons {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         splitDone = false;
-        dragonCache.clear();
         for (Dragon drag : dragons) {
             drag.reset();
         }

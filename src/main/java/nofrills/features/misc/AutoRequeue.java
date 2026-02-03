@@ -31,7 +31,8 @@ public class AutoRequeue {
                 || msg.startsWith("You have been kicked from the party by ")
                 || msg.endsWith(" has been removed from the party.")
                 || msg.endsWith(" has left the party.")
-                || msg.endsWith(" has disbanded the party!");
+                || msg.endsWith(" has disbanded the party!")
+                || msg.endsWith(" has disconnected, they have 5 minutes to rejoin before they are removed from the party.");
     }
 
     public static void setPaused() {

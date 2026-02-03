@@ -1,5 +1,6 @@
 package nofrills.misc;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,6 +18,7 @@ import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.component.DataComponentTypes;
@@ -138,10 +140,13 @@ public class Utils {
     public static void refillItem(String refill_query, int amount) {
         int total = 0;
         PlayerInventory inv = mc.player.getInventory();
+        String query = refill_query.replaceAll("_", " ");
         for (int i = 0; i <= 35; i++) {
             ItemStack stack = inv.getStack(i);
-            String id = Utils.getSkyblockId(stack);
-            if (id.replaceAll("_", " ").equalsIgnoreCase(refill_query.replaceAll("_", " "))) {
+            if (stack.isEmpty()) continue;
+            String id = Utils.getSkyblockId(stack).replaceAll("_", " ");
+            String name = Utils.toPlain(stack.getName());
+            if (query.equalsIgnoreCase(id) || query.equalsIgnoreCase(name)) {
                 total += stack.getCount();
             }
         }
@@ -211,7 +216,7 @@ public class Utils {
      * Checks if the player is currently on the specific Dungeon floor. For example, "F7" checks for F7 only, "M7" checks for M7 only, and "7" checks for both of them.
      */
     public static boolean isOnDungeonFloor(String floor) {
-        return isInDungeons() && SkyblockData.getLocation().endsWith(floor + ")");
+        return DungeonUtil.getCurrentFloor().endsWith(floor);
     }
 
     /**
@@ -226,13 +231,13 @@ public class Utils {
      */
     public static boolean isInDungeonBoss(String floor) {
         return isOnDungeonFloor(floor) && switch (floor) {
-            case "1" -> isInZone(-72, 146, -40, -14, 55, 49);
-            case "2" -> isInZone(-40, 99, -40, 24, 54, 54);
-            case "3" -> isInZone(-40, 118, -40, 42, 64, 73);
-            case "4" -> isInZone(50, 112, 81, -40, 53, -40);
-            case "5" -> isInZone(50, 112, 118, -40, 53, -8);
-            case "6" -> isInZone(22, 110, 134, -40, 51, -8);
-            case "7" -> isInZone(134, 254, 147, -8, 0, -8);
+            case "1", "F1", "M1" -> isInZone(-72, 146, -40, -14, 55, 49);
+            case "2", "F2", "M2" -> isInZone(-40, 99, -40, 24, 54, 54);
+            case "3", "F3", "M3" -> isInZone(-40, 118, -40, 42, 64, 73);
+            case "4", "F4", "M4" -> isInZone(50, 112, 81, -40, 53, -40);
+            case "5", "F5", "M5" -> isInZone(50, 112, 118, -40, 53, -8);
+            case "6", "F6", "M6" -> isInZone(22, 110, 134, -40, 51, -8);
+            case "7", "F7", "M7" -> isInZone(134, 254, 147, -8, 0, -8);
             default -> false;
         };
     }
@@ -280,6 +285,11 @@ public class Utils {
 
     public static boolean isInSkyblock() {
         return SkyblockData.isInSkyblock();
+    }
+
+    public static boolean isOnHypixel() {
+        ServerInfo info = mc.getCurrentServerEntry();
+        return info != null && toLower(info.address).endsWith("hypixel.net");
     }
 
     /**
@@ -727,15 +737,7 @@ public class Utils {
     }
 
     public static List<String> getTabListLines() {
-        List<String> lines = new ArrayList<>();
-        if (mc.getNetworkHandler() != null) {
-            for (PlayerListEntry entry : new ArrayList<>(mc.getNetworkHandler().getPlayerList())) {
-                if (entry != null && entry.getDisplayName() != null) {
-                    lines.add(toPlain(entry.getDisplayName()).trim());
-                }
-            }
-        }
-        return lines;
+        return SkyblockData.getTabListLines();
     }
 
     /**
@@ -875,15 +877,13 @@ public class Utils {
      */
     public static String format(String string, Object... values) {
         StringBuilder builder = new StringBuilder();
-        String[] sections = string.split("\\{}");
-        if (sections.length == 0) {
-            sections = new String[]{""};
-        }
-        for (int i = 0; i < sections.length; i++) {
-            builder.append(sections[i]);
-            if (i < values.length) {
-                builder.append(values[i]);
+        int index = 0;
+        for (String section : Splitter.on("{}").split(string)) {
+            builder.append(section);
+            if (index < values.length) {
+                builder.append(values[index]);
             }
+            index++;
         }
         return builder.toString();
     }

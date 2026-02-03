@@ -33,6 +33,7 @@ public class NoRender {
     public static final SettingBool effectDisplay = new SettingBool(false, "effectDisplay", instance.key());
     public static final SettingBool deadEntities = new SettingBool(false, "deadEntities", instance.key());
     public static final SettingBool deadPoof = new SettingBool(false, "deadPoof", instance.key());
+    public static final SettingBool damageSplash = new SettingBool(false, "damageSplash", instance);
     public static final SettingBool lightning = new SettingBool(false, "lightning", instance.key());
     public static final SettingBool fallingBlocks = new SettingBool(false, "fallingBlocks", instance.key());
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
@@ -58,6 +59,7 @@ public class NoRender {
             ParticleTypes.GUST,
             ParticleTypes.GUST_EMITTER_LARGE
     );
+    private static final Pattern damageSplashPattern = Pattern.compile("[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)"); // pattern from skyhanni
 
     public static FogData getFogAsEmpty(FogData data) {
         data.renderDistanceStart = Float.MAX_VALUE;
@@ -95,12 +97,19 @@ public class NoRender {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && deadEntities.value()) {
-            String name = event.namePlain.replaceAll(Utils.Symbols.vampLow, "");
-            for (Pattern pattern : deadPatterns) {
-                if (pattern.matcher(name).matches()) {
+        if (instance.isActive()) {
+            if (deadEntities.value()) {
+                String name = event.namePlain.replaceAll(Utils.Symbols.vampLow, "");
+                for (Pattern pattern : deadPatterns) {
+                    if (pattern.matcher(name).matches()) {
+                        event.entity.setCustomNameVisible(false);
+                        return;
+                    }
+                }
+            }
+            if (damageSplash.value()) {
+                if (damageSplashPattern.matcher(event.namePlain.replaceAll(",", "")).matches()) {
                     event.entity.setCustomNameVisible(false);
-                    break;
                 }
             }
         }

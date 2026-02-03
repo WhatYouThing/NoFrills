@@ -163,6 +163,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Effect Display", NoRender.effectDisplay, "Removes the potion effect display from the inventory and the top right of the screen."),
                                 new Settings.Toggle("Dead Entities", NoRender.deadEntities, "Hides entities that are in their death animation, and their health bars (if applicable)."),
                                 new Settings.Toggle("Dead Poof", NoRender.deadPoof, "Tries to hide the death \"poof\" particles that appear after a dead entity is deleted."),
+                                new Settings.Toggle("Damage Splash", NoRender.damageSplash, "Hides the damage splash nametags that appear when dealing damage."),
                                 new Settings.Toggle("Lightning", NoRender.lightning, "Hides lightning strikes."),
                                 new Settings.Toggle("Falling Blocks", NoRender.fallingBlocks, "Hides falling block entities such as sand."),
                                 new Settings.Toggle("Mage Beam", NoRender.mageBeam, "Prevents the server from spawning the Mage Beam particles in Dungeons."),
@@ -215,7 +216,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Extra Lines", ChatTweaks.extraLines, "Overrides the chat line limit. Allows you to keep more messages in the chat history."),
                                 new Settings.SliderInt("Lines", 100, 5000, 10, ChatTweaks.lines, "The chat line limit override.")
                         ))),
-                        new Module("Item Protection", ItemProtection.instance, "Prevent yourself from accidentally dropping and/or selling items.", new Settings(List.of(
+                        new Module("Item Protection", ItemProtection.instance, "Prevents you from accidentally dropping, selling or salvaging your important items.", new Settings(List.of(
                                 new Settings.Keybind("UUID Protect Key", ItemProtection.uuidKey, "The keybind to protect a specific item by UUID."),
                                 new Settings.Keybind("ID Protect Key", ItemProtection.skyblockIdKey, "The keybind to protect a specific item by Skyblock ID."),
                                 new Settings.Toggle("Protect By UUID", ItemProtection.protectUUID, "Protects items that you have protected by UUID."),
@@ -331,8 +332,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Keybind("Scroll Down", GuiKeybinds.down, "The keybind to scroll down in the GUI."),
                                 new Settings.Keybind("Go Back", GuiKeybinds.back, "The keybind to go back to the previous GUI.")
                         ))),
-                        new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking."),
-                        new Module("Hotbar Scroll Lock", HotbarScrollLock.instance, "Prevents your hotbar going from the first to the last slot when scrolling, and vice versa.")
+                        new Module("Force Nametag", ForceNametag.instance, "Makes player nametags always visible, even if they are invisible and/or sneaking.", new Settings(List.of(
+                                new Settings.Toggle("Self Nametag", ForceNametag.self, "Forces your own player nametag to render. Only visible in the third person perspective.")
+                        ))),
+                        new Module("Hotbar Scroll Lock", HotbarScrollLock.instance, "Prevents your hotbar going from the first to the last slot when scrolling, and vice versa."),
+                        new Module("Auto Tip", AutoTip.instance, "Automatically runs /tipall every 15 minutes while connected to Hypixel.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experimentation Table", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
@@ -427,8 +431,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Separator("Arrow Align"),
                                 new Settings.Toggle("Solve Arrow Align", DeviceSolvers.arrowAlign, "Shows the amount of needed clicks while doing the 3rd device."),
                                 new Settings.Toggle("Block Wrong Clicks", DeviceSolvers.alignBlockWrong, "Prevents you from rotating the arrows that already have the correct rotation."),
-                                new Settings.Toggle("Inverted Block", DeviceSolvers.alignBlockInvert, "Prevents wrong rotations only while sneaking instead of only while not sneaking."),
-                                new Settings.Toggle("Instant Rotate", DeviceSolvers.alignInstantRotate, "Makes the item frame arrow rotation pingless.")
+                                new Settings.Toggle("Inverted Block", DeviceSolvers.alignBlockInvert, "Prevents wrong rotations only while sneaking instead of only while not sneaking.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, StarredMobHighlight.color, "The color of the starred mob highlight.")
@@ -531,11 +534,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Chest Value", DungeonChestValue.instance, "Calculates the value of your Dungeons loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
                                 new Settings.ColorPicker("Background", true, DungeonChestValue.background, "The color of the background of the value text.")
                         ))),
-                        new Module("Tick Timers", TickTimers.instance, "Displays a timer for various things during the F7/M7 boss fight.\nUses the Tick Timers HUD element found in the HUD editor.", new Settings(List.of(
-                                new Settings.Toggle("Storm Timer", TickTimers.storm, "Shows a timer for the pads in 2nd phase."),
-                                new Settings.Toggle("Terminal Start Timer", TickTimers.terminalStart, "Shows a timer for the 3rd phase starting."),
-                                new Settings.Toggle("Goldor Timer", TickTimers.goldor, "Shows a timer for Goldor's death tick in 3rd phase.")
-                        ))),
                         new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
                         new Module("Class Nametags", ClassNametags.instance, "Renders large nametags for your teammates, indicating their selected class and position.", new Settings(List.of(
                                 new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, ClassNametags.scale, "The scale of the text."),
@@ -544,6 +542,17 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Bers Color", false, ClassNametags.bers, "The text color for Berserker."),
                                 new Settings.ColorPicker("Arch Color", false, ClassNametags.arch, "The text color for Archer."),
                                 new Settings.ColorPicker("Tank Color", false, ClassNametags.tank, "The text color for Tank.")
+                        ))),
+                        new Module("Score Calculator", ScoreCalculator.instance, "Calculates the score in your dungeon runs.", new Settings(List.of(
+                                new Settings.Dropdown<>("Paul State", ScoreCalculator.paulState, "Allows you to force the state of Paul's EZPZ perk.\nSet to Auto to automatically check for EZPZ through the NoFrills API."),
+                                new Settings.Toggle("Send 270 Message", ScoreCalculator.sendMsg270, "If enabled, send a message upon reaching 270 (S) score."),
+                                new Settings.TextInput("270 Message", ScoreCalculator.msg270, "The message to send when 270 (S) score is reached."),
+                                new Settings.Toggle("Show 270 Title", ScoreCalculator.showTitle270, "If enabled, show a title on screen upon reaching 270 (S) score."),
+                                new Settings.TextInput("270 Title", ScoreCalculator.title270, "The title to show when 270 (S) score is reached."),
+                                new Settings.Toggle("Send 300 Message", ScoreCalculator.sendMsg300, "If enabled, send a message upon reaching 300 (S+) score."),
+                                new Settings.TextInput("300 Message", ScoreCalculator.msg300, "The message to send when 300 (S+) score is reached."),
+                                new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 (S+) score."),
+                                new Settings.TextInput("300 Title", ScoreCalculator.title300, "The title to show when 300 (S+) score is reached.")
                         )))
                 )),
                 new Category("Kuudra", List.of(

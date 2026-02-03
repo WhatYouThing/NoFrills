@@ -9,7 +9,10 @@ import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
-import nofrills.events.*;
+import nofrills.events.AttackEntityEvent;
+import nofrills.events.EntityNamedEvent;
+import nofrills.events.InteractEntityEvent;
+import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SkyblockData;
@@ -40,8 +43,7 @@ public class SpookyChests {
     private static void clickChest(Entity ent) {
         if (ent instanceof ArmorStandEntity) {
             List<Entity> chests = new ArrayList<>(chestList.get());
-            EntityCache clicked = clickedList.removeDead();
-            chests.removeIf(clicked::has);
+            chests.removeIf(clickedList::has);
             chests.sort(Comparator.comparingDouble(chest -> Utils.horizontalDistance(ent, chest)));
             if (!chests.isEmpty() && Utils.horizontalDistance(ent, chests.getFirst()) <= 1.5) {
                 clickedList.add(chests.getFirst());
@@ -74,9 +76,8 @@ public class SpookyChests {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !chestList.empty()) {
-            EntityCache clicked = clickedList.removeDead();
             for (Entity chest : chestList.get()) {
-                if (clicked.has(chest)) {
+                if (clickedList.has(chest)) {
                     continue;
                 }
                 BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);
@@ -84,11 +85,5 @@ public class SpookyChests {
                 if (tracer.value()) event.drawTracer(pos.toCenterPos(), color.valueWithAlpha(1.0f));
             }
         }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        chestList.clear();
-        clickedList.clear();
     }
 }

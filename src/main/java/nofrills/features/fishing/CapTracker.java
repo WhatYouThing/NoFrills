@@ -7,7 +7,6 @@ import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
 import nofrills.config.SettingString;
 import nofrills.events.EntityNamedEvent;
-import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.SeaCreatureData;
@@ -29,7 +28,6 @@ public class CapTracker {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive()) {
-            seaCreatures.removeDead();
             int count = seaCreatures.size();
             if (count >= target.value() && notifyTicks == 0) {
                 if (sendMsg.value() && !msg.value().isEmpty()) {
@@ -54,10 +52,5 @@ public class CapTracker {
         if (instance.isActive() && !Utils.isInDungeons() && SeaCreatureData.isSeaCreature(event.namePlain)) {
             seaCreatures.add(event.entity);
         }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        seaCreatures.clear();
     }
 }

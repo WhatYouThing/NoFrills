@@ -13,8 +13,13 @@ public class PrinceMessage {
 
     @EventHandler
     private static void onMsg(ChatMsgEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && event.messagePlain.equals("A Prince falls. +1 Bonus Score")) {
-            Utils.sendMessage(msg.value());
+        if (event.messagePlain.equals("A Prince falls. +1 Bonus Score") && Utils.isInDungeons()) {
+            if (instance.isActive()) {
+                Utils.sendMessage(msg.value());
+            }
+            if (ScoreCalculator.instance.isActive()) {
+                ScoreCalculator.princeKilled();
+            }
         }
     }
 }

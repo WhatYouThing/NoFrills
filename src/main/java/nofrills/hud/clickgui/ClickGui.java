@@ -166,6 +166,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Damage Splash", NoRender.damageSplash, "Hides the damage splash nametags that appear when dealing damage."),
                                 new Settings.Toggle("Lightning", NoRender.lightning, "Hides lightning strikes."),
                                 new Settings.Toggle("Falling Blocks", NoRender.fallingBlocks, "Hides falling block entities such as sand."),
+                                new Settings.Toggle("Entity Fire", NoRender.entityFire, "Hides the fire effect that appears on burning mobs."),
                                 new Settings.Toggle("Mage Beam", NoRender.mageBeam, "Prevents the server from spawning the Mage Beam particles in Dungeons."),
                                 new Settings.Toggle("Tree Bits", NoRender.treeBits, "Hides the flying wood and leaves blocks that appear when chopping trees on the Galatea."),
                                 new Settings.Toggle("Nausea", NoRender.nausea, "Prevents the nausea screen wobble and/or green overlay from rendering."),

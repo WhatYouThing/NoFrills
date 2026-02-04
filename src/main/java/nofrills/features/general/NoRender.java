@@ -36,6 +36,7 @@ public class NoRender {
     public static final SettingBool damageSplash = new SettingBool(false, "damageSplash", instance);
     public static final SettingBool lightning = new SettingBool(false, "lightning", instance.key());
     public static final SettingBool fallingBlocks = new SettingBool(false, "fallingBlocks", instance.key());
+    public static final SettingBool entityFire = new SettingBool(false, "entityFire", instance.key());
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());

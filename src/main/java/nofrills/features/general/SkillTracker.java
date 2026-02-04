@@ -14,13 +14,14 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.Config;
 import nofrills.config.Feature;
+import nofrills.config.SettingColor;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.OverlayMsgEvent;
 import nofrills.events.WorldTickEvent;
-import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.nio.file.Files;
@@ -34,6 +35,17 @@ import static nofrills.Main.mc;
 
 public class SkillTracker {
     public static final Feature instance = new Feature("skillTracker");
+
+    public static final SettingColor combatColor = new SettingColor(RenderColor.fromHex(0x55ffff), "combatColor", instance);
+    public static final SettingColor farmingColor = new SettingColor(RenderColor.fromHex(0x55ff55), "farmingColor", instance);
+    public static final SettingColor fishingColor = new SettingColor(RenderColor.fromHex(0x5555ff), "fishingColor", instance);
+    public static final SettingColor miningColor = new SettingColor(RenderColor.fromHex(0xaa00aa), "miningColor", instance);
+    public static final SettingColor foragingColor = new SettingColor(RenderColor.fromHex(0x00aa00), "foragingColor", instance);
+    public static final SettingColor enchantingColor = new SettingColor(RenderColor.fromHex(0xff55ff), "enchantingColor", instance);
+    public static final SettingColor alchemyColor = new SettingColor(RenderColor.fromHex(0xffff55), "alchemyColor", instance);
+    public static final SettingColor carpentryColor = new SettingColor(RenderColor.fromHex(0xaa0000), "carpentryColor", instance);
+    public static final SettingColor huntingColor = new SettingColor(RenderColor.fromHex(0x00aaaa), "huntingColor", instance);
+    public static final SettingColor catacombsColor = new SettingColor(RenderColor.fromHex(0xff5555), "catacombsColor", instance);
 
     private static final Path sessionPath = Config.getFolderPath().resolve("SkillTracker.json");
     private static final List<String> skills = List.of(
@@ -65,18 +77,24 @@ public class SkillTracker {
                     data.add(skill, getDefaultData());
                 }
                 data.get(skill).getAsJsonObject().addProperty("active", value);
-                new Thread(SkillTracker::saveData).start();
+                saveData();
             });
             ButtonComponent reset = Components.button(Text.literal("Reset Session"), button -> {
                 data.add(skill, getDefaultData());
                 mc.setScreen(buildSettings());
-                new Thread(SkillTracker::saveData).start();
+                saveData();
             });
             reset.renderer(Settings.buttonRendererWhite);
             layout.child(label);
             layout.child(toggle);
             layout.child(reset);
             list.add(layout);
+        }
+        for (String skill : skills) {
+            SettingColor color = getSessionColor(skill);
+            if (color != null) {
+                list.add(new Settings.ColorPicker(skill + " Color", false, color, "The color used for " + skill + " on the Skill Tracker Display HUD element."));
+            }
         }
         return list;
     }
@@ -99,11 +117,13 @@ public class SkillTracker {
     }
 
     public static void saveData() {
-        try {
-            Utils.atomicWrite(sessionPath, data.toString());
-        } catch (Exception exception) {
-            LOGGER.error("Unable to save NoFrills Skill Tracker file!", exception);
-        }
+        Thread.startVirtualThread(() -> {
+            try {
+                Utils.atomicWrite(sessionPath, data.toString());
+            } catch (Exception exception) {
+                LOGGER.error("Unable to save NoFrills Skill Tracker file!", exception);
+            }
+        });
     }
 
     public static JsonObject getDefaultData() {
@@ -118,6 +138,22 @@ public class SkillTracker {
         return obj;
     }
 
+    private static SettingColor getSessionColor(String skill) {
+        return switch (skill) {
+            case "Combat" -> combatColor;
+            case "Farming" -> farmingColor;
+            case "Fishing" -> fishingColor;
+            case "Mining" -> miningColor;
+            case "Foraging" -> foragingColor;
+            case "Enchanting" -> enchantingColor;
+            case "Alchemy" -> alchemyColor;
+            case "Carpentry" -> carpentryColor;
+            case "Hunting" -> huntingColor;
+            case "Catacombs" -> catacombsColor;
+            default -> null;
+        };
+    }
+
     public static boolean isSessionActive(String skill) {
         return data.has(skill) && data.get(skill).getAsJsonObject().get("active").getAsBoolean();
     }
@@ -127,7 +163,7 @@ public class SkillTracker {
             if (skill.equals("Catacombs") && Utils.isInDungeons()) {
                 return false;
             }
-            return data.get(skill).getAsJsonObject().get("pauseTicks").getAsLong() >= 1200;
+            return data.get(skill).getAsJsonObject().get("pauseTicks").getAsLong() >= 600;
         }
         return false;
     }
@@ -153,20 +189,21 @@ public class SkillTracker {
 
     public static MutableText getText() {
         List<String> active = skills.stream().filter(SkillTracker::isSessionActive).toList();
+        MutableText text = Text.literal("Skill Tracker");
         if (active.isEmpty()) {
-            return Text.literal("§bSkill Tracker\n§7None tracked.");
+            return text.append("\n§7None tracked.");
         }
-        MutableText text = Text.literal("§bSkill Tracker");
         for (String skill : active) {
-            MutableText sessionText = Text.literal("§a" + skill);
+            SettingColor color = getSessionColor(skill);
+            MutableText sessionText = color != null ? Text.literal(skill).withColor(color.value().argb) : Text.literal(skill);
             JsonObject obj = data.has(skill) ? data.get(skill).getAsJsonObject() : getDefaultData();
             long totalTicks = obj.get("totalTicks").getAsLong();
             long countedTicks = obj.get("countedTicks").getAsLong();
             double currentExp = obj.get("currentExp").getAsDouble();
-            sessionText.append(Utils.format("\nTime Elapsed: {}", Utils.ticksToTime(totalTicks)));
-            sessionText.append(Utils.format("\nTime Counted: {}", Utils.ticksToTime(countedTicks)));
-            sessionText.append(Utils.format("\nEXP Gained: {}", Utils.formatSeparator(currentExp)));
             sessionText.append(Utils.format("\nEXP Per Hour: {}", Utils.formatSeparator(currentExp / (countedTicks / 72000.0))));
+            sessionText.append(Utils.format("\nEXP Gained: {}", Utils.formatSeparator(currentExp)));
+            sessionText.append(Utils.format("\nTime Counted: {}", Utils.ticksToTime(countedTicks)));
+            sessionText.append(Utils.format("\nTime Elapsed: {}", Utils.ticksToTime(totalTicks)));
             text.append("\n").append(sessionText);
         }
         return text;
@@ -178,8 +215,8 @@ public class SkillTracker {
 
     @EventHandler
     private static void onOverlay(OverlayMsgEvent event) {
-        String msg = event.messagePlain;
         if (instance.isActive()) {
+            String msg = event.messagePlain;
             int index = msg.indexOf("+");
             if (index == -1) return;
             for (String skill : skills) {
@@ -225,13 +262,10 @@ public class SkillTracker {
             for (String skill : skills) {
                 if (isSessionActive(skill)) tickSession(skill);
             }
-            if (HudManager.skillTrackerElement.instance.isActive()) {
-                HudManager.skillTrackerElement.setText(getText());
-            }
             saveTicks++;
             if (saveTicks >= 1200) {
                 if (skills.stream().anyMatch(SkillTracker::isSessionActive)) {
-                    new Thread(SkillTracker::saveData).start();
+                    saveData();
                 }
                 saveTicks = 0;
             }

@@ -147,6 +147,9 @@ public class HudManager {
         if (quiver.isActive()) {
             quiver.update();
         }
+        if (dungeonScore.isActive()) {
+            dungeonScore.tick();
+        }
         if (skillTracker.isActive()) {
             skillTracker.tick();
         }

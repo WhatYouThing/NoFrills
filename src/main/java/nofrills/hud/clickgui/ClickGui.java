@@ -237,7 +237,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Skill Tracker", SkillTracker.instance, "Tracks the experience you gain for specific skills, similarly to SBE on 1.8.9.\nThis feature will be inaccurate if your tracked skills are not maxed (Catacombs excluded).", SkillTracker.buildSettings())
                 )),
                 new Category("Tweaks", List.of(
-                        new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),
+                        new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands.", new Settings(List.of(
+                                new Settings.Toggle("Server Only", NoLoadingScreen.serverOnly, "Only prevent loading screens while connected to a third party server.")
+                        ))),
                         new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother."),
                         new Module("No Front Perspective", NoFrontPerspective.instance, "Removes the front facing camera perspective."),
                         new Module("No Ability Place", NoAbilityPlace.instance, "Prevents block items with abilities from being placeable client side, such as the Egglocator.", new Settings(List.of(

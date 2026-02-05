@@ -57,8 +57,12 @@ public abstract class MinecraftClientMixin {
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void onBeforeOpenScreen(Screen screen, CallbackInfo ci) {
         if (NoLoadingScreen.instance.isActive() && screen instanceof LevelLoadingScreen) {
-            ServerInfo serverEntry = this.getCurrentServerEntry();
-            if (serverEntry == null || serverEntry.isLocal()) return;
+            if (NoLoadingScreen.serverOnly.value()) {
+                ServerInfo serverEntry = this.getCurrentServerEntry();
+                if (serverEntry == null || serverEntry.isLocal()) {
+                    return;
+                }
+            }
             this.setScreen(null);
             ci.cancel();
         }

@@ -29,6 +29,7 @@
     "HeldItemRendererMixin",
     "InGameHudMixin",
     "InGameOverlayRendererMixin",
+    "ItemEntityRendererMixin",
     "ItemStackMixin",
     "KeyboardMixin",
     "LightmapTextureManagerMixin",

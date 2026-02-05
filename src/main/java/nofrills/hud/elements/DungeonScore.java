@@ -24,6 +24,10 @@ public class DungeonScore extends SimpleTextElement {
         } else if (!this.isEditingHud() && (!Utils.isInDungeons() || !DungeonUtil.isDungeonStarted())) {
             return;
         }
+        super.draw(context, mouseX, mouseY, partialTicks, delta);
+    }
+
+    public void tick() {
         int score = ScoreCalculator.getScore();
         if (score > 0) {
             int color = this.getScoreColor(score);
@@ -33,7 +37,6 @@ public class DungeonScore extends SimpleTextElement {
         } else {
             this.setDefaultText();
         }
-        super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
     public int getScoreColor(int score) {

@@ -166,6 +166,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Damage Splash", NoRender.damageSplash, "Hides the damage splash nametags that appear when dealing damage."),
                                 new Settings.Toggle("Lightning", NoRender.lightning, "Hides lightning strikes."),
                                 new Settings.Toggle("Falling Blocks", NoRender.fallingBlocks, "Hides falling block entities such as sand."),
+                                new Settings.Toggle("Entity Fire", NoRender.entityFire, "Hides the fire effect that appears on burning mobs."),
                                 new Settings.Toggle("Mage Beam", NoRender.mageBeam, "Prevents the server from spawning the Mage Beam particles in Dungeons."),
                                 new Settings.Toggle("Tree Bits", NoRender.treeBits, "Hides the flying wood and leaves blocks that appear when chopping trees on the Galatea."),
                                 new Settings.Toggle("Nausea", NoRender.nausea, "Prevents the nausea screen wobble and/or green overlay from rendering."),
@@ -232,10 +233,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Created Date", InfoTooltips.createdDate, "Displays the exact date at which an item was created."),
                                 new Settings.Toggle("Hex Color", InfoTooltips.hexColor, "Displays the color of an item. Only applies to armor pieces that use leather armor as their base."),
                                 new Settings.Toggle("Museum Donated", InfoTooltips.museumDonated, "Displays if the item has been donated to the Museum.")
-                        )))
+                        ))),
+                        new Module("Skill Tracker", SkillTracker.instance, "Tracks the experience you gain for specific skills, similarly to SBE on 1.8.9.\nThis feature will be inaccurate if your tracked skills are not maxed (Catacombs excluded).", SkillTracker.buildSettings())
                 )),
                 new Category("Tweaks", List.of(
-                        new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands."),
+                        new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands.", new Settings(List.of(
+                                new Settings.Toggle("Server Only", NoLoadingScreen.serverOnly, "Only prevent loading screens while connected to a third party server.")
+                        ))),
                         new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother."),
                         new Module("No Front Perspective", NoFrontPerspective.instance, "Removes the front facing camera perspective."),
                         new Module("No Ability Place", NoAbilityPlace.instance, "Prevents block items with abilities from being placeable client side, such as the Egglocator.", new Settings(List.of(
@@ -334,7 +338,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Self Nametag", ForceNametag.self, "Forces your own player nametag to render. Only visible in the third person perspective.")
                         ))),
                         new Module("Hotbar Scroll Lock", HotbarScrollLock.instance, "Prevents your hotbar going from the first to the last slot when scrolling, and vice versa."),
-                        new Module("Auto Tip", AutoTip.instance, "Automatically runs /tipall every 15 minutes while connected to Hypixel.")
+                        new Module("Auto Tip", AutoTip.instance, "Automatically runs /tipall every 15 minutes while connected to Hypixel."),
+                        new Module("Item Scale", ItemScale.instance, "Changes the scale of items laying on the ground.", new Settings(List.of(
+                                new Settings.SliderDouble("Scale", 0.0, 10.0, 0.01, ItemScale.scale, "The scale multiplier.")
+                        )))
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experimentation Table", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(

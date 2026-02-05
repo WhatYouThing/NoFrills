@@ -84,7 +84,7 @@ public class DungeonMap extends HudElement {
             }
             matrices.translate(this.x(), this.y());
             context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, this.mapTexture.getGlTextureView(), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
-            int index = 1;
+            int index = 0;
             ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
             for (MapDecoration decor : mapState.decorations.values()) {
                 if (this.isMarkerSelf(decor)) {
@@ -99,12 +99,11 @@ public class DungeonMap extends HudElement {
                         if (texture != null) {
                             this.drawMarkerHead(context, texture, decor.x(), decor.z(), decor.rotation(), this.selfMarkerScale.valueFloat());
                             this.drawMarkerLabel(context, name, decor.x(), decor.z(), this.markerNameScale.valueFloat());
-                        } else {
-                            this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.otherMarkerScale.valueFloat());
+                            index += 1;
+                            continue;
                         }
-                    } else {
-                        this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.otherMarkerScale.valueFloat());
                     }
+                    this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.otherMarkerScale.valueFloat());
                     index += 1;
                 }
             }

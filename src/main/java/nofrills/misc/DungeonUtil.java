@@ -77,6 +77,15 @@ public class DungeonUtil {
         return mapId;
     }
 
+    private static String getClassFromLine(String line) {
+        for (String dungeonClass : dungeonClasses) {
+            if (line.contains("(" + dungeonClass) && line.endsWith(")")) {
+                return dungeonClass;
+            }
+        }
+        return "";
+    }
+
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (Utils.isInDungeons()) {
@@ -90,15 +99,14 @@ public class DungeonUtil {
                         String count = line.substring(line.indexOf("(") + 1).replace(")", "");
                         partyCount = Utils.parseInt(count).orElse(0);
                     } else {
-                        for (String dungeonClass : dungeonClasses) {
-                            if (line.contains("(" + dungeonClass) && line.endsWith(")")) {
-                                int start = line.lastIndexOf("]") + 2;
-                                String name = line.substring(start, line.indexOf(" ", start));
-                                teamCache.add(name);
-                                classCache.put(name, dungeonClass);
-                                break;
-                            }
+                        String dungeonClass = getClassFromLine(line);
+                        if (dungeonClass.isEmpty()) continue;
+                        int start = line.lastIndexOf("]") + 2;
+                        String name = line.substring(start, line.indexOf(" ", start));
+                        if (!name.equalsIgnoreCase(mc.player.getName().getString())) {
+                            teamCache.add(name);
                         }
+                        classCache.put(name, dungeonClass);
                     }
                 }
             }

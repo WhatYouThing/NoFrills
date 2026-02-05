@@ -97,7 +97,7 @@ public class DungeonMap extends HudElement {
                         PlayerListEntry entry = networkHandler != null ? networkHandler.getPlayerListEntry(name) : null;
                         Identifier texture = entry != null ? entry.getSkinTextures().body().texturePath() : null;
                         if (texture != null) {
-                            this.drawMarkerHead(context, texture, decor.x(), decor.z(), decor.rotation(), this.selfMarkerScale.valueFloat());
+                            this.drawMarkerHead(context, texture, decor.x(), decor.z(), decor.rotation(), this.otherMarkerScale.valueFloat());
                             this.drawMarkerLabel(context, name, decor.x(), decor.z(), this.markerNameScale.valueFloat());
                             index += 1;
                             continue;

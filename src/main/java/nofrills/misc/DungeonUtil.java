@@ -33,8 +33,9 @@ public class DungeonUtil {
         return classCache;
     }
 
-    public static List<Teammate> getAliveTeammates() {
+    public static List<Teammate> getAliveTeammates(boolean excludeSelf) {
         List<Teammate> list = new ArrayList<>();
+        String playerName = mc.player.getName().getString();
         for (String line : Utils.getTabListLines()) {
             if (!line.endsWith(")")) {
                 continue;
@@ -43,12 +44,18 @@ public class DungeonUtil {
                 if (line.contains("(" + dungeonClass)) {
                     int start = line.lastIndexOf("]") + 2;
                     String name = line.substring(start, line.indexOf(" ", start));
+                    if (excludeSelf && name.equalsIgnoreCase(playerName)) {
+                        break;
+                    }
                     list.add(new Teammate(name, dungeonClass));
-                    break;
                 }
             }
         }
         return list;
+    }
+
+    public static List<Teammate> getAliveTeammates() {
+        return getAliveTeammates(false);
     }
 
     public static HashSet<String> getDungeonClasses() {

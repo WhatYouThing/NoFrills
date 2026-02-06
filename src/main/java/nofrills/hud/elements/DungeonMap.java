@@ -171,7 +171,7 @@ public class DungeonMap extends HudElement {
 
     public void onMapUpdate(MapUpdateS2CPacket packet) {
         if (packet.mapId().equals(DungeonUtil.getMapId()) && Utils.isInDungeons()) {
-            this.teammates = DungeonUtil.getAliveTeammates();
+            this.teammates = DungeonUtil.getAliveTeammates(true);
             if (this.parameters == null) {
                 for (MapDecoration decor : packet.decorations().orElse(List.of())) {
                     if (this.isMarkerSelf(decor)) {

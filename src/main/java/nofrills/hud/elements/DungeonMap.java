@@ -40,13 +40,14 @@ public class DungeonMap extends HudElement {
     private final SpriteAtlasTexture atlasTexture = mc.getAtlasManager().getAtlasTexture(Atlases.MAP_DECORATIONS);
     private final NativeImageBackedTexture mapTexture = new NativeImageBackedTexture(() -> "NoFrills Dungeon Map", new NativeImage(128, 128, true));
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
-    private final SettingDouble otherMarkerScale = new SettingDouble(1.5, "otherMarkerScale", this.instance);
-    private final SettingDouble markerNameScale = new SettingDouble(0.8, "markerNameScale", this.instance);
+    private final SettingDouble playerMarkerScale = new SettingDouble(1.5, "playerMarkerScale", this.instance);
+    private final SettingDouble playerNameScale = new SettingDouble(0.8, "playerNameScale", this.instance);
     private final SettingColor healColor = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", instance.key());
     private final SettingColor mageColor = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", instance.key());
     private final SettingColor bersColor = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", instance.key());
     private final SettingColor archColor = new SettingColor(RenderColor.fromHex(0x4a14b7), "archColor", instance.key());
     private final SettingColor tankColor = new SettingColor(RenderColor.fromHex(0x768f46), "tankColor", instance.key());
+    private List<DungeonUtil.Teammate> teammates = List.of();
     private MapParameters parameters = null;
 
     public DungeonMap() {
@@ -54,8 +55,8 @@ public class DungeonMap extends HudElement {
         this.layout.sizing(Sizing.fixed(128), Sizing.fixed(128));
         this.options = this.getBaseSettings(List.of(
                 new Settings.SliderDouble("Self Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),
-                new Settings.SliderDouble("Player Scale", 0.0, 2.0, 0.01, this.otherMarkerScale, "The scale of the markers of your teammates."),
-                new Settings.SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.markerNameScale, "The scale of the name displayed below teammate markers."),
+                new Settings.SliderDouble("Player Scale", 0.0, 2.0, 0.01, this.playerMarkerScale, "The scale of the markers of your teammates."),
+                new Settings.SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.playerNameScale, "The scale of the name displayed below teammate markers."),
                 new Settings.ColorPicker("Healer Color", false, this.healColor, "The color used for the Healer marker name text."),
                 new Settings.ColorPicker("Mage Color", false, this.mageColor, "The color used for the Mage marker name text."),
                 new Settings.ColorPicker("Bers Color", false, this.bersColor, "The color used for the Berserk marker name text."),
@@ -74,7 +75,6 @@ public class DungeonMap extends HudElement {
         }
         super.draw(context, mouseX, mouseY, partialTicks, delta);
         MapState mapState = DungeonUtil.getMap();
-        List<String> team = DungeonUtil.getTeamCache();
         if (mapState != null && this.parameters != null) {
             Matrix3x2fStack matrices = context.getMatrices();
             matrices.pushMatrix();
@@ -92,19 +92,18 @@ public class DungeonMap extends HudElement {
                     byte rot = parameters.getPlayerMarkerRot(delta);
                     this.drawMarker(context, decor, pos[0], pos[1], rot, this.selfMarkerScale.valueFloat());
                 } else {
-                    if (index < team.size()) {
-                        String name = team.get(index);
-                        PlayerListEntry entry = networkHandler != null ? networkHandler.getPlayerListEntry(name) : null;
+                    if (index < this.teammates.size()) {
+                        DungeonUtil.Teammate teammate = this.teammates.get(index);
+                        index += 1;
+                        PlayerListEntry entry = networkHandler != null ? networkHandler.getPlayerListEntry(teammate.name()) : null;
                         Identifier texture = entry != null ? entry.getSkinTextures().body().texturePath() : null;
                         if (texture != null) {
-                            this.drawMarkerHead(context, texture, decor.x(), decor.z(), decor.rotation(), this.otherMarkerScale.valueFloat());
-                            this.drawMarkerLabel(context, name, decor.x(), decor.z(), this.markerNameScale.valueFloat());
-                            index += 1;
+                            this.drawMarkerHead(context, texture, decor.x(), decor.z(), decor.rotation(), this.playerMarkerScale.valueFloat());
+                            this.drawMarkerLabel(context, teammate, decor.x(), decor.z(), this.playerNameScale.valueFloat());
                             continue;
                         }
                     }
-                    this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.otherMarkerScale.valueFloat());
-                    index += 1;
+                    this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.playerMarkerScale.valueFloat());
                 }
             }
             matrices.popMatrix();
@@ -150,9 +149,10 @@ public class DungeonMap extends HudElement {
         matrices.popMatrix();
     }
 
-    protected void drawMarkerLabel(OwoUIDrawContext context, String text, byte x, byte z, float scale) {
+    protected void drawMarkerLabel(OwoUIDrawContext context, DungeonUtil.Teammate teammate, byte x, byte z, float scale) {
+        String text = teammate.name();
         float width = mc.textRenderer.getWidth(text);
-        int color = switch (DungeonUtil.getPlayerClass(text)) {
+        int color = switch (teammate.selectedClass()) {
             case "Healer" -> this.healColor.value().argb;
             case "Mage" -> this.mageColor.value().argb;
             case "Berserk" -> this.bersColor.value().argb;
@@ -171,6 +171,7 @@ public class DungeonMap extends HudElement {
 
     public void onMapUpdate(MapUpdateS2CPacket packet) {
         if (packet.mapId().equals(DungeonUtil.getMapId()) && Utils.isInDungeons()) {
+            this.teammates = DungeonUtil.getAliveTeammates();
             if (this.parameters == null) {
                 for (MapDecoration decor : packet.decorations().orElse(List.of())) {
                     if (this.isMarkerSelf(decor)) {
@@ -196,6 +197,7 @@ public class DungeonMap extends HudElement {
     }
 
     public void reset() {
+        this.teammates = List.of();
         this.parameters = null;
     }
 

@@ -8,7 +8,7 @@ import net.minecraft.util.Util;
 import nofrills.events.*;
 import nofrills.features.fishing.CapTracker;
 import nofrills.hud.elements.*;
-import nofrills.misc.SkyblockData;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -95,7 +95,7 @@ public class HudManager {
     @EventHandler
     private static void onWorldTick(WorldTickEvent event) {
         if (power.isActive()) {
-            power.setPower(SkyblockData.dungeonPower);
+            power.setPower(DungeonUtil.getPower());
         }
         if (day.isActive() && mc.world != null) {
             day.setDay(mc.world.getLevelProperties().getTimeOfDay() / 24000L);

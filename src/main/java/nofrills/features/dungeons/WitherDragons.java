@@ -17,7 +17,10 @@ import nofrills.config.SettingBool;
 import nofrills.config.SettingDouble;
 import nofrills.config.SettingEnum;
 import nofrills.events.*;
-import nofrills.misc.*;
+import nofrills.misc.DungeonUtil;
+import nofrills.misc.EntityCache;
+import nofrills.misc.RenderColor;
+import nofrills.misc.Utils;
 
 import java.util.List;
 
@@ -46,14 +49,11 @@ public class WitherDragons {
     private static boolean splitDone = false;
 
     private static boolean isArcherTeam() {
-        return switch (SkyblockData.dungeonClass) {
-            case "Archer", "Tank" -> true;
-            default -> false;
-        };
+        return DungeonUtil.isClass("Archer") || DungeonUtil.isClass("Tank");
     }
 
     private static double getPowerLevel() {
-        return SkyblockData.dungeonPower;
+        return DungeonUtil.getPower();
     }
 
     private static boolean isDragonParticle(ParticleS2CPacket packet) {

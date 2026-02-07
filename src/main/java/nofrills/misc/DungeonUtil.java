@@ -25,13 +25,10 @@ public class DungeonUtil {
     );
     private static String currentFloor = "";
     private static int partyCount = 0;
+    private static double powerLevel = 0;
 
     public static HashMap<String, String> getClassCache() {
         return classCache;
-    }
-
-    public static HashSet<String> getDungeonClasses() {
-        return dungeonClasses;
     }
 
     public static boolean isDungeonStarted() {
@@ -48,6 +45,14 @@ public class DungeonUtil {
 
     public static String getCurrentFloor() {
         return currentFloor;
+    }
+
+    public static boolean isClass(String dungeonClass) {
+        return mc.player != null && getPlayerClass(mc.player.getName().getString()).equalsIgnoreCase(dungeonClass);
+    }
+
+    public static double getPower() {
+        return powerLevel;
     }
 
     public static boolean isSecretBat(Entity entity) {
@@ -85,6 +90,16 @@ public class DungeonUtil {
                     }
                 }
             }
+            double power = 0;
+            for (String line : Utils.getFooterLines()) {
+                if (line.startsWith("Blessing of Power")) {
+                    power += Utils.parseRoman(line.replace("Blessing of Power", "").trim());
+                }
+                if (line.startsWith("Blessing of Time")) {
+                    power += 0.5 * Utils.parseRoman(line.replace("Blessing of Time", "").trim());
+                }
+            }
+            powerLevel = power;
         }
     }
 
@@ -93,5 +108,6 @@ public class DungeonUtil {
         classCache.clear();
         currentFloor = "";
         partyCount = 0;
+        powerLevel = 0.0;
     }
 }

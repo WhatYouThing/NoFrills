@@ -47,8 +47,6 @@ public class SkyblockData {
             new InstanceType("t5", "KUUDRA_INFERNAL")
     );
     private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
-    public static String dungeonClass = "Berserk";
-    public static double dungeonPower = 0;
     private static String location = "";
     private static String area = "";
     private static boolean inSkyblock = false;
@@ -58,35 +56,6 @@ public class SkyblockData {
     private static boolean showPing = false;
     private static boolean tabListDirty = true;
     private static boolean scoreboardDirty = true;
-
-    private static void updateDungeonClass(String msg) {
-        if (mc.player != null) {
-            String playerName = mc.player.getName().getString();
-            for (String name : DungeonUtil.getDungeonClasses()) {
-                String tag = Utils.format("[{}]", name);
-                String selected = Utils.format("{} selected the {} Class!", playerName, name);
-                String selectedHub = Utils.format("You have selected the {} Dungeon Class!", name);
-                String milestone = Utils.format("{} Milestone", name);
-                if (msg.startsWith(tag) || msg.equals(selectedHub) || msg.equals(selected) || msg.startsWith(milestone)) {
-                    dungeonClass = name;
-                    break;
-                }
-            }
-        }
-    }
-
-    private static double updateDungeonPower() {
-        double total = 0;
-        for (String line : Utils.getFooterLines()) {
-            if (line.startsWith("Blessing of Power")) {
-                total += Utils.parseRoman(line.replace("Blessing of Power", "").trim());
-            }
-            if (line.startsWith("Blessing of Time")) {
-                total += 0.5 * Utils.parseRoman(line.replace("Blessing of Time", "").trim());
-            }
-        }
-        return total;
-    }
 
     /**
      * Returns the current location from the scoreboard, such as "⏣ Your Island". The location prefix is not omitted.
@@ -209,10 +178,6 @@ public class SkyblockData {
             if (!instanceOver && scoreRegex.matcher(event.messagePlain.trim()).matches()) {
                 instanceOver = true;
             }
-            updateDungeonClass(event.messagePlain);
-        }
-        if (getArea().equals("Dungeon Hub")) {
-            updateDungeonClass(event.messagePlain);
         }
     }
 
@@ -235,11 +200,6 @@ public class SkyblockData {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onWorldTick(WorldTickEvent event) {
-        if (Utils.isInDungeons()) {
-            dungeonPower = updateDungeonPower();
-        } else if (dungeonPower != 0) {
-            dungeonPower = 0;
-        }
         updateTabList();
         updateScoreboard();
     }

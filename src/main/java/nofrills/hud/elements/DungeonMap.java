@@ -24,6 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
+import nofrills.config.SettingEnum;
 import nofrills.hud.HudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.DungeonUtil;
@@ -42,11 +43,12 @@ public class DungeonMap extends HudElement {
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
     private final SettingDouble playerMarkerScale = new SettingDouble(1.5, "playerMarkerScale", this.instance);
     private final SettingDouble playerNameScale = new SettingDouble(0.8, "playerNameScale", this.instance);
-    private final SettingColor healColor = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", instance.key());
-    private final SettingColor mageColor = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", instance.key());
-    private final SettingColor bersColor = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", instance.key());
-    private final SettingColor archColor = new SettingColor(RenderColor.fromHex(0x4a14b7), "archColor", instance.key());
-    private final SettingColor tankColor = new SettingColor(RenderColor.fromHex(0x768f46), "tankColor", instance.key());
+    private final SettingEnum<NameMode> playerNameMode = new SettingEnum<>(NameMode.Normal, NameMode.class, "playerNameMode", this.instance);
+    private final SettingColor healColor = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", this.instance);
+    private final SettingColor mageColor = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", this.instance);
+    private final SettingColor bersColor = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", this.instance);
+    private final SettingColor archColor = new SettingColor(RenderColor.fromHex(0x4a14b7), "archColor", this.instance);
+    private final SettingColor tankColor = new SettingColor(RenderColor.fromHex(0x768f46), "tankColor", this.instance);
     private List<DungeonUtil.Teammate> teammates = List.of();
     private MapParameters parameters = null;
 
@@ -57,6 +59,7 @@ public class DungeonMap extends HudElement {
                 new Settings.SliderDouble("Self Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),
                 new Settings.SliderDouble("Player Scale", 0.0, 2.0, 0.01, this.playerMarkerScale, "The scale of the markers of your teammates."),
                 new Settings.SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.playerNameScale, "The scale of the name displayed below teammate markers."),
+                new Settings.Dropdown<>("Name Mode", this.playerNameMode, "The mode of how the player names are displayed.\n\nNormal: The full name of the player is displayed.\nClass: A short player class label is displayed (\"Arch\", \"Bers\" etc.).\nDisabled: No names displayed."),
                 new Settings.ColorPicker("Healer Color", false, this.healColor, "The color used for the Healer marker name text."),
                 new Settings.ColorPicker("Mage Color", false, this.mageColor, "The color used for the Mage marker name text."),
                 new Settings.ColorPicker("Bers Color", false, this.bersColor, "The color used for the Berserk marker name text."),
@@ -150,7 +153,16 @@ public class DungeonMap extends HudElement {
     }
 
     protected void drawMarkerLabel(OwoUIDrawContext context, DungeonUtil.Teammate teammate, byte x, byte z, float scale) {
-        String text = teammate.name();
+        NameMode mode = this.playerNameMode.value();
+        if (mode.equals(NameMode.Disabled)) {
+            return;
+        }
+        String text = mode.equals(NameMode.Normal) ? teammate.name() : switch (teammate.selectedClass()) {
+            case "Healer" -> "Heal";
+            case "Berserk" -> "Bers";
+            case "Archer" -> "Arch";
+            default -> teammate.selectedClass();
+        };
         float width = mc.textRenderer.getWidth(text);
         int color = switch (teammate.selectedClass()) {
             case "Healer" -> this.healColor.value().argb;
@@ -199,6 +211,12 @@ public class DungeonMap extends HudElement {
     public void reset() {
         this.teammates = List.of();
         this.parameters = null;
+    }
+
+    public enum NameMode {
+        Normal,
+        Class,
+        Disabled
     }
 
     public static class MapParameters {

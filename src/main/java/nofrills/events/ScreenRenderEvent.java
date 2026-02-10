@@ -12,6 +12,8 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import org.joml.Matrix3x2f;
 
+import java.util.Optional;
+
 import static nofrills.Main.mc;
 
 public class ScreenRenderEvent {
@@ -33,10 +35,21 @@ public class ScreenRenderEvent {
         this.focusedSlot = focusedSlot;
     }
 
-    public void drawLine(int firstSlot, int secondSlot, double width, RenderColor color) {
-        Slot slot1 = this.handler.getSlot(firstSlot);
-        Slot slot2 = this.handler.getSlot(secondSlot);
-        drawLine(RenderPipelines.GUI, slot1.x + 8, slot1.y + 8, slot2.x + 8, slot2.y + 8, width, Color.ofArgb(color.argb));
+    private Optional<Slot> getSlot(int slotId) {
+        if (slotId < 0 || slotId >= this.handler.slots.size()) {
+            return Optional.empty();
+        }
+        return Optional.of(this.handler.getSlot(slotId));
+    }
+
+    public void drawLine(int firstId, int secondId, double width, RenderColor color) {
+        Optional<Slot> slot1 = this.getSlot(firstId);
+        Optional<Slot> slot2 = this.getSlot(secondId);
+        if (slot1.isPresent() && slot2.isPresent()) {
+            Slot first = slot1.get();
+            Slot second = slot2.get();
+            this.drawLine(RenderPipelines.GUI, first.x + 8, first.y + 8, second.x + 8, second.y + 8, width, Color.ofArgb(color.argb));
+        }
     }
 
     public void drawLine(RenderPipeline pipeline, int x1, int y1, int x2, int y2, double width, Color color) {
@@ -51,18 +64,15 @@ public class ScreenRenderEvent {
     }
 
     public void drawBorder(int slotId, RenderColor color) {
-        Slot slot = this.handler.getSlot(slotId);
-        Rendering.drawBorder(this.context, slot.x, slot.y, 16, 16, color.argb);
+        this.getSlot(slotId).ifPresent(slot -> Rendering.drawBorder(this.context, slot.x, slot.y, 16, 16, color.argb));
     }
 
     public void drawLabel(int slotId, Text text) {
-        Slot slot = this.handler.getSlot(slotId);
-        this.context.drawCenteredTextWithShadow(mc.textRenderer, text, slot.x + 8, slot.y + 4, RenderColor.white.argb);
+        this.getSlot(slotId).ifPresent(slot -> this.context.drawCenteredTextWithShadow(mc.textRenderer, text, slot.x + 8, slot.y + 4, RenderColor.white.argb));
     }
 
     public void drawFill(int slotId, RenderColor color) {
-        Slot slot = this.handler.getSlot(slotId);
-        this.context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, color.argb);
+        this.getSlot(slotId).ifPresent(slot -> this.context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, color.argb));
     }
 
     public static class Before extends ScreenRenderEvent {

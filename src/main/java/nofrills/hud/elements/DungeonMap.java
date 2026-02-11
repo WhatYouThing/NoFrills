@@ -21,10 +21,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Atlases;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
-import nofrills.config.Feature;
-import nofrills.config.SettingColor;
-import nofrills.config.SettingDouble;
-import nofrills.config.SettingEnum;
+import nofrills.config.*;
 import nofrills.hud.HudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.DungeonUtil;
@@ -49,6 +46,7 @@ public class DungeonMap extends HudElement {
     private final SettingColor bersColor = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", this.instance);
     private final SettingColor archColor = new SettingColor(RenderColor.fromHex(0x4a14b7), "archColor", this.instance);
     private final SettingColor tankColor = new SettingColor(RenderColor.fromHex(0x768f46), "tankColor", this.instance);
+    private final SettingBool debug = new SettingBool(false, "debug", this.instance);
     private List<DungeonUtil.Teammate> teammates = List.of();
     private MapParameters parameters = null;
 
@@ -64,7 +62,8 @@ public class DungeonMap extends HudElement {
                 new Settings.ColorPicker("Mage Color", false, this.mageColor, "The color used for the Mage marker name text."),
                 new Settings.ColorPicker("Bers Color", false, this.bersColor, "The color used for the Berserk marker name text."),
                 new Settings.ColorPicker("Archer Color", false, this.archColor, "The color used for the Archer marker name text."),
-                new Settings.ColorPicker("Tank Color", false, this.tankColor, "The color used for the Tank marker name text.")
+                new Settings.ColorPicker("Tank Color", false, this.tankColor, "The color used for the Tank marker name text."),
+                new Settings.Toggle("Debug", this.debug, "Outputs debug information about the map's behavior.")
         ));
         this.setDesc("Displays the dungeon map while in Dungeons.");
     }
@@ -187,7 +186,7 @@ public class DungeonMap extends HudElement {
             if (this.parameters == null) {
                 for (MapDecoration decor : packet.decorations().orElse(List.of())) {
                     if (this.isMarkerSelf(decor)) {
-                        this.parameters = this.getMapParameters().adjustCenter(decor);
+                        this.parameters = this.getMapParameters().adjustCenter(decor, this.debug.value());
                         break;
                     }
                 }
@@ -232,16 +231,26 @@ public class DungeonMap extends HudElement {
             this.centerY = center;
         }
 
-        public MapParameters adjustCenter(MapDecoration playerMarker) {
+        public MapParameters adjustCenter(MapDecoration playerMarker, boolean debug) {
+            if (debug) {
+                Utils.infoFormat("Got first map marker position: {} {}", playerMarker.x(), playerMarker.z());
+                Utils.infoFormat("Map parameters: {} {} {} {}", this.scaleX, this.scaleY, this.centerX, this.centerY);
+            }
             Vec3d pos = mc.player.getEntityPos();
             byte currentX = this.toMarkerPos(this.toCoordX(pos, this.centerX));
             byte currentZ = this.toMarkerPos(this.toCoordZ(pos, this.centerY));
-            if (Utils.difference(currentX, playerMarker.x()) > 4) {
-                Utils.infoFormat("map x center {} is off, adjusting to -120", this.centerX);
+            int diffX = Utils.difference(currentX, playerMarker.x());
+            int diffZ = Utils.difference(currentZ, playerMarker.z());
+            if (diffX > 4) {
+                if (debug) {
+                    Utils.infoFormat("Map parameter updated: X Center, {} -> -120 ({})", this.centerX, diffX);
+                }
                 this.centerX = -120;
             }
-            if (Utils.difference(currentZ, playerMarker.z()) > 4) {
-                Utils.infoFormat("map y center {} is off, adjusting to -120", this.centerY);
+            if (diffZ > 4) {
+                if (debug) {
+                    Utils.infoFormat("Map parameter updated: Y Center, {} -> -120 ({})", this.centerY, diffZ);
+                }
                 this.centerY = -120;
             }
             return this;

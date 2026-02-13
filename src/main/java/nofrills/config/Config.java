@@ -41,17 +41,18 @@ public class Config {
 
     public static void save() {
         try {
+            var pretty = GSON.toJson(data);
             if (!Files.exists(folderPath)) {
                 Files.createDirectory(folderPath);
             }
-            Files.writeString(tempPath, GSON.toJson(data));
+            Files.writeString(tempPath, pretty);
             try {
                 Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
             } catch (AtomicMoveNotSupportedException ignored) {
                 Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING);
             }
             Files.deleteIfExists(tempPath);
-            Utils.atomicWrite(filePath, data.toString());
+            Utils.atomicWrite(filePath, pretty);
         } catch (Exception exception) {
             LOGGER.error("Unable to save NoFrills config file!", exception);
         }

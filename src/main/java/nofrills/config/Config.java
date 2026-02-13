@@ -41,18 +41,7 @@ public class Config {
 
     public static void save() {
         try {
-            var pretty = GSON.toJson(data);
-            if (!Files.exists(folderPath)) {
-                Files.createDirectory(folderPath);
-            }
-            Files.writeString(tempPath, pretty);
-            try {
-                Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException ignored) {
-                Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING);
-            }
-            Files.deleteIfExists(tempPath);
-            Utils.atomicWrite(filePath, pretty);
+            Utils.atomicWrite(filePath, GSON.toJson(data));
         } catch (Exception exception) {
             LOGGER.error("Unable to save NoFrills config file!", exception);
         }

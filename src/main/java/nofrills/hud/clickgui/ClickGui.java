@@ -12,10 +12,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import nofrills.features.dungeons.*;
-import nofrills.features.farming.GlowingMushroom;
-import nofrills.features.farming.PlotBorders;
-import nofrills.features.farming.SpaceFarmer;
-import nofrills.features.farming.VacuumSolver;
+import nofrills.features.farming.*;
 import nofrills.features.fishing.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
@@ -679,6 +676,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Tracer", VacuumSolver.tracer, "Draws a tracer towards the guess."),
                                 new Settings.ColorPicker("Color", true, VacuumSolver.color, "The color of the guess highlight."),
                                 new Settings.ColorPicker("Tracer Color", true, VacuumSolver.tracerColor, "The color of the guess tracer.")
+                        ))),
+                        new Module("Watering Helper", WateringHelper.instance, "Improves the Greenhouse watering cans.", new Settings(List.of(
+                                new Settings.Toggle("Better Visibility", WateringHelper.betterVisibility, "Makes the crop water levels more visible by replacing them with seethrough text."),
+                                new Settings.Toggle("Hide Particles", WateringHelper.hideParticles, "Removes the particles that appear while using a watering can.")
                         )))
                 ))
         );

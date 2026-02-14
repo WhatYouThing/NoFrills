@@ -7,10 +7,8 @@ import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
 import nofrills.misc.Utils;
 
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 import static nofrills.Main.LOGGER;
 

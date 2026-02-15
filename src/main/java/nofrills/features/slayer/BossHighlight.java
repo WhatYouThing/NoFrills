@@ -8,8 +8,8 @@ import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldRenderEvent;
-import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
+import nofrills.misc.RenderStyle;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
@@ -20,7 +20,7 @@ public class BossHighlight {
 
     public static final SettingColor fillColor = new SettingColor(RenderColor.fromArgb(0x5500ffff), "fillColor", instance.key());
     public static final SettingColor outlineColor = new SettingColor(RenderColor.fromArgb(0xff00ffff), "outlineColor", instance.key());
-    public static final SettingEnum<style> highlightStyle = new SettingEnum<>(style.Both, style.class, "highlightStyle", instance.key());
+    public static final SettingEnum<RenderStyle> highlightStyle = new SettingEnum<>(RenderStyle.Both, RenderStyle.class, "highlightStyle", instance.key());
     public static final SettingColor ashenFill = new SettingColor(RenderColor.fromArgb(0x55000000), "ashenFill", instance.key());
     public static final SettingColor ashenOutline = new SettingColor(RenderColor.fromArgb(0xff000000), "ashenOutline", instance.key());
     public static final SettingColor spiritFill = new SettingColor(RenderColor.fromArgb(0x55ffffff), "spiritFill", instance.key());
@@ -54,21 +54,12 @@ public class BossHighlight {
             Entity boss = blazeHighlight != null ? blazeHighlight.entity : SlayerUtil.getBossEntity();
             RenderColor fill = blazeHighlight != null ? blazeHighlight.fill : fillColor.value();
             RenderColor outline = blazeHighlight != null ? blazeHighlight.outline : outlineColor.value();
-            if (!EntityCache.exists(boss)) return;
+            if (boss == null || !boss.isAlive() || fill == null || outline == null) {
+                return;
+            }
             Box box = Utils.getLerpedBox(boss, event.tickCounter.getTickProgress(true));
-            if (!highlightStyle.value().equals(style.Outline) && fill != null) {
-                event.drawFilled(box, false, fill);
-            }
-            if (!highlightStyle.value().equals(style.Filled) && outline != null) {
-                event.drawOutline(box, false, outline);
-            }
+            event.drawStyled(box, highlightStyle.value(), false, outline, fill);
         }
-    }
-
-    public enum style {
-        Outline,
-        Filled,
-        Both
     }
 
     public static class BlazeHighlight {

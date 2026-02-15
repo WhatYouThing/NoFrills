@@ -34,6 +34,7 @@ public class GhostVision {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInArea("Dwarven Mines")) {
             for (Entity ent : cache.get()) {
+                if (!ent.isAlive()) continue;
                 Box box = Utils.getLerpedBox(ent, event.tickCounter.getTickProgress(true));
                 event.drawFilled(box, false, fill.value());
                 event.drawOutline(box, false, outline.value());

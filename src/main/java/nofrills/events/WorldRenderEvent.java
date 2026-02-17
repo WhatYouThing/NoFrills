@@ -8,6 +8,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import nofrills.misc.RenderColor;
+import nofrills.misc.RenderStyle;
 import nofrills.misc.Rendering;
 
 public class WorldRenderEvent {
@@ -29,6 +30,15 @@ public class WorldRenderEvent {
 
     public void drawOutline(Box box, boolean throughWalls, RenderColor color) {
         Rendering.drawOutline(matrices, consumer, camera, box, throughWalls, color);
+    }
+
+    public void drawStyled(Box box, RenderStyle style, boolean throughWalls, RenderColor outlineColor, RenderColor filledColor) {
+        if (!style.equals(RenderStyle.Outline)) {
+            this.drawFilled(box, throughWalls, filledColor);
+        }
+        if (!style.equals(RenderStyle.Filled)) {
+            this.drawOutline(box, throughWalls, outlineColor);
+        }
     }
 
     public void drawText(Vec3d pos, Text text, float scale, boolean throughWalls, RenderColor color) {

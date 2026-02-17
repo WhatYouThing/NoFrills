@@ -7,10 +7,8 @@ import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
 import nofrills.misc.Utils;
 
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 import static nofrills.Main.LOGGER;
 
@@ -41,17 +39,7 @@ public class Config {
 
     public static void save() {
         try {
-            if (!Files.exists(folderPath)) {
-                Files.createDirectory(folderPath);
-            }
-            Files.writeString(tempPath, GSON.toJson(data));
-            try {
-                Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException ignored) {
-                Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING);
-            }
-            Files.deleteIfExists(tempPath);
-            Utils.atomicWrite(filePath, data.toString());
+            Utils.atomicWrite(filePath, GSON.toJson(data));
         } catch (Exception exception) {
             LOGGER.error("Unable to save NoFrills config file!", exception);
         }

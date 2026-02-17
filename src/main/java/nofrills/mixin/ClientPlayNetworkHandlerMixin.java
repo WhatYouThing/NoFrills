@@ -56,7 +56,7 @@ public class ClientPlayNetworkHandlerMixin {
             if (ent instanceof ArmorStandEntity) {
                 for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
                     if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) && entry.value() != null) {
-                        ((Optional<Text>) entry.value()).ifPresent(value -> eventBus.post(new EntityNamedEvent(ent, Utils.toPlain(value))));
+                        ((Optional<Text>) entry.value()).ifPresent(value -> eventBus.post(new EntityNamedEvent(ent, value)));
                         break;
                     }
                 }

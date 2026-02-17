@@ -14,10 +14,7 @@ import nofrills.commands.NoFrillsCommand;
 import nofrills.commands.YeetCommand;
 import nofrills.config.Config;
 import nofrills.features.dungeons.*;
-import nofrills.features.farming.GlowingMushroom;
-import nofrills.features.farming.PlotBorders;
-import nofrills.features.farming.SpaceFarmer;
-import nofrills.features.farming.VacuumSolver;
+import nofrills.features.farming.*;
 import nofrills.features.fishing.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
@@ -186,6 +183,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(AutoTip.class);
         eventBus.subscribe(ScoreCalculator.class);
         eventBus.subscribe(SkillTracker.class);
+        eventBus.subscribe(WateringHelper.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

@@ -12,10 +12,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import nofrills.features.dungeons.*;
-import nofrills.features.farming.GlowingMushroom;
-import nofrills.features.farming.PlotBorders;
-import nofrills.features.farming.SpaceFarmer;
-import nofrills.features.farming.VacuumSolver;
+import nofrills.features.farming.*;
 import nofrills.features.fishing.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
@@ -570,7 +567,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.TextInput("Message", FreshTimer.message, "The message to send.")
                         ))),
                         new Module("Kuudra Hitbox", KuudraHitbox.instance, "Renders a hitbox for Kuudra.", new Settings(List.of(
-                                new Settings.Toggle("Through Walls", KuudraHitbox.walls, "Makes the hitbox render through walls, because even YouTube ranks can get away with ESP in Kuudra."),
                                 new Settings.ColorPicker("Color", true, KuudraHitbox.color, "The color of the hitbox.")
                         ))),
                         new Module("Waypoints", KuudraWaypoints.instance, "Renders various waypoints in Kuudra.", new Settings(List.of(
@@ -679,6 +675,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Tracer", VacuumSolver.tracer, "Draws a tracer towards the guess."),
                                 new Settings.ColorPicker("Color", true, VacuumSolver.color, "The color of the guess highlight."),
                                 new Settings.ColorPicker("Tracer Color", true, VacuumSolver.tracerColor, "The color of the guess tracer.")
+                        ))),
+                        new Module("Watering Helper", WateringHelper.instance, "Improves the Greenhouse watering cans.", new Settings(List.of(
+                                new Settings.Toggle("Better Visibility", WateringHelper.betterVisibility, "Makes the crop water levels more visible by replacing them with seethrough text."),
+                                new Settings.Toggle("Hide Particles", WateringHelper.hideParticles, "Removes the particles that appear while using a watering can.")
                         )))
                 ))
         );

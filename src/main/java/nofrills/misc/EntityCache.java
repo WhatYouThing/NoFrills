@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import static nofrills.Main.mc;
-
 /**
  * An object for temporarily storing any relevant entity handles, such as armor stands with custom names.
  */
@@ -23,10 +21,6 @@ public class EntityCache {
 
     public EntityCache() {
         instances.add(this);
-    }
-
-    public static boolean exists(Entity ent) {
-        return ent != null && mc.world != null && ent.isAlive() && mc.world.getEntityById(ent.getId()) != null;
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -50,10 +44,6 @@ public class EntityCache {
         for (EntityCache instance : instances) {
             instance.clear();
         }
-    }
-
-    public boolean equals(Entity ent1, Entity ent2) {
-        return ent1.equals(ent2);
     }
 
     public boolean has(Entity ent) {
@@ -88,5 +78,9 @@ public class EntityCache {
 
     public CopyOnWriteArraySet<Entity> get() {
         return this.entities;
+    }
+
+    public Entity getFirst() {
+        return this.entities.stream().findFirst().orElse(null);
     }
 }

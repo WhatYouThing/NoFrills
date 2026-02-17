@@ -15,7 +15,6 @@ import static nofrills.Main.LOGGER;
 public class Config {
     private static final Path folderPath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills");
     private static final Path filePath = folderPath.resolve("Configuration.json");
-    private static final Path tempPath = folderPath.resolve("Temp.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static JsonObject data = new JsonObject();
     private static int hash = 0;

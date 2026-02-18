@@ -104,7 +104,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Bazaar", PriceTooltips.bazaar, "Adds the Bazaar insta-buy and insta-sell prices to applicable items."),
                                 new Settings.Toggle("NPC Sell", PriceTooltips.npc, "Adds the NPC sell price to applicable items."),
                                 new Settings.Toggle("Motes Sell", PriceTooltips.mote, "Adds the Motes sell price to applicable items."),
-                                new Settings.SliderInt("Grubber Stacks", 0, 5, 1, PriceTooltips.burgers, "The amount of McGrubber's Burgers you've eaten, used to calculate the bonus Motes value.")
+                                new Settings.SliderInt("Burger Count", 0, 5, 1, PriceTooltips.burgers, "The amount of McGrubber's Burgers you've eaten, used to calculate the bonus Motes value."),
+                                new Settings.Toggle("Price Paid", PriceTooltips.pricePaid, "Tracks and displays the amount you've paid for a specific item in a BIN auction.")
                         ))),
                         new Module("Wardrobe Keybinds", WardrobeKeybinds.instance, "Adds hotkeys to the Skyblock Wardrobe.", new Settings(List.of(
                                 new Settings.Dropdown<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),

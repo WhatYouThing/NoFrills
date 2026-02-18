@@ -142,6 +142,14 @@ public class PartyCommands {
             return !this.behavior.value().equals(Behavior.Disabled);
         }
 
+        public Optional<String> getTarget(String msg) {
+            String[] parts = msg.split(" ");
+            if (parts.length > 1) {
+                return Optional.of(parts[1]);
+            }
+            return Optional.empty();
+        }
+
         public boolean process(String author, String content, boolean whitelisted) {
             Behavior value = this.behavior.value();
             if (whitelisted || value.equals(Behavior.Automatic)) {
@@ -187,12 +195,13 @@ public class PartyCommands {
 
         @Override
         public void onAutomatic(String author, String msg) {
-            Utils.sendMessage("/party transfer " + author);
+            Utils.sendMessage("/party transfer " + this.getTarget(msg).orElse(author));
         }
 
         @Override
         public void onManual(String author, String msg) {
-            Utils.infoButton("§aClick here to promote " + author + " as leader.", "/party transfer " + author);
+            String target = this.getTarget(msg).orElse(author);
+            Utils.infoButton("§aClick here to promote " + target + " as leader.", "/party transfer " + target);
         }
     }
 
@@ -285,14 +294,6 @@ public class PartyCommands {
 
         public KickCommand() {
             super(kick, "kick", "k");
-        }
-
-        public Optional<String> getTarget(String msg) {
-            String[] parts = msg.split(" ");
-            if (parts.length > 1) {
-                return Optional.of(parts[1]);
-            }
-            return Optional.empty();
         }
 
         @Override

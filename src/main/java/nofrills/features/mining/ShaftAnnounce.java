@@ -15,7 +15,7 @@ import java.util.Map;
 public class ShaftAnnounce {
     public static final Feature instance = new Feature("shaftAnnounce");
 
-    public static final SettingString msg = new SettingString("/pc !pt Entered Mineshaft: {id}. Corpses: {corpses}.", "msg", instance);
+    public static final SettingString msg = new SettingString("/pc !ptme Entered Mineshaft: {id}. Corpses: {corpses}.", "msg", instance);
 
     private static int ticks = 120;
 

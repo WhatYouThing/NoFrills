@@ -635,9 +635,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Yog Color", false, CorpseHighlight.yogColor, "The color of the Umber corpse."),
                                 new Settings.ColorPicker("Vanguard Color", false, CorpseHighlight.vanguardColor, "The color of the Vanguard corpse.")
                         ))),
-                        new Module("Better Sky Mall", BetterSkyMall.instance, "Compacts Sky Mall messages, and fully hides them if you are not mining.", new Settings(List.of(
-                                new Settings.TextInput("Buff Whitelist", BetterSkyMall.whitelist, "Allows a buff message to always show if it contains a specific keyword.\nThe list is case insensitive, and separated by comma.")
-                        ))),
                         new Module("Ghost Vision", GhostVision.instance, "Makes Ghosts easier to see in the Dwarven Mines.", new Settings(List.of(
                                 new Settings.ColorPicker("Fill Color", true, GhostVision.fill, "The color of the filled box over each Ghost."),
                                 new Settings.ColorPicker("Outline Color", true, GhostVision.outline, "The color of the outline box over each Ghost.")

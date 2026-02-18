@@ -194,6 +194,14 @@ public class PartyCommands {
         }
 
         @Override
+        public Optional<String> getTarget(String msg) {
+            if (msg.startsWith("ptme")) {
+                return Optional.empty();
+            }
+            return super.getTarget(msg);
+        }
+
+        @Override
         public void onAutomatic(String author, String msg) {
             Utils.sendMessage("/party transfer " + this.getTarget(msg).orElse(author));
         }

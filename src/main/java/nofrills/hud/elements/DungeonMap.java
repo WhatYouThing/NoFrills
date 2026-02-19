@@ -232,24 +232,24 @@ public class DungeonMap extends HudElement {
         }
 
         public MapParameters adjustCenter(MapDecoration playerMarker, boolean debug) {
+            Vec3d pos = mc.player.getEntityPos();
             if (debug) {
-                Utils.infoFormat("Got first map marker position: {} {}", playerMarker.x(), playerMarker.z());
+                Utils.infoFormat("Got first map marker position: {} {} ({} {})", playerMarker.x(), playerMarker.z(), pos.getX(), pos.getZ());
                 Utils.infoFormat("Map parameters: {} {} {} {}", this.scaleX, this.scaleY, this.centerX, this.centerY);
             }
-            Vec3d pos = mc.player.getEntityPos();
             byte currentX = this.toMarkerPos(this.toCoordX(pos, this.centerX));
             byte currentZ = this.toMarkerPos(this.toCoordZ(pos, this.centerY));
             int diffX = Utils.difference(currentX, playerMarker.x());
             int diffZ = Utils.difference(currentZ, playerMarker.z());
             if (diffX > 4) {
                 if (debug) {
-                    Utils.infoFormat("Map parameter updated: X Center, {} -> -120 ({})", this.centerX, diffX);
+                    Utils.infoFormat("Map X Center set to fallback: {} -> -120 ({} diff)", this.centerX, diffX);
                 }
                 this.centerX = -120;
             }
             if (diffZ > 4) {
                 if (debug) {
-                    Utils.infoFormat("Map parameter updated: Y Center, {} -> -120 ({})", this.centerY, diffZ);
+                    Utils.infoFormat("Map Z Center set to fallback: {} -> -120 ({} diff)", this.centerY, diffZ);
                 }
                 this.centerY = -120;
             }

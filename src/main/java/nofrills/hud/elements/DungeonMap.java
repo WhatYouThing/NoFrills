@@ -231,27 +231,26 @@ public class DungeonMap extends HudElement {
             this.centerY = center;
         }
 
-        public MapParameters adjustCenter(MapDecoration playerMarker, boolean debug) {
+        public MapParameters adjustCenter(MapDecoration marker, boolean debug) {
             Vec3d pos = mc.player.getEntityPos();
             if (debug) {
-                Utils.infoFormat("Got first map marker position: {} {} ({} {})", playerMarker.x(), playerMarker.z(), pos.getX(), pos.getZ());
+                Utils.infoFormat("Got first map marker position: {} {} ({} {})", marker.x(), marker.z(), pos.getX(), pos.getZ());
                 Utils.infoFormat("Map parameters: {} {} {} {}", this.scaleX, this.scaleY, this.centerX, this.centerY);
             }
-            byte currentX = this.toMarkerPos(this.toCoordX(pos, this.centerX));
-            byte currentZ = this.toMarkerPos(this.toCoordZ(pos, this.centerY));
-            int diffX = Utils.difference(currentX, playerMarker.x());
-            int diffZ = Utils.difference(currentZ, playerMarker.z());
-            if (diffX > 4) {
-                if (debug) {
-                    Utils.infoFormat("Map X Center set to fallback: {} -> -120 ({} diff)", this.centerX, diffX);
-                }
+            int diffX = Utils.difference(this.toMarkerPos(this.toCoordX(pos, this.centerX)), marker.x());
+            int diffZ = Utils.difference(this.toMarkerPos(this.toCoordZ(pos, this.centerY)), marker.z());
+            int fallbackX = Utils.difference(this.toMarkerPos(this.toCoordX(pos, -120)), marker.x());
+            int fallbackZ = Utils.difference(this.toMarkerPos(this.toCoordZ(pos, -120)), marker.z());
+            if (fallbackX < diffX) {
                 this.centerX = -120;
             }
-            if (diffZ > 4) {
-                if (debug) {
-                    Utils.infoFormat("Map Z Center set to fallback: {} -> -120 ({} diff)", this.centerY, diffZ);
-                }
+            if (fallbackZ < diffZ) {
                 this.centerY = -120;
+            }
+            if (debug) {
+                Utils.infoFormat("Map X Center calculation: {} difference, {} fallback difference", diffX, fallbackX);
+                Utils.infoFormat("Map Z Center calculation: {} difference, {} fallback difference", diffZ, fallbackZ);
+                Utils.infoFormat("Final map center parameters: {} {}", this.centerX, this.centerY);
             }
             return this;
         }

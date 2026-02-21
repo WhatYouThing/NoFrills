@@ -38,6 +38,7 @@ public class NoRender {
     public static final SettingBool fallingBlocks = new SettingBool(false, "fallingBlocks", instance.key());
     public static final SettingBool entityFire = new SettingBool(false, "entityFire", instance.key());
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
+    public static final SettingBool iceSpray = new SettingBool(false, "iceSpray", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
     public static final SettingBool vignette = new SettingBool(false, "vignette", instance.key());
@@ -119,13 +120,16 @@ public class NoRender {
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive()) {
-            if (event.type.equals(ParticleTypes.POOF) && deadPoof.value() && isPoofParticle(event.packet)) {
+            if (deadPoof.value() && event.type.equals(ParticleTypes.POOF) && isPoofParticle(event.packet)) {
                 event.cancel();
             }
-            if (explosionParticles.contains(event.type) && explosions.value()) {
+            if (explosions.value() && explosionParticles.contains(event.type)) {
                 event.cancel();
             }
-            if (event.type.equals(ParticleTypes.FIREWORK) && mageBeam.value() && Utils.isInDungeons()) {
+            if (mageBeam.value() && event.type.equals(ParticleTypes.FIREWORK) && Utils.isInDungeons()) {
+                event.cancel();
+            }
+            if (iceSpray.value() && event.matchParameters(ParticleTypes.POOF, 3, 0.0, 0.0, 0.0, 0.0)) {
                 event.cancel();
             }
         }

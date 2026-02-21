@@ -31,6 +31,7 @@ public class ItemProtection {
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingKeybind uuidKey = new SettingKeybind(-1, "uuidKey", instance);
     public static final SettingKeybind skyblockIdKey = new SettingKeybind(-1, "skyblockIdKey", instance);
+    public static final SettingKeybind overrideKey = new SettingKeybind(-1, "overrideKey", instance);
     public static final SettingBool protectUUID = new SettingBool(false, "protectUUID", instance);
     public static final SettingBool protectSkyblockId = new SettingBool(false, "protectSkyblockId", instance);
     public static final SettingBool protectMaxQuality = new SettingBool(false, "protectMaxQuality", instance);
@@ -41,13 +42,14 @@ public class ItemProtection {
 
     private static boolean isSellGUI = false;
     private static boolean isSalvageGUI = false;
+    private static boolean overrideActive = false;
 
     public static boolean isProtectingValue() {
         return instance.isActive() && protectValue.value();
     }
 
     public static ProtectType getProtectType(ItemStack stack) {
-        if (stack.isEmpty()) return ProtectType.None;
+        if (overrideActive || stack.isEmpty()) return ProtectType.None;
         NbtCompound customData = Utils.getCustomData(stack);
         if (customData == null) return ProtectType.None;
         String id = Utils.getMarketId(stack);
@@ -147,19 +149,22 @@ public class ItemProtection {
     @EventHandler
     private static void onKey(InputEvent event) {
         if (instance.isActive() && (mc.currentScreen instanceof InventoryScreen || mc.currentScreen instanceof GenericContainerScreen)) {
-            Slot focused = Utils.getFocusedSlot();
-            if (focused == null) return;
-            ItemStack stack = focused.getStack();
-            if (event.key == uuidKey.key()) {
-                if (event.action == GLFW.GLFW_PRESS && !stack.isEmpty()) {
-                    addUUID(stack);
-                }
+            if (overrideKey.isKey(event.key)) {
+                overrideActive = event.action != GLFW.GLFW_RELEASE;
                 event.cancel();
-            } else if (event.key == skyblockIdKey.key()) {
-                if (event.action == GLFW.GLFW_PRESS && !stack.isEmpty()) {
-                    addSkyblockID(stack);
+                return;
+            }
+            if (uuidKey.isKey(event.key) || skyblockIdKey.isKey(event.key)) {
+                Slot focused = Utils.getFocusedSlot();
+                if (focused == null) return;
+                ItemStack stack = focused.getStack();
+                if (!stack.isEmpty()) {
+                    if (event.action == GLFW.GLFW_PRESS) {
+                        if (uuidKey.isKey(event.key)) addUUID(stack);
+                        if (skyblockIdKey.isKey(event.key)) addSkyblockID(stack);
+                    }
+                    event.cancel();
                 }
-                event.cancel();
             }
         }
     }
@@ -212,6 +217,7 @@ public class ItemProtection {
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
         if (instance.isActive()) {
+            isSellGUI = false;
             isSalvageGUI = event.screen.getTitle().getString().equals("Salvage Items");
         }
     }
@@ -219,8 +225,7 @@ public class ItemProtection {
     @EventHandler
     private static void onScreenClose(ScreenCloseEvent event) {
         if (instance.isActive()) {
-            isSellGUI = false;
-            isSalvageGUI = false;
+            overrideActive = false;
         }
     }
 

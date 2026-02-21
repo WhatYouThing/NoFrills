@@ -218,6 +218,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Item Protection", ItemProtection.instance, "Prevents you from accidentally dropping, selling or salvaging your important items.", new Settings(List.of(
                                 new Settings.Keybind("UUID Protect Key", ItemProtection.uuidKey, "The keybind to protect a specific item by UUID."),
                                 new Settings.Keybind("ID Protect Key", ItemProtection.skyblockIdKey, "The keybind to protect a specific item by Skyblock ID."),
+                                new Settings.Keybind("Override Key", ItemProtection.overrideKey, "The keybind to override the item protection. Temporarily disables all protection rules while held."),
                                 new Settings.Toggle("Protect By UUID", ItemProtection.protectUUID, "Protects items that you have protected by UUID."),
                                 new Settings.Toggle("Protect By ID", ItemProtection.protectSkyblockId, "Protects items that you have protected by Skyblock ID."),
                                 new Settings.Toggle("Protect Max Quality", ItemProtection.protectMaxQuality, "Protects Dungeon items with a rarity upgrade (50/50 quality)."),

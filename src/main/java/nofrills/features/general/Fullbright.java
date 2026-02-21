@@ -13,8 +13,8 @@ import static nofrills.Main.mc;
 public class Fullbright {
     public static final Feature instance = new Feature("fullbright");
 
-    public static final SettingEnum<modes> mode = new SettingEnum<>(modes.Gamma, modes.class, "mode", instance.key());
-    public static final SettingBool noEffect = new SettingBool(false, "noEffect", instance.key());
+    public static final SettingEnum<Mode> mode = new SettingEnum<>(Mode.Ambient, Mode.class, "mode", instance);
+    public static final SettingBool noEffect = new SettingBool(false, "noEffect", instance);
 
     public static final float gamma = 1600.0f;
     public static final float ambient = 1.0f;
@@ -22,7 +22,7 @@ public class Fullbright {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && mc.player != null) {
-            if (mode.value().equals(modes.Potion)) {
+            if (mode.value().equals(Mode.Potion)) {
                 mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 840));
             } else if (noEffect.value()) {
                 mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
@@ -30,9 +30,9 @@ public class Fullbright {
         }
     }
 
-    public enum modes {
-        Gamma,
+    public enum Mode {
         Ambient,
+        Gamma,
         Potion
     }
 }

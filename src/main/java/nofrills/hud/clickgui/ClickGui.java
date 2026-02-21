@@ -148,7 +148,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Wrong Outline", true, EtherwarpOverlay.outlineWrong, "The outline color used when your Etherwarp target is considered invalid.")
                         ))),
                         new Module("Fullbright", Fullbright.instance, "You know him, you love him.", new Settings(List.of(
-                                new Settings.Dropdown<>("Mode", Fullbright.mode, "The lighting mode used by fullbright."),
+                                new Settings.Dropdown<>("Mode", Fullbright.mode, "The lighting mode.\n\nAmbient: Increases dimension ambient light, most reliable.\nGamma: Increases the Minecraft brightness setting to a high value.\nPotion: Permanently applies the Night Vision potion effect to your player."),
                                 new Settings.Toggle("No Effect", Fullbright.noEffect, "Removes the Night Vision effect while active. Ignored if you use the Potion mode.")
                         ))),
                         new Module("No Render", NoRender.instance, "Prevent various things from appearing.", new Settings(List.of(

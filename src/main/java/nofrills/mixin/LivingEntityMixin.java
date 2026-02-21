@@ -69,7 +69,7 @@ public abstract class LivingEntityMixin extends Entity {
     @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
     private boolean hasNightVision(boolean original, RegistryEntry<StatusEffect> effect) {
         if (Fullbright.instance.isActive() && Utils.isSelf(this) && effect == StatusEffects.NIGHT_VISION) {
-            if (Fullbright.noEffect.value() && !Fullbright.mode.value().equals(Fullbright.modes.Potion)) {
+            if (Fullbright.noEffect.value() && !Fullbright.mode.value().equals(Fullbright.Mode.Potion)) {
                 return false;
             }
         }

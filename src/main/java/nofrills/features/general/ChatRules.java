@@ -100,7 +100,7 @@ public class ChatRules {
             case EndsWith -> message.endsWith(match);
             case Regex -> {
                 try {
-                    yield Pattern.compile(rule.get("match").getAsString()).matcher(msg).matches();
+                    yield Pattern.compile(rule.get("match").getAsString(), (caseSensitive ? 0 : Pattern.CASE_INSENSITIVE) | Pattern.UNICODE_CASE).matcher(msg).matches();
                 } catch (Exception exception) {
                     Utils.infoFormat("§cFailed to compile Regex pattern for chat rule {}: {}", rule.get("name").getAsString(), exception.getMessage());
                     yield false;

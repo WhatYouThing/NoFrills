@@ -112,7 +112,7 @@ public class PriceTooltips {
 
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
-        if (instance.isActive() && event.customData != null) {
+        if (instance.isActive()) {
             String itemId = Utils.getMarketId(event.stack);
             if (itemId.isEmpty()) return;
             int quantity = getStackQuantity(event.stack);
@@ -137,7 +137,7 @@ public class PriceTooltips {
                 event.addLine(buildLine("§eBazaar Buy", prices.get("buy"), quantity));
                 event.addLine(buildLine("§eBazaar Sell", prices.get("sell"), quantity));
             }
-            if (pricePaid.value() && event.customData.contains("uuid") && paidData.value().has("prices")) {
+            if (pricePaid.value() && event.customData != null && event.customData.contains("uuid") && paidData.value().has("prices")) {
                 String uuid = event.customData.getString("uuid", "");
                 JsonObject data = paidData.value().get("prices").getAsJsonObject();
                 if (data.has(uuid)) {

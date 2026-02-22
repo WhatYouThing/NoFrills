@@ -13,7 +13,7 @@ import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.*;
-import nofrills.features.general.CustomKeybinds;
+import nofrills.features.general.CommandKeybinds;
 import nofrills.hud.clickgui.components.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
@@ -68,7 +68,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 case ColorPicker picker -> picker.sliderList.size() == 4 ? 90 : 70;
                 case Description description -> 10 + ((PlainLabel) description.children().getLast()).getTextHeight();
                 case Separator ignored -> 20;
-                case CustomKeybinds.Setting ignored -> 51;
+                case CommandKeybinds.Setting ignored -> 51;
                 default -> 30;
             };
             height += childHeight;

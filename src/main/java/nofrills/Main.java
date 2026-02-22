@@ -43,18 +43,20 @@ public class Main implements ModInitializer {
     public static MinecraftClient mc;
 
     public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess access) {
+        CommandShortcuts.init(dispatcher); // register shortcuts first so that the user cant softlock the mod by overriding the main commands
         YeetCommand.init(dispatcher);
         NoFrillsCommand.init(dispatcher);
     }
 
     public static void injectRenderDoc() {
-        try {
-            String path = System.getProperty("nofrills.renderdoc.library_path");
-            if (path != null) {
+        String path = System.getProperty("nofrills.renderdoc.library_path");
+        if (path != null) {
+            try {
                 System.load(path);
                 LOGGER.info("Loaded RenderDoc lib: {}", path);
+            } catch (Exception exception) {
+                LOGGER.error("Failed to load RenderDoc lib.", exception);
             }
-        } catch (Exception ignored) {
         }
     }
 
@@ -138,7 +140,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SpiritBowHighlight.class);
         eventBus.subscribe(DeviceSolvers.class);
         eventBus.subscribe(Fullbright.class);
-        eventBus.subscribe(CustomKeybinds.class);
+        eventBus.subscribe(CommandKeybinds.class);
         eventBus.subscribe(EndNodeHighlight.class);
         eventBus.subscribe(HotbarSwap.class);
         eventBus.subscribe(TempleSkip.class);

@@ -10,3 +10,6 @@ accessible method net/minecraft/client/gui/hud/ChatHud toChatLineY (D)D
 accessible method net/minecraft/client/gui/hud/ChatHud getMessageLineIndex (DD)I
 accessible field net/minecraft/client/gui/hud/ChatHud visibleMessages Ljava/util/List;
 accessible field net/minecraft/entity/PlayerLikeEntity STANDING_DIMENSIONS Lnet/minecraft/entity/EntityDimensions;
+accessible method net/minecraft/client/gui/DrawContext drawTexturedQuad (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lcom/mojang/blaze3d/textures/GpuTextureView;IIIIFFFFI)V
+accessible field net/minecraft/item/map/MapState decorations Ljava/util/Map;
+accessible method net/minecraft/client/gui/hud/PlayerListHud collectPlayerEntries ()Ljava/util/List;

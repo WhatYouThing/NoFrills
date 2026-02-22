@@ -102,16 +102,14 @@ public class SkyblockData {
 
     private static void updateTabListIfDirty() {
         List<String> lines = new ArrayList<>();
-        if (mc.getNetworkHandler() != null) {
-            for (PlayerListEntry entry : mc.getNetworkHandler().getPlayerList()) {
-                if (entry != null && entry.getDisplayName() != null) {
-                    String name = Utils.toPlain(entry.getDisplayName()).trim();
-                    if (name.isEmpty()) continue;
-                    if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
-                        area = name.split(":", 2)[1].trim();
-                    }
-                    lines.add(name);
+        for (PlayerListEntry entry : mc.inGameHud.getPlayerListHud().collectPlayerEntries()) {
+            if (entry != null && entry.getDisplayName() != null) {
+                String name = Utils.toPlain(entry.getDisplayName()).trim();
+                if (name.isEmpty()) continue;
+                if (name.startsWith("Area: ") || name.startsWith("Dungeon: ")) {
+                    area = name.split(":", 2)[1].trim();
                 }
+                lines.add(name);
             }
         }
         tabListLines = lines;

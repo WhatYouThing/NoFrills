@@ -5,11 +5,14 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.BatEntity;
+import net.minecraft.item.map.MapState;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import static nofrills.Main.mc;
 
@@ -31,8 +34,33 @@ public class DungeonUtil {
         return classCache;
     }
 
+    public static List<Teammate> getAliveTeammates(boolean excludeSelf) {
+        List<Teammate> list = new ArrayList<>();
+        String playerName = mc.player.getName().getString();
+        for (String line : Utils.getTabListLines()) {
+            if (!line.endsWith(")")) {
+                continue;
+            }
+            for (String dungeonClass : dungeonClasses) {
+                if (line.contains("(" + dungeonClass)) {
+                    int start = line.lastIndexOf("]") + 2;
+                    String name = line.substring(start, line.indexOf(" ", start));
+                    if (excludeSelf && name.equalsIgnoreCase(playerName)) {
+                        break;
+                    }
+                    list.add(new Teammate(name, dungeonClass));
+                }
+            }
+        }
+        return list;
+    }
+
+    public static List<Teammate> getAliveTeammates() {
+        return getAliveTeammates(false);
+    }
+
     public static boolean isDungeonStarted() {
-        return mc.world != null && mc.world.getMapState(mapId) != null;
+        return getMap() != null;
     }
 
     public static boolean isInDragonPhase() {
@@ -66,28 +94,33 @@ public class DungeonUtil {
         return classCache.getOrDefault(name, "");
     }
 
+    public static MapState getMap() {
+        return mc.world != null ? mc.world.getMapState(mapId) : null;
+    }
+
+    public static MapIdComponent getMapId() {
+        return mapId;
+    }
+
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (Utils.isInDungeons()) {
-            if (currentFloor.isEmpty() && SkyblockData.getLocation().contains("The Catacombs (")) {
+            if (currentFloor.isEmpty()) {
                 String location = SkyblockData.getLocation();
-                currentFloor = location.substring(location.indexOf("(") + 1, location.indexOf(")"));
+                if (location.contains("The Catacombs (")) {
+                    currentFloor = location.substring(location.indexOf("(") + 1, location.indexOf(")"));
+                }
             }
             if ((partyCount == 0 || classCache.size() != partyCount) && isDungeonStarted()) {
                 for (String line : Utils.getTabListLines()) {
                     if (line.startsWith("Party (") && line.endsWith(")")) {
                         String count = line.substring(line.indexOf("(") + 1).replace(")", "");
                         partyCount = Utils.parseInt(count).orElse(0);
-                    } else {
-                        for (String dungeonClass : dungeonClasses) {
-                            if (line.contains("(" + dungeonClass) && line.endsWith(")")) {
-                                int start = line.lastIndexOf("]") + 2;
-                                String name = line.substring(start, line.indexOf(" ", start));
-                                classCache.put(name, dungeonClass);
-                                break;
-                            }
-                        }
+                        break;
                     }
+                }
+                for (Teammate teammate : getAliveTeammates()) {
+                    classCache.put(teammate.name, teammate.selectedClass);
                 }
             }
             double power = 0;
@@ -109,5 +142,8 @@ public class DungeonUtil {
         currentFloor = "";
         partyCount = 0;
         powerLevel = 0.0;
+    }
+
+    public record Teammate(String name, String selectedClass) {
     }
 }

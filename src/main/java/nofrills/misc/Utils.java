@@ -872,6 +872,10 @@ public class Utils {
         );
     }
 
+    public static int difference(int first, int second) {
+        return Math.abs(Math.abs(first) - Math.abs(second));
+    }
+
     /**
      * Formats the string by replacing each set of curly brackets "{}" with one of the values in order, similarly to Rust's format macro.
      */

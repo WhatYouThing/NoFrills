@@ -20,6 +20,7 @@ import nofrills.events.*;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.NoConfirmScreen;
+import nofrills.hud.HudManager;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -142,6 +143,13 @@ public class ClientPlayNetworkHandlerMixin {
             }
         } else if (eventBus.post(new OverlayMsgEvent(packet.content(), msg)).isCancelled()) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "onMapUpdate", at = @At("TAIL"))
+    private void onAfterMapUpdate(MapUpdateS2CPacket packet, CallbackInfo ci) {
+        if (HudManager.dungeonMap.isActive()) {
+            HudManager.dungeonMap.onMapUpdate(packet);
         }
     }
 }

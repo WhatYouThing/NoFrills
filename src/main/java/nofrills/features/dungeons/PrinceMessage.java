@@ -18,7 +18,7 @@ public class PrinceMessage {
                 Utils.sendMessage(msg.value());
             }
             if (ScoreCalculator.instance.isActive()) {
-                ScoreCalculator.princeKilled();
+                ScoreCalculator.setPrinceKilled();
             }
         }
     }

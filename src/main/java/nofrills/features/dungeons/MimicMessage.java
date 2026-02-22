@@ -26,7 +26,7 @@ public class MimicMessage {
             Utils.sendMessage(msg.value());
         }
         if (ScoreCalculator.instance.isActive()) {
-            ScoreCalculator.mimicKilled();
+            ScoreCalculator.setMimicKilled();
         }
         mimicKilled = true;
     }

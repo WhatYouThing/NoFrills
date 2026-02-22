@@ -49,6 +49,19 @@ public class ScoreCalculator {
         return line.substring(line.indexOf(":") + 1).trim();
     }
 
+    private static int floored(double value) {
+        return (int) Math.floor(value);
+    }
+
+    private static int parseTime(String line, String unit) {
+        int index = line.indexOf(unit);
+        if (index != -1) {
+            String time = line.substring(Math.max(0, line.lastIndexOf(" ", index)), index).trim();
+            return Utils.parseInt(time.startsWith("0") ? time.substring(1) : time).orElse(0);
+        }
+        return 0;
+    }
+
     private static void processAlert(SettingBool send, SettingString msg, SettingBool doTitle, SettingString title) {
         if (send.value()) {
             Utils.sendMessage(msg.value());
@@ -97,14 +110,20 @@ public class ScoreCalculator {
         return 0;
     }
 
+    private static int getSecondsElapsed() {
+        for (String line : SkyblockData.getTabListLines().reversed()) {
+            if (line.startsWith("Time: ")) {
+                String time = line.substring(line.indexOf(":") + 1);
+                return parseTime(time, "m") * 60 + parseTime(time, "s");
+            }
+        }
+        return 0;
+    }
+
     private static int getTotalClearedRooms() {
         int rooms = getClearedRooms();
-        if (!bloodDone) {
-            rooms += 1;
-        }
-        if (!DungeonUtil.isInBossRoom()) {
-            rooms += 1;
-        }
+        if (!bloodDone) rooms += 1;
+        if (!DungeonUtil.isInBossRoom()) rooms += 1;
         return rooms;
     }
 
@@ -117,6 +136,16 @@ public class ScoreCalculator {
             case "F5" -> 0.7;
             case "F6" -> 0.85;
             default -> 1.0;
+        };
+    }
+
+    private static int getTimeLimit() {
+        return switch (DungeonUtil.getCurrentFloor()) {
+            case "F1", "F2", "F3", "F5", "M6" -> 600;
+            case "F4", "F6" -> 720;
+            case "F7", "M7" -> 840;
+            case "M1", "M2", "M3", "M4", "M5" -> 480;
+            default -> 0;
         };
     }
 
@@ -142,31 +171,28 @@ public class ScoreCalculator {
     }
 
     private static int getSkillScore(double clearedRooms, double totalRooms) {
-        int skillScore = Math.min((int) Math.floor(80.0 * clearedRooms / totalRooms), 80);
-        return 20 + Math.clamp(skillScore - getPuzzlePenalty() - getDeathPenalty(), 0, 80);
+        return 20 + Math.clamp(Math.min(floored(80.0 * clearedRooms / totalRooms), 80) - getPuzzlePenalty() - getDeathPenalty(), 0, 80);
     }
 
     private static int getExploreScore(double clearedRooms, double totalRooms, double secretsFound, double secretsNeeded) {
-        int clearScore = Math.min((int) Math.floor(60.0 * clearedRooms / totalRooms), 60);
-        int secretScore = Math.min((int) Math.floor(40.0 * secretsFound / secretsNeeded), 40);
-        return Math.clamp(clearScore + secretScore, 0, 100);
+        return Math.clamp(Math.min(floored(60.0 * clearedRooms / totalRooms), 60) + Math.min(floored(40.0 * secretsFound / secretsNeeded), 40), 0, 100);
     }
 
-    private static int getSpeedScore() {
-        return 100;
+    private static int getSpeedScore() { // calculations from Skytils, probably works
+        int overtime = getSecondsElapsed() + 480 - getTimeLimit();
+        if (overtime < 492) return 100;
+        if (overtime < 600) return floored(140 - overtime / 12.0);
+        if (overtime < 840) return floored(115 - overtime / 24.0);
+        if (overtime < 1140) return floored(108 - overtime / 30.0);
+        if (overtime < 3570) return floored(98.5 - overtime / 40.0);
+        return 0;
     }
 
     private static int getBonusScore() {
         int bonus = 0;
-        if (mimic) {
-            bonus += 2;
-        }
-        if (prince) {
-            bonus += 1;
-        }
-        if (isEZPZ()) {
-            bonus += 10;
-        }
+        if (mimic) bonus += 2;
+        if (prince) bonus += 1;
+        if (isEZPZ()) bonus += 10;
         for (String line : SkyblockData.getTabListLines()) {
             if (line.startsWith("Crypts: ")) {
                 bonus += Math.clamp(Utils.parseInt(getLineValue(line)).orElse(0), 0, 5);
@@ -175,11 +201,11 @@ public class ScoreCalculator {
         return bonus;
     }
 
-    public static void mimicKilled() {
+    public static void setMimicKilled() {
         mimic = true;
     }
 
-    public static void princeKilled() {
+    public static void setPrinceKilled() {
         prince = true;
     }
 
@@ -231,11 +257,13 @@ public class ScoreCalculator {
     private static void onPartyMsg(PartyChatMsgEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
             String msg = Utils.toLower(event.message);
-            if (msg.contains("kill") || msg.contains("dead")) {
-                if (msg.contains("mimic")) {
-                    mimicKilled();
-                } else if (msg.contains("prince")) {
-                    princeKilled();
+            if (msg.contains("kill") || msg.contains("dead") || msg.contains("score")) {
+                if (msg.contains("mimic") && (Utils.isOnDungeonFloor("6") || Utils.isOnDungeonFloor("7"))) {
+                    setMimicKilled();
+                    return;
+                }
+                if (msg.contains("prince")) {
+                    setPrinceKilled();
                 }
             }
         }

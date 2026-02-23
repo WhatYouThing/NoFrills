@@ -7,7 +7,6 @@ import nofrills.config.Feature;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
-import nofrills.misc.Utils;
 
 public class PlatformHighlight {
     public static final Feature instance = new Feature("platformHighlight");

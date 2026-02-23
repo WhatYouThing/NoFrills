@@ -75,6 +75,10 @@ public class DungeonUtil {
         return currentFloor;
     }
 
+    public static boolean isOnFloor(String floor) {
+        return getCurrentFloor().endsWith(floor);
+    }
+
     public static boolean isClass(String dungeonClass) {
         return mc.player != null && getPlayerClass(mc.player.getName().getString()).equalsIgnoreCase(dungeonClass);
     }

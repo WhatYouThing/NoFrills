@@ -185,6 +185,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ScoreCalculator.class);
         eventBus.subscribe(SkillTracker.class);
         eventBus.subscribe(WateringHelper.class);
+        eventBus.subscribe(PlatformHighlight.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

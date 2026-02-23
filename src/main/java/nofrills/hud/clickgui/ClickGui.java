@@ -559,7 +559,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.TextInput("300 Message", ScoreCalculator.msg300, "The message to send when 300 (S+) score is reached."),
                                 new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 (S+) score."),
                                 new Settings.TextInput("300 Title", ScoreCalculator.title300, "The title to show when 300 (S+) score is reached.")
-                        )))
+                        ))),
+                        new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 platform area which you mine as Healer in F7/M7 after terminal phase.")
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(

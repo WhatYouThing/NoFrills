@@ -157,7 +157,7 @@ public class WitherDragons {
                 for (Dragon drag : dragons) {
                     if (!drag.hasEntity()) {
                         for (Entity collar : drag.collarCache.get()) {
-                            if (Utils.horizontalDistance(dragon, collar) <= 8.0) {
+                            if (Utils.horizontalDistance(dragon, collar) <= 10.0) {
                                 drag.setEntity(dragon);
                                 break;
                             }
@@ -173,7 +173,7 @@ public class WitherDragons {
                     if (drag.isCollar(stand)) {
                         drag.collarCache.add(stand);
                         for (Entity dragon : drag.dragonCache.get()) {
-                            if (Utils.horizontalDistance(dragon, stand) <= 8.0) {
+                            if (Utils.horizontalDistance(dragon, stand) <= 10.0) {
                                 drag.setEntity((EnderDragonEntity) dragon);
                                 break;
                             }
@@ -347,7 +347,7 @@ public class WitherDragons {
         }
 
         public boolean hasEntity() {
-            return !this.dragonCache.empty();
+            return !this.dragonCache.empty() && this.dragonCache.getFirst().isAlive();
         }
 
         public EnderDragonEntity getEntity() {

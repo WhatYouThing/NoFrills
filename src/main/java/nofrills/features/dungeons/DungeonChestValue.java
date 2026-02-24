@@ -26,12 +26,12 @@ public class DungeonChestValue {
     public static final SettingColor background = new SettingColor(RenderColor.fromHex(0x202020, 0.8f), "background", instance);
 
     private static final HashSet<String> chestNames = Sets.newHashSet(
-            "Wood Chest",
-            "Gold Chest",
-            "Diamond Chest",
-            "Emerald Chest",
-            "Obsidian Chest",
-            "Bedrock Chest"
+            "Wood",
+            "Gold",
+            "Diamond",
+            "Emerald",
+            "Obsidian",
+            "Bedrock"
     );
     private static double currentValue = 0.0;
 

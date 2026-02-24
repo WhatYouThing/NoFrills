@@ -8,7 +8,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
-import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.hud.ClientBossBar;
@@ -53,7 +52,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.entity.SimpleEntityLookup;
-import nofrills.events.WorldTickEvent;
 import nofrills.mixin.BossBarHudAccessor;
 import nofrills.mixin.HandledScreenAccessor;
 import nofrills.mixin.PlayerListHudAccessor;
@@ -87,7 +85,6 @@ public class Utils {
             "Dungeon Hub",
             "Crimson Isle"
     );
-    private static Screen newScreen = null;
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         mc.inGameHud.setTitle(Text.of(title));
@@ -849,6 +846,14 @@ public class Utils {
         }
     }
 
+    public static Optional<Integer> parseHex(String value) {
+        try {
+            return Optional.of((int) Long.parseLong(value.replace("0x", ""), 16));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
+    }
+
     public static Optional<Double> parseDouble(String value) {
         try {
             return Optional.of(Double.parseDouble(value));
@@ -946,15 +951,7 @@ public class Utils {
     }
 
     public static void setScreen(Screen screen) {
-        newScreen = screen;
-    }
-
-    @EventHandler
-    private static void onTick(WorldTickEvent event) {
-        if (newScreen != null) {
-            mc.setScreen(newScreen);
-            newScreen = null;
-        }
+        mc.send(() -> mc.setScreen(screen));
     }
 
     public static class Symbols {

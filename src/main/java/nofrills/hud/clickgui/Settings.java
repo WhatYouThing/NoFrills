@@ -9,13 +9,14 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.Click;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.*;
 import nofrills.features.general.CommandKeybinds;
+import nofrills.hud.ColorPickerScreen;
 import nofrills.hud.clickgui.components.*;
-import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
@@ -45,15 +46,21 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     public Settings(List<FlowLayout> settings) {
         this.settings = settings;
+        for (FlowLayout setting : this.settings) {
+            if (setting instanceof ColorPicker colorPicker) {
+                colorPicker.previous = this;
+            }
+        }
+    }
+
+    public Settings(FlowLayout... settings) {
+        this(List.of(settings));
     }
 
     private static ButtonComponent buildResetButton(Consumer<ButtonComponent> onPress) {
         ButtonComponent button = Components.button(Text.literal("Reset").withColor(0xffffff), onPress);
         button.positioning(Positioning.relative(100, 0));
-        button.renderer((context, btn, delta) -> {
-            context.fill(btn.getX(), btn.getY(), btn.getX() + btn.getWidth(), btn.getY() + btn.getHeight(), 0xff101010);
-            Rendering.drawBorder(context, btn.getX(), btn.getY(), btn.getWidth(), btn.getHeight(), 0xffffffff);
-        });
+        button.renderer(buttonRendererWhite);
         return button;
     }
 
@@ -65,7 +72,6 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         int height = 0;
         for (Component child : children) {
             int childHeight = switch (child) {
-                case ColorPicker picker -> picker.sliderList.size() == 4 ? 90 : 70;
                 case Description description -> 10 + ((PlainLabel) description.children().getLast()).getTextHeight();
                 case Separator ignored -> 20;
                 case CommandKeybinds.Setting ignored -> 51;
@@ -308,6 +314,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     public static class ColorPicker extends FlowLayout {
         public SettingColor setting;
         public List<FlatSlider> sliderList = new ArrayList<>();
+        public Screen previous;
 
         public ColorPicker(String name, boolean alpha, SettingColor setting, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
@@ -319,85 +326,18 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
             FlowLayout colorDisplay = Containers.verticalFlow(Sizing.fixed(20), Sizing.fixed(20));
-            colorDisplay.surface(Surface.flat(this.setting.value().argb)).margins(Insets.right(10));
-            FlowLayout colorSliders = Containers.verticalFlow(Sizing.content(), Sizing.content());
-            for (int i = 0; i <= 3; i++) {
-                if (i == 3 && !alpha) {
-                    continue;
-                }
-                int id = i;
-                FlowLayout row = Containers.horizontalFlow(Sizing.content(), Sizing.content());
-                PlainLabel colorLabel = new PlainLabel(Text.literal(getColorLabel(id)).withColor(0xffffff));
-                colorLabel.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
-                FlatTextbox text = new FlatTextbox(Sizing.fixed(30));
-                FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
-                slider.min(0).max(255).stepSize(1).horizontalSizing(Sizing.fixed(60)).verticalSizing(Sizing.fixed(20));
-                sliderList.add(slider);
-                text.onChanged().subscribe(change -> {
-                    Optional<Integer> value = Utils.parseInt(text.getText());
-                    if (value.isPresent()) {
-                        setColorValue(id, value.get() / 255.0f);
-                        slider.value(value.get());
-                        colorDisplay.surface(Surface.flat(this.setting.value().argb));
-                    }
-                });
-                text.text(String.valueOf((int) (getColorValue(id) * 255.0f)));
-                slider.onChanged().subscribe(change -> {
-                    int value = (int) slider.value();
-                    setColorValue(id, value / 255.0f);
-                    text.setText(String.valueOf(value));
-                    colorDisplay.surface(Surface.flat(this.setting.value().argb));
-                });
-                row.child(colorLabel);
-                row.child(text);
-                row.child(slider);
-                colorSliders.child(row);
-            }
+            colorDisplay.surface((context, component) -> context.fill(component.x(), component.y(), component.x() + component.width(), component.y() + component.height(), this.setting.value().argb)).margins(Insets.right(5));
+            this.child(buildResetButton(btn -> this.setting.reset()).positioning(Positioning.relative(100, 50)));
+            ButtonComponent editButton = Components.button(Text.literal("Edit Color"), (btn) -> {
+                ColorPickerScreen pickerScreen = ColorPickerScreen.build(this.setting, this.previous);
+                pickerScreen.setTitle(Text.literal(!Utils.toLower(name).endsWith(" color") ? name + " Color" : name));
+                mc.setScreen(pickerScreen);
+            });
+            editButton.horizontalSizing(Sizing.fixed(60));
+            editButton.renderer(buttonRenderer);
             this.child(label);
             this.child(colorDisplay);
-            this.child(colorSliders);
-            this.child(buildResetButton(btn -> {
-                this.setting.reset();
-                for (int i = 0; i <= 3; i++) {
-                    if (i == 3 && !alpha) {
-                        continue;
-                    }
-                    sliderList.get(i).value((int) (getColorValue(i) * 255.0f));
-                }
-            }).positioning(Positioning.relative(100, 50)));
-        }
-
-        private String getColorLabel(int id) {
-            return switch (id) {
-                case 0 -> "R";
-                case 1 -> "G";
-                case 2 -> "B";
-                case 3 -> "A";
-                default -> "";
-            };
-        }
-
-        private double getColorValue(int id) {
-            RenderColor color = this.setting.value();
-            return switch (id) {
-                case 0 -> color.r;
-                case 1 -> color.g;
-                case 2 -> color.b;
-                case 3 -> color.a;
-                default -> 0;
-            };
-        }
-
-        private void setColorValue(int id, double value) {
-            RenderColor color = this.setting.value();
-            RenderColor newColor = switch (id) { // quite scuffed but its either this or pasting the same code 4 times to build the color picker
-                case 0 -> RenderColor.fromFloat((float) value, color.g, color.b, color.a);
-                case 1 -> RenderColor.fromFloat(color.r, (float) value, color.b, color.a);
-                case 2 -> RenderColor.fromFloat(color.r, color.g, (float) value, color.a);
-                case 3 -> RenderColor.fromFloat(color.r, color.g, color.b, (float) value);
-                default -> color;
-            };
-            this.setting.set(newColor);
+            this.child(editButton);
         }
     }
 

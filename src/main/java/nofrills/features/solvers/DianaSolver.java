@@ -39,13 +39,13 @@ public class DianaSolver {
     public static final SettingBool cryptToggle = new SettingBool(false, "cryptToggle", instance);
 
     private static final List<DianaWarp> warps = List.of(
-            new DianaWarp("Hub", "hub", hubToggle, -3, 70, -70),
-            new DianaWarp("Stonks Auction", "stonks", stonksToggle, -53, 72, -53),
-            new DianaWarp("Museum", "museum", museumToggle, -76, 76, 80),
+            new DianaWarp("Hub", "hub", hubToggle, 0, 77, -1),
+            new DianaWarp("Stonks Auction", "stonks", stonksToggle, -37, 70, -82),
+            new DianaWarp("Museum", "museum", museumToggle, 29, 72, 1),
             new DianaWarp("Castle", "castle", castleToggle, -250, 130, 45),
-            new DianaWarp("Wizard Tower", "wizard", wizardToggle, 42, 122, 69),
-            new DianaWarp("Dark Auction", "da", daToggle, 91, 74, 173),
-            new DianaWarp("Crypt", "crypt", cryptToggle, -190, 74, -88)
+            new DianaWarp("Wizard Tower", "wizard", wizardToggle, 44, 119, 93),
+            new DianaWarp("Dark Auction", "da", daToggle, 91, 75, 173),
+            new DianaWarp("Crypt", "crypt", cryptToggle, -161, 62, -107)
     );
     private static final HashSet<String> spoonDrawer = Sets.newHashSet(
             "ANCESTRAL_SPADE",

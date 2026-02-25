@@ -35,6 +35,15 @@ public class DungeonChestValue {
     );
     private static double currentValue = 0.0;
 
+    private static boolean isChest(String title) {
+        for (String name : chestNames) {
+            if (title.equals(name) || (title.startsWith(name) && title.endsWith("Chest"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static int getLootQuantity(ItemStack stack, String name) {
         String[] parts = name.split(" ");
         String last = parts[parts.length - 1];
@@ -56,7 +65,7 @@ public class DungeonChestValue {
 
     @EventHandler
     private static void onSlot(SlotUpdateEvent event) {
-        if (instance.isActive() && chestNames.contains(event.title) && Utils.isInLootArea()) {
+        if (instance.isActive() && isChest(event.title) && Utils.isInLootArea()) {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }

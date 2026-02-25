@@ -25,12 +25,14 @@ public class AnvilHelper {
 
     private static String getEnchantInContainer(GenericContainerScreenHandler handler) {
         List<Slot> slots = Utils.getContainerSlots(handler);
-        List<Slot> bookSlots = slots.stream().filter(slot -> slot.getStack().getItem().equals(Items.ENCHANTED_BOOK)).toList();
-        if (bookSlots.size() == 1) {
-            Slot slot = bookSlots.getFirst();
-            int above = slot.id - 9;
-            if (above >= 0 && handler.getSlot(above).getStack().getItem().equals(Items.LIME_STAINED_GLASS_PANE)) {
-                return Utils.getMarketId(slot.getStack());
+        if (slots.stream().noneMatch(slot -> slot.getStack().getItem().equals(Items.BARRIER) && Utils.toPlain(slot.getStack().getName()).equals("Anvil"))) {
+            return "";
+        }
+        List<Slot> idSlots = slots.stream().filter(slot -> !Utils.getSkyblockId(slot.getStack()).isEmpty()).toList();
+        if (idSlots.size() == 1) {
+            ItemStack stack = idSlots.getFirst().getStack();
+            if (stack.getItem().equals(Items.ENCHANTED_BOOK)) {
+                return Utils.getMarketId(stack);
             }
         }
         return "";

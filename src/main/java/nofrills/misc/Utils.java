@@ -76,8 +76,12 @@ import static nofrills.Main.*;
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     private static final HashSet<String> modernIslands = Sets.newHashSet(
-            "The Park",
-            "Galatea"
+            "Hub",
+            "Galatea",
+            "Spider's Den",
+            "The Barn", 
+            "The End",
+            "The Park"
     );
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",

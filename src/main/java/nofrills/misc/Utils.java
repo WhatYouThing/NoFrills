@@ -78,6 +78,7 @@ public class Utils {
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "Hub",
             "Galatea",
+            "Gold Mine",
             "Spider's Den",
             "The Barn", 
             "The End",

@@ -17,7 +17,10 @@ import nofrills.config.SettingBool;
 import nofrills.config.SettingDouble;
 import nofrills.config.SettingEnum;
 import nofrills.events.*;
-import nofrills.misc.*;
+import nofrills.misc.DungeonUtil;
+import nofrills.misc.EntityCache;
+import nofrills.misc.RenderColor;
+import nofrills.misc.Utils;
 
 import java.util.List;
 
@@ -42,18 +45,14 @@ public class WitherDragons {
             Dragon.PURPLE,
             Dragon.GREEN
     );
-    private static final EntityCache dragonCache = new EntityCache();
     private static boolean splitDone = false;
 
     private static boolean isArcherTeam() {
-        return switch (SkyblockData.dungeonClass) {
-            case "Archer", "Tank" -> true;
-            default -> false;
-        };
+        return DungeonUtil.isClass("Archer") || DungeonUtil.isClass("Tank");
     }
 
     private static double getPowerLevel() {
-        return SkyblockData.dungeonPower;
+        return DungeonUtil.getPower();
     }
 
     private static boolean isDragonParticle(ParticleS2CPacket packet) {
@@ -106,7 +105,7 @@ public class WitherDragons {
                 }
                 if (health.value() && drag.hasEntity()) {
                     MutableText healthText = Text.literal(Utils.formatDecimal(drag.health * 0.000001) + "M");
-                    Vec3d pos = drag.entity.getLerpedPos(event.tickCounter.getTickProgress(true)); // should make the text move smoothly with the dragons
+                    Vec3d pos = drag.getEntity().getLerpedPos(event.tickCounter.getTickProgress(true)); // should make the text move smoothly with the dragons
                     event.drawText(pos, healthText, 0.2f, true, drag.color);
                 }
             }
@@ -155,16 +154,15 @@ public class WitherDragons {
     private static void onEntity(EntityUpdatedEvent event) {
         if (instance.isActive() && DungeonUtil.isInDragonPhase()) {
             if (event.entity instanceof EnderDragonEntity dragon) {
-                dragonCache.add(dragon);
                 for (Dragon drag : dragons) {
                     if (!drag.hasEntity()) {
-                        for (Entity collar : drag.cache.get()) {
-                            if (Utils.horizontalDistance(dragon, collar) <= 8.0) {
+                        for (Entity collar : drag.collarCache.get()) {
+                            if (Utils.horizontalDistance(dragon, collar) <= 10.0) {
                                 drag.setEntity(dragon);
                                 break;
                             }
                         }
-                    } else if (drag.entity.equals(dragon)) {
+                    } else if (drag.getEntity().equals(dragon)) {
                         drag.setEntity(dragon);
                         break;
                     }
@@ -173,9 +171,9 @@ public class WitherDragons {
             if (event.entity instanceof ArmorStandEntity stand) {
                 for (Dragon drag : dragons) {
                     if (drag.isCollar(stand)) {
-                        drag.cache.add(stand);
-                        for (Entity dragon : dragonCache.get()) {
-                            if (Utils.horizontalDistance(dragon, stand) <= 8.0) {
+                        drag.collarCache.add(stand);
+                        for (Entity dragon : drag.dragonCache.get()) {
+                            if (Utils.horizontalDistance(dragon, stand) <= 10.0) {
                                 drag.setEntity((EnderDragonEntity) dragon);
                                 break;
                             }
@@ -199,7 +197,6 @@ public class WitherDragons {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         splitDone = false;
-        dragonCache.clear();
         for (Dragon drag : dragons) {
             drag.reset();
         }
@@ -306,7 +303,8 @@ public class WitherDragons {
                 ),
                 new Box(7, 5, 80, 37, 28, 110)
         );
-
+        public final EntityCache dragonCache = new EntityCache();
+        public final EntityCache collarCache = new EntityCache();
         public String name;
         public int archPriority;
         public int bersPriority;
@@ -315,10 +313,8 @@ public class WitherDragons {
         public Box pos;
         public List<Box> parts;
         public Box area;
-        public EnderDragonEntity entity = null;
         public float health = 0.0f;
         public int spawnTicks = 0;
-        public EntityCache cache = new EntityCache();
 
         public Dragon(String name, int archPriority, int bersPriority, String texture, RenderColor color, Box pos, List<Box> parts, Box area) {
             this.name = name;
@@ -346,18 +342,20 @@ public class WitherDragons {
         }
 
         public void reset() {
-            this.entity = null;
             this.health = 0.0f;
             this.spawnTicks = 0;
-            this.cache.clear();
         }
 
         public boolean hasEntity() {
-            return EntityCache.exists(this.entity);
+            return !this.dragonCache.empty() && this.dragonCache.getFirst().isAlive();
+        }
+
+        public EnderDragonEntity getEntity() {
+            return (EnderDragonEntity) this.dragonCache.getFirst();
         }
 
         public void setEntity(EnderDragonEntity ent) {
-            this.entity = ent;
+            this.dragonCache.add(ent);
             this.health = ent.getHealth(); // store the health value on update, required as the client appears to reset it on the next tick
             if (glow.value() && !Utils.isGlowing(ent)) {
                 Utils.setGlowing(ent, true, this.color);

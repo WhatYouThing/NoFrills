@@ -11,7 +11,7 @@ public abstract class LightmapTextureManagerMixin {
 
     @ModifyExpressionValue(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/dimension/DimensionType;ambientLight()F"))
     private float getAmbientLight(float original) {
-        if (Fullbright.instance.isActive() && Fullbright.mode.value().equals(Fullbright.modes.Ambient)) {
+        if (Fullbright.instance.isActive() && Fullbright.mode.value().equals(Fullbright.Mode.Ambient)) {
             return Fullbright.ambient;
         }
         return original;
@@ -19,7 +19,7 @@ public abstract class LightmapTextureManagerMixin {
 
     @ModifyExpressionValue(method = "update", at = @At(value = "INVOKE", target = "Ljava/lang/Double;floatValue()F", ordinal = 1))
     private float getGamma(float original) {
-        if (Fullbright.instance.isActive() && Fullbright.mode.value().equals(Fullbright.modes.Gamma)) {
+        if (Fullbright.instance.isActive() && Fullbright.mode.value().equals(Fullbright.Mode.Gamma)) {
             return Fullbright.gamma;
         }
         return original;

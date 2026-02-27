@@ -32,7 +32,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class CustomKeybinds {
+public class CommandKeybinds {
     public static final Feature instance = new Feature("customKeybinds");
 
     public static final SettingBool allowInGui = new SettingBool(false, "allowInGui", instance.key());
@@ -42,7 +42,7 @@ public class CustomKeybinds {
         List<FlowLayout> list = new ArrayList<>();
         Settings.Toggle allowInGuiToggle = new Settings.Toggle("Allow in GUI", allowInGui, "Allow keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
         list.add(allowInGuiToggle);
-        Settings.BigButton button = new Settings.BigButton("Add New Custom Keybind", btn -> {
+        Settings.BigButton button = new Settings.BigButton("Add New Keybind", btn -> {
             data.edit(object -> {
                 if (!object.has("binds")) {
                     object.add("binds", new JsonArray());
@@ -69,7 +69,7 @@ public class CustomKeybinds {
 
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Custom Keybinds"));
+        settings.setTitle(Text.literal("Command Keybinds"));
         return settings;
     }
 

@@ -10,14 +10,11 @@ import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import nofrills.config.Config;
 import nofrills.config.Feature;
 import nofrills.config.SettingJson;
 import nofrills.events.ChatMsgEvent;
-import nofrills.events.WorldTickEvent;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
@@ -26,9 +23,7 @@ import nofrills.hud.clickgui.components.ToggleButton;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
@@ -38,10 +33,6 @@ public class ChatRules {
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
 
-    private static final List<Rule> ruleCache = new ArrayList<>();
-    private static final Pattern fallbackPattern = Pattern.compile("null");
-    private static int hash = 0;
-
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
         Settings.BigButton button = new Settings.BigButton("Add New Chat Rule", btn -> {
@@ -49,7 +40,21 @@ public class ChatRules {
                 if (!object.has("rules")) {
                     object.add("rules", new JsonArray());
                 }
-                object.get("rules").getAsJsonArray().add(new Rule().toObject());
+                JsonObject obj = new JsonObject();
+                obj.addProperty("name", "New Rule");
+                obj.addProperty("match", "");
+                obj.addProperty("enabled", false);
+                obj.addProperty("caseSensitive", false);
+                obj.addProperty("matchType", MatchType.Equals.name());
+                obj.addProperty("cancel", false);
+                obj.addProperty("title", "");
+                obj.addProperty("titleFadeIn", 0);
+                obj.addProperty("titleStay", 30);
+                obj.addProperty("titleFadeOut", 10);
+                obj.addProperty("sound", "");
+                obj.addProperty("soundVolume", 1.0f);
+                obj.addProperty("soundPitch", 1.0f);
+                object.get("rules").getAsJsonArray().add(obj);
             });
             Config.computeHash();
             mc.setScreen(buildSettings());
@@ -71,44 +76,59 @@ public class ChatRules {
         return settings;
     }
 
-    private static boolean matchRule(Rule rule, String msg) {
-        String match = rule.caseSensitive ? rule.match : Utils.toLower(rule.match);
-        String message = rule.caseSensitive ? msg : Utils.toLower(msg);
-        return rule.enabled && switch (rule.matchType) {
+    private static MatchType getRuleMatchType(JsonObject rule) {
+        String type = rule.get("matchType").getAsString();
+        for (MatchType value : MatchType.values()) {
+            if (value.name().equals(type)) {
+                return value;
+            }
+        }
+        return MatchType.Equals;
+    }
+
+    private static boolean matchRule(JsonObject rule, String msg) {
+        if (!rule.get("enabled").getAsBoolean()) {
+            return false;
+        }
+        boolean caseSensitive = rule.get("caseSensitive").getAsBoolean();
+        String match = caseSensitive ? rule.get("match").getAsString() : Utils.toLower(rule.get("match").getAsString());
+        String message = caseSensitive ? msg : Utils.toLower(msg);
+        return switch (getRuleMatchType(rule)) {
             case Equals -> message.equals(match);
             case Contains -> message.contains(match);
             case StartsWith -> message.startsWith(match);
             case EndsWith -> message.endsWith(match);
-            case Regex -> rule.getRegex().matcher(message).matches();
+            case Regex -> {
+                try {
+                    yield Pattern.compile(rule.get("match").getAsString(), (caseSensitive ? 0 : Pattern.CASE_INSENSITIVE) | Pattern.UNICODE_CASE).matcher(msg).matches();
+                } catch (Exception exception) {
+                    Utils.infoFormat("§cFailed to compile Regex pattern for chat rule {}: {}", rule.get("name").getAsString(), exception.getMessage());
+                    yield false;
+                }
+            }
         };
     }
 
     @EventHandler(priority = EventPriority.LOW)
     private static void onMsg(ChatMsgEvent event) {
-        if (instance.isActive()) {
-            for (Rule rule : new ArrayList<>(ruleCache)) {
-                if (matchRule(rule, event.messagePlain)) {
-                    if (!rule.title.isEmpty())
-                        Utils.showTitle(rule.title.replaceAll("&", "§"), "", rule.titleFadeIn, rule.titleStay, rule.titleFadeOut);
-                    if (!rule.sound.isEmpty())
-                        Utils.playSound(SoundEvent.of(Identifier.of(rule.sound)), rule.soundVolume, rule.soundPitch);
-                    if (rule.cancel) event.cancel();
+        if (instance.isActive() && data.value().has("rules")) {
+            for (JsonElement rule : data.value().getAsJsonArray("rules")) {
+                JsonObject obj = rule.getAsJsonObject();
+                if (matchRule(obj, event.messagePlain)) {
+                    String title = obj.get("title").getAsString();
+                    if (!title.isEmpty()) {
+                        Utils.showTitle(title.replaceAll("&", "§"), "", obj.get("titleFadeIn").getAsInt(), obj.get("titleStay").getAsInt(), obj.get("titleFadeOut").getAsInt());
+                    }
+                    String sound = obj.get("sound").getAsString();
+                    if (!sound.isEmpty()) {
+                        Utils.playSound(sound, obj.get("soundVolume").getAsFloat(), obj.get("soundPitch").getAsFloat());
+                    }
+                    if (obj.get("cancel").getAsBoolean()) {
+                        event.cancel();
+                    }
                     break;
                 }
             }
-        }
-    }
-
-    @EventHandler
-    private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && (hash == 0 || hash != Config.getHash())) {
-            ruleCache.clear();
-            if (data.value().has("rules")) {
-                for (JsonElement rule : data.value().getAsJsonArray("rules")) {
-                    ruleCache.add(Rule.fromObject(rule.getAsJsonObject()));
-                }
-            }
-            hash = Config.getHash();
         }
     }
 
@@ -120,112 +140,32 @@ public class ChatRules {
         Regex
     }
 
-    public static class Rule {
-        public String name = "New Rule";
-        public String match = "";
-        public boolean enabled = false;
-        public boolean caseSensitive = false;
-        public MatchType matchType = MatchType.Equals;
-        public boolean cancel = false;
-        public String title = "";
-        public int titleFadeIn = 5;
-        public int titleStay = 30;
-        public int titleFadeOut = 5;
-        public String sound = "";
-        public float soundVolume = 1.0f;
-        public float soundPitch = 1.0f;
-        public Pattern regex;
-
-        public Rule() {
-        }
-
-        public static Rule fromObject(JsonObject obj) {
-            Rule rule = new Rule();
-            rule.name = obj.get("name").getAsString();
-            rule.match = obj.get("match").getAsString();
-            rule.enabled = obj.get("enabled").getAsBoolean();
-            rule.caseSensitive = obj.get("caseSensitive").getAsBoolean();
-            rule.matchType = Arrays.stream(MatchType.values())
-                    .filter(value -> value.name().equals(obj.get("matchType").getAsString()))
-                    .findFirst()
-                    .orElse(MatchType.Equals);
-            rule.cancel = obj.get("cancel").getAsBoolean();
-            rule.title = obj.get("title").getAsString();
-            rule.titleFadeIn = obj.get("titleFadeIn").getAsInt();
-            rule.titleStay = obj.get("titleStay").getAsInt();
-            rule.titleFadeOut = obj.get("titleFadeOut").getAsInt();
-            rule.sound = obj.get("sound").getAsString();
-            rule.soundVolume = obj.get("soundVolume").getAsFloat();
-            rule.soundPitch = obj.get("soundPitch").getAsFloat();
-            return rule;
-        }
-
-        public JsonObject toObject() {
-            JsonObject obj = new JsonObject();
-            obj.addProperty("name", this.name);
-            obj.addProperty("match", this.match);
-            obj.addProperty("enabled", this.enabled);
-            obj.addProperty("caseSensitive", this.caseSensitive);
-            obj.addProperty("matchType", this.matchType.name());
-            obj.addProperty("cancel", this.cancel);
-            obj.addProperty("title", this.title);
-            obj.addProperty("titleFadeIn", this.titleFadeIn);
-            obj.addProperty("titleStay", this.titleStay);
-            obj.addProperty("titleFadeOut", this.titleFadeOut);
-            obj.addProperty("sound", this.sound);
-            obj.addProperty("soundVolume", this.soundVolume);
-            obj.addProperty("soundPitch", this.soundPitch);
-            return obj;
-        }
-
-        public Pattern getRegex() {
-            if (this.regex == null) {
-                try {
-                    this.regex = Pattern.compile(this.match);
-                } catch (Exception exception) {
-                    Utils.infoFormat("Failed to compile Regex pattern for chat rule \"{}\": {}", this.name, exception.getMessage());
-                    this.regex = fallbackPattern;
-                }
-            }
-            return this.regex;
-        }
-    }
-
     public static class Setting extends FlowLayout {
         public int index;
-        public Rule rule;
 
         public Setting(int index) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
 
             this.index = index;
-            this.rule = Rule.fromObject(this.getData());
             this.padding(Insets.of(5, 5, 4, 5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
 
             FlatTextbox input = new FlatTextbox(Sizing.fixed(140));
             input.margins(Insets.of(0, 0, 0, 6));
-            input.text(rule.name);
+            input.text(this.getData().get("name").getAsString());
             input.tooltip(Text.literal("The name of this chat rule."));
-            input.onChanged().subscribe(value -> {
-                rule.name = value;
-                this.save();
-            });
-            ToggleButton mainToggle = new ToggleButton(rule.enabled);
+            input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("name", value)));
+            ToggleButton mainToggle = new ToggleButton(this.getData().get("enabled").getAsBoolean());
             mainToggle.verticalSizing(Sizing.fixed(18));
             mainToggle.margins(Insets.of(1, 0, 0, 3));
             mainToggle.tooltip(Text.literal("The main toggle for this chat rule."));
-            mainToggle.onToggled().subscribe(toggle -> {
-                rule.enabled = toggle;
-                this.save();
-            });
+            mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));
             ButtonComponent editButton = UIComponents.button(Text.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildRuleSettings()));
             editButton.verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             editButton.horizontalSizing(Sizing.fixed(49));
             editButton.renderer(Settings.buttonRendererWhite);
             ButtonComponent delete = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("rules").getAsJsonArray().remove(this.index));
-                Config.computeHash();
                 mc.setScreen(buildSettings());
             });
             delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18));
@@ -237,13 +177,12 @@ public class ChatRules {
             this.child(delete);
         }
 
-        public JsonObject getData() {
-            return data.value().get("rules").getAsJsonArray().get(this.index).getAsJsonObject();
+        public JsonObject getData(JsonObject object) {
+            return object.get("rules").getAsJsonArray().get(this.index).getAsJsonObject();
         }
 
-        public void save() {
-            data.edit(object -> object.get("rules").getAsJsonArray().set(this.index, this.rule.toObject()));
-            Config.computeHash();
+        public JsonObject getData() {
+            return this.getData(data.value());
         }
 
         public FlowLayout buildMatchTextSetting() {
@@ -253,12 +192,9 @@ public class ChatRules {
             PlainLabel label = new PlainLabel(Text.literal("Match Text"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
-            input.text(rule.match);
+            input.text(this.getData().get("match").getAsString());
             input.tooltip(Text.literal("The text/regex this rule would match with."));
-            input.onChanged().subscribe(value -> {
-                rule.match = value;
-                this.save();
-            });
+            input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("match", value)));
             layout.child(label);
             layout.child(input);
             return layout;
@@ -270,13 +206,10 @@ public class ChatRules {
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Text.literal("Match Type"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            EnumButton<MatchType> button = new EnumButton<>(rule.matchType.name(), MatchType.Equals, MatchType.class);
+            EnumButton<MatchType> button = new EnumButton<>(this.getData().get("matchType").getAsString(), MatchType.Equals, MatchType.class);
             button.horizontalSizing(Sizing.fixed(80));
             button.tooltip(Text.literal("The type of match to perform.\n\nEquals: Message must be equal to the matching text.\nContains: Message must contain the matching text.\nStartsWith: Message must start with the matching text.\nEndsWith: Message must end with the matching text.\nRegex: Message must match the Java regular expression, advanced users only."));
-            button.onChanged().subscribe(value -> {
-                rule.matchType = Arrays.stream(MatchType.values()).filter(type -> type.name().equals(value)).findFirst().orElse(MatchType.Equals);
-                this.save();
-            });
+            button.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("matchType", value)));
             layout.child(label);
             layout.child(button);
             return layout;
@@ -288,12 +221,9 @@ public class ChatRules {
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Text.literal("Case Sensitive"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            ToggleButton button = new ToggleButton(rule.caseSensitive);
+            ToggleButton button = new ToggleButton(this.getData().get("caseSensitive").getAsBoolean());
             button.tooltip(Text.literal("If enabled, the rule will account for character casing."));
-            button.onToggled().subscribe(toggle -> {
-                rule.caseSensitive = toggle;
-                this.save();
-            });
+            button.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("caseSensitive", toggle)));
             layout.child(label);
             layout.child(button);
             return layout;
@@ -305,12 +235,9 @@ public class ChatRules {
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Text.literal("Cancel Message"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            ToggleButton button = new ToggleButton(rule.cancel);
+            ToggleButton button = new ToggleButton(this.getData().get("cancel").getAsBoolean());
             button.tooltip(Text.literal("If enabled, the rule will hide/cancel matching chat messages."));
-            button.onToggled().subscribe(toggle -> {
-                rule.cancel = toggle;
-                this.save();
-            });
+            button.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("cancel", toggle)));
             layout.child(label);
             layout.child(button);
             return layout;
@@ -323,42 +250,21 @@ public class ChatRules {
             PlainLabel label = new PlainLabel(Text.literal("Title"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox inputTitle = new FlatTextbox(Sizing.fixed(140));
-            inputTitle.text(rule.title);
+            inputTitle.text(this.getData().get("title").getAsString());
             inputTitle.tooltip(Text.literal("The title to show on screen if the rule matches. Leave blank to disable.\nYou can use the & symbol to insert formatting codes."));
-            inputTitle.onChanged().subscribe(value -> {
-                rule.title = value;
-                this.save();
-            });
+            inputTitle.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("title", value)));
             FlatTextbox inputFadeIn = new FlatTextbox(Sizing.fixed(25));
-            inputFadeIn.text(String.valueOf(rule.titleFadeIn));
+            inputFadeIn.text(String.valueOf(this.getData().get("titleFadeIn").getAsInt()));
             inputFadeIn.tooltip(Text.literal("The amount of ticks the title should fade in for."));
-            inputFadeIn.onChanged().subscribe(value -> {
-                Optional<Integer> ticks = Utils.parseInt(value);
-                if (ticks.isPresent()) {
-                    rule.titleFadeIn = ticks.get();
-                    this.save();
-                }
-            });
+            inputFadeIn.onChanged().subscribe(value -> Utils.parseInt(value).ifPresent(integer -> data.edit(obj -> this.getData(obj).addProperty("titleFadeIn", integer))));
             FlatTextbox inputStay = new FlatTextbox(Sizing.fixed(25));
-            inputStay.text(String.valueOf(rule.titleStay));
+            inputStay.text(String.valueOf(this.getData().get("titleStay").getAsInt()));
             inputStay.tooltip(Text.literal("The amount of ticks the title should stay for."));
-            inputStay.onChanged().subscribe(value -> {
-                Optional<Integer> ticks = Utils.parseInt(value);
-                if (ticks.isPresent()) {
-                    rule.titleStay = ticks.get();
-                    this.save();
-                }
-            });
+            inputStay.onChanged().subscribe(value -> Utils.parseInt(value).ifPresent(integer -> data.edit(obj -> this.getData(obj).addProperty("titleStay", integer))));
             FlatTextbox inputFadeOut = new FlatTextbox(Sizing.fixed(25));
-            inputFadeOut.text(String.valueOf(rule.titleFadeOut));
+            inputFadeOut.text(String.valueOf(this.getData().get("titleFadeOut").getAsInt()));
             inputFadeOut.tooltip(Text.literal("The amount of ticks the title should fade out for."));
-            inputFadeOut.onChanged().subscribe(value -> {
-                Optional<Integer> ticks = Utils.parseInt(value);
-                if (ticks.isPresent()) {
-                    rule.titleFadeOut = ticks.get();
-                    this.save();
-                }
-            });
+            inputFadeOut.onChanged().subscribe(value -> Utils.parseInt(value).ifPresent(integer -> data.edit(obj -> this.getData(obj).addProperty("titleFadeOut", integer))));
             layout.child(label);
             layout.child(inputTitle);
             layout.child(inputFadeIn);
@@ -374,32 +280,17 @@ public class ChatRules {
             PlainLabel label = new PlainLabel(Text.literal("Sound"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox inputSound = new FlatTextbox(Sizing.fixed(150));
-            inputSound.text(rule.sound);
+            inputSound.text(this.getData().get("sound").getAsString());
             inputSound.tooltip(Text.literal("The sound identifier to play if the rule matches. Leave blank to disable."));
-            inputSound.onChanged().subscribe(value -> {
-                rule.sound = value;
-                this.save();
-            });
+            inputSound.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("sound", value)));
             FlatTextbox inputVolume = new FlatTextbox(Sizing.fixed(25));
-            inputVolume.text(String.valueOf(rule.soundVolume));
+            inputVolume.text(String.valueOf(this.getData().get("soundVolume").getAsFloat()));
             inputVolume.tooltip(Text.literal("The volume of the sound."));
-            inputVolume.onChanged().subscribe(value -> {
-                Optional<Double> volume = Utils.parseDouble(value);
-                if (volume.isPresent()) {
-                    rule.soundVolume = volume.get().floatValue();
-                    this.save();
-                }
-            });
+            inputVolume.onChanged().subscribe(value -> Utils.parseDouble(value).ifPresent(val -> data.edit(obj -> this.getData(obj).addProperty("soundVolume", val.floatValue()))));
             FlatTextbox inputPitch = new FlatTextbox(Sizing.fixed(25));
-            inputPitch.text(String.valueOf(rule.soundPitch));
+            inputPitch.text(String.valueOf(this.getData().get("soundPitch").getAsFloat()));
             inputPitch.tooltip(Text.literal("The pitch of the sound."));
-            inputPitch.onChanged().subscribe(value -> {
-                Optional<Double> pitch = Utils.parseDouble(value);
-                if (pitch.isPresent()) {
-                    rule.soundPitch = pitch.get().floatValue();
-                    this.save();
-                }
-            });
+            inputPitch.onChanged().subscribe(value -> Utils.parseDouble(value).ifPresent(val -> data.edit(obj -> this.getData(obj).addProperty("soundPitch", val.floatValue()))));
             layout.child(label);
             layout.child(inputSound);
             layout.child(inputVolume);
@@ -416,7 +307,7 @@ public class ChatRules {
             list.add(this.buildTitleSetting());
             list.add(this.buildSoundSetting());
             ChatRulesSettings settings = new ChatRulesSettings(list);
-            settings.setTitle(Text.literal("Chat Rule: " + this.rule.name));
+            settings.setTitle(Text.literal("Chat Rule: " + this.getData().get("name").getAsString()));
             return settings;
         }
     }

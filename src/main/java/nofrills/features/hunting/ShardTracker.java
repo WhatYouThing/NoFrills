@@ -331,7 +331,7 @@ public class ShardTracker {
                         String name = Utils.toLower(Utils.toPlain(event.stack.getName()));
                         JsonObject tracked = getTrackedShard(name);
                         if (tracked != null) {
-                            data.edit(object -> tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack, event.title)));
+                            data.edit(object -> tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack)));
                             refreshDisplay();
                         }
                         break;

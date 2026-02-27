@@ -7,14 +7,20 @@ import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import io.wispforest.owo.ui.core.Sizing;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import nofrills.config.Feature;
+import nofrills.config.SettingEnum;
 import nofrills.hud.HudElement;
+import nofrills.hud.clickgui.Settings;
+
+import java.util.List;
 
 import static nofrills.Main.mc;
 
 public class Inventory extends HudElement {
+    public final SettingEnum<HideMode> hideMode;
     private final FlowLayout content;
 
     public Inventory() {
@@ -30,13 +36,19 @@ public class Inventory extends HudElement {
             this.content.child(container);
         }
         this.layout.child(this.content);
-        this.options = this.getBaseSettings();
+        this.hideMode = new SettingEnum<>(HideMode.Disabled, HideMode.class, "hideMode", this.instance);
+        this.options = this.getBaseSettings(List.of(
+                new Settings.Dropdown<>("Hide In Screen", this.hideMode, "Automatically hides the element while a screen is open.\n\nDisabled: The element will appear regardless of screen.\nInventory: The element will be hidden in screens that have item slots (player inventory, containers etc).\nAny: The element will be hidden if any type of screen is present.")
+        ));
         this.setDesc("Displays the contents of your inventory.");
     }
 
     @Override
     public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (this.shouldRender()) {
+            if (this.shouldHideInScreen() && !this.isEditingHud()) {
+                return;
+            }
             super.draw(context, mouseX, mouseY, partialTicks, delta);
         }
     }
@@ -52,5 +64,19 @@ public class Inventory extends HudElement {
                 }
             }
         }
+    }
+
+    public boolean shouldHideInScreen() {
+        return switch (this.hideMode.value()) {
+            case Disabled -> false;
+            case Inventory -> mc.currentScreen instanceof HandledScreen<?>;
+            case Any -> mc.currentScreen != null;
+        };
+    }
+
+    public enum HideMode {
+        Disabled,
+        Inventory,
+        Any
     }
 }

@@ -10,8 +10,8 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.events.*;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
-import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class TerracottaTimer {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && gyroTicks > 0 && Utils.isInDungeonBoss("6")) {
-            if (mageCheck.value() && !SkyblockData.dungeonClass.equals("Mage")) return;
+            if (mageCheck.value() && !DungeonUtil.isClass("Mage")) return;
             Utils.showTitleCustom("GYRO: " + Utils.formatDecimal(gyroTicks / 20.0f) + "s", 1, 25, 2.5f, color.value());
         }
     }

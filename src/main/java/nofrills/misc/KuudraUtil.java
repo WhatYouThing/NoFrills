@@ -24,8 +24,8 @@ public class KuudraUtil {
             "Shoot Ballista at",
             "Mine Kuudra's pods"
     );
+    private static final EntityCache kuudraCache = new EntityCache();
     private static PickupSpot preSpot = null;
-    private static MagmaCubeEntity kuudraEntity = null;
     private static Phase currentPhase = Phase.Starting;
 
     public static Phase getCurrentPhase() {
@@ -33,7 +33,7 @@ public class KuudraUtil {
     }
 
     public static MagmaCubeEntity getKuudraEntity() {
-        return kuudraEntity;
+        return (MagmaCubeEntity) kuudraCache.getFirst();
     }
 
     public static PickupSpot getPreSpot() {
@@ -41,7 +41,7 @@ public class KuudraUtil {
     }
 
     private static void updateKuudraEntity() {
-        if (!EntityCache.exists(kuudraEntity)) {
+        if (kuudraCache.empty()) {
             MagmaCubeEntity kuudra = null;
             double maxY = 0;
             int cubesFound = 0;
@@ -55,12 +55,8 @@ public class KuudraUtil {
                     }
                 }
             }
-            if (kuudra == null) {
-                kuudraEntity = null;
-                return;
-            }
-            if (cubesFound == 2 || currentPhase.equals(Phase.Lair)) {
-                kuudraEntity = kuudra;
+            if (kuudra != null && (cubesFound == 2 || currentPhase.equals(Phase.Lair))) {
+                kuudraCache.add(kuudra);
             }
         }
     }
@@ -113,7 +109,6 @@ public class KuudraUtil {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         preSpot = null;
-        kuudraEntity = null;
         currentPhase = Phase.Starting;
     }
 

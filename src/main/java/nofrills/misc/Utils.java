@@ -1,5 +1,6 @@
 package nofrills.misc;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -7,7 +8,6 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
-import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.hud.ClientBossBar;
@@ -17,6 +17,7 @@ import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.input.MouseInput;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.component.DataComponentTypes;
@@ -29,6 +30,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
@@ -50,7 +52,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.entity.SimpleEntityLookup;
-import nofrills.events.WorldTickEvent;
 import nofrills.mixin.BossBarHudAccessor;
 import nofrills.mixin.HandledScreenAccessor;
 import nofrills.mixin.PlayerListHudAccessor;
@@ -60,6 +61,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.*;
@@ -71,8 +76,13 @@ import static nofrills.Main.*;
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     private static final HashSet<String> modernIslands = Sets.newHashSet(
-            "The Park",
-            "Galatea"
+            "Hub",
+            "Galatea",
+            "Gold Mine",
+            "Spider's Den",
+            "The Barn",
+            "The End",
+            "The Park"
     );
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",
@@ -80,7 +90,6 @@ public class Utils {
             "Dungeon Hub",
             "Crimson Isle"
     );
-    private static Screen newScreen = null;
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         mc.inGameHud.setTitle(Text.of(title));
@@ -127,6 +136,24 @@ public class Utils {
             } else {
                 mc.player.networkHandler.sendChatMessage(message);
             }
+        }
+    }
+
+    public static void refillItem(String refill_query, int amount) {
+        int total = 0;
+        PlayerInventory inv = mc.player.getInventory();
+        String query = refill_query.replaceAll("_", " ");
+        for (int i = 0; i <= 35; i++) {
+            ItemStack stack = inv.getStack(i);
+            if (stack.isEmpty()) continue;
+            String id = Utils.getSkyblockId(stack).replaceAll("_", " ");
+            String name = Utils.toPlain(stack.getName());
+            if (query.equalsIgnoreCase(id) || query.equalsIgnoreCase(name)) {
+                total += stack.getCount();
+            }
+        }
+        if (total < amount) {
+            Utils.sendMessage(Utils.format("/gfs {} {}", refill_query, amount - total));
         }
     }
 
@@ -191,7 +218,7 @@ public class Utils {
      * Checks if the player is currently on the specific Dungeon floor. For example, "F7" checks for F7 only, "M7" checks for M7 only, and "7" checks for both of them.
      */
     public static boolean isOnDungeonFloor(String floor) {
-        return isInDungeons() && SkyblockData.getLocation().endsWith(floor + ")");
+        return DungeonUtil.getCurrentFloor().endsWith(floor);
     }
 
     /**
@@ -206,13 +233,13 @@ public class Utils {
      */
     public static boolean isInDungeonBoss(String floor) {
         return isOnDungeonFloor(floor) && switch (floor) {
-            case "1" -> isInZone(-72, 146, -40, -14, 55, 49);
-            case "2" -> isInZone(-40, 99, -40, 24, 54, 54);
-            case "3" -> isInZone(-40, 118, -40, 42, 64, 73);
-            case "4" -> isInZone(50, 112, 81, -40, 53, -40);
-            case "5" -> isInZone(50, 112, 118, -40, 53, -8);
-            case "6" -> isInZone(22, 110, 134, -40, 51, -8);
-            case "7" -> isInZone(134, 254, 147, -8, 0, -8);
+            case "1", "F1", "M1" -> isInZone(-72, 146, -40, -14, 55, 49);
+            case "2", "F2", "M2" -> isInZone(-40, 99, -40, 24, 54, 54);
+            case "3", "F3", "M3" -> isInZone(-40, 118, -40, 42, 64, 73);
+            case "4", "F4", "M4" -> isInZone(50, 112, 81, -40, 53, -40);
+            case "5", "F5", "M5" -> isInZone(50, 112, 118, -40, 53, -8);
+            case "6", "F6", "M6" -> isInZone(22, 110, 134, -40, 51, -8);
+            case "7", "F7", "M7" -> isInZone(134, 254, 147, -8, 0, -8);
             default -> false;
         };
     }
@@ -260,6 +287,11 @@ public class Utils {
 
     public static boolean isInSkyblock() {
         return SkyblockData.isInSkyblock();
+    }
+
+    public static boolean isOnHypixel() {
+        ServerInfo info = mc.getCurrentServerEntry();
+        return info != null && toLower(info.address).endsWith("hypixel.net");
     }
 
     /**
@@ -581,6 +613,26 @@ public class Utils {
                 .collect(Collectors.joining(" ")).trim();
     }
 
+    public static void atomicWrite(Path path, String content) throws IOException {
+        Path parent = path.getParent();
+        String fileName = path.getFileName().toString();
+        Path tempPath = parent.resolve(Utils.format("{}-Temp-{}.{}",
+                fileName.substring(0, fileName.indexOf(".")),
+                Util.getMeasuringTimeMs(),
+                fileName.substring(fileName.indexOf(".") + 1)
+        ));
+        if (!Files.exists(parent)) {
+            Files.createDirectory(parent);
+        }
+        Files.writeString(tempPath, content);
+        try {
+            Files.move(tempPath, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException ignored) {
+            Files.move(tempPath, path, StandardCopyOption.REPLACE_EXISTING);
+        }
+        Files.deleteIfExists(tempPath);
+    }
+
     private static int getVersionNumber(String version) {
         String[] numbers = version.split("\\.");
         if (numbers.length >= 3) {
@@ -687,15 +739,7 @@ public class Utils {
     }
 
     public static List<String> getTabListLines() {
-        List<String> lines = new ArrayList<>();
-        if (mc.getNetworkHandler() != null) {
-            for (PlayerListEntry entry : new ArrayList<>(mc.getNetworkHandler().getPlayerList())) {
-                if (entry != null && entry.getDisplayName() != null) {
-                    lines.add(toPlain(entry.getDisplayName()).trim());
-                }
-            }
-        }
-        return lines;
+        return SkyblockData.getTabListLines();
     }
 
     /**
@@ -722,9 +766,18 @@ public class Utils {
 
     /**
      * Returns every slot that is part of the container screen handler, excluding the player inventory slots.
+     *
+     * @param inverse if true, returns the slots that are part of the player inventory instead of the container itself.
      */
-    public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
+    public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler, boolean inverse) {
+        if (inverse) {
+            return handler.slots.stream().filter(slot -> slot.id >= handler.getRows() * 9).toList();
+        }
         return handler.slots.stream().filter(slot -> slot.id < handler.getRows() * 9).toList();
+    }
+
+    public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
+        return getContainerSlots(handler, false);
     }
 
     public static ItemStack getHeldItem() {
@@ -798,6 +851,14 @@ public class Utils {
         }
     }
 
+    public static Optional<Integer> parseHex(String value) {
+        try {
+            return Optional.of((int) Long.parseLong(value.replace("0x", ""), 16));
+        } catch (NumberFormatException ignored) {
+            return Optional.empty();
+        }
+    }
+
     public static Optional<Double> parseDouble(String value) {
         try {
             return Optional.of(Double.parseDouble(value));
@@ -821,17 +882,22 @@ public class Utils {
         );
     }
 
+    public static int difference(int first, int second) {
+        return Math.abs(Math.abs(first) - Math.abs(second));
+    }
+
     /**
      * Formats the string by replacing each set of curly brackets "{}" with one of the values in order, similarly to Rust's format macro.
      */
     public static String format(String string, Object... values) {
         StringBuilder builder = new StringBuilder();
-        String[] sections = string.split("\\{}");
-        for (int i = 0; i < sections.length; i++) {
-            builder.append(sections[i]);
-            if (i < values.length) {
-                builder.append(values[i]);
+        int index = 0;
+        for (String section : Splitter.on("{}").split(string)) {
+            builder.append(section);
+            if (index < values.length) {
+                builder.append(values[index]);
             }
+            index++;
         }
         return builder.toString();
     }
@@ -868,16 +934,29 @@ public class Utils {
         return formatSeparator((double) number);
     }
 
-    public static void setScreen(Screen screen) {
-        newScreen = screen;
+    public static String ticksToTime(long ticks) {
+        if (ticks < 20) {
+            return "0s";
+        }
+        StringBuilder builder = new StringBuilder();
+        long current = ticks;
+        String[] units = new String[]{"h", "m", "s"};
+        int[] durations = new int[]{72000, 1200, 20};
+        for (int i = 0; i <= 2; i++) {
+            int amount = 0;
+            while (current >= durations[i]) {
+                amount++;
+                current -= durations[i];
+            }
+            if (amount > 0) {
+                builder.append(amount).append(units[i]);
+            }
+        }
+        return builder.toString();
     }
 
-    @EventHandler
-    private static void onTick(WorldTickEvent event) {
-        if (newScreen != null) {
-            mc.setScreen(newScreen);
-            newScreen = null;
-        }
+    public static void setScreen(Screen screen) {
+        mc.send(() -> mc.setScreen(screen));
     }
 
     public static class Symbols {

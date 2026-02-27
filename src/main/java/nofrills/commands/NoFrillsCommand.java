@@ -19,7 +19,6 @@ import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
-import nofrills.features.general.PearlRefill;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.hud.HudEditorScreen;
@@ -190,9 +189,31 @@ public class NoFrillsCommand {
             }))),
             new ModCommand("queue", "Command that lets you queue for any Dungeon floor/Kuudra tier.", queueCommandBuilder),
             new ModCommand("getPearls", "Refills your Ender Pearls (up to 16) directly from your sacks.", literal("getPearls").executes(context -> {
-                PearlRefill.getPearls();
+                Utils.refillItem("ENDER_PEARL", 16);
                 return SINGLE_SUCCESS;
             })),
+            new ModCommand("getSuperboom", "Refills your Superboom TNTs (up to 64) directly from your sacks.", literal("getSuperboom").executes(context -> {
+                Utils.refillItem("SUPERBOOM_TNT", 64);
+                return SINGLE_SUCCESS;
+            })),
+            new ModCommand("getLeaps", "Refills your Spirit Leaps (up to 16) directly from your sacks.", literal("getLeaps").executes(context -> {
+                Utils.refillItem("SPIRIT_LEAP", 16);
+                return SINGLE_SUCCESS;
+            })),
+            new ModCommand("getDraft", "Refills your Architect's First Drafts (up to 1) directly from your sacks.", literal("getDraft").executes(context -> {
+                Utils.refillItem("ARCHITECT_FIRST_DRAFT", 1);
+                return SINGLE_SUCCESS;
+            })),
+            new ModCommand("refill", "Refills a specific item up to the specific amount from your sacks.", literal("refill").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(argument("query", StringArgumentType.greedyString()).executes(context -> {
+                String args = StringArgumentType.getString(context, "query");
+                int index = args.lastIndexOf(" ");
+                Optional<Integer> amount = index != -1 ? Utils.parseInt(args.substring(index).trim()) : Optional.empty();
+                String query = amount.isPresent() ? args.substring(0, index) : args;
+                Utils.refillItem(query, amount.orElse(64));
+                return SINGLE_SUCCESS;
+            }))),
             new ModCommand("ping", "Checks your current ping.", literal("ping").executes(context -> {
                 Utils.info("§7Pinging...");
                 SkyblockData.showPing();
@@ -253,6 +274,11 @@ public class NoFrillsCommand {
                     }
                 }
                 Utils.info("Dumped player texture URL's to latest.log.");
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpTabList").executes(context -> {
+                for (String line : Utils.getTabListLines()) {
+                    Utils.info(line);
+                }
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("shardTracker", "Commands for managing the Shard Tracker feature.", literal("shardTracker").executes(context -> {

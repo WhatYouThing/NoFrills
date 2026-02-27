@@ -1,9 +1,8 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
-import net.minecraft.network.packet.s2c.play.ScoreboardObjectiveUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.play.TeamS2CPacket;
+import meteordevelopment.orbit.EventPriority;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.scoreboard.*;
 import net.minecraft.util.Formatting;
@@ -48,43 +47,15 @@ public class SkyblockData {
             new InstanceType("t5", "KUUDRA_INFERNAL")
     );
     private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
-    public static String dungeonClass = "Berserk";
-    public static double dungeonPower = 0;
     private static String location = "";
     private static String area = "";
     private static boolean inSkyblock = false;
     private static boolean instanceOver = false;
+    private static List<String> tabListLines = new ArrayList<>();
     private static List<String> lines = new ArrayList<>();
     private static boolean showPing = false;
-
-    private static void updateDungeonClass(String msg) {
-        if (mc.player != null) {
-            String playerName = mc.player.getName().getString();
-            for (String name : DungeonUtil.getDungeonClasses()) {
-                String tag = Utils.format("[{}]", name);
-                String selected = Utils.format("{} selected the {} Class!", playerName, name);
-                String selectedHub = Utils.format("You have selected the {} Dungeon Class!", name);
-                String milestone = Utils.format("{} Milestone", name);
-                if (msg.startsWith(tag) || msg.equals(selectedHub) || msg.equals(selected) || msg.startsWith(milestone)) {
-                    dungeonClass = name;
-                    break;
-                }
-            }
-        }
-    }
-
-    private static double updateDungeonPower() {
-        double total = 0;
-        for (String line : Utils.getFooterLines()) {
-            if (line.startsWith("Blessing of Power")) {
-                total += Utils.parseRoman(line.replace("Blessing of Power", "").trim());
-            }
-            if (line.startsWith("Blessing of Time")) {
-                total += 0.5 * Utils.parseRoman(line.replace("Blessing of Time", "").trim());
-            }
-        }
-        return total;
-    }
+    private static boolean tabListDirty = true;
+    private static boolean scoreboardDirty = true;
 
     /**
      * Returns the current location from the scoreboard, such as "⏣ Your Island". The location prefix is not omitted.
@@ -112,11 +83,12 @@ public class SkyblockData {
         return instanceOver;
     }
 
-    /**
-     * Returns a list with every line that is currently displayed on the scoreboard.
-     */
+    public static List<String> getTabListLines() {
+        return tabListLines;
+    }
+
     public static List<String> getLines() {
-        return new ArrayList<>(lines); // return a copy to avoid a potential concurrent modification exception
+        return lines;
     }
 
     public static void showPing() {
@@ -124,18 +96,33 @@ public class SkyblockData {
         Utils.sendPingPacket();
     }
 
-    public static void updateTabList(PlayerListS2CPacket packet, List<PlayerListS2CPacket.Entry> entries) {
-        for (PlayerListS2CPacket.Entry entry : entries) {
-            if (entry.displayName() == null) continue;
-            String name = Utils.toPlain(entry.displayName()).trim();
-            if (name.startsWith("Area:") || name.startsWith("Dungeon:")) {
-                area = name.split(":", 2)[1].trim();
-                break;
+    public static void markTabListDirty() {
+        tabListDirty = true;
+    }
+
+    private static void updateTabListIfDirty() {
+        List<String> lines = new ArrayList<>();
+        for (PlayerListEntry entry : mc.inGameHud.getPlayerListHud().collectPlayerEntries()) {
+            if (entry != null && entry.getDisplayName() != null) {
+                String name = Utils.toPlain(entry.getDisplayName()).trim();
+                if (name.isEmpty()) continue;
+                if (name.startsWith("Area: ") || name.startsWith("Dungeon: ")) {
+                    area = name.split(":", 2)[1].trim();
+                }
+                lines.add(name);
             }
+        }
+        tabListLines = lines;
+    }
+
+    private static void updateTabList() {
+        if (tabListDirty) {
+            updateTabListIfDirty();
+            tabListDirty = false;
         }
     }
 
-    public static void updateObjective(ScoreboardObjectiveUpdateS2CPacket packet) {
+    public static void updateObjective() {
         if (mc.player != null) {
             Scoreboard scoreboard = mc.player.networkHandler.getScoreboard();
             ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.FROM_ID.apply(1));
@@ -145,7 +132,11 @@ public class SkyblockData {
         }
     }
 
-    public static void updateScoreboard(TeamS2CPacket packet) {
+    public static void markScoreboardDirty() {
+        scoreboardDirty = true;
+    }
+
+    private static void updateScoreboardIfDirty() {
         if (mc.player != null) {
             List<String> currentLines = new ArrayList<>();
             Scoreboard scoreboard = mc.player.networkHandler.getScoreboard();
@@ -172,16 +163,19 @@ public class SkyblockData {
         }
     }
 
+    private static void updateScoreboard() {
+        if (scoreboardDirty) {
+            updateScoreboardIfDirty();
+            scoreboardDirty = false;
+        }
+    }
+
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
         if (Utils.isInDungeons()) {
             if (!instanceOver && scoreRegex.matcher(event.messagePlain.trim()).matches()) {
                 instanceOver = true;
             }
-            updateDungeonClass(event.messagePlain);
-        }
-        if (getArea().equals("Dungeon Hub")) {
-            updateDungeonClass(event.messagePlain);
         }
     }
 
@@ -202,13 +196,10 @@ public class SkyblockData {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private static void onWorldTick(WorldTickEvent event) {
-        if (Utils.isInDungeons()) {
-            dungeonPower = updateDungeonPower();
-        } else if (dungeonPower != 0) {
-            dungeonPower = 0;
-        }
+        updateTabList();
+        updateScoreboard();
     }
 
     public static class InstanceType {

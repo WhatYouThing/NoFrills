@@ -6,7 +6,6 @@ public class RenderColor {
     public static final RenderColor white = RenderColor.fromHex(0xffffff);
     public static final RenderColor green = RenderColor.fromHex(0x55ff55);
     public static final RenderColor red = RenderColor.fromHex(0xff5555);
-    public static final RenderColor darkGray = RenderColor.fromHex(0x202020);
 
     public float r;
     public float g;
@@ -45,11 +44,23 @@ public class RenderColor {
         return new RenderColor((hex >> 16) & 0xFF, (hex >> 8) & 0xFF, hex & 0xFF, (int) (255 * alpha));
     }
 
-    public static RenderColor fromColor(io.wispforest.owo.ui.core.Color color) {
-        return RenderColor.fromHex(color.rgb(), color.alpha());
-    }
-
     public static RenderColor fromFloat(float r, float g, float b, float a) {
         return new RenderColor(r, g, b, a);
+    }
+
+    public RenderColor withRed(float red) {
+        return new RenderColor(red, this.g, this.b, this.a);
+    }
+
+    public RenderColor withGreen(float green) {
+        return new RenderColor(this.r, green, this.b, this.a);
+    }
+
+    public RenderColor withBlue(float blue) {
+        return new RenderColor(this.r, this.g, blue, this.a);
+    }
+
+    public RenderColor withAlpha(float alpha) {
+        return new RenderColor(this.r, this.g, this.b, alpha);
     }
 }

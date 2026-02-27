@@ -10,7 +10,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldTickEvent;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -28,7 +27,10 @@ public class SlayerUtil {
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
     private static final Predicate<Entity> predicate = entity -> entity.isAlive() && Utils.isMob(entity);
-    private static final HashMap<String, Entity> entities = new HashMap<>();
+    private static final EntityCache spawnerCache = new EntityCache();
+    private static final EntityCache timerCache = new EntityCache();
+    private static final EntityCache nameCache = new EntityCache();
+    private static final EntityCache bossCache = new EntityCache();
     public static boolean bossAlive = false;
     public static SlayerBoss currentBoss = null;
 
@@ -49,19 +51,19 @@ public class SlayerUtil {
     }
 
     public static ArmorStandEntity getSpawnerEntity() {
-        return entities.containsKey("spawner") ? (ArmorStandEntity) entities.get("spawner") : null;
+        return (ArmorStandEntity) spawnerCache.getFirst();
     }
 
     public static ArmorStandEntity getTimerEntity() {
-        return entities.containsKey("timer") ? (ArmorStandEntity) entities.get("timer") : null;
+        return (ArmorStandEntity) timerCache.getFirst();
     }
 
     public static ArmorStandEntity getNameEntity() {
-        return entities.containsKey("name") ? (ArmorStandEntity) entities.get("name") : null;
+        return (ArmorStandEntity) nameCache.getFirst();
     }
 
     public static LivingEntity getBossEntity() {
-        return entities.containsKey("boss") ? (LivingEntity) entities.get("boss") : null;
+        return (LivingEntity) bossCache.getFirst();
     }
 
     public static void updateQuestState(List<String> lines) {
@@ -80,15 +82,12 @@ public class SlayerUtil {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (currentBoss != null && isSpawner(event.namePlain)) {
-            entities.put("spawner", event.entity);
+            spawnerCache.add(event.entity);
         }
     }
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (!entities.isEmpty()) {
-            entities.entrySet().removeIf(entry -> !EntityCache.exists(entry.getValue()));
-        }
         if (currentBoss != null) {
             Entity spawner = getSpawnerEntity();
             if (spawner == null) return;
@@ -96,15 +95,15 @@ public class SlayerUtil {
                 if (entity instanceof ArmorStandEntity stand) {
                     String name = Utils.toPlain(stand.getName());
                     if (isTimer(name)) {
-                        entities.put("timer", entity);
+                        timerCache.add(entity);
                     }
                     if (isName(name)) {
-                        entities.put("name", entity);
+                        nameCache.add(entity);
                     }
                     continue;
                 }
                 if (currentBoss.predicate.test(entity)) {
-                    entities.put("boss", entity);
+                    bossCache.add(entity);
                 }
             }
         }

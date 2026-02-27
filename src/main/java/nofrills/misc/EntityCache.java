@@ -1,26 +1,49 @@
 package nofrills.misc;
 
+import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.entity.Entity;
+import nofrills.events.EntityRemovedEvent;
+import nofrills.events.EntityUpdatedEvent;
+import nofrills.events.ServerJoinEvent;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.function.Predicate;
-
-import static nofrills.Main.mc;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * An object for temporarily storing any relevant entity handles, such as armor stands with custom names.
  */
 public class EntityCache {
-    private final HashSet<Entity> entities = new HashSet<>();
+    private static final List<EntityCache> instances = new ArrayList<>();
 
-    public static boolean exists(Entity ent) {
-        return ent != null && ent.isAlive() && mc.world != null && mc.world.getEntityById(ent.getId()) != null;
+    private final CopyOnWriteArraySet<Entity> entities = new CopyOnWriteArraySet<>();
+
+    public EntityCache() {
+        instances.add(this);
     }
 
-    public boolean equals(Entity ent1, Entity ent2) {
-        return ent1.equals(ent2);
+    @EventHandler(priority = EventPriority.LOW)
+    private static void onRemoved(EntityRemovedEvent event) {
+        for (EntityCache instance : instances) {
+            instance.remove(event.entity);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    private static void onUpdated(EntityUpdatedEvent event) {
+        if (event.entity.isRemoved()) {
+            for (EntityCache instance : instances) {
+                instance.remove(event.entity);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    private static void onJoin(ServerJoinEvent event) {
+        for (EntityCache instance : instances) {
+            instance.clear();
+        }
     }
 
     public boolean has(Entity ent) {
@@ -53,21 +76,11 @@ public class EntityCache {
         this.entities.clear();
     }
 
-    public EntityCache removeDead() {
-        this.entities.removeIf(entity -> !exists(entity));
-        return this;
+    public CopyOnWriteArraySet<Entity> get() {
+        return this.entities;
     }
 
-    public EntityCache removeIf(Predicate<Entity> filter) {
-        this.entities.removeIf(filter);
-        return this;
-    }
-
-    /**
-     * Removes any dead/dropped entities from the list, and returns a copy.
-     */
-    public List<Entity> get() {
-        this.removeDead();
-        return new ArrayList<>(this.entities);
+    public Entity getFirst() {
+        return this.entities.stream().findFirst().orElse(null);
     }
 }

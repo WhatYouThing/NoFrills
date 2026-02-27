@@ -14,10 +14,7 @@ import nofrills.commands.NoFrillsCommand;
 import nofrills.commands.YeetCommand;
 import nofrills.config.Config;
 import nofrills.features.dungeons.*;
-import nofrills.features.farming.GlowingMushroom;
-import nofrills.features.farming.PlotBorders;
-import nofrills.features.farming.SpaceFarmer;
-import nofrills.features.farming.VacuumSolver;
+import nofrills.features.farming.*;
 import nofrills.features.fishing.*;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
@@ -46,18 +43,20 @@ public class Main implements ModInitializer {
     public static MinecraftClient mc;
 
     public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess access) {
+        CommandShortcuts.init(dispatcher); // register shortcuts first so that the user cant softlock the mod by overriding the main commands
         YeetCommand.init(dispatcher);
         NoFrillsCommand.init(dispatcher);
     }
 
     public static void injectRenderDoc() {
-        try {
-            String path = System.getProperty("nofrills.renderdoc.library_path");
-            if (path != null) {
+        String path = System.getProperty("nofrills.renderdoc.library_path");
+        if (path != null) {
+            try {
                 System.load(path);
                 LOGGER.info("Loaded RenderDoc lib: {}", path);
+            } catch (Exception exception) {
+                LOGGER.error("Failed to load RenderDoc lib.", exception);
             }
-        } catch (Exception ignored) {
         }
     }
 
@@ -79,13 +78,13 @@ public class Main implements ModInitializer {
 
         eventBus.subscribe(SkyblockData.class);
         eventBus.subscribe(SlotOptions.class);
-        eventBus.subscribe(Utils.class);
+        eventBus.subscribe(EntityCache.class);
         eventBus.subscribe(NoFrillsAPI.class);
-        eventBus.subscribe(ItemProtection.class);
         eventBus.subscribe(KuudraUtil.class);
         eventBus.subscribe(SlayerUtil.class);
         eventBus.subscribe(DungeonUtil.class);
         eventBus.subscribe(HudManager.class);
+        eventBus.subscribe(ItemProtection.class);
         eventBus.subscribe(SpookyChests.class);
         eventBus.subscribe(ExperimentSolver.class);
         eventBus.subscribe(BeaconTuningSolver.class);
@@ -101,7 +100,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ScathaMining.class);
         eventBus.subscribe(GhostVision.class);
         eventBus.subscribe(CorpseHighlight.class);
-        eventBus.subscribe(BetterSkyMall.class);
         eventBus.subscribe(AbilityAlert.class);
         eventBus.subscribe(PreMessage.class);
         eventBus.subscribe(KuudraWaypoints.class);
@@ -109,7 +107,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(FreshTimer.class);
         eventBus.subscribe(DrainMessage.class);
         eventBus.subscribe(RecipeLookup.class);
-        eventBus.subscribe(PearlRefill.class);
         eventBus.subscribe(LassoAlert.class);
         eventBus.subscribe(InvisibugHighlight.class);
         eventBus.subscribe(FusionKeybinds.class);
@@ -142,7 +139,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(SpiritBowHighlight.class);
         eventBus.subscribe(DeviceSolvers.class);
         eventBus.subscribe(Fullbright.class);
-        eventBus.subscribe(CustomKeybinds.class);
+        eventBus.subscribe(CommandKeybinds.class);
         eventBus.subscribe(EndNodeHighlight.class);
         eventBus.subscribe(HotbarSwap.class);
         eventBus.subscribe(TempleSkip.class);
@@ -167,7 +164,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(QuickClose.class);
         eventBus.subscribe(DungeonChestValue.class);
         eventBus.subscribe(NoCursorReset.class);
-        eventBus.subscribe(TickTimers.class);
         eventBus.subscribe(RelicHighlight.class);
         eventBus.subscribe(GemstoneDesyncFix.class);
         eventBus.subscribe(DianaSolver.class);
@@ -182,6 +178,13 @@ public class Main implements ModInitializer {
         eventBus.subscribe(MuteEnderman.class);
         eventBus.subscribe(ClassNametags.class);
         eventBus.subscribe(InfoTooltips.class);
+        eventBus.subscribe(AnvilHelper.class);
+        eventBus.subscribe(ShaftAnnounce.class);
+        eventBus.subscribe(AutoTip.class);
+        eventBus.subscribe(ScoreCalculator.class);
+        eventBus.subscribe(SkillTracker.class);
+        eventBus.subscribe(WateringHelper.class);
+        eventBus.subscribe(PlatformHighlight.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

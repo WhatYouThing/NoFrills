@@ -12,6 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.debug.gizmo.GizmoDrawing;
 import net.minecraft.world.debug.gizmo.TextGizmo;
 import nofrills.misc.RenderColor;
+import nofrills.misc.RenderStyle;
 
 public class WorldRenderEvent {
     public RenderTickCounter tickCounter;
@@ -43,6 +44,15 @@ public class WorldRenderEvent {
             GizmoDrawing.box(box, style).ignoreOcclusion();
         } else {
             GizmoDrawing.box(box, style);
+        }
+    }
+
+    public void drawStyled(Box box, RenderStyle style, boolean throughWalls, RenderColor outlineColor, RenderColor filledColor) {
+        if (!style.equals(RenderStyle.Outline)) {
+            this.drawFilled(box, throughWalls, filledColor);
+        }
+        if (!style.equals(RenderStyle.Filled)) {
+            this.drawOutline(box, throughWalls, outlineColor);
         }
     }
 

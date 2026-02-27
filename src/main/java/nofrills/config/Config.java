@@ -5,21 +5,23 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
+import nofrills.misc.Utils;
 
-import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 import static nofrills.Main.LOGGER;
 
 public class Config {
     private static final Path folderPath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills");
     private static final Path filePath = folderPath.resolve("Configuration.json");
-    private static final Path tempPath = folderPath.resolve("Temp.json");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static JsonObject data = new JsonObject();
     private static int hash = 0;
+
+    public static Path getFolderPath() {
+        return folderPath;
+    }
 
     public static void load() {
         if (Files.exists(filePath)) {
@@ -36,16 +38,7 @@ public class Config {
 
     public static void save() {
         try {
-            if (!Files.exists(folderPath)) {
-                Files.createDirectory(folderPath);
-            }
-            Files.writeString(tempPath, GSON.toJson(data));
-            try {
-                Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (AtomicMoveNotSupportedException ignored) {
-                Files.move(tempPath, filePath, StandardCopyOption.REPLACE_EXISTING);
-            }
-            Files.deleteIfExists(tempPath);
+            Utils.atomicWrite(filePath, GSON.toJson(data));
         } catch (Exception exception) {
             LOGGER.error("Unable to save NoFrills config file!", exception);
         }

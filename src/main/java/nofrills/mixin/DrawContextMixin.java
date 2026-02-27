@@ -15,6 +15,7 @@ import nofrills.features.misc.TooltipScale;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
+import org.joml.Vector2ic;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,6 +31,12 @@ public abstract class DrawContextMixin {
     @Final
     private Matrix3x2fStack matrices;
 
+    @Shadow
+    public abstract int getScaledWindowWidth();
+
+    @Shadow
+    public abstract int getScaledWindowHeight();
+
     @ModifyExpressionValue(method = "drawHoverEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/HoverEvent$ShowText;value()Lnet/minecraft/text/Text;"))
     private Text getHoveredText(Text original, @Local(argsOnly = true) Style style) {
         if (CommandTooltip.instance.isActive() && style.getClickEvent() instanceof ClickEvent.RunCommand runCommand) {
@@ -38,20 +45,23 @@ public abstract class DrawContextMixin {
         return original;
     }
 
-    @Inject(method = "drawTooltipImmediately", at = @At("HEAD"))
-    private void beforeDrawTooltip(TextRenderer textRenderer, List<TooltipComponent> components, int x, int y, TooltipPositioner positioner, @Nullable Identifier texture, CallbackInfo ci) {
+    @Inject(method = "drawTooltipImmediately", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/tooltip/TooltipBackgroundRenderer;render(Lnet/minecraft/client/gui/DrawContext;IIIILnet/minecraft/util/Identifier;)V"))
+    private void beforeDrawTooltip(TextRenderer textRenderer, List<TooltipComponent> components, int x, int y, TooltipPositioner positioner, @Nullable Identifier texture, CallbackInfo ci, @Local Vector2ic pos, @Local(ordinal = 2) int width, @Local(ordinal = 3) int height) {
         if (TooltipScale.instance.isActive()) {
-            this.matrices.pushMatrix();
-            float scale = (float) TooltipScale.scale.value();
-            this.matrices.translate(x - x * scale, y - y * scale);
-            this.matrices.scale(scale, scale);
-        }
-    }
-
-    @Inject(method = "drawTooltipImmediately", at = @At("TAIL"))
-    private void afterDrawTooltip(TextRenderer textRenderer, List<TooltipComponent> components, int x, int y, TooltipPositioner positioner, @Nullable Identifier texture, CallbackInfo ci) {
-        if (TooltipScale.instance.isActive()) {
-            this.matrices.popMatrix();
+            if (TooltipScale.isDynamic()) {
+                int screenX = this.getScaledWindowWidth();
+                int screenY = this.getScaledWindowHeight();
+                float scaleX = Math.min((float) screenX / (width + 8), 1.0f);
+                float scaleY = Math.min((float) screenY / (height + 8), 1.0f);
+                float scale = Math.min(scaleX, scaleY);
+                float offsetY = y + (height * scale - y);
+                this.matrices.translate(x - x * scale, offsetY - offsetY * scale);
+                this.matrices.scale(scale, scale);
+            } else if (TooltipScale.isCustom()) {
+                float scale = (float) TooltipScale.scale.value();
+                this.matrices.translate(x - x * scale, y - y * scale);
+                this.matrices.scale(scale, scale);
+            }
         }
     }
 }

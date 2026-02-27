@@ -15,10 +15,12 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.network.packet.s2c.play.*;
+import net.minecraft.text.Text;
 import nofrills.events.*;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.NoConfirmScreen;
+import nofrills.hud.HudManager;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,12 +29,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
+
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"))
     private void onPreTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
         if (ent.equals(mc.player) && AnimationFix.active()) {
@@ -45,13 +49,14 @@ public class ClientPlayNetworkHandlerMixin {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Inject(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V", shift = At.Shift.AFTER))
     private void onPostTrackerUpdate(EntityTrackerUpdateS2CPacket packet, CallbackInfo ci, @Local Entity ent) {
         if (ent instanceof LivingEntity || ent instanceof ItemEntity) {
             if (ent instanceof ArmorStandEntity) {
                 for (DataTracker.SerializedEntry<?> entry : packet.trackedValues()) {
-                    if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) && entry.value() != null && ent.getCustomName() != null) {
-                        eventBus.post(new EntityNamedEvent(ent, Utils.toPlain(ent.getCustomName())));
+                    if (entry.handler().equals(TrackedDataHandlerRegistry.OPTIONAL_TEXT_COMPONENT) && entry.value() != null) {
+                        ((Optional<Text>) entry.value()).ifPresent(value -> eventBus.post(new EntityNamedEvent(ent, value)));
                         break;
                     }
                 }
@@ -103,12 +108,17 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onScoreboardObjectiveUpdate", at = @At("TAIL"))
     private void onObjectiveUpdate(ScoreboardObjectiveUpdateS2CPacket packet, CallbackInfo ci) {
-        SkyblockData.updateObjective(packet);
+        SkyblockData.updateObjective();
     }
 
     @Inject(method = "onTeam", at = @At("TAIL"))
     private void onScoreUpdate(TeamS2CPacket packet, CallbackInfo ci) {
-        SkyblockData.updateScoreboard(packet);
+        SkyblockData.markScoreboardDirty();
+    }
+
+    @Inject(method = "onPlayerList", at = @At("TAIL"))
+    private void onTabListUpdate(PlayerListS2CPacket packet, CallbackInfo ci) {
+        SkyblockData.markTabListDirty();
     }
 
     @Inject(method = "onGameJoin", at = @At("TAIL"))
@@ -118,21 +128,28 @@ public class ClientPlayNetworkHandlerMixin {
 
     @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/message/MessageHandler;onGameMessage(Lnet/minecraft/text/Text;Z)V"), cancellable = true)
     private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
+        String msg = Utils.toPlain(packet.content());
         if (!packet.overlay()) {
-            String msg = Utils.toPlain(packet.content());
-            ChatMsgEvent event = eventBus.post(new ChatMsgEvent(packet.content(), msg));
-            if (event.isCancelled()) {
+            if (eventBus.post(new ChatMsgEvent(packet.content(), msg)).isCancelled()) {
                 ci.cancel();
             }
             if (msg.startsWith("Party > ") && msg.contains(": ")) {
                 int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");
                 String[] clean = msg.replace(msg.substring(0, nameStart + 1), "").split(":", 2);
                 String author = clean[0].trim(), content = clean[1].trim();
-                boolean self = author.equalsIgnoreCase(mc.getSession().getUsername());
-                if (eventBus.post(new PartyChatMsgEvent(content, author, self)).isCancelled() && !ci.isCancelled()) {
+                if (eventBus.post(new PartyChatMsgEvent(content, author)).isCancelled() && !ci.isCancelled()) {
                     ci.cancel();
                 }
             }
+        } else if (eventBus.post(new OverlayMsgEvent(packet.content(), msg)).isCancelled()) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "onMapUpdate", at = @At("TAIL"))
+    private void onAfterMapUpdate(MapUpdateS2CPacket packet, CallbackInfo ci) {
+        if (HudManager.dungeonMap.isActive()) {
+            HudManager.dungeonMap.onMapUpdate(packet);
         }
     }
 }

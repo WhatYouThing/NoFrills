@@ -169,7 +169,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Ice Spray", NoRender.iceSpray, "Prevents the server from spawning the Ice Spray Wand particles."),
                                 new Settings.Toggle("Tree Bits", NoRender.treeBits, "Hides the flying wood and leaves blocks that appear when chopping trees on the Galatea."),
                                 new Settings.Toggle("Nausea", NoRender.nausea, "Prevents the nausea screen wobble and/or green overlay from rendering."),
-                                new Settings.Toggle("Vignette", NoRender.vignette, "Prevents the dark vignette overlay from rendering."),
+                                new Settings.Dropdown<>("Vignette", NoRender.vignette, "The type of vignette overlay to hide.\n\nNone: Don't hide the vignette.\nAmbient: Hides the dark vignette that appears when in darkness.\nDanger: Hides the red (world border) vignette.\nBoth: Always hides the vignette."),
                                 new Settings.Toggle("Exp Orbs", NoRender.expOrbs, "Prevents experience orbs from rendering."),
                                 new Settings.Toggle("Stuck Arrows", NoRender.stuckArrows, "Prevents arrows stuck to entities from rendering.")
                         ))),

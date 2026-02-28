@@ -13,6 +13,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.slot.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.misc.Utils;
@@ -41,7 +42,7 @@ public class NoRender {
     public static final SettingBool iceSpray = new SettingBool(false, "iceSpray", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
-    public static final SettingBool vignette = new SettingBool(false, "vignette", instance.key());
+    public static final SettingEnum<VignetteMode> vignette = new SettingEnum<>(VignetteMode.None, VignetteMode.class, "vignetteMode", instance.key());
     public static final SettingBool expOrbs = new SettingBool(false, "expOrbs", instance.key());
     public static final SettingBool stuckArrows = new SettingBool(false, "stuckArrows", instance.key());
 
@@ -133,5 +134,12 @@ public class NoRender {
                 event.cancel();
             }
         }
+    }
+
+    public enum VignetteMode {
+        None,
+        Ambient,
+        Danger,
+        Both
     }
 }

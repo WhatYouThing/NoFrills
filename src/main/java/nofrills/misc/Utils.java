@@ -80,7 +80,7 @@ public class Utils {
             "Galatea",
             "Gold Mine",
             "Spider's Den",
-            "The Barn", 
+            "The Barn",
             "The End",
             "The Park"
     );

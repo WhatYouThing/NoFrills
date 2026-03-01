@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.Components;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 import static nofrills.Main.mc;
 
@@ -43,10 +45,14 @@ public class CommandShortcuts {
                     continue;
                 }
                 String name = shortcutName.startsWith("/") ? shortcutName.substring(1) : shortcutName;
-                LiteralArgumentBuilder<FabricClientCommandSource> command = literal(name).executes(context -> {
+                LiteralArgumentBuilder<FabricClientCommandSource> command = literal(name.trim()).executes(context -> {
                     Utils.sendMessage(shortcut.get("message").getAsString());
                     return SINGLE_SUCCESS;
-                });
+                }).then(argument("param", StringArgumentType.greedyString()).executes(context -> {
+                    String param = StringArgumentType.getString(context, "param");
+                    Utils.sendMessage(Utils.format("{} {}", shortcut.get("message").getAsString(), param.trim()));
+                    return SINGLE_SUCCESS;
+                }));
                 dispatcher.register(command);
             }
         }

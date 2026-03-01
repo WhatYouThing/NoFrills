@@ -199,7 +199,7 @@ public class ItemProtection {
                     }
                 }
             }
-            if (event.slotId == -999 || isSellGUI || event.actionType.equals(SlotActionType.THROW)) {
+            if (Utils.getFocusedSlot() == null || isSellGUI || event.actionType.equals(SlotActionType.THROW)) {
                 if (!getProtectType(stack).equals(ProtectType.None)) {
                     event.cancel();
                 }

@@ -70,10 +70,7 @@ public class SeaCreatureData {
     );
 
     public static boolean isSeaCreature(String name) {
-        if (name.endsWith(Utils.Symbols.heart)) {
-            return name.contains(Utils.Symbols.aquatic) || name.contains(Utils.Symbols.magmatic);
-        }
-        return false;
+        return name.contains(Utils.Symbols.heart) && (name.contains(Utils.Symbols.aquatic) || name.contains(Utils.Symbols.magmatic));
     }
 
     public static class SeaCreature {

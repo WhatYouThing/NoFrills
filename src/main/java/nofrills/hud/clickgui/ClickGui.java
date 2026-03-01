@@ -161,7 +161,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Effect Display", NoRender.effectDisplay, "Removes the potion effect display from the inventory and the top right of the screen."),
                                 new Settings.Toggle("Dead Entities", NoRender.deadEntities, "Hides entities that are in their death animation, and their health bars (if applicable)."),
                                 new Settings.Toggle("Dead Poof", NoRender.deadPoof, "Tries to hide the death \"poof\" particles that appear after a dead entity is deleted."),
-                                new Settings.Toggle("Damage Splash", NoRender.damageSplash, "Hides the damage splash nametags that appear when dealing damage."),
                                 new Settings.Toggle("Lightning", NoRender.lightning, "Hides lightning strikes."),
                                 new Settings.Toggle("Falling Blocks", NoRender.fallingBlocks, "Hides falling block entities such as sand."),
                                 new Settings.Toggle("Entity Fire", NoRender.entityFire, "Hides the fire effect that appears on burning mobs."),
@@ -342,7 +341,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Auto Tip", AutoTip.instance, "Automatically runs /tipall every 15 minutes while connected to Hypixel."),
                         new Module("Item Scale", ItemScale.instance, "Changes the scale of items laying on the ground.", new Settings(List.of(
                                 new Settings.SliderDouble("Scale", 0.0, 10.0, 0.01, ItemScale.scale, "The scale multiplier.")
-                        )))
+                        ))),
+                        new Module("No Damage Splash", NoDamageSplash.instance, "Hides damage splash nametags.", new Settings(
+                                new Settings.Toggle("Slayer Only", NoDamageSplash.slayerOnly, "Only hide damage splashes while a slayer boss is alive."),
+                                new Settings.Toggle("Dungeons Only", NoDamageSplash.dungeonsOnly, "Only hide damage splashes while in Dungeons.")
+                        ))
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experimentation Table", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(

@@ -74,7 +74,6 @@ public class HudManager {
         tps.reset();
         fps.reset();
         lagMeter.setTickTime(0);
-        bobber.hologram = null;
         bossHealth.reset();
         padTimer.pause();
         terminalStartTimer.pause();
@@ -121,13 +120,6 @@ public class HudManager {
         if (seaCreatures.isActive()) {
             seaCreatures.setCount(CapTracker.seaCreatures.size());
         }
-        if (bobber.isActive() && mc.player != null) {
-            if (mc.player.fishHook != null && (bobber.hologram == null || !bobber.hologram.isAlive())) {
-                bobber.setActive();
-            } else if (mc.player.fishHook == null) {
-                bobber.setInactive();
-            }
-        }
         if (fps.isActive()) {
             if (fps.ticks > 0) {
                 fps.ticks -= 1;
@@ -165,8 +157,8 @@ public class HudManager {
         if (tps.isActive()) {
             tps.serverTicks += 1;
         }
-        if (bobber.isActive() && bobber.timer.value() && bobber.active) {
-            bobber.timerTicks += 1;
+        if (bobber.isActive()) {
+            bobber.onServerTick();
         }
         if (Utils.isOnDungeonFloor("7")) {
             if (padTimer.isActive()) {
@@ -183,11 +175,8 @@ public class HudManager {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (bobber.isActive() && event.namePlain.length() == 3) {
-            if (event.namePlain.equals("!!!") || event.namePlain.indexOf(".") == 1) {
-                bobber.hologram = event.entity;
-                bobber.setTimer(event.namePlain);
-            }
+        if (bobber.isActive()) {
+            bobber.onNamed(event);
         }
     }
 

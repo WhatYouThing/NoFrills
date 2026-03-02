@@ -35,7 +35,7 @@ public class DungeonChestValue {
     );
     private static double currentValue = 0.0;
 
-    private static boolean isChest(String title) {
+    public static boolean isChest(String title) {
         for (String name : chestNames) {
             if (title.equals(name) || (title.startsWith(name) && title.endsWith("Chest"))) {
                 return true;

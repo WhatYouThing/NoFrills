@@ -231,7 +231,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Dungeon Quality", InfoTooltips.dungeonQuality, "Displays the quality and the floor tier on applicable dungeon items."),
                                 new Settings.Toggle("Created Date", InfoTooltips.createdDate, "Displays the exact date at which an item was created."),
                                 new Settings.Toggle("Hex Color", InfoTooltips.hexColor, "Displays the color of an item. Only applies to armor pieces that use leather armor as their base."),
-                                new Settings.Toggle("Museum Donated", InfoTooltips.museumDonated, "Displays if the item has been donated to the Museum.")
+                                new Settings.Toggle("Museum Donated", InfoTooltips.museumDonated, "Displays if the item has been donated to the Museum."),
+                                new Settings.Toggle("Item ID", InfoTooltips.skyblockId, "Displays the Skyblock ID of an item.\nNote: Items with generic IDs (pets, potions etc.) will display a dynamically generated ID.")
                         ))),
                         new Module("Skill Tracker", SkillTracker.instance, "Tracks the experience you gain for specific skills, similarly to SBE on 1.8.9.\nThis feature will be inaccurate if your tracked skills are not maxed (Catacombs excluded).", SkillTracker.buildSettings()),
                         new Module("Command Shortcuts", CommandShortcuts.instance, "Create shortcuts which send a specific message/command when ran.\nNote: A lobby change is required to fully apply the changes made to the shortcuts.", CommandShortcuts.buildSettings())

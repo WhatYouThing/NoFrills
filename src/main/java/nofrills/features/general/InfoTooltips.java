@@ -18,11 +18,12 @@ public class InfoTooltips {
     public static final SettingBool createdDate = new SettingBool(false, "createdDate", instance);
     public static final SettingBool hexColor = new SettingBool(false, "hexColor", instance);
     public static final SettingBool museumDonated = new SettingBool(false, "museumDonated", instance);
+    public static final SettingBool skyblockId = new SettingBool(false, "skyblockId", instance);
 
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
-        if (instance.isActive()) {
-            if (dungeonQuality.value() && event.customData != null) {
+        if (instance.isActive() && event.customData != null) {
+            if (dungeonQuality.value()) {
                 int boost = event.customData.getInt("baseStatBoostPercentage", 0);
                 int tier = event.customData.getInt("item_tier", 0);
                 if (boost != 0) {
@@ -30,7 +31,7 @@ public class InfoTooltips {
                     event.addLine(Utils.getShortTag().append(Utils.format("§bQuality: {}{}/50, Tier {}", color, boost, tier)));
                 }
             }
-            if (createdDate.value() && event.customData != null) {
+            if (createdDate.value()) {
                 long timestamp = event.customData.getLong("timestamp", 0L);
                 if (timestamp != 0) {
                     Calendar calendar = Calendar.getInstance();
@@ -45,10 +46,16 @@ public class InfoTooltips {
                     event.addLine(Utils.getShortTag().append(Utils.format("§bDye Color: §6{}", hex)));
                 }
             }
-            if (museumDonated.value() && event.customData != null) {
+            if (museumDonated.value()) {
                 byte donated = event.customData.getByte("donated_museum", (byte) 0);
                 if (donated != 0) {
                     event.addLine(Utils.getShortTag().append("§bDonated to Museum"));
+                }
+            }
+            if (skyblockId.value()) {
+                String id = Utils.getMarketId(event.stack);
+                if (!id.isEmpty()) {
+                    event.addLine(Utils.getShortTag().append(Utils.format("§bItem ID: §6{}", id)));
                 }
             }
         }

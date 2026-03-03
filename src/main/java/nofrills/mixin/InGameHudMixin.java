@@ -1,6 +1,7 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -93,10 +94,20 @@ public abstract class InGameHudMixin implements TitleRendering {
         }
     }
 
-    @Inject(method = "renderVignetteOverlay", at = @At("HEAD"), cancellable = true)
-    private void onRenderVignette(DrawContext context, Entity entity, CallbackInfo ci) {
-        if (NoRender.instance.isActive() && NoRender.vignette.value()) {
-            ci.cancel();
+    @Inject(method = "renderVignetteOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTexture(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/util/Identifier;IIFFIIIII)V"), cancellable = true)
+    private void onRenderVignette(DrawContext context, Entity entity, CallbackInfo ci, @Local(ordinal = 0) float f) {
+        if (NoRender.instance.isActive()) {
+            NoRender.VignetteMode mode = NoRender.vignette.value();
+            if (mode.equals(NoRender.VignetteMode.None)) return;
+            switch (mode) {
+                case Ambient -> {
+                    if (f <= 0.0f) ci.cancel();
+                }
+                case Danger -> {
+                    if (f > 0.0f) ci.cancel();
+                }
+                case Both -> ci.cancel();
+            }
         }
     }
 

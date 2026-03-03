@@ -13,6 +13,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.slot.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.misc.Utils;
@@ -33,7 +34,6 @@ public class NoRender {
     public static final SettingBool effectDisplay = new SettingBool(false, "effectDisplay", instance.key());
     public static final SettingBool deadEntities = new SettingBool(false, "deadEntities", instance.key());
     public static final SettingBool deadPoof = new SettingBool(false, "deadPoof", instance.key());
-    public static final SettingBool damageSplash = new SettingBool(false, "damageSplash", instance);
     public static final SettingBool lightning = new SettingBool(false, "lightning", instance.key());
     public static final SettingBool fallingBlocks = new SettingBool(false, "fallingBlocks", instance.key());
     public static final SettingBool entityFire = new SettingBool(false, "entityFire", instance.key());
@@ -41,7 +41,7 @@ public class NoRender {
     public static final SettingBool iceSpray = new SettingBool(false, "iceSpray", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
-    public static final SettingBool vignette = new SettingBool(false, "vignette", instance.key());
+    public static final SettingEnum<VignetteMode> vignette = new SettingEnum<>(VignetteMode.None, VignetteMode.class, "vignetteMode", instance.key());
     public static final SettingBool expOrbs = new SettingBool(false, "expOrbs", instance.key());
     public static final SettingBool stuckArrows = new SettingBool(false, "stuckArrows", instance.key());
 
@@ -61,7 +61,6 @@ public class NoRender {
             ParticleTypes.GUST,
             ParticleTypes.GUST_EMITTER_LARGE
     );
-    private static final Pattern damageSplashPattern = Pattern.compile("[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)"); // pattern from skyhanni
 
     public static FogData getFogAsEmpty(FogData data) {
         data.renderDistanceStart = Float.MAX_VALUE;
@@ -109,11 +108,6 @@ public class NoRender {
                     }
                 }
             }
-            if (damageSplash.value()) {
-                if (damageSplashPattern.matcher(event.namePlain.replaceAll(",", "")).matches()) {
-                    event.entity.setCustomNameVisible(false);
-                }
-            }
         }
     }
 
@@ -133,5 +127,12 @@ public class NoRender {
                 event.cancel();
             }
         }
+    }
+
+    public enum VignetteMode {
+        None,
+        Ambient,
+        Danger,
+        Both
     }
 }

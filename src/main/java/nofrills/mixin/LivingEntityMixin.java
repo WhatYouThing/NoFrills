@@ -2,7 +2,6 @@ package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -11,17 +10,13 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import nofrills.features.general.Fullbright;
 import nofrills.features.general.Viewmodel;
-import nofrills.features.tweaks.NoDropSwing;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-
-import static nofrills.Main.mc;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
@@ -59,11 +54,6 @@ public abstract class LivingEntityMixin extends Entity {
             }
         }
         return original;
-    }
-
-    @WrapWithCondition(method = "dropItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
-    private boolean onDropSwing(LivingEntity instance, Hand hand) {
-        return !(NoDropSwing.active() && instance == mc.player);
     }
 
     @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))

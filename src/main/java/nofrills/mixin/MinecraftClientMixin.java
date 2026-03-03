@@ -1,26 +1,22 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.world.LevelLoadingScreen;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ServerInfo;
 import net.minecraft.client.sound.SoundManager;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import nofrills.config.Config;
 import nofrills.events.*;
 import nofrills.features.misc.UnfocusedTweaks;
-import nofrills.features.tweaks.NoDropSwing;
 import nofrills.features.tweaks.NoLoadingScreen;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -48,11 +44,6 @@ public abstract class MinecraftClientMixin {
 
     @Shadow
     public abstract @Nullable ServerInfo getCurrentServerEntry();
-
-    @WrapWithCondition(method = "handleInputEvents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;swingHand(Lnet/minecraft/util/Hand;)V"))
-    private boolean onDropSwing(ClientPlayerEntity instance, Hand hand) {
-        return !NoDropSwing.active();
-    }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     private void onBeforeOpenScreen(Screen screen, CallbackInfo ci) {

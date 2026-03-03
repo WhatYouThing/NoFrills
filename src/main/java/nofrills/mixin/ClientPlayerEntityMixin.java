@@ -1,17 +1,13 @@
 package nofrills.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
 import nofrills.features.general.ItemProtection;
 import nofrills.features.hunting.InstantFog;
-import nofrills.features.tweaks.HitboxFix;
 import nofrills.features.tweaks.RidingCameraFix;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
@@ -39,14 +35,6 @@ public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity
         if (InstantFog.instance.isActive()) {
             cir.setReturnValue(1.0f);
         }
-    }
-
-    @ModifyExpressionValue(method = "wouldCollideAt", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;getBoundingBox()Lnet/minecraft/util/math/Box;"))
-    private Box onGetBoundingBox(Box original) {
-        if (HitboxFix.active()) {
-            return PlayerEntity.STANDING_DIMENSIONS.getBoxAt(this.getEntityPos());
-        }
-        return original;
     }
 
     @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)

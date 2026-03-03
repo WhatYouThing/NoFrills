@@ -242,43 +242,17 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother."),
                         new Module("No Front Perspective", NoFrontPerspective.instance, "Removes the front facing camera perspective."),
-                        new Module("No Ability Place", NoAbilityPlace.instance, "Prevents block items with abilities from being placeable client side, such as the Egglocator.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", NoAbilityPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", NoAbilityPlace.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("Hitbox Fix", HitboxFix.instance, "Fixes lagbacks on old islands caused by the smaller crouching/swimming collision hitbox.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", HitboxFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", HitboxFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("Enchant Fix", EnchantFix.instance, "Fixes client side issues with certain vanilla enchants.\n\n- Fixes Efficiency being lag and ping dependent\n- Fixes Aqua Affinity not working", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", EnchantFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", EnchantFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
                         new Module("Item Count Fix", ItemCountFix.instance, "Prevents the game from hiding item counts for unstackable items."),
                         new Module("Middle Click Fix", MiddleClickFix.instance, "Allows the middle mouse button to work just as it does on 1.8.9."),
-                        new Module("No Drop Swing", NoDropSwing.instance, "Don't swing your hand while dropping items.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", NoDropSwing.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", NoDropSwing.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
                         new Module("No Pearl Cooldown", NoPearlCooldown.instance, "Removes the visual cooldown from Ender Pearls.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", NoPearlCooldown.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", NoPearlCooldown.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("Old Eye Height", OldEyeHeight.instance, "Allows you to restore the 1.8 sneaking eye height and/or disable the swimming eye height.", new Settings(List.of(
-                                new Settings.Separator("Sneaking"),
-                                new Settings.Toggle("Sneaking", OldEyeHeight.sneakEnabled, "If enabled, the sneaking eye height will be reverted."),
-                                new Settings.Toggle("Skyblock Only", OldEyeHeight.sneakSkyblockCheck, "Prevent the sneaking eye height from changing outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", OldEyeHeight.sneakModernCheck, "Prevent the sneaking eye height from changing on islands using modern Minecraft versions (such as Galatea)."),
-                                new Settings.Separator("Swimming"),
-                                new Settings.Toggle("Swimming", OldEyeHeight.swimEnabled, "If enabled, the swimming eye height will be disabled."),
-                                new Settings.Toggle("Skyblock Only", OldEyeHeight.swimSkyblockCheck, "Prevent the swimming eye height from changing outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", OldEyeHeight.swimModernCheck, "Prevent the swimming eye height from changing on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Riding Camera Fix", RidingCameraFix.instance, "Removes the floaty camera movement effect while riding entities.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", RidingCameraFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", RidingCameraFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
-                        new Module("Animation Fix", AnimationFix.instance, "Fixes the ancient bug where certain animations can play twice, such as unsneaking.", new Settings(List.of(
+                        new Module("Animation Fix", AnimationFix.instance, "Fixes the sneaking/swimming animations being able to play twice.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", AnimationFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", AnimationFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
@@ -287,15 +261,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Old Island Only", DoubleUseFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         ))),
                         new Module("Disconnect Fix", DisconnectFix.instance, "Fixes Tarantula slayer disconnecting you due to corrupted packets."),
-                        new Module("No Confirm Screen", NoConfirmScreen.instance, "Removes the \"Confirm Command Execution\" screen and allows the command to run anyways."),
+                        new Module("No Confirm Screen", NoConfirmScreen.instance, "Removes the \"Confirm Command Execution\" screen that prevents you from running certain commands."),
                         new Module("No Cursor Reset", NoCursorReset.instance, "Retains your cursor position between container screens.", new Settings(List.of(
                                 new Settings.SliderInt("Clear Time", 0, 1200, 5, NoCursorReset.clearTicks, "The amount of ticks until your last cursor position is forgotten. Set to 0 to always remember.")
                         ))),
-                        new Module("No Skull Place", NoSkullPlace.instance, "Prevents skull block items from being placeable client side, similarly to 1.8.9.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", NoSkullPlace.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
-                                new Settings.Toggle("Old Island Only", NoSkullPlace.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
-                        ))),
-                        new Module("Instant Sneak", InstantSneak.instance, "Removes the smooth sneaking animation.")
+                        new Module("Instant Sneak", InstantSneak.instance, "Removes the smooth sneaking/swimming animation.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(

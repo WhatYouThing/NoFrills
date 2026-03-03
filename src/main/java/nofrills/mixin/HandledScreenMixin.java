@@ -19,6 +19,7 @@ import nofrills.features.dungeons.TerminalSolvers;
 import nofrills.features.general.NoRender;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.tweaks.MiddleClickFix;
+import nofrills.features.tweaks.MiddleClickOverride;
 import nofrills.misc.ScreenOptions;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
@@ -61,6 +62,9 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         super(title);
     }
 
+    @Shadow
+    protected abstract void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType);
+
     @Override
     public void nofrills_mod$addLeapButton(LeapOverlay.LeapTarget target) {
         leapButtons.add(new LeapOverlay.LeapButton(target, leapButtons.size()));
@@ -69,6 +73,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
         if (LeapOverlay.isLeapMenu(this.title.getString()) || NoRender.shouldHideTooltip(slot, this.title.getString()) || SlotOptions.isDisabled(slot)) {
+            ci.cancel();
+            return;
+        }
+        if (MiddleClickOverride.shouldOverride(slot, button, actionType)) {
+            this.onMouseClick(slot, slotId, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE);
             ci.cancel();
             return;
         }

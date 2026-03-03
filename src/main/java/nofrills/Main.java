@@ -24,7 +24,6 @@ import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
 import nofrills.features.solvers.*;
 import nofrills.features.tweaks.DoubleUseFix;
-import nofrills.features.tweaks.MiddleClickOverride;
 import nofrills.features.tweaks.NoCursorReset;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.ClickGui;
@@ -118,7 +117,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(PartyFinder.class);
         eventBus.subscribe(PartyCommands.class);
         eventBus.subscribe(NoRender.class);
-        eventBus.subscribe(MiddleClickOverride.class);
         eventBus.subscribe(EtherwarpOverlay.class);
         eventBus.subscribe(ChatWaypoints.class);
         eventBus.subscribe(AutoSprint.class);

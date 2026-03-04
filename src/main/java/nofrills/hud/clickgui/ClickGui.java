@@ -266,7 +266,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Cursor Reset", NoCursorReset.instance, "Retains your cursor position between container screens.", new Settings(List.of(
                                 new Settings.SliderInt("Clear Time", 0, 1200, 5, NoCursorReset.clearTicks, "The amount of ticks until your last cursor position is forgotten. Set to 0 to always remember.")
                         ))),
-                        new Module("Instant Sneak", InstantSneak.instance, "Removes the smooth sneaking/swimming animation.")
+                        new Module("Instant Sneak", InstantSneak.instance, "Removes the smooth sneaking/swimming animation."),
+                        new Module("Eye Height Fix", EyeHeightFix.instance, "Visually reverts the sneaking eye height on islands without modern version support.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(

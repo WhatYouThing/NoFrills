@@ -40,15 +40,9 @@ public class CroesusSolver {
         }
         for (Text line : lore.lines()) {
             String string = Utils.toPlain(line);
-            if (string.equals("No chests opened yet!")) {
-                return LootState.Unopened;
-            }
-            if (string.startsWith("Opened Chest: ")) {
-                return LootState.Opened;
-            }
-            if (string.equals("No more chests to open!")) {
-                return LootState.OpenedKey;
-            }
+            if (string.equals("No chests opened yet!")) return LootState.Unopened;
+            if (string.startsWith("Opened Chest: ")) return LootState.Opened;
+            if (string.equals("No more chests to open!")) return LootState.OpenedKey;
         }
         return LootState.Unknown;
     }
@@ -123,7 +117,7 @@ public class CroesusSolver {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (!event.stack.isEmpty() && Utils.isInLootArea()) {
+        if (instance.isActive() && !event.stack.isEmpty() && Utils.isInLootArea()) {
             if (event.title.equals("Croesus")) {
                 highlightLoot(event.stack, event.slot);
             }

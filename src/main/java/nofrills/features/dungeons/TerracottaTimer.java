@@ -55,7 +55,7 @@ public class TerracottaTimer {
                     terracottas.add(terracotta);
                 }
             }
-            if (gyroTicks == 0 && event.oldState.isAir() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
+            if (Utils.isOnDungeonFloor("M6") && gyroTicks == 0 && event.oldState.isAir() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
                 gyroTicks = 235;
             }
         }

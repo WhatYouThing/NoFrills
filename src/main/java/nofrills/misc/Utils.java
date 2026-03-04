@@ -69,6 +69,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static nofrills.Main.*;
@@ -458,6 +459,63 @@ public class Utils {
     }
 
     /**
+     * Tries to parse the Bazaar/Auction ID tied to the name of the item.
+     */
+    public static String getMarketId(Text text) {
+        String name = toPlain(text);
+        if (hasItemQuantity(name)) {
+            name = name.substring(0, name.lastIndexOf(" ")).trim();
+        }
+        if (name.startsWith("Enchanted Book (") && name.endsWith(")")) {
+            String enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
+            String enchantName = toID(enchant.substring(0, enchant.lastIndexOf(" ")));
+            int enchantLevel = parseRoman(enchant.substring(enchant.lastIndexOf(" ") + 1));
+            Optional<Style> style = getStyle(text, enchant::equals);
+            if (style.isPresent() && hasColor(style.get(), Formatting.LIGHT_PURPLE) && !enchantName.startsWith("ULTIMATE_")) {
+                return format("ENCHANTMENT_ULTIMATE_{}_{}", enchantName, enchantLevel);
+            }
+            return format("ENCHANTMENT_{}_{}", enchantName, enchantLevel);
+        }
+        if (name.endsWith(" Essence")) {
+            return format("ESSENCE_{}", toID(name.substring(0, name.lastIndexOf(" "))));
+        }
+        if (name.endsWith(" Dye")) {
+            return format("DYE_{}", toID(name.substring(0, name.lastIndexOf(" "))));
+        }
+        if (name.startsWith("Master Skull - Tier ")) {
+            return toID(name.replace(" - ", " "));
+        }
+        if (name.startsWith("[Lvl 1] ")) {
+            String petName = name.substring(name.indexOf("]") + 2);
+            Optional<Style> styleOptional = getStyle(text, petName::equals);
+            String rarity = "COMMON";
+            if (styleOptional.isPresent()) {
+                Style style = styleOptional.get();
+                if (hasColor(style, Formatting.GOLD)) rarity = "LEGENDARY";
+                if (hasColor(style, Formatting.DARK_PURPLE)) rarity = "EPIC";
+                if (hasColor(style, Formatting.BLUE)) rarity = "RARE";
+                if (hasColor(style, Formatting.GREEN)) rarity = "UNCOMMON";
+            }
+            return format("{}_PET_{}", toID(petName), rarity);
+        }
+        if (name.endsWith(" Shard")) {
+            return ShardData.getId(name);
+        }
+        return switch (name) {
+            case "Shadow Warp" -> "SHADOW_WARP_SCROLL";
+            case "Wither Shield" -> "WITHER_SHIELD_SCROLL";
+            case "Implosion" -> "IMPLOSION_SCROLL";
+            case "Giant's Sword" -> "GIANTS_SWORD";
+            case "Warped Stone" -> "AOTE_STONE";
+            case "Spirit Boots" -> "THORNS_BOOTS";
+            case "Spirit Shortbow" -> "ITEM_SPIRIT_BOW";
+            case "Spirit Stone" -> "SPIRIT_DECOY";
+            case "Adaptive Blade" -> "STONE_BLADE";
+            default -> toID(name);
+        };
+    }
+
+    /**
      * Returns the Bazaar/Auction ID tied to the item.
      */
     public static String getMarketId(ItemStack stack) {
@@ -508,6 +566,10 @@ public class Utils {
             }
         }
         return id;
+    }
+
+    public static boolean hasItemQuantity(String name) {
+        return Pattern.matches(".* x[0-9]*", name);
     }
 
     public static GameProfile getTextures(ItemStack stack) {
@@ -833,6 +895,10 @@ public class Utils {
         return string.toUpperCase(Locale.ROOT);
     }
 
+    public static String toID(String string) {
+        return toUpper(string.replace("'s", "").replaceAll(" ", "_"));
+    }
+
     /**
      * Gets the string out of a Text object and removes any formatting codes.
      */
@@ -841,6 +907,23 @@ public class Utils {
             return Formatting.strip(text.getString());
         }
         return "";
+    }
+
+    public static Optional<Style> getStyle(Text text, Predicate<String> predicate) {
+        return text.visit((textStyle, textString) -> {
+            if (predicate.test(textString)) {
+                return Optional.of(textStyle);
+            }
+            return Optional.empty();
+        }, Style.EMPTY);
+    }
+
+    public static boolean hasColor(Style style, Formatting color) {
+        return color.getColorValue() != null && hasColor(style, color.getColorValue());
+    }
+
+    public static boolean hasColor(Style style, int hex) {
+        return style != null && style.getColor() != null && style.getColor().getRgb() == hex;
     }
 
     public static Optional<Integer> parseInt(String value) {

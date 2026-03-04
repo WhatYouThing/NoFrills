@@ -534,7 +534,15 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 (S+) score."),
                                 new Settings.TextInput("300 Title", ScoreCalculator.title300, "The title to show when 300 (S+) score is reached.")
                         ))),
-                        new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 platform area which you mine as Healer in F7/M7 after terminal phase.")
+                        new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 platform area which you mine as Healer in F7/M7 after terminal phase."),
+                        new Module("Croesus Solver", CroesusSolver.instance, "Highlights unopened loot and the most profitable chests in the Croesus.", new Settings(
+                                new Settings.ColorPicker("Profit Color", true, CroesusSolver.profitColor, "The highlight color for the most profitable chest."),
+                                new Settings.ColorPicker("Key Profit Color", true, CroesusSolver.profitKeyColor, "The highlight color for the 2nd most profitable chest. Includes the cost of the Dungeon Chest Key."),
+                                new Settings.ColorPicker("Unopened Color", true, CroesusSolver.unopenedColor, "The highlight color for unopened loot."),
+                                new Settings.ColorPicker("Opened Color", true, CroesusSolver.openedColor, "The highlight color for opened loot."),
+                                new Settings.ColorPicker("Key Opened Color", true, CroesusSolver.openedKeyColor, "The highlight color for fully opened loot using a Dungeon Chest Key."),
+                                new Settings.Toggle("Floor Label", CroesusSolver.floorLabel, "Adds labels which indicate the floor the loot was obtained on.")
+                        ))
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(

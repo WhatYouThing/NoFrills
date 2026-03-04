@@ -224,19 +224,28 @@ public class ShardData {
             String name = Utils.toPlain(stack.getName());
             String source = getSource(stack);
             String shardName = Utils.toLower(!source.isEmpty() ? source : name);
-            for (HashSet<String> set : shardSetList) {
-                for (String shard : set) {
-                    if (shardName.equals(shard) || shardName.startsWith(shard + " ")) {
-                        return switch (shard) {
-                            case "cinderbat" -> "SHARD_CINDER_BAT";
-                            case "abyssal lanternfish" -> "SHARD_ABYSSAL_LANTERN";
-                            case "stridersurfer" -> "SHARD_STRIDER_SURFER";
-                            case "bogged" -> "SHARD_SEA_ARCHER";
-                            case "loch emperor" -> "SHARD_SEA_EMPEROR";
-                            case "end stone protector" -> "SHARD_ENDSTONE_PROTECTOR";
-                            default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
-                        };
-                    }
+            return parseId(shardName);
+        }
+        return "";
+    }
+
+    public static String getId(String name) {
+        return parseId(Utils.toLower(name));
+    }
+
+    public static String parseId(String name) {
+        for (HashSet<String> set : shardSetList) {
+            for (String shard : set) {
+                if (name.equals(shard) || name.startsWith(shard + " ")) {
+                    return switch (shard) {
+                        case "cinderbat" -> "SHARD_CINDER_BAT";
+                        case "abyssal lanternfish" -> "SHARD_ABYSSAL_LANTERN";
+                        case "stridersurfer" -> "SHARD_STRIDER_SURFER";
+                        case "bogged" -> "SHARD_SEA_ARCHER";
+                        case "loch emperor" -> "SHARD_SEA_EMPEROR";
+                        case "end stone protector" -> "SHARD_ENDSTONE_PROTECTOR";
+                        default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
+                    };
                 }
             }
         }

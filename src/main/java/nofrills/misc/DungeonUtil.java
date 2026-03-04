@@ -26,6 +26,14 @@ public class DungeonUtil {
             "Archer",
             "Tank"
     );
+    private static final HashSet<String> chestNames = Sets.newHashSet(
+            "Wood",
+            "Gold",
+            "Diamond",
+            "Emerald",
+            "Obsidian",
+            "Bedrock"
+    );
     private static String currentFloor = "";
     private static int partyCount = 0;
     private static double powerLevel = 0;
@@ -73,6 +81,10 @@ public class DungeonUtil {
 
     public static String getCurrentFloor() {
         return currentFloor;
+    }
+
+    public static HashSet<String> getChestNames() {
+        return chestNames;
     }
 
     public static boolean isOnFloor(String floor) {

@@ -110,6 +110,10 @@ public class DungeonUtil {
         return classCache.getOrDefault(name, "");
     }
 
+    public static String getPlayerClass() {
+        return mc.player != null ? getPlayerClass(mc.player.getName().getString()) : "";
+    }
+
     public static MapState getMap() {
         return mc.world != null ? mc.world.getMapState(mapId) : null;
     }

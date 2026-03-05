@@ -430,11 +430,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Spirit Bow Highlight", SpiritBowHighlight.instance, "Highlights the Spirit Bow in the F4/M4 boss fight.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", true, SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")
                         ))),
-                        new Module("Reminders", DungeonReminders.instance, "Various class specific Dungeons reminders.", new Settings(List.of(
-                                new Settings.Toggle("Wish", DungeonReminders.wish, "Reminds you to wish as Healer when Maxor enrages in F7/M7."),
-                                new Settings.Toggle("Blood Camp", DungeonReminders.bloodCamp, "Reminds you to start camping the blood room as Mage."),
-                                new Settings.Toggle("M5 Rag", DungeonReminders.rag, "Reminds you to use your Ragnarock in the M5 boss room as Mage.")
-                        ))),
                         new Module("Leap Overlay", LeapOverlay.instance, "Renders a custom overlay in place of the Spirit Leap menu.", new Settings(List.of(
                                 new Settings.Toggle("Send Message", LeapOverlay.send, "Sends a message once you leap to a teammate."),
                                 new Settings.TextInput("Leap Message", LeapOverlay.message, "The message to send. Replaces {name} with the name of the player."),

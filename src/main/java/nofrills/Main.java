@@ -130,7 +130,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(TerracottaTimer.class);
         eventBus.subscribe(TerminalSolvers.class);
         eventBus.subscribe(LeapOverlay.class);
-        eventBus.subscribe(DungeonReminders.class);
         eventBus.subscribe(StarredMobHighlight.class);
         eventBus.subscribe(MinibossHighlight.class);
         eventBus.subscribe(KeyHighlight.class);

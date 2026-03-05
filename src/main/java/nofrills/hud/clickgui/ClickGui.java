@@ -267,7 +267,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Clear Time", 0, 1200, 5, NoCursorReset.clearTicks, "The amount of ticks until your last cursor position is forgotten. Set to 0 to always remember.")
                         ))),
                         new Module("Instant Sneak", InstantSneak.instance, "Removes the smooth sneaking/swimming animation."),
-                        new Module("Eye Height Fix", EyeHeightFix.instance, "Visually reverts the sneaking eye height on islands without modern version support.")
+                        new Module("Eye Height Fix", EyeHeightFix.instance, "Visually reverts the sneaking eye height on islands without modern version support."),
+                        new Module("No Ability Place", NoAbilityPlace.instance, "Prevents ghost blocks from appearing when using block items with right click abilities.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(

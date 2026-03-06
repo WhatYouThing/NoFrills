@@ -313,10 +313,9 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     public static class ColorPicker extends FlowLayout {
         public SettingColor setting;
-        public List<FlatSlider> sliderList = new ArrayList<>();
         public Screen previous;
 
-        public ColorPicker(String name, boolean alpha, SettingColor setting, String tooltip) {
+        public ColorPicker(String name, SettingColor setting, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);

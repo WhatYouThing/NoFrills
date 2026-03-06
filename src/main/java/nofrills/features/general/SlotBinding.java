@@ -124,8 +124,8 @@ public class SlotBinding {
         list.add(new Settings.Toggle("Show Lines", SlotBinding.lines, "Draw lines between the slot you're hovering over, and any slots bound to it."));
         list.add(new Settings.Toggle("Show Borders", SlotBinding.borders, "Draw borders around any slot that is bound to the slot you're hovering over."));
         list.add(new Settings.SliderDouble("Line Width", 0.1, 5.0, 0.1, SlotBinding.lineWidth, "The width of the lines"));
-        list.add(new Settings.ColorPicker("Binding Color", true, SlotBinding.binding, "The color used to display the bind you are currently creating."));
-        list.add(new Settings.ColorPicker("Bound Color", true, SlotBinding.bound, "The color used to display existing slot binds."));
+        list.add(new Settings.ColorPicker("Binding Color", SlotBinding.binding, "The color used to display the bind you are currently creating."));
+        list.add(new Settings.ColorPicker("Bound Color", SlotBinding.bound, "The color used to display existing slot binds."));
         return list;
     }
 

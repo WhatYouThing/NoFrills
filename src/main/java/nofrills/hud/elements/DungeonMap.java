@@ -58,11 +58,11 @@ public class DungeonMap extends HudElement {
                 new Settings.SliderDouble("Player Scale", 0.0, 2.0, 0.01, this.playerMarkerScale, "The scale of the markers of your teammates."),
                 new Settings.SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.playerNameScale, "The scale of the name displayed below teammate markers."),
                 new Settings.Dropdown<>("Name Mode", this.playerNameMode, "The mode of how the player names are displayed.\n\nNormal: The full name of the player is displayed.\nClass: A short player class label is displayed (\"Arch\", \"Bers\" etc.).\nDisabled: No names displayed."),
-                new Settings.ColorPicker("Healer Color", false, this.healColor, "The color used for the Healer marker name text."),
-                new Settings.ColorPicker("Mage Color", false, this.mageColor, "The color used for the Mage marker name text."),
-                new Settings.ColorPicker("Bers Color", false, this.bersColor, "The color used for the Berserk marker name text."),
-                new Settings.ColorPicker("Archer Color", false, this.archColor, "The color used for the Archer marker name text."),
-                new Settings.ColorPicker("Tank Color", false, this.tankColor, "The color used for the Tank marker name text."),
+                new Settings.ColorPicker("Healer Color", this.healColor, "The color used for the Healer marker name text."),
+                new Settings.ColorPicker("Mage Color", this.mageColor, "The color used for the Mage marker name text."),
+                new Settings.ColorPicker("Bers Color", this.bersColor, "The color used for the Berserk marker name text."),
+                new Settings.ColorPicker("Archer Color", this.archColor, "The color used for the Archer marker name text."),
+                new Settings.ColorPicker("Tank Color", this.tankColor, "The color used for the Tank marker name text."),
                 new Settings.Toggle("Debug", this.debug, "Outputs debug information about the map's behavior.")
         ));
         this.setDesc("Displays the dungeon map while in Dungeons.");

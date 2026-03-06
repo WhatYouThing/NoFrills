@@ -93,7 +93,7 @@ public class SkillTracker {
         for (String skill : skills) {
             SettingColor color = getSessionColor(skill);
             if (color != null) {
-                list.add(new Settings.ColorPicker(skill + " Color", false, color, "The color used for " + skill + " on the Skill Tracker Display HUD element."));
+                list.add(new Settings.ColorPicker(skill + " Color", color, "The color used for " + skill + " on the Skill Tracker Display HUD element."));
             }
         }
         return list;

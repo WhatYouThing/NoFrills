@@ -184,7 +184,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         list.add(new Settings.Dropdown<>("Horizontal Scale Alignment", this.hScaleAlign, "The horizontal alignment of the scaled element according to its original bounding box."));
         list.add(new Settings.Dropdown<>("Vertical Scale Alignment", this.vScaleAlign, "The vertical alignment of the scaled element according to its original bounding box."));
         list.add(new Settings.Toggle("Use Background", this.useBackground, "Draw a background for this element."));
-        list.add(new Settings.ColorPicker("Background", true, this.background, "The color of the background."));
+        list.add(new Settings.ColorPicker("Background", this.background, "The color of the background."));
         HudSettings settings = new HudSettings(list);
         settings.setTitle(this.elementLabel);
         return settings;

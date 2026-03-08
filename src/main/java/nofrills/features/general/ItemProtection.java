@@ -26,7 +26,7 @@ import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.*;
 
 public class ItemProtection {
-    public static final Feature instance = new Feature("itemProtection");
+    public static final Feature instance = new Feature("itemProtection").requiresPricingAPI();
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingKeybind uuidKey = new SettingKeybind(-1, "uuidKey", instance);
@@ -43,10 +43,6 @@ public class ItemProtection {
     private static boolean isSellGUI = false;
     private static boolean isSalvageGUI = false;
     private static boolean overrideActive = false;
-
-    public static boolean isProtectingValue() {
-        return instance.isActive() && protectValue.value();
-    }
 
     public static ProtectType getProtectType(ItemStack stack) {
         if (overrideActive || stack.isEmpty()) return ProtectType.None;

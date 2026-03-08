@@ -321,10 +321,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))
                 )),
                 new Category("Solvers", List.of(
-                        new Module("Experimentation Table", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
+                        new Module("Experiment Solver", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
                                 new Settings.Toggle("Chronomatron", ExperimentSolver.chronomatron, "Reveals the solution in Chronomatron."),
                                 new Settings.Toggle("Ultrasequencer", ExperimentSolver.ultrasequencer, "Reveals the solution in Ultrasequencer."),
-                                new Settings.Toggle("Superpairs", ExperimentSolver.superpairs, "Reveals uncovered rewards in Superpairs and highlights matchable/matched pairs.")
+                                new Settings.Toggle("Superpairs", ExperimentSolver.superpairs, "Reveals uncovered rewards in Superpairs and highlights matchable/matched pairs."),
+                                new Settings.ColorPicker("Superpairs Matched", ExperimentSolver.superColorMatched, "The color of the matched pair highlight in Superpairs."),
+                                new Settings.ColorPicker("Superpairs Matchable", ExperimentSolver.superColorMatch, "The color of the matchable pair highlight in Superpairs."),
+                                new Settings.ColorPicker("Superpairs Powerup", ExperimentSolver.superColorPowerup, "The color of the powerup highlight in Superpairs.")
                         ))),
                         new Module("Calendar Date", CalendarDate.instance, "Calculates the exact starting dates of events in the calendar."),
                         new Module("Spooky Chests", SpookyChests.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(

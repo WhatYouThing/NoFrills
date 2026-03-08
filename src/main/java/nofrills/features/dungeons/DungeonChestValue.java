@@ -20,7 +20,7 @@ import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
 public class DungeonChestValue {
-    public static final Feature instance = new Feature("dungeonChestValue");
+    public static final Feature instance = new Feature("dungeonChestValue").requiresPricingAPI();
 
     public static final SettingColor background = new SettingColor(RenderColor.fromHex(0x202020, 0.8f), "background", instance);
 

@@ -1,6 +1,7 @@
 package nofrills.config;
 
 import com.google.gson.JsonObject;
+import nofrills.misc.NoFrillsAPI;
 
 public class Feature {
     public String key;
@@ -40,5 +41,15 @@ public class Feature {
         this.value = toggle;
         Config.get().get(this.key).getAsJsonObject().addProperty("enabled", this.value);
         Config.computeHash();
+    }
+
+    public Feature requiresPricingAPI() {
+        NoFrillsAPI.pricingFeatures.add(this);
+        return this;
+    }
+
+    public Feature requiresPerksAPI() {
+        NoFrillsAPI.perksFeatures.add(this);
+        return this;
     }
 }

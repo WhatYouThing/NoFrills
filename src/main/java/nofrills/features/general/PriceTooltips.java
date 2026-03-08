@@ -24,7 +24,7 @@ import java.util.Optional;
 import static nofrills.misc.NoFrillsAPI.*;
 
 public class PriceTooltips {
-    public static final Feature instance = new Feature("priceTooltips");
+    public static final Feature instance = new Feature("priceTooltips").requiresPricingAPI();
 
     public static final SettingBool auction = new SettingBool(false, "auction", instance.key());
     public static final SettingBool bazaar = new SettingBool(false, "bazaar", instance.key());

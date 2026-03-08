@@ -18,7 +18,7 @@ import nofrills.misc.Utils;
 import java.util.Optional;
 
 public class ScoreCalculator {
-    public static final Feature instance = new Feature("scoreCalculator");
+    public static final Feature instance = new Feature("scoreCalculator").requiresPerksAPI();
 
     public static final SettingEnum<PaulState> paulState = new SettingEnum<>(PaulState.Auto, PaulState.class, "paulState", instance);
     public static final SettingBool sendMsg270 = new SettingBool(false, "sendMsg270", instance);
@@ -36,10 +36,6 @@ public class ScoreCalculator {
     private static boolean prince = false;
     private static boolean sent270 = false;
     private static boolean sent300 = false;
-
-    public static boolean shouldUpdatePaul() {
-        return instance.isActive() && paulState.value().equals(PaulState.Auto);
-    }
 
     private static String getLineValue(String line) {
         if (line.contains("%")) {

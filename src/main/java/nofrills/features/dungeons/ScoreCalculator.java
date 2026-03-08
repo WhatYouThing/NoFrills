@@ -31,7 +31,6 @@ public class ScoreCalculator {
     public static final SettingString title300 = new SettingString("&c&l300", "title300", instance);
 
     private static int score = 0;
-    private static int deaths = 0;
     private static boolean bloodDone = false;
     private static boolean mimic = false;
     private static boolean prince = false;
@@ -154,8 +153,10 @@ public class ScoreCalculator {
     }
 
     private static int getDeathPenalty() {
-        if (deaths > 0) { // need to assume spirit pet on 1st death, api key application got declined a month after applying
-            return deaths * 2 - 1;
+        for (String line : SkyblockData.getTabListLines()) {
+            if (line.startsWith("Team Deaths: ")) { // need to assume spirit pet on 1st death, api key application got declined a month after applying
+                return Math.max(0, Utils.parseInt(getLineValue(line)).orElse(0) * 2 - 1);
+            }
         }
         return 0;
     }
@@ -239,17 +240,8 @@ public class ScoreCalculator {
 
     @EventHandler
     private static void onMsg(ChatMsgEvent event) {
-        if (instance.isActive() && Utils.isInDungeons()) {
-            String msg = event.messagePlain.trim();
-            if (msg.equals("[BOSS] The Watcher: You have proven yourself. You may pass.")) {
-                bloodDone = true;
-                return;
-            }
-            if (msg.startsWith(Utils.Symbols.skull)) {
-                if (event.messagePlain.endsWith(" ghost.") || event.messagePlain.endsWith(" died.")) {
-                    deaths += 1;
-                }
-            }
+        if (instance.isActive() && Utils.isInDungeons() && event.messagePlain.equals("[BOSS] The Watcher: You have proven yourself. You may pass.")) {
+            bloodDone = true;
         }
     }
 
@@ -272,7 +264,6 @@ public class ScoreCalculator {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         score = 0;
-        deaths = 0;
         bloodDone = false;
         mimic = false;
         prince = false;

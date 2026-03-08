@@ -6,12 +6,11 @@ import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.screen.slot.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ScreenOpenEvent;
-import nofrills.events.SendPacketEvent;
+import nofrills.events.SlotClickEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
@@ -48,7 +47,7 @@ public class ExperimentSolver {
     }
 
     public static ExperimentType getExperimentType() {
-        if (Utils.isOnPrivateIsland() && mc.currentScreen instanceof GenericContainerScreen container) {
+        if (mc.currentScreen instanceof GenericContainerScreen container && Utils.isOnPrivateIsland()) {
             String title = container.getTitle().getString();
             if (title.startsWith("Chronomatron (")) return ExperimentType.Chronomatron;
             if (title.startsWith("Ultrasequencer (")) return ExperimentType.Ultrasequencer;
@@ -225,10 +224,10 @@ public class ExperimentSolver {
     }
 
     @EventHandler
-    private static void onSendPacket(SendPacketEvent event) {
-        if (instance.isActive() && event.packet instanceof ClickSlotC2SPacket clickPacket) {
+    private static void onClickSlot(SlotClickEvent event) {
+        if (instance.isActive() && event.slotId >= 0) {
             ExperimentType type = getExperimentType();
-            int slotId = clickPacket.slot();
+            int slotId = event.slotId;
             if (chronomatron.value() && type.equals(ExperimentType.Chronomatron) && !rememberPhase) {
                 if (!chronoSolution.isEmpty()) {
                     Solution first = chronoSolution.getFirst();

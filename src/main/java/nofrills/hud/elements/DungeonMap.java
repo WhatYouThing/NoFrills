@@ -35,8 +35,8 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class DungeonMap extends HudElement {
+    public static NativeImageBackedTexture mapTexture;
     private final SpriteAtlasTexture atlasTexture = mc.getAtlasManager().getAtlasTexture(Atlases.MAP_DECORATIONS);
-    private final NativeImageBackedTexture mapTexture = new NativeImageBackedTexture(() -> "NoFrills Dungeon Map", new NativeImage(128, 128, true));
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
     private final SettingDouble playerMarkerScale = new SettingDouble(1.5, "playerMarkerScale", this.instance);
     private final SettingDouble playerNameScale = new SettingDouble(0.8, "playerNameScale", this.instance);
@@ -85,7 +85,7 @@ public class DungeonMap extends HudElement {
                 this.applyScaling(context, scale);
             }
             matrices.translate(this.x(), this.y());
-            context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, this.mapTexture.getGlTextureView(), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
+            context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, mapTexture.getGlTextureView(), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
             int index = 0;
             ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
             for (MapDecoration decor : mapState.decorations.values()) {
@@ -193,7 +193,7 @@ public class DungeonMap extends HudElement {
             }
             packet.updateData().ifPresent(data -> {
                 byte[] colors = data.colors();
-                NativeImage nativeImage = this.mapTexture.getImage();
+                NativeImage nativeImage = mapTexture.getImage();
                 if (nativeImage != null) {
                     for (int i = 0; i < 128; i++) {
                         for (int j = 0; j < 128; j++) {
@@ -202,7 +202,7 @@ public class DungeonMap extends HudElement {
                         }
                     }
                 }
-                this.mapTexture.upload();
+                mapTexture.upload();
             });
         }
     }

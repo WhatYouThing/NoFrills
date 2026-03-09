@@ -7,8 +7,11 @@ import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import nofrills.commands.NoFrillsCommand;
 import nofrills.commands.YeetCommand;
@@ -27,6 +30,7 @@ import nofrills.features.tweaks.DoubleUseFix;
 import nofrills.features.tweaks.NoCursorReset;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.ClickGui;
+import nofrills.hud.elements.DungeonMap;
 import nofrills.misc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +76,11 @@ public class Main implements ModInitializer {
         ConfigScreenProviders.register(MOD_ID, screen -> new ClickGui());
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
+
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+            DungeonMap.mapTexture = new NativeImageBackedTexture("NoFrills Dungeon Map", 128, 128, true);
+            client.getTextureManager().registerTexture(Identifier.of("nofrills", "dungeon_map_texture"), DungeonMap.mapTexture);
+        });
 
         eventBus.registerLambdaFactory(MOD_ID, (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
 

@@ -54,7 +54,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         this.vScaleAlign = new SettingEnum<>(VerticalScaleAlignment.Left, VerticalScaleAlignment.class, "vScaleAlign", instance);
         this.useBackground = new SettingBool(false, "useBackground", instance);
         this.background = new SettingColor(RenderColor.fromArgb(0x40000000), "background", instance);
-        this.identifier = Identifier.of("nofrills", Utils.toLower(label.replaceAll(" ", "-")));
+        this.identifier = Identifier.of("nofrills", Utils.toLower(label.replaceAll(" ", "_")));
         this.positioning(Positioning.absolute(0, 0));
         this.layout = layout;
         this.layout.sizing(Sizing.content(), Sizing.content());

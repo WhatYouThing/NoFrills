@@ -101,7 +101,7 @@ public class KuudraChestValue {
             if (auctionPricing.containsKey(id)) {
                 currentValue += auctionPricing.get(id) * quantity;
             } else if (bazaarPricing.containsKey(id)) {
-                currentValue += bazaarPricing.get(id).get("sell") * quantity;
+                currentValue += bazaarPricing.get(id).sell() * quantity;
             }
         }
     }

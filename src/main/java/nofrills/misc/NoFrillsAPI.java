@@ -20,8 +20,8 @@ public class NoFrillsAPI {
     public static final List<Feature> pricingFeatures = new ArrayList<>();
     public static final List<Feature> perksFeatures = new ArrayList<>();
     public static HashMap<String, Long> auctionPricing = new HashMap<>();
-    public static HashMap<String, HashMap<String, Double>> bazaarPricing = new HashMap<>();
-    public static HashMap<String, HashMap<String, Double>> npcPricing = new HashMap<>();
+    public static HashMap<String, BazaarPrice> bazaarPricing = new HashMap<>();
+    public static HashMap<String, NPCPrice> npcPricing = new HashMap<>();
     public static HashSet<String> electionPerks = new HashSet<>();
     private static int refreshTicks = 0;
 
@@ -53,28 +53,18 @@ public class NoFrillsAPI {
                     auction.put(entry.getKey(), entry.getValue().getAsLong());
                 }
                 auctionPricing = auction;
-                HashMap<String, HashMap<String, Double>> bazaar = new HashMap<>();
+                HashMap<String, BazaarPrice> bazaar = new HashMap<>();
                 for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("bazaar").asMap().entrySet()) {
                     JsonObject object = entry.getValue().getAsJsonObject();
-                    HashMap<String, Double> pricing = new HashMap<>();
-                    pricing.put("buy", object.get("buy").getAsDouble());
-                    pricing.put("sell", object.get("sell").getAsDouble());
-                    bazaar.put(entry.getKey(), pricing);
+                    bazaar.put(entry.getKey(), new BazaarPrice(object.get("buy").getAsDouble(), object.get("sell").getAsDouble()));
                 }
                 bazaarPricing = bazaar;
-                HashMap<String, HashMap<String, Double>> npc = new HashMap<>();
+                HashMap<String, NPCPrice> npc = new HashMap<>();
                 for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("npc").asMap().entrySet()) {
                     JsonObject object = entry.getValue().getAsJsonObject();
-                    HashMap<String, Double> pricing = new HashMap<>();
-                    if (object.has("coin")) {
-                        pricing.put("coin", object.get("coin").getAsDouble());
-                    }
-                    if (object.has("mote")) {
-                        pricing.put("mote", object.get("mote").getAsDouble());
-                    }
-                    if (!pricing.isEmpty()) {
-                        npc.put(entry.getKey(), pricing);
-                    }
+                    double coin = object.has("coin") ? object.get("coin").getAsDouble() : 0.0;
+                    double mote = object.has("mote") ? object.get("mote").getAsDouble() : 0.0;
+                    npc.put(entry.getKey(), new NPCPrice(coin, mote));
                 }
                 npcPricing = npc;
             } catch (Exception exception) {
@@ -116,5 +106,11 @@ public class NoFrillsAPI {
                 refreshTicks--;
             }
         }
+    }
+
+    public record BazaarPrice(double buy, double sell) {
+    }
+
+    public record NPCPrice(double coin, double mote) {
     }
 }

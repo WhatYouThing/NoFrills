@@ -72,10 +72,9 @@ public class ItemProtection {
         if (protectValue.value()) {
             double min = protectValueMin.value();
             List<Double> prices = new ArrayList<>();
-            if (bazaarPricing.containsKey(id)) prices.add(bazaarPricing.get(id).get("buy"));
+            if (bazaarPricing.containsKey(id)) prices.add(bazaarPricing.get(id).buy());
             if (auctionPricing.containsKey(id)) prices.add(Double.valueOf(auctionPricing.get(id)));
-            if (npcPricing.containsKey(id) && npcPricing.get(id).containsKey("coin"))
-                prices.add(npcPricing.get(id).get("coin"));
+            if (npcPricing.containsKey(id)) prices.add(npcPricing.get(id).coin());
             for (double price : prices) {
                 if (price >= min) {
                     return ProtectType.Value;

@@ -535,7 +535,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.TextInput("300 Title", ScoreCalculator.title300, "The title to show when 300 (S+) score is reached.")
                         ))),
                         new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 platform area which you mine as Healer in F7/M7 after terminal phase."),
-                        new Module("Croesus Solver", CroesusSolver.instance, "Highlights unopened loot and the most profitable chests in the Croesus.", new Settings(
+                        new Module("Croesus Solver", CroesusSolver.instance, "Highlights unopened loot and the most profitable chests in the Croesus.\nRequires connectivity to the NoFrills API.", new Settings(
                                 new Settings.ColorPicker("Profit Color", CroesusSolver.profitColor, "The highlight color for the most profitable chest."),
                                 new Settings.ColorPicker("Key Profit Color", CroesusSolver.profitKeyColor, "The highlight color for the 2nd most profitable chest. Includes the cost of the Dungeon Chest Key."),
                                 new Settings.ColorPicker("Unopened Color", CroesusSolver.unopenedColor, "The highlight color for unopened loot."),

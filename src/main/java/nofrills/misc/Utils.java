@@ -604,16 +604,21 @@ public class Utils {
         return false;
     }
 
+    public static List<Text> getLoreText(ItemStack stack) {
+        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+        if (lore != null) {
+            return lore.lines();
+        }
+        return new ArrayList<>();
+    }
+
     /**
      * Returns every line of the stack's lore with no formatting, or else an empty list.
      */
     public static List<String> getLoreLines(ItemStack stack) {
         List<String> lines = new ArrayList<>();
-        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
-        if (lore != null) {
-            for (Text line : lore.lines()) {
-                lines.add(toPlain(line).trim());
-            }
+        for (Text line : getLoreText(stack)) {
+            lines.add(toPlain(line).trim());
         }
         return lines;
     }

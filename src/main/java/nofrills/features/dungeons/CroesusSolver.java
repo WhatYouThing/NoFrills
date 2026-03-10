@@ -1,8 +1,6 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
@@ -34,12 +32,7 @@ public class CroesusSolver {
     private static final HashMap<Slot, Double> chestValues = new HashMap<>();
 
     private static LootState getLootState(ItemStack stack) {
-        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
-        if (lore == null) {
-            return LootState.Unknown;
-        }
-        for (Text line : lore.lines()) {
-            String string = Utils.toPlain(line);
+        for (String string : Utils.getLoreLines(stack)) {
             if (string.equals("No chests opened yet!")) return LootState.Unopened;
             if (string.startsWith("Opened Chest: ")) return LootState.Opened;
             if (string.equals("No more chests to open!")) return LootState.OpenedKey;
@@ -69,13 +62,12 @@ public class CroesusSolver {
     private static void highlightChest(ItemStack stack, Slot slot) {
         String name = Utils.toPlain(stack.getName());
         if (!DungeonUtil.getChestNames().contains(name)) return;
-        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
-        if (lore == null) return;
+        List<Text> lore = Utils.getLoreText(stack);
         double value = 0;
         double cost = 0;
         int costIndex = -1;
-        for (int i = 0; i < lore.lines().size(); i++) {
-            Text text = lore.lines().get(i);
+        for (int i = 0; i < lore.size(); i++) {
+            Text text = lore.get(i);
             String line = Utils.toPlain(text);
             if (line.isEmpty() || line.equals("Contents") || line.equals("Cost")) {
                 if (line.equals("Cost")) costIndex = i;
@@ -86,7 +78,7 @@ public class CroesusSolver {
                 String id = Utils.getMarketId(text);
                 int quantity = Utils.hasItemQuantity(line) ? Utils.parseInt(line.substring(line.lastIndexOf("x") + 1)).orElse(0) : 1;
                 if (bazaarPricing.containsKey(id)) {
-                    value += bazaarPricing.get(id).get("sell") * quantity;
+                    value += bazaarPricing.get(id).sell() * quantity;
                 } else if (auctionPricing.containsKey(id)) {
                     value += auctionPricing.get(id) * quantity;
                 }
@@ -109,7 +101,7 @@ public class CroesusSolver {
         }
         if (chests.size() >= 2 && bazaarPricing.containsKey("DUNGEON_CHEST_KEY")) {
             Map.Entry<Slot, Double> entry = chests.get(1);
-            if (entry.getValue() - bazaarPricing.get("DUNGEON_CHEST_KEY").get("buy") > 0) {
+            if (entry.getValue() - bazaarPricing.get("DUNGEON_CHEST_KEY").buy() > 0) {
                 SlotOptions.setBackground(entry.getKey(), profitKeyColor.value());
             }
         }
@@ -128,7 +120,7 @@ public class CroesusSolver {
     }
 
     @EventHandler
-    private static void onScreenClose(ScreenOpenEvent event) {
+    private static void onScreen(ScreenOpenEvent event) {
         chestValues.clear();
     }
 

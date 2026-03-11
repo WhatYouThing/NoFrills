@@ -16,11 +16,11 @@ public class LagMeter extends SimpleTextElement {
     public long lastTick = 0;
 
     public LagMeter(String text) {
-        super(Text.literal(text), new Feature("lagMeterElement"), "Lag Meter Element");
+        super(Text.literal(text), new Feature("lagMeterElement"), "Lag Meter");
         this.options = this.getBaseSettings(List.of(
                 new Settings.SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
         ));
-        this.setDesc("Displays the time since the last received server tick.");
+        this.setDesc("Displays the time since the last received server tick.\nHelps indicate if a lag spike is occurring.");
     }
 
     @Override

@@ -29,6 +29,7 @@ public class HudManager {
     public static final BossHealth bossHealth = new BossHealth();
     public static final DungeonMap dungeonMap = new DungeonMap();
     public static final DungeonScore dungeonScore = new DungeonScore();
+    public static final TerracottaGyroTimer terraGyroTimer = new TerracottaGyroTimer();
     public static final PadTimer padTimer = new PadTimer();
     public static final TerminalStartTimer terminalStartTimer = new TerminalStartTimer();
     public static final GoldorTickTimer goldorTickTimer = new GoldorTickTimer();
@@ -75,6 +76,7 @@ public class HudManager {
         fps.reset();
         lagMeter.setTickTime(0);
         bossHealth.reset();
+        terraGyroTimer.pause();
         padTimer.pause();
         terminalStartTimer.pause();
         goldorTickTimer.pause();
@@ -159,6 +161,11 @@ public class HudManager {
         }
         if (bobber.isActive()) {
             bobber.onServerTick();
+        }
+        if (Utils.isOnDungeonFloor("6")) {
+            if (terraGyroTimer.isActive()) {
+                terraGyroTimer.tick();
+            }
         }
         if (Utils.isOnDungeonFloor("7")) {
             if (padTimer.isActive()) {

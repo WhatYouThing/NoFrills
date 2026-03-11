@@ -15,7 +15,7 @@ public class SeaCreatures extends SimpleTextElement {
     private boolean active = false;
 
     public SeaCreatures(String text) {
-        super(Text.literal(text), new Feature("seaCreaturesElement"), "Sea Creatures Element");
+        super(Text.literal(text), new Feature("seaCreaturesElement"), "Sea Creatures");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
         ));

@@ -31,10 +31,6 @@ public class TickTimerElement extends SimpleTextElement {
         this.startTicks = ticks;
     }
 
-    public void setRepeating(boolean repeating) {
-        this.repeating = repeating;
-    }
-
     public String ticksAsTime(int ticks) {
         if (ticks < 0) {
             return "0.00s";
@@ -65,5 +61,17 @@ public class TickTimerElement extends SimpleTextElement {
 
     public void pause() {
         this.ticks = -1;
+    }
+
+    public boolean isTicking() {
+        return this.ticks != -1;
+    }
+
+    public boolean isRepeating() {
+        return this.repeating;
+    }
+
+    public void setRepeating(boolean repeating) {
+        this.repeating = repeating;
     }
 }

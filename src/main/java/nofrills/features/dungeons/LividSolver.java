@@ -14,13 +14,13 @@ import nofrills.events.BlockUpdateEvent;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldRenderEvent;
+import nofrills.misc.ConcurrentHashSet;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 public class LividSolver {
     public static final Feature instance = new Feature("lividSolver");
@@ -86,7 +86,7 @@ public class LividSolver {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (isActive()) {
-            CopyOnWriteArraySet<Entity> livids = lividCache.get();
+            ConcurrentHashSet<Entity> livids = lividCache.get();
             if (livids.size() <= 1) return;
             for (Entity livid : livids) {
                 if (Utils.toPlain(livid.getName()).equals(currentName)) {

@@ -9,7 +9,7 @@ import nofrills.misc.Utils;
 public class Day extends SimpleTextElement {
 
     public Day(String text) {
-        super(Text.literal(text), new Feature("dayElement"), "Day Element");
+        super(Text.literal(text), new Feature("dayElement"), "Day");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the day that the server world is on.");
     }

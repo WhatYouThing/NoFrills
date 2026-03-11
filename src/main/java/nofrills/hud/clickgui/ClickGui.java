@@ -451,7 +451,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.\nAlso displays timers for the 1st Gyro and Sadan's last giant, useful if you are Mage.", new Settings(List.of(
-                                new Settings.Toggle("Mage Check", TerracottaTimer.mageCheck, "If enabled, prevents the 1st Gyro and last giant timers from appearing if you are not Mage."),
+                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text."),
                                 new Settings.ColorPicker("Text Color", TerracottaTimer.color, "The color of the timer text.")
                         ))),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(

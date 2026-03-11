@@ -51,7 +51,7 @@ public class DungeonMap extends HudElement {
     private MapParameters parameters = null;
 
     public DungeonMap() {
-        super(new Feature("dungeonMapElement"), "Dungeon Map Element");
+        super(new Feature("dungeonMapElement"), "Dungeon Map");
         this.layout.sizing(Sizing.fixed(128), Sizing.fixed(128));
         this.options = this.getBaseSettings(List.of(
                 new Settings.SliderDouble("Self Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),

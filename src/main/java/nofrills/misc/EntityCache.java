@@ -9,7 +9,6 @@ import nofrills.events.ServerJoinEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * An object for temporarily storing any relevant entity handles, such as armor stands with custom names.
@@ -17,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class EntityCache {
     private static final List<EntityCache> instances = new ArrayList<>();
 
-    private final CopyOnWriteArraySet<Entity> entities = new CopyOnWriteArraySet<>();
+    private final ConcurrentHashSet<Entity> entities = new ConcurrentHashSet<>();
 
     public EntityCache() {
         instances.add(this);
@@ -76,7 +75,7 @@ public class EntityCache {
         this.entities.clear();
     }
 
-    public CopyOnWriteArraySet<Entity> get() {
+    public ConcurrentHashSet<Entity> get() {
         return this.entities;
     }
 

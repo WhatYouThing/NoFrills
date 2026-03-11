@@ -23,7 +23,7 @@ public class Armor extends HudElement {
     private Alignment lastAlign;
 
     public Armor() {
-        super(new Feature("armorElement"), "Armor Element");
+        super(new Feature("armorElement"), "Armor");
         this.content = this.getAlignment(align.value());
         this.lastAlign = align.value();
         this.layout.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);

@@ -24,7 +24,7 @@ public class FishingBobber extends SimpleTextElement {
     public int timerTicks = 0;
 
     public FishingBobber(String text) {
-        super(Text.literal(text), new Feature("bobberElement"), "Bobber Element");
+        super(Text.literal(text), new Feature("bobberElement"), "Fishing Bobber");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Inactive", this.inactive, "Hides the element if your fishing bobber is inactive."),
                 new Settings.Toggle("Bobber Timer", this.timer, "Displays how long your fishing bobber has existed for, useful for Slugfish.")

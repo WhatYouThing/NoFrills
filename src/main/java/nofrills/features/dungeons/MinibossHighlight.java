@@ -32,9 +32,13 @@ public class MinibossHighlight {
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
-            if (minibossList.contains(player.getName().getString()) && !cache.has(event.entity)) {
+            String name = player.getName().getString();
+            if (minibossList.contains(name) && !cache.has(event.entity)) {
                 if (Utils.isInDungeonBoss("4") && event.entity.getEntityPos().getY() >= 76.0) {
                     return; // prevents the Floor 4 "crowd" NPC's from getting highlighted
+                }
+                if (!Utils.isInDungeonBoss("4") && name.equals("Spirit Bear")) {
+                    return; // prevents the Spirit Bear spawned by the Watcher from getting highlighted
                 }
                 cache.add(event.entity);
             }

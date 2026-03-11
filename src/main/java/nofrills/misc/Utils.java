@@ -709,7 +709,7 @@ public class Utils {
     }
 
     public static void checkUpdate(boolean notifyIfMatch) {
-        new Thread(() -> {
+        Thread.startVirtualThread(() -> {
             try {
                 String version = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata().getVersion().getFriendlyString();
                 InputStream connection = URI.create("https://raw.githubusercontent.com/WhatYouThing/NoFrills/refs/heads/main/gradle.properties").toURL().openStream();
@@ -725,15 +725,11 @@ public class Utils {
                 if (notifyIfMatch) {
                     info("§aNoFrills is up to date.");
                 }
-            } catch (IOException e) {
+            } catch (IOException exception) {
                 info("§cAn error occurred while checking for an update. Additional information can be found in the log.");
-                StringBuilder trace = new StringBuilder();
-                for (StackTraceElement element : e.getStackTrace()) {
-                    trace.append("\n\tat ").append(element.toString());
-                }
-                LOGGER.error("{}{}", e.getMessage(), trace);
+                LOGGER.error("NoFrills update check failed.", exception);
             }
-        }).start();
+        });
     }
 
     /**

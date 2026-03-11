@@ -14,7 +14,6 @@ import nofrills.events.BlockUpdateEvent;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldRenderEvent;
-import nofrills.misc.ConcurrentHashSet;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -85,10 +84,8 @@ public class LividSolver {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (isActive()) {
-            ConcurrentHashSet<Entity> livids = lividCache.get();
-            if (livids.size() <= 1) return;
-            for (Entity livid : livids) {
+        if (isActive() && lividCache.size() > 1) {
+            for (Entity livid : lividCache.get()) {
                 if (Utils.toPlain(livid.getName()).equals(currentName)) {
                     float delta = event.tickCounter.getTickProgress(true);
                     if (highlight.value()) {

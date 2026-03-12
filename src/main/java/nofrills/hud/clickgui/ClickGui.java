@@ -419,7 +419,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Inverted Block", DeviceSolvers.alignBlockInvert, "Prevents wrong rotations only while sneaking instead of only while not sneaking.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", StarredMobHighlight.color, "The color of the starred mob highlight.")
+                                new Settings.Dropdown<>("Highlight Style", StarredMobHighlight.style, "The style of the starred mon highlight."),
+                                new Settings.ColorPicker("Outline Color", StarredMobHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", StarredMobHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
                         new Module("Miniboss Highlight", MinibossHighlight.instance, "Highlights minibosses.", new Settings(List.of(
                                 new Settings.Dropdown<>("Highlight Style", MinibossHighlight.style, "The style of the miniboss highlight."),

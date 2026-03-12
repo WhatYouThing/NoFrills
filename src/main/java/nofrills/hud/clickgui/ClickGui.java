@@ -422,7 +422,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", StarredMobHighlight.color, "The color of the starred mob highlight.")
                         ))),
                         new Module("Miniboss Highlight", MinibossHighlight.instance, "Highlights minibosses.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", MinibossHighlight.color, "The color of the miniboss highlight.")
+                                new Settings.Dropdown<>("Highlight Style", MinibossHighlight.style, "The style of the miniboss highlight."),
+                                new Settings.ColorPicker("Outline Color", MinibossHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", MinibossHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
                         new Module("Key Highlight", KeyHighlight.instance, "Highlights nearby Wither and Blood keys.", new Settings(List.of(
                                 new Settings.Toggle("Highlight", KeyHighlight.highlight, "Renders a highlight + beam on top of Wither Keys."),

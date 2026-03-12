@@ -473,7 +473,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Title", LividSolver.title, "Show a title on screen once the Livid color is identified."),
                                 new Settings.Toggle("Highlight", LividSolver.highlight, "Renders an outline for the correct Livid."),
                                 new Settings.Toggle("Tracer", LividSolver.tracer, "Renders a tracer towards the correct Livid."),
-                                new Settings.ColorPicker("Highlight Color", LividSolver.color, "The color of the outline."),
+                                new Settings.Dropdown<>("Highlight Style", LividSolver.style, "The style of the correct Livid highlight."),
+                                new Settings.ColorPicker("Outline Color", LividSolver.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", LividSolver.fillColor, "The color of the fill style highlight."),
                                 new Settings.ColorPicker("Tracer Color", LividSolver.tracerColor, "The color of the tracer.")
                         ))),
                         new Module("Prince Message", PrinceMessage.instance, "Sends a message when you gain bonus score from the Prince Shard.", new Settings(List.of(

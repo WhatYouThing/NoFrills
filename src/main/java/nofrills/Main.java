@@ -8,6 +8,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.command.CommandRegistryAccess;
@@ -16,6 +17,9 @@ import net.minecraft.util.Util;
 import nofrills.commands.NoFrillsCommand;
 import nofrills.commands.YeetCommand;
 import nofrills.config.Config;
+import nofrills.events.ChatMsgEvent;
+import nofrills.events.OverlayMsgEvent;
+import nofrills.events.PartyChatMsgEvent;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.*;
 import nofrills.features.fishing.*;
@@ -80,6 +84,23 @@ public class Main implements ModInitializer {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             DungeonMap.mapTexture = new NativeImageBackedTexture("NoFrills Dungeon Map", 128, 128, true);
             client.getTextureManager().registerTexture(Identifier.of("nofrills", "dungeon_map_texture"), DungeonMap.mapTexture);
+        });
+
+        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
+            String msg = Utils.toPlain(message);
+
+            if (overlay) {
+                return !eventBus.post(new OverlayMsgEvent(message, msg)).isCancelled();
+            }
+
+            boolean cancelled = eventBus.post(new ChatMsgEvent(message, msg)).isCancelled();
+            if (msg.startsWith("Party > ") && msg.contains(": ")) {
+                int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");
+                String[] clean = msg.replace(msg.substring(0, nameStart + 1), "").split(":", 2);
+                String author = clean[0].trim(), content = clean[1].trim();
+                cancelled = eventBus.post(new PartyChatMsgEvent(content, author)).isCancelled() || cancelled;
+            }
+            return !cancelled;
         });
 
         eventBus.registerLambdaFactory(MOD_ID, (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));

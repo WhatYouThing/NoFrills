@@ -22,7 +22,6 @@ import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.NoConfirmScreen;
 import nofrills.hud.HudManager;
 import nofrills.misc.SkyblockData;
-import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -124,26 +123,6 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onGameJoin", at = @At("TAIL"))
     private void onJoinGame(GameJoinS2CPacket packet, CallbackInfo ci) {
         eventBus.post(new ServerJoinEvent());
-    }
-
-    @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/message/MessageHandler;onGameMessage(Lnet/minecraft/text/Text;Z)V"), cancellable = true)
-    private void onGameMessage(GameMessageS2CPacket packet, CallbackInfo ci) {
-        String msg = Utils.toPlain(packet.content());
-        if (!packet.overlay()) {
-            if (eventBus.post(new ChatMsgEvent(packet.content(), msg)).isCancelled()) {
-                ci.cancel();
-            }
-            if (msg.startsWith("Party > ") && msg.contains(": ")) {
-                int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");
-                String[] clean = msg.replace(msg.substring(0, nameStart + 1), "").split(":", 2);
-                String author = clean[0].trim(), content = clean[1].trim();
-                if (eventBus.post(new PartyChatMsgEvent(content, author)).isCancelled() && !ci.isCancelled()) {
-                    ci.cancel();
-                }
-            }
-        } else if (eventBus.post(new OverlayMsgEvent(packet.content(), msg)).isCancelled()) {
-            ci.cancel();
-        }
     }
 
     @Inject(method = "onMapUpdate", at = @At("TAIL"))

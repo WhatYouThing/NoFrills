@@ -5,8 +5,10 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.fog.FogData;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.*;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
@@ -15,7 +17,9 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.SpawnParticleEvent;
+import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
 
 import java.util.HashSet;
@@ -39,6 +43,7 @@ public class NoRender {
     public static final SettingBool entityFire = new SettingBool(false, "entityFire", instance.key());
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
     public static final SettingBool iceSpray = new SettingBool(false, "iceSpray", instance.key());
+    public static final SettingBool soulweaverSkulls = new SettingBool(false, "soulweaverSkulls", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
     public static final SettingEnum<VignetteMode> vignette = new SettingEnum<>(VignetteMode.None, VignetteMode.class, "vignetteMode", instance.key());
@@ -61,6 +66,8 @@ public class NoRender {
             ParticleTypes.GUST,
             ParticleTypes.GUST_EMITTER_LARGE
     );
+    private static final String skullTexture = "2f24ed6875304fa4a1f0c785b2cb6a6a72563e9f3e24ea55e18178452119aa66";
+    private static final EntityCache skullsCache = new EntityCache();
 
     public static FogData getFogAsEmpty(FogData data) {
         data.renderDistanceStart = Float.MAX_VALUE;
@@ -70,18 +77,32 @@ public class NoRender {
         return data;
     }
 
-    public static boolean isTreeBlock(Entity entity) {
-        if (entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
-            return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
-        }
-        return false;
-    }
-
     public static boolean shouldHideTooltip(Slot slot, String title) {
         if (title.startsWith("Ultrasequencer (")) {
             return false;
         }
         return instance.isActive() && emptyTooltips.value() && slot != null && slot.getStack().getName().getString().trim().isEmpty();
+    }
+
+    public static boolean shouldCancelRender(Entity entity) {
+        if (deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()) {
+            return true;
+        }
+        if (fallingBlocks.value() && entity instanceof FallingBlockEntity) {
+            return true;
+        }
+        if (treeBits.value() && entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
+            if (treeBlocks.contains(blockDisplay.getBlockState().getBlock())) {
+                return true;
+            }
+        }
+        if (lightning.value() && entity instanceof LightningEntity) {
+            return true;
+        }
+        if (expOrbs.value() && entity instanceof ExperienceOrbEntity) {
+            return true;
+        }
+        return soulweaverSkulls.value() && entity instanceof ArmorStandEntity && skullsCache.has(entity);
     }
 
     private static boolean isPoofParticle(ParticleS2CPacket packet) {
@@ -125,6 +146,18 @@ public class NoRender {
             }
             if (iceSpray.value() && event.matchParameters(ParticleTypes.POOF, 3, 0.0, 0.0, 0.0, 0.0)) {
                 event.cancel();
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onUpdated(EntityUpdatedEvent event) {
+        if (instance.isActive()) {
+            if (soulweaverSkulls.value() && event.entity instanceof ArmorStandEntity stand && Utils.isInDungeons()) {
+                ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
+                if (!helmet.isEmpty() && Utils.isTextureEqual(Utils.getTextures(helmet), skullTexture)) {
+                    skullsCache.add(stand);
+                }
             }
         }
     }

@@ -24,8 +24,14 @@ public class AutoSprint {
                 }
                 return;
             }
-            mc.options.sprintKey.setPressed(true);
-            wasSprinting = true;
+            if (mc.options.getSprintToggled().getValue()) {
+                if (!mc.options.sprintKey.isPressed()) {
+                    mc.options.sprintKey.setPressed(true);
+                }
+            } else {
+                mc.options.sprintKey.setPressed(true);
+            }
+            wasSprinting = mc.options.sprintKey.isPressed();
         }
     }
 }

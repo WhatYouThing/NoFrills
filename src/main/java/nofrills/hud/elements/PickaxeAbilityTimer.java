@@ -6,8 +6,8 @@ import nofrills.hud.TimerElement;
 public class PickaxeAbilityTimer extends TimerElement {
 
     public PickaxeAbilityTimer() {
-        super("Pickaxe Ability: §f{}", new Feature("pickaxeAbilityTimer"), "Pickaxe Ability Timer");
+        super("Pickaxe Ability: §f{}", new Feature("pickaxeAbilityTimerElement"), "Pickaxe Ability Timer");
         this.options = this.getBaseSettings();
-        this.setDesc("Displays the duration of your pickaxe ability cooldown. Used by the Ability Alert feature.");
+        this.setDesc("Displays the duration of your pickaxe ability cooldown.\nUsed by the Ability Alert feature.");
     }
 }

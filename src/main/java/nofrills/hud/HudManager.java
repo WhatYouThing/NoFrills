@@ -35,6 +35,7 @@ public class HudManager {
     public static final TerminalStartTimer terminalStartTimer = new TerminalStartTimer();
     public static final GoldorTickTimer goldorTickTimer = new GoldorTickTimer();
     public static final Power power = new Power("Power: §f0");
+    public static final FreshToolsTimer freshToolsTimer = new FreshToolsTimer();
     public static final SeaCreatures seaCreatures = new SeaCreatures("Sea Creatures: §70");
     public static final FishingBobber bobber = new FishingBobber("Bobber: §7Inactive");
     public static final ShardTrackerDisplay shardTracker = new ShardTrackerDisplay();
@@ -81,6 +82,7 @@ public class HudManager {
         padTimer.pause();
         terminalStartTimer.pause();
         goldorTickTimer.pause();
+        freshToolsTimer.pause();
         dungeonMap.reset();
     }
 
@@ -178,6 +180,9 @@ public class HudManager {
             if (goldorTickTimer.isActive()) {
                 goldorTickTimer.tick();
             }
+        }
+        if (Utils.isInKuudra()) {
+            freshToolsTimer.tick();
         }
     }
 

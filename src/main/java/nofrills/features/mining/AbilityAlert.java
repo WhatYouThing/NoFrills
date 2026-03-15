@@ -8,10 +8,11 @@ import nofrills.config.SettingInt;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.InventoryUpdateEvent;
 import nofrills.events.WorldTickEvent;
-import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
 
 import java.util.List;
+
+import static nofrills.hud.HudManager.pickAbilityTimer;
 
 public class AbilityAlert {
     public static final Feature instance = new Feature("abilityAlert");
@@ -45,8 +46,8 @@ public class AbilityAlert {
 
     private static void setCooldown(int tickDuration) {
         ticks = tickDuration;
-        if (HudManager.pickAbilityTimer.isActive()) {
-            HudManager.pickAbilityTimer.start(tickDuration * 50L);
+        if (pickAbilityTimer.isActive()) {
+            pickAbilityTimer.start(tickDuration * 50L);
         }
     }
 

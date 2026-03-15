@@ -1,6 +1,7 @@
 package nofrills.features.general;
 
 import com.google.common.collect.Sets;
+import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -9,6 +10,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
@@ -17,13 +19,12 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
-import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.SpawnParticleEvent;
-import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 public class NoRender {
@@ -48,17 +49,11 @@ public class NoRender {
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
     public static final SettingEnum<VignetteMode> vignette = new SettingEnum<>(VignetteMode.None, VignetteMode.class, "vignetteMode", instance.key());
     public static final SettingBool expOrbs = new SettingBool(false, "expOrbs", instance.key());
-    public static final SettingBool stuckArrows = new SettingBool(false, "stuckArrows", instance.key());
+    public static final SettingBool stuckArrows = new SettingBool(false, "stuckArrows", instance);
 
     private static final List<Pattern> deadPatterns = List.of(
             Pattern.compile(".* 0" + Utils.Symbols.heart),
             Pattern.compile(".* 0/.*" + Utils.Symbols.heart)
-    );
-    private static final HashSet<Block> treeBlocks = Sets.newHashSet(
-            Blocks.MANGROVE_WOOD,
-            Blocks.MANGROVE_LEAVES,
-            Blocks.STRIPPED_SPRUCE_WOOD,
-            Blocks.AZALEA_LEAVES
     );
     private static final HashSet<ParticleType<?>> explosionParticles = Sets.newHashSet(
             ParticleTypes.EXPLOSION,
@@ -66,8 +61,7 @@ public class NoRender {
             ParticleTypes.GUST,
             ParticleTypes.GUST_EMITTER_LARGE
     );
-    private static final String skullTexture = "2f24ed6875304fa4a1f0c785b2cb6a6a72563e9f3e24ea55e18178452119aa66";
-    private static final EntityCache skullsCache = new EntityCache();
+    private static final EntityPredicates entityPredicates = new EntityPredicates();
 
     public static FogData getFogAsEmpty(FogData data) {
         data.renderDistanceStart = Float.MAX_VALUE;
@@ -85,24 +79,44 @@ public class NoRender {
     }
 
     public static boolean shouldCancelRender(Entity entity) {
-        if (deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()) {
-            return true;
-        }
-        if (fallingBlocks.value() && entity instanceof FallingBlockEntity) {
-            return true;
-        }
-        if (treeBits.value() && entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
-            if (treeBlocks.contains(blockDisplay.getBlockState().getBlock())) {
+        for (Predicate<Entity> predicate : entityPredicates.get()) {
+            if (predicate.test(entity)) {
                 return true;
             }
         }
-        if (lightning.value() && entity instanceof LightningEntity) {
-            return true;
-        }
-        if (expOrbs.value() && entity instanceof ExperienceOrbEntity) {
-            return true;
-        }
-        return soulweaverSkulls.value() && entity instanceof ArmorStandEntity && skullsCache.has(entity);
+        return false;
+    }
+
+    private static List<Predicate<Entity>> initEntityPredicates() {
+        String skullTexture = "2f24ed6875304fa4a1f0c785b2cb6a6a72563e9f3e24ea55e18178452119aa66";
+        HashSet<Block> treeBlocks = Sets.newHashSet(
+                Blocks.MANGROVE_WOOD,
+                Blocks.MANGROVE_LEAVES,
+                Blocks.STRIPPED_SPRUCE_WOOD,
+                Blocks.AZALEA_LEAVES
+        );
+        return List.of(
+                (entity -> deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()),
+                (entity -> fallingBlocks.value() && entity instanceof FallingBlockEntity),
+                (entity -> {
+                    if (treeBits.value() && entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
+                        return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
+                    }
+                    return false;
+                }),
+                (entity -> lightning.value() && entity instanceof LightningEntity),
+                (entity -> expOrbs.value() && entity instanceof ExperienceOrbEntity),
+                (entity -> {
+                    if (soulweaverSkulls.value() && entity instanceof ArmorStandEntity stand) {
+                        ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
+                        if (!helmet.isEmpty() && helmet.getItem().equals(Items.PLAYER_HEAD)) {
+                            GameProfile profile = Utils.getTextures(helmet);
+                            return Utils.isTextureEqual(profile, skullTexture) && Utils.isInDungeons();
+                        }
+                    }
+                    return false;
+                })
+        );
     }
 
     private static boolean isPoofParticle(ParticleS2CPacket packet) {
@@ -150,22 +164,50 @@ public class NoRender {
         }
     }
 
-    @EventHandler
-    private static void onUpdated(EntityUpdatedEvent event) {
-        if (instance.isActive()) {
-            if (soulweaverSkulls.value() && event.entity instanceof ArmorStandEntity stand && Utils.isInDungeons()) {
-                ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
-                if (!helmet.isEmpty() && Utils.isTextureEqual(Utils.getTextures(helmet), skullTexture)) {
-                    skullsCache.add(stand);
-                }
-            }
-        }
-    }
-
     public enum VignetteMode {
         None,
         Ambient,
         Danger,
         Both
+    }
+
+    public static class EntityPredicates {
+        private final List<Predicate<Entity>> predicates;
+
+        public EntityPredicates() {
+            String skullTexture = "2f24ed6875304fa4a1f0c785b2cb6a6a72563e9f3e24ea55e18178452119aa66";
+            HashSet<Block> treeBlocks = Sets.newHashSet(
+                    Blocks.MANGROVE_WOOD,
+                    Blocks.MANGROVE_LEAVES,
+                    Blocks.STRIPPED_SPRUCE_WOOD,
+                    Blocks.AZALEA_LEAVES
+            );
+            this.predicates = List.of(
+                    (entity -> deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()),
+                    (entity -> fallingBlocks.value() && entity instanceof FallingBlockEntity),
+                    (entity -> {
+                        if (treeBits.value() && entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
+                            return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
+                        }
+                        return false;
+                    }),
+                    (entity -> lightning.value() && entity instanceof LightningEntity),
+                    (entity -> expOrbs.value() && entity instanceof ExperienceOrbEntity),
+                    (entity -> {
+                        if (soulweaverSkulls.value() && entity instanceof ArmorStandEntity stand) {
+                            ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
+                            if (!helmet.isEmpty() && helmet.getItem().equals(Items.PLAYER_HEAD)) {
+                                GameProfile profile = Utils.getTextures(helmet);
+                                return Utils.isTextureEqual(profile, skullTexture) && Utils.isInDungeons();
+                            }
+                        }
+                        return false;
+                    })
+            );
+        }
+
+        public List<Predicate<Entity>> get() {
+            return this.predicates;
+        }
     }
 }

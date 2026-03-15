@@ -26,6 +26,7 @@ public class HudManager {
     public static final Inventory inventory = new Inventory();
     public static final Quiver quiver = new Quiver("Quiver: §fN/A");
     public static final LagMeter lagMeter = new LagMeter("Last server tick was 0.00s ago");
+    public static final PickaxeAbilityTimer pickAbilityTimer = new PickaxeAbilityTimer();
     public static final BossHealth bossHealth = new BossHealth();
     public static final DungeonMap dungeonMap = new DungeonMap();
     public static final DungeonScore dungeonScore = new DungeonScore();

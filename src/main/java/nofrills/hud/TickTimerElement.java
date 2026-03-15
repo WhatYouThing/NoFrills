@@ -20,7 +20,7 @@ public class TickTimerElement extends SimpleTextElement {
     public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
-        } else if (!this.isEditingHud() && (this.ticks == -1 || !Utils.isInDungeons())) {
+        } else if (!this.isEditingHud() && !this.isTicking()) {
             return;
         }
         this.updateTimer();

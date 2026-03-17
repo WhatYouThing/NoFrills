@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -25,8 +26,10 @@ public class CroesusSolver {
     public static final Feature instance = new Feature("croesusSolver").requiresPricingAPI();
 
     public static final SettingColor profitColor = new SettingColor(RenderColor.fromHex(0x55FF55), "profitColor", instance);
-    public static final SettingColor profitKeyColor = new SettingColor(RenderColor.fromHex(0xFFFF55), "profitKeyColor", instance);
+    public static final SettingColor profitSecondaryColor = new SettingColor(RenderColor.fromHex(0xFFFF55), "profitSecondaryColor", instance);
+    public static final SettingColor profitKeyColor = new SettingColor(RenderColor.fromHex(0x55FFFF), "profitKeyColor", instance);
     public static final SettingColor unopenedColor = new SettingColor(RenderColor.fromHex(0x55FF55), "unopenedColor", instance);
+    public static final SettingColor rerolledColor = new SettingColor(RenderColor.fromHex(0x55FFFF), "rerolledColor", instance);
     public static final SettingColor openedColor = new SettingColor(RenderColor.fromHex(0xFF5555), "openedColor", instance);
     public static final SettingColor openedKeyColor = new SettingColor(RenderColor.fromHex(0x555555), "openedKeyColor", instance);
     public static final SettingBool valueTooltip = new SettingBool(true, "valueTooltip", instance);
@@ -36,7 +39,15 @@ public class CroesusSolver {
 
     private static LootState getLootState(ItemStack stack) {
         for (String string : Utils.getLoreLines(stack)) {
-            if (string.equals("No chests opened yet!")) return LootState.Unopened;
+            if (string.equals("No chests opened yet!")) {
+                for (Text text : Utils.getLoreText(stack)) {
+                    Optional<Style> style = Utils.getStyle(text, line -> line.endsWith("Kismet Feather"));
+                    if (style.isPresent() && style.get().isStrikethrough()) {
+                        return LootState.Rerolled;
+                    }
+                }
+                return LootState.Unopened;
+            }
             if (string.startsWith("Opened Chest: ")) return LootState.Opened;
             if (string.equals("No more chests to open!")) return LootState.OpenedKey;
         }
@@ -48,6 +59,7 @@ public class CroesusSolver {
         if (!name.endsWith("The Catacombs")) return;
         RenderColor color = switch (getLootState(stack)) {
             case Unopened -> unopenedColor.value();
+            case Rerolled -> rerolledColor.value();
             case Opened -> openedColor.value();
             case OpenedKey -> openedKeyColor.value();
             case Unknown -> null;
@@ -102,10 +114,12 @@ public class CroesusSolver {
                 SlotOptions.setBackground(entry.getKey(), profitColor.value());
             }
         }
-        if (chests.size() >= 2 && bazaarPricing.containsKey("DUNGEON_CHEST_KEY")) {
+        if (chests.size() >= 2) {
             Map.Entry<Slot, Double> entry = chests.get(1);
-            if (entry.getValue() - bazaarPricing.get("DUNGEON_CHEST_KEY").buy() > 0) {
+            if (bazaarPricing.containsKey("DUNGEON_CHEST_KEY") && entry.getValue() - bazaarPricing.get("DUNGEON_CHEST_KEY").buy() > 0) {
                 SlotOptions.setBackground(entry.getKey(), profitKeyColor.value());
+            } else if (entry.getValue() > 0) {
+                SlotOptions.setBackground(entry.getKey(), profitSecondaryColor.value());
             }
         }
     }
@@ -141,6 +155,7 @@ public class CroesusSolver {
 
     public enum LootState {
         Unopened,
+        Rerolled,
         Opened,
         OpenedKey,
         Unknown

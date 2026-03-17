@@ -3,12 +3,14 @@ package nofrills.features.dungeons;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.SlotUpdateEvent;
+import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
@@ -27,6 +29,7 @@ public class CroesusSolver {
     public static final SettingColor unopenedColor = new SettingColor(RenderColor.fromHex(0x55FF55), "unopenedColor", instance);
     public static final SettingColor openedColor = new SettingColor(RenderColor.fromHex(0xFF5555), "openedColor", instance);
     public static final SettingColor openedKeyColor = new SettingColor(RenderColor.fromHex(0x555555), "openedKeyColor", instance);
+    public static final SettingBool valueTooltip = new SettingBool(true, "valueTooltip", instance);
     public static final SettingBool floorLabel = new SettingBool(true, "floorLabel", instance);
 
     private static final HashMap<Slot, Double> chestValues = new HashMap<>();
@@ -115,6 +118,18 @@ public class CroesusSolver {
             }
             if (event.title.startsWith("Catacombs - Floor") || event.title.startsWith("Master Catacombs - Floor")) {
                 highlightChest(event.stack, event.slot);
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onTooltip(TooltipRenderEvent event) {
+        if (instance.isActive() && valueTooltip.value() && Utils.isInLootArea()) {
+            Slot slot = Utils.getFocusedSlot();
+            if (slot != null && chestValues.containsKey(slot)) {
+                double value = chestValues.get(slot);
+                MutableText valueText = Text.literal(Utils.formatSeparator(value)).withColor(value > 0 ? RenderColor.green.argb : RenderColor.red.argb);
+                event.addLine(Utils.getShortTag().append("§bChest Value: §r").append(valueText));
             }
         }
     }

@@ -551,6 +551,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Unopened Color", CroesusSolver.unopenedColor, "The highlight color for unopened loot."),
                                 new Settings.ColorPicker("Opened Color", CroesusSolver.openedColor, "The highlight color for opened loot."),
                                 new Settings.ColorPicker("Key Opened Color", CroesusSolver.openedKeyColor, "The highlight color for fully opened loot using a Dungeon Chest Key."),
+                                new Settings.Toggle("Value Tooltip", CroesusSolver.valueTooltip, "Displays the value of individual chests in the tooltip."),
                                 new Settings.Toggle("Floor Label", CroesusSolver.floorLabel, "Adds labels which indicate the floor the loot was obtained on.")
                         ))
                 )),

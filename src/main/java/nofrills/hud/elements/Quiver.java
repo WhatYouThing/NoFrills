@@ -22,7 +22,7 @@ public class Quiver extends SimpleTextElement {
     public final SettingBool onlyBow = new SettingBool(true, "onlyBow", this.instance);
 
     public Quiver(String text) {
-        super(Text.literal(text), new Feature("quiverElement"), "Quiver");
+        super(Text.literal(text), new Feature("quiverElement"), "Quiver Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Only If Bow", this.onlyBow, "Automatically hides the element if you are not holding a bow.")
         ));

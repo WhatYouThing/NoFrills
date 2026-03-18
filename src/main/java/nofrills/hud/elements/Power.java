@@ -9,7 +9,7 @@ import nofrills.misc.Utils;
 public class Power extends SimpleTextElement {
 
     public Power(String text) {
-        super(Text.literal(text), new Feature("powerElement"), "Power");
+        super(Text.literal(text), new Feature("powerElement"), "Power Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the power blessing level while in Dungeons.");
     }

@@ -18,7 +18,7 @@ public class Ping extends SimpleTextElement {
     public List<Long> pingList = new CopyOnWriteArrayList<>();
 
     public Ping(String text) {
-        super(Text.literal(text), new Feature("pingElement"), "Ping");
+        super(Text.literal(text), new Feature("pingElement"), "Ping Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds your average ping to the element.")
         ));

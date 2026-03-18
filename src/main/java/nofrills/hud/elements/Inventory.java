@@ -24,7 +24,7 @@ public class Inventory extends HudElement {
     private final FlowLayout content;
 
     public Inventory() {
-        super(new Feature("inventoryElement"), "Inventory");
+        super(new Feature("inventoryElement"), "Inventory Display");
         this.content = Containers.verticalFlow(Sizing.fixed(162), Sizing.fixed(54));
         for (int i = 0; i <= 2; i++) {
             FlowLayout container = Containers.horizontalFlow(Sizing.fixed(162), Sizing.fixed(18));

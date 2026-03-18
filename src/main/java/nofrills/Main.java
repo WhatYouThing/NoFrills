@@ -181,7 +181,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(LividSolver.class);
         eventBus.subscribe(MimicMessage.class);
         eventBus.subscribe(PrinceMessage.class);
-        eventBus.subscribe(SpiritBearTimer.class);
         eventBus.subscribe(EggHitsDisplay.class);
         eventBus.subscribe(BeaconTracer.class);
         eventBus.subscribe(CocoonAlert.class);

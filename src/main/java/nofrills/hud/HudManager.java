@@ -2,6 +2,7 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -30,6 +31,7 @@ public class HudManager {
     public static final BossHealth bossHealth = new BossHealth();
     public static final DungeonMap dungeonMap = new DungeonMap();
     public static final DungeonScore dungeonScore = new DungeonScore();
+    public static final SpiritBearTimer spiritBearTimer = new SpiritBearTimer();
     public static final TerracottaGyroTimer terraGyroTimer = new TerracottaGyroTimer();
     public static final PadTimer padTimer = new PadTimer();
     public static final TerminalStartTimer terminalStartTimer = new TerminalStartTimer();
@@ -216,6 +218,15 @@ public class HudManager {
                 case "The Core entrance is opening!" -> goldorTickTimer.pause();
                 default -> {
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onBlockUpdate(BlockUpdateEvent event) {
+        if (spiritBearTimer.isActive() && event.newState.getBlock().equals(Blocks.SEA_LANTERN) && Utils.isInDungeonBoss("4")) {
+            if (event.pos.getX() == 7 && event.pos.getY() == 77 && event.pos.getZ() == 34) {
+                spiritBearTimer.start();
             }
         }
     }

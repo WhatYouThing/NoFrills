@@ -492,7 +492,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Mimic Message", MimicMessage.instance, "Sends a message once you kill the Mimic. Should work even if it's instantly killed.", new Settings(List.of(
                                 new Settings.TextInput("Message", MimicMessage.msg, "The message to send.")
                         ))),
-                        new Module("Spirit Bear Timer", SpiritBearTimer.instance, "Renders a timer on screen for when the Spirit Bear is going to spawn in F4/M4."),
                         new Module("Secret Chime", SecretChime.instance, "Plays sounds upon collecting specific secrets.", new Settings(List.of(
                                 new Settings.Toggle("Items", SecretChime.itemsToggle, "Play a chime upon picking up a secret item."),
                                 new Settings.TextInput("Items Sound", SecretChime.itemsSound, "The identifier of the sound to play."),

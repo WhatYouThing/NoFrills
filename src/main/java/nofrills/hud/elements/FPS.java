@@ -17,7 +17,7 @@ public class FPS extends SimpleTextElement {
     public List<Integer> fpsList = new ArrayList<>();
 
     public FPS(String text) {
-        super(Text.literal(text), new Feature("fpsElement"), "FPS");
+        super(Text.literal(text), new Feature("fpsElement"), "FPS Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds the average FPS to the element.")
         ));

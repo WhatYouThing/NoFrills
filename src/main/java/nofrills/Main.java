@@ -150,7 +150,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(EtherwarpOverlay.class);
         eventBus.subscribe(ChatWaypoints.class);
         eventBus.subscribe(AutoSprint.class);
-        eventBus.subscribe(RareGlow.class);
+        eventBus.subscribe(RareHighlight.class);
         eventBus.subscribe(RareAnnounce.class);
         eventBus.subscribe(MuteDrake.class);
         eventBus.subscribe(CapTracker.class);

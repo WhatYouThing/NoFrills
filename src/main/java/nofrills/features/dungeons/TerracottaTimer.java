@@ -37,11 +37,11 @@ public class TerracottaTimer {
 
     @EventHandler
     private static void onBlockUpdate(BlockUpdateEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("6")) {
-            if (event.oldState.isAir() && event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
+        if (instance.isActive() && Utils.isInDungeonBoss("6") && event.oldState.isAir()) {
+            if (event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
                 terracottas.add(new Terracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300));
             }
-            if (!terraGyroTimer.isTicking() && event.oldState.isAir() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
+            if (!terraGyroTimer.isTicking() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
                 terraGyroTimer.setStartTicks(235);
                 terraGyroTimer.start();
             }
@@ -89,6 +89,11 @@ public class TerracottaTimer {
             if (this.ticks > 0) {
                 this.ticks--;
             }
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            return object instanceof Terracotta terracotta && this.pos.equals(terracotta.pos);
         }
 
         @Override

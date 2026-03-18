@@ -336,21 +336,6 @@ public class Utils {
         return entity.getDimensions(EntityPose.STANDING).getBoxAt(entity.getLerpedPos(tickProgress));
     }
 
-    /**
-     * Enable/disable glowing for a specific entity.
-     */
-    public static void setGlowing(Entity ent, boolean shouldGlow, RenderColor color) {
-        ((EntityRendering) ent).nofrills_mod$setGlowingColored(shouldGlow, color);
-    }
-
-    /**
-     * Checks if an entity is drawing the glow effect. Does not account for vanilla/server applied glows.
-     */
-    public static boolean isGlowing(Entity ent) {
-        return ((EntityRendering) ent).nofrills_mod$getGlowing();
-    }
-
-    @SuppressWarnings("unchecked")
     public static List<Entity> getEntities() {
         if (mc.world != null) {
             SimpleEntityLookup<Entity> lookup = (SimpleEntityLookup<Entity>) mc.world.entityManager.getLookup();

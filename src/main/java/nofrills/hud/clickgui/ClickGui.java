@@ -378,8 +378,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Kill Delay", 5, 120, 1, CapTracker.delay, "The delay (in seconds) until the cap starts being tracked again after it is reached.")
                         ))),
                         new Module("Mute Drake", MuteDrake.instance, "Prevents the Reindrake from blowing up your ears with gifts."),
-                        new Module("Rare Glow", RareGlow.instance, "Applies a glow effect to nearby rare/profitable sea creatures.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", RareGlow.color, "The color of the glow.")
+                        new Module("Rare Highlight", RareHighlight.instance, "Highlights rare/profitable sea creatures.", new Settings(List.of(
+                                new Settings.Dropdown<>("Highlight Style", RareHighlight.style, "The style of the highlight."),
+                                new Settings.ColorPicker("Outline Color", RareHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", RareHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
                         new Module("Rare Alert", RareAnnounce.instance, "Alerts you, and/or your party when you catch a rare sea creature.", new Settings(List.of(
                                 new Settings.Toggle("Show Title", RareAnnounce.title, "Shows a title on screen with the name of the sea creature."),
@@ -423,7 +425,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Inverted Block", DeviceSolvers.alignBlockInvert, "Prevents wrong rotations only while sneaking instead of only while not sneaking.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
-                                new Settings.Dropdown<>("Highlight Style", StarredMobHighlight.style, "The style of the starred mon highlight."),
+                                new Settings.Dropdown<>("Highlight Style", StarredMobHighlight.style, "The style of the starred mob highlight."),
                                 new Settings.ColorPicker("Outline Color", StarredMobHighlight.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", StarredMobHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
@@ -466,7 +468,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Spawn Alert", WitherDragons.alert, "Alerts you when a dragon is about to spawn.\nThis option also calculates the priority on the initial spawn based on your selected class."),
                                 new Settings.SliderDouble("Split Power", 0, 32, 0.1, WitherDragons.power, "The required Power blessing level to consider a split possible.\nLeaving this option at 0 is recommended for party finder teams."),
                                 new Settings.SliderDouble("Easy Power", 0, 32, 0.1, WitherDragons.powerEasy, "The required Power blessing level to consider a split possible, as long as one of the dragons is Purple."),
-                                new Settings.Toggle("Dragon Glow", WitherDragons.glow, "Applies a glow effect to each dragon."),
                                 new Settings.Toggle("Kill Areas", WitherDragons.boxes, "Renders the kill areas of every alive dragon."),
                                 new Settings.Toggle("Tracers", WitherDragons.tracers, "Draws tracer lines to spawning dragons."),
                                 new Settings.Toggle("Stack Waypoints", WitherDragons.stack, "Renders waypoints for stacking your Last Breath arrows."),
@@ -474,8 +475,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Spawn Timer", WitherDragons.timer, "Renders timers for exactly when a dragon should finish spawning."),
                                 new Settings.Toggle("Dragon Health", WitherDragons.health, "Renders the exact health of the dragons.")
                         ))),
-                        new Module("Secret Bat Highlight", SecretBatHighlight.instance, "Applies a glow effect to secret bats.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", SecretBatHighlight.color, "The color of the secret bat glow.")
+                        new Module("Secret Bat Highlight", SecretBatHighlight.instance, "Highlights secret bats.", new Settings(List.of(
+                                new Settings.Dropdown<>("Highlight Style", SecretBatHighlight.style, "The style of the highlight."),
+                                new Settings.ColorPicker("Outline Color", SecretBatHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", SecretBatHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
                         new Module("Livid Solver", LividSolver.instance, "Finds and highlights the correct Livid in F5/M5.", new Settings(List.of(
                                 new Settings.Toggle("Title", LividSolver.title, "Show a title on screen once the Livid color is identified."),
@@ -629,10 +632,15 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
                                 new Settings.Toggle("Hide Opened", CorpseHighlight.hideOpened, "Removes the highlight from corpses you've already opened."),
-                                new Settings.ColorPicker("Lapis Color", CorpseHighlight.lapisColor, "The color of the Lapis corpse."),
-                                new Settings.ColorPicker("Mineral Color", CorpseHighlight.mineralColor, "The color of the Tungsten corpse."),
-                                new Settings.ColorPicker("Yog Color", CorpseHighlight.yogColor, "The color of the Umber corpse."),
-                                new Settings.ColorPicker("Vanguard Color", CorpseHighlight.vanguardColor, "The color of the Vanguard corpse.")
+                                new Settings.Dropdown<>("Highlight Style", CorpseHighlight.style, "The style of the corpse highlight."),
+                                new Settings.ColorPicker("Lapis Outline", CorpseHighlight.lapisOutline, "The color of the Lapis corpse outline style highlight."),
+                                new Settings.ColorPicker("Lapis Fill", CorpseHighlight.lapisFill, "The color of the Lapis corpse fill style highlight."),
+                                new Settings.ColorPicker("Tungsten Outline", CorpseHighlight.mineralOutline, "The color of the Tungsten corpse outline style highlight."),
+                                new Settings.ColorPicker("Tungsten Fill", CorpseHighlight.mineralFill, "The color of the Tungsten corpse fill style highlight."),
+                                new Settings.ColorPicker("Umber Outline", CorpseHighlight.yogOutline, "The color of the Umber corpse outline style highlight."),
+                                new Settings.ColorPicker("Umber Fill", CorpseHighlight.yogFill, "The color of the Umber corpse fill style highlight."),
+                                new Settings.ColorPicker("Vanguard Outline", CorpseHighlight.vanguardOutline, "The color of the Vanguard corpse outline style highlight."),
+                                new Settings.ColorPicker("Vanguard Fill", CorpseHighlight.vanguardFill, "The color of the Vanguard corpse fill style highlight.")
                         ))),
                         new Module("Ghost Vision", GhostVision.instance, "Makes Ghosts easier to see in the Dwarven Mines.", new Settings(List.of(
                                 new Settings.ColorPicker("Fill Color", GhostVision.fill, "The color of the filled box over each Ghost."),
@@ -642,10 +650,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Spawn Alert", ScathaMining.alert, "Alerts you when a Worm/Scatha spawns nearby."),
                                 new Settings.Toggle("Cooldown", ScathaMining.cooldown, "Tracks the Worm spawn cooldown for you.")
                         ))),
-                        new Module("End Node Highlight", EndNodeHighlight.instance, "Highlights Ender Nodes.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", EndNodeHighlight.color, "The color of the node highlight.")
+                        new Module("End Node Highlight", EndNodeHighlight.instance, "Highlights End Nodes.", new Settings(List.of(
+                                new Settings.Dropdown<>("Highlight Style", EndNodeHighlight.style, "The style of the highlight."),
+                                new Settings.ColorPicker("Outline Color", EndNodeHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", EndNodeHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
-                        new Module("Temple Skip", TempleSkip.instance, "Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.", new Settings(List.of(
+                        new Module("Temple Skip", TempleSkip.instance, "Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.\n\nUsage:\n1. Stand on top of the highlighted stone block.\n2. Look straight up at the highlighted bedrock and throw 2 Ender Pearls by holding right click.\n3. Hold jump to enter the temple after you get teleported into the bedrock.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", TempleSkip.color, "The color of the skip highlight.")
                         ))),
                         new Module("Gemstone Desync Fix", GemstoneDesyncFix.instance, "Fixes adjacent gemstone blocks not correctly updating when mining."),

@@ -2,7 +2,6 @@ package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
@@ -20,8 +19,6 @@ public class TempleSkip {
 
     public static final SettingColor color = new SettingColor(new RenderColor(127, 0, 255, 255), "color", instance.key());
 
-    private static final Text text = Text.literal("Double Pearl (Hold) + Jump");
-    private static final Text standText = Text.literal("Stand On Top");
     private static BlockPos spot = null;
 
     @EventHandler
@@ -42,8 +39,6 @@ public class TempleSkip {
             Box standBox = Box.enclosing(standPos, standPos);
             event.drawOutline(box, true, color.value());
             event.drawOutline(standBox, true, color.value());
-            event.drawText(box.getCenter().add(0, -1, 0), text, 0.035f, true, RenderColor.white);
-            event.drawText(standBox.getCenter().add(0, 1, 0), standText, 0.035f, true, RenderColor.white);
         }
     }
 

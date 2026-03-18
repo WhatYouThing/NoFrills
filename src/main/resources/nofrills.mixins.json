@@ -17,7 +17,6 @@
     "DataTrackerMixin",
     "DrawContextMixin",
     "EndermanEntityMixin",
-    "EntityMixin",
     "EntityRendererMixin",
     "FogRendererMixin",
     "GameOptionsMixin",

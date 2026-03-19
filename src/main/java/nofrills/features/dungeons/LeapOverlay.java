@@ -5,13 +5,19 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.screen.GenericContainerScreenHandler;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import nofrills.config.*;
-import nofrills.events.SlotUpdateEvent;
+import nofrills.events.ScreenOpenEvent;
 import nofrills.misc.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import static nofrills.Main.mc;
 
@@ -30,32 +36,23 @@ public class LeapOverlay {
     public static final RenderColor deadColor = RenderColor.fromHex(0xaaaaaa);
 
     private static final String leapMenuName = "Spirit Leap";
+    protected static boolean sentLeapMsg = false;
 
     public static boolean isLeapMenu(String title) {
         return instance.isActive() && Utils.isInDungeons() && title.equals(leapMenuName);
     }
 
     @EventHandler
-    private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && event.isFinal && event.title.equals(leapMenuName) && Utils.isInDungeons()) {
+    private static void onScreenOpen(ScreenOpenEvent event) {
+        if (instance.isActive() && event.screen.getTitle().getString().equals(leapMenuName) && Utils.isInDungeons()) {
+            String self = mc.player.getName().getString();
+            List<DungeonUtil.Teammate> teammates = DungeonUtil.getAliveTeammates(true);
             List<LeapTarget> targets = new ArrayList<>();
-            HashMap<String, Integer> alive = new HashMap<>(4);
-            for (Slot slot : Utils.getContainerSlots(event.handler)) {
-                ItemStack stack = slot.getStack();
-                if (!stack.getItem().equals(Items.PLAYER_HEAD)) continue;
-                List<String> lore = Utils.getLoreLines(stack);
-                String name = Utils.toPlain(stack.getName());
-                String dungeonClass = DungeonUtil.getPlayerClass(name);
-                if (!lore.isEmpty() && !dungeonClass.isEmpty() && lore.getFirst().equals("Click to teleport!")) {
-                    alive.put(name, slot.id);
-                }
-            }
             for (Map.Entry<String, String> entry : DungeonUtil.getClassCache().entrySet()) {
                 String name = entry.getKey();
                 String dungeonClass = entry.getValue();
-                if (!name.equalsIgnoreCase(mc.player.getName().getString())) {
-                    int slotId = alive.getOrDefault(name, -1);
-                    targets.add(new LeapTarget(slotId, name, dungeonClass, slotId == -1));
+                if (!name.equalsIgnoreCase(self)) {
+                    targets.add(new LeapTarget(name, dungeonClass, teammates.stream().noneMatch(teammate -> teammate.name().equals(name))));
                 }
             }
             targets.sort(Comparator.comparing(target -> target.dungeonClass + target.name));
@@ -65,6 +62,7 @@ public class LeapOverlay {
                     targets.add(LeapTarget.empty());
                 }
             }
+            sentLeapMsg = false;
             for (LeapTarget target : targets) {
                 ((ScreenOptions) event.screen).nofrills_mod$addLeapButton(target);
             }
@@ -72,25 +70,22 @@ public class LeapOverlay {
     }
 
     public static class LeapTarget {
-        public int slotId;
         public String name;
         public String dungeonClass;
         public boolean dead;
 
-        public LeapTarget(int slotId, String name, String dungeonClass, boolean dead) {
-            this.slotId = slotId;
+        public LeapTarget(String name, String dungeonClass, boolean dead) {
             this.name = name;
             this.dungeonClass = dungeonClass;
             this.dead = dead;
         }
 
         public static LeapTarget empty() {
-            return new LeapTarget(-1, "", "Empty", false);
+            return new LeapTarget("", "Empty", false);
         }
     }
 
     public static class LeapButton implements Drawable {
-        public final int slotId;
         public final Text player;
         public final Text dungeonClass;
         public final boolean dead;
@@ -107,7 +102,6 @@ public class LeapOverlay {
         public int maxY = 0;
 
         public LeapButton(LeapTarget target, int index) {
-            this.slotId = target.slotId;
             this.player = Text.literal(target.name);
             this.dungeonClass = Text.literal(target.dungeonClass);
             this.dead = target.dead;
@@ -137,7 +131,25 @@ public class LeapOverlay {
         }
 
         public boolean isHovered(double mouseX, double mouseY) {
-            return this.slotId != -1 && mouseX >= this.minX && mouseX <= this.maxX && mouseY >= this.minY && mouseY <= this.maxY;
+            return !this.player.getString().isEmpty() && mouseX >= this.minX && mouseX <= this.maxX && mouseY >= this.minY && mouseY <= this.maxY;
+        }
+
+        public void click(ScreenHandler handler) {
+            for (Slot slot : Utils.getContainerSlots((GenericContainerScreenHandler) handler)) {
+                ItemStack stack = slot.getStack();
+                if (!stack.getItem().equals(Items.PLAYER_HEAD)) continue;
+                List<String> lore = Utils.getLoreLines(stack);
+                if (!lore.isEmpty() && Utils.toPlain(stack.getName()).equals(this.player.getString()) && lore.getFirst().equals("Click to teleport!")) {
+                    mc.interactionManager.clickSlot(handler.syncId, slot.id, 0, SlotActionType.PICKUP, mc.player);
+                    handler.setCursorStack(ItemStack.EMPTY);
+                    if (LeapOverlay.send.value() && !LeapOverlay.message.value().isEmpty() && !sentLeapMsg) {
+                        Utils.sendMessage(LeapOverlay.message.value().replace("{name}", this.player.getString()));
+                        sentLeapMsg = true;
+                    }
+                    return;
+                }
+            }
+            Utils.infoFormat("§7Could not leap to §f{}§7, the screen might not be built yet and/or the player might be dead.");
         }
 
         public void drawText(DrawContext context, Text text, int x, int y, float scale, RenderColor color) {
@@ -155,8 +167,9 @@ public class LeapOverlay {
             this.maxX = getX(context, this.offsetX + 0.2f);
             this.maxY = getY(context, this.offsetY + 0.2f);
             context.fill(minX, minY, maxX, maxY, this.isHovered(mouseX, mouseY) ? backgroundHover.argb : background.argb);
-            if (this.slotId != -1)
+            if (!this.player.getString().isEmpty()) {
                 Rendering.drawBorder(context, minX, minY, maxX - minX, maxY - minY, border);
+            }
             float textScale = (float) (scale.value() / mc.options.getGuiScale().getValue());
             int textX = this.minX + (this.maxX - this.minX) / 2;
             int playerTextY = (int) (this.minY + (this.maxY - this.minY) * 0.25);

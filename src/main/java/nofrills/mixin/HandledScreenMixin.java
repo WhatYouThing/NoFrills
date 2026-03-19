@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static nofrills.Main.eventBus;
-import static nofrills.Main.mc;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen implements ScreenOptions {
@@ -55,8 +54,6 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     protected int x;
     @Unique
     List<LeapOverlay.LeapButton> leapButtons = new ArrayList<>();
-    @Unique
-    boolean sentLeapMsg = false;
 
     protected HandledScreenMixin(Text title) {
         super(title);
@@ -186,12 +183,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         if (LeapOverlay.isLeapMenu(this.title.getString()) && click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
             for (LeapOverlay.LeapButton leapButton : leapButtons) {
                 if (leapButton.isHovered(click.x(), click.y())) {
-                    mc.interactionManager.clickSlot(handler.syncId, leapButton.slotId, 0, SlotActionType.PICKUP, mc.player);
-                    this.handler.setCursorStack(ItemStack.EMPTY);
-                    if (LeapOverlay.send.value() && !LeapOverlay.message.value().isEmpty() && !sentLeapMsg) {
-                        Utils.sendMessage(LeapOverlay.message.value().replace("{name}", leapButton.player.getString()));
-                        sentLeapMsg = true;
-                    }
+                    leapButton.click(this.handler);
                     cir.setReturnValue(true);
                 }
             }

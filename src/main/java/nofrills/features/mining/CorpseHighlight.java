@@ -98,7 +98,7 @@ public class CorpseHighlight {
                     continue;
                 }
                 ArmorStandEntity stand = (ArmorStandEntity) ent;
-                Box box = new Box(BlockPos.ofFloored(stand.getEyePos()));
+                Box box = new Box(Utils.findGround(BlockPos.ofFloored(stand.getEyePos()), 4).add(0, 1, 0));
                 switch (getCorpseType(stand)) {
                     case Lapis -> event.drawStyled(box, style.value(), false, lapisOutline.value(), lapisFill.value());
                     case Tungsten ->

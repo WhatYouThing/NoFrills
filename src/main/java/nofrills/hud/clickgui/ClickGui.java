@@ -643,6 +643,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Vanguard Fill", CorpseHighlight.vanguardFill, "The color of the Vanguard corpse fill style highlight.")
                         ))),
                         new Module("Ghost Vision", GhostVision.instance, "Makes Ghosts easier to see in the Dwarven Mines.", new Settings(List.of(
+                                new Settings.Dropdown<>("Highlight Style", GhostVision.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Fill Color", GhostVision.fill, "The color of the filled box over each Ghost."),
                                 new Settings.ColorPicker("Outline Color", GhostVision.outline, "The color of the outline box over each Ghost.")
                         ))),

@@ -9,6 +9,7 @@ import net.minecraft.client.render.fog.FogData;
 import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
@@ -45,6 +46,8 @@ public class NoRender {
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
     public static final SettingBool iceSpray = new SettingBool(false, "iceSpray", instance.key());
     public static final SettingBool soulweaverSkulls = new SettingBool(false, "soulweaverSkulls", instance.key());
+    public static final SettingBool guidedSheep = new SettingBool(false, "guidedSheep", instance.key());
+    public static final SettingBool bonePlating = new SettingBool(false, "bonePlating", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
     public static final SettingEnum<VignetteMode> vignette = new SettingEnum<>(VignetteMode.None, VignetteMode.class, "vignetteMode", instance.key());
@@ -200,6 +203,14 @@ public class NoRender {
                                 GameProfile profile = Utils.getTextures(helmet);
                                 return Utils.isTextureEqual(profile, skullTexture) && Utils.isInDungeons();
                             }
+                        }
+                        return false;
+                    }),
+                    (entity -> guidedSheep.value() && entity instanceof SheepEntity sheep && sheep.getHealth() == 8.0f && Utils.isInDungeons()),
+                    (entity -> {
+                        if (bonePlating.value() && entity instanceof ItemEntity item) {
+                            ItemStack stack = item.getStack();
+                            return stack.getItem().equals(Items.BONE_MEAL) && stack.getName().getString().equals("Bone Meal") && Utils.isInDungeons();
                         }
                         return false;
                     })

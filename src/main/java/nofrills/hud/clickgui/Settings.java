@@ -75,6 +75,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 case Description description -> 10 + ((PlainLabel) description.children().getLast()).getTextHeight();
                 case Separator ignored -> 20;
                 case CommandKeybinds.Setting ignored -> 51;
+                case CustomHeight customHeight -> customHeight.heightOverride;
                 default -> 30;
             };
             height += childHeight;
@@ -458,6 +459,18 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 this.setting.reset();
                 text.setText(String.valueOf(this.setting.value()));
             }));
+        }
+    }
+
+    public static class CustomHeight extends FlowLayout {
+        public int heightOverride;
+
+        public CustomHeight(int height) {
+            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            this.padding(Insets.of(5));
+            this.horizontalAlignment(HorizontalAlignment.LEFT);
+            this.verticalAlignment(VerticalAlignment.CENTER);
+            this.heightOverride = height;
         }
     }
 }

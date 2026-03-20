@@ -32,6 +32,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -59,22 +60,23 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         super(title);
     }
 
-    @Shadow
-    protected abstract void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType);
-
     @Override
     public void nofrills_mod$addLeapButton(LeapOverlay.LeapTarget target) {
         leapButtons.add(new LeapOverlay.LeapButton(target, leapButtons.size()));
     }
 
+    @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", ordinal = 1))
+    private void onClickSlotRedirect(HandledScreen<?> instance, Slot slot, int slotId, int button, SlotActionType actionType) {
+        if (MiddleClickOverride.shouldOverride(slot, button, actionType)) {
+            instance.onMouseClick(slot, slotId, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE);
+        } else {
+            instance.onMouseClick(slot, slotId, button, actionType);
+        }
+    }
+
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At("HEAD"), cancellable = true)
     private void onClickSlot(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
         if (LeapOverlay.isLeapMenu(this.title.getString()) || NoRender.shouldHideTooltip(slot, this.title.getString()) || SlotOptions.isDisabled(slot)) {
-            ci.cancel();
-            return;
-        }
-        if (MiddleClickOverride.shouldOverride(slot, button, actionType)) {
-            this.onMouseClick(slot, slotId, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE);
             ci.cancel();
             return;
         }

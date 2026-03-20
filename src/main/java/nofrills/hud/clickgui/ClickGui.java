@@ -244,7 +244,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands.", new Settings(List.of(
                                 new Settings.Toggle("Server Only", NoLoadingScreen.serverOnly, "Only prevent loading screens while connected to a third party server.")
                         ))),
-                        new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother."),
+                        new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother.", new Settings(
+                                new Settings.Toggle("Debug", MiddleClickOverride.debug, "Outputs a chat message once a click is successfully replaced.")
+                        )),
                         new Module("No Front Perspective", NoFrontPerspective.instance, "Removes the front facing camera perspective."),
                         new Module("Item Count Fix", ItemCountFix.instance, "Prevents the game from hiding item counts for unstackable items."),
                         new Module("Middle Click Fix", MiddleClickFix.instance, "Allows the middle mouse button to work just as it does on 1.8.9."),

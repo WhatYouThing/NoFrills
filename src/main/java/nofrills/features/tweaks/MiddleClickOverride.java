@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import nofrills.config.Feature;
+import nofrills.config.SettingBool;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
@@ -15,6 +16,8 @@ import static nofrills.Main.mc;
 
 public class MiddleClickOverride {
     public static final Feature instance = new Feature("middleClickOverride");
+
+    public static final SettingBool debug = new SettingBool(false, "debug", instance);
 
     private static final HashSet<String> matchBlacklist = Sets.newHashSet(
             "Attribute Fusion",
@@ -64,6 +67,10 @@ public class MiddleClickOverride {
             "Bits Shop"
     );
 
+    private static boolean isLeftClick(int button, SlotActionType actionType) {
+        return button == GLFW.GLFW_MOUSE_BUTTON_LEFT && actionType.equals(SlotActionType.PICKUP);
+    }
+
     private static boolean isBlacklisted(String title) {
         return matchBlacklist.contains(title) || containBlacklist.stream().anyMatch(title::contains);
     }
@@ -77,14 +84,17 @@ public class MiddleClickOverride {
     }
 
     public static boolean shouldOverride(Slot slot, int button, SlotActionType actionType) {
-        if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container && Utils.isInSkyblock()) {
-            if (slot != null && button == GLFW.GLFW_MOUSE_BUTTON_LEFT && actionType.equals(SlotActionType.PICKUP)) {
-                String title = container.getTitle().getString();
-                ItemStack stack = slot.getStack();
-                if (stack.isEmpty() || isBlacklisted(title)) {
-                    return false;
+        if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container && slot != null && isLeftClick(button, actionType)) {
+            String title = container.getTitle().getString();
+            ItemStack stack = slot.getStack();
+            if (stack.isEmpty() || isBlacklisted(title) || !Utils.isInSkyblock()) {
+                return false;
+            }
+            if (Utils.getSkyblockId(stack).isEmpty() || isWhitelisted(title) || isTransaction(stack)) {
+                if (debug.value()) {
+                    Utils.infoFormat("Middle Click Override replaced click: slot {}, button {}, {} action type.", slot.id, button, actionType.name());
                 }
-                return Utils.getSkyblockId(stack).isEmpty() || isWhitelisted(title) || isTransaction(stack);
+                return true;
             }
         }
         return false;

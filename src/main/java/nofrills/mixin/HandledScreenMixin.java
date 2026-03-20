@@ -1,6 +1,8 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
@@ -32,7 +34,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -65,12 +66,12 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
         leapButtons.add(new LeapOverlay.LeapButton(target, leapButtons.size()));
     }
 
-    @Redirect(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", ordinal = 1))
-    private void onClickSlotRedirect(HandledScreen<?> instance, Slot slot, int slotId, int button, SlotActionType actionType) {
+    @WrapOperation(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", ordinal = 1))
+    private void onClickSlotRedirect(HandledScreen<?> instance, Slot slot, int slotId, int button, SlotActionType actionType, Operation<Void> original) {
         if (MiddleClickOverride.shouldOverride(slot, button, actionType)) {
             instance.onMouseClick(slot, slotId, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE);
         } else {
-            instance.onMouseClick(slot, slotId, button, actionType);
+            original.call(instance, slot, slotId, button, actionType);
         }
     }
 

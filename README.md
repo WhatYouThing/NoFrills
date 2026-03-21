@@ -1,6 +1,6 @@
 # NoFrills Mod
 
-It's in the name. Simple and effective Hypixel Skyblock mod for modern versions (1.20+) of Minecraft.
+It's in the name. Simple and effective Hypixel Skyblock mod for modern versions of Minecraft.
 
 ## Features
 
@@ -221,15 +221,16 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 ## Scam Warning
 
-- **There are fake NoFrills websites and Discord servers floating around. Here are some general rules of thumb to help
-  you stay safe:**
-    - The official Discord server link is https://discord.com/invite/NENuTFvS7X.
-    - The official Discord server does not require any form of verification.
-    - The official Discord server does not have a vanity link, it is currently taken by a phishing server which tries to
-      steal your Microsoft account.
-    - There is no official website where you can download the mod from. The Modrinth and the GitHub are the only safe
-      sources of the mod.
-    - Microsoft does not care about your account safety. Never share your email address with anyone.
+**There are fake NoFrills websites and Discord servers floating around.** Here are some general rules of thumb to help
+you stay safe:
+
+- The official Discord server link is https://discord.com/invite/NENuTFvS7X.
+- The official Discord server does not require any form of verification.
+- The official Discord server does not have a vanity link, it is currently taken by a phishing server which tries to
+  steal your Microsoft account.
+- There is no official website where you can download the mod from. The Modrinth and the GitHub are the only safe
+  sources of the mod.
+- Microsoft does not care about your account safety. Never share your email address with anyone.
 
 ## Installation
 

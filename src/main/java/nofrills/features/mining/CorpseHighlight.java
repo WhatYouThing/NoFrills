@@ -1,12 +1,11 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -99,10 +98,7 @@ public class CorpseHighlight {
                     continue;
                 }
                 ArmorStandEntity stand = (ArmorStandEntity) ent;
-                BlockPos blockPos = BlockPos.ofFloored(stand.getEyePos());
-                Box box = mc.world.getBlockState(blockPos).getBlock().equals(Blocks.ICE)
-                        ? new Box(blockPos.add(0, 1, 0))
-                        : new Box(Utils.findGround(blockPos, 2).add(0, 1, 0));
+                Box box = stand.getDimensions(EntityPose.STANDING).getBoxAt(stand.getEntityPos()).expand(0.25, 0.0, 0.25);
                 switch (getCorpseType(stand)) {
                     case Lapis -> event.drawStyled(box, style.value(), false, lapisOutline.value(), lapisFill.value());
                     case Tungsten ->

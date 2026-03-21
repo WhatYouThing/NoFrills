@@ -85,8 +85,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         int height = context.getScaledWindowHeight();
-        context.drawTextWithShadow(this.textRenderer, "Left click a feature to toggle", 1, height - 20, RenderColor.white.argb);
-        context.drawTextWithShadow(this.textRenderer, "Right click a feature open its settings", 1, height - 10, RenderColor.white.argb);
+        context.drawTextWithShadow(this.textRenderer, "Left click a feature to toggle", 1, height - 30, RenderColor.white.argb);
+        context.drawTextWithShadow(this.textRenderer, "Right click a feature open its settings", 1, height - 20, RenderColor.white.argb);
+        context.drawTextWithShadow(this.textRenderer, "Scrolling supported in each category and the screen itself", 1, height - 10, RenderColor.white.argb);
     }
 
     @Override

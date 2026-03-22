@@ -39,10 +39,12 @@ public class ItemProtection {
     public static final SettingBool protectRarityUpgraded = new SettingBool(false, "protectRarityUpgraded", instance);
     public static final SettingBool protectValue = new SettingBool(false, "protectValue", instance);
     public static final SettingDouble protectValueMin = new SettingDouble(5000000.0, "protectValueMin", instance);
+    public static final SettingBool hideTooltip = new SettingBool(false, "hideTooltip", instance);
 
     private static boolean isSellGUI = false;
     private static boolean isSalvageGUI = false;
     private static boolean overrideActive = false;
+    private static boolean revealingTooltip = false;
 
     public static ProtectType getProtectType(ItemStack stack) {
         if (overrideActive || stack.isEmpty()) return ProtectType.None;
@@ -144,6 +146,9 @@ public class ItemProtection {
     @EventHandler
     private static void onKey(InputEvent event) {
         if (instance.isActive() && (mc.currentScreen instanceof InventoryScreen || mc.currentScreen instanceof GenericContainerScreen)) {
+            if (hideTooltip.value() && event.key == GLFW.GLFW_KEY_LEFT_SHIFT) {
+                revealingTooltip = event.action != GLFW.GLFW_RELEASE;
+            }
             if (overrideKey.isKey(event.key)) {
                 overrideActive = event.action != GLFW.GLFW_RELEASE;
                 event.cancel();
@@ -167,6 +172,9 @@ public class ItemProtection {
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && !event.stack.isEmpty() && event.customData != null) {
+            if (hideTooltip.value() && !revealingTooltip) {
+                return;
+            }
             ProtectType type = getProtectType(event.stack);
             if (!type.equals(ProtectType.None)) {
                 MutableText line = Text.literal(Utils.format("§aItem Protected §7({})", type.name()));
@@ -221,6 +229,7 @@ public class ItemProtection {
     private static void onScreenClose(ScreenCloseEvent event) {
         if (instance.isActive()) {
             overrideActive = false;
+            revealingTooltip = false;
         }
     }
 

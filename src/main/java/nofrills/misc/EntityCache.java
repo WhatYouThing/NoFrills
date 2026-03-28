@@ -9,6 +9,7 @@ import nofrills.events.ServerJoinEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * An object for temporarily storing any relevant entity handles, such as armor stands with custom names.
@@ -69,6 +70,10 @@ public class EntityCache {
      */
     public void remove(Entity ent) {
         this.entities.remove(ent);
+    }
+
+    public void removeIf(Predicate<Entity> predicate) {
+        this.entities.removeIf(predicate);
     }
 
     public void clear() {

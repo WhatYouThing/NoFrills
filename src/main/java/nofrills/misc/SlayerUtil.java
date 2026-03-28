@@ -79,6 +79,11 @@ public class SlayerUtil {
         currentBoss = null;
     }
 
+    private static void setCachedEntity(EntityCache cache, Entity entity) {
+        cache.add(entity);
+        cache.removeIf(ent -> !ent.equals(entity));
+    }
+
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (currentBoss != null && isSpawner(event.namePlain)) {
@@ -95,15 +100,15 @@ public class SlayerUtil {
                 if (entity instanceof ArmorStandEntity stand) {
                     String name = Utils.toPlain(stand.getName());
                     if (isTimer(name)) {
-                        timerCache.add(entity);
+                        setCachedEntity(timerCache, entity);
                     }
                     if (isName(name)) {
-                        nameCache.add(entity);
+                        setCachedEntity(nameCache, entity);
                     }
                     continue;
                 }
                 if (currentBoss.predicate.test(entity)) {
-                    bossCache.add(entity);
+                    setCachedEntity(bossCache, entity);
                 }
             }
         }

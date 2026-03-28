@@ -75,10 +75,8 @@ public class WorldRenderEvent {
     private void drawLine(Vec3d start, Vec3d end, float width, VertexConsumer consumer, RenderColor color) {
         MatrixStack.Entry entry = this.matrices.peek();
         Vec3d camPos = this.camera.getCameraPos();
-        Vector4f vector4f = new Vector4f();
-        Vector4f vector4f2 = new Vector4f();
-        vector4f.set(start.getX() - camPos.getX(), start.getY() - camPos.getY(), start.getZ() - camPos.getZ(), 1.0);
-        vector4f2.set(end.getX() - camPos.getX(), end.getY() - camPos.getY(), end.getZ() - camPos.getZ(), 1.0);
+        Vector4f vector4f = new Vector4f().set(start.getX() - camPos.getX(), start.getY() - camPos.getY(), start.getZ() - camPos.getZ(), 1.0);
+        Vector4f vector4f2 = new Vector4f().set(end.getX() - camPos.getX(), end.getY() - camPos.getY(), end.getZ() - camPos.getZ(), 1.0);
         consumer.vertex(entry, vector4f.x, vector4f.y, vector4f.z)
                 .normal(entry, vector4f2.x - vector4f.x, vector4f2.y - vector4f.y, vector4f2.z - vector4f.z)
                 .color(color.argb)

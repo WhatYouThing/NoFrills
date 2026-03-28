@@ -9,10 +9,10 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import nofrills.commands.NoFrillsCommand;
 import nofrills.commands.YeetCommand;
@@ -47,9 +47,9 @@ public class Main implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static final IEventBus eventBus = new EventBus();
 
-    public static MinecraftClient mc;
+    public static Minecraft mc;
 
-    public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandRegistryAccess access) {
+    public static void registerCommands(CommandDispatcher<FabricClientCommandSource> dispatcher, CommandBuildContext access) {
         CommandShortcuts.init(dispatcher); // register shortcuts first so that the user cant softlock the mod by overriding the main commands
         YeetCommand.init(dispatcher);
         NoFrillsCommand.init(dispatcher);
@@ -69,9 +69,9 @@ public class Main implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        long start = Util.getMeasuringTimeMs();
+        long start = Util.getMillis();
 
-        mc = MinecraftClient.getInstance();
+        mc = Minecraft.getInstance();
 
         injectRenderDoc();
 
@@ -82,8 +82,8 @@ public class Main implements ModInitializer {
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
-            DungeonMap.mapTexture = new NativeImageBackedTexture("NoFrills Dungeon Map", 128, 128, true);
-            client.getTextureManager().registerTexture(Identifier.of("nofrills", "dungeon_map_texture"), DungeonMap.mapTexture);
+            DungeonMap.mapTexture = new DynamicTexture("NoFrills Dungeon Map", 128, 128, true);
+            client.getTextureManager().register(Identifier.fromNamespaceAndPath("nofrills", "dungeon_map_texture"), DungeonMap.mapTexture);
         });
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
@@ -215,6 +215,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(CroesusSolver.class);
         eventBus.subscribe(EquipmentHighlight.class);
 
-        LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
+        LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMillis() - start);
     }
 }

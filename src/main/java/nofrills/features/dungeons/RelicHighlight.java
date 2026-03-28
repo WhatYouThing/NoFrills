@@ -1,10 +1,10 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.DungeonUtil;
@@ -25,9 +25,9 @@ public class RelicHighlight {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && DungeonUtil.isInDragonPhase() && mc.player != null) {
-            ItemStack stack = mc.player.getInventory().getStack(8);
+            ItemStack stack = mc.player.getInventory().getItem(8);
             if (!stack.isEmpty() && stack.getItem().equals(Items.PLAYER_HEAD)) {
-                String name = Utils.toPlain(stack.getName());
+                String name = Utils.toPlain(stack.getHoverName());
                 Relic relic = switch (name) {
                     case "Corrupted Green Relic" -> green;
                     case "Corrupted Red Relic" -> red;
@@ -42,12 +42,12 @@ public class RelicHighlight {
     }
 
     public static class Relic {
-        public Box box;
+        public AABB box;
         public RenderColor color;
 
         public Relic(int x, int y, int z, RenderColor color) {
             BlockPos pos = new BlockPos(x, y, z);
-            this.box = Box.enclosing(pos, pos);
+            this.box = AABB.encapsulatingFullBlocks(pos, pos);
             this.color = color;
         }
     }

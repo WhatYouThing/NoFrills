@@ -1,14 +1,14 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
@@ -71,7 +71,7 @@ public class WardrobeKeybinds {
             }
             case Hotbar -> {
                 for (int i = 1; i <= 9; i++) {
-                    KeyBinding binding = mc.options.hotbarKeys[i - 1]; // could crash if someone is doing some voodoo
+                    KeyMapping binding = mc.options.keyHotbarSlots[i - 1]; // could crash if someone is doing some voodoo
                     if (Utils.matchesKey(binding, event.keyInput, event.mouseInput)) {
                         yield i + (page - 1) * 9;
                     }
@@ -91,9 +91,9 @@ public class WardrobeKeybinds {
     }
 
     private static boolean isEquipButton(Slot slot, int target) {
-        ItemStack stack = slot.getStack();
+        ItemStack stack = slot.getItem();
         Item item = stack.getItem();
-        String name = Utils.toPlain(stack.getName());
+        String name = Utils.toPlain(stack.getHoverName());
         if (!stack.isEmpty() && target != -1 && name.startsWith(Utils.format("Slot {}:", target))) {
             if (noUnequip.value() && item.equals(Items.LIME_DYE)) {
                 return false;
@@ -105,17 +105,17 @@ public class WardrobeKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
+        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
             int page = getWardrobePage(container.getTitle().getString());
             if (page == -1) return;
             int target = getTargetSlot(event, page);
             if (target != -1) {
-                for (Slot slot : Utils.getContainerSlots(container.getScreenHandler())) {
+                for (Slot slot : Utils.getContainerSlots(container.getMenu())) {
                     if (isEquipButton(slot, target)) {
                         if (event.action == GLFW.GLFW_PRESS) {
-                            mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_LEFT, SlotActionType.PICKUP, mc.player);
+                            mc.gameMode.handleContainerInput(container.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_LEFT, ContainerInput.PICKUP, mc.player);
                             if (sound.value()) {
-                                Utils.playSound(SoundEvents.ENTITY_HORSE_ARMOR, 0.69f, 1.0f);
+                                Utils.playSound(SoundEvents.HORSE_ARMOR, 0.69f, 1.0f);
                             }
                         }
                         break;

@@ -2,10 +2,10 @@ package nofrills.misc;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.component.type.MapIdComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.passive.BatEntity;
-import net.minecraft.item.map.MapState;
+import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 
@@ -18,7 +18,7 @@ import static nofrills.Main.mc;
 
 public class DungeonUtil {
     private static final HashMap<String, String> classCache = new HashMap<>();
-    private static final MapIdComponent mapId = new MapIdComponent(1024);
+    private static final MapId mapId = new MapId(1024);
     private static final HashSet<String> dungeonClasses = Sets.newHashSet(
             "Healer",
             "Mage",
@@ -72,7 +72,7 @@ public class DungeonUtil {
     }
 
     public static boolean isInDragonPhase() {
-        return mc.player != null && mc.player.getEntityPos().getY() < 50 && Utils.isInDungeonBoss("7");
+        return mc.player != null && mc.player.position().y() < 50 && Utils.isInDungeonBoss("7");
     }
 
     public static boolean isInBossRoom() {
@@ -100,7 +100,7 @@ public class DungeonUtil {
     }
 
     public static boolean isSecretBat(Entity entity) {
-        if (entity instanceof BatEntity bat) {
+        if (entity instanceof Bat bat) {
             return Utils.isBaseHealth(bat, 100.0f) && !Utils.isInDungeonBoss("4");
         }
         return false;
@@ -114,11 +114,11 @@ public class DungeonUtil {
         return mc.player != null ? getPlayerClass(mc.player.getName().getString()) : "";
     }
 
-    public static MapState getMap() {
-        return mc.world != null ? mc.world.getMapState(mapId) : null;
+    public static MapItemSavedData getMap() {
+        return mc.level != null ? mc.level.getMapData(mapId) : null;
     }
 
-    public static MapIdComponent getMapId() {
+    public static MapId getMapId() {
         return mapId;
     }
 

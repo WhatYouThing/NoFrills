@@ -2,9 +2,9 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
-import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
-import net.minecraft.util.Identifier;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import nofrills.events.*;
 import nofrills.features.fishing.CapTracker;
@@ -24,7 +24,7 @@ public class HudManager {
     public static final Ping ping = new Ping("Ping: §f0ms");
     public static final Day day = new Day("Day: §f0");
     public static final Armor armor = new Armor();
-    public static final Inventory inventory = new Inventory();
+    public static final InventoryOverlay inventory = new InventoryOverlay();
     public static final Quiver quiver = new Quiver("Quiver: §fN/A");
     public static final LagMeter lagMeter = new LagMeter("Last server tick was 0.00s ago");
     public static final PickaxeAbilityTimer pickAbilityTimer = new PickaxeAbilityTimer();
@@ -44,7 +44,7 @@ public class HudManager {
     public static final SkillTrackerDisplay skillTracker = new SkillTrackerDisplay();
 
     public static boolean isEditingHud() {
-        return mc.currentScreen instanceof HudEditorScreen;
+        return mc.screen instanceof HudEditorScreen;
     }
 
     public static List<HudElement> getElements() {
@@ -90,9 +90,9 @@ public class HudManager {
 
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
-        if (event.packet instanceof PingResultS2CPacket pingPacket) {
+        if (event.packet instanceof ClientboundPongResponsePacket pingPacket) {
             if (ping.isActive()) {
-                ping.setPing(Util.getMeasuringTimeMs() - pingPacket.startTime());
+                ping.setPing(Util.getMillis() - pingPacket.time());
                 ping.ticks = 20;
             }
         }
@@ -103,8 +103,8 @@ public class HudManager {
         if (power.isActive()) {
             power.setPower(DungeonUtil.getPower());
         }
-        if (day.isActive() && mc.world != null) {
-            day.setDay(mc.world.getLevelProperties().getTimeOfDay() / 24000L);
+        if (day.isActive() && mc.level != null) {
+            day.setDay(mc.level.getLevelData().getGameTime() / 24000L);
         }
         if (ping.isActive()) { // pings every second when element is enabled, waits until ping result is received
             if (ping.ticks > 0) {
@@ -131,7 +131,7 @@ public class HudManager {
             if (fps.ticks > 0) {
                 fps.ticks -= 1;
                 if (fps.ticks == 0) {
-                    fps.setFps(mc.getCurrentFps());
+                    fps.setFps(mc.getFps());
                     fps.ticks = 20;
                 }
             }
@@ -159,7 +159,7 @@ public class HudManager {
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
         if (lagMeter.isActive()) {
-            lagMeter.setTickTime(Util.getMeasuringTimeMs());
+            lagMeter.setTickTime(Util.getMillis());
         }
         if (tps.isActive()) {
             tps.serverTicks += 1;

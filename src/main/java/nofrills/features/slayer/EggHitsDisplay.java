@@ -1,8 +1,8 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.text.Text;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
@@ -38,7 +38,7 @@ public class EggHitsDisplay {
         if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.tarantula)) {
             for (Entity ent : cache.get()) {
                 String name = Utils.toPlain(ent.getName());
-                event.drawText(ent.getEntityPos(), Text.literal(name.substring(name.indexOf(" ") + 1)), scale.valueFloat(), true, color.value());
+                event.drawText(ent.position(), Component.literal(name.substring(name.indexOf(" ") + 1)), scale.valueFloat(), true, color.value());
             }
         }
     }

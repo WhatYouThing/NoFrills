@@ -1,7 +1,7 @@
 package nofrills.features.fishing;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
@@ -34,7 +34,7 @@ public class CapTracker {
                     Utils.sendMessage(msg.value());
                 }
                 if (sound.value()) {
-                    Utils.playSound(SoundEvents.ITEM_TRIDENT_RETURN, 3, 1);
+                    Utils.playSound(SoundEvents.TRIDENT_RETURN, 3, 1);
                 }
                 if (title.value()) {
                     Utils.showTitle("§4§lCAP REACHED", "§8§l" + count + " Sea Creatures", 5, 20, 5);

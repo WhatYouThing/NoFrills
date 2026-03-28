@@ -1,13 +1,13 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.core.Vec3i;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
@@ -44,19 +44,19 @@ public class EndNodeHighlight {
         return state.getBlock().equals(Blocks.PURPLE_TERRACOTTA);
     }
 
-    private static boolean isNodeParticle(ParticleS2CPacket packet) {
-        return packet.isImportant() && packet.shouldForceSpawn()
-                && packet.getCount() == 2 && packet.getSpeed() == 0.0f
-                && (packet.getOffsetX() == 0.25f || packet.getOffsetY() == 0.25f || packet.getOffsetZ() == 0.25f);
+    private static boolean isNodeParticle(ClientboundLevelParticlesPacket packet) {
+        return packet.alwaysShow() && packet.isOverrideLimiter()
+                && packet.getCount() == 2 && packet.getMaxSpeed() == 0.0f
+                && (packet.getXDist() == 0.25f || packet.getYDist() == 0.25f || packet.getZDist() == 0.25f);
     }
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive() && event.type.equals(ParticleTypes.WITCH) && isNodeParticle(event.packet) && Utils.isInArea("The End")) {
-            BlockPos blockPos = BlockPos.ofFloored(event.pos);
+            BlockPos blockPos = BlockPos.containing(event.pos);
             for (Vec3i offset : offsets) {
-                BlockPos pos = blockPos.add(offset);
-                if (!nodes.contains(pos) && isNodeBlock(mc.world.getBlockState(pos))) {
+                BlockPos pos = blockPos.offset(offset);
+                if (!nodes.contains(pos) && isNodeBlock(mc.level.getBlockState(pos))) {
                     nodes.add(pos);
                     break;
                 }
@@ -68,11 +68,11 @@ public class EndNodeHighlight {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !nodes.isEmpty() && Utils.isInArea("The End")) {
             for (BlockPos node : nodes) {
-                if (!isNodeBlock(mc.world.getBlockState(node))) {
+                if (!isNodeBlock(mc.level.getBlockState(node))) {
                     nodes.remove(node);
                     continue;
                 }
-                event.drawStyled(Box.enclosing(node, node), style.value(), false, outlineColor.value(), fillColor.value());
+                event.drawStyled(AABB.encapsulatingFullBlocks(node, node), style.value(), false, outlineColor.value(), fillColor.value());
             }
         }
     }

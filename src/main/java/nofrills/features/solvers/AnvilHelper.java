@@ -1,11 +1,11 @@
 package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.ScreenCloseEvent;
@@ -23,14 +23,14 @@ public class AnvilHelper {
 
     private static boolean isInAnvil = false;
 
-    private static String getEnchantInContainer(GenericContainerScreenHandler handler) {
+    private static String getEnchantInContainer(ChestMenu handler) {
         List<Slot> slots = Utils.getContainerSlots(handler);
-        if (slots.stream().noneMatch(slot -> slot.getStack().getItem().equals(Items.BARRIER) && Utils.toPlain(slot.getStack().getName()).equals("Anvil"))) {
+        if (slots.stream().noneMatch(slot -> slot.getItem().getItem().equals(Items.BARRIER) && Utils.toPlain(slot.getItem().getHoverName()).equals("Anvil"))) {
             return "";
         }
-        List<Slot> idSlots = slots.stream().filter(slot -> !Utils.getSkyblockId(slot.getStack()).isEmpty()).toList();
+        List<Slot> idSlots = slots.stream().filter(slot -> !Utils.getSkyblockId(slot.getItem()).isEmpty()).toList();
         if (idSlots.size() == 1) {
-            ItemStack stack = idSlots.getFirst().getStack();
+            ItemStack stack = idSlots.getFirst().getItem();
             if (stack.getItem().equals(Items.ENCHANTED_BOOK)) {
                 return Utils.getMarketId(stack);
             }
@@ -40,14 +40,14 @@ public class AnvilHelper {
 
     @EventHandler
     private static void onScreenRender(ScreenRenderEvent.Before event) {
-        if (instance.isActive() && isInAnvil && event.handler instanceof GenericContainerScreenHandler handler) {
+        if (instance.isActive() && isInAnvil && event.handler instanceof ChestMenu handler) {
             String enchantId = getEnchantInContainer(handler);
             if (!enchantId.isEmpty() && !enchantId.equals("ENCHANTMENT_UNKNOWN")) {
                 for (Slot slot : Utils.getContainerSlots(handler, true)) {
-                    ItemStack stack = slot.getStack();
+                    ItemStack stack = slot.getItem();
                     Item item = stack.getItem();
                     if (item.equals(Items.ENCHANTED_BOOK) && Utils.getMarketId(stack).equals(enchantId)) {
-                        event.drawFill(slot.id, color.value());
+                        event.drawFill(slot.index, color.value());
                     }
                 }
             }

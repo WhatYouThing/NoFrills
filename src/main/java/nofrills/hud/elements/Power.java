@@ -1,7 +1,7 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import net.minecraft.text.Text;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.Utils;
@@ -9,13 +9,13 @@ import nofrills.misc.Utils;
 public class Power extends SimpleTextElement {
 
     public Power(String text) {
-        super(Text.literal(text), new Feature("powerElement"), "Power Display");
+        super(Component.literal(text), new Feature("powerElement"), "Power Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the power blessing level while in Dungeons.");
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
         } else if (!this.isEditingHud() && !Utils.isInDungeons()) {

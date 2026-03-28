@@ -2,11 +2,11 @@ package nofrills.features.fishing;
 
 import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
@@ -26,8 +26,8 @@ public class RareHighlight {
 
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
-        if (instance.isActive() && event.entity instanceof ArmorStandEntity stand && !Utils.isInDungeons()) {
-            ItemStack helmet = stand.getEquippedStack(EquipmentSlot.HEAD);
+        if (instance.isActive() && event.entity instanceof ArmorStand stand && !Utils.isInDungeons()) {
+            ItemStack helmet = stand.getItemBySlot(EquipmentSlot.HEAD);
             if (helmet.isEmpty()) return;
             GameProfile textures = Utils.getTextures(helmet);
             if (textures != null) {
@@ -51,9 +51,9 @@ public class RareHighlight {
                     Entity owner = Utils.findNametagOwner(event.entity, Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, Utils::isMob));
                     if (owner != null) {
                         cache.add(owner);
-                        if (owner.hasVehicle()) {
+                        if (owner.isPassenger()) {
                             cache.add(owner.getVehicle());
-                        } else if (owner.hasPassengers()) {
+                        } else if (owner.isVehicle()) {
                             cache.add(owner.getFirstPassenger());
                         }
                     }
@@ -65,11 +65,11 @@ public class RareHighlight {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !cache.empty()) {
-            float delta = event.tickCounter.getTickProgress(true);
+            float delta = event.tickCounter.getGameTimeDeltaPartialTick(true);
             for (Entity ent : cache.get()) {
                 if (!ent.isAlive()) continue;
-                Box box = ent instanceof ArmorStandEntity
-                        ? Box.of(ent.getLerpedPos(delta).add(0.0, ent.getStandingEyeHeight(), 0.0), 1.0, 1.0, 1.0)
+                AABB box = ent instanceof ArmorStand
+                        ? AABB.ofSize(ent.getPosition(delta).add(0.0, ent.getEyeHeight(), 0.0), 1.0, 1.0, 1.0)
                         : Utils.getLerpedBox(ent, delta);
                 event.drawStyled(box, style.value(), false, outlineColor.value(), fillColor.value());
             }

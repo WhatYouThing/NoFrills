@@ -1,8 +1,8 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
@@ -51,7 +51,7 @@ public class BossHighlight {
             if (SlayerUtil.isFightingBoss(SlayerUtil.blaze)) {
                 for (Entity ent : blazeCache.get()) {
                     if (!ent.isAlive()) return;
-                    Box box = Utils.getLerpedBox(ent, event.tickCounter.getTickProgress(true));
+                    AABB box = Utils.getLerpedBox(ent, event.tickCounter.getGameTimeDeltaPartialTick(true));
                     String attunement = attunementMap.getOrDefault(ent.getId(), "");
                     RenderStyle style = highlightStyle.value();
                     switch (attunement) {
@@ -65,7 +65,7 @@ public class BossHighlight {
             } else {
                 Entity boss = SlayerUtil.getBossEntity();
                 if (boss == null || !boss.isAlive()) return;
-                Box box = Utils.getLerpedBox(boss, event.tickCounter.getTickProgress(true));
+                AABB box = Utils.getLerpedBox(boss, event.tickCounter.getGameTimeDeltaPartialTick(true));
                 event.drawStyled(box, highlightStyle.value(), false, outlineColor.value(), fillColor.value());
             }
         }

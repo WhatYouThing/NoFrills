@@ -1,9 +1,9 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityNamedEvent;
@@ -24,9 +24,9 @@ public class TempleSkip {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && spot == null && Utils.isInArea("Crystal Hollows") && event.namePlain.equals("Kalhuiki Door Guardian")) {
-            BlockPos ground = Utils.findGround(event.entity.getBlockPos(), 4);
-            if (mc.world.getBlockState(ground).getBlock().equals(Blocks.STONE_BRICKS)) {
-                spot = ground.add(20, -45, -35);
+            BlockPos ground = Utils.findGround(event.entity.blockPosition(), 4);
+            if (mc.level.getBlockState(ground).getBlock().equals(Blocks.STONE_BRICKS)) {
+                spot = ground.offset(20, -45, -35);
             }
         }
     }
@@ -34,9 +34,9 @@ public class TempleSkip {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && spot != null && Utils.isInArea("Crystal Hollows")) {
-            BlockPos standPos = spot.down(8);
-            Box box = Box.enclosing(spot, spot);
-            Box standBox = Box.enclosing(standPos, standPos);
+            BlockPos standPos = spot.below(8);
+            AABB box = AABB.encapsulatingFullBlocks(spot, spot);
+            AABB standBox = AABB.encapsulatingFullBlocks(standPos, standPos);
             event.drawOutline(box, true, color.value());
             event.drawOutline(standBox, true, color.value());
         }

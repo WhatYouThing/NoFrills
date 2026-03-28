@@ -1,10 +1,10 @@
 package nofrills.features.tweaks;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.HitResult;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.HitResult;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.InteractBlockEvent;
@@ -45,7 +45,7 @@ public class DoubleUseFix {
 
     @EventHandler
     private static void onUseItem(InteractItemEvent event) {
-        if (active() && mc.crosshairTarget != null && mc.crosshairTarget.getType().equals(HitResult.Type.BLOCK) && getDisableType().equals(type.Dagger)) {
+        if (active() && mc.hitResult != null && mc.hitResult.getType().equals(HitResult.Type.BLOCK) && getDisableType().equals(type.Dagger)) {
             event.cancel();
         }
     }
@@ -53,8 +53,8 @@ public class DoubleUseFix {
     @EventHandler
     private static void onUseBlock(InteractBlockEvent event) {
         if (active() && getDisableType().equals(type.Rod)) {
-            mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-            mc.player.swingHand(Hand.MAIN_HAND);
+            mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
+            mc.player.swing(InteractionHand.MAIN_HAND);
             event.cancel();
         }
     }

@@ -2,11 +2,11 @@ package nofrills.features.solvers;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.misc.CurveSolver;
@@ -77,11 +77,11 @@ public class DianaSolver {
         );
     }
 
-    private static DianaWarp findWarp(Vec3d pos) {
-        double lowestDist = mc.player.getEntityPos().distanceTo(pos);
+    private static DianaWarp findWarp(Vec3 pos) {
+        double lowestDist = mc.player.position().distanceTo(pos);
         DianaWarp closestWarp = null;
         for (DianaWarp warp : warps) {
-            Vec3d warpPos = warp.pos.toCenterPos();
+            Vec3 warpPos = warp.pos.getCenter();
             double warpDist = warpPos.distanceTo(pos);
             if (warp.toggle.value() && warpDist < lowestDist) {
                 lowestDist = warpDist;
@@ -111,7 +111,7 @@ public class DianaSolver {
             if (type.equals(BurrowType.Guess) && ticks > 0 && solver.isWithinDist(event.pos, 8.0, 4.0)) {
                 solver.addPos(event.pos);
                 ticks = 10;
-                Vec3d pos = solver.getSolvedPos();
+                Vec3 pos = solver.getSolvedPos();
                 if (pos != null) {
                     Burrow guess = new Burrow(pos, BurrowType.Guess);
                     burrowsList.removeIf(Burrow::isGuess);
@@ -121,7 +121,7 @@ public class DianaSolver {
                 }
             }
             if (!type.equals(BurrowType.Guess) && isHoldingSpoon()) {
-                BlockPos pos = BlockPos.ofFloored(event.pos.subtract(0, 0.5, 0));
+                BlockPos pos = BlockPos.containing(event.pos.subtract(0, 0.5, 0));
                 Burrow nearby = new Burrow(pos, type);
                 burrowsList.removeIf(burrow -> burrow.equals(nearby) || (burrow.isGuess() && burrow.isNear(nearby)));
                 burrowsList.add(nearby);
@@ -131,7 +131,7 @@ public class DianaSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.currentScreen == null && warpKey.key() == event.key && Utils.isInHub()) {
+        if (instance.isActive() && mc.screen == null && warpKey.key() == event.key && Utils.isInHub()) {
             if (event.action == GLFW.GLFW_PRESS) {
                 Optional<Burrow> burrow = getBurrowsList().stream().filter(Burrow::isGuess).findFirst();
                 if (burrow.isPresent()) {
@@ -206,23 +206,23 @@ public class DianaSolver {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInHub()) {
             for (Burrow burrow : getBurrowsList()) {
-                Vec3d pos = burrow.getVec();
-                Vec3d textPos = pos.subtract(0.0, 0.25, 0.0);
+                Vec3 pos = burrow.getVec();
+                Vec3 textPos = pos.subtract(0.0, 0.25, 0.0);
                 double dist = burrow.distanceTo();
                 float scale = Utils.getTextScale(textPos, 0.05f);
                 if (burrow.type.equals(BurrowType.Guess)) {
-                    MutableText label = Text.literal(Utils.format("Guess §e{}m", (int) Math.floor(dist)));
+                    MutableComponent label = Component.literal(Utils.format("Guess §e{}m", (int) Math.floor(dist)));
                     event.drawBeam(pos, 256, true, guessColor.value());
                     event.drawText(textPos, label, scale, true, guessColor.valueWithAlpha(1.0f));
                     if (guessTracer.value()) {
                         event.drawTracer(pos, guessTracerColor.value());
                     }
                 } else {
-                    MutableText label = switch (burrow.type) {
-                        case Treasure -> Text.literal("Treasure");
-                        case Enemy -> Text.literal("Enemy");
-                        case Start -> Text.literal("Start");
-                        default -> Text.literal("Unknown");
+                    MutableComponent label = switch (burrow.type) {
+                        case Treasure -> Component.literal("Treasure");
+                        case Enemy -> Component.literal("Enemy");
+                        case Start -> Component.literal("Start");
+                        default -> Component.literal("Unknown");
                     };
                     RenderColor color = switch (burrow.type) {
                         case Treasure -> treasureColor.value();
@@ -281,20 +281,20 @@ public class DianaSolver {
             this.type = type;
         }
 
-        public Burrow(Vec3d pos, BurrowType type) {
-            this(BlockPos.ofFloored(pos), type);
+        public Burrow(Vec3 pos, BurrowType type) {
+            this(BlockPos.containing(pos), type);
         }
 
         public void tick() {
             if (this.ticks > 0) this.ticks--;
         }
 
-        public Vec3d getVec() {
-            return this.pos.toCenterPos().add(0, 0.5, 0);
+        public Vec3 getVec() {
+            return this.pos.getCenter().add(0, 0.5, 0);
         }
 
         public double distanceTo() {
-            return mc.player.getEntityPos().distanceTo(this.getVec());
+            return mc.player.position().distanceTo(this.getVec());
         }
 
         public boolean isGuess() {

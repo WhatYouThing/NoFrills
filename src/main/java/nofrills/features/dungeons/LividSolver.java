@@ -1,12 +1,12 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -69,7 +69,7 @@ public class LividSolver {
             if (!currentName.equals(livid.name)) {
                 if (title.value()) {
                     Utils.showTitle(livid.title + "!", "", 0, 50, 10);
-                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
+                    Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
                 }
                 currentName = livid.name;
             }
@@ -78,7 +78,7 @@ public class LividSolver {
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (isActive() && event.entity instanceof PlayerEntity player && !Utils.isPlayer(player)) {
+        if (isActive() && event.entity instanceof Player player && !Utils.isPlayer(player)) {
             String name = Utils.toPlain(player.getName());
             if (!lividCache.has(event.entity) && lividData.values().stream().anyMatch(livid -> livid.name.equals(name))) {
                 lividCache.add(event.entity);
@@ -91,8 +91,8 @@ public class LividSolver {
         if (isActive() && lividCache.size() > 1) {
             for (Entity livid : lividCache.get()) {
                 if (Utils.toPlain(livid.getName()).equals(currentName)) {
-                    float delta = event.tickCounter.getTickProgress(true);
-                    Box box = Utils.getLerpedBox(livid, delta);
+                    float delta = event.tickCounter.getGameTimeDeltaPartialTick(true);
+                    AABB box = Utils.getLerpedBox(livid, delta);
                     if (highlight.value()) {
                         event.drawStyled(box, style.value(), false, outlineColor.value(), fillColor.value());
                     }

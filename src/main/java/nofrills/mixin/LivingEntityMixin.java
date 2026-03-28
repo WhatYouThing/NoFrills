@@ -2,15 +2,15 @@ package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.Holder;
+import net.minecraft.world.level.Level;
 import nofrills.features.general.Fullbright;
 import nofrills.features.general.Viewmodel;
 import nofrills.misc.Utils;
@@ -20,14 +20,14 @@ import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin extends Entity {
-    public LivingEntityMixin(EntityType<?> type, World world) {
+    public LivingEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
 
     @Shadow
     public abstract boolean isHolding(Item item);
 
-    @ModifyExpressionValue(method = "getHandSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/effect/StatusEffectUtil;hasHaste(Lnet/minecraft/entity/LivingEntity;)Z"))
+    @ModifyExpressionValue(method = "getCurrentSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffectUtil;hasDigSpeed(Lnet/minecraft/world/entity/LivingEntity;)Z"))
     private boolean hasHaste(boolean original) {
         if (Viewmodel.instance.isActive() && Viewmodel.noHaste.value() && Utils.isSelf(this)) {
             return false;
@@ -35,7 +35,7 @@ public abstract class LivingEntityMixin extends Entity {
         return original;
     }
 
-    @ModifyExpressionValue(method = "getHandSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;hasStatusEffect(Lnet/minecraft/registry/entry/RegistryEntry;)Z"))
+    @ModifyExpressionValue(method = "getCurrentSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hasEffect(Lnet/minecraft/core/Holder;)Z"))
     private boolean hasMiningFatigue(boolean original) {
         if (Viewmodel.instance.isActive() && Viewmodel.noHaste.value() && Utils.isSelf(this)) {
             return false;
@@ -43,7 +43,7 @@ public abstract class LivingEntityMixin extends Entity {
         return original;
     }
 
-    @ModifyReturnValue(method = "getHandSwingDuration", at = @At("RETURN"))
+    @ModifyReturnValue(method = "getCurrentSwingDuration", at = @At("RETURN"))
     private int getSwingSpeed(int original) {
         if (Viewmodel.instance.isActive() && Utils.isSelf(this)) {
             if (Viewmodel.noBowSwing.value() && this.isHolding(Items.BOW)) {
@@ -56,9 +56,9 @@ public abstract class LivingEntityMixin extends Entity {
         return original;
     }
 
-    @ModifyReturnValue(method = "hasStatusEffect", at = @At("RETURN"))
-    private boolean hasNightVision(boolean original, RegistryEntry<StatusEffect> effect) {
-        if (Fullbright.instance.isActive() && Utils.isSelf(this) && effect == StatusEffects.NIGHT_VISION) {
+    @ModifyReturnValue(method = "hasEffect", at = @At("RETURN"))
+    private boolean hasNightVision(boolean original, Holder<MobEffect> effect) {
+        if (Fullbright.instance.isActive() && Utils.isSelf(this) && effect == MobEffects.NIGHT_VISION) {
             if (Fullbright.noEffect.value() && !Fullbright.mode.value().equals(Fullbright.Mode.Potion)) {
                 return false;
             }

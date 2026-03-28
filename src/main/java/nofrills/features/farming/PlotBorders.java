@@ -1,9 +1,9 @@
 package nofrills.features.farming;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -112,17 +112,17 @@ public class PlotBorders {
 
     public static class Plot {
         public BlockPos center;
-        public Box boundingBox;
+        public AABB boundingBox;
 
         public Plot(int centerX, int centerZ) {
             this.center = new BlockPos(centerX, 66, centerZ);
-            this.boundingBox = Box.of(this.center.toCenterPos().add(-0.5, 0.5, -0.5), 96, 0, 96);
+            this.boundingBox = AABB.ofSize(this.center.getCenter().add(-0.5, 0.5, -0.5), 96, 0, 96);
         }
 
         public boolean isPlayerAbove() {
-            Vec3d pos = mc.player.getEntityPos();
-            if (pos.getY() > 66 && pos.getY() < 142) {
-                return pos.getX() > boundingBox.minX && pos.getX() < boundingBox.maxX && pos.getZ() > boundingBox.minZ && pos.getZ() < boundingBox.maxZ;
+            Vec3 pos = mc.player.position();
+            if (pos.y() > 66 && pos.y() < 142) {
+                return pos.x() > boundingBox.minX && pos.x() < boundingBox.maxX && pos.z() > boundingBox.minZ && pos.z() < boundingBox.maxZ;
             }
             return false;
         }

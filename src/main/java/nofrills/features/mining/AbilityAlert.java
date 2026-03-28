@@ -1,8 +1,8 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.ChatMsgEvent;
@@ -108,7 +108,7 @@ public class AbilityAlert {
                 ticks--;
                 if (ticks == 0) {
                     Utils.showTitle("§6" + Utils.toUpper(toolData.ability) + "!", "", 0, 50, 10);
-                    Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
+                    Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
                 }
             }
         }

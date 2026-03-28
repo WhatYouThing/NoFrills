@@ -1,9 +1,9 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.PlaySoundEvent;
@@ -21,13 +21,13 @@ public class PillarAlert {
     public static final Feature instance = new Feature("pillarAlert");
 
     private static final Pattern firePillarRegex = Pattern.compile("[0-9]s [0-9] hits");
-    private static final List<Vec3d> pillarData = new ArrayList<>();
+    private static final List<Vec3> pillarData = new ArrayList<>();
     private static int pillarClearTicks = 0;
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && !pillarData.isEmpty() && firePillarRegex.matcher(event.namePlain).matches()) {
-            if (Utils.horizontalDistance(event.entity.getEntityPos(), pillarData.getLast()) <= 3) {
+            if (Utils.horizontalDistance(event.entity.position(), pillarData.getLast()) <= 3) {
                 Utils.showTitleCustom("Pillar: " + event.namePlain, 30, 25, 4.0f, RenderColor.fromHex(0xffff00));
                 pillarClearTicks = 60;
             }
@@ -56,12 +56,12 @@ public class PillarAlert {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze) && event.isSound(SoundEvents.ENTITY_CHICKEN_EGG)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze) && event.isSound(SoundEvents.CHICKEN_EGG)) {
             Entity spawner = SlayerUtil.getSpawnerEntity();
             if (spawner == null) return;
-            Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
+            Vec3 pos = new Vec3(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             if (pillarData.isEmpty()) {
-                if (Utils.horizontalDistance(pos, spawner.getEntityPos()) <= 1.5) {
+                if (Utils.horizontalDistance(pos, spawner.position()) <= 1.5) {
                     pillarData.add(pos);
                     pillarClearTicks = 60;
                 }

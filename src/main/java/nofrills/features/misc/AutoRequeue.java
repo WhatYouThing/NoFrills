@@ -64,7 +64,7 @@ public class AutoRequeue {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.currentScreen == null && pauseBind.isKey(event.key) && SkyblockData.isInInstance()) {
+        if (instance.isActive() && mc.screen == null && pauseBind.isKey(event.key) && SkyblockData.isInInstance()) {
             if (event.action == GLFW.GLFW_PRESS) {
                 setPaused();
             }

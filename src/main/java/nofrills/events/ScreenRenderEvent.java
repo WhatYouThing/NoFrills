@@ -3,11 +3,11 @@ package nofrills.events;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import io.wispforest.owo.ui.core.Color;
 import io.wispforest.owo.ui.renderstate.LineElementRenderState;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.Text;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.network.chat.Component;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import org.joml.Matrix3x2f;
@@ -17,15 +17,15 @@ import java.util.Optional;
 import static nofrills.Main.mc;
 
 public class ScreenRenderEvent {
-    public DrawContext context;
+    public GuiGraphicsExtractor context;
     public int mouseX;
     public int mouseY;
     public float deltaTicks;
     public String title;
-    public ScreenHandler handler;
+    public AbstractContainerMenu handler;
     public Slot focusedSlot;
 
-    public ScreenRenderEvent(DrawContext context, int mouseX, int mouseY, float deltaTicks, String title, ScreenHandler handler, Slot focusedSlot) {
+    public ScreenRenderEvent(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, String title, AbstractContainerMenu handler, Slot focusedSlot) {
         this.context = context;
         this.mouseX = mouseX;
         this.mouseY = mouseY;
@@ -53,10 +53,10 @@ public class ScreenRenderEvent {
     }
 
     public void drawLine(RenderPipeline pipeline, int x1, int y1, int x2, int y2, double width, Color color) {
-        this.context.state.addSimpleElement(new LineElementRenderState(
+        this.context.guiRenderState.addGuiElement(new LineElementRenderState(
                 pipeline,
-                new Matrix3x2f(context.getMatrices()),
-                context.scissorStack.peekLast(),
+                new Matrix3x2f(context.pose()),
+                context.scissorStack.peek(),
                 x1, y1, x2, y2,
                 width,
                 color
@@ -67,8 +67,8 @@ public class ScreenRenderEvent {
         this.getSlot(slotId).ifPresent(slot -> Rendering.drawBorder(this.context, slot.x, slot.y, 16, 16, color.argb));
     }
 
-    public void drawLabel(int slotId, Text text) {
-        this.getSlot(slotId).ifPresent(slot -> this.context.drawCenteredTextWithShadow(mc.textRenderer, text, slot.x + 8, slot.y + 4, RenderColor.white.argb));
+    public void drawLabel(int slotId, Component text) {
+        this.getSlot(slotId).ifPresent(slot -> this.context.centeredText(mc.font, text, slot.x + 8, slot.y + 4, RenderColor.white.argb));
     }
 
     public void drawFill(int slotId, RenderColor color) {
@@ -76,13 +76,13 @@ public class ScreenRenderEvent {
     }
 
     public static class Before extends ScreenRenderEvent {
-        public Before(DrawContext context, int mouseX, int mouseY, float deltaTicks, String title, ScreenHandler handler, Slot focusedSlot) {
+        public Before(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, String title, AbstractContainerMenu handler, Slot focusedSlot) {
             super(context, mouseX, mouseY, deltaTicks, title, handler, focusedSlot);
         }
     }
 
     public static class After extends ScreenRenderEvent {
-        public After(DrawContext context, int mouseX, int mouseY, float deltaTicks, String title, ScreenHandler handler, Slot focusedSlot) {
+        public After(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, String title, AbstractContainerMenu handler, Slot focusedSlot) {
             super(context, mouseX, mouseY, deltaTicks, title, handler, focusedSlot);
         }
     }

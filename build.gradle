@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -30,24 +30,28 @@ repositories {
         name = "jama-maven"
         url = "https://mvn.topobyte.de"
     }
+
+    maven {
+        name = "jitpack-maven"
+        url = "https://jitpack.io"
+    }
 }
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabricapi_version}"
-    modImplementation "meteordevelopment:orbit:${project.orbit_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabricapi_version}"
+    implementation "meteordevelopment:orbit:${project.orbit_version}"
 
     include "meteordevelopment:orbit:${project.orbit_version}"
 
-    modImplementation("io.wispforest:owo-lib:${project.owolib_version}")
+    implementation("io.wispforest:owo-lib:${project.owolib_version}")
     include "io.wispforest:owo-sentinel:${project.owolib_version}"
 
-    modImplementation("de.topobyte:jama:${project.jama_version}")
+    implementation("de.topobyte:jama:${project.jama_version}")
     include "de.topobyte:jama:${project.jama_version}"
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
+    runtimeOnly "net.litetex.mcm:dev-auth-neo:${project.devauth_version}"
 }
 
 loom {
@@ -63,12 +67,12 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {

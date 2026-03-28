@@ -1,25 +1,25 @@
 package nofrills.events;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.text.Text;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 
 import java.util.List;
 
 public class TooltipRenderEvent {
-    public List<Text> lines;
+    public List<Component> lines;
     public ItemStack stack;
-    public NbtCompound customData;
+    public CompoundTag customData;
     public String title;
 
-    public TooltipRenderEvent(List<Text> lines, ItemStack stack, NbtCompound customData, String title) {
+    public TooltipRenderEvent(List<Component> lines, ItemStack stack, CompoundTag customData, String title) {
         this.lines = lines;
         this.stack = stack;
         this.customData = customData;
         this.title = title;
     }
 
-    public void addLine(Text line) {
+    public void addLine(Component line) {
         try {
             lines.add(line);
         } catch (UnsupportedOperationException ignored) {

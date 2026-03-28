@@ -1,7 +1,7 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
@@ -70,7 +70,7 @@ public class ScoreCalculator {
         }
         if (doTitle.value()) {
             Utils.showTitle(title.value().replaceAll("&", "§"), "", 0, 30, 10);
-            Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
+            Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
         }
     }
 

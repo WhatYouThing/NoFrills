@@ -2,17 +2,17 @@ package nofrills.features.dungeons;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ChestBlock;
-import net.minecraft.block.LeverBlock;
-import net.minecraft.block.PlayerSkullBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.command.BlockDataObject;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.passive.BatEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.PlayerHeadBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.server.commands.data.BlockDataAccessor;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingDouble;
@@ -75,11 +75,11 @@ public class SecretChime {
     }
 
     private static boolean isEssence(BlockState state, BlockPos pos) {
-        if (state.getBlock() instanceof PlayerSkullBlock && mc.world != null) {
-            BlockEntity skull = mc.world.getBlockEntity(pos);
+        if (state.getBlock() instanceof PlayerHeadBlock && mc.level != null) {
+            BlockEntity skull = mc.level.getBlockEntity(pos);
             if (skull != null) {
-                NbtCompound nbt = new BlockDataObject(skull, pos).getNbt();
-                Optional<NbtCompound> profile = nbt.getCompound("profile");
+                CompoundTag nbt = new BlockDataAccessor(skull, pos).getData();
+                Optional<CompoundTag> profile = nbt.getCompound("profile");
                 if (profile.isPresent()) {
                     Optional<int[]> id = profile.get().getIntArray("id");
                     return id.isPresent() && Arrays.equals(id.get(), essenceUUID); // match the uuid, profile data is corrupted at the time of adding
@@ -105,9 +105,9 @@ public class SecretChime {
 
     @EventHandler
     private static void onUseBlock(InteractBlockEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && !clickedThisTick && mc.world != null) {
+        if (instance.isActive() && Utils.isInDungeons() && !clickedThisTick && mc.level != null) {
             BlockPos pos = event.blockHitResult.getBlockPos();
-            BlockState state = mc.world.getBlockState(pos);
+            BlockState state = mc.level.getBlockState(pos);
             clickedThisTick = true;
             if (state.getBlock() instanceof ChestBlock && chestToggle.value()) {
                 playSound(chestSound, chestVolume, chestPitch);
@@ -125,14 +125,14 @@ public class SecretChime {
     private static void onUpdated(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
             if (itemsToggle.value() && event.entity instanceof ItemEntity item) {
-                if (secretItems.contains(Utils.getMarketId(item.getStack()))) {
+                if (secretItems.contains(Utils.getMarketId(item.getItem()))) {
                     entityCache.add(item);
                 }
                 if (!item.isAlive() && entityCache.has(item)) {
                     playItemChime(item);
                 }
             }
-            if (batToggle.value() && event.entity instanceof BatEntity bat) {
+            if (batToggle.value() && event.entity instanceof Bat bat) {
                 if (DungeonUtil.isSecretBat(bat)) {
                     entityCache.add(bat);
                 }
@@ -149,7 +149,7 @@ public class SecretChime {
             if (itemsToggle.value() && event.entity instanceof ItemEntity && entityCache.has(event.entity)) {
                 playItemChime(event.entity);
             }
-            if (batToggle.value() && event.entity instanceof BatEntity && entityCache.has(event.entity)) {
+            if (batToggle.value() && event.entity instanceof Bat && entityCache.has(event.entity)) {
                 playBatChime(event.entity);
             }
         }

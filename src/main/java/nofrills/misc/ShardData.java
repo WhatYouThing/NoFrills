@@ -1,7 +1,7 @@
 package nofrills.misc;
 
 import com.google.common.collect.Sets;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.HashSet;
 import java.util.List;
@@ -221,7 +221,7 @@ public class ShardData {
 
     public static String getId(ItemStack stack) {
         if (isShard(stack)) {
-            String name = Utils.toPlain(stack.getName());
+            String name = Utils.toPlain(stack.getHoverName());
             String source = getSource(stack);
             String shardName = Utils.toLower(!source.isEmpty() ? source : name);
             return parseId(shardName);
@@ -254,7 +254,7 @@ public class ShardData {
 
     private static boolean isShard(ItemStack stack) {
         String id = Utils.getSkyblockId(stack);
-        String name = Utils.toPlain(stack.getName());
+        String name = Utils.toPlain(stack.getHoverName());
         if (id.equals("ATTRIBUTE_SHARD") || name.contains(" Shard")) {
             return true;
         }

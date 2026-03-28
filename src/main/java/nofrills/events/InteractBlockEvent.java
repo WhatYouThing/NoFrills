@@ -1,6 +1,6 @@
 package nofrills.events;
 
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class InteractBlockEvent extends Cancellable {
     public BlockHitResult blockHitResult;

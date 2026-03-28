@@ -1,8 +1,8 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ChatMsgEvent;
@@ -38,7 +38,7 @@ public class ScathaMining {
 
     private static boolean isWithinRadius(BlockPos wormPos) {
         if (mc.player != null) {
-            BlockPos playerPos = mc.player.getBlockPos();
+            BlockPos playerPos = mc.player.blockPosition();
             return Math.abs(wormPos.getY() - playerPos.getY()) <= 4 &&
                     (Math.abs(wormPos.getX() - playerPos.getX()) <= 2 || Math.abs(wormPos.getZ() - playerPos.getZ()) <= 2);
         }
@@ -48,10 +48,10 @@ public class ScathaMining {
     private static void alertSpawn(boolean scatha) {
         if (scatha) {
             Utils.showTitle("§cScatha", "", 5, 20, 5);
-            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
+            Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
         } else {
             Utils.showTitle("§eWorm", "", 5, 20, 5);
-            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.0f);
+            Utils.playSound(SoundEvents.NOTE_BLOCK_BASS, 1.0f, 0.0f);
         }
     }
 
@@ -59,7 +59,7 @@ public class ScathaMining {
     private static void onNamed(EntityNamedEvent event) {
         if (active()) {
             WormType type = getWormType(event.namePlain);
-            if (!type.equals(WormType.None) && !wormsCache.has(event.entity) && isWithinRadius(event.entity.getBlockPos())) {
+            if (!type.equals(WormType.None) && !wormsCache.has(event.entity) && isWithinRadius(event.entity.blockPosition())) {
                 if (alert.value()) {
                     alertSpawn(type.equals(WormType.Scatha));
                 }
@@ -83,7 +83,7 @@ public class ScathaMining {
                 if (active() && cooldown.value()) {
                     Utils.showTitle("§a§lCOOLDOWN ENDED", "", 5, 20, 5);
                     Utils.info("§aWorm spawn cooldown ended!");
-                    Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_HARP, 1.0f, 0.0f);
+                    Utils.playSound(SoundEvents.NOTE_BLOCK_HARP, 1.0f, 0.0f);
                 }
             }
         }

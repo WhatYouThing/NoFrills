@@ -1,8 +1,8 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -37,7 +37,7 @@ public class KeyHighlight {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
             for (Entity key : keyCache.get()) {
-                Box box = Box.of(key.getEntityPos().add(0, 1.5, 0), 1, 1, 1);
+                AABB box = AABB.ofSize(key.position().add(0, 1.5, 0), 1, 1, 1);
                 if (highlight.value()) event.drawFilledWithBeam(box, 256, true, color.value());
                 if (tracer.value()) event.drawTracer(box.getCenter(), tracerColor.value());
             }

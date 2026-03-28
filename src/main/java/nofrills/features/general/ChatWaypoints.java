@@ -1,9 +1,9 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.network.chat.Component;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -37,7 +37,7 @@ public class ChatWaypoints {
         if (mc.player != null && mc.player.getName().getString().equals(name)) {
             return false;
         }
-        return mc.getNetworkHandler() != null && mc.getNetworkHandler().getPlayerListEntry(name) != null;
+        return mc.getConnection() != null && mc.getConnection().getPlayerInfo(name) != null;
     }
 
     private static void highlightCoords(String message, String sender, boolean party) {
@@ -119,7 +119,7 @@ public class ChatWaypoints {
                     waypointList.remove(waypoint);
                     continue;
                 }
-                if (waypoint.shouldClear() && waypoint.box.getCenter().distanceTo(mc.player.getEntityPos()) <= 8.0) {
+                if (waypoint.shouldClear() && waypoint.box.getCenter().distanceTo(mc.player.position()) <= 8.0) {
                     waypointList.remove(waypoint);
                     continue;
                 }
@@ -138,14 +138,14 @@ public class ChatWaypoints {
     }
 
     private static class PlayerWaypoint {
-        public Text name;
-        public Box box;
+        public Component name;
+        public AABB box;
         public int duration;
         public boolean party;
 
         public PlayerWaypoint(String name, BlockPos pos, int duration, boolean party) {
-            this.name = Text.literal(name);
-            this.box = Box.enclosing(pos, pos);
+            this.name = Component.literal(name);
+            this.box = AABB.encapsulatingFullBlocks(pos, pos);
             this.duration = duration;
             this.party = party;
         }

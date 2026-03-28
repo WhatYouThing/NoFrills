@@ -1,9 +1,9 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
@@ -26,7 +26,7 @@ public class StarredMobHighlight {
     private static final EntityCache cache = new EntityCache();
 
     private static boolean isDungeonMob(Entity entity) {
-        if (entity instanceof ArmorStandEntity) {
+        if (entity instanceof ArmorStand) {
             return false;
         }
         return Utils.isMob(entity) && !cache.has(entity);
@@ -53,7 +53,7 @@ public class StarredMobHighlight {
         if (instance.isActive() && Utils.isInDungeons()) {
             for (Entity ent : cache.get()) {
                 if (!ent.isAlive()) continue;
-                Box box = Utils.getLerpedBox(ent, event.tickCounter.getTickProgress(true));
+                AABB box = Utils.getLerpedBox(ent, event.tickCounter.getGameTimeDeltaPartialTick(true));
                 event.drawStyled(box, style.value(), false, outlineColor.value(), fillColor.value());
             }
         }

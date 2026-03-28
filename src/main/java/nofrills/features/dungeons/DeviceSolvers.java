@@ -1,15 +1,15 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.chat.Component;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -87,10 +87,10 @@ public class DeviceSolvers {
 
     public static final class Sharpshooter {
         public static final List<BlockPos> list = new ArrayList<>();
-        public static final Box target = Box.enclosing(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
-        public static final Box area = new Box(63.2, 127, 35.8, 63.8, 128, 35.2);
-        public static final BlockState terracotta = Blocks.BLUE_TERRACOTTA.getDefaultState();
-        public static final BlockState emerald = Blocks.EMERALD_BLOCK.getDefaultState();
+        public static final AABB target = AABB.encapsulatingFullBlocks(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
+        public static final AABB area = new AABB(63.2, 127, 35.8, 63.8, 128, 35.2);
+        public static final BlockState terracotta = Blocks.BLUE_TERRACOTTA.defaultBlockState();
+        public static final BlockState emerald = Blocks.EMERALD_BLOCK.defaultBlockState();
         public static BlockPos next = null;
 
         private static boolean isActive() {
@@ -102,7 +102,7 @@ public class DeviceSolvers {
                 for (double y = target.minY; y <= target.maxY; y++) {
                     for (double z = target.minZ; z <= target.maxZ; z++) {
                         BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
-                        if (mc.world.getBlockState(pos).equals(emerald)) {
+                        if (mc.level.getBlockState(pos).equals(emerald)) {
                             return pos;
                         }
                     }
@@ -112,7 +112,7 @@ public class DeviceSolvers {
         }
 
         public static void blockUpdate(BlockUpdateEvent event) {
-            if (target.contains(event.pos.toCenterPos()) && isActive()) {
+            if (target.contains(event.pos.getCenter()) && isActive()) {
                 if (event.oldState.equals(emerald) && event.newState.equals(terracotta) && next != null) {
                     list.add(next);
                 }
@@ -136,17 +136,17 @@ public class DeviceSolvers {
         public static void render(WorldRenderEvent event) {
             if (!list.isEmpty()) {
                 for (BlockPos pos : list) {
-                    event.drawFilled(Box.enclosing(pos, pos), true, sharpHitColor.value());
+                    event.drawFilled(AABB.encapsulatingFullBlocks(pos, pos), true, sharpHitColor.value());
                 }
             }
             if (next != null) {
-                event.drawFilled(Box.enclosing(next, next), true, sharpTargetColor.value());
+                event.drawFilled(AABB.encapsulatingFullBlocks(next, next), true, sharpTargetColor.value());
             }
         }
     }
 
     public static final class ArrowAlign {
-        public static final Box area = new Box(-2, 125, 81, 4, 120, 74);
+        public static final AABB area = new AABB(-2, 125, 81, 4, 120, 74);
         public static final BlockPos corner = new BlockPos(-2, 124, 79);
         public static final int[][] solutions = new int[][]{
                 new int[]{1, 1, 3, -1, -1, 7, -1, 3, -1, -1, -1, -1, 3, -1, -1, -1, -1, 3, -1, 7, -1, -1, 1, 1, 7},
@@ -159,37 +159,37 @@ public class DeviceSolvers {
                 new int[]{-1, 1, 1, 3, -1, -1, 7, -1, 3, -1, -1, 7, -1, 3, -1, -1, 7, -1, 3, -1, -1, 7, -1, 1, -1},
                 new int[]{-1, 1, 3, -1, -1, -1, -1, 1, 1, -1, -1, 1, 7, -1, -1, -1, -1, 1, 1, -1, -1, 1, 7, -1, -1}
         }; // solution set from Skyblocker, no idea how Odin formats its solutions which sure does prevent me from copying them
-        public static final ConcurrentHashMap<ItemFrameEntity, Integer> solutionMap = new ConcurrentHashMap<>();
-        public static final ConcurrentHashMap<ItemFrameEntity, Integer> clicksMap = new ConcurrentHashMap<>();
+        public static final ConcurrentHashMap<ItemFrame, Integer> solutionMap = new ConcurrentHashMap<>();
+        public static final ConcurrentHashMap<ItemFrame, Integer> clicksMap = new ConcurrentHashMap<>();
 
         public static boolean isActive() {
-            return mc.player != null && area.getCenter().distanceTo(mc.player.getEntityPos()) <= 8.0;
+            return mc.player != null && area.getCenter().distanceTo(mc.player.position()) <= 8.0;
         }
 
         private static int getNeededClicks(int current, int target) {
             return (8 - current + target) % 8;
         }
 
-        public static List<ItemFrameEntity> getFrames() {
-            List<Entity> entities = Utils.getOtherEntities(null, ArrowAlign.area, entity -> entity instanceof ItemFrameEntity);
-            List<ItemFrameEntity> frames = new ArrayList<>();
+        public static List<ItemFrame> getFrames() {
+            List<Entity> entities = Utils.getOtherEntities(null, ArrowAlign.area, entity -> entity instanceof ItemFrame);
+            List<ItemFrame> frames = new ArrayList<>();
             for (Entity entity : entities) {
-                ItemFrameEntity frame = (ItemFrameEntity) entity;
-                if (frame.getHeldItemStack().getItem().equals(Items.ARROW)) {
+                ItemFrame frame = (ItemFrame) entity;
+                if (frame.getItem().getItem().equals(Items.ARROW)) {
                     frames.add(frame);
                 }
             }
             return frames;
         }
 
-        public static int toIndex(ItemFrameEntity entity) {
-            BlockPos pos = entity.getBlockPos();
+        public static int toIndex(ItemFrame entity) {
+            BlockPos pos = entity.blockPosition();
             return corner.getZ() - pos.getZ() + 5 * (corner.getY() - pos.getY());
         }
 
-        public static boolean matchSolution(int[] array, List<ItemFrameEntity> frames) {
+        public static boolean matchSolution(int[] array, List<ItemFrame> frames) {
             int count = 0;
-            for (ItemFrameEntity frame : frames) {
+            for (ItemFrame frame : frames) {
                 if (array[toIndex(frame)] == -1) {
                     return false;
                 }
@@ -202,7 +202,7 @@ public class DeviceSolvers {
             return count == frames.size();
         }
 
-        public static int[] findSolution(List<ItemFrameEntity> frames) {
+        public static int[] findSolution(List<ItemFrame> frames) {
             if (frames.isEmpty()) return new int[]{};
             for (int[] array : solutions) {
                 if (!matchSolution(array, frames)) {
@@ -222,23 +222,23 @@ public class DeviceSolvers {
                 return;
             }
             if (solutionMap.isEmpty()) {
-                List<ItemFrameEntity> frames = getFrames();
+                List<ItemFrame> frames = getFrames();
                 int[] solution = findSolution(frames);
                 if (frames.isEmpty() || solution.length == 0) return;
-                for (ItemFrameEntity frame : frames) {
+                for (ItemFrame frame : frames) {
                     solutionMap.put(frame, solution[ArrowAlign.toIndex(frame)]);
                 }
             }
         }
 
         public static void render(WorldRenderEvent event) {
-            for (Map.Entry<ItemFrameEntity, Integer> entry : solutionMap.entrySet()) {
-                ItemFrameEntity frame = entry.getKey();
-                Vec3d pos = frame.getEyePos().add(0.0, 0.2, 0.0);
+            for (Map.Entry<ItemFrame, Integer> entry : solutionMap.entrySet()) {
+                ItemFrame frame = entry.getKey();
+                Vec3 pos = frame.getEyePosition().add(0.0, 0.2, 0.0);
                 int rotation = clicksMap.containsKey(frame) ? clicksMap.get(frame) : frame.getRotation();
                 int clicks = getNeededClicks(rotation, entry.getValue());
                 if (clicks > 0) {
-                    event.drawText(pos, Text.literal(String.valueOf(clicks)), 0.04f, true, RenderColor.white);
+                    event.drawText(pos, Component.literal(String.valueOf(clicks)), 0.04f, true, RenderColor.white);
                 }
             }
         }
@@ -246,15 +246,15 @@ public class DeviceSolvers {
         public static boolean shouldBlock() {
             if (alignBlockWrong.value()) {
                 if (alignBlockInvert.value()) {
-                    return mc.options.sneakKey.isPressed();
+                    return mc.options.keyShift.isDown();
                 }
-                return !mc.options.sneakKey.isPressed();
+                return !mc.options.keyShift.isDown();
             }
             return false;
         }
 
         public static void interactEntity(InteractEntityEvent event) {
-            if (event.entity instanceof ItemFrameEntity frame && solutionMap.containsKey(frame)) {
+            if (event.entity instanceof ItemFrame frame && solutionMap.containsKey(frame)) {
                 int rotation = clicksMap.containsKey(frame) ? clicksMap.get(frame) : frame.getRotation();
                 if (shouldBlock() && getNeededClicks(rotation, solutionMap.get(frame)) == 0) {
                     event.cancel();
@@ -265,7 +265,7 @@ public class DeviceSolvers {
         }
 
         public static void updateEntity(EntityUpdatedEvent event) {
-            if (event.entity instanceof ItemFrameEntity frame && solutionMap.containsKey(frame)) {
+            if (event.entity instanceof ItemFrame frame && solutionMap.containsKey(frame)) {
                 if (clicksMap.containsKey(frame) && frame.getRotation() == clicksMap.get(frame)) {
                     clicksMap.remove(frame);
                 }

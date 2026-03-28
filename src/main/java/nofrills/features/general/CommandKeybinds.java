@@ -4,16 +4,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.component.UIComponents;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
@@ -69,7 +69,7 @@ public class CommandKeybinds {
 
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Command Keybinds"));
+        settings.setTitle(Component.literal("Command Keybinds"));
         return settings;
     }
 
@@ -94,7 +94,7 @@ public class CommandKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && ((allowInGui.value() && mc.currentScreen instanceof HandledScreen) || mc.currentScreen == null)) {
+        if (instance.isActive() && ((allowInGui.value() && mc.screen instanceof AbstractContainerScreen) || mc.screen == null)) {
             if (data.value().has("binds")) {
                 for (JsonElement entry : data.value().get("binds").getAsJsonArray()) {
                     JsonObject bind = entry.getAsJsonObject();
@@ -147,30 +147,30 @@ public class CommandKeybinds {
             this.input = new FlatTextbox(Sizing.fixed(240));
             this.input.margins(Insets.of(0, 0, 0, 6));
             this.input.text(this.getData(data.value()).get("command").getAsString());
-            this.input.tooltip(Text.literal("The message/command that this keybind will send."));
+            this.input.tooltip(Component.literal("The message/command that this keybind will send."));
             this.input.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("command", value)));
 
-            this.options = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            this.options = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
 
             this.keybind = new KeybindButton();
             this.keybind.verticalSizing(Sizing.fixed(18)).horizontalSizing(Sizing.fixed(100)).margins(Insets.of(3, 0, 1, 0));
             this.keybind.bind(this.getData(data.value()).get("key").getAsInt());
-            this.keybind.tooltip(Text.literal("The key bound to this command."));
+            this.keybind.tooltip(Component.literal("The key bound to this command."));
             this.keybind.onBound().subscribe(key -> data.edit(object -> this.getData(object).addProperty("key", key)));
 
             this.modifier = new EnumButton<>(this.getData(data.value()).has("modifier") ? this.getData(data.value()).get("modifier").getAsString() : "Any", Modifier.Any, Modifier.class);
             this.modifier.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("modifier", value)));
             this.modifier.margins(Insets.of(3, 0, 5, 0));
             this.modifier.sizing(Sizing.fixed(80), Sizing.fixed(18));
-            this.modifier.tooltip(Text.literal("The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held."));
+            this.modifier.tooltip(Component.literal("The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held."));
 
             this.toggle = new ToggleButton(this.getData(data.value()).has("enabled") && this.getData(data.value()).get("enabled").getAsBoolean());
             this.toggle.onToggled().subscribe(value -> data.edit(object -> this.getData(object).addProperty("enabled", value)));
             this.toggle.verticalSizing(Sizing.fixed(18)).horizontalSizing(Sizing.fixed(54));
-            this.toggle.tooltip(Text.literal("The toggle for the keybind, allows you to disable it without having to delete it."));
+            this.toggle.tooltip(Component.literal("The toggle for the keybind, allows you to disable it without having to delete it."));
             this.toggle.margins(Insets.of(3, 0, 5, 0));
 
-            this.delete = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            this.delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("binds").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });

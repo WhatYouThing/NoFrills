@@ -1,7 +1,7 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.PlaySoundEvent;
 
@@ -10,7 +10,7 @@ public class MuteEnderman {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && (event.isSound(SoundEvents.ENTITY_ENDERMAN_STARE) || event.isSound(SoundEvents.ENTITY_ENDERMAN_SCREAM))) {
+        if (instance.isActive() && (event.isSound(SoundEvents.ENDERMAN_STARE) || event.isSound(SoundEvents.ENDERMAN_SCREAM))) {
             event.cancel();
         }
     }

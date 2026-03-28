@@ -1,9 +1,9 @@
 package nofrills.features.fishing;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -22,7 +22,7 @@ public class RadarSolver {
     public static final SettingColor tracerColor = new SettingColor(RenderColor.fromArgb(0xffff55ff), "tracerColor", instance);
 
     private static final CurveSolver solver = new CurveSolver();
-    private static Vec3d currentPos = null;
+    private static Vec3 currentPos = null;
     private static int ticks = 0;
 
     private static boolean isHoldingRadar() {
@@ -62,14 +62,14 @@ public class RadarSolver {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && currentPos != null) {
-            if (mc.player.getEntityPos().distanceTo(currentPos) <= 16.0) {
+            if (mc.player.position().distanceTo(currentPos) <= 16.0) {
                 currentPos = null;
                 return;
             }
-            Vec3d textPos = currentPos.subtract(0.0, 0.25, 0.0);
+            Vec3 textPos = currentPos.subtract(0.0, 0.25, 0.0);
             float scale = Utils.getTextScale(textPos, 0.05f);
             event.drawBeam(currentPos, 256, true, color.value());
-            event.drawText(textPos, Text.literal("Hotspot"), scale, true, color.valueWithAlpha(1.0f));
+            event.drawText(textPos, Component.literal("Hotspot"), scale, true, color.valueWithAlpha(1.0f));
             if (tracer.value()) {
                 event.drawTracer(currentPos, tracerColor.value());
             }

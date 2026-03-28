@@ -1,10 +1,10 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityNamedEvent;
@@ -37,10 +37,10 @@ public class ChaliceHighlight {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.vampire)) {
             for (Entity ent : chaliceData.get()) {
-                BlockPos blockPos = Utils.findGround(ent.getBlockPos(), 4);
-                Vec3d pos = ent.getEntityPos();
-                Vec3d posAdjust = new Vec3d(pos.x, blockPos.up(1).getY() + 0.5, pos.z);
-                event.drawFilledWithBeam(Box.of(posAdjust, 1, 1.25, 1), 256, true, color.value());
+                BlockPos blockPos = Utils.findGround(ent.blockPosition(), 4);
+                Vec3 pos = ent.position();
+                Vec3 posAdjust = new Vec3(pos.x, blockPos.above(1).getY() + 0.5, pos.z);
+                event.drawFilledWithBeam(AABB.ofSize(posAdjust, 1, 1.25, 1), 256, true, color.value());
             }
         }
     }

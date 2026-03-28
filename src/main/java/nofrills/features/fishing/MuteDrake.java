@@ -1,7 +1,7 @@
 package nofrills.features.fishing;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.PlaySoundEvent;
 import nofrills.misc.Utils;
@@ -11,7 +11,7 @@ public class MuteDrake {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && Utils.isInArea("Jerry's Workshop") && event.isSound(SoundEvents.ITEM_TOTEM_USE)) {
+        if (instance.isActive() && Utils.isInArea("Jerry's Workshop") && event.isSound(SoundEvents.TOTEM_USE)) {
             event.cancel();
         }
     }

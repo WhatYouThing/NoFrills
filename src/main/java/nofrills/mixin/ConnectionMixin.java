@@ -1,10 +1,10 @@
 package nofrills.mixin;
 
 import io.netty.channel.ChannelFutureListener;
-import net.minecraft.network.ClientConnection;
-import net.minecraft.network.listener.PacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.common.CommonPingS2CPacket;
+import net.minecraft.network.Connection;
+import net.minecraft.network.PacketListener;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ClientboundPingPacket;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.events.SendPacketEvent;
 import nofrills.events.ServerTickEvent;
@@ -16,12 +16,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static nofrills.Main.eventBus;
 
-@Mixin(ClientConnection.class)
-public abstract class ClientConnectionMixin {
+@Mixin(Connection.class)
+public abstract class ConnectionMixin {
 
-    @Inject(method = "handlePacket", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "genericsFtw", at = @At("HEAD"), cancellable = true)
     private static void onPacketReceive(Packet<?> packet, PacketListener listener, CallbackInfo ci) {
-        if (packet instanceof CommonPingS2CPacket pingPacket && pingPacket.getParameter() != 0) {
+        if (packet instanceof ClientboundPingPacket pingPacket && pingPacket.getId() != 0) {
             eventBus.post(new ServerTickEvent());
         }
         if (eventBus.post(new ReceivePacketEvent(packet)).isCancelled()) {
@@ -29,7 +29,7 @@ public abstract class ClientConnectionMixin {
         }
     }
 
-    @Inject(method = "send(Lnet/minecraft/network/packet/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At("HEAD"), cancellable = true)
     private void onPacketSend(Packet<?> packet, @Nullable ChannelFutureListener channelFutureListener, boolean flush, CallbackInfo ci) {
         if (eventBus.post(new SendPacketEvent(packet)).isCancelled()) {
             ci.cancel();

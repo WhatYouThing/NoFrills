@@ -1,12 +1,12 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -45,10 +45,10 @@ public class CorpseHighlight {
         return instance.isActive() && Utils.isInArea("Mineshaft");
     }
 
-    private static CorpseType getCorpseType(ArmorStandEntity ent) {
+    private static CorpseType getCorpseType(ArmorStand ent) {
         ItemStack helmet = Utils.getEntityArmor(ent).getFirst();
         if (!helmet.isEmpty()) {
-            return switch (Utils.toPlain(helmet.getName())) {
+            return switch (Utils.toPlain(helmet.getHoverName())) {
                 case "Lapis Armor Helmet" -> CorpseType.Lapis;
                 case "Mineral Helmet" -> CorpseType.Tungsten;
                 case "Yog Helmet" -> CorpseType.Umber;
@@ -67,9 +67,9 @@ public class CorpseHighlight {
             default -> "";
         };
         if (!id.isEmpty()) {
-            PlayerInventory inv = mc.player.getInventory();
+            Inventory inv = mc.player.getInventory();
             for (int i = 0; i <= 35; i++) {
-                ItemStack stack = inv.getStack(i);
+                ItemStack stack = inv.getItem(i);
                 if (!stack.isEmpty() && Utils.getSkyblockId(stack).equals(id)) {
                     return true;
                 }
@@ -83,7 +83,7 @@ public class CorpseHighlight {
     private static void onTick(WorldTickEvent event) {
         if (isActive()) {
             for (Entity ent : Utils.getEntities()) {
-                if (ent instanceof ArmorStandEntity stand && !stand.isInvisible()) {
+                if (ent instanceof ArmorStand stand && !stand.isInvisible()) {
                     cache.add(stand);
                 }
             }
@@ -97,8 +97,8 @@ public class CorpseHighlight {
                 if (hideOpened.value() && openedCorpses.contains(ent.getId())) {
                     continue;
                 }
-                ArmorStandEntity stand = (ArmorStandEntity) ent;
-                Box box = stand.getDimensions(EntityPose.STANDING).getBoxAt(stand.getEntityPos()).expand(0.25, 0.0, 0.25);
+                ArmorStand stand = (ArmorStand) ent;
+                AABB box = stand.getDimensions(Pose.STANDING).makeBoundingBox(stand.position()).inflate(0.25, 0.0, 0.25);
                 switch (getCorpseType(stand)) {
                     case Lapis -> event.drawStyled(box, style.value(), false, lapisOutline.value(), lapisFill.value());
                     case Tungsten ->
@@ -113,7 +113,7 @@ public class CorpseHighlight {
 
     @EventHandler
     private static void onInteractEntity(InteractEntityEvent event) {
-        if (isActive() && hideOpened.value() && event.entity instanceof ArmorStandEntity stand) {
+        if (isActive() && hideOpened.value() && event.entity instanceof ArmorStand stand) {
             CorpseType type = getCorpseType(stand);
             if (!type.equals(CorpseType.None) && hasKeyForCorpse(type)) {
                 openedCorpses.add(stand.getId());

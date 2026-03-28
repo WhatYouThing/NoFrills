@@ -1,15 +1,15 @@
 package nofrills.events;
 
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.input.MouseInput;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 
 public class InputEvent extends Cancellable {
     public int key, modifiers, action;
     public boolean isKeyboard = false, isMouse = false;
-    public KeyInput keyInput = null;
-    public MouseInput mouseInput = null;
+    public KeyEvent keyInput = null;
+    public MouseButtonInfo mouseInput = null;
 
-    public InputEvent(KeyInput input, int action) {
+    public InputEvent(KeyEvent input, int action) {
         this.setCancelled(false);
         this.key = input.key();
         this.modifiers = input.modifiers();
@@ -18,7 +18,7 @@ public class InputEvent extends Cancellable {
         this.keyInput = input;
     }
 
-    public InputEvent(MouseInput input, int action) {
+    public InputEvent(MouseButtonInfo input, int action) {
         this.setCancelled(false);
         this.key = input.button();
         this.modifiers = input.modifiers();

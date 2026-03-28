@@ -1,10 +1,10 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -55,8 +55,8 @@ public class KuudraChestValue {
         if (salvageValue.value() && salvageAmounts.containsKey(id)) {
             int amount = salvageAmounts.get(id);
             if (amount != 120) return amount;
-            NbtCompound data = Utils.getCustomData(stack);
-            int stars = data != null ? data.getInt("upgrade_level", 0) : 0;
+            CompoundTag data = Utils.getCustomData(stack);
+            int stars = data != null ? data.getIntOr("upgrade_level", 0) : 0;
             int starCost = 0;
             for (int i = 1; i <= stars; i++) {
                 starCost += i > 7 ? i * 10 - 10 : i * 5 + 25; // simple formula for the price of each star on a basic tier piece
@@ -94,7 +94,7 @@ public class KuudraChestValue {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }
-            String name = Utils.toPlain(event.stack.getName());
+            String name = Utils.toPlain(event.stack.getHoverName());
             String id = getLootID(event.stack, name);
             if (id.isEmpty()) return;
             int quantity = getLootQuantity(event.stack, name, id);
@@ -111,11 +111,11 @@ public class KuudraChestValue {
         if (instance.isActive() && currentValue > 0.0) {
             Slot targetSlot = event.handler.getSlot(4);
             String value = Utils.format("Chest Value: {}", Utils.formatSeparator(currentValue));
-            int width = mc.textRenderer.getWidth(value);
+            int width = mc.font.width(value);
             int baseX = targetSlot.x + 8;
             int baseY = targetSlot.y + 8;
             event.context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, background.value().argb);
-            event.context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, RenderColor.green.argb);
+            event.context.centeredText(mc.font, value, baseX, baseY - 4, RenderColor.green.argb);
         }
     }
 

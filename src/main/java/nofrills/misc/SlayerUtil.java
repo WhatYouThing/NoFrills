@@ -1,12 +1,17 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.mob.*;
-import net.minecraft.entity.passive.WolfEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
+import net.minecraft.world.entity.monster.spider.CaveSpider;
+import net.minecraft.world.entity.monster.spider.Spider;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
+import net.minecraft.world.entity.player.Player;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldTickEvent;
 
@@ -17,12 +22,12 @@ import java.util.regex.Pattern;
 import static nofrills.Main.mc;
 
 public class SlayerUtil {
-    public static final SlayerBoss revenant = new SlayerBoss("Revenant Horror", List.of("Revenant Horror", "Atoned Horror"), ent -> ent instanceof ZombieEntity);
-    public static final SlayerBoss tarantula = new SlayerBoss("Tarantula Broodfather", List.of("Tarantula Broodfather", "Conjoined Brood"), ent -> ent instanceof SpiderEntity && !(ent instanceof CaveSpiderEntity));
-    public static final SlayerBoss sven = new SlayerBoss("Sven Packmaster", List.of("Sven Packmaster"), ent -> ent instanceof WolfEntity);
-    public static final SlayerBoss voidgloom = new SlayerBoss("Voidgloom Seraph", List.of("Voidgloom Seraph"), ent -> ent instanceof EndermanEntity);
-    public static final SlayerBoss vampire = new SlayerBoss("Riftstalker Bloodfiend", List.of("Bloodfiend"), ent -> ent instanceof PlayerEntity player && !Utils.isPlayer(player));
-    public static final SlayerBoss blaze = new SlayerBoss("Inferno Demonlord", List.of("Inferno Demonlord", "ⓉⓎⓅⒽⓄⒺⓊⓈ", "ⓆⓊⒶⓏⒾⒾ"), ent -> ent instanceof BlazeEntity || ent instanceof ZombifiedPiglinEntity || ent instanceof WitherSkeletonEntity);
+    public static final SlayerBoss revenant = new SlayerBoss("Revenant Horror", List.of("Revenant Horror", "Atoned Horror"), ent -> ent instanceof Zombie);
+    public static final SlayerBoss tarantula = new SlayerBoss("Tarantula Broodfather", List.of("Tarantula Broodfather", "Conjoined Brood"), ent -> ent instanceof Spider && !(ent instanceof CaveSpider));
+    public static final SlayerBoss sven = new SlayerBoss("Sven Packmaster", List.of("Sven Packmaster"), ent -> ent instanceof Wolf);
+    public static final SlayerBoss voidgloom = new SlayerBoss("Voidgloom Seraph", List.of("Voidgloom Seraph"), ent -> ent instanceof EnderMan);
+    public static final SlayerBoss vampire = new SlayerBoss("Riftstalker Bloodfiend", List.of("Bloodfiend"), ent -> ent instanceof Player player && !Utils.isPlayer(player));
+    public static final SlayerBoss blaze = new SlayerBoss("Inferno Demonlord", List.of("Inferno Demonlord", "ⓉⓎⓅⒽⓄⒺⓊⓈ", "ⓆⓊⒶⓏⒾⒾ"), ent -> ent instanceof Blaze || ent instanceof ZombifiedPiglin || ent instanceof WitherSkeleton);
     public static final List<SlayerBoss> bossList = List.of(revenant, tarantula, sven, voidgloom, vampire, blaze);
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
@@ -50,16 +55,16 @@ public class SlayerUtil {
         return bossAlive && currentBoss != null && currentBoss.equals(boss);
     }
 
-    public static ArmorStandEntity getSpawnerEntity() {
-        return (ArmorStandEntity) spawnerCache.getFirst();
+    public static ArmorStand getSpawnerEntity() {
+        return (ArmorStand) spawnerCache.getFirst();
     }
 
-    public static ArmorStandEntity getTimerEntity() {
-        return (ArmorStandEntity) timerCache.getFirst();
+    public static ArmorStand getTimerEntity() {
+        return (ArmorStand) timerCache.getFirst();
     }
 
-    public static ArmorStandEntity getNameEntity() {
-        return (ArmorStandEntity) nameCache.getFirst();
+    public static ArmorStand getNameEntity() {
+        return (ArmorStand) nameCache.getFirst();
     }
 
     public static LivingEntity getBossEntity() {
@@ -92,7 +97,7 @@ public class SlayerUtil {
             Entity spawner = getSpawnerEntity();
             if (spawner == null) return;
             for (Entity entity : Utils.getOtherEntities(spawner, 0.5, 2.0, 0.5, predicate)) {
-                if (entity instanceof ArmorStandEntity stand) {
+                if (entity instanceof ArmorStand stand) {
                     String name = Utils.toPlain(stand.getName());
                     if (isTimer(name)) {
                         timerCache.add(entity);

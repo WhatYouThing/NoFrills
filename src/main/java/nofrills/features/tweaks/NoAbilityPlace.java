@@ -1,9 +1,9 @@
 package nofrills.features.tweaks;
 
 import com.google.common.collect.Sets;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.misc.Utils;
 
@@ -23,9 +23,9 @@ public class NoAbilityPlace {
             "SNOW_HOWITZER"
     );
 
-    public static boolean hasAbility(ItemPlacementContext context) {
+    public static boolean hasAbility(BlockPlaceContext context) {
         if (context != null) {
-            ItemStack stack = context.getStack();
+            ItemStack stack = context.getItemInHand();
             String id = Utils.getSkyblockId(stack);
             if (!id.isEmpty()) {
                 if (abilityWhitelist.contains(id) || id.startsWith("ABIPHONE")) {

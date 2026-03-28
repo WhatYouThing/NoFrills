@@ -1,7 +1,7 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import net.minecraft.text.Text;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
@@ -16,7 +16,7 @@ public class LagMeter extends SimpleTextElement {
     public long lastTick = 0;
 
     public LagMeter(String text) {
-        super(Text.literal(text), new Feature("lagMeterElement"), "Lag Meter");
+        super(Component.literal(text), new Feature("lagMeterElement"), "Lag Meter");
         this.options = this.getBaseSettings(List.of(
                 new Settings.SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
         ));
@@ -24,12 +24,12 @@ public class LagMeter extends SimpleTextElement {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
         } else if (!this.isEditingHud()) {
             if (lastTick != 0) {
-                long sinceTick = Util.getMeasuringTimeMs() - lastTick;
+                long sinceTick = Util.getMillis() - lastTick;
                 if (sinceTick >= min.value()) {
                     this.setText(Utils.format("Last server tick was {}s ago", Utils.formatDecimal(sinceTick * 0.001)));
                 } else {

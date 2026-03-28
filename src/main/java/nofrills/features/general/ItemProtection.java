@@ -4,16 +4,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.misc.Utils;
@@ -48,11 +48,11 @@ public class ItemProtection {
 
     public static ProtectType getProtectType(ItemStack stack) {
         if (overrideActive || stack.isEmpty()) return ProtectType.None;
-        NbtCompound customData = Utils.getCustomData(stack);
+        CompoundTag customData = Utils.getCustomData(stack);
         if (customData == null) return ProtectType.None;
         String id = Utils.getMarketId(stack);
         if (protectUUID.value() && data.value().has("uuids")) {
-            String uuid = customData.getString("uuid", "");
+            String uuid = customData.getStringOr("uuid", "");
             if (data.value().getAsJsonArray("uuids").contains(new JsonPrimitive(uuid))) {
                 return ProtectType.UUID;
             }
@@ -62,13 +62,13 @@ public class ItemProtection {
                 return ProtectType.SkyblockID;
             }
         }
-        if (protectMaxQuality.value() && customData.getInt("baseStatBoostPercentage", 0) == 50) {
+        if (protectMaxQuality.value() && customData.getIntOr("baseStatBoostPercentage", 0) == 50) {
             return ProtectType.MaxQuality;
         }
-        if (protectStarred.value() && customData.getInt("upgrade_level", 0) > 0 && !customData.contains("boss_tier")) {
+        if (protectStarred.value() && customData.getIntOr("upgrade_level", 0) > 0 && !customData.contains("boss_tier")) {
             return ProtectType.Starred;
         }
-        if (protectRarityUpgraded.value() && customData.getInt("rarity_upgrades", 0) > 0) {
+        if (protectRarityUpgraded.value() && customData.getIntOr("rarity_upgrades", 0) > 0) {
             return ProtectType.RarityUpgraded;
         }
         if (protectValue.value()) {
@@ -87,24 +87,24 @@ public class ItemProtection {
     }
 
     private static boolean isSellStack(ItemStack stack) {
-        return (stack.getItem().equals(Items.HOPPER) && Utils.toPlain(stack.getName()).equals("Sell Item"))
+        return (stack.getItem().equals(Items.HOPPER) && Utils.toPlain(stack.getHoverName()).equals("Sell Item"))
                 || Utils.getLoreLines(stack).contains("Click to buyback!");
     }
 
     private static boolean isSalvageButton(ItemStack stack) {
-        String name = Utils.toPlain(stack.getName());
+        String name = Utils.toPlain(stack.getHoverName());
         return name.equals("Salvage Items") || name.equals("Confirm Salvage");
     }
 
     private static void addUUID(ItemStack stack) {
-        NbtCompound customData = Utils.getCustomData(stack);
+        CompoundTag customData = Utils.getCustomData(stack);
         if (customData == null) {
-            Utils.infoRaw(Text.literal("§cItem ").append(stack.getName()).append(" §chas no custom data, unable to protect."));
+            Utils.infoRaw(Component.literal("§cItem ").append(stack.getHoverName()).append(" §chas no custom data, unable to protect."));
             return;
         }
-        String uuid = customData.getString("uuid", "");
+        String uuid = customData.getStringOr("uuid", "");
         if (uuid.isEmpty()) {
-            Utils.infoRaw(Text.literal("§cItem ").append(stack.getName()).append(" §chas no UUID, unable to protect."));
+            Utils.infoRaw(Component.literal("§cItem ").append(stack.getHoverName()).append(" §chas no UUID, unable to protect."));
             return;
         }
         data.edit(object -> {
@@ -114,9 +114,9 @@ public class ItemProtection {
             JsonArray array = object.getAsJsonArray("uuids");
             JsonPrimitive primitive = new JsonPrimitive(uuid);
             if (array.remove(primitive)) {
-                Utils.infoRaw(Text.literal("§eItem ").append(stack.getName()).append(" §eis no longer protected by UUID."));
+                Utils.infoRaw(Component.literal("§eItem ").append(stack.getHoverName()).append(" §eis no longer protected by UUID."));
             } else {
-                Utils.infoRaw(Text.literal("§aItem ").append(stack.getName()).append(" §ais now protected by UUID."));
+                Utils.infoRaw(Component.literal("§aItem ").append(stack.getHoverName()).append(" §ais now protected by UUID."));
                 array.add(primitive);
             }
         });
@@ -125,7 +125,7 @@ public class ItemProtection {
     private static void addSkyblockID(ItemStack stack) {
         String id = Utils.getMarketId(stack);
         if (id.isEmpty()) {
-            Utils.infoRaw(Text.literal("§cItem ").append(stack.getName()).append(" §chas no Skyblock ID, unable to protect."));
+            Utils.infoRaw(Component.literal("§cItem ").append(stack.getHoverName()).append(" §chas no Skyblock ID, unable to protect."));
             return;
         }
         data.edit(object -> {
@@ -135,9 +135,9 @@ public class ItemProtection {
             JsonArray array = object.getAsJsonArray("ids");
             JsonPrimitive primitive = new JsonPrimitive(id);
             if (array.remove(primitive)) {
-                Utils.infoRaw(Text.literal("§eItem ").append(stack.getName()).append(" §eis no longer protected by Skyblock ID."));
+                Utils.infoRaw(Component.literal("§eItem ").append(stack.getHoverName()).append(" §eis no longer protected by Skyblock ID."));
             } else {
-                Utils.infoRaw(Text.literal("§aItem ").append(stack.getName()).append(" §ais now protected by Skyblock ID."));
+                Utils.infoRaw(Component.literal("§aItem ").append(stack.getHoverName()).append(" §ais now protected by Skyblock ID."));
                 array.add(primitive);
             }
         });
@@ -145,7 +145,7 @@ public class ItemProtection {
 
     @EventHandler
     private static void onKey(InputEvent event) {
-        if (instance.isActive() && (mc.currentScreen instanceof InventoryScreen || mc.currentScreen instanceof GenericContainerScreen)) {
+        if (instance.isActive() && (mc.screen instanceof InventoryScreen || mc.screen instanceof ContainerScreen)) {
             if (hideTooltip.value() && event.key == GLFW.GLFW_KEY_LEFT_SHIFT) {
                 revealingTooltip = event.action != GLFW.GLFW_RELEASE;
             }
@@ -157,7 +157,7 @@ public class ItemProtection {
             if (uuidKey.isKey(event.key) || skyblockIdKey.isKey(event.key)) {
                 Slot focused = Utils.getFocusedSlot();
                 if (focused == null) return;
-                ItemStack stack = focused.getStack();
+                ItemStack stack = focused.getItem();
                 if (!stack.isEmpty()) {
                     if (event.action == GLFW.GLFW_PRESS) {
                         if (uuidKey.isKey(event.key)) addUUID(stack);
@@ -177,7 +177,7 @@ public class ItemProtection {
             }
             ProtectType type = getProtectType(event.stack);
             if (!type.equals(ProtectType.None)) {
-                MutableText line = Text.literal(Utils.format("§aItem Protected §7({})", type.name()));
+                MutableComponent line = Component.literal(Utils.format("§aItem Protected §7({})", type.name()));
                 event.addLine(Utils.getShortTag().append(line.withColor(0xffffff)));
             }
         }
@@ -186,23 +186,23 @@ public class ItemProtection {
     @EventHandler
     private static void onSlotClick(SlotClickEvent event) {
         if (instance.isActive()) {
-            ItemStack stack = event.slot != null ? event.slot.getStack() : event.handler.getCursorStack();
-            if (event.handler instanceof GenericContainerScreenHandler handler) {
-                if (isSellGUI && event.slotId >= 0 && event.slotId < handler.getRows() * 9) {
+            ItemStack stack = event.slot != null ? event.slot.getItem() : event.handler.getCarried();
+            if (event.handler instanceof ChestMenu handler) {
+                if (isSellGUI && event.slotId >= 0 && event.slotId < handler.getRowCount() * 9) {
                     return;
                 }
                 if (isSalvageGUI && isSalvageButton(stack)) {
                     for (Slot slot : Utils.getContainerSlots(handler)) {
-                        ItemStack slotStack = slot.getStack();
+                        ItemStack slotStack = slot.getItem();
                         if (!getProtectType(slotStack).equals(ProtectType.None)) {
-                            Utils.infoRaw(Text.literal("§aPrevented salvage, ").append(slotStack.getName()).append(" §ais a protected item."));
+                            Utils.infoRaw(Component.literal("§aPrevented salvage, ").append(slotStack.getHoverName()).append(" §ais a protected item."));
                             event.cancel();
                             return;
                         }
                     }
                 }
             }
-            if (Utils.getFocusedSlot() == null || isSellGUI || event.actionType.equals(SlotActionType.THROW)) {
+            if (Utils.getFocusedSlot() == null || isSellGUI || event.actionType.equals(ContainerInput.THROW)) {
                 if (!getProtectType(stack).equals(ProtectType.None)) {
                     event.cancel();
                 }

@@ -1,7 +1,7 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import nofrills.config.Feature;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;

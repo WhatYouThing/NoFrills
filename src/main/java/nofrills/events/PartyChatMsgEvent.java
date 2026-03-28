@@ -12,6 +12,6 @@ public class PartyChatMsgEvent extends Cancellable {
         this.setCancelled(false);
         this.message = message;
         this.sender = sender;
-        this.self = sender.equalsIgnoreCase(mc.getSession().getUsername());
+        this.self = sender.equalsIgnoreCase(mc.getUser().getName());
     }
 }

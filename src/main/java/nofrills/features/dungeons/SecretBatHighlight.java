@@ -1,8 +1,8 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
@@ -31,7 +31,7 @@ public class SecretBatHighlight {
         if (instance.isActive() && cache.size() > 0) {
             for (Entity ent : cache.get()) {
                 if (!ent.isAlive()) continue;
-                Box box = Utils.getLerpedBox(ent, event.tickCounter.getTickProgress(true));
+                AABB box = Utils.getLerpedBox(ent, event.tickCounter.getGameTimeDeltaPartialTick(true));
                 event.drawStyled(box, style.value(), false, outlineColor.value(), fillColor.value());
             }
         }

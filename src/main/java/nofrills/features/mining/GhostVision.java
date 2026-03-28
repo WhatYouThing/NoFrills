@@ -1,9 +1,9 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.CreeperEntity;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
@@ -23,14 +23,14 @@ public class GhostVision {
 
     private static final EntityCache cache = new EntityCache();
 
-    public static boolean isGhost(CreeperEntity entity) {
+    public static boolean isGhost(Creeper entity) {
         return instance.isActive() && cache.has(entity);
     }
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (instance.isActive() && event.entity instanceof CreeperEntity creeper && Utils.isInArea("Dwarven Mines")) {
-            if (creeper.getEntity().getY() < 100) {
+        if (instance.isActive() && event.entity instanceof Creeper creeper && Utils.isInArea("Dwarven Mines")) {
+            if (creeper.asLivingEntity().getY() < 100) {
                 cache.add(event.entity);
             }
         }
@@ -41,7 +41,7 @@ public class GhostVision {
         if (instance.isActive() && Utils.isInArea("Dwarven Mines")) {
             for (Entity ent : cache.get()) {
                 if (!ent.isAlive()) continue;
-                Box box = Utils.getLerpedBox(ent, event.tickCounter.getTickProgress(true));
+                AABB box = Utils.getLerpedBox(ent, event.tickCounter.getGameTimeDeltaPartialTick(true));
                 event.drawStyled(box, style.value(), false, outline.value(), fill.value());
             }
         }

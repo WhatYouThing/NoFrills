@@ -1,18 +1,18 @@
 package nofrills.events;
 
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ContainerInput;
 
 public class SlotClickEvent extends Cancellable {
     public Slot slot;
     public int slotId;
     public int button;
-    public SlotActionType actionType;
+    public ContainerInput actionType;
     public String title;
-    public ScreenHandler handler;
+    public AbstractContainerMenu handler;
 
-    public SlotClickEvent(Slot slot, int slotId, int button, SlotActionType actionType, String title, ScreenHandler handler) {
+    public SlotClickEvent(Slot slot, int slotId, int button, ContainerInput actionType, String title, AbstractContainerMenu handler) {
         this.setCancelled(false);
         this.slot = slot;
         this.slotId = slotId;

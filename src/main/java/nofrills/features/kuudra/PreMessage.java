@@ -1,9 +1,9 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.GiantEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Giant;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
@@ -27,9 +27,9 @@ public class PreMessage {
                         Utils.infoFormat("§eYour Pre: {}", preSpot.name);
                         boolean preFound = false, secondaryFound = false;
                         for (Entity ent : Utils.getEntities()) {
-                            if (ent instanceof GiantEntity) {
-                                Vec3d entPos = ent.getEntityPos();
-                                Vec3d supplyPos = new Vec3d(entPos.getX(), 76, entPos.getZ());
+                            if (ent instanceof Giant) {
+                                Vec3 entPos = ent.position();
+                                Vec3 supplyPos = new Vec3(entPos.x(), 76, entPos.z());
                                 if (preSpot.spot.distanceTo(supplyPos) < preSpot.supplyDist) {
                                     preFound = true;
                                 }

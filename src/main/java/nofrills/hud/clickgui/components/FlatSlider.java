@@ -2,7 +2,7 @@ package nofrills.hud.clickgui.components;
 
 import io.wispforest.owo.ui.component.SlimSliderComponent;
 import io.wispforest.owo.ui.core.CursorStyle;
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
 import org.lwjgl.glfw.GLFW;
 
 public class FlatSlider extends SlimSliderComponent {
@@ -28,7 +28,7 @@ public class FlatSlider extends SlimSliderComponent {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         context.fill(this.x, this.y + 8, this.x + this.width, this.y + this.height - 8, this.trackColor);
         int sliderX = (int) (this.x + (this.width - 4) * this.value.get());
         context.fill(sliderX, this.y + 2, sliderX + 4, this.y + this.height - 2, this.sliderColor);

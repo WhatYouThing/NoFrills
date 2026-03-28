@@ -1,7 +1,7 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import net.minecraft.text.Text;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -15,7 +15,7 @@ public class SeaCreatures extends SimpleTextElement {
     private boolean active = false;
 
     public SeaCreatures(String text) {
-        super(Text.literal(text), new Feature("seaCreaturesElement"), "Sea Creatures");
+        super(Component.literal(text), new Feature("seaCreaturesElement"), "Sea Creatures");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
         ));
@@ -23,7 +23,7 @@ public class SeaCreatures extends SimpleTextElement {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
         } else if (!this.isEditingHud()) {

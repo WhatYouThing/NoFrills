@@ -2,8 +2,8 @@ package nofrills.hud.clickgui;
 
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.client.gui.Click;
-import net.minecraft.text.Text;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.hud.clickgui.components.PlainLabel;
 import org.lwjgl.glfw.GLFW;
@@ -13,8 +13,8 @@ import static nofrills.Main.mc;
 public class Module extends FlowLayout {
     public boolean active = false;
     public Feature feature;
-    public Text activeText;
-    public Text inactiveText;
+    public Component activeText;
+    public Component inactiveText;
     public PlainLabel label;
     public Settings options;
 
@@ -24,22 +24,22 @@ public class Module extends FlowLayout {
 
     public Module(String name, Feature feature, String tooltip, Settings options) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
-        this.activeText = Text.literal(name).withColor(0x5ca0bf);
-        this.inactiveText = Text.literal(name).withColor(0xdddddd);
-        this.label = new PlainLabel(Text.literal(name));
+        this.activeText = Component.literal(name).withColor(0x5ca0bf);
+        this.inactiveText = Component.literal(name).withColor(0xdddddd);
+        this.label = new PlainLabel(Component.literal(name));
         this.label.horizontalTextAlignment(HorizontalAlignment.LEFT).verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(3, 2, 5, 5));
-        this.label.tooltip(Text.literal(tooltip));
+        this.label.tooltip(Component.literal(tooltip));
         this.child(label);
         this.options = options;
         if (this.options != null) {
-            this.options.setTitle(Text.literal(name).withColor(0xffffff));
+            this.options.setTitle(Component.literal(name).withColor(0xffffff));
         }
         this.feature = feature;
         this.active(this.feature.isActive());
     }
 
     @Override
-    public boolean onMouseDown(Click click, boolean doubled) {
+    public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
         if (click.y() <= (double) this.label.fullSize().height()) {
             if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
                 this.active(!this.feature.isActive());

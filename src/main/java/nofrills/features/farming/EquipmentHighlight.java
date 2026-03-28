@@ -2,8 +2,8 @@ package nofrills.features.farming;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.ScreenRenderEvent;
@@ -41,14 +41,14 @@ public class EquipmentHighlight {
     private static void onScreenRender(ScreenRenderEvent.Before event) {
         if (instance.isActive() && event.title.equals("Your Equipment and Stats") && Utils.isInGarden()) {
             for (Slot slot : event.handler.slots) {
-                ItemStack stack = slot.getStack();
+                ItemStack stack = slot.getItem();
                 if (stack.isEmpty()) continue;
                 String id = Utils.getSkyblockId(stack);
                 if (!id.isEmpty()) {
                     if (farmEquipment.contains(id)) {
-                        event.drawFill(slot.id, farmColor.value());
+                        event.drawFill(slot.index, farmColor.value());
                     } else if (pestEquipment.contains(id)) {
-                        event.drawFill(slot.id, pestColor.value());
+                        event.drawFill(slot.index, pestColor.value());
                     }
                 }
             }

@@ -1,8 +1,9 @@
 package nofrills.features.fishing;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
+import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
@@ -31,13 +32,13 @@ public class RareAnnounce {
                         Utils.showTitle(creature.color + "§l" + Utils.toUpper(creature.name), "", 5, 20, 5);
                     }
                     if (sound.value()) {
-                        Utils.playSound(SoundEvents.ENTITY_ZOMBIE_CONVERTED_TO_DROWNED, 1, 1);
+                        Utils.playSound(SoundEvents.ZOMBIE_CONVERTED_TO_DROWNED, 1, 1);
                     }
                     if (sendMsg.value() && !msg.value().isEmpty()) {
                         Utils.sendMessage(msg.value().replace("{name}", creature.name).replace("{spawnmsg}", creature.spawnMsg));
                     }
                     if (replace.value()) {
-                        mc.inGameHud.getChatHud().addMessage(Text.literal(creature.color + "§l" + creature.spawnMsg + "§r"), null, noFrillsIndicator);
+                        mc.gui.getChat().addMessage(Component.literal(creature.color + "§l" + creature.spawnMsg + "§r"), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator);
                         event.cancel();
                     }
                     return;

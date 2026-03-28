@@ -2,17 +2,17 @@ package nofrills.features.mining;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.StainedGlassBlock;
-import net.minecraft.block.StainedGlassPaneBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.StainedGlassBlock;
+import net.minecraft.world.level.block.StainedGlassPaneBlock;
 import nofrills.config.Feature;
 import nofrills.events.BlockUpdateEvent;
 import nofrills.misc.SkyblockData;
 
 import java.util.HashSet;
 
-import static net.minecraft.block.HorizontalConnectingBlock.*;
+import static net.minecraft.world.level.block.CrossCollisionBlock.*;
 import static nofrills.Main.mc;
 
 public class GemstoneDesyncFix {
@@ -40,17 +40,17 @@ public class GemstoneDesyncFix {
     }
 
     public static boolean isConnectedPane(BlockState state) {
-        return state.get(NORTH) || state.get(EAST) || state.get(SOUTH) || state.get(WEST);
+        return state.getValue(NORTH) || state.getValue(EAST) || state.getValue(SOUTH) || state.getValue(WEST);
     }
 
     public static BlockState asFullPane(BlockState state) {
-        return state.with(NORTH, true).with(EAST, true).with(SOUTH, true).with(WEST, true);
+        return state.setValue(NORTH, true).setValue(EAST, true).setValue(SOUTH, true).setValue(WEST, true);
     }
 
     @EventHandler
     private static void onBlock(BlockUpdateEvent event) {
         if (active() && event.newState.isAir() && isStainedGlass(event.oldState)) {
-            event.newState.updateNeighbors(mc.world, event.pos, Block.NOTIFY_ALL);
+            event.newState.updateNeighbourShapes(mc.level, event.pos, Block.UPDATE_ALL);
         }
     }
 }

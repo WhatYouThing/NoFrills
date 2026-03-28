@@ -1,9 +1,9 @@
 package nofrills.features.farming;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.particle.ParticleTypes;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.particles.ParticleTypes;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
@@ -26,7 +26,7 @@ public class WateringHelper {
     }
 
     private static boolean isHoldingWateringCan() {
-        NbtCompound data = Utils.getCustomData(Utils.getHeldItem());
+        CompoundTag data = Utils.getCustomData(Utils.getHeldItem());
         return data != null && data.contains("water_level");
     }
 
@@ -45,7 +45,7 @@ public class WateringHelper {
                 if (!ent.hasCustomName()) {
                     continue;
                 }
-                event.drawText(ent.getEntityPos().add(0.0, 0.5, 0.0), ent.getName(), 0.025f, true, RenderColor.white);
+                event.drawText(ent.position().add(0.0, 0.5, 0.0), ent.getName(), 0.025f, true, RenderColor.white);
             }
         }
     }

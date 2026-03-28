@@ -1,26 +1,29 @@
 package nofrills.hud.elements;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
 import io.wispforest.owo.ui.core.Sizing;
-import net.minecraft.block.MapColor;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.render.state.TextGuiElementRenderState;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.client.texture.Sprite;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.item.map.MapDecoration;
-import net.minecraft.item.map.MapDecorationTypes;
-import net.minecraft.item.map.MapState;
-import net.minecraft.network.packet.s2c.play.MapUpdateS2CPacket;
-import net.minecraft.text.OrderedText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Atlases;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.state.gui.GuiTextRenderState;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.world.level.saveddata.maps.MapDecoration;
+import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.network.protocol.game.ClientboundMapItemDataPacket;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.network.chat.Component;
+import net.minecraft.data.AtlasIds;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.*;
 import nofrills.hud.HudElement;
 import nofrills.hud.clickgui.Settings;
@@ -35,8 +38,8 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class DungeonMap extends HudElement {
-    public static NativeImageBackedTexture mapTexture;
-    private final SpriteAtlasTexture atlasTexture = mc.getAtlasManager().getAtlasTexture(Atlases.MAP_DECORATIONS);
+    public static DynamicTexture mapTexture;
+    private final TextureAtlas atlasTexture = mc.getAtlasManager().getAtlasOrThrow(AtlasIds.MAP_DECORATIONS);
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
     private final SettingDouble playerMarkerScale = new SettingDouble(1.5, "playerMarkerScale", this.instance);
     private final SettingDouble playerNameScale = new SettingDouble(0.8, "playerNameScale", this.instance);
@@ -69,25 +72,25 @@ public class DungeonMap extends HudElement {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
-        if (!this.shouldRender() || mc.world == null) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
+        if (!this.shouldRender() || mc.level == null) {
             return;
         } else if (!this.isEditingHud() && (!Utils.isInDungeons() || DungeonUtil.isInBossRoom())) {
             return;
         }
         super.draw(context, mouseX, mouseY, partialTicks, delta);
-        MapState mapState = DungeonUtil.getMap();
+        MapItemSavedData mapState = DungeonUtil.getMap();
         if (mapState != null && this.parameters != null) {
-            Matrix3x2fStack matrices = context.getMatrices();
+            Matrix3x2fStack matrices = context.pose();
             matrices.pushMatrix();
             float scale = this.scale.valueFloat();
             if (scale != 1.0f && !this.isEditingHud()) {
                 this.applyScaling(context, scale);
             }
             matrices.translate(this.x(), this.y());
-            context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, mapTexture.getGlTextureView(), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
+            context.innerBlit(RenderPipelines.GUI_TEXTURED, mapTexture.getTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
             int index = 0;
-            ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
+            ClientPacketListener networkHandler = mc.getConnection();
             for (MapDecoration decor : mapState.decorations.values()) {
                 if (this.isMarkerSelf(decor)) {
                     byte[] pos = parameters.getPlayerMarkerPos(delta);
@@ -97,20 +100,20 @@ public class DungeonMap extends HudElement {
                     if (index < this.teammates.size()) {
                         DungeonUtil.Teammate teammate = this.teammates.get(index);
                         index += 1;
-                        PlayerListEntry entry = networkHandler != null ? networkHandler.getPlayerListEntry(teammate.name()) : null;
-                        Identifier texture = entry != null ? entry.getSkinTextures().body().texturePath() : null;
+                        PlayerInfo entry = networkHandler != null ? networkHandler.getPlayerInfo(teammate.name()) : null;
+                        Identifier texture = entry != null ? entry.getSkin().body().texturePath() : null;
                         if (texture != null) {
-                            this.drawMarkerHead(context, texture, decor.x(), decor.z(), decor.rotation(), this.playerMarkerScale.valueFloat());
-                            this.drawMarkerLabel(context, teammate, decor.x(), decor.z(), this.playerNameScale.valueFloat());
+                            this.drawMarkerHead(context, texture, decor.x(), decor.y(), decor.rot(), this.playerMarkerScale.valueFloat());
+                            this.drawMarkerLabel(context, teammate, decor.x(), decor.y(), this.playerNameScale.valueFloat());
                             continue;
                         }
                     }
-                    this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.playerMarkerScale.valueFloat());
+                    this.drawMarker(context, decor, decor.x(), decor.y(), decor.rot(), this.playerMarkerScale.valueFloat());
                 }
             }
             matrices.popMatrix();
         } else if (this.isEditingHud()) {
-            context.drawCenteredTextWithShadow(mc.textRenderer, "Dungeon Map", (int) (this.x + this.width * 0.5), (int) (this.y + this.height * 0.5) - 4, 0xffffffff);
+            context.centeredText(mc.font, "Dungeon Map", (int) (this.x + this.width * 0.5), (int) (this.y + this.height * 0.5) - 4, 0xffffffff);
         }
     }
 
@@ -127,31 +130,31 @@ public class DungeonMap extends HudElement {
         return decor.type().value().equals(MapDecorationTypes.FRAME.value());
     }
 
-    protected void drawMarker(OwoUIDrawContext context, MapDecoration decor, byte x, byte z, byte rot, float scale) {
-        Sprite sprite = this.atlasTexture.getSprite(decor.getAssetId());
-        Matrix3x2fStack matrices = context.getMatrices();
+    protected void drawMarker(OwoUIGraphics context, MapDecoration decor, byte x, byte z, byte rot, float scale) {
+        TextureAtlasSprite sprite = this.atlasTexture.getSprite(decor.getSpriteLocation());
+        Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
         matrices.translate(x / 2.0F + 64.0F, z / 2.0F + 64.0F);
         matrices.rotate((float) (Math.PI / 180.0) * rot * 360.0F / 16.0F);
         matrices.scale(scale, scale);
         matrices.translate(-0.125F, 0.125F);
-        GpuTextureView view = mc.getTextureManager().getTexture(sprite.getAtlasId()).getGlTextureView();
-        context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, view, -1, -1, 1, 1, sprite.getMinU(), sprite.getMaxU(), sprite.getMaxV(), sprite.getMinV(), -1);
+        GpuTextureView view = mc.getTextureManager().getTexture(sprite.atlasLocation()).getTextureView();
+        context.innerBlit(RenderPipelines.GUI_TEXTURED, view, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST), -1, -1, 1, 1, sprite.getU0(), sprite.getU1(), sprite.getV1(), sprite.getV0(), -1);
         matrices.popMatrix();
     }
 
-    protected void drawMarkerHead(OwoUIDrawContext context, Identifier texture, byte x, byte z, byte rot, float scale) {
-        Matrix3x2fStack matrices = context.getMatrices();
+    protected void drawMarkerHead(OwoUIGraphics context, Identifier texture, byte x, byte z, byte rot, float scale) {
+        Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
         matrices.translate(x / 2.0F + 64.0F, z / 2.0F + 64.0F);
         matrices.rotate((float) (Math.PI / 180.0) * rot * 360.0F / 16.0F);
         matrices.scale(scale, scale);
         matrices.translate(-0.125F * 24, -0.125F * 24);
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, texture, -1, -1, 8.0F, 16.0f, 8, 8, 8, -8, 64, 64, -1);
+        context.blit(RenderPipelines.GUI_TEXTURED, texture, -1, -1, 8.0F, 16.0f, 8, 8, 8, -8, 64, 64, -1);
         matrices.popMatrix();
     }
 
-    protected void drawMarkerLabel(OwoUIDrawContext context, DungeonUtil.Teammate teammate, byte x, byte z, float scale) {
+    protected void drawMarkerLabel(OwoUIGraphics context, DungeonUtil.Teammate teammate, byte x, byte z, float scale) {
         NameMode mode = this.playerNameMode.value();
         if (mode.equals(NameMode.Disabled)) {
             return;
@@ -162,7 +165,7 @@ public class DungeonMap extends HudElement {
             case "Archer" -> "Arch";
             default -> teammate.selectedClass();
         };
-        float width = mc.textRenderer.getWidth(text);
+        float width = mc.font.width(text);
         int color = switch (teammate.selectedClass()) {
             case "Healer" -> this.healColor.value().argb;
             case "Mage" -> this.mageColor.value().argb;
@@ -171,16 +174,16 @@ public class DungeonMap extends HudElement {
             case "Tank" -> this.tankColor.value().argb;
             default -> 0xffffff;
         };
-        OrderedText orderedText = Text.literal(text).asOrderedText();
-        Matrix3x2fStack matrices = context.getMatrices();
+        FormattedCharSequence orderedText = Component.literal(text).getVisualOrderText();
+        Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();
         matrices.translate(x / 2.0F + 64.0F - width * scale / 2.0F, z / 2.0F + 64.0F + 8.0F);
         matrices.scale(scale, scale);
-        context.state.addText(new TextGuiElementRenderState(mc.textRenderer, orderedText, new Matrix3x2f(matrices), 0, 0, color, Integer.MIN_VALUE, true, context.scissorStack.peekLast()));
+        context.guiRenderState.addText(new GuiTextRenderState(mc.font, orderedText, new Matrix3x2f(matrices), 0, 0, color, Integer.MIN_VALUE, true, false, context.scissorStack.peek()));
         matrices.popMatrix();
     }
 
-    public void onMapUpdate(MapUpdateS2CPacket packet) {
+    public void onMapUpdate(ClientboundMapItemDataPacket packet) {
         if (packet.mapId().equals(DungeonUtil.getMapId()) && Utils.isInDungeons()) {
             this.teammates = DungeonUtil.getAliveTeammates(true);
             if (this.parameters == null) {
@@ -191,14 +194,14 @@ public class DungeonMap extends HudElement {
                     }
                 }
             }
-            packet.updateData().ifPresent(data -> {
-                byte[] colors = data.colors();
-                NativeImage nativeImage = mapTexture.getImage();
+            packet.colorPatch().ifPresent(data -> {
+                byte[] colors = data.mapColors();
+                NativeImage nativeImage = mapTexture.getPixels();
                 if (nativeImage != null) {
                     for (int i = 0; i < 128; i++) {
                         for (int j = 0; j < 128; j++) {
                             int k = j + i * 128;
-                            nativeImage.setColorArgb(j, i, MapColor.getRenderColor(colors[k]));
+                            nativeImage.setPixel(j, i, MapColor.getColorFromPackedId(colors[k]));
                         }
                     }
                 }
@@ -232,15 +235,15 @@ public class DungeonMap extends HudElement {
         }
 
         public MapParameters adjustCenter(MapDecoration marker, boolean debug) {
-            Vec3d pos = mc.player.getEntityPos();
+            Vec3 pos = mc.player.position();
             if (debug) {
-                Utils.infoFormat("Got first map marker position: {} {} ({} {})", marker.x(), marker.z(), pos.getX(), pos.getZ());
+                Utils.infoFormat("Got first map marker position: {} {} ({} {})", marker.x(), marker.y(), pos.x(), pos.z());
                 Utils.infoFormat("Map parameters: {} {} {} {}", this.scaleX, this.scaleY, this.centerX, this.centerY);
             }
             int diffX = Utils.difference(this.toMarkerPos(this.toCoordX(pos, this.centerX)), marker.x());
-            int diffZ = Utils.difference(this.toMarkerPos(this.toCoordZ(pos, this.centerY)), marker.z());
+            int diffZ = Utils.difference(this.toMarkerPos(this.toCoordZ(pos, this.centerY)), marker.y());
             int fallbackX = Utils.difference(this.toMarkerPos(this.toCoordX(pos, -120)), marker.x());
-            int fallbackZ = Utils.difference(this.toMarkerPos(this.toCoordZ(pos, -120)), marker.z());
+            int fallbackZ = Utils.difference(this.toMarkerPos(this.toCoordZ(pos, -120)), marker.y());
             if (fallbackX < diffX) {
                 this.centerX = -120;
             }
@@ -256,21 +259,21 @@ public class DungeonMap extends HudElement {
         }
 
         public byte[] getPlayerMarkerPos(float delta) {
-            Vec3d pos = mc.player.getLerpedPos(delta);
+            Vec3 pos = mc.player.getPosition(delta);
             return new byte[]{this.toMarkerPos(this.toCoordX(pos, this.centerX)), this.toMarkerPos(this.toCoordZ(pos, this.centerY))};
         }
 
         public byte getPlayerMarkerRot(float delta) {
-            float rot = mc.player.getYaw(delta);
+            float rot = mc.player.getViewYRot(delta);
             return this.toMarkerDir(rot);
         }
 
-        private float toCoordX(Vec3d pos, int center) {
-            return (float) (pos.getX() - center) / this.scaleX;
+        private float toCoordX(Vec3 pos, int center) {
+            return (float) (pos.x() - center) / this.scaleX;
         }
 
-        private float toCoordZ(Vec3d pos, int center) {
-            return (float) (pos.getZ() - center) / this.scaleY;
+        private float toCoordZ(Vec3 pos, int center) {
+            return (float) (pos.z() - center) / this.scaleY;
         }
 
         private byte toMarkerPos(float coord) {

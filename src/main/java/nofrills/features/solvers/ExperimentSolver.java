@@ -1,12 +1,12 @@
 package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.item.DyeItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.world.item.DyeItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -48,7 +48,7 @@ public class ExperimentSolver {
     }
 
     public static ExperimentType getExperimentType() {
-        if (mc.currentScreen instanceof GenericContainerScreen container && Utils.isOnPrivateIsland()) {
+        if (mc.screen instanceof ContainerScreen container && Utils.isOnPrivateIsland()) {
             String title = container.getTitle().getString();
             if (title.startsWith("Chronomatron (")) return ExperimentType.Chronomatron;
             if (title.startsWith("Ultrasequencer (")) return ExperimentType.Ultrasequencer;
@@ -59,7 +59,7 @@ public class ExperimentSolver {
 
     private static boolean isStatus(ItemStack stack) {
         Item item = stack.getItem();
-        String name = Utils.toPlain(stack.getName());
+        String name = Utils.toPlain(stack.getHoverName());
         return item.equals(Items.CLOCK)
                 || item.equals(Items.BOOKSHELF)
                 || (item.equals(Items.GLOWSTONE) && !name.equals("Enchanted Book"))
@@ -106,7 +106,7 @@ public class ExperimentSolver {
         if (chronoSolution.size() > 1) {
             Solution first = chronoSolution.getFirst();
             for (Slot solution : chronoSolution.get(1).slots) {
-                if (first.slots.stream().noneMatch(slot -> slot.id == solution.id)) {
+                if (first.slots.stream().noneMatch(slot -> slot.index == solution.index)) {
                     SlotOptions.setSpoofed(solution, SlotOptions.SECOND);
                     SlotOptions.setDisabled(solution, true);
                 }
@@ -129,7 +129,7 @@ public class ExperimentSolver {
 
     private static boolean matchSuperStacks(ItemStack first, ItemStack second) {
         return first.getItem().equals(second.getItem())
-                && first.getName().getString().equals(second.getName().getString())
+                && first.getHoverName().getString().equals(second.getHoverName().getString())
                 && first.getCount() == second.getCount()
                 && Objects.equals(Utils.getTextureUrl(first), Utils.getTextureUrl(second));
     }
@@ -156,7 +156,7 @@ public class ExperimentSolver {
                     }
                     chronoSolution.getLast().slots.add(event.slot);
                 } else if (isStainedGlass(event.stack)) {
-                    if (!chronoSolution.isEmpty() && chronoSolution.getLast().slots.stream().anyMatch(slot -> slot.id == event.slotId)) {
+                    if (!chronoSolution.isEmpty() && chronoSolution.getLast().slots.stream().anyMatch(slot -> slot.index == event.slotId)) {
                         chronoSolution.add(new Solution(new ArrayList<>()));
                     }
                 }
@@ -181,8 +181,8 @@ public class ExperimentSolver {
                 SlotOptions.clearDisabled();
                 for (Slot slot : Utils.getContainerSlots(event.handler)) {
                     SlotOptions.setDisabled(slot, true);
-                    if (isDye(slot.getStack())) {
-                        solution.add(new Solution(slot.getStack(), slot));
+                    if (isDye(slot.getItem())) {
+                        solution.add(new Solution(slot.getItem(), slot));
                     }
                 }
                 ultraSolution.clear();
@@ -196,7 +196,7 @@ public class ExperimentSolver {
             }
             if (!isStainedGlass(event.stack) && !isStainedGlassPane(event.stack) && !item.equals(Items.AIR)) {
                 if (superSolution.slot != null && superSolution.slot != event.slot) {
-                    if (matchSuperStacks(event.stack, superSolution.slot.getStack())) {
+                    if (matchSuperStacks(event.stack, superSolution.slot.getItem())) {
                         SlotOptions.setBackground(event.slot, superColorMatched.value());
                         SlotOptions.setBackground(superSolution.slot, superColorMatched.value());
                     }
@@ -222,7 +222,7 @@ public class ExperimentSolver {
             if (chronomatron.value() && type.equals(ExperimentType.Chronomatron) && !rememberPhase) {
                 if (!chronoSolution.isEmpty()) {
                     Solution first = chronoSolution.getFirst();
-                    if (first.slots.stream().anyMatch(slot -> slot.id == slotId)) {
+                    if (first.slots.stream().anyMatch(slot -> slot.index == slotId)) {
                         for (Slot slot : first.slots) {
                             SlotOptions.clearSpoofed(slot);
                             SlotOptions.setDisabled(slot, true);
@@ -234,7 +234,7 @@ public class ExperimentSolver {
             }
             if (ultrasequencer.value() && type.equals(ExperimentType.Ultrasequencer) && !rememberPhase) {
                 if (!ultraSolution.isEmpty()) {
-                    if (ultraSolution.getFirst().slot.id == slotId) {
+                    if (ultraSolution.getFirst().slot.index == slotId) {
                         Solution first = ultraSolution.getFirst();
                         SlotOptions.setSpoofed(first.slot, SlotOptions.stackWithCount(SlotOptions.SOLID_BACKGROUND, first.stack.getCount()));
                         SlotOptions.setDisabled(first.slot, true);

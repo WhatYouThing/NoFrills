@@ -17,21 +17,21 @@ public class AutoSprint {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && mc.player != null) {
-            if (waterCheck.value() && mc.player.isTouchingWater()) {
+            if (waterCheck.value() && mc.player.isInWater()) {
                 if (wasSprinting) {
-                    mc.options.sprintKey.setPressed(false);
+                    mc.options.keySprint.setDown(false);
                     wasSprinting = false;
                 }
                 return;
             }
-            if (mc.options.getSprintToggled().getValue()) {
-                if (!mc.options.sprintKey.isPressed()) {
-                    mc.options.sprintKey.setPressed(true);
+            if (mc.options.toggleSprint().get()) {
+                if (!mc.options.keySprint.isDown()) {
+                    mc.options.keySprint.setDown(true);
                 }
             } else {
-                mc.options.sprintKey.setPressed(true);
+                mc.options.keySprint.setDown(true);
             }
-            wasSprinting = mc.options.sprintKey.isPressed();
+            wasSprinting = mc.options.keySprint.isDown();
         }
     }
 }

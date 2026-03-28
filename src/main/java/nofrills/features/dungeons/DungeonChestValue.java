@@ -1,9 +1,9 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.ScreenOpenEvent;
@@ -60,7 +60,7 @@ public class DungeonChestValue {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }
-            String name = Utils.toPlain(event.stack.getName());
+            String name = Utils.toPlain(event.stack.getHoverName());
             String id = getLootID(event.stack, name);
             if (id.isEmpty()) {
                 if (name.equals("Open Reward Chest")) {
@@ -86,11 +86,11 @@ public class DungeonChestValue {
         if (instance.isActive() && currentValue != 0.0) {
             Slot targetSlot = event.handler.getSlot(4);
             String value = Utils.format("Chest Value: {}", Utils.formatSeparator(currentValue));
-            int width = mc.textRenderer.getWidth(value);
+            int width = mc.font.width(value);
             int baseX = targetSlot.x + 8;
             int baseY = targetSlot.y + 8;
             event.context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, background.value().argb);
-            event.context.drawCenteredTextWithShadow(mc.textRenderer, value, baseX, baseY - 4, currentValue > 0 ? RenderColor.green.argb : RenderColor.red.argb);
+            event.context.centeredText(mc.font, value, baseX, baseY - 4, currentValue > 0 ? RenderColor.green.argb : RenderColor.red.argb);
         }
     }
 

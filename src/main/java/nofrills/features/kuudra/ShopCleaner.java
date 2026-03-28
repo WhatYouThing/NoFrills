@@ -1,8 +1,8 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.SlotOptions;
@@ -30,7 +30,7 @@ public class ShopCleaner {
             if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }
-            String name = Utils.toPlain(event.stack.getName());
+            String name = Utils.toPlain(event.stack.getHoverName());
             for (String garbage : garbageList) {
                 if (name.startsWith(garbage)) {
                     Slot slot = event.handler.getSlot(event.slotId);

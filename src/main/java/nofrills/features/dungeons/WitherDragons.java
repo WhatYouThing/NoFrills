@@ -1,17 +1,17 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingDouble;
@@ -54,10 +54,10 @@ public class WitherDragons {
         return DungeonUtil.getPower();
     }
 
-    private static boolean isDragonParticle(ParticleS2CPacket packet) {
-        return packet.getParameters().getType().equals(ParticleTypes.FLAME) && packet.getCount() == 20
-                && packet.getY() == 19 && packet.getOffsetX() == 2.0f && packet.getOffsetY() == 3.0f
-                && packet.getOffsetZ() == 2.0f && packet.getSpeed() == 0.0f && packet.getX() % 1 == 0.0
+    private static boolean isDragonParticle(ClientboundLevelParticlesPacket packet) {
+        return packet.getParticle().getType().equals(ParticleTypes.FLAME) && packet.getCount() == 20
+                && packet.getY() == 19 && packet.getXDist() == 2.0f && packet.getYDist() == 3.0f
+                && packet.getZDist() == 2.0f && packet.getMaxSpeed() == 0.0f && packet.getX() % 1 == 0.0
                 && packet.getZ() % 1 == 0.0;
     }
 
@@ -74,11 +74,11 @@ public class WitherDragons {
 
     private static void announceSpawn(Dragon drag, boolean split) {
         Utils.showTitleCustom(Utils.toUpper(drag.name) + " IS SPAWNING!", 60, -20, 4.0f, drag.color);
-        Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
+        Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
         if (split) {
-            Utils.infoRaw(Text.literal(drag.name + " is your priority dragon.").withColor(drag.color.hex));
+            Utils.infoRaw(Component.literal(drag.name + " is your priority dragon.").withColor(drag.color.hex));
         } else if (splitDone) {
-            Utils.infoRaw(Text.literal(drag.name + " is spawning.").withColor(drag.color.hex));
+            Utils.infoRaw(Component.literal(drag.name + " is spawning.").withColor(drag.color.hex));
         }
     }
 
@@ -91,7 +91,7 @@ public class WitherDragons {
                 }
                 if (stack.value() && drag.isSpawning()) {
                     if (stackType.value().equals(stackTypes.Advanced)) {
-                        for (Box part : drag.parts) {
+                        for (AABB part : drag.parts) {
                             event.drawOutline(part, true, drag.color);
                         }
                     } else {
@@ -99,12 +99,12 @@ public class WitherDragons {
                     }
                 }
                 if (timer.value() && drag.isSpawning()) {
-                    MutableText timerText = Text.literal(Utils.formatDecimal(drag.spawnTicks / 20.0f, 3) + "s");
+                    MutableComponent timerText = Component.literal(Utils.formatDecimal(drag.spawnTicks / 20.0f, 3) + "s");
                     event.drawText(drag.pos.getCenter().add(0, 4, 0), timerText, 0.3f, true, drag.color);
                 }
                 if (health.value() && drag.hasEntity()) {
-                    MutableText healthText = Text.literal(Utils.formatDecimal(drag.health * 0.000001) + "M");
-                    Vec3d pos = drag.getEntity().getLerpedPos(event.tickCounter.getTickProgress(true)); // should make the text move smoothly with the dragons
+                    MutableComponent healthText = Component.literal(Utils.formatDecimal(drag.health * 0.000001) + "M");
+                    Vec3 pos = drag.getEntity().getPosition(event.tickCounter.getGameTimeDeltaPartialTick(true)); // should make the text move smoothly with the dragons
                     event.drawText(pos, healthText, 0.2f, true, drag.color);
                 }
             }
@@ -152,7 +152,7 @@ public class WitherDragons {
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
         if (instance.isActive() && DungeonUtil.isInDragonPhase()) {
-            if (event.entity instanceof EnderDragonEntity dragon) {
+            if (event.entity instanceof EnderDragon dragon) {
                 for (Dragon drag : dragons) {
                     if (!drag.hasEntity()) {
                         for (Entity collar : drag.collarCache.get()) {
@@ -167,13 +167,13 @@ public class WitherDragons {
                     }
                 }
             }
-            if (event.entity instanceof ArmorStandEntity stand) {
+            if (event.entity instanceof ArmorStand stand) {
                 for (Dragon drag : dragons) {
                     if (drag.isCollar(stand)) {
                         drag.collarCache.add(stand);
                         for (Entity dragon : drag.dragonCache.get()) {
                             if (Utils.horizontalDistance(dragon, stand) <= 10.0) {
-                                drag.setEntity((EnderDragonEntity) dragon);
+                                drag.setEntity((EnderDragon) dragon);
                                 break;
                             }
                         }
@@ -213,18 +213,18 @@ public class WitherDragons {
                 3,
                 "c20ef06dd60499766ac8ce15d2bea41d2813fe55718864b52dc41cbaae1ea913",
                 RenderColor.fromHex(0xff0000),
-                Box.of(new Vec3d(27.0, 14.0, 59.0), 1, 1, 1),
+                AABB.ofSize(new Vec3(27.0, 14.0, 59.0), 1, 1, 1),
                 List.of(
-                        new Box(26.5, 14.0, 52.0, 27.5, 15.0, 53.0),
-                        new Box(25.5, 14.0, 52.0, 28.5, 17.0, 55.0),
-                        new Box(24.5, 14.0, 56.0, 29.5, 17.0, 61.0),
-                        new Box(26.0, 15.5, 61.5, 28.0, 17.5, 63.5),
-                        new Box(26.0, 15.5, 63.5, 28.0, 17.5, 65.5),
-                        new Box(26.0, 15.5, 65.5, 28.0, 17.5, 67.5),
-                        new Box(29.5, 16.0, 57.0, 33.5, 18.0, 61.0),
-                        new Box(20.5, 16.0, 57.0, 24.5, 18.0, 61.0)
+                        new AABB(26.5, 14.0, 52.0, 27.5, 15.0, 53.0),
+                        new AABB(25.5, 14.0, 52.0, 28.5, 17.0, 55.0),
+                        new AABB(24.5, 14.0, 56.0, 29.5, 17.0, 61.0),
+                        new AABB(26.0, 15.5, 61.5, 28.0, 17.5, 63.5),
+                        new AABB(26.0, 15.5, 63.5, 28.0, 17.5, 65.5),
+                        new AABB(26.0, 15.5, 65.5, 28.0, 17.5, 67.5),
+                        new AABB(29.5, 16.0, 57.0, 33.5, 18.0, 61.0),
+                        new AABB(20.5, 16.0, 57.0, 24.5, 18.0, 61.0)
                 ),
-                new Box(14.5, 5, 45.5, 39.5, 28, 70.5)
+                new AABB(14.5, 5, 45.5, 39.5, 28, 70.5)
         );
         public static final Dragon ORANGE = new Dragon(
                 "Orange",
@@ -232,18 +232,18 @@ public class WitherDragons {
                 5,
                 "aace6bb3aa4ccac031168202f6d4532597bcac6351059abd9d10b28610493aeb",
                 RenderColor.fromHex(0xffaa00),
-                Box.of(new Vec3d(85.0, 14.0, 56.0), 1, 1, 1),
+                AABB.ofSize(new Vec3(85.0, 14.0, 56.0), 1, 1, 1),
                 List.of(
-                        new Box(84.5, 14.0, 49.0, 85.5, 15.0, 50.0),
-                        new Box(83.5, 14.0, 49.0, 86.5, 17.0, 52.0),
-                        new Box(82.5, 14.0, 53.0, 87.5, 17.0, 58.0),
-                        new Box(84.0, 15.5, 58.5, 86.0, 17.5, 60.5),
-                        new Box(84.0, 15.5, 60.5, 86.0, 17.5, 62.5),
-                        new Box(84.0, 15.5, 62.5, 86.0, 17.5, 64.5),
-                        new Box(87.5, 16.0, 54.0, 91.5, 18.0, 58.0),
-                        new Box(78.5, 16.0, 54.0, 82.5, 18.0, 58.0)
+                        new AABB(84.5, 14.0, 49.0, 85.5, 15.0, 50.0),
+                        new AABB(83.5, 14.0, 49.0, 86.5, 17.0, 52.0),
+                        new AABB(82.5, 14.0, 53.0, 87.5, 17.0, 58.0),
+                        new AABB(84.0, 15.5, 58.5, 86.0, 17.5, 60.5),
+                        new AABB(84.0, 15.5, 60.5, 86.0, 17.5, 62.5),
+                        new AABB(84.0, 15.5, 62.5, 86.0, 17.5, 64.5),
+                        new AABB(87.5, 16.0, 54.0, 91.5, 18.0, 58.0),
+                        new AABB(78.5, 16.0, 54.0, 82.5, 18.0, 58.0)
                 ),
-                new Box(72, 5, 47, 102, 28, 77)
+                new AABB(72, 5, 47, 102, 28, 77)
         );
         public static final Dragon BLUE = new Dragon(
                 "Blue",
@@ -251,18 +251,18 @@ public class WitherDragons {
                 2,
                 "e4e71671db5f69d2c46a0d72766b249c1236d726782c00a0e22668df5772d4b9",
                 RenderColor.fromHex(0x55ffff),
-                Box.of(new Vec3d(84.0, 14.0, 94.0), 1, 1, 1),
+                AABB.ofSize(new Vec3(84.0, 14.0, 94.0), 1, 1, 1),
                 List.of(
-                        new Box(83.5, 14.0, 87.0, 84.5, 15.0, 88.0),
-                        new Box(82.5, 14.0, 87.0, 85.5, 17.0, 90.0),
-                        new Box(81.5, 14.0, 91.0, 86.5, 17.0, 96.0),
-                        new Box(83.0, 15.5, 96.5, 85.0, 17.5, 98.5),
-                        new Box(83.0, 15.5, 98.5, 85.0, 17.5, 100.5),
-                        new Box(83.0, 15.5, 100.5, 85.0, 17.5, 102.5),
-                        new Box(86.5, 16.0, 92.0, 90.5, 18.0, 96.0),
-                        new Box(77.5, 16.0, 92.0, 81.5, 18.0, 96.0)
+                        new AABB(83.5, 14.0, 87.0, 84.5, 15.0, 88.0),
+                        new AABB(82.5, 14.0, 87.0, 85.5, 17.0, 90.0),
+                        new AABB(81.5, 14.0, 91.0, 86.5, 17.0, 96.0),
+                        new AABB(83.0, 15.5, 96.5, 85.0, 17.5, 98.5),
+                        new AABB(83.0, 15.5, 98.5, 85.0, 17.5, 100.5),
+                        new AABB(83.0, 15.5, 100.5, 85.0, 17.5, 102.5),
+                        new AABB(86.5, 16.0, 92.0, 90.5, 18.0, 96.0),
+                        new AABB(77.5, 16.0, 92.0, 81.5, 18.0, 96.0)
                 ),
-                new Box(71.5, 5, 82.5, 96.5, 26, 107.5)
+                new AABB(71.5, 5, 82.5, 96.5, 26, 107.5)
         );
         public static final Dragon PURPLE = new Dragon(
                 "Purple",
@@ -270,18 +270,18 @@ public class WitherDragons {
                 1,
                 "cad8cc982786fb4d40b0b6e64a41f0d9736f9c26affb898f4a7faea88ccf8997",
                 RenderColor.fromHex(0xaa00aa),
-                Box.of(new Vec3d(56.0, 14.0, 125.0), 1, 1, 1),
+                AABB.ofSize(new Vec3(56.0, 14.0, 125.0), 1, 1, 1),
                 List.of(
-                        new Box(55.5, 14.0, 118.0, 56.5, 15.0, 119.0),
-                        new Box(54.5, 14.0, 118.0, 57.5, 17.0, 121.0),
-                        new Box(53.5, 14.0, 122.0, 58.5, 17.0, 127.0),
-                        new Box(55.0, 15.5, 127.5, 57.0, 17.5, 129.5),
-                        new Box(55.0, 15.5, 129.5, 57.0, 17.5, 131.5),
-                        new Box(55.0, 15.5, 131.5, 57.0, 17.5, 133.5),
-                        new Box(58.5, 16.0, 123.0, 62.5, 18.0, 127.0),
-                        new Box(49.5, 16.0, 123.0, 53.5, 18.0, 127.0)
+                        new AABB(55.5, 14.0, 118.0, 56.5, 15.0, 119.0),
+                        new AABB(54.5, 14.0, 118.0, 57.5, 17.0, 121.0),
+                        new AABB(53.5, 14.0, 122.0, 58.5, 17.0, 127.0),
+                        new AABB(55.0, 15.5, 127.5, 57.0, 17.5, 129.5),
+                        new AABB(55.0, 15.5, 129.5, 57.0, 17.5, 131.5),
+                        new AABB(55.0, 15.5, 131.5, 57.0, 17.5, 133.5),
+                        new AABB(58.5, 16.0, 123.0, 62.5, 18.0, 127.0),
+                        new AABB(49.5, 16.0, 123.0, 53.5, 18.0, 127.0)
                 ),
-                new Box(45.5, 6, 113.5, 68.5, 23, 136.5)
+                new AABB(45.5, 6, 113.5, 68.5, 23, 136.5)
         );
         public static final Dragon GREEN = new Dragon(
                 "Green",
@@ -289,18 +289,18 @@ public class WitherDragons {
                 4,
                 "816f0073c58703d8d41e55e0a3abb042b73f8c105bc41c2f02ffe33f0383cf0a",
                 RenderColor.fromHex(0x00ff00),
-                Box.of(new Vec3d(27.0, 14.0, 94.0), 1, 1, 1),
+                AABB.ofSize(new Vec3(27.0, 14.0, 94.0), 1, 1, 1),
                 List.of(
-                        new Box(26.5, 14.0, 87.0, 27.5, 15.0, 88.0),
-                        new Box(25.5, 14.0, 87.0, 28.5, 17.0, 90.0),
-                        new Box(24.5, 14.0, 91.0, 29.5, 17.0, 96.0),
-                        new Box(26.0, 15.5, 96.5, 28.0, 17.5, 98.5),
-                        new Box(26.0, 15.5, 98.5, 28.0, 17.5, 100.5),
-                        new Box(26.0, 15.5, 100.5, 28.0, 17.5, 102.5),
-                        new Box(29.5, 16.0, 92.0, 33.5, 18.0, 96.0),
-                        new Box(20.5, 16.0, 92.0, 24.5, 18.0, 96.0)
+                        new AABB(26.5, 14.0, 87.0, 27.5, 15.0, 88.0),
+                        new AABB(25.5, 14.0, 87.0, 28.5, 17.0, 90.0),
+                        new AABB(24.5, 14.0, 91.0, 29.5, 17.0, 96.0),
+                        new AABB(26.0, 15.5, 96.5, 28.0, 17.5, 98.5),
+                        new AABB(26.0, 15.5, 98.5, 28.0, 17.5, 100.5),
+                        new AABB(26.0, 15.5, 100.5, 28.0, 17.5, 102.5),
+                        new AABB(29.5, 16.0, 92.0, 33.5, 18.0, 96.0),
+                        new AABB(20.5, 16.0, 92.0, 24.5, 18.0, 96.0)
                 ),
-                new Box(7, 5, 80, 37, 28, 110)
+                new AABB(7, 5, 80, 37, 28, 110)
         );
         public final EntityCache dragonCache = new EntityCache();
         public final EntityCache collarCache = new EntityCache();
@@ -309,13 +309,13 @@ public class WitherDragons {
         public int bersPriority;
         public String texture;
         public RenderColor color;
-        public Box pos;
-        public List<Box> parts;
-        public Box area;
+        public AABB pos;
+        public List<AABB> parts;
+        public AABB area;
         public float health = 0.0f;
         public int spawnTicks = 0;
 
-        public Dragon(String name, int archPriority, int bersPriority, String texture, RenderColor color, Box pos, List<Box> parts, Box area) {
+        public Dragon(String name, int archPriority, int bersPriority, String texture, RenderColor color, AABB pos, List<AABB> parts, AABB area) {
             this.name = name;
             this.archPriority = archPriority;
             this.bersPriority = bersPriority;
@@ -349,16 +349,16 @@ public class WitherDragons {
             return !this.dragonCache.empty() && this.dragonCache.getFirst().isAlive();
         }
 
-        public EnderDragonEntity getEntity() {
-            return (EnderDragonEntity) this.dragonCache.getFirst();
+        public EnderDragon getEntity() {
+            return (EnderDragon) this.dragonCache.getFirst();
         }
 
-        public void setEntity(EnderDragonEntity ent) {
+        public void setEntity(EnderDragon ent) {
             this.dragonCache.add(ent);
             this.health = ent.getHealth(); // store the health value on update, required as the client appears to reset it on the next tick
         }
 
-        public boolean isCollar(ArmorStandEntity entity) {
+        public boolean isCollar(ArmorStand entity) {
             ItemStack helmet = Utils.getEntityArmor(entity).getFirst();
             return Utils.isTextureEqual(Utils.getTextures(helmet), this.texture);
         }

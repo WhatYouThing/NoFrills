@@ -1,7 +1,7 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.PlaySoundEvent;
@@ -16,7 +16,7 @@ public class MuteVampire {
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
         if (instance.isActive() && Utils.isInChateau()) { // no boss check since you can also get blasted by someone else's boss
-            if ((mania.value() && event.isSound(SoundEvents.ENTITY_ELDER_GUARDIAN_CURSE)) || (springs.value() && event.isSound(SoundEvents.ENTITY_WITHER_SPAWN))) {
+            if ((mania.value() && event.isSound(SoundEvents.ELDER_GUARDIAN_CURSE)) || (springs.value() && event.isSound(SoundEvents.WITHER_SPAWN))) {
                 event.cancel();
             }
         }

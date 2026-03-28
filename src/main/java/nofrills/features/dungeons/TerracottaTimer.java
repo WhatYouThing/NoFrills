@@ -1,11 +1,11 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FlowerPotBlock;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FlowerPotBlock;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.core.BlockPos;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
@@ -52,12 +52,12 @@ public class TerracottaTimer {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInDungeonBoss("6")) {
             for (Terracotta terra : terracottas) {
-                if (terra.ticks == 0 || mc.world.getBlockState(terra.pos).isAir()) {
+                if (terra.ticks == 0 || mc.level.getBlockState(terra.pos).isAir()) {
                     terracottas.remove(terra);
                     continue;
                 }
-                MutableText text = Text.literal(Utils.formatDecimal(terra.ticks / 20.0f) + "s");
-                event.drawText(terra.pos.toCenterPos(), text, scale.valueFloat() * 0.1f, true, color.value());
+                MutableComponent text = Component.literal(Utils.formatDecimal(terra.ticks / 20.0f) + "s");
+                event.drawText(terra.pos.getCenter(), text, scale.valueFloat() * 0.1f, true, color.value());
             }
         }
     }

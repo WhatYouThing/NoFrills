@@ -2,9 +2,9 @@ package nofrills.features.farming;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -36,7 +36,7 @@ public class VacuumSolver {
             "INFINI_VACUUM",
             "INFINI_VACUUM_HOOVERIUS"
     );
-    private static Vec3d currentPos = null;
+    private static Vec3 currentPos = null;
     private static int ticks = 0;
 
     private static boolean isHoldingVacuum() {
@@ -65,7 +65,7 @@ public class VacuumSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && Utils.matchesKey(mc.options.attackKey, event.keyInput, event.mouseInput) && event.action == GLFW.GLFW_PRESS) {
+        if (instance.isActive() && Utils.matchesKey(mc.options.keyAttack, event.keyInput, event.mouseInput) && event.action == GLFW.GLFW_PRESS) {
             if (Utils.isInGarden() && isHoldingVacuum()) onVacuumStart();
         }
     }
@@ -73,14 +73,14 @@ public class VacuumSolver {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && currentPos != null) {
-            if (mc.player.getEntityPos().distanceTo(currentPos) <= 16.0) {
+            if (mc.player.position().distanceTo(currentPos) <= 16.0) {
                 currentPos = null;
                 return;
             }
-            Vec3d textPos = currentPos.subtract(0.0, 0.25, 0.0);
+            Vec3 textPos = currentPos.subtract(0.0, 0.25, 0.0);
             float scale = Utils.getTextScale(textPos, 0.05f);
             event.drawBeam(currentPos, 256, true, color.value());
-            event.drawText(textPos, Text.literal("Pest"), scale, true, color.valueWithAlpha(1.0f));
+            event.drawText(textPos, Component.literal("Pest"), scale, true, color.valueWithAlpha(1.0f));
             if (tracer.value()) {
                 event.drawTracer(currentPos, tracerColor.value());
             }

@@ -1,18 +1,19 @@
 package nofrills.hud;
 
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.DraggableContainer;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.util.Window;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.input.MouseButtonEvent;
+import com.mojang.blaze3d.platform.Window;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import nofrills.config.*;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class HudElement extends DraggableContainer<FlowLayout> {
-    public final MutableText elementLabel;
+    public final MutableComponent elementLabel;
     public final Feature instance;
     public final SettingBool added;
     public final SettingDouble xPos;
@@ -35,14 +36,14 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     public final SettingColor background;
     public final Identifier identifier;
     public final Surface disabledSurface = Surface.flat(0x55ff0000);
-    public MutableText elementDesc = Text.empty();
+    public MutableComponent elementDesc = Component.empty();
     public FlowLayout layout;
     public HudSettings options;
     public boolean toggling = false;
 
     public HudElement(FlowLayout layout, Feature instance, String label) {
         super(Sizing.content(), Sizing.content(), layout);
-        this.elementLabel = Text.literal(label);
+        this.elementLabel = Component.literal(label);
         this.instance = instance;
         this.added = new SettingBool(false, "added", instance);
         this.xPos = new SettingDouble(0.5, "x", instance);
@@ -54,7 +55,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         this.vScaleAlign = new SettingEnum<>(VerticalScaleAlignment.Left, VerticalScaleAlignment.class, "vScaleAlign", instance);
         this.useBackground = new SettingBool(false, "useBackground", instance);
         this.background = new SettingColor(RenderColor.fromArgb(0x40000000), "background", instance);
-        this.identifier = Identifier.of("nofrills", Utils.toLower(label.replaceAll(" ", "_")));
+        this.identifier = Identifier.fromNamespaceAndPath("nofrills", Utils.toLower(label.replaceAll(" ", "_")));
         this.positioning(Positioning.absolute(0, 0));
         this.layout = layout;
         this.layout.sizing(Sizing.content(), Sizing.content());
@@ -66,11 +67,11 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     public HudElement(Feature instance, String label) {
-        this(Containers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
+        this(UIContainers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
     }
 
     @Override
-    protected void drawChildren(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta, List<? extends Component> children) {
+    protected void drawChildren(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta, List<? extends UIComponent> children) {
         try {
             super.drawChildren(context, mouseX, mouseY, partialTicks, delta, children);
         } catch (Exception ignored) {
@@ -78,20 +79,20 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         float scale = this.scale.valueFloat();
         if (scale != 1.0f && !this.isEditingHud()) {
-            context.getMatrices().pushMatrix();
+            context.pose().pushMatrix();
             this.applyScaling(context, scale);
             super.draw(context, mouseX, mouseY, partialTicks, delta);
-            context.getMatrices().popMatrix();
+            context.pose().popMatrix();
         } else {
             super.draw(context, mouseX, mouseY, partialTicks, delta);
         }
     }
 
     @Override
-    public boolean onMouseDown(Click click, boolean doubled) {
+    public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
         if (this.isAdded()) {
             if (click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 this.toggling = true;
@@ -106,25 +107,25 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     @Override
-    public boolean onMouseDrag(Click click, double deltaX, double deltaY) {
+    public boolean onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
         if (this.isAdded()) {
             boolean result = super.onMouseDrag(click, deltaX, deltaY);
             Window window = mc.getWindow();
-            this.savePosition(this.xOffset / window.getScaledWidth(), this.yOffset / window.getScaledHeight());
+            this.savePosition(this.xOffset / window.getGuiScaledWidth(), this.yOffset / window.getGuiScaledHeight());
             return result;
         }
         return false;
     }
 
     @Override
-    public Component childAt(int x, int y) {
+    public @Nullable UIComponent childAt(int x, int y) {
         if (this.isInBoundingBox(x, y)) { // gets rid of the forehead
             return this;
         }
         return super.childAt(x, y);
     }
 
-    public void applyScaling(OwoUIDrawContext context, float scale) {
+    public void applyScaling(OwoUIGraphics context, float scale) {
         float originalX = (float) (this.xOffset - this.xOffset * scale);
         float originalY = (float) (this.yOffset - this.yOffset * scale);
         float alignX = switch (this.vScaleAlign.value()) {
@@ -137,8 +138,8 @@ public class HudElement extends DraggableContainer<FlowLayout> {
             case Middle -> this.width * 0.25f;
             case Bottom -> this.width * 0.5f;
         };
-        context.getMatrices().translate(originalX + alignX, originalY + alignY);
-        context.getMatrices().scale(scale, scale);
+        context.pose().translate(originalX + alignX, originalY + alignY);
+        context.pose().scale(scale, scale);
     }
 
     public boolean isAdded() {
@@ -163,10 +164,10 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         if (HudManager.isEditingHud()) {
             return true;
         }
-        if (this.hideTablist.value() && mc.options.playerListKey.isPressed()) {
+        if (this.hideTablist.value() && mc.options.keyPlayerList.isDown()) {
             return false;
         }
-        if (this.hideF3.value() && mc.debugHudEntryList.isF3Enabled()) {
+        if (this.hideF3.value() && mc.debugEntries.isOverlayVisible()) {
             return false;
         }
         return active;
@@ -191,7 +192,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     public void setDesc(String description) {
-        this.elementDesc = Text.literal(description);
+        this.elementDesc = Component.literal(description);
     }
 
     public boolean isEditingHud() {
@@ -200,7 +201,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
 
     public void updatePosition() {
         Window window = mc.getWindow();
-        int width = window.getScaledWidth(), height = window.getScaledHeight();
+        int width = window.getGuiScaledWidth(), height = window.getGuiScaledHeight();
         this.xOffset = Math.clamp(this.xPos.value() * width, 0, Math.clamp(width - this.width, 0, width));
         this.yOffset = Math.clamp(this.yPos.value() * height, 0, Math.clamp(height - this.height, 0, height));
         this.updateX(0);

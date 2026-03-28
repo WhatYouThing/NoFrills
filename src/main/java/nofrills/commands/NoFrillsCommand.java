@@ -10,13 +10,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.PlayerHeadItem;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PlayerHeadItem;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.general.SlotBinding;
@@ -30,8 +30,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 import static nofrills.misc.SkyblockData.instances;
@@ -175,16 +175,16 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("copyCoords", "Alternative to the sendCoords command, which copies your coordinates to your clipboard instead of sending them in the chat.", literal("copyCoords").executes(context -> {
-                mc.keyboard.setClipboard(Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
+                mc.keyboardHandler.setClipboard(Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
                 return SINGLE_SUCCESS;
             }).then(literal("patcher").executes(context -> {
-                mc.keyboard.setClipboard(Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
+                mc.keyboardHandler.setClipboard(Utils.getCoordsFormatted("x: {}, y: {}, z: {}"));
                 return SINGLE_SUCCESS;
             })).then(literal("simple").executes(context -> {
-                mc.keyboard.setClipboard(Utils.getCoordsFormatted("{} {} {}"));
+                mc.keyboardHandler.setClipboard(Utils.getCoordsFormatted("{} {} {}"));
                 return SINGLE_SUCCESS;
             })).then(literal("location").executes(context -> {
-                mc.keyboard.setClipboard(Utils.format("{} [ {} ]", Utils.getCoordsFormatted("x: {}, y: {}, z: {}"), SkyblockData.getLocation()));
+                mc.keyboardHandler.setClipboard(Utils.format("{} [ {} ]", Utils.getCoordsFormatted("x: {}, y: {}, z: {}"), SkyblockData.getLocation()));
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("queue", "Command that lets you queue for any Dungeon floor/Kuudra tier.", queueCommandBuilder),
@@ -234,18 +234,18 @@ public class NoFrillsCommand {
                 for (Entity ent : Utils.getEntities()) {
                     if (ent instanceof LivingEntity living) {
                         for (EquipmentSlot slot : searchedSlots) {
-                            ItemStack stack = living.getEquippedStack(slot);
+                            ItemStack stack = living.getItemBySlot(slot);
                             GameProfile textures = Utils.getTextures(stack);
                             if (textures != null && stack.getItem() instanceof PlayerHeadItem) {
-                                Vec3d pos = living.getEntityPos();
+                                Vec3 pos = living.position();
                                 LOGGER.info(Utils.format("\n\tURL - {}\n\tSlot - {}\n\tEntity Name - {}\n\tHead Name - {}\n\tPosition - {} {} {}",
                                         Utils.getTextureUrl(textures),
                                         Utils.toUpper(slot.name()),
                                         living.getName().getString(),
-                                        stack.getName().getString(),
-                                        pos.getX(),
-                                        pos.getY(),
-                                        pos.getZ()
+                                        stack.getHoverName().getString(),
+                                        pos.x(),
+                                        pos.y(),
+                                        pos.z()
                                 ));
                             }
                         }
@@ -254,21 +254,21 @@ public class NoFrillsCommand {
                 Utils.info("Dumped head texture URL's to latest.log.");
                 return SINGLE_SUCCESS;
             })).then(literal("dumpPlayerTextures").executes(context -> {
-                MinecraftSessionService service = mc.getApiServices().sessionService();
+                MinecraftSessionService service = mc.services().sessionService();
                 for (Entity ent : Utils.getEntities()) {
-                    if (ent instanceof PlayerEntity player) {
+                    if (ent instanceof Player player) {
                         if (player.getGameProfile() != null) {
                             MinecraftProfileTextures textures = service.getTextures(player.getGameProfile());
-                            Vec3d pos = player.getEntityPos();
+                            Vec3 pos = player.position();
                             if (textures.skin() == null) {
                                 continue;
                             }
                             LOGGER.info(Utils.format("\n\tURL - {}\n\tEntity Name - {}\n\tPosition - {} {} {}",
                                     textures.skin().getUrl(),
                                     player.getName().getString(),
-                                    pos.getX(),
-                                    pos.getY(),
-                                    pos.getZ()
+                                    pos.x(),
+                                    pos.y(),
+                                    pos.z()
                             ));
                         }
                     }

@@ -1,10 +1,10 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import net.minecraft.client.gui.hud.ClientBossBar;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.MagmaCubeEntity;
-import net.minecraft.text.Text;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -26,7 +26,7 @@ public class BossHealth extends SimpleTextElement {
     private float kuudraDPS = 0.0f;
 
     public BossHealth() {
-        super(Text.literal("Boss Health: §fN/A"), new Feature("bossHealthElement"), "Boss Health");
+        super(Component.literal("Boss Health: §fN/A"), new Feature("bossHealthElement"), "Boss Health");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Slayer", this.slayer, "If enabled, the health of your slayer boss is displayed."),
                 new Settings.Toggle("Dungeon", this.dungeon, "If enabled, the health of the dungeon bosses is displayed."),
@@ -36,7 +36,7 @@ public class BossHealth extends SimpleTextElement {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
         } else if (!this.isEditingHud() && !this.visible) {
@@ -61,21 +61,21 @@ public class BossHealth extends SimpleTextElement {
         }
         if (dungeon.value() && Utils.isInDungeons() && !Utils.isInstanceOver()) {
             if (DungeonUtil.isInBossRoom() && !DungeonUtil.isInDragonPhase()) {
-                List<ClientBossBar> bossBars = Utils.getBossBars();
+                List<LerpingBossEvent> bossBars = Utils.getBossBars();
                 if (!bossBars.isEmpty()) {
-                    this.setHealth(Utils.format("§a{}%", Utils.formatDecimal(bossBars.getFirst().getPercent() * 100)));
+                    this.setHealth(Utils.format("§a{}%", Utils.formatDecimal(bossBars.getFirst().getProgress() * 100)));
                     return;
                 }
             }
         }
         if (kuudra.value() && Utils.isInKuudra() && !Utils.isInstanceOver()) {
-            MagmaCubeEntity kuudra = KuudraUtil.getKuudraEntity();
+            MagmaCube kuudra = KuudraUtil.getKuudraEntity();
             KuudraUtil.Phase phase = KuudraUtil.getCurrentPhase();
             if (phase.equals(KuudraUtil.Phase.DPS)) {
                 if (kuudra == null) {
-                    List<ClientBossBar> bossBars = Utils.getBossBars();
+                    List<LerpingBossEvent> bossBars = Utils.getBossBars();
                     if (!bossBars.isEmpty()) {
-                        this.setHealth(Utils.format("§e{}%", Utils.formatDecimal(bossBars.getFirst().getPercent() * 100)));
+                        this.setHealth(Utils.format("§e{}%", Utils.formatDecimal(bossBars.getFirst().getProgress() * 100)));
                     }
                     return;
                 }

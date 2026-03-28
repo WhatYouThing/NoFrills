@@ -1,11 +1,11 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -40,7 +40,7 @@ public class CroesusSolver {
     private static LootState getLootState(ItemStack stack) {
         for (String string : Utils.getLoreLines(stack)) {
             if (string.equals("No chests opened yet!")) {
-                for (Text text : Utils.getLoreText(stack)) {
+                for (Component text : Utils.getLoreText(stack)) {
                     Optional<Style> style = Utils.getStyle(text, line -> line.endsWith("Kismet Feather"));
                     if (style.isPresent() && style.get().isStrikethrough()) {
                         return LootState.Rerolled;
@@ -55,7 +55,7 @@ public class CroesusSolver {
     }
 
     private static void highlightLoot(ItemStack stack, Slot slot) {
-        String name = Utils.toPlain(stack.getName());
+        String name = Utils.toPlain(stack.getHoverName());
         if (!name.endsWith("The Catacombs")) return;
         RenderColor color = switch (getLootState(stack)) {
             case Unopened -> unopenedColor.value();
@@ -75,14 +75,14 @@ public class CroesusSolver {
     }
 
     private static void highlightChest(ItemStack stack, Slot slot) {
-        String name = Utils.toPlain(stack.getName());
+        String name = Utils.toPlain(stack.getHoverName());
         if (!DungeonUtil.getChestNames().contains(name)) return;
-        List<Text> lore = Utils.getLoreText(stack);
+        List<Component> lore = Utils.getLoreText(stack);
         double value = 0;
         double cost = 0;
         int costIndex = -1;
         for (int i = 0; i < lore.size(); i++) {
-            Text text = lore.get(i);
+            Component text = lore.get(i);
             String line = Utils.toPlain(text);
             if (line.isEmpty() || line.equals("Contents") || line.equals("Cost")) {
                 if (line.equals("Cost")) costIndex = i;
@@ -142,7 +142,7 @@ public class CroesusSolver {
             Slot slot = Utils.getFocusedSlot();
             if (slot != null && chestValues.containsKey(slot)) {
                 double value = chestValues.get(slot);
-                MutableText valueText = Text.literal(Utils.formatSeparator(value)).withColor(value > 0 ? RenderColor.green.argb : RenderColor.red.argb);
+                MutableComponent valueText = Component.literal(Utils.formatSeparator(value)).withColor(value > 0 ? RenderColor.green.argb : RenderColor.red.argb);
                 event.addLine(Utils.getShortTag().append("§bChest Value: §r").append(valueText));
             }
         }

@@ -1,14 +1,14 @@
 package nofrills.events;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.ScreenHandlerSlotUpdateS2CPacket;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 
 public class InventoryUpdateEvent {
-    public ScreenHandlerSlotUpdateS2CPacket packet;
+    public ClientboundContainerSetSlotPacket packet;
     public int slotId;
     public ItemStack stack;
 
-    public InventoryUpdateEvent(ScreenHandlerSlotUpdateS2CPacket packet, ItemStack stack, int slotId) {
+    public InventoryUpdateEvent(ClientboundContainerSetSlotPacket packet, ItemStack stack, int slotId) {
         this.packet = packet;
         this.stack = stack;
         this.slotId = slotId;

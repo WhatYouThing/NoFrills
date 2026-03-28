@@ -5,18 +5,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.network.chat.Component;
 import nofrills.config.*;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenRenderEvent;
@@ -110,7 +110,7 @@ public class SlotBinding {
             savePreset("New preset");
             mc.setScreen(buildSettings());
         });
-        button.button.tooltip(Text.literal("Saves your current slot binding configuration as a preset.\nCan be loaded at any time to quickly change your binds."));
+        button.button.tooltip(Component.literal("Saves your current slot binding configuration as a preset.\nCan be loaded at any time to quickly change your binds."));
         button.button.verticalSizing(Sizing.fixed(18));
         list.add(button);
         if (data.value().has("presets")) {
@@ -131,18 +131,18 @@ public class SlotBinding {
 
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Slot Binding"));
+        settings.setTitle(Component.literal("Slot Binding"));
         return settings;
     }
 
     private static void sendSuccess(String message) {
         Utils.infoFormat("§a{}", message);
-        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
+        Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
     }
 
     private static void sendError() {
         Utils.info("§cInvalid slot binding combination detected, doing nothing.");
-        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.0f);
+        Utils.playSound(SoundEvents.NOTE_BLOCK_BASS, 1.0f, 0.0f);
     }
 
     private static void sendAlert(String message) {
@@ -151,24 +151,24 @@ public class SlotBinding {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.currentScreen instanceof InventoryScreen inventory) {
+        if (instance.isActive() && mc.screen instanceof InventoryScreen inventory) {
             BoundSlot focused = new BoundSlot(Utils.getFocusedSlot());
             if (event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.action == GLFW.GLFW_PRESS && event.modifiers == GLFW.GLFW_MOD_SHIFT && focused.isValid()) {
-                int syncId = inventory.getScreenHandler().syncId;
+                int syncId = inventory.getMenu().containerId;
                 if (focused.isHotbar() && focused.hasData()) {
                     JsonObject object = data.value().get(focused.getName()).getAsJsonObject();
                     JsonArray binds = object.get("binds").getAsJsonArray();
                     int last = object.get("last").getAsInt();
                     int first = !binds.isEmpty() ? binds.get(0).getAsInt() : 0;
                     if (last != 0 || first != 0) {
-                        mc.interactionManager.clickSlot(syncId, last != 0 ? last : first, focused.toHotbar() - 1, SlotActionType.SWAP, mc.player);
+                        mc.gameMode.handleContainerInput(syncId, last != 0 ? last : first, focused.toHotbar() - 1, ContainerInput.SWAP, mc.player);
                         event.cancel();
                     }
                 } else {
                     for (BoundSlot slot : getHotbarSlots()) {
                         JsonArray array = data.value().get(slot.getName()).getAsJsonObject().get("binds").getAsJsonArray();
                         if (array.contains(new JsonPrimitive(focused.id))) {
-                            mc.interactionManager.clickSlot(syncId, focused.id, slot.toHotbar() - 1, SlotActionType.SWAP, mc.player);
+                            mc.gameMode.handleContainerInput(syncId, focused.id, slot.toHotbar() - 1, ContainerInput.SWAP, mc.player);
                             data.edit(value -> value.get(slot.getName()).getAsJsonObject().addProperty("last", focused.id));
                             event.cancel();
                         }
@@ -228,7 +228,7 @@ public class SlotBinding {
 
     @EventHandler
     private static void onRender(ScreenRenderEvent.Before event) {
-        if (instance.isActive() && mc.currentScreen instanceof InventoryScreen && event.focusedSlot != null) {
+        if (instance.isActive() && mc.screen instanceof InventoryScreen && event.focusedSlot != null) {
             BoundSlot focused = new BoundSlot(event.focusedSlot);
             if (focused.isHotbar() && focused.hasData()) {
                 for (JsonElement element : data.value().get(focused.getName()).getAsJsonObject().get("binds").getAsJsonArray()) {
@@ -256,7 +256,7 @@ public class SlotBinding {
             if (lastSlot.isValid()) {
                 event.drawBorder(lastSlot.id, binding.value());
                 event.drawBorder(focused.id, binding.value());
-                event.drawLine(lastSlot.id, event.focusedSlot.id, lineWidth.value(), binding.value());
+                event.drawLine(lastSlot.id, event.focusedSlot.index, lineWidth.value(), binding.value());
             }
         }
     }
@@ -269,7 +269,7 @@ public class SlotBinding {
         }
 
         public BoundSlot(Slot slot) {
-            this(slot != null ? slot.id : -1);
+            this(slot != null ? slot.index : -1);
         }
 
         public boolean isHotbar(int id) {
@@ -324,13 +324,13 @@ public class SlotBinding {
             this.index = index;
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
             input.margins(Insets.of(0, 0, 0, 5));
-            input.tooltip(Text.literal("The name of this slot binding preset."));
+            input.tooltip(Component.literal("The name of this slot binding preset."));
             input.text(this.getData(data.value()).get("name").getAsString());
             input.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("name", value)));
-            ButtonComponent loadButton = Components.button(Text.literal("Load").withColor(0xffffff), button -> loadPreset(this.getData(data.value())));
+            ButtonComponent loadButton = UIComponents.button(Component.literal("Load").withColor(0xffffff), button -> loadPreset(this.getData(data.value())));
             loadButton.horizontalSizing(Sizing.fixed(42)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             loadButton.renderer(Settings.buttonRenderer);
-            ButtonComponent deleteButton = Components.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            ButtonComponent deleteButton = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("presets").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });

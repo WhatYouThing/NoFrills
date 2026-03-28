@@ -1,9 +1,9 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
@@ -43,12 +43,12 @@ public class MelodyMessage {
     private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && Utils.isOnDungeonFloor("7") && !event.isInventory && isMelody(event.title) && progress.value()) {
             List<Slot> slots = Utils.getContainerSlots(event.handler).reversed();
-            if (slots.stream().filter(slot -> !slot.getStack().isEmpty()).toList().size() != 54) {
+            if (slots.stream().filter(slot -> !slot.getItem().isEmpty()).toList().size() != 54) {
                 return; // quick and dirty check for if the screen is built
             }
             int count = 0;
             for (Slot slot : slots) {
-                Item item = slot.getStack().getItem();
+                Item item = slot.getItem().getItem();
                 if (item.equals(Items.RED_TERRACOTTA) || item.equals(Items.LIME_TERRACOTTA)) {
                     count++;
                 } // go from last slot to first, count every terracotta item, find the terminal progress from the first lime terracotta

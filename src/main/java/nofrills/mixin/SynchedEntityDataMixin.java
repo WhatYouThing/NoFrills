@@ -1,6 +1,6 @@
 package nofrills.mixin;
 
-import net.minecraft.entity.data.DataTracker;
+import net.minecraft.network.syncher.SynchedEntityData;
 import nofrills.features.tweaks.DisconnectFix;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,16 +11,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
-@Mixin(DataTracker.class)
-public abstract class DataTrackerMixin {
+@Mixin(SynchedEntityData.class)
+public abstract class SynchedEntityDataMixin {
     @Shadow
     @Final
-    private DataTracker.Entry<?>[] entries;
+    private SynchedEntityData.DataItem<?>[] itemsById;
 
-    @Inject(method = "writeUpdatedEntries", at = @At("HEAD"))
-    private void onWriteEntries(List<DataTracker.SerializedEntry<?>> entries, CallbackInfo ci) {
+    @Inject(method = "assignValues", at = @At("HEAD"))
+    private void onWriteEntries(List<SynchedEntityData.DataValue<?>> entries, CallbackInfo ci) {
         if (DisconnectFix.active()) {
-            entries.removeIf(entry -> entry.id() > this.entries.length - 1);
+            entries.removeIf(entry -> entry.id() > this.itemsById.length - 1);
         }
     }
 }

@@ -13,7 +13,7 @@ public class HudSettings extends Settings {
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         mc.setScreen(new HudEditorScreen());
     }
 }

@@ -1,12 +1,12 @@
 package nofrills.hud;
 
 import io.wispforest.owo.ui.base.BaseOwoScreen;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
 import nofrills.features.misc.AutoSave;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.components.ToggleButton;
@@ -22,12 +22,12 @@ import static nofrills.Main.mc;
 
 public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     public HudEditorScreen() {
-        super(Text.of(""));
+        super(Component.nullToEmpty(""));
     }
 
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
-        return OwoUIAdapter.create(this, Containers::verticalFlow);
+        return OwoUIAdapter.create(this, UIContainers::verticalFlow);
     }
 
     @Override
@@ -43,20 +43,20 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void drawComponentTooltip(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         for (HudElement element : HudManager.getElements()) {
             if (element.isAdded()) element.updatePosition();
         }
-        super.render(context, mouseX, mouseY, delta);
-        int center = context.getScaledWindowWidth() / 2;
-        context.drawCenteredTextWithShadow(mc.textRenderer, "NoFrills HUD Editor", center, 10, RenderColor.white.argb);
-        context.drawCenteredTextWithShadow(mc.textRenderer, "Left click element to hide", center, 20, RenderColor.white.argb);
-        context.drawCenteredTextWithShadow(mc.textRenderer, "Right click element to view its settings", center, 30, RenderColor.white.argb);
-        context.drawCenteredTextWithShadow(mc.textRenderer, "Right click screen to add/remove elements", center, 40, RenderColor.white.argb);
+        super.drawComponentTooltip(context, mouseX, mouseY, delta);
+        int center = context.guiWidth() / 2;
+        context.centeredText(mc.font, "NoFrills HUD Editor", center, 10, RenderColor.white.argb);
+        context.centeredText(mc.font, "Left click element to hide", center, 20, RenderColor.white.argb);
+        context.centeredText(mc.font, "Right click element to view its settings", center, 30, RenderColor.white.argb);
+        context.centeredText(mc.font, "Right click screen to add/remove elements", center, 40, RenderColor.white.argb);
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {
+    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
         if (this.uiAdapter == null) {
             return false;
         }
@@ -66,7 +66,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
             List<HudElement> elementList = new ArrayList<>(HudManager.getElements());
             elementList.sort(Comparator.comparing(element -> element.elementLabel.getString()));
             for (HudElement element : elementList) {
-                FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+                FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
                 layout.padding(Insets.of(5));
                 PlainLabel label = new PlainLabel(element.elementLabel);
                 label.tooltip(element.elementDesc);
@@ -78,7 +78,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
                 list.add(layout);
             }
             HudSettings settings = new HudSettings(list);
-            settings.setTitle(Text.literal("HUD Elements"));
+            settings.setTitle(Component.literal("HUD Elements"));
             mc.setScreen(settings);
             return true;
         }
@@ -86,7 +86,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public boolean mouseReleased(Click click) {
+    public boolean mouseReleased(MouseButtonEvent click) {
         if (click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
             for (HudElement element : HudManager.getElements()) {
                 if (element.toggling && element.isAdded()) {
@@ -100,7 +100,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public boolean mouseDragged(Click click, double deltaX, double deltaY) {
+    public boolean mouseDragged(MouseButtonEvent click, double deltaX, double deltaY) {
         for (HudElement element : HudManager.getElements()) {
             if (element.toggling && element.isAdded()) {
                 element.toggling = false;
@@ -110,8 +110,8 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         if (AutoSave.instance.isActive()) AutoSave.save();
-        super.close();
+        super.onClose();
     }
 }

@@ -15,6 +15,6 @@ public class UnfocusedTweaks {
     public static final SettingInt fpsLimit = new SettingInt(0, "fpsLimit", instance.key());
 
     public static boolean active() {
-        return instance.isActive() && !mc.isWindowFocused();
+        return instance.isActive() && !mc.isWindowActive();
     }
 }

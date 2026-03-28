@@ -1,24 +1,24 @@
 package nofrills.events;
 
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.world.phys.Vec3;
 
 public class SpawnParticleEvent extends Cancellable {
-    public ParticleS2CPacket packet;
+    public ClientboundLevelParticlesPacket packet;
     public ParticleType<?> type;
-    public Vec3d pos;
+    public Vec3 pos;
 
-    public SpawnParticleEvent(ParticleS2CPacket packet) {
+    public SpawnParticleEvent(ClientboundLevelParticlesPacket packet) {
         this.setCancelled(false);
         this.packet = packet;
-        this.type = packet.getParameters().getType();
-        this.pos = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
+        this.type = packet.getParticle().getType();
+        this.pos = new Vec3(packet.getX(), packet.getY(), packet.getZ());
     }
 
     public boolean matchParameters(ParticleType<?> type, int count, double speed, double offsetX, double offsetY, double offsetZ) {
-        return this.type.equals(type) && this.packet.getCount() == count && this.packet.getSpeed() == (float) speed
-                && this.packet.getOffsetX() == (float) offsetX && this.packet.getOffsetY() == (float) offsetY
-                && this.packet.getOffsetZ() == (float) offsetZ;
+        return this.type.equals(type) && this.packet.getCount() == count && this.packet.getMaxSpeed() == (float) speed
+                && this.packet.getXDist() == (float) offsetX && this.packet.getYDist() == (float) offsetY
+                && this.packet.getZDist() == (float) offsetZ;
     }
 }

@@ -1,18 +1,18 @@
 package nofrills.events;
 
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 
 public class ChatMsgEvent extends Cancellable {
-    public Text message;
+    public Component message;
     public String messagePlain;
 
-    public ChatMsgEvent(Text message, String messagePlain) {
+    public ChatMsgEvent(Component message, String messagePlain) {
         this.setCancelled(false);
         this.message = message;
         this.messagePlain = messagePlain;
     }
 
-    public Text getMessage() {
+    public Component getMessage() {
         return this.message;
     }
 

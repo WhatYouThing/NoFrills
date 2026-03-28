@@ -1,15 +1,15 @@
 package nofrills.events;
 
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.DeltaTracker;
 
 public class HudRenderEvent {
-    public DrawContext context;
-    public TextRenderer textRenderer;
-    public RenderTickCounter tickCounter;
+    public GuiGraphicsExtractor context;
+    public Font textRenderer;
+    public DeltaTracker tickCounter;
 
-    public HudRenderEvent(DrawContext context, TextRenderer textRenderer, RenderTickCounter tickCounter) {
+    public HudRenderEvent(GuiGraphicsExtractor context, Font textRenderer, DeltaTracker tickCounter) {
         this.context = context;
         this.textRenderer = textRenderer;
         this.tickCounter = tickCounter;

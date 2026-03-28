@@ -1,31 +1,31 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.Text;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.network.chat.Component;
 import nofrills.events.ScreenOpenEvent;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SlotOptions {
-    public static final ItemStack BACKGROUND = stackWithName(Items.BLACK_STAINED_GLASS_PANE.getDefaultStack(), " ");
-    public static final ItemStack SOLID_BACKGROUND = stackWithName(Items.GRAY_CONCRETE.getDefaultStack(), " ");
-    public static final ItemStack FIRST = stackWithName(Items.LIME_CONCRETE.getDefaultStack(), Utils.Symbols.format + "aClick here!");
-    public static final ItemStack SECOND = stackWithName(Items.ORANGE_CONCRETE.getDefaultStack(), Utils.Symbols.format + "9Click next.");
-    public static final ItemStack THIRD = stackWithName(Items.RED_CONCRETE.getDefaultStack(), Utils.Symbols.format + "cClick after.");
+    public static final ItemStack BACKGROUND = stackWithName(Items.BLACK_STAINED_GLASS_PANE.getDefaultInstance(), " ");
+    public static final ItemStack SOLID_BACKGROUND = stackWithName(Items.GRAY_CONCRETE.getDefaultInstance(), " ");
+    public static final ItemStack FIRST = stackWithName(Items.LIME_CONCRETE.getDefaultInstance(), Utils.Symbols.format + "aClick here!");
+    public static final ItemStack SECOND = stackWithName(Items.ORANGE_CONCRETE.getDefaultInstance(), Utils.Symbols.format + "9Click next.");
+    public static final ItemStack THIRD = stackWithName(Items.RED_CONCRETE.getDefaultInstance(), Utils.Symbols.format + "cClick after.");
     public static final ConcurrentHashMap<Slot, Flags> slotFlags = new ConcurrentHashMap<>();
 
     public static ItemStack stackWithName(ItemStack stack, String name) {
-        stack.set(DataComponentTypes.CUSTOM_NAME, Text.of(name));
+        stack.set(DataComponents.CUSTOM_NAME, Component.nullToEmpty(name));
         return stack;
     }
 
-    public static ItemStack stackWithName(ItemStack stack, Text name) {
-        stack.set(DataComponentTypes.CUSTOM_NAME, name);
+    public static ItemStack stackWithName(ItemStack stack, Component name) {
+        stack.set(DataComponents.CUSTOM_NAME, name);
         return stack;
     }
 

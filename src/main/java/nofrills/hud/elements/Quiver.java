@@ -1,12 +1,12 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -22,7 +22,7 @@ public class Quiver extends SimpleTextElement {
     public final SettingBool onlyBow = new SettingBool(true, "onlyBow", this.instance);
 
     public Quiver(String text) {
-        super(Text.literal(text), new Feature("quiverElement"), "Quiver Display");
+        super(Component.literal(text), new Feature("quiverElement"), "Quiver Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Only If Bow", this.onlyBow, "Automatically hides the element if you are not holding a bow.")
         ));
@@ -30,7 +30,7 @@ public class Quiver extends SimpleTextElement {
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
         } else if (!this.isEditingHud() && this.onlyBow.value() && !mc.player.isHolding(Items.BOW)) {
@@ -41,18 +41,18 @@ public class Quiver extends SimpleTextElement {
 
     public void update() {
         if (mc.player == null) return;
-        ItemStack stack = mc.player.getInventory().getStack(8);
+        ItemStack stack = mc.player.getInventory().getItem(8);
         Item item = stack.getItem();
         if (item.equals(Items.ARROW) || item.equals(Items.FEATHER)) {
-            for (Text text : Utils.getLoreText(stack)) {
+            for (Component text : Utils.getLoreText(stack)) {
                 String line = Utils.toPlain(text);
                 if (line.startsWith("Active Arrow: ")) {
                     String info = line.substring(line.indexOf(":") + 2);
                     String name = info.substring(0, info.indexOf("(") - 1).replace(" Arrow", "");
                     String quantity = info.substring(info.indexOf("(") + 1, info.indexOf(")"));
                     Optional<Style> style = Utils.getStyle(text, str -> str.startsWith(name));
-                    MutableText arrowName = Text.literal(name).setStyle(style.orElse(Style.EMPTY));
-                    this.setText(Text.literal("Quiver: ").append(arrowName).append(Utils.format(" §7(§e{}§7)", quantity)));
+                    MutableComponent arrowName = Component.literal(name).setStyle(style.orElse(Style.EMPTY));
+                    this.setText(Component.literal("Quiver: ").append(arrowName).append(Utils.format(" §7(§e{}§7)", quantity)));
                     break;
                 }
             }

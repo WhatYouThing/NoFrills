@@ -1,11 +1,11 @@
 package nofrills.features.farming;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.SpawnParticleEvent;
@@ -29,14 +29,14 @@ public class GlowingMushroom {
     private static boolean isInCave = false;
 
     private static boolean isShroom(BlockPos pos) {
-        Block block = mc.world.getBlockState(pos).getBlock();
+        Block block = mc.level.getBlockState(pos).getBlock();
         return block == Blocks.RED_MUSHROOM || block == Blocks.BROWN_MUSHROOM;
     }
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive() && isInCave && event.type.equals(ParticleTypes.ENTITY_EFFECT)) {
-            BlockPos pos = BlockPos.ofFloored(event.pos);
+            BlockPos pos = BlockPos.containing(event.pos);
             if (!shroomData.contains(pos) && isShroom(pos)) {
                 shroomData.add(pos);
             }
@@ -59,7 +59,7 @@ public class GlowingMushroom {
             List<BlockPos> shrooms = new ArrayList<>(shroomData);
             for (BlockPos pos : shrooms) {
                 if (isShroom(pos)) {
-                    event.drawFilled(Box.enclosing(pos, pos), false, color.value());
+                    event.drawFilled(AABB.encapsulatingFullBlocks(pos, pos), false, color.value());
                 } else {
                     shroomData.remove(pos);
                 }

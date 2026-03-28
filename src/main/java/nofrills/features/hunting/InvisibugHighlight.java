@@ -1,13 +1,13 @@
 package nofrills.features.hunting;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.ServerJoinEvent;
@@ -29,16 +29,16 @@ public class InvisibugHighlight {
 
     private static final List<Invisibug> invisibugList = new ArrayList<>();
 
-    private static boolean isInvisibugParticle(ParticleS2CPacket packet) {
-        return packet.getCount() == 1 && packet.getSpeed() == 0.0f && packet.getOffsetX() == 0.0f
-                && packet.getOffsetY() == 0.0f && packet.getOffsetZ() == 0.0f
-                && packet.isImportant() && packet.shouldForceSpawn();
+    private static boolean isInvisibugParticle(ClientboundLevelParticlesPacket packet) {
+        return packet.getCount() == 1 && packet.getMaxSpeed() == 0.0f && packet.getXDist() == 0.0f
+                && packet.getYDist() == 0.0f && packet.getZDist() == 0.0f
+                && packet.alwaysShow() && packet.isOverrideLimiter();
     }
 
-    private static boolean hasInvisibugMarker(Vec3d pos) {
-        List<Entity> other = Utils.getOtherEntities(mc.player, Box.of(pos, 1, 2, 1), null);
-        if (other.size() == 1 && other.getFirst() instanceof ArmorStandEntity marker) {
-            return marker.isMarker() && marker.getCustomName() == null && marker.getMainHandStack().isEmpty();
+    private static boolean hasInvisibugMarker(Vec3 pos) {
+        List<Entity> other = Utils.getOtherEntities(mc.player, AABB.ofSize(pos, 1, 2, 1), null);
+        if (other.size() == 1 && other.getFirst() instanceof ArmorStand marker) {
+            return marker.isMarker() && marker.getCustomName() == null && marker.getMainHandItem().isEmpty();
         }
         return false;
     }
@@ -75,8 +75,8 @@ public class InvisibugHighlight {
         if (instance.isActive() && Utils.isInArea("Galatea")) {
             for (Invisibug bug : new ArrayList<>(invisibugList)) {
                 if (bug.positions.size() == 4) {
-                    event.drawText(bug.positions.getLast().add(0, 1, 0), Text.of("Invisibug"), 0.035f, false, RenderColor.white);
-                    event.drawFilled(Box.of(bug.positions.getLast(), 1, 1, 1), false, color.value());
+                    event.drawText(bug.positions.getLast().add(0, 1, 0), Component.nullToEmpty("Invisibug"), 0.035f, false, RenderColor.white);
+                    event.drawFilled(AABB.ofSize(bug.positions.getLast(), 1, 1, 1), false, color.value());
                 }
             }
         }
@@ -89,9 +89,9 @@ public class InvisibugHighlight {
 
     private static class Invisibug {
         public int updateTicks = 20;
-        public List<Vec3d> positions = new ArrayList<>();
+        public List<Vec3> positions = new ArrayList<>();
 
-        public Invisibug(Vec3d initialPos) {
+        public Invisibug(Vec3 initialPos) {
             this.positions.add(initialPos);
         }
 
@@ -101,11 +101,11 @@ public class InvisibugHighlight {
             }
         }
 
-        public boolean isNear(Vec3d pos) {
+        public boolean isNear(Vec3 pos) {
             return !this.positions.isEmpty() && pos.distanceTo(this.positions.getLast()) <= 0.3;
         }
 
-        public void add(Vec3d pos) {
+        public void add(Vec3 pos) {
             if (this.positions.size() == 4) {
                 this.positions.removeFirst();
             }

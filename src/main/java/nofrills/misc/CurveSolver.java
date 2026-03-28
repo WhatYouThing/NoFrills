@@ -1,7 +1,7 @@
 package nofrills.misc;
 
 import jama.Matrix;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,9 +10,9 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class CurveSolver {
-    private final List<Vec3d> particleList = new ArrayList<>();
+    private final List<Vec3> particleList = new ArrayList<>();
     private final PolynomialFitter3D fitter3D = new PolynomialFitter3D();
-    private Vec3d lastPos = null;
+    private Vec3 lastPos = null;
 
     private double[][] arrayPush(double[][] target, double[] value) {
         int length = target.length;
@@ -21,7 +21,7 @@ public class CurveSolver {
         return array;
     }
 
-    public void addPos(Vec3d pos) {
+    public void addPos(Vec3 pos) {
         this.fitter3D.addPoint(this.particleList.size(), pos);
         this.particleList.add(pos);
         if (this.particleList.size() > 3) {
@@ -29,15 +29,15 @@ public class CurveSolver {
         }
     }
 
-    public double getLastDist(Vec3d pos) {
-        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) : mc.player.getEyePos().distanceTo(pos);
+    public double getLastDist(Vec3 pos) {
+        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) : mc.player.getEyePosition().distanceTo(pos);
     }
 
-    public boolean isWithinDist(Vec3d pos, double eyeDist, double lastDist) {
-        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) <= lastDist : mc.player.getEyePos().distanceTo(pos) <= eyeDist;
+    public boolean isWithinDist(Vec3 pos, double eyeDist, double lastDist) {
+        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) <= lastDist : mc.player.getEyePosition().distanceTo(pos) <= eyeDist;
     }
 
-    public Vec3d getSolvedPos() {
+    public Vec3 getSolvedPos() {
         return this.lastPos;
     }
 
@@ -56,7 +56,7 @@ public class CurveSolver {
         return 7 / (Math.sqrt(9 * Math.pow(y, 2) + 7 * (Math.pow(x, 2) + Math.pow(z, 2) + Math.pow(y, 2))) - 3 * y);
     }
 
-    private Vec3d solve() {
+    private Vec3 solve() {
         double[][] res = fitter3D.fit();
         double[] deriv_0 = new double[3];
         for (int i = 0; i < 3; i++) {
@@ -72,7 +72,7 @@ public class CurveSolver {
             term *= end_t;
         }
         acc[1] -= 0.5;
-        return new Vec3d(acc[0], acc[1], acc[2]);
+        return new Vec3(acc[0], acc[1], acc[2]);
     }
 
     public class PolynomialFitter {
@@ -120,10 +120,10 @@ public class CurveSolver {
         public PolynomialFitter3D() {
         }
 
-        public void addPoint(double t, Vec3d point) {
-            this.fitters[0].addPoint(t, point.getX());
-            this.fitters[1].addPoint(t, point.getY());
-            this.fitters[2].addPoint(t, point.getZ());
+        public void addPoint(double t, Vec3 point) {
+            this.fitters[0].addPoint(t, point.x());
+            this.fitters[1].addPoint(t, point.y());
+            this.fitters[2].addPoint(t, point.z());
         }
 
         public double[][] fit() {

@@ -1,14 +1,14 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.BlockUpdateEvent;
@@ -36,8 +36,8 @@ public class BeaconTracer {
     @EventHandler
     private static void onBlock(BlockUpdateEvent event) {
         if (isActive() && beaconEntity != null && event.newState.getBlock().equals(Blocks.BEACON)) {
-            Vec3d pos = new Vec3d(event.pos.getX(), event.pos.getY(), event.pos.getZ());
-            if (Utils.horizontalDistance(beaconEntity.getEntityPos(), pos) <= 4.0) {
+            Vec3 pos = new Vec3(event.pos.getX(), event.pos.getY(), event.pos.getZ());
+            if (Utils.horizontalDistance(beaconEntity.position(), pos) <= 4.0) {
                 beaconPos = event.pos;
                 beaconEntity = null;
             }
@@ -46,11 +46,11 @@ public class BeaconTracer {
 
     @EventHandler
     private static void onUpdate(EntityUpdatedEvent event) {
-        if (isActive() && event.entity instanceof ArmorStandEntity stand) {
+        if (isActive() && event.entity instanceof ArmorStand stand) {
             ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
             Entity boss = SlayerUtil.getBossEntity();
             if (!helmet.getItem().equals(Items.BEACON) || boss == null) return;
-            if (Utils.horizontalDistance(boss.getEntityPos(), event.entity.getEntityPos()) <= 4.0) {
+            if (Utils.horizontalDistance(boss.position(), event.entity.position()) <= 4.0) {
                 beaconEntity = event.entity;
             }
         }
@@ -58,13 +58,13 @@ public class BeaconTracer {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (beaconPos != null && mc.world != null && isActive()) {
-            if (!mc.world.getBlockState(beaconPos).getBlock().equals(Blocks.BEACON)) {
+        if (beaconPos != null && mc.level != null && isActive()) {
+            if (!mc.level.getBlockState(beaconPos).getBlock().equals(Blocks.BEACON)) {
                 beaconPos = null;
                 return;
             }
-            event.drawOutline(Box.enclosing(beaconPos, beaconPos), false, color.value());
-            event.drawTracer(beaconPos.toCenterPos(), color.value());
+            event.drawOutline(AABB.encapsulatingFullBlocks(beaconPos, beaconPos), false, color.value());
+            event.drawTracer(beaconPos.getCenter(), color.value());
         }
     }
 

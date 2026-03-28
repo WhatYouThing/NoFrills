@@ -1,12 +1,12 @@
 package nofrills.features.hunting;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ContainerInput;
 import nofrills.config.Feature;
 import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
@@ -26,7 +26,7 @@ public class FusionKeybinds {
 
     private static boolean isBindValid(ItemStack stack, String title, int key) {
         if (!stack.isEmpty()) {
-            String name = Utils.toPlain(stack.getName());
+            String name = Utils.toPlain(stack.getHoverName());
             if (title.equals("Fusion Box")) {
                 return name.equals("Repeat Previous Fusion") && key == repeat.value();
             }
@@ -40,15 +40,15 @@ public class FusionKeybinds {
 
     @EventHandler
     private static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
+        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
             String title = container.getTitle().getString();
             if (!title.equals("Fusion Box") && !title.equals("Confirm Fusion")) {
                 return;
             }
-            for (Slot slot : container.getScreenHandler().slots) {
-                if (isBindValid(slot.getStack(), title, event.key)) {
+            for (Slot slot : container.getMenu().slots) {
+                if (isBindValid(slot.getItem(), title, event.key)) {
                     if (event.action == GLFW.GLFW_PRESS) {
-                        mc.interactionManager.clickSlot(container.getScreenHandler().syncId, slot.id, GLFW.GLFW_MOUSE_BUTTON_3, SlotActionType.CLONE, mc.player);
+                        mc.gameMode.handleContainerInput(container.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_3, ContainerInput.CLONE, mc.player);
                     }
                     event.cancel();
                     return;

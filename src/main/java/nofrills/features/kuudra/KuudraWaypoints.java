@@ -1,10 +1,10 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.GiantEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Giant;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -30,10 +30,10 @@ public class KuudraWaypoints {
     private static final EntityCache dropOffs = new EntityCache();
     private static final EntityCache buildPiles = new EntityCache();
 
-    private static Vec3d getGround(Vec3d pos) {
-        BlockPos blockPos = BlockPos.ofFloored(pos.getX(), Math.max(pos.getY(), 75), pos.getZ());
+    private static Vec3 getGround(Vec3 pos) {
+        BlockPos blockPos = BlockPos.containing(pos.x(), Math.max(pos.y(), 75), pos.z());
         BlockPos ground = Utils.findGround(blockPos, 4);
-        return new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ());
+        return new Vec3(pos.x(), ground.getCenter().add(0, 0.5, 0).y(), pos.z());
     }
 
     private static boolean hasName(Entity ent, String name) {
@@ -56,7 +56,7 @@ public class KuudraWaypoints {
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInKuudra() && supply.value() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
             for (Entity ent : Utils.getEntities()) {
-                if (ent instanceof GiantEntity) {
+                if (ent instanceof Giant) {
                     supplies.add(ent);
                 }
             }
@@ -68,13 +68,13 @@ public class KuudraWaypoints {
         if (instance.isActive() && Utils.isInKuudra()) {
             if (!supplies.empty() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
                 for (Entity supply : supplies.get()) {
-                    float delta = event.tickCounter.getTickProgress(true);
-                    Vec3d pos = supply.getLerpedPos(delta);
-                    float yaw = supply.getYaw(delta);
-                    Vec3d supplyPos = new Vec3d(
-                            pos.getX() + (3.7 * Math.cos((yaw + 130) * (Math.PI / 180))),
+                    float delta = event.tickCounter.getGameTimeDeltaPartialTick(true);
+                    Vec3 pos = supply.getPosition(delta);
+                    float yaw = supply.getViewYRot(delta);
+                    Vec3 supplyPos = new Vec3(
+                            pos.x() + (3.7 * Math.cos((yaw + 130) * (Math.PI / 180))),
                             75,
-                            pos.getZ() + (3.7 * Math.sin((yaw + 130) * (Math.PI / 180)))
+                            pos.z() + (3.7 * Math.sin((yaw + 130) * (Math.PI / 180)))
                     );
                     event.drawBeam(supplyPos, 256, true, supplyColor.value());
                 }
@@ -82,7 +82,7 @@ public class KuudraWaypoints {
             if (!dropOffs.empty()) {
                 for (Entity drop : dropOffs.get()) {
                     if (hasName(drop, "BRING SUPPLY CHEST HERE")) {
-                        event.drawBeam(getGround(drop.getEntityPos()), 256, true, dropColor.value());
+                        event.drawBeam(getGround(drop.position()), 256, true, dropColor.value());
                     } else {
                         dropOffs.remove(drop);
                     }
@@ -91,7 +91,7 @@ public class KuudraWaypoints {
             if (!buildPiles.empty()) {
                 for (Entity pile : buildPiles.get()) {
                     if (hasName(pile, "%")) {
-                        event.drawBeam(getGround(pile.getLerpedPos(event.tickCounter.getTickProgress(true))), 256, true, buildColor.value());
+                        event.drawBeam(getGround(pile.getPosition(event.tickCounter.getGameTimeDeltaPartialTick(true))), 256, true, buildColor.value());
                     } else {
                         buildPiles.remove(pile);
                     }

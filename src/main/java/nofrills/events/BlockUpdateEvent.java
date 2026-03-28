@@ -1,7 +1,7 @@
 package nofrills.events;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
 
 public class BlockUpdateEvent {
 

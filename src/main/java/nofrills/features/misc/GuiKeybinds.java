@@ -1,13 +1,13 @@
 package nofrills.features.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.ContainerInput;
 import nofrills.config.Feature;
 import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
@@ -29,7 +29,7 @@ public class GuiKeybinds {
         if (!stack.isEmpty() && Utils.getSkyblockId(stack).isEmpty()) {
             Item item = stack.getItem();
             if (item.equals(Items.ARROW) || item.equals(Items.PLAYER_HEAD)) {
-                String name = Utils.toPlain(stack.getName());
+                String name = Utils.toPlain(stack.getHoverName());
                 if (name.contains("Next Page") || name.contains("Scroll Right")) return ButtonType.Next;
                 if (name.contains("Previous Page") || name.contains("Scroll Left")) return ButtonType.Previous;
                 if (name.equals("Scroll Up")) return ButtonType.Up;
@@ -52,24 +52,24 @@ public class GuiKeybinds {
     }
 
     private static void click(int syncId, Slot slot) {
-        boolean extraLines = Utils.getLoreLines(slot.getStack()).size() > 1;
-        mc.interactionManager.clickSlot(
+        boolean extraLines = Utils.getLoreLines(slot.getItem()).size() > 1;
+        mc.gameMode.handleContainerInput(
                 syncId,
-                slot.id,
+                slot.index,
                 extraLines ? GLFW.GLFW_MOUSE_BUTTON_LEFT : GLFW.GLFW_MOUSE_BUTTON_3,
-                extraLines ? SlotActionType.PICKUP : SlotActionType.CLONE,
+                extraLines ? ContainerInput.PICKUP : ContainerInput.CLONE,
                 mc.player
         );
     }
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
-            GenericContainerScreenHandler handler = container.getScreenHandler();
+        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
+            ChestMenu handler = container.getMenu();
             for (Slot slot : Utils.getContainerSlots(handler)) {
-                ButtonType type = getButtonType(slot.getStack());
+                ButtonType type = getButtonType(slot.getItem());
                 if (!type.equals(ButtonType.None) && getBoundKey(type).key() == event.key) {
-                    if (event.action == GLFW.GLFW_PRESS) click(handler.syncId, slot);
+                    if (event.action == GLFW.GLFW_PRESS) click(handler.containerId, slot);
                     event.cancel();
                     break;
                 }

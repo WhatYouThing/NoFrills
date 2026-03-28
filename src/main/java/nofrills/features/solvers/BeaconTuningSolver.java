@@ -1,18 +1,18 @@
 package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.resources.Identifier;
 import nofrills.config.Feature;
 import nofrills.events.PlaySoundEvent;
 import nofrills.events.ScreenOpenEvent;
@@ -35,9 +35,9 @@ public class BeaconTuningSolver {
     public static final Feature instance = new Feature("beaconTuningSolver");
 
     private static final List<Identifier> EXCLUDED_COLORS = List.of(
-            Identifier.of("minecraft", "gray_stained_glass_pane"),
-            Identifier.of("minecraft", "light_gray_stained_glass_pane"),
-            Identifier.of("minecraft", "black_stained_glass_pane")
+            Identifier.fromNamespaceAndPath("minecraft", "gray_stained_glass_pane"),
+            Identifier.fromNamespaceAndPath("minecraft", "light_gray_stained_glass_pane"),
+            Identifier.fromNamespaceAndPath("minecraft", "black_stained_glass_pane")
     );
     private static final List<Item> colorsOrder = createColorsOrder();
     public static int matchSpeed = 0;
@@ -55,14 +55,14 @@ public class BeaconTuningSolver {
     private static PitchType changePitch = null;
 
     private static List<Item> createColorsOrder() {
-        return StreamSupport.stream(Registries.ITEM.spliterator(), false).filter(item -> {
-            Identifier id = Registries.ITEM.getId(item);
+        return StreamSupport.stream(BuiltInRegistries.ITEM.spliterator(), false).filter(item -> {
+            Identifier id = BuiltInRegistries.ITEM.getKey(item);
             return id.getPath().endsWith("_stained_glass_pane");
-        }).filter(item -> !EXCLUDED_COLORS.contains(Registries.ITEM.getId(item))).sorted(Comparator.comparingInt(Registries.ITEM::getRawId)).collect(Collectors.toList());
+        }).filter(item -> !EXCLUDED_COLORS.contains(BuiltInRegistries.ITEM.getKey(item))).sorted(Comparator.comparingInt(BuiltInRegistries.ITEM::getId)).collect(Collectors.toList());
     }
 
     public static TuningType getTuningType() {
-        if (mc.currentScreen instanceof GenericContainerScreen container) {
+        if (mc.screen instanceof ContainerScreen container) {
             String title = container.getTitle().getString();
             if (title.startsWith("Tune Frequency")) {
                 return TuningType.Normal;
@@ -80,54 +80,54 @@ public class BeaconTuningSolver {
         return 6 - Math.floorDiv(tickDelta, 10);
     }
 
-    private static void updateSpeedSlot(GenericContainerScreenHandler handler) {
+    private static void updateSpeedSlot(ChestMenu handler) {
         if (speedSlot1Id != -1) {
-            ItemStack stack = Items.WHITE_WOOL.getDefaultStack();
+            ItemStack stack = Items.WHITE_WOOL.getDefaultInstance();
             if (matchSpeed > 0 && matchSpeed == changeSpeed) {
-                stack = Items.GREEN_WOOL.getDefaultStack();
+                stack = Items.GREEN_WOOL.getDefaultInstance();
             } else if (matchSpeed > 0) {
-                stack = Items.RED_WOOL.getDefaultStack();
+                stack = Items.RED_WOOL.getDefaultInstance();
             }
-            stack.set(DataComponentTypes.LORE, new LoreComponent(List.of(
-                    Text.literal("Target speed: ").styled(style -> style.withItalic(false).withColor(Formatting.WHITE))
-                            .append(Text.literal(Utils.format("{}", matchSpeed)).styled(style -> style.withItalic(false).withColor(matchSpeed == changeSpeed ? Formatting.GREEN : Formatting.RED))),
-                    Text.literal("Current speed: ").styled(style -> style.withItalic(false).withColor(Formatting.WHITE))
-                            .append(Text.literal(Utils.format("{}", changeSpeed)).styled(style -> style.withItalic(false).withColor(matchSpeed == changeSpeed ? Formatting.GREEN : Formatting.RED)))
+            stack.set(DataComponents.LORE, new ItemLore(List.of(
+                    Component.literal("Target speed: ").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE))
+                            .append(Component.literal(Utils.format("{}", matchSpeed)).withStyle(style -> style.withItalic(false).withColor(matchSpeed == changeSpeed ? ChatFormatting.GREEN : ChatFormatting.RED))),
+                    Component.literal("Current speed: ").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE))
+                            .append(Component.literal(Utils.format("{}", changeSpeed)).withStyle(style -> style.withItalic(false).withColor(matchSpeed == changeSpeed ? ChatFormatting.GREEN : ChatFormatting.RED)))
 
             )));
             SlotOptions.setSpoofed(handler.getSlot(speedSlot1Id), SlotOptions.stackWithName(
                     SlotOptions.stackWithCount(stack, changeSpeed),
-                    Text.literal("Speed").styled(style -> style.withItalic(false).withColor(Formatting.YELLOW))
+                    Component.literal("Speed").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.YELLOW))
             ));
         }
     }
 
-    private static void updatePitchSlot(GenericContainerScreenHandler handler) {
+    private static void updatePitchSlot(ChestMenu handler) {
         if (pitchSlot1Id != -1) {
             ItemStack stack;
-            stack = Items.CYAN_WOOL.getDefaultStack();
-            stack.set(DataComponentTypes.LORE, new LoreComponent(List.of(
-                    Text.literal("Wait for the target tile to move once to see the target pitch.").styled(style -> style.withItalic(false).withColor(Formatting.WHITE)),
-                    Text.literal("If possible target is empty - it's likely already solved.").styled(style -> style.withItalic(false).withColor(Formatting.WHITE)),
-                    Text.literal("Possible target: ").styled(style -> style.withColor(Formatting.AQUA))
-                            .append(Text.literal(Utils.format("{}", heardPitch))
-                                    .styled(style -> style.withItalic(false).withColor(Formatting.WHITE))),
-                    Text.literal("Current pitch: ").styled(style -> style.withItalic(false).withColor(Formatting.WHITE))
-                            .append(Text.literal(Utils.format("{}", changePitch)).styled(style -> style.withItalic(false).withColor(
+            stack = Items.CYAN_WOOL.getDefaultInstance();
+            stack.set(DataComponents.LORE, new ItemLore(List.of(
+                    Component.literal("Wait for the target tile to move once to see the target pitch.").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE)),
+                    Component.literal("If possible target is empty - it's likely already solved.").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE)),
+                    Component.literal("Possible target: ").withStyle(style -> style.withColor(ChatFormatting.AQUA))
+                            .append(Component.literal(Utils.format("{}", heardPitch))
+                                    .withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE))),
+                    Component.literal("Current pitch: ").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE))
+                            .append(Component.literal(Utils.format("{}", changePitch)).withStyle(style -> style.withItalic(false).withColor(
                                     switch (changePitch) {
-                                        case PitchType.Low -> Formatting.GREEN;
-                                        case PitchType.Normal -> Formatting.YELLOW;
-                                        case PitchType.High -> Formatting.RED;
+                                        case PitchType.Low -> ChatFormatting.GREEN;
+                                        case PitchType.Normal -> ChatFormatting.YELLOW;
+                                        case PitchType.High -> ChatFormatting.RED;
                                     }
                             )))
             )));
             SlotOptions.setSpoofed(handler.getSlot(pitchSlot1Id), SlotOptions.stackWithName(stack,
-                    Text.literal("Pitch").styled(style -> style.withItalic(false).withColor(Formatting.YELLOW))
+                    Component.literal("Pitch").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.YELLOW))
             ));
         }
     }
 
-    private static void updateColorSlot(GenericContainerScreenHandler handler) {
+    private static void updateColorSlot(ChestMenu handler) {
         int matchRoll = colorsOrder.indexOf(matchColor);
         int changeRoll = colorsOrder.indexOf(changeColor);
         int target1 = (matchRoll - changeRoll + colorsOrder.size()) % colorsOrder.size();
@@ -135,26 +135,26 @@ public class BeaconTuningSolver {
         colorTarget1 = target1 < target2 ? -target1 : target2;
         ItemStack stack;
         if (colorTarget1 < 0) {
-            stack = Items.GREEN_WOOL.getDefaultStack();
-            stack.set(DataComponentTypes.LORE, new LoreComponent(List.of(
-                    Text.literal("Left clicks ").styled(style -> style.withColor(RenderColor.green.hex))
-                            .append(Text.literal(Utils.format("required: {}", Math.abs(colorTarget1)))
-                                    .styled(style -> style.withItalic(false).withColor(Formatting.WHITE)))
+            stack = Items.GREEN_WOOL.getDefaultInstance();
+            stack.set(DataComponents.LORE, new ItemLore(List.of(
+                    Component.literal("Left clicks ").withStyle(style -> style.withColor(RenderColor.green.hex))
+                            .append(Component.literal(Utils.format("required: {}", Math.abs(colorTarget1)))
+                                    .withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE)))
             )));
         } else if (colorTarget1 > 0) {
-            stack = Items.ORANGE_WOOL.getDefaultStack();
-            stack.set(DataComponentTypes.LORE, new LoreComponent(List.of(
-                    Text.literal("Right clicks ").styled(style -> style.withColor(RenderColor.red.hex))
-                            .append(Text.literal(Utils.format("required: {}", Math.abs(colorTarget1)))
-                                    .styled(style -> style.withItalic(false).withColor(Formatting.WHITE)))
+            stack = Items.ORANGE_WOOL.getDefaultInstance();
+            stack.set(DataComponents.LORE, new ItemLore(List.of(
+                    Component.literal("Right clicks ").withStyle(style -> style.withColor(RenderColor.red.hex))
+                            .append(Component.literal(Utils.format("required: {}", Math.abs(colorTarget1)))
+                                    .withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE)))
             )));
         } else {
             // just in case, unreachable
-            stack = Items.WHITE_WOOL.getDefaultStack();
+            stack = Items.WHITE_WOOL.getDefaultInstance();
         }
         SlotOptions.setSpoofed(handler.getSlot(colorSlot1Id), SlotOptions.stackWithName(
                 SlotOptions.stackWithCount(stack, Math.abs(colorTarget1)),
-                Text.literal("Color").styled(style -> style.withItalic(false).withColor(Formatting.YELLOW))
+                Component.literal("Color").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.YELLOW))
         ));
     }
 
@@ -189,7 +189,7 @@ public class BeaconTuningSolver {
         if (instance.isActive() && Utils.isInArea("Galatea")) {
             TuningType tuningType = getTuningType();
             if (tuningType.equals(TuningType.None)) return;
-            if (event.isSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS)) {
+            if (event.isSound(SoundEvents.NOTE_BLOCK_BASS)) {
                 switch (tuningType) {
                     case TuningType.Normal -> {
                         PitchType soundPitch = PitchType.match(event.packet.getPitch());
@@ -210,7 +210,7 @@ public class BeaconTuningSolver {
         if (instance.isActive() && Utils.isInArea("Galatea") && !event.isInventory) {
             TuningType tuningType = getTuningType();
             if (tuningType.equals(TuningType.None)) return;
-            String name = Utils.toPlain(event.stack.getName());
+            String name = Utils.toPlain(event.stack.getHoverName());
             switch (tuningType) {
                 case TuningType.Normal -> {
                     if (name.startsWith("Pause")) {

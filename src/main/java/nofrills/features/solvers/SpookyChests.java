@@ -1,11 +1,11 @@
 package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -41,7 +41,7 @@ public class SpookyChests {
     }
 
     private static void clickChest(Entity ent) {
-        if (ent instanceof ArmorStandEntity) {
+        if (ent instanceof ArmorStand) {
             List<Entity> chests = new ArrayList<>(chestList.get());
             chests.removeIf(clickedList::has);
             chests.sort(Comparator.comparingDouble(chest -> Utils.horizontalDistance(ent, chest)));
@@ -57,7 +57,7 @@ public class SpookyChests {
             String name = Utils.toLower(event.namePlain);
             if (name.equals("trick or treat?") || name.equals("party chest")) {
                 Utils.showTitle("§6§lCHEST SPAWNED!", "", 5, 20, 5);
-                Utils.playSound(SoundEvents.BLOCK_VAULT_ACTIVATE, 1.0f, 1.0f);
+                Utils.playSound(SoundEvents.VAULT_ACTIVATE, 1.0f, 1.0f);
                 chestList.add(event.entity);
             }
         }
@@ -80,9 +80,9 @@ public class SpookyChests {
                 if (clickedList.has(chest)) {
                     continue;
                 }
-                BlockPos pos = Utils.findGround(chest.getBlockPos(), 4).up(1);
-                event.drawFilledWithBeam(Box.enclosing(pos, pos), 256, true, color.value());
-                if (tracer.value()) event.drawTracer(pos.toCenterPos(), color.valueWithAlpha(1.0f));
+                BlockPos pos = Utils.findGround(chest.blockPosition(), 4).above(1);
+                event.drawFilledWithBeam(AABB.encapsulatingFullBlocks(pos, pos), 256, true, color.value());
+                if (tracer.value()) event.drawTracer(pos.getCenter(), color.valueWithAlpha(1.0f));
             }
         }
     }

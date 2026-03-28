@@ -1,7 +1,7 @@
 package nofrills.hud;
 
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import net.minecraft.text.Text;
+import io.wispforest.owo.ui.core.OwoUIGraphics;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.misc.Utils;
 
@@ -12,12 +12,12 @@ public class TickTimerElement extends SimpleTextElement {
     protected boolean repeating = false;
 
     public TickTimerElement(String text, Feature instance, String label) {
-        super(Text.literal(Utils.format(text, "N/A")), instance, label);
+        super(Component.literal(Utils.format(text, "N/A")), instance, label);
         this.timerText = text;
     }
 
     @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
+    public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
         } else if (!this.isEditingHud() && !this.isTicking()) {

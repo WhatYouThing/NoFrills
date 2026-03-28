@@ -2,10 +2,10 @@ package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.item.ItemStack;
 import nofrills.features.general.ItemProtection;
 import nofrills.features.hunting.InstantFog;
 import nofrills.features.tweaks.RidingCameraFix;
@@ -16,34 +16,34 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(ClientPlayerEntity.class)
-public abstract class ClientPlayerEntityMixin extends AbstractClientPlayerEntity {
-    public ClientPlayerEntityMixin(ClientWorld world, GameProfile profile) {
+@Mixin(LocalPlayer.class)
+public abstract class LocalPlayerMixin extends AbstractClientPlayer {
+    public LocalPlayerMixin(ClientLevel world, GameProfile profile) {
         super(world, profile);
     }
 
-    @ModifyReturnValue(method = "getYaw", at = @At("RETURN"))
+    @ModifyReturnValue(method = "getViewYRot", at = @At("RETURN"))
     private float onGetYaw(float original) {
         if (RidingCameraFix.active()) {
-            return getYaw();
+            return getYRot();
         }
         return original;
     }
 
-    @Inject(method = "getUnderwaterVisibility", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/MathHelper;clamp(FFF)F"), cancellable = true)
+    @Inject(method = "getWaterVision", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"), cancellable = true)
     private void onGetWaterVisibility(CallbackInfoReturnable<Float> cir) {
         if (InstantFog.instance.isActive()) {
             cir.setReturnValue(1.0f);
         }
     }
 
-    @Inject(method = "dropSelectedItem", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "drop", at = @At("HEAD"), cancellable = true)
     private void onBeforeDropItem(boolean entireStack, CallbackInfoReturnable<Boolean> cir) {
         if (ItemProtection.instance.isActive()) {
             if (Utils.isInDungeons() && DungeonUtil.isDungeonStarted()) {
                 return; // items cannot be directly dropped while in an active dungeon due to the class ability
             }
-            ItemStack stack = this.getInventory().getSelectedStack();
+            ItemStack stack = this.getInventory().getSelectedItem();
             if (!ItemProtection.getProtectType(stack).equals(ItemProtection.ProtectType.None)) {
                 cir.setReturnValue(false);
             }

@@ -3,15 +3,15 @@ package nofrills.features.general;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.wispforest.owo.ui.component.ButtonComponent;
-import io.wispforest.owo.ui.component.Components;
-import io.wispforest.owo.ui.container.Containers;
+import io.wispforest.owo.ui.component.UIComponents;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.VerticalAlignment;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Config;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
@@ -66,9 +66,9 @@ public class SkillTracker {
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
         for (String skill : skills) {
-            FlowLayout layout = Containers.horizontalFlow(Sizing.content(), Sizing.content());
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
-            PlainLabel label = new PlainLabel(Text.literal(skill));
+            PlainLabel label = new PlainLabel(Component.literal(skill));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             ToggleButton toggle = new ToggleButton(isSessionActive(skill));
             toggle.margins(Insets.of(0, 0, 0, 5));
@@ -79,7 +79,7 @@ public class SkillTracker {
                 data.get(skill).getAsJsonObject().addProperty("active", value);
                 saveData();
             });
-            ButtonComponent reset = Components.button(Text.literal("Reset Session"), button -> {
+            ButtonComponent reset = UIComponents.button(Component.literal("Reset Session"), button -> {
                 data.add(skill, getDefaultData());
                 mc.setScreen(buildSettings());
                 saveData();
@@ -101,7 +101,7 @@ public class SkillTracker {
 
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Skill Tracker"));
+        settings.setTitle(Component.literal("Skill Tracker"));
         return settings;
     }
 
@@ -187,15 +187,15 @@ public class SkillTracker {
         }
     }
 
-    public static MutableText getText() {
+    public static MutableComponent getText() {
         List<String> active = skills.stream().filter(SkillTracker::isSessionActive).toList();
-        MutableText text = Text.literal("Skill Tracker");
+        MutableComponent text = Component.literal("Skill Tracker");
         if (active.isEmpty()) {
             return text.append("\n§7None tracked.");
         }
         for (String skill : active) {
             SettingColor color = getSessionColor(skill);
-            MutableText sessionText = color != null ? Text.literal(skill).withColor(color.value().argb) : Text.literal(skill);
+            MutableComponent sessionText = color != null ? Component.literal(skill).withColor(color.value().argb) : Component.literal(skill);
             JsonObject obj = data.has(skill) ? data.get(skill).getAsJsonObject() : getDefaultData();
             long totalTicks = obj.get("totalTicks").getAsLong();
             long countedTicks = obj.get("countedTicks").getAsLong();

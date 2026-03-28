@@ -12,6 +12,8 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
+import static nofrills.hud.HudManager.pickAbilityTimer;
+
 public class AbilityAlert {
     public static final Feature instance = new Feature("abilityAlert");
 
@@ -42,6 +44,13 @@ public class AbilityAlert {
         return !ability.isEmpty() ? ability.substring(ability.indexOf(":") + 1).replace("RIGHT CLICK", "").trim() : "";
     }
 
+    private static void setCooldown(int tickDuration) {
+        ticks = tickDuration;
+        if (pickAbilityTimer.isActive()) {
+            pickAbilityTimer.start(tickDuration * 50L);
+        }
+    }
+
     private static String getWidget() {
         if (!toolData.isEmpty()) {
             for (String line : Utils.getTabListLines()) {
@@ -66,12 +75,12 @@ public class AbilityAlert {
         if (instance.isActive() && !Utils.isInDungeons() && isUsedMessage(event.messagePlain)) {
             if (!toolData.isEmpty() && getWidget().isEmpty()) {
                 if (override.value() > 0) {
-                    ticks = override.value();
+                    setCooldown(override.value());
                 } else {
                     for (String line : Utils.getLoreLines(toolData.tool).reversed()) {
                         if (line.startsWith("Cooldown: ")) {
                             String duration = line.substring(line.indexOf(":") + 2).replace("s", "");
-                            ticks = Utils.parseInt(duration).orElse(0) * 20;
+                            setCooldown(Utils.parseInt(duration).orElse(0) * 20);
                         }
                     }
                 }
@@ -86,12 +95,12 @@ public class AbilityAlert {
             if (!widget.isEmpty()) {
                 String duration = widget.substring(widget.indexOf(":") + 2);
                 if (ticks > 1 && duration.equals("Available")) {
-                    ticks = 1; // instantly skips cooldown if the server does, such as if the player enters a mineshaft
+                    setCooldown(1); // instantly skips cooldown if the server does, such as if the player enters a mineshaft
                 }
                 if (ticks == 0 && duration.endsWith("s")) {
                     int durationTicks = Utils.parseInt(duration.replace("s", "")).orElse(0);
-                    if (durationTicks >= 5) {
-                        ticks = durationTicks * 20;
+                    if (durationTicks > 6) {
+                        setCooldown(durationTicks * 20);
                     }
                 }
             }

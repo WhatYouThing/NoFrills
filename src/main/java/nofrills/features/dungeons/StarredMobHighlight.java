@@ -3,12 +3,15 @@ package nofrills.features.dungeons;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
+import nofrills.misc.RenderStyle;
 import nofrills.misc.Utils;
 
 import java.util.List;
@@ -16,7 +19,9 @@ import java.util.List;
 public class StarredMobHighlight {
     public static final Feature instance = new Feature("starredMobHighlight");
 
-    public static final SettingColor color = new SettingColor(RenderColor.fromArgb(0xff00ffff), "color", instance.key());
+    public static final SettingEnum<RenderStyle> style = new SettingEnum<>(RenderStyle.Outline, RenderStyle.class, "style", instance);
+    public static final SettingColor outlineColor = new SettingColor(RenderColor.fromArgb(0xff00ffff), "color", instance);
+    public static final SettingColor fillColor = new SettingColor(RenderColor.fromHex(0x00ffff, 0.5f), "fillColor", instance);
 
     private static final EntityCache cache = new EntityCache();
 
@@ -48,7 +53,8 @@ public class StarredMobHighlight {
         if (instance.isActive() && Utils.isInDungeons()) {
             for (Entity ent : cache.get()) {
                 if (!ent.isAlive()) continue;
-                event.drawOutline(Utils.getLerpedBox(ent, event.tickCounter.getTickProgress(true)), false, color.value());
+                Box box = Utils.getLerpedBox(ent, event.tickCounter.getTickProgress(true));
+                event.drawStyled(box, style.value(), false, outlineColor.value(), fillColor.value());
             }
         }
     }

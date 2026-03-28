@@ -10,13 +10,15 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3i;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.config.SettingEnum;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.events.WorldRenderEvent;
+import nofrills.misc.ConcurrentHashSet;
 import nofrills.misc.RenderColor;
+import nofrills.misc.RenderStyle;
 import nofrills.misc.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static nofrills.Main.mc;
@@ -24,9 +26,11 @@ import static nofrills.Main.mc;
 public class EndNodeHighlight {
     public static final Feature instance = new Feature("endNodeHighlight");
 
-    public static final SettingColor color = new SettingColor(new RenderColor(0, 255, 0, 255), "color", instance.key());
+    public static final SettingEnum<RenderStyle> style = new SettingEnum<>(RenderStyle.Filled, RenderStyle.class, "style", instance);
+    public static final SettingColor outlineColor = new SettingColor(new RenderColor(0, 255, 0, 255), "outlineColor", instance);
+    public static final SettingColor fillColor = new SettingColor(new RenderColor(0, 255, 0, 255), "color", instance);
 
-    private static final List<BlockPos> nodes = new ArrayList<>();
+    private static final ConcurrentHashSet<BlockPos> nodes = new ConcurrentHashSet<>();
     private static final List<Vec3i> offsets = List.of(
             new Vec3i(1, 0, 0),
             new Vec3i(-1, 0, 0),
@@ -48,13 +52,13 @@ public class EndNodeHighlight {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (instance.isActive() && Utils.isInArea("The End") && event.type.equals(ParticleTypes.WITCH) && isNodeParticle(event.packet)) {
+        if (instance.isActive() && event.type.equals(ParticleTypes.WITCH) && isNodeParticle(event.packet) && Utils.isInArea("The End")) {
             BlockPos blockPos = BlockPos.ofFloored(event.pos);
             for (Vec3i offset : offsets) {
                 BlockPos pos = blockPos.add(offset);
-                if (isNodeBlock(mc.world.getBlockState(pos)) && !nodes.contains(pos)) {
+                if (!nodes.contains(pos) && isNodeBlock(mc.world.getBlockState(pos))) {
                     nodes.add(pos);
-                    return;
+                    break;
                 }
             }
         }
@@ -62,13 +66,13 @@ public class EndNodeHighlight {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && Utils.isInArea("The End") && !nodes.isEmpty()) {
-            for (BlockPos node : new ArrayList<>(nodes)) {
-                if (isNodeBlock(mc.world.getBlockState(node))) {
-                    event.drawFilled(Box.enclosing(node, node), false, color.value());
-                } else {
+        if (instance.isActive() && !nodes.isEmpty() && Utils.isInArea("The End")) {
+            for (BlockPos node : nodes) {
+                if (!isNodeBlock(mc.world.getBlockState(node))) {
                     nodes.remove(node);
+                    continue;
                 }
+                event.drawStyled(Box.enclosing(node, node), style.value(), false, outlineColor.value(), fillColor.value());
             }
         }
     }

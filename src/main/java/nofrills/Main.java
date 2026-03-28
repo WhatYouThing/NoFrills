@@ -7,12 +7,19 @@ import meteordevelopment.orbit.IEventBus;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import nofrills.commands.NoFrillsCommand;
 import nofrills.commands.YeetCommand;
 import nofrills.config.Config;
+import nofrills.events.ChatMsgEvent;
+import nofrills.events.OverlayMsgEvent;
+import nofrills.events.PartyChatMsgEvent;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.*;
 import nofrills.features.fishing.*;
@@ -24,10 +31,10 @@ import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
 import nofrills.features.solvers.*;
 import nofrills.features.tweaks.DoubleUseFix;
-import nofrills.features.tweaks.MiddleClickOverride;
 import nofrills.features.tweaks.NoCursorReset;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.ClickGui;
+import nofrills.hud.elements.DungeonMap;
 import nofrills.misc.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,6 +81,28 @@ public class Main implements ModInitializer {
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 
+        ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
+            DungeonMap.mapTexture = new NativeImageBackedTexture("NoFrills Dungeon Map", 128, 128, true);
+            client.getTextureManager().registerTexture(Identifier.of("nofrills", "dungeon_map_texture"), DungeonMap.mapTexture);
+        });
+
+        ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
+            String msg = Utils.toPlain(message);
+
+            if (overlay) {
+                return !eventBus.post(new OverlayMsgEvent(message, msg)).isCancelled();
+            }
+
+            boolean cancelled = eventBus.post(new ChatMsgEvent(message, msg)).isCancelled();
+            if (msg.startsWith("Party > ") && msg.contains(": ")) {
+                int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");
+                String[] clean = msg.replace(msg.substring(0, nameStart + 1), "").split(":", 2);
+                String author = clean[0].trim(), content = clean[1].trim();
+                cancelled = eventBus.post(new PartyChatMsgEvent(content, author)).isCancelled() || cancelled;
+            }
+            return !cancelled;
+        });
+
         eventBus.registerLambdaFactory(MOD_ID, (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
 
         eventBus.subscribe(SkyblockData.class);
@@ -118,11 +147,10 @@ public class Main implements ModInitializer {
         eventBus.subscribe(PartyFinder.class);
         eventBus.subscribe(PartyCommands.class);
         eventBus.subscribe(NoRender.class);
-        eventBus.subscribe(MiddleClickOverride.class);
         eventBus.subscribe(EtherwarpOverlay.class);
         eventBus.subscribe(ChatWaypoints.class);
         eventBus.subscribe(AutoSprint.class);
-        eventBus.subscribe(RareGlow.class);
+        eventBus.subscribe(RareHighlight.class);
         eventBus.subscribe(RareAnnounce.class);
         eventBus.subscribe(MuteDrake.class);
         eventBus.subscribe(CapTracker.class);
@@ -132,7 +160,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(TerracottaTimer.class);
         eventBus.subscribe(TerminalSolvers.class);
         eventBus.subscribe(LeapOverlay.class);
-        eventBus.subscribe(DungeonReminders.class);
         eventBus.subscribe(StarredMobHighlight.class);
         eventBus.subscribe(MinibossHighlight.class);
         eventBus.subscribe(KeyHighlight.class);
@@ -154,7 +181,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(LividSolver.class);
         eventBus.subscribe(MimicMessage.class);
         eventBus.subscribe(PrinceMessage.class);
-        eventBus.subscribe(SpiritBearTimer.class);
         eventBus.subscribe(EggHitsDisplay.class);
         eventBus.subscribe(BeaconTracer.class);
         eventBus.subscribe(CocoonAlert.class);
@@ -186,6 +212,8 @@ public class Main implements ModInitializer {
         eventBus.subscribe(WateringHelper.class);
         eventBus.subscribe(PlatformHighlight.class);
         eventBus.subscribe(NoDamageSplash.class);
+        eventBus.subscribe(CroesusSolver.class);
+        eventBus.subscribe(EquipmentHighlight.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

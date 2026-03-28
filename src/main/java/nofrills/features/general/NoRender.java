@@ -1,12 +1,17 @@
 package nofrills.features.general;
 
 import com.google.common.collect.Sets;
+import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.render.fog.FogData;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.*;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.entity.passive.SheepEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
@@ -20,6 +25,7 @@ import nofrills.misc.Utils;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 public class NoRender {
@@ -39,21 +45,18 @@ public class NoRender {
     public static final SettingBool entityFire = new SettingBool(false, "entityFire", instance.key());
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
     public static final SettingBool iceSpray = new SettingBool(false, "iceSpray", instance.key());
+    public static final SettingBool soulweaverSkulls = new SettingBool(false, "soulweaverSkulls", instance.key());
+    public static final SettingBool guidedSheep = new SettingBool(false, "guidedSheep", instance.key());
+    public static final SettingBool bonePlating = new SettingBool(false, "bonePlating", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
     public static final SettingEnum<VignetteMode> vignette = new SettingEnum<>(VignetteMode.None, VignetteMode.class, "vignetteMode", instance.key());
     public static final SettingBool expOrbs = new SettingBool(false, "expOrbs", instance.key());
-    public static final SettingBool stuckArrows = new SettingBool(false, "stuckArrows", instance.key());
+    public static final SettingBool stuckArrows = new SettingBool(false, "stuckArrows", instance);
 
     private static final List<Pattern> deadPatterns = List.of(
             Pattern.compile(".* 0" + Utils.Symbols.heart),
             Pattern.compile(".* 0/.*" + Utils.Symbols.heart)
-    );
-    private static final HashSet<Block> treeBlocks = Sets.newHashSet(
-            Blocks.MANGROVE_WOOD,
-            Blocks.MANGROVE_LEAVES,
-            Blocks.STRIPPED_SPRUCE_WOOD,
-            Blocks.AZALEA_LEAVES
     );
     private static final HashSet<ParticleType<?>> explosionParticles = Sets.newHashSet(
             ParticleTypes.EXPLOSION,
@@ -61,6 +64,7 @@ public class NoRender {
             ParticleTypes.GUST,
             ParticleTypes.GUST_EMITTER_LARGE
     );
+    private static final EntityPredicates entityPredicates = new EntityPredicates();
 
     public static FogData getFogAsEmpty(FogData data) {
         data.renderDistanceStart = Float.MAX_VALUE;
@@ -70,18 +74,52 @@ public class NoRender {
         return data;
     }
 
-    public static boolean isTreeBlock(Entity entity) {
-        if (entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
-            return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
-        }
-        return false;
-    }
-
     public static boolean shouldHideTooltip(Slot slot, String title) {
         if (title.startsWith("Ultrasequencer (")) {
             return false;
         }
         return instance.isActive() && emptyTooltips.value() && slot != null && slot.getStack().getName().getString().trim().isEmpty();
+    }
+
+    public static boolean shouldCancelRender(Entity entity) {
+        for (Predicate<Entity> predicate : entityPredicates.get()) {
+            if (predicate.test(entity)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<Predicate<Entity>> initEntityPredicates() {
+        String skullTexture = "2f24ed6875304fa4a1f0c785b2cb6a6a72563e9f3e24ea55e18178452119aa66";
+        HashSet<Block> treeBlocks = Sets.newHashSet(
+                Blocks.MANGROVE_WOOD,
+                Blocks.MANGROVE_LEAVES,
+                Blocks.STRIPPED_SPRUCE_WOOD,
+                Blocks.AZALEA_LEAVES
+        );
+        return List.of(
+                (entity -> deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()),
+                (entity -> fallingBlocks.value() && entity instanceof FallingBlockEntity),
+                (entity -> {
+                    if (treeBits.value() && entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
+                        return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
+                    }
+                    return false;
+                }),
+                (entity -> lightning.value() && entity instanceof LightningEntity),
+                (entity -> expOrbs.value() && entity instanceof ExperienceOrbEntity),
+                (entity -> {
+                    if (soulweaverSkulls.value() && entity instanceof ArmorStandEntity stand) {
+                        ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
+                        if (!helmet.isEmpty() && helmet.getItem().equals(Items.PLAYER_HEAD)) {
+                            GameProfile profile = Utils.getTextures(helmet);
+                            return Utils.isTextureEqual(profile, skullTexture) && Utils.isInDungeons();
+                        }
+                    }
+                    return false;
+                })
+        );
     }
 
     private static boolean isPoofParticle(ParticleS2CPacket packet) {
@@ -134,5 +172,53 @@ public class NoRender {
         Ambient,
         Danger,
         Both
+    }
+
+    public static class EntityPredicates {
+        private final List<Predicate<Entity>> predicates;
+
+        public EntityPredicates() {
+            String skullTexture = "2f24ed6875304fa4a1f0c785b2cb6a6a72563e9f3e24ea55e18178452119aa66";
+            HashSet<Block> treeBlocks = Sets.newHashSet(
+                    Blocks.MANGROVE_WOOD,
+                    Blocks.MANGROVE_LEAVES,
+                    Blocks.STRIPPED_SPRUCE_WOOD,
+                    Blocks.AZALEA_LEAVES
+            );
+            this.predicates = List.of(
+                    (entity -> deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()),
+                    (entity -> fallingBlocks.value() && entity instanceof FallingBlockEntity),
+                    (entity -> {
+                        if (treeBits.value() && entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
+                            return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
+                        }
+                        return false;
+                    }),
+                    (entity -> lightning.value() && entity instanceof LightningEntity),
+                    (entity -> expOrbs.value() && entity instanceof ExperienceOrbEntity),
+                    (entity -> {
+                        if (soulweaverSkulls.value() && entity instanceof ArmorStandEntity stand) {
+                            ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
+                            if (!helmet.isEmpty() && helmet.getItem().equals(Items.PLAYER_HEAD)) {
+                                GameProfile profile = Utils.getTextures(helmet);
+                                return Utils.isTextureEqual(profile, skullTexture) && Utils.isInDungeons();
+                            }
+                        }
+                        return false;
+                    }),
+                    (entity -> guidedSheep.value() && entity instanceof SheepEntity sheep && sheep.getHealth() == 8.0f && Utils.isInDungeons()),
+                    (entity -> {
+                        if (bonePlating.value() && entity instanceof ItemEntity item) {
+                            ItemStack stack = item.getStack();
+                            return stack.getItem().equals(Items.BONE_MEAL) && stack.getName().getString().equals("Bone Meal") && Utils.isInDungeons();
+                        }
+                        return false;
+                    })
+            );
+        }
+
+        public List<Predicate<Entity>> get() {
+            return this.predicates;
+        }
     }
 }

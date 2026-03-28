@@ -23,7 +23,7 @@ import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
 public class KuudraChestValue {
-    public static final Feature instance = new Feature("kuudraChestValue");
+    public static final Feature instance = new Feature("kuudraChestValue").requiresPricingAPI();
 
     public static final SettingInt petBonus = new SettingInt(0, "petBonus", instance);
     public static final SettingBool salvageValue = new SettingBool(false, "salvageValue", instance);
@@ -101,7 +101,7 @@ public class KuudraChestValue {
             if (auctionPricing.containsKey(id)) {
                 currentValue += auctionPricing.get(id) * quantity;
             } else if (bazaarPricing.containsKey(id)) {
-                currentValue += bazaarPricing.get(id).get("sell") * quantity;
+                currentValue += bazaarPricing.get(id).sell() * quantity;
             }
         }
     }

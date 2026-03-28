@@ -26,7 +26,7 @@ import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.*;
 
 public class ItemProtection {
-    public static final Feature instance = new Feature("itemProtection");
+    public static final Feature instance = new Feature("itemProtection").requiresPricingAPI();
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingKeybind uuidKey = new SettingKeybind(-1, "uuidKey", instance);
@@ -39,14 +39,12 @@ public class ItemProtection {
     public static final SettingBool protectRarityUpgraded = new SettingBool(false, "protectRarityUpgraded", instance);
     public static final SettingBool protectValue = new SettingBool(false, "protectValue", instance);
     public static final SettingDouble protectValueMin = new SettingDouble(5000000.0, "protectValueMin", instance);
+    public static final SettingBool hideTooltip = new SettingBool(false, "hideTooltip", instance);
 
     private static boolean isSellGUI = false;
     private static boolean isSalvageGUI = false;
     private static boolean overrideActive = false;
-
-    public static boolean isProtectingValue() {
-        return instance.isActive() && protectValue.value();
-    }
+    private static boolean revealingTooltip = false;
 
     public static ProtectType getProtectType(ItemStack stack) {
         if (overrideActive || stack.isEmpty()) return ProtectType.None;
@@ -76,10 +74,9 @@ public class ItemProtection {
         if (protectValue.value()) {
             double min = protectValueMin.value();
             List<Double> prices = new ArrayList<>();
-            if (bazaarPricing.containsKey(id)) prices.add(bazaarPricing.get(id).get("buy"));
+            if (bazaarPricing.containsKey(id)) prices.add(bazaarPricing.get(id).buy());
             if (auctionPricing.containsKey(id)) prices.add(Double.valueOf(auctionPricing.get(id)));
-            if (npcPricing.containsKey(id) && npcPricing.get(id).containsKey("coin"))
-                prices.add(npcPricing.get(id).get("coin"));
+            if (npcPricing.containsKey(id)) prices.add(npcPricing.get(id).coin());
             for (double price : prices) {
                 if (price >= min) {
                     return ProtectType.Value;
@@ -149,6 +146,9 @@ public class ItemProtection {
     @EventHandler
     private static void onKey(InputEvent event) {
         if (instance.isActive() && (mc.currentScreen instanceof InventoryScreen || mc.currentScreen instanceof GenericContainerScreen)) {
+            if (hideTooltip.value() && event.key == GLFW.GLFW_KEY_LEFT_SHIFT) {
+                revealingTooltip = event.action != GLFW.GLFW_RELEASE;
+            }
             if (overrideKey.isKey(event.key)) {
                 overrideActive = event.action != GLFW.GLFW_RELEASE;
                 event.cancel();
@@ -172,6 +172,9 @@ public class ItemProtection {
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && !event.stack.isEmpty() && event.customData != null) {
+            if (hideTooltip.value() && !revealingTooltip) {
+                return;
+            }
             ProtectType type = getProtectType(event.stack);
             if (!type.equals(ProtectType.None)) {
                 MutableText line = Text.literal(Utils.format("§aItem Protected §7({})", type.name()));
@@ -226,6 +229,7 @@ public class ItemProtection {
     private static void onScreenClose(ScreenCloseEvent event) {
         if (instance.isActive()) {
             overrideActive = false;
+            revealingTooltip = false;
         }
     }
 

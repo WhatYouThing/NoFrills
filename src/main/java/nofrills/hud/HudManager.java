@@ -2,6 +2,7 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.block.Blocks;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -26,13 +27,17 @@ public class HudManager {
     public static final Inventory inventory = new Inventory();
     public static final Quiver quiver = new Quiver("Quiver: §fN/A");
     public static final LagMeter lagMeter = new LagMeter("Last server tick was 0.00s ago");
+    public static final PickaxeAbilityTimer pickAbilityTimer = new PickaxeAbilityTimer();
     public static final BossHealth bossHealth = new BossHealth();
     public static final DungeonMap dungeonMap = new DungeonMap();
     public static final DungeonScore dungeonScore = new DungeonScore();
+    public static final SpiritBearTimer spiritBearTimer = new SpiritBearTimer();
+    public static final TerracottaGyroTimer terraGyroTimer = new TerracottaGyroTimer();
     public static final PadTimer padTimer = new PadTimer();
     public static final TerminalStartTimer terminalStartTimer = new TerminalStartTimer();
     public static final GoldorTickTimer goldorTickTimer = new GoldorTickTimer();
     public static final Power power = new Power("Power: §f0");
+    public static final FreshToolsTimer freshToolsTimer = new FreshToolsTimer();
     public static final SeaCreatures seaCreatures = new SeaCreatures("Sea Creatures: §70");
     public static final FishingBobber bobber = new FishingBobber("Bobber: §7Inactive");
     public static final ShardTrackerDisplay shardTracker = new ShardTrackerDisplay();
@@ -75,9 +80,11 @@ public class HudManager {
         fps.reset();
         lagMeter.setTickTime(0);
         bossHealth.reset();
+        terraGyroTimer.pause();
         padTimer.pause();
         terminalStartTimer.pause();
         goldorTickTimer.pause();
+        freshToolsTimer.pause();
         dungeonMap.reset();
     }
 
@@ -160,6 +167,11 @@ public class HudManager {
         if (bobber.isActive()) {
             bobber.onServerTick();
         }
+        if (Utils.isOnDungeonFloor("6")) {
+            if (terraGyroTimer.isActive()) {
+                terraGyroTimer.tick();
+            }
+        }
         if (Utils.isOnDungeonFloor("7")) {
             if (padTimer.isActive()) {
                 padTimer.tick();
@@ -170,6 +182,9 @@ public class HudManager {
             if (goldorTickTimer.isActive()) {
                 goldorTickTimer.tick();
             }
+        }
+        if (Utils.isInKuudra()) {
+            freshToolsTimer.tick();
         }
     }
 
@@ -203,6 +218,15 @@ public class HudManager {
                 case "The Core entrance is opening!" -> goldorTickTimer.pause();
                 default -> {
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onBlockUpdate(BlockUpdateEvent event) {
+        if (spiritBearTimer.isActive() && event.newState.getBlock().equals(Blocks.SEA_LANTERN) && Utils.isInDungeonBoss("4")) {
+            if (event.pos.getX() == 7 && event.pos.getY() == 77 && event.pos.getZ() == 34) {
+                spiritBearTimer.start();
             }
         }
     }

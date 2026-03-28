@@ -9,7 +9,7 @@ import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.state.WorldRenderState;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
 import nofrills.events.WorldRenderEvent;
 import nofrills.features.general.NoRender;
 import org.joml.Matrix4f;
@@ -41,12 +41,8 @@ public abstract class WorldRendererMixin {
 
     @ModifyExpressionValue(method = "fillEntityRenderStates", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderManager;shouldRender(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/Frustum;DDD)Z"))
     private boolean onBeforeRenderEntity(boolean original, @Local Entity entity) {
-        if (NoRender.instance.isActive()) {
-            if (NoRender.deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()) return false;
-            if (NoRender.fallingBlocks.value() && entity instanceof FallingBlockEntity) return false;
-            if (NoRender.treeBits.value() && NoRender.isTreeBlock(entity)) return false;
-            if (NoRender.lightning.value() && entity instanceof LightningEntity) return false;
-            if (NoRender.expOrbs.value() && entity instanceof ExperienceOrbEntity) return false;
+        if (NoRender.instance.isActive() && NoRender.shouldCancelRender(entity)) {
+            return false;
         }
         return original;
     }

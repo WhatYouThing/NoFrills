@@ -32,7 +32,7 @@ public class WateringHelper {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (isActive() && betterVisibility.value() && isHoldingWateringCan() && event.namePlain.equals("||||||||||||||||")) {
+        if (isActive() && betterVisibility.value() && event.namePlain.equals("||||||||||||||||")) {
             event.entity.setCustomNameVisible(false);
             waterLevels.add(event.entity);
         }

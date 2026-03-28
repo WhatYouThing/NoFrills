@@ -85,8 +85,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         int height = context.getScaledWindowHeight();
-        context.drawTextWithShadow(this.textRenderer, "Left click a feature to toggle", 1, height - 20, RenderColor.white.argb);
-        context.drawTextWithShadow(this.textRenderer, "Right click a feature open its settings", 1, height - 10, RenderColor.white.argb);
+        context.drawTextWithShadow(this.textRenderer, "Left click a feature to toggle", 1, height - 30, RenderColor.white.argb);
+        context.drawTextWithShadow(this.textRenderer, "Right click a feature open its settings", 1, height - 20, RenderColor.white.argb);
+        context.drawTextWithShadow(this.textRenderer, "Scrolling supported in each category and the screen itself", 1, height - 10, RenderColor.white.argb);
     }
 
     @Override
@@ -126,12 +127,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Create Waypoints", ChatWaypoints.partyWaypoints, "Enables creating waypoints for coordinates sent by party members."),
                                 new Settings.Toggle("Clear On Arrive", ChatWaypoints.partyClear, "Automatically removes the party waypoint once you get close."),
                                 new Settings.SliderInt("Duration", 1, 600, 1, ChatWaypoints.partyDuration, "The duration (in seconds) that party waypoints should be rendered for."),
-                                new Settings.ColorPicker("Color", true, ChatWaypoints.partyColor, "The color used for the party waypoints."),
+                                new Settings.ColorPicker("Color", ChatWaypoints.partyColor, "The color used for the party waypoints."),
                                 new Settings.Separator("All Chat"),
                                 new Settings.Toggle("Create Waypoints", ChatWaypoints.allWaypoints, "Enables creating waypoints for coordinates sent by players in the all chat."),
                                 new Settings.Toggle("Clear On Arrive", ChatWaypoints.allClear, "Automatically remove the all chat waypoint once you get close."),
                                 new Settings.SliderInt("Duration", 1, 600, 1, ChatWaypoints.allDuration, "The duration (in seconds) that all chat waypoints should be rendered for."),
-                                new Settings.ColorPicker("Color", true, ChatWaypoints.allColor, "The color used for the all chat waypoints.")
+                                new Settings.ColorPicker("Color", ChatWaypoints.allColor, "The color used for the all chat waypoints.")
                         ))),
                         new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(List.of(
                                 new Settings.Separator("Sound"),
@@ -142,10 +143,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Cancel Sound", EtherwarpOverlay.cancelSound, "Prevents the intended Ether Transmission sound effect from playing."),
                                 new Settings.Separator("Highlight"),
                                 new Settings.Dropdown<>("Highlight Style", EtherwarpOverlay.highlightStyle, "The style of the highlight"),
-                                new Settings.ColorPicker("Correct Fill", true, EtherwarpOverlay.fillCorrect, "The fill color used when your Etherwarp target is considered valid."),
-                                new Settings.ColorPicker("Wrong Fill", true, EtherwarpOverlay.fillWrong, "The fill color used when your Etherwarp target is considered invalid."),
-                                new Settings.ColorPicker("Correct Outline", true, EtherwarpOverlay.outlineCorrect, "The outline color used when your Etherwarp target is considered valid."),
-                                new Settings.ColorPicker("Wrong Outline", true, EtherwarpOverlay.outlineWrong, "The outline color used when your Etherwarp target is considered invalid.")
+                                new Settings.ColorPicker("Correct Fill", EtherwarpOverlay.fillCorrect, "The fill color used when your Etherwarp target is considered valid."),
+                                new Settings.ColorPicker("Wrong Fill", EtherwarpOverlay.fillWrong, "The fill color used when your Etherwarp target is considered invalid."),
+                                new Settings.ColorPicker("Correct Outline", EtherwarpOverlay.outlineCorrect, "The outline color used when your Etherwarp target is considered valid."),
+                                new Settings.ColorPicker("Wrong Outline", EtherwarpOverlay.outlineWrong, "The outline color used when your Etherwarp target is considered invalid.")
                         ))),
                         new Module("Fullbright", Fullbright.instance, "You know him, you love him.", new Settings(List.of(
                                 new Settings.Dropdown<>("Mode", Fullbright.mode, "The lighting mode.\n\nAmbient: Increases dimension ambient light, most reliable.\nGamma: Increases the Minecraft brightness setting to a high value.\nPotion: Permanently applies the Night Vision potion effect to your player."),
@@ -166,6 +167,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Entity Fire", NoRender.entityFire, "Hides the fire effect that appears on burning mobs."),
                                 new Settings.Toggle("Mage Beam", NoRender.mageBeam, "Prevents the server from spawning the Mage Beam particles in Dungeons."),
                                 new Settings.Toggle("Ice Spray", NoRender.iceSpray, "Prevents the server from spawning the Ice Spray Wand particles."),
+                                new Settings.Toggle("Soulweaver Skulls", NoRender.soulweaverSkulls, "Hides the floating skulls that appear while wearing the Soulweaver Gloves in Dungeons."),
+                                new Settings.Toggle("Guided Sheep", NoRender.guidedSheep, "Hides the Guided Sheep Mage ability in Dungeons."),
+                                new Settings.Toggle("Bone Plating", NoRender.bonePlating, "Hides the Bone Plating Archer ability (floating bone meal item) in Dungeons."),
                                 new Settings.Toggle("Tree Bits", NoRender.treeBits, "Hides the flying wood and leaves blocks that appear when chopping trees on the Galatea."),
                                 new Settings.Toggle("Nausea", NoRender.nausea, "Prevents the nausea screen wobble and/or green overlay from rendering."),
                                 new Settings.Dropdown<>("Vignette", NoRender.vignette, "The type of vignette overlay to hide.\n\nNone: Don't hide the vignette.\nAmbient: Hides the dark vignette that appears when in darkness.\nDanger: Hides the red (world border) vignette.\nBoth: Always hides the vignette."),
@@ -225,13 +229,15 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Protect Starred", ItemProtection.protectStarred, "Protects any item with Dungeon stars on it."),
                                 new Settings.Toggle("Protect Rarity Upgraded", ItemProtection.protectRarityUpgraded, "Protects any item that is Recombobulated."),
                                 new Settings.Toggle("Protect By Value", ItemProtection.protectValue, "Protects any item that has a high enough NPC/Auction/Bazaar value."),
-                                new Settings.DoubleInput("Minimum Value", ItemProtection.protectValueMin, "The minimum item value for an item to be protected by value.")
+                                new Settings.DoubleInput("Minimum Value", ItemProtection.protectValueMin, "The minimum item value for an item to be protected by value."),
+                                new Settings.Toggle("Hide Tooltip", ItemProtection.hideTooltip, "Hides the tooltip line about items being protected. Hold Left Shift to reveal the line.")
                         ))),
                         new Module("Info Tooltips", InfoTooltips.instance, "Adds various information about an item to its tooltip.", new Settings(List.of(
                                 new Settings.Toggle("Dungeon Quality", InfoTooltips.dungeonQuality, "Displays the quality and the floor tier on applicable dungeon items."),
                                 new Settings.Toggle("Created Date", InfoTooltips.createdDate, "Displays the exact date at which an item was created."),
                                 new Settings.Toggle("Hex Color", InfoTooltips.hexColor, "Displays the color of an item. Only applies to armor pieces that use leather armor as their base."),
-                                new Settings.Toggle("Museum Donated", InfoTooltips.museumDonated, "Displays if the item has been donated to the Museum.")
+                                new Settings.Toggle("Museum Donated", InfoTooltips.museumDonated, "Displays if the item has been donated to the Museum."),
+                                new Settings.Toggle("Item ID", InfoTooltips.skyblockId, "Displays the Skyblock ID of an item.\nNote: Items with generic IDs (pets, potions etc.) will display a dynamically generated ID.")
                         ))),
                         new Module("Skill Tracker", SkillTracker.instance, "Tracks the experience you gain for specific skills, similarly to SBE on 1.8.9.\nThis feature will be inaccurate if your tracked skills are not maxed (Catacombs excluded).", SkillTracker.buildSettings()),
                         new Module("Command Shortcuts", CommandShortcuts.instance, "Create shortcuts which send a specific message/command when ran.\nNote: A lobby change is required to fully apply the changes made to the shortcuts.", CommandShortcuts.buildSettings())
@@ -240,7 +246,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands.", new Settings(List.of(
                                 new Settings.Toggle("Server Only", NoLoadingScreen.serverOnly, "Only prevent loading screens while connected to a third party server.")
                         ))),
-                        new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother."),
+                        new Module("Middle Click Override", MiddleClickOverride.instance, "Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother.", new Settings(
+                                new Settings.Toggle("Debug", MiddleClickOverride.debug, "Outputs a chat message once a click is successfully replaced.")
+                        )),
                         new Module("No Front Perspective", NoFrontPerspective.instance, "Removes the front facing camera perspective."),
                         new Module("Item Count Fix", ItemCountFix.instance, "Prevents the game from hiding item counts for unstackable items."),
                         new Module("Middle Click Fix", MiddleClickFix.instance, "Allows the middle mouse button to work just as it does on 1.8.9."),
@@ -265,7 +273,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Cursor Reset", NoCursorReset.instance, "Retains your cursor position between container screens.", new Settings(List.of(
                                 new Settings.SliderInt("Clear Time", 0, 1200, 5, NoCursorReset.clearTicks, "The amount of ticks until your last cursor position is forgotten. Set to 0 to always remember.")
                         ))),
-                        new Module("Instant Sneak", InstantSneak.instance, "Removes the smooth sneaking/swimming animation.")
+                        new Module("Instant Sneak", InstantSneak.instance, "Removes the smooth sneaking/swimming animation."),
+                        new Module("Eye Height Fix", EyeHeightFix.instance, "Visually reverts the sneaking eye height on islands without modern version support.", new Settings(
+                                new Settings.Toggle("Skyblock Only", EyeHeightFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
+                                new Settings.Toggle("Old Island Only", EyeHeightFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
+                        )),
+                        new Module("No Ability Place", NoAbilityPlace.instance, "Prevents ghost blocks from appearing when using block items with right click abilities.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(
@@ -318,25 +331,28 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))
                 )),
                 new Category("Solvers", List.of(
-                        new Module("Experimentation Table", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
+                        new Module("Experiment Solver", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(
                                 new Settings.Toggle("Chronomatron", ExperimentSolver.chronomatron, "Reveals the solution in Chronomatron."),
                                 new Settings.Toggle("Ultrasequencer", ExperimentSolver.ultrasequencer, "Reveals the solution in Ultrasequencer."),
-                                new Settings.Toggle("Superpairs", ExperimentSolver.superpairs, "Reveals uncovered rewards in Superpairs and highlights matchable/matched pairs.")
+                                new Settings.Toggle("Superpairs", ExperimentSolver.superpairs, "Reveals uncovered rewards in Superpairs and highlights matchable/matched pairs."),
+                                new Settings.ColorPicker("Superpairs Matched", ExperimentSolver.superColorMatched, "The color of the matched pair highlight in Superpairs."),
+                                new Settings.ColorPicker("Superpairs Matchable", ExperimentSolver.superColorMatch, "The color of the matchable pair highlight in Superpairs."),
+                                new Settings.ColorPicker("Superpairs Powerup", ExperimentSolver.superColorPowerup, "The color of the powerup highlight in Superpairs.")
                         ))),
                         new Module("Calendar Date", CalendarDate.instance, "Calculates the exact starting dates of events in the calendar."),
                         new Module("Spooky Chests", SpookyChests.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(
                                 new Settings.Toggle("Chest Tracer", SpookyChests.tracer, "Draws tracers towards unopened trick or treat chests."),
-                                new Settings.ColorPicker("Color", true, SpookyChests.color, "The color of the spooky chest highlight.")
+                                new Settings.ColorPicker("Color", SpookyChests.color, "The color of the spooky chest highlight.")
                         ))),
                         new Module("Diana Solver", DianaSolver.instance, "Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.", new Settings(List.of(
                                 new Settings.Separator("Burrows"),
                                 new Settings.Dropdown<>("Guess Mode", DianaSolver.guessMode, "Which spade particle to use for calculating the burrow position.\nThis option shouldn't have any difference in most cases."),
                                 new Settings.Toggle("Guess Tracer", DianaSolver.guessTracer, "Draws a tracer towards the guessed burrow."),
-                                new Settings.ColorPicker("Tracer Color", true, DianaSolver.guessTracerColor, "The color of the guessed burrow tracer."),
-                                new Settings.ColorPicker("Guess Color", true, DianaSolver.guessColor, "The color of the guessed burrow beacon."),
-                                new Settings.ColorPicker("Treasure Color", true, DianaSolver.treasureColor, "The color of the treasure burrow beacon."),
-                                new Settings.ColorPicker("Enemy Color", true, DianaSolver.enemyColor, "The color of the enemy burrow beacon."),
-                                new Settings.ColorPicker("Start Color", true, DianaSolver.startColor, "The color of the start burrow beacon."),
+                                new Settings.ColorPicker("Tracer Color", DianaSolver.guessTracerColor, "The color of the guessed burrow tracer."),
+                                new Settings.ColorPicker("Guess Color", DianaSolver.guessColor, "The color of the guessed burrow beacon."),
+                                new Settings.ColorPicker("Treasure Color", DianaSolver.treasureColor, "The color of the treasure burrow beacon."),
+                                new Settings.ColorPicker("Enemy Color", DianaSolver.enemyColor, "The color of the enemy burrow beacon."),
+                                new Settings.ColorPicker("Start Color", DianaSolver.startColor, "The color of the start burrow beacon."),
                                 new Settings.Separator("Warps"),
                                 new Settings.Keybind("Warp Keybind", DianaSolver.warpKey, "The keybind to warp to the location closest to the guessed burrow."),
                                 new Settings.Toggle("Warp Message", DianaSolver.warpMsg, "Shows a message in chat with the location name if the closest warp is successful."),
@@ -350,12 +366,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Hoppity Solver", HoppitySolver.instance, "Guesses Hoppity egg positions when using your Egglocator.", new Settings(List.of(
                                 new Settings.Toggle("Tracer", HoppitySolver.tracer, "Draws a tracer towards the guess."),
-                                new Settings.ColorPicker("Color", true, HoppitySolver.color, "The color of the guess highlight."),
-                                new Settings.ColorPicker("Tracer Color", true, HoppitySolver.tracerColor, "The color of the guess tracer.")
+                                new Settings.ColorPicker("Color", HoppitySolver.color, "The color of the guess highlight."),
+                                new Settings.ColorPicker("Tracer Color", HoppitySolver.tracerColor, "The color of the guess tracer.")
                         ))),
                         new Module("Moonglade Beacon", BeaconTuningSolver.instance, "Solves the beacon tuning mini-game on Galatea."),
                         new Module("Anvil Helper", AnvilHelper.instance, "Highlights the enchanted books which you can safely combine while using the anvil.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, AnvilHelper.color, "The color of the highlight.")
+                                new Settings.ColorPicker("Color", AnvilHelper.color, "The color of the highlight.")
                         )))
                 )),
                 new Category("Fishing", List.of(
@@ -368,8 +384,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Kill Delay", 5, 120, 1, CapTracker.delay, "The delay (in seconds) until the cap starts being tracked again after it is reached.")
                         ))),
                         new Module("Mute Drake", MuteDrake.instance, "Prevents the Reindrake from blowing up your ears with gifts."),
-                        new Module("Rare Glow", RareGlow.instance, "Applies a glow effect to nearby rare/profitable sea creatures.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", false, RareGlow.color, "The color of the glow.")
+                        new Module("Rare Highlight", RareHighlight.instance, "Highlights rare/profitable sea creatures.", new Settings(List.of(
+                                new Settings.Dropdown<>("Highlight Style", RareHighlight.style, "The style of the highlight."),
+                                new Settings.ColorPicker("Outline Color", RareHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", RareHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
                         new Module("Rare Alert", RareAnnounce.instance, "Alerts you, and/or your party when you catch a rare sea creature.", new Settings(List.of(
                                 new Settings.Toggle("Show Title", RareAnnounce.title, "Shows a title on screen with the name of the sea creature."),
@@ -380,16 +398,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Radar Solver", RadarSolver.instance, "Guesses Fishing Hotspot positions when using your Hotspot Radar.", new Settings(List.of(
                                 new Settings.Toggle("Tracer", RadarSolver.tracer, "Draws a tracer towards the guess."),
-                                new Settings.ColorPicker("Color", true, RadarSolver.color, "The color of the guess highlight."),
-                                new Settings.ColorPicker("Tracer Color", true, RadarSolver.tracerColor, "The color of the guess tracer.")
+                                new Settings.ColorPicker("Color", RadarSolver.color, "The color of the guess highlight."),
+                                new Settings.ColorPicker("Tracer Color", RadarSolver.tracerColor, "The color of the guess tracer.")
                         )))
                 )),
                 new Category("Hunting", List.of(
                         new Module("Invisibug Highlight", InvisibugHighlight.instance, "Highlights nearby Invisibugs on the Galatea.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, InvisibugHighlight.color, "The color of the Invisibug highlight.")
+                                new Settings.ColorPicker("Color", InvisibugHighlight.color, "The color of the Invisibug highlight.")
                         ))),
                         new Module("Cinderbat Highlight", CinderbatHighlight.instance, "Highlights the annoying bats on the Crimson Isle.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, CinderbatHighlight.color, "The color of the Cinderbat highlight.")
+                                new Settings.ColorPicker("Color", CinderbatHighlight.color, "The color of the Cinderbat highlight.")
                         ))),
                         new Module("Fusion Keybinds", FusionKeybinds.instance, "Adds handy keybinds to the Fusion Machine.", new Settings(List.of(
                                 new Settings.Keybind("Repeat Previous", FusionKeybinds.repeat, "The keybind to repeat the previous fusion."),
@@ -405,42 +423,41 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(
                                 new Settings.Separator("Sharpshooter"),
                                 new Settings.Toggle("Solve Sharpshooter", DeviceSolvers.sharpshooter, "Highlights the active and the hit targets while doing the 4th device."),
-                                new Settings.ColorPicker("Target Color", true, DeviceSolvers.sharpTargetColor, "The color of the active target block."),
-                                new Settings.ColorPicker("Hit Color", true, DeviceSolvers.sharpHitColor, "The color of the hit target blocks."),
+                                new Settings.ColorPicker("Target Color", DeviceSolvers.sharpTargetColor, "The color of the active target block."),
+                                new Settings.ColorPicker("Hit Color", DeviceSolvers.sharpHitColor, "The color of the hit target blocks."),
                                 new Settings.Separator("Arrow Align"),
                                 new Settings.Toggle("Solve Arrow Align", DeviceSolvers.arrowAlign, "Shows the amount of needed clicks while doing the 3rd device."),
                                 new Settings.Toggle("Block Wrong Clicks", DeviceSolvers.alignBlockWrong, "Prevents you from rotating the arrows that already have the correct rotation."),
                                 new Settings.Toggle("Inverted Block", DeviceSolvers.alignBlockInvert, "Prevents wrong rotations only while sneaking instead of only while not sneaking.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, StarredMobHighlight.color, "The color of the starred mob highlight.")
+                                new Settings.Dropdown<>("Highlight Style", StarredMobHighlight.style, "The style of the starred mob highlight."),
+                                new Settings.ColorPicker("Outline Color", StarredMobHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", StarredMobHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
                         new Module("Miniboss Highlight", MinibossHighlight.instance, "Highlights minibosses.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, MinibossHighlight.color, "The color of the miniboss highlight.")
+                                new Settings.Dropdown<>("Highlight Style", MinibossHighlight.style, "The style of the miniboss highlight."),
+                                new Settings.ColorPicker("Outline Color", MinibossHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", MinibossHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
                         new Module("Key Highlight", KeyHighlight.instance, "Highlights nearby Wither and Blood keys.", new Settings(List.of(
                                 new Settings.Toggle("Highlight", KeyHighlight.highlight, "Renders a highlight + beam on top of Wither Keys."),
                                 new Settings.Toggle("Tracer", KeyHighlight.tracer, "Renders a tracer towards the Wither Key."),
-                                new Settings.ColorPicker("Highlight Color", true, KeyHighlight.color, "The color of the highlight."),
-                                new Settings.ColorPicker("Tracer Color", true, KeyHighlight.tracerColor, "The color of the tracer.")
+                                new Settings.ColorPicker("Highlight Color", KeyHighlight.color, "The color of the highlight."),
+                                new Settings.ColorPicker("Tracer Color", KeyHighlight.tracerColor, "The color of the tracer.")
                         ))),
                         new Module("Spirit Bow Highlight", SpiritBowHighlight.instance, "Highlights the Spirit Bow in the F4/M4 boss fight.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")
-                        ))),
-                        new Module("Reminders", DungeonReminders.instance, "Various class specific Dungeons reminders.", new Settings(List.of(
-                                new Settings.Toggle("Wish", DungeonReminders.wish, "Reminds you to wish as Healer when Maxor enrages in F7/M7."),
-                                new Settings.Toggle("Blood Camp", DungeonReminders.bloodCamp, "Reminds you to start camping the blood room as Mage."),
-                                new Settings.Toggle("M5 Rag", DungeonReminders.rag, "Reminds you to use your Ragnarock in the M5 boss room as Mage.")
+                                new Settings.ColorPicker("Color", SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")
                         ))),
                         new Module("Leap Overlay", LeapOverlay.instance, "Renders a custom overlay in place of the Spirit Leap menu.", new Settings(List.of(
                                 new Settings.Toggle("Send Message", LeapOverlay.send, "Sends a message once you leap to a teammate."),
                                 new Settings.TextInput("Leap Message", LeapOverlay.message, "The message to send. Replaces {name} with the name of the player."),
                                 new Settings.SliderDouble("Text Scale", 1.0, 4.0, 1.0, LeapOverlay.scale, "The scale of the text on the overlay."),
-                                new Settings.ColorPicker("Healer Color", false, LeapOverlay.healer, "The color used for Healer on the overlay."),
-                                new Settings.ColorPicker("Mage Color", false, LeapOverlay.mage, "The color used for Mage on the overlay."),
-                                new Settings.ColorPicker("Bers Color", false, LeapOverlay.bers, "The color used for Berserker on the overlay."),
-                                new Settings.ColorPicker("Arch Color", false, LeapOverlay.arch, "The color used for Archer on the overlay."),
-                                new Settings.ColorPicker("Tank Color", false, LeapOverlay.tank, "The color used for Tank on the overlay.")
+                                new Settings.ColorPicker("Healer Color", LeapOverlay.healer, "The color used for Healer on the overlay."),
+                                new Settings.ColorPicker("Mage Color", LeapOverlay.mage, "The color used for Mage on the overlay."),
+                                new Settings.ColorPicker("Bers Color", LeapOverlay.bers, "The color used for Berserker on the overlay."),
+                                new Settings.ColorPicker("Arch Color", LeapOverlay.arch, "The color used for Archer on the overlay."),
+                                new Settings.ColorPicker("Tank Color", LeapOverlay.tank, "The color used for Tank on the overlay.")
                         ))),
                         new Module("Terminal Solvers", TerminalSolvers.instance, "Solves terminals and prevents wrong clicks in F7/M7. Also hides item tooltips in every terminal.", new Settings(List.of(
                                 new Settings.Toggle("Solve Panes", TerminalSolvers.panes, "Solves the \"Correct all panes\" terminal."),
@@ -450,14 +467,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.\nAlso displays timers for the 1st Gyro and Sadan's last giant, useful if you are Mage.", new Settings(List.of(
-                                new Settings.Toggle("Mage Check", TerracottaTimer.mageCheck, "If enabled, prevents the 1st Gyro and last giant timers from appearing if you are not Mage."),
-                                new Settings.ColorPicker("Text Color", true, TerracottaTimer.color, "The color of the timer text.")
+                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text."),
+                                new Settings.ColorPicker("Text Color", TerracottaTimer.color, "The color of the timer text.")
                         ))),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(
                                 new Settings.Toggle("Spawn Alert", WitherDragons.alert, "Alerts you when a dragon is about to spawn.\nThis option also calculates the priority on the initial spawn based on your selected class."),
                                 new Settings.SliderDouble("Split Power", 0, 32, 0.1, WitherDragons.power, "The required Power blessing level to consider a split possible.\nLeaving this option at 0 is recommended for party finder teams."),
                                 new Settings.SliderDouble("Easy Power", 0, 32, 0.1, WitherDragons.powerEasy, "The required Power blessing level to consider a split possible, as long as one of the dragons is Purple."),
-                                new Settings.Toggle("Dragon Glow", WitherDragons.glow, "Applies a glow effect to each dragon."),
                                 new Settings.Toggle("Kill Areas", WitherDragons.boxes, "Renders the kill areas of every alive dragon."),
                                 new Settings.Toggle("Tracers", WitherDragons.tracers, "Draws tracer lines to spawning dragons."),
                                 new Settings.Toggle("Stack Waypoints", WitherDragons.stack, "Renders waypoints for stacking your Last Breath arrows."),
@@ -465,15 +481,19 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Spawn Timer", WitherDragons.timer, "Renders timers for exactly when a dragon should finish spawning."),
                                 new Settings.Toggle("Dragon Health", WitherDragons.health, "Renders the exact health of the dragons.")
                         ))),
-                        new Module("Secret Bat Highlight", SecretBatHighlight.instance, "Applies a glow effect to secret bats.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", false, SecretBatHighlight.color, "The color of the secret bat glow.")
+                        new Module("Secret Bat Highlight", SecretBatHighlight.instance, "Highlights secret bats.", new Settings(List.of(
+                                new Settings.Dropdown<>("Highlight Style", SecretBatHighlight.style, "The style of the highlight."),
+                                new Settings.ColorPicker("Outline Color", SecretBatHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", SecretBatHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
                         new Module("Livid Solver", LividSolver.instance, "Finds and highlights the correct Livid in F5/M5.", new Settings(List.of(
                                 new Settings.Toggle("Title", LividSolver.title, "Show a title on screen once the Livid color is identified."),
                                 new Settings.Toggle("Highlight", LividSolver.highlight, "Renders an outline for the correct Livid."),
                                 new Settings.Toggle("Tracer", LividSolver.tracer, "Renders a tracer towards the correct Livid."),
-                                new Settings.ColorPicker("Highlight Color", true, LividSolver.color, "The color of the outline."),
-                                new Settings.ColorPicker("Tracer Color", true, LividSolver.tracerColor, "The color of the tracer.")
+                                new Settings.Dropdown<>("Highlight Style", LividSolver.style, "The style of the correct Livid highlight."),
+                                new Settings.ColorPicker("Outline Color", LividSolver.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", LividSolver.fillColor, "The color of the fill style highlight."),
+                                new Settings.ColorPicker("Tracer Color", LividSolver.tracerColor, "The color of the tracer.")
                         ))),
                         new Module("Prince Message", PrinceMessage.instance, "Sends a message when you gain bonus score from the Prince Shard.", new Settings(List.of(
                                 new Settings.TextInput("Message", PrinceMessage.msg, "The message to send.")
@@ -481,7 +501,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Mimic Message", MimicMessage.instance, "Sends a message once you kill the Mimic. Should work even if it's instantly killed.", new Settings(List.of(
                                 new Settings.TextInput("Message", MimicMessage.msg, "The message to send.")
                         ))),
-                        new Module("Spirit Bear Timer", SpiritBearTimer.instance, "Renders a timer on screen for when the Spirit Bear is going to spawn in F4/M4."),
                         new Module("Secret Chime", SecretChime.instance, "Plays sounds upon collecting specific secrets.", new Settings(List.of(
                                 new Settings.Toggle("Items", SecretChime.itemsToggle, "Play a chime upon picking up a secret item."),
                                 new Settings.TextInput("Items Sound", SecretChime.itemsSound, "The identifier of the sound to play."),
@@ -511,16 +530,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Quick Close", QuickClose.instance, "Quickly close Dungeon secret and/or loot chests by pressing any of the movement keys (WASD)."),
                         new Module("Chest Value", DungeonChestValue.instance, "Calculates the value of your Dungeons loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
-                                new Settings.ColorPicker("Background", true, DungeonChestValue.background, "The color of the background of the value text.")
+                                new Settings.ColorPicker("Background", DungeonChestValue.background, "The color of the background of the value text.")
                         ))),
                         new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
                         new Module("Class Nametags", ClassNametags.instance, "Renders large nametags for your teammates, indicating their selected class and position.", new Settings(List.of(
                                 new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, ClassNametags.scale, "The scale of the text."),
-                                new Settings.ColorPicker("Healer Color", false, ClassNametags.healer, "The text color for Healer."),
-                                new Settings.ColorPicker("Mage Color", false, ClassNametags.mage, "The text color for Mage."),
-                                new Settings.ColorPicker("Bers Color", false, ClassNametags.bers, "The text color for Berserker."),
-                                new Settings.ColorPicker("Arch Color", false, ClassNametags.arch, "The text color for Archer."),
-                                new Settings.ColorPicker("Tank Color", false, ClassNametags.tank, "The text color for Tank.")
+                                new Settings.ColorPicker("Healer Color", ClassNametags.healer, "The text color for Healer."),
+                                new Settings.ColorPicker("Mage Color", ClassNametags.mage, "The text color for Mage."),
+                                new Settings.ColorPicker("Bers Color", ClassNametags.bers, "The text color for Berserker."),
+                                new Settings.ColorPicker("Arch Color", ClassNametags.arch, "The text color for Archer."),
+                                new Settings.ColorPicker("Tank Color", ClassNametags.tank, "The text color for Tank.")
                         ))),
                         new Module("Score Calculator", ScoreCalculator.instance, "Calculates the score in your dungeon runs.", new Settings(List.of(
                                 new Settings.Dropdown<>("Paul State", ScoreCalculator.paulState, "Allows you to force the state of Paul's EZPZ perk.\nSet to Auto to automatically check for EZPZ through the NoFrills API."),
@@ -533,7 +552,18 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 (S+) score."),
                                 new Settings.TextInput("300 Title", ScoreCalculator.title300, "The title to show when 300 (S+) score is reached.")
                         ))),
-                        new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 platform area which you mine as Healer in F7/M7 after terminal phase.")
+                        new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 platform area which you mine as Healer in F7/M7 after terminal phase."),
+                        new Module("Croesus Solver", CroesusSolver.instance, "Highlights unopened loot and the most profitable chests in the Croesus.\nRequires connectivity to the NoFrills API.", new Settings(
+                                new Settings.ColorPicker("Profit Color", CroesusSolver.profitColor, "The highlight color for the most profitable chest."),
+                                new Settings.ColorPicker("Secondary Profit Color", CroesusSolver.profitSecondaryColor, "The highlight color for the 2nd most profitable chest."),
+                                new Settings.ColorPicker("Key Profit Color", CroesusSolver.profitKeyColor, "The highlight color for the 2nd most profitable chest if using a Dungeon Chest Key is worth it."),
+                                new Settings.ColorPicker("Unopened Color", CroesusSolver.unopenedColor, "The highlight color for unopened loot."),
+                                new Settings.ColorPicker("Rerolled Color", CroesusSolver.rerolledColor, "The highlight color for unopened loot that is already rerolled."),
+                                new Settings.ColorPicker("Opened Color", CroesusSolver.openedColor, "The highlight color for opened loot."),
+                                new Settings.ColorPicker("Key Opened Color", CroesusSolver.openedKeyColor, "The highlight color for fully opened loot using a Dungeon Chest Key."),
+                                new Settings.Toggle("Value Tooltip", CroesusSolver.valueTooltip, "Displays the value of individual chests in the tooltip."),
+                                new Settings.Toggle("Floor Label", CroesusSolver.floorLabel, "Adds labels which indicate the floor the loot was obtained on.")
+                        ))
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(
@@ -545,45 +575,45 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.TextInput("Message", FreshTimer.message, "The message to send.")
                         ))),
                         new Module("Kuudra Hitbox", KuudraHitbox.instance, "Renders a hitbox for Kuudra.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, KuudraHitbox.color, "The color of the hitbox.")
+                                new Settings.ColorPicker("Color", KuudraHitbox.color, "The color of the hitbox.")
                         ))),
                         new Module("Waypoints", KuudraWaypoints.instance, "Renders various waypoints in Kuudra.", new Settings(List.of(
                                 new Settings.Toggle("Supplies", KuudraWaypoints.supply, "Renders beacons for every supply crate."),
-                                new Settings.ColorPicker("Supply Color", true, KuudraWaypoints.supplyColor, "The color of the supply crate beacons."),
+                                new Settings.ColorPicker("Supply Color", KuudraWaypoints.supplyColor, "The color of the supply crate beacons."),
                                 new Settings.Toggle("Drop-offs", KuudraWaypoints.drop, "Renders beacons for every available supply drop-off point."),
-                                new Settings.ColorPicker("Drop-off Color", true, KuudraWaypoints.dropColor, "The color of the drop-off beacons."),
+                                new Settings.ColorPicker("Drop-off Color", KuudraWaypoints.dropColor, "The color of the drop-off beacons."),
                                 new Settings.Toggle("Build Piles", KuudraWaypoints.build, "Renders beacons for every unfinished Ballista build pile."),
-                                new Settings.ColorPicker("Piles Color", true, KuudraWaypoints.buildColor, "The color of the build pile beacons.")
+                                new Settings.ColorPicker("Piles Color", KuudraWaypoints.buildColor, "The color of the build pile beacons.")
                         ))),
                         new Module("Pre Message", PreMessage.instance, "Announces if no supply spawns at your pre spot (or your next pickup spot)."),
                         new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop."),
                         new Module("Chest Value", KuudraChestValue.instance, "Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
                                 new Settings.SliderInt("Pet Bonus", 0, 20, 1, KuudraChestValue.petBonus, "The extra Crimson Essence percentage granted by your Kuudra pet.\nUsed to calculate the value of the essence with the extra perk included."),
                                 new Settings.Toggle("Use Salvage Value", KuudraChestValue.salvageValue, "Prices armor and equipment pieces based on the amount of essence gained from salvaging them.\nCan give a more accurate chest value compared to the default Lowest BIN value."),
-                                new Settings.ColorPicker("Background", true, KuudraChestValue.background, "The color of the background of the value text.")
+                                new Settings.ColorPicker("Background", KuudraChestValue.background, "The color of the background of the value text.")
                         ))),
                         new Module("Crate Priority", CratePriority.instance, "Shows which crates to pull and/or grab after you collect your Pre.\nThis feature requires the full party to be using some kind of Pre message feature.")
                 )),
                 new Category("Slayer", List.of(
                         new Module("Boss Highlight", BossHighlight.instance, "Highlights your slayer boss.", new Settings(List.of(
-                                new Settings.ColorPicker("Fill Color", true, BossHighlight.fillColor, "The color of the filled box highlight (if applicable)."),
-                                new Settings.ColorPicker("Outline Color", true, BossHighlight.outlineColor, "The color of the outline box highlight (if applicable)."),
+                                new Settings.ColorPicker("Fill Color", BossHighlight.fillColor, "The color of the filled box highlight (if applicable)."),
+                                new Settings.ColorPicker("Outline Color", BossHighlight.outlineColor, "The color of the outline box highlight (if applicable)."),
                                 new Settings.Dropdown<>("Highlight Style", BossHighlight.highlightStyle, "The style of the highlight."),
                                 new Settings.Separator("Inferno Demonlord"),
-                                new Settings.ColorPicker("Ashen Fill", true, BossHighlight.ashenFill, "The color of the filled box if your boss is using the Ashen attunement."),
-                                new Settings.ColorPicker("Ashen Outline", true, BossHighlight.ashenOutline, "The color of the outline box if your boss is using the Ashen attunement."),
-                                new Settings.ColorPicker("Spirit Fill", true, BossHighlight.spiritFill, "The color of the filled box if your boss is using the Spirit attunement."),
-                                new Settings.ColorPicker("Spirit Outline", true, BossHighlight.spiritOutline, "The color of the outline if your boss is using the Spirit attunement."),
-                                new Settings.ColorPicker("Auric Fill", true, BossHighlight.auricFill, "The color of the filled box if your boss is using the Auric attunement."),
-                                new Settings.ColorPicker("Auric Outline", true, BossHighlight.auricOutline, "The color of the outline box if your boss is using the Auric attunement."),
-                                new Settings.ColorPicker("Crystal Fill", true, BossHighlight.crystalFill, "The color of the filled box if your boss is using the Crystal attunement."),
-                                new Settings.ColorPicker("Crystal Outline", true, BossHighlight.crystalOutline, "The color of the outline box if your boss is using the Crystal attunement.")
+                                new Settings.ColorPicker("Ashen Fill", BossHighlight.ashenFill, "The color of the filled box if your boss is using the Ashen attunement."),
+                                new Settings.ColorPicker("Ashen Outline", BossHighlight.ashenOutline, "The color of the outline box if your boss is using the Ashen attunement."),
+                                new Settings.ColorPicker("Spirit Fill", BossHighlight.spiritFill, "The color of the filled box if your boss is using the Spirit attunement."),
+                                new Settings.ColorPicker("Spirit Outline", BossHighlight.spiritOutline, "The color of the outline if your boss is using the Spirit attunement."),
+                                new Settings.ColorPicker("Auric Fill", BossHighlight.auricFill, "The color of the filled box if your boss is using the Auric attunement."),
+                                new Settings.ColorPicker("Auric Outline", BossHighlight.auricOutline, "The color of the outline box if your boss is using the Auric attunement."),
+                                new Settings.ColorPicker("Crystal Fill", BossHighlight.crystalFill, "The color of the filled box if your boss is using the Crystal attunement."),
+                                new Settings.ColorPicker("Crystal Outline", BossHighlight.crystalOutline, "The color of the outline box if your boss is using the Crystal attunement.")
                         ))),
                         new Module("Pillar Alert", PillarAlert.instance, "Alerts you when your Blaze boss spawns a fire pillar.\nThis feature tries to prevent false flags by tracking the \"path\" that the pillars take."),
                         new Module("No Attunement Spam", NoAttunementSpam.instance, "Filters the chat messages about using the wrong attunement on the Blaze boss."),
                         new Module("Kill Timer", KillTimer.instance, "Tracks how long your slayer boss took to kill."),
                         new Module("Chalice Highlight", ChaliceHighlight.instance, "Highlights the Blood Ichor chalices spawned by the T5 Vampire.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, ChaliceHighlight.color, "The color of the chalice highlight.")
+                                new Settings.ColorPicker("Color", ChaliceHighlight.color, "The color of the chalice highlight.")
                         ))),
                         new Module("Ice Alert", IceAlert.instance, "Shows a timer for when your Vampire boss is going to cast Twinclaws."),
                         new Module("Stake Alert", StakeAlert.instance, "Shows text on screen once you can vanquish your Vampire boss with the Steak Stake."),
@@ -592,11 +622,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Killer Springs", MuteVampire.springs, "Mutes the Wither sound spam that occurs when your boss spawns a Killer Spring.")
                         ))),
                         new Module("Egg Hits Display", EggHitsDisplay.instance, "Renders the needed hits for the Tarantula Broodfather egg sack phase.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, EggHitsDisplay.color, "The color of the text."),
+                                new Settings.ColorPicker("Color", EggHitsDisplay.color, "The color of the text."),
                                 new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, EggHitsDisplay.scale, "The scale of the text.")
                         ))),
                         new Module("Beacon Tracer", BeaconTracer.instance, "Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, BeaconTracer.color, "The color of the tracer.")
+                                new Settings.ColorPicker("Color", BeaconTracer.color, "The color of the tracer.")
                         ))),
                         new Module("Mute Enderman", MuteEnderman.instance, "Prevents the angry Enderman sounds from playing."),
                         new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt."),
@@ -608,24 +638,32 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
                                 new Settings.Toggle("Hide Opened", CorpseHighlight.hideOpened, "Removes the highlight from corpses you've already opened."),
-                                new Settings.ColorPicker("Lapis Color", false, CorpseHighlight.lapisColor, "The color of the Lapis corpse."),
-                                new Settings.ColorPicker("Mineral Color", false, CorpseHighlight.mineralColor, "The color of the Tungsten corpse."),
-                                new Settings.ColorPicker("Yog Color", false, CorpseHighlight.yogColor, "The color of the Umber corpse."),
-                                new Settings.ColorPicker("Vanguard Color", false, CorpseHighlight.vanguardColor, "The color of the Vanguard corpse.")
+                                new Settings.Dropdown<>("Highlight Style", CorpseHighlight.style, "The style of the corpse highlight."),
+                                new Settings.ColorPicker("Lapis Outline", CorpseHighlight.lapisOutline, "The color of the Lapis corpse outline style highlight."),
+                                new Settings.ColorPicker("Lapis Fill", CorpseHighlight.lapisFill, "The color of the Lapis corpse fill style highlight."),
+                                new Settings.ColorPicker("Tungsten Outline", CorpseHighlight.mineralOutline, "The color of the Tungsten corpse outline style highlight."),
+                                new Settings.ColorPicker("Tungsten Fill", CorpseHighlight.mineralFill, "The color of the Tungsten corpse fill style highlight."),
+                                new Settings.ColorPicker("Umber Outline", CorpseHighlight.yogOutline, "The color of the Umber corpse outline style highlight."),
+                                new Settings.ColorPicker("Umber Fill", CorpseHighlight.yogFill, "The color of the Umber corpse fill style highlight."),
+                                new Settings.ColorPicker("Vanguard Outline", CorpseHighlight.vanguardOutline, "The color of the Vanguard corpse outline style highlight."),
+                                new Settings.ColorPicker("Vanguard Fill", CorpseHighlight.vanguardFill, "The color of the Vanguard corpse fill style highlight.")
                         ))),
                         new Module("Ghost Vision", GhostVision.instance, "Makes Ghosts easier to see in the Dwarven Mines.", new Settings(List.of(
-                                new Settings.ColorPicker("Fill Color", true, GhostVision.fill, "The color of the filled box over each Ghost."),
-                                new Settings.ColorPicker("Outline Color", true, GhostVision.outline, "The color of the outline box over each Ghost.")
+                                new Settings.Dropdown<>("Highlight Style", GhostVision.style, "The style of the highlight."),
+                                new Settings.ColorPicker("Fill Color", GhostVision.fill, "The color of the filled box over each Ghost."),
+                                new Settings.ColorPicker("Outline Color", GhostVision.outline, "The color of the outline box over each Ghost.")
                         ))),
                         new Module("Scatha Mining", ScathaMining.instance, "Scatha mining features.", new Settings(List.of(
                                 new Settings.Toggle("Spawn Alert", ScathaMining.alert, "Alerts you when a Worm/Scatha spawns nearby."),
                                 new Settings.Toggle("Cooldown", ScathaMining.cooldown, "Tracks the Worm spawn cooldown for you.")
                         ))),
-                        new Module("End Node Highlight", EndNodeHighlight.instance, "Highlights Ender Nodes.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, EndNodeHighlight.color, "The color of the node highlight.")
+                        new Module("End Node Highlight", EndNodeHighlight.instance, "Highlights End Nodes.", new Settings(List.of(
+                                new Settings.Dropdown<>("Highlight Style", EndNodeHighlight.style, "The style of the highlight."),
+                                new Settings.ColorPicker("Outline Color", EndNodeHighlight.outlineColor, "The color of the outline style highlight."),
+                                new Settings.ColorPicker("Fill Color", EndNodeHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
-                        new Module("Temple Skip", TempleSkip.instance, "Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, TempleSkip.color, "The color of the skip highlight.")
+                        new Module("Temple Skip", TempleSkip.instance, "Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.\n\nUsage:\n1. Stand on top of the highlighted stone block.\n2. Look straight up at the highlighted bedrock and throw 2 Ender Pearls by holding right click.\n3. Hold jump to enter the temple after you get teleported into the bedrock.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", TempleSkip.color, "The color of the skip highlight.")
                         ))),
                         new Module("Gemstone Desync Fix", GemstoneDesyncFix.instance, "Fixes adjacent gemstone blocks not correctly updating when mining."),
                         new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress, also known as HSM."),
@@ -636,25 +674,29 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 new Category("Farming", List.of(
                         new Module("Space Farmer", SpaceFarmer.instance, "Allows you to farm by holding space bar, sneak and press space to activate.\nThis feature will also lock your view once you start holding space."),
                         new Module("Glowing Mushrooms", GlowingMushroom.instance, "Highlights Glowing Mushrooms.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", true, GlowingMushroom.color, "The color of the highlight.")
+                                new Settings.ColorPicker("Color", GlowingMushroom.color, "The color of the highlight.")
                         ))),
                         new Module("Plot Borders", PlotBorders.instance, "Renders borders for plots.", new Settings(List.of(
                                 new Settings.Toggle("Infested Plots", PlotBorders.infested, "Adds borders to plots with pests in them."),
-                                new Settings.ColorPicker("Infested Color", true, PlotBorders.infestedColor, "The color of the infested plot border."),
+                                new Settings.ColorPicker("Infested Color", PlotBorders.infestedColor, "The color of the infested plot border."),
                                 new Settings.Toggle("Current Plot", PlotBorders.current, "Adds a border to the plot you are in."),
-                                new Settings.ColorPicker("Current Color", true, PlotBorders.currentColor, "The color of the current plot border."),
+                                new Settings.ColorPicker("Current Color", PlotBorders.currentColor, "The color of the current plot border."),
                                 new Settings.Toggle("All Plots", PlotBorders.all, "Adds borders to every plot if no other border should apply."),
-                                new Settings.ColorPicker("All Color", true, PlotBorders.allColor, "The color of the border for every plot.")
+                                new Settings.ColorPicker("All Color", PlotBorders.allColor, "The color of the border for every plot.")
                         ))),
                         new Module("Vacuum Solver", VacuumSolver.instance, "Guesses Pest positions when using the Pest Tracker ability on your vacuum.", new Settings(List.of(
                                 new Settings.Toggle("Tracer", VacuumSolver.tracer, "Draws a tracer towards the guess."),
-                                new Settings.ColorPicker("Color", true, VacuumSolver.color, "The color of the guess highlight."),
-                                new Settings.ColorPicker("Tracer Color", true, VacuumSolver.tracerColor, "The color of the guess tracer.")
+                                new Settings.ColorPicker("Color", VacuumSolver.color, "The color of the guess highlight."),
+                                new Settings.ColorPicker("Tracer Color", VacuumSolver.tracerColor, "The color of the guess tracer.")
                         ))),
                         new Module("Watering Helper", WateringHelper.instance, "Improves the Greenhouse watering cans.", new Settings(List.of(
                                 new Settings.Toggle("Better Visibility", WateringHelper.betterVisibility, "Makes the crop water levels more visible by replacing them with seethrough text."),
                                 new Settings.Toggle("Hide Particles", WateringHelper.hideParticles, "Removes the particles that appear while using a watering can.")
-                        )))
+                        ))),
+                        new Module("Equipment Highlight", EquipmentHighlight.instance, "Highlights your farming and pest spawning equipment in the equipment menu.", new Settings(
+                                new Settings.ColorPicker("Farm Color", EquipmentHighlight.farmColor, "The color of the farming equipment highlight."),
+                                new Settings.ColorPicker("Pest Color", EquipmentHighlight.pestColor, "The color of the pest spawning equipment highlight.")
+                        ))
                 ))
         );
         this.categories.getLast().margins(Insets.of(5, 0, 3, 3));

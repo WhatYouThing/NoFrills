@@ -26,7 +26,7 @@ public class BossHealth extends SimpleTextElement {
     private float kuudraDPS = 0.0f;
 
     public BossHealth() {
-        super(Text.literal("Boss Health: §fN/A"), new Feature("bossHealthElement"), "Boss Health Element");
+        super(Text.literal("Boss Health: §fN/A"), new Feature("bossHealthElement"), "Boss Health");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Slayer", this.slayer, "If enabled, the health of your slayer boss is displayed."),
                 new Settings.Toggle("Dungeon", this.dungeon, "If enabled, the health of the dungeon bosses is displayed."),

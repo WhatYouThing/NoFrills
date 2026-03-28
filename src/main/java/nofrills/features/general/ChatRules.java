@@ -20,6 +20,7 @@ import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class ChatRules {
                 obj.addProperty("caseSensitive", false);
                 obj.addProperty("matchType", MatchType.Equals.name());
                 obj.addProperty("cancel", false);
+                obj.addProperty("classFilter", "");
                 obj.addProperty("title", "");
                 obj.addProperty("titleFadeIn", 0);
                 obj.addProperty("titleStay", 30);
@@ -89,6 +91,13 @@ public class ChatRules {
     private static boolean matchRule(JsonObject rule, String msg) {
         if (!rule.get("enabled").getAsBoolean()) {
             return false;
+        }
+        if (rule.has("classFilter")) {
+            String filter = rule.get("classFilter").getAsString();
+            String playerClass = DungeonUtil.getPlayerClass();
+            if (!filter.isEmpty() && !playerClass.isEmpty() && !Utils.toLower(filter).contains(Utils.toLower(playerClass))) {
+                return false;
+            }
         }
         boolean caseSensitive = rule.get("caseSensitive").getAsBoolean();
         String match = caseSensitive ? rule.get("match").getAsString() : Utils.toLower(rule.get("match").getAsString());
@@ -243,6 +252,21 @@ public class ChatRules {
             return layout;
         }
 
+        public FlowLayout buildClassFilterSetting() {
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+            layout.padding(Insets.of(5));
+            layout.horizontalAlignment(HorizontalAlignment.LEFT);
+            PlainLabel label = new PlainLabel(Text.literal("Class Filter"));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
+            input.text(this.getData().has("classFilter") ? this.getData().get("classFilter").getAsString() : "");
+            input.tooltip(Text.literal("The list of selected dungeon classes that this rule requires to work.\nFor example: \"mage archer\" will disable the rule if not playing as either Mage or Archer.\n\nLeave empty to disable class filtering."));
+            input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("classFilter", value)));
+            layout.child(label);
+            layout.child(input);
+            return layout;
+        }
+
         public FlowLayout buildTitleSetting() {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
@@ -304,6 +328,7 @@ public class ChatRules {
             list.add(this.buildMatchTypeSetting());
             list.add(this.buildCaseSensitiveSetting());
             list.add(this.buildCancelSetting());
+            list.add(this.buildClassFilterSetting());
             list.add(this.buildTitleSetting());
             list.add(this.buildSoundSetting());
             ChatRulesSettings settings = new ChatRulesSettings(list);

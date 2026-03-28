@@ -31,8 +31,8 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class DungeonMap extends HudElement {
+    public static NativeImageBackedTexture mapTexture;
     private final SpriteAtlasTexture atlasTexture = mc.getAtlasManager().getAtlasTexture(Atlases.MAP_DECORATIONS);
-    private final NativeImageBackedTexture mapTexture = new NativeImageBackedTexture(() -> "NoFrills Dungeon Map", new NativeImage(128, 128, true));
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
     private final SettingDouble playerMarkerScale = new SettingDouble(1.5, "playerMarkerScale", this.instance);
     private final SettingDouble playerNameScale = new SettingDouble(0.8, "playerNameScale", this.instance);
@@ -47,18 +47,18 @@ public class DungeonMap extends HudElement {
     private MapParameters parameters = null;
 
     public DungeonMap() {
-        super(new Feature("dungeonMapElement"), "Dungeon Map Element");
+        super(new Feature("dungeonMapElement"), "Dungeon Map");
         this.layout.sizing(Sizing.fixed(128), Sizing.fixed(128));
         this.options = this.getBaseSettings(List.of(
                 new Settings.SliderDouble("Self Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),
                 new Settings.SliderDouble("Player Scale", 0.0, 2.0, 0.01, this.playerMarkerScale, "The scale of the markers of your teammates."),
                 new Settings.SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.playerNameScale, "The scale of the name displayed below teammate markers."),
                 new Settings.Dropdown<>("Name Mode", this.playerNameMode, "The mode of how the player names are displayed.\n\nNormal: The full name of the player is displayed.\nClass: A short player class label is displayed (\"Arch\", \"Bers\" etc.).\nDisabled: No names displayed."),
-                new Settings.ColorPicker("Healer Color", false, this.healColor, "The color used for the Healer marker name text."),
-                new Settings.ColorPicker("Mage Color", false, this.mageColor, "The color used for the Mage marker name text."),
-                new Settings.ColorPicker("Bers Color", false, this.bersColor, "The color used for the Berserk marker name text."),
-                new Settings.ColorPicker("Archer Color", false, this.archColor, "The color used for the Archer marker name text."),
-                new Settings.ColorPicker("Tank Color", false, this.tankColor, "The color used for the Tank marker name text."),
+                new Settings.ColorPicker("Healer Color", this.healColor, "The color used for the Healer marker name text."),
+                new Settings.ColorPicker("Mage Color", this.mageColor, "The color used for the Mage marker name text."),
+                new Settings.ColorPicker("Bers Color", this.bersColor, "The color used for the Berserk marker name text."),
+                new Settings.ColorPicker("Archer Color", this.archColor, "The color used for the Archer marker name text."),
+                new Settings.ColorPicker("Tank Color", this.tankColor, "The color used for the Tank marker name text."),
                 new Settings.Toggle("Debug", this.debug, "Outputs debug information about the map's behavior.")
         ));
         this.setDesc("Displays the dungeon map while in Dungeons.");
@@ -81,7 +81,7 @@ public class DungeonMap extends HudElement {
                 this.applyScaling(context, scale);
             }
             matrices.translate(this.x(), this.y());
-            context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, this.mapTexture.getGlTextureView(), this.mapTexture.getSampler(), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
+            context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, mapTexture.getGlTextureView(), mapTexture.getSampler(), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
             int index = 0;
             ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
             for (MapDecoration decor : mapState.decorations.values()) {
@@ -189,7 +189,7 @@ public class DungeonMap extends HudElement {
             }
             packet.updateData().ifPresent(data -> {
                 byte[] colors = data.colors();
-                NativeImage nativeImage = this.mapTexture.getImage();
+                NativeImage nativeImage = mapTexture.getImage();
                 if (nativeImage != null) {
                     for (int i = 0; i < 128; i++) {
                         for (int j = 0; j < 128; j++) {
@@ -198,7 +198,7 @@ public class DungeonMap extends HudElement {
                         }
                     }
                 }
-                this.mapTexture.upload();
+                mapTexture.upload();
             });
         }
     }

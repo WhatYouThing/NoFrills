@@ -27,7 +27,7 @@ public class Module extends FlowLayout {
         this.activeText = Text.literal(name).withColor(0x5ca0bf);
         this.inactiveText = Text.literal(name).withColor(0xdddddd);
         this.label = new PlainLabel(Text.literal(name));
-        this.label.horizontalTextAlignment(HorizontalAlignment.LEFT).verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(5));
+        this.label.horizontalTextAlignment(HorizontalAlignment.LEFT).verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(3, 2, 5, 5));
         this.label.tooltip(Text.literal(tooltip));
         this.child(label);
         this.options = options;

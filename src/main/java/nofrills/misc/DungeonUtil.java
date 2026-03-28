@@ -26,6 +26,14 @@ public class DungeonUtil {
             "Archer",
             "Tank"
     );
+    private static final HashSet<String> chestNames = Sets.newHashSet(
+            "Wood",
+            "Gold",
+            "Diamond",
+            "Emerald",
+            "Obsidian",
+            "Bedrock"
+    );
     private static String currentFloor = "";
     private static int partyCount = 0;
     private static double powerLevel = 0;
@@ -75,6 +83,10 @@ public class DungeonUtil {
         return currentFloor;
     }
 
+    public static HashSet<String> getChestNames() {
+        return chestNames;
+    }
+
     public static boolean isOnFloor(String floor) {
         return getCurrentFloor().endsWith(floor);
     }
@@ -96,6 +108,10 @@ public class DungeonUtil {
 
     public static String getPlayerClass(String name) {
         return classCache.getOrDefault(name, "");
+    }
+
+    public static String getPlayerClass() {
+        return mc.player != null ? getPlayerClass(mc.player.getName().getString()) : "";
     }
 
     public static MapState getMap() {

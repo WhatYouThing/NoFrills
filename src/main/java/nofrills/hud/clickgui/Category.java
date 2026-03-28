@@ -34,7 +34,7 @@ public class Category extends FlowLayout {
             module.horizontalSizing(Sizing.fixed(this.categoryWidth));
             modules.child(module);
         }
-        ScrollContainer<FlowLayout> scroll = UIContainers.verticalScroll(Sizing.content(), Sizing.fill(75), modules)
+        ScrollContainer<FlowLayout> scroll = UIContainers.verticalScroll(Sizing.content(), Sizing.fill(80), modules)
                 .scrollbarThiccness(2)
                 .scrollbar(ScrollContainer.Scrollbar.flat(color));
         BaseUIComponent label = new PlainLabel(Text.literal(title))

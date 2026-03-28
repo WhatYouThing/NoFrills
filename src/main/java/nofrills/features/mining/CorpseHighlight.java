@@ -2,16 +2,22 @@ package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
+import nofrills.config.SettingEnum;
 import nofrills.events.InteractEntityEvent;
 import nofrills.events.ServerJoinEvent;
+import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
+import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
+import nofrills.misc.RenderStyle;
 import nofrills.misc.Utils;
 
 import java.util.HashSet;
@@ -22,14 +28,20 @@ public class CorpseHighlight {
     public static final Feature instance = new Feature("corpseHighlight");
 
     public static final SettingBool hideOpened = new SettingBool(true, "hideOpened", instance);
-    public static final SettingColor lapisColor = new SettingColor(new RenderColor(85, 85, 255, 255), "lapis", instance.key());
-    public static final SettingColor mineralColor = new SettingColor(new RenderColor(170, 170, 170, 255), "mineral", instance.key());
-    public static final SettingColor yogColor = new SettingColor(new RenderColor(255, 170, 0, 255), "yog", instance.key());
-    public static final SettingColor vanguardColor = new SettingColor(new RenderColor(255, 85, 255, 255), "vanguard", instance.key());
+    public static final SettingEnum<RenderStyle> style = new SettingEnum<>(RenderStyle.Outline, RenderStyle.class, "style", instance);
+    public static final SettingColor lapisOutline = new SettingColor(new RenderColor(85, 85, 255, 255), "lapisOutline", instance);
+    public static final SettingColor lapisFill = new SettingColor(new RenderColor(85, 85, 255, 127), "lapisFill", instance);
+    public static final SettingColor mineralOutline = new SettingColor(new RenderColor(170, 170, 170, 255), "mineralOutline", instance);
+    public static final SettingColor mineralFill = new SettingColor(new RenderColor(170, 170, 170, 127), "mineralFill", instance);
+    public static final SettingColor yogOutline = new SettingColor(new RenderColor(255, 170, 0, 255), "yogOutline", instance);
+    public static final SettingColor yogFill = new SettingColor(new RenderColor(255, 170, 0, 127), "yogFill", instance);
+    public static final SettingColor vanguardOutline = new SettingColor(new RenderColor(255, 85, 255, 255), "vanguardOutline", instance);
+    public static final SettingColor vanguardFill = new SettingColor(new RenderColor(255, 85, 255, 127), "vanguardFill", instance);
 
+    private static final EntityCache cache = new EntityCache();
     private static final HashSet<Integer> openedCorpses = new HashSet<>();
 
-    private static boolean active() {
+    private static boolean isActive() {
         return instance.isActive() && Utils.isInArea("Mineshaft");
     }
 
@@ -45,16 +57,6 @@ public class CorpseHighlight {
             };
         }
         return CorpseType.None;
-    }
-
-    private static RenderColor getCorpseColor(CorpseType type) {
-        return switch (type) {
-            case Lapis -> lapisColor.value();
-            case Tungsten -> mineralColor.value();
-            case Umber -> yogColor.value();
-            case Vanguard -> vanguardColor.value();
-            default -> null;
-        };
     }
 
     private static boolean hasKeyForCorpse(CorpseType type) {
@@ -79,14 +81,31 @@ public class CorpseHighlight {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (active()) {
+        if (isActive()) {
             for (Entity ent : Utils.getEntities()) {
                 if (ent instanceof ArmorStandEntity stand && !stand.isInvisible()) {
-                    if (openedCorpses.contains(stand.getId()) || Utils.isGlowing(stand)) {
-                        continue;
-                    }
-                    RenderColor color = getCorpseColor(getCorpseType(stand));
-                    if (color != null) Utils.setGlowing(stand, true, color);
+                    cache.add(stand);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onRender(WorldRenderEvent event) {
+        if (isActive() && cache.size() > 0) {
+            for (Entity ent : cache.get()) {
+                if (hideOpened.value() && openedCorpses.contains(ent.getId())) {
+                    continue;
+                }
+                ArmorStandEntity stand = (ArmorStandEntity) ent;
+                Box box = stand.getDimensions(EntityPose.STANDING).getBoxAt(stand.getEntityPos()).expand(0.25, 0.0, 0.25);
+                switch (getCorpseType(stand)) {
+                    case Lapis -> event.drawStyled(box, style.value(), false, lapisOutline.value(), lapisFill.value());
+                    case Tungsten ->
+                            event.drawStyled(box, style.value(), false, mineralOutline.value(), mineralFill.value());
+                    case Umber -> event.drawStyled(box, style.value(), false, yogOutline.value(), yogFill.value());
+                    case Vanguard ->
+                            event.drawStyled(box, style.value(), false, vanguardOutline.value(), vanguardFill.value());
                 }
             }
         }
@@ -94,11 +113,10 @@ public class CorpseHighlight {
 
     @EventHandler
     private static void onInteractEntity(InteractEntityEvent event) {
-        if (active() && hideOpened.value() && event.entity instanceof ArmorStandEntity stand) {
+        if (isActive() && hideOpened.value() && event.entity instanceof ArmorStandEntity stand) {
             CorpseType type = getCorpseType(stand);
             if (!type.equals(CorpseType.None) && hasKeyForCorpse(type)) {
                 openedCorpses.add(stand.getId());
-                Utils.setGlowing(stand, false, RenderColor.white);
             }
         }
     }

@@ -20,7 +20,7 @@ public class TickTimerElement extends SimpleTextElement {
     public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
-        } else if (!this.isEditingHud() && (this.ticks == -1 || !Utils.isInDungeons())) {
+        } else if (!this.isEditingHud() && !this.isTicking()) {
             return;
         }
         this.updateTimer();
@@ -29,10 +29,6 @@ public class TickTimerElement extends SimpleTextElement {
 
     public void setStartTicks(int ticks) {
         this.startTicks = ticks;
-    }
-
-    public void setRepeating(boolean repeating) {
-        this.repeating = repeating;
     }
 
     public String ticksAsTime(int ticks) {
@@ -65,5 +61,17 @@ public class TickTimerElement extends SimpleTextElement {
 
     public void pause() {
         this.ticks = -1;
+    }
+
+    public boolean isTicking() {
+        return this.ticks != -1;
+    }
+
+    public boolean isRepeating() {
+        return this.repeating;
+    }
+
+    public void setRepeating(boolean repeating) {
+        this.repeating = repeating;
     }
 }

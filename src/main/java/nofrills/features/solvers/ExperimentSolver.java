@@ -6,12 +6,12 @@ import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.screen.slot.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.config.SettingColor;
 import nofrills.events.ScreenOpenEvent;
-import nofrills.events.SendPacketEvent;
+import nofrills.events.SlotClickEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
@@ -28,12 +28,12 @@ public class ExperimentSolver {
     public static final SettingBool chronomatron = new SettingBool(false, "chronomatron", instance.key());
     public static final SettingBool ultrasequencer = new SettingBool(false, "ultrasequencer", instance.key());
     public static final SettingBool superpairs = new SettingBool(false, "superpairs", instance.key());
+    public static final SettingColor superColorMatched = new SettingColor(RenderColor.fromHex(0x00ff00, 0.5f), "superColorMatched", instance);
+    public static final SettingColor superColorMatch = new SettingColor(RenderColor.fromHex(0xffff00, 0.5f), "superColorMatch", instance);
+    public static final SettingColor superColorPowerup = new SettingColor(RenderColor.fromHex(0xff00ff, 0.5f), "superColorPowerup", instance);
 
     private static final List<Solution> chronoSolution = new ArrayList<>();
     private static final List<Solution> ultraSolution = new ArrayList<>();
-    private static final RenderColor superColorFound = RenderColor.fromHex(0x00ff00, 0.5f);
-    private static final RenderColor superColorPotential = RenderColor.fromHex(0xffff00, 0.5f);
-    private static final RenderColor superColorPowerup = RenderColor.fromHex(0xff00ff, 0.5f);
     private static Solution superSolution = new Solution();
     private static boolean rememberPhase = true;
 
@@ -48,7 +48,7 @@ public class ExperimentSolver {
     }
 
     public static ExperimentType getExperimentType() {
-        if (Utils.isOnPrivateIsland() && mc.currentScreen instanceof GenericContainerScreen container) {
+        if (mc.currentScreen instanceof GenericContainerScreen container && Utils.isOnPrivateIsland()) {
             String title = container.getTitle().getString();
             if (title.startsWith("Chronomatron (")) return ExperimentType.Chronomatron;
             if (title.startsWith("Ultrasequencer (")) return ExperimentType.Ultrasequencer;
@@ -191,20 +191,20 @@ public class ExperimentSolver {
         }
         if (superpairs.value() && experimentType.equals(ExperimentType.Superpairs) && !isStatus(event.stack)) {
             if (isPowerup(event.stack)) {
-                SlotOptions.setBackground(event.slot, superColorPowerup);
+                SlotOptions.setBackground(event.slot, superColorPowerup.value());
                 return;
             }
             if (!isStainedGlass(event.stack) && !isStainedGlassPane(event.stack) && !item.equals(Items.AIR)) {
                 if (superSolution.slot != null && superSolution.slot != event.slot) {
                     if (matchSuperStacks(event.stack, superSolution.slot.getStack())) {
-                        SlotOptions.setBackground(event.slot, superColorFound);
-                        SlotOptions.setBackground(superSolution.slot, superColorFound);
+                        SlotOptions.setBackground(event.slot, superColorMatched.value());
+                        SlotOptions.setBackground(superSolution.slot, superColorMatched.value());
                     }
                 }
                 for (Map.Entry<Slot, ItemStack> solution : superSolution.rewards.entrySet()) {
                     if (!SlotOptions.hasBackground(event.slot) && !event.slot.equals(solution.getKey()) && matchSuperStacks(event.stack, solution.getValue())) {
-                        SlotOptions.setBackground(event.slot, superColorPotential);
-                        SlotOptions.setBackground(solution.getKey(), superColorPotential);
+                        SlotOptions.setBackground(event.slot, superColorMatch.value());
+                        SlotOptions.setBackground(solution.getKey(), superColorMatch.value());
                     }
                 }
                 superSolution.rewards.put(event.slot, event.stack);
@@ -215,20 +215,10 @@ public class ExperimentSolver {
     }
 
     @EventHandler
-    private static void onScreen(ScreenOpenEvent event) {
-        if (instance.isActive()) {
-            rememberPhase = true;
-            chronoSolution.clear();
-            ultraSolution.clear();
-            superSolution = new Solution();
-        }
-    }
-
-    @EventHandler
-    private static void onSendPacket(SendPacketEvent event) {
-        if (instance.isActive() && event.packet instanceof ClickSlotC2SPacket clickPacket) {
+    private static void onClickSlot(SlotClickEvent event) {
+        if (instance.isActive() && event.slotId >= 0) {
             ExperimentType type = getExperimentType();
-            int slotId = clickPacket.slot();
+            int slotId = event.slotId;
             if (chronomatron.value() && type.equals(ExperimentType.Chronomatron) && !rememberPhase) {
                 if (!chronoSolution.isEmpty()) {
                     Solution first = chronoSolution.getFirst();
@@ -254,6 +244,14 @@ public class ExperimentSolver {
                 showUltraSolution();
             }
         }
+    }
+
+    @EventHandler
+    private static void onScreen(ScreenOpenEvent event) {
+        rememberPhase = true;
+        chronoSolution.clear();
+        ultraSolution.clear();
+        superSolution = new Solution();
     }
 
     public enum ExperimentType {
@@ -282,7 +280,7 @@ public class ExperimentSolver {
         }
 
         public Solution() {
-            this.type = ExperimentType.Ultrasequencer;
+            this.type = ExperimentType.Superpairs;
             this.rewards = new ConcurrentHashMap<>();
             this.slot = null;
         }

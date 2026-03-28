@@ -2,6 +2,7 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.component.BoxComponent;
 import io.wispforest.owo.ui.component.ButtonComponent;
+import io.wispforest.owo.ui.component.ColorPickerComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
@@ -38,6 +39,14 @@ public class ColorPickerScreen extends Settings {
         BoxComponent colorDisplay = UIComponents.box(Sizing.fixed(290), Sizing.fixed(20));
         colorDisplay.color(Color.ofArgb(setting.value().argb)).fill(true);
         colorSection.child(colorDisplay);
+
+        CustomHeight pickerSection = new Settings.CustomHeight(120);
+        pickerSection.verticalSizing(Sizing.fixed(120));
+        ColorPickerComponent colorPicker = new ColorPickerComponent();
+        colorPicker.showAlpha(true).sizing(Sizing.fixed(110), Sizing.fixed(110));
+        colorPicker.selectedColor(Color.ofArgb(setting.value().argb));
+        pickerSection.child(addLabel("Picker"));
+        pickerSection.child(colorPicker);
 
         FlowLayout argbSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         argbSection.horizontalAlignment(HorizontalAlignment.LEFT).padding(Insets.of(5));
@@ -96,7 +105,9 @@ public class ColorPickerScreen extends Settings {
             int green = (int) (color.g * 255);
             int blue = (int) (color.b * 255);
             int alpha = (int) (color.a * 255);
-            colorDisplay.color(Color.ofArgb(color.argb)).fill(true);
+            Color owoColor = Color.ofArgb(color.argb);
+            colorDisplay.color(owoColor).fill(true);
+            colorPicker.selectedColor(owoColor);
             argbInput.setText("0x" + Integer.toHexString(color.argb));
             redInput.setText(String.valueOf(red));
             redSlider.value(red);
@@ -126,6 +137,11 @@ public class ColorPickerScreen extends Settings {
         buttonSection.child(backButton);
         buttonSection.child(copyButton);
         buttonSection.child(pasteButton);
+
+        colorPicker.onChanged().subscribe(color -> {
+            setting.set(RenderColor.fromArgb(color.argb()));
+            syncValues.run();
+        });
 
         argbInput.onChanged().subscribe((value) -> {
             Utils.parseHex(value).ifPresent(integer -> setting.set(RenderColor.fromArgb(integer)));
@@ -169,6 +185,7 @@ public class ColorPickerScreen extends Settings {
         });
 
         list.add(colorSection);
+        list.add(pickerSection);
         list.add(argbSection);
         list.add(redSection);
         list.add(greenSection);

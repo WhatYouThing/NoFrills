@@ -1,6 +1,5 @@
 package nofrills.features.dungeons;
 
-import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -10,10 +9,10 @@ import nofrills.config.SettingColor;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotUpdateEvent;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
-import java.util.HashSet;
 import java.util.Optional;
 
 import static nofrills.Main.mc;
@@ -21,22 +20,14 @@ import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
 public class DungeonChestValue {
-    public static final Feature instance = new Feature("dungeonChestValue");
+    public static final Feature instance = new Feature("dungeonChestValue").requiresPricingAPI();
 
     public static final SettingColor background = new SettingColor(RenderColor.fromHex(0x202020, 0.8f), "background", instance);
 
-    private static final HashSet<String> chestNames = Sets.newHashSet(
-            "Wood",
-            "Gold",
-            "Diamond",
-            "Emerald",
-            "Obsidian",
-            "Bedrock"
-    );
     private static double currentValue = 0.0;
 
     public static boolean isChest(String title) {
-        for (String name : chestNames) {
+        for (String name : DungeonUtil.getChestNames()) {
             if (title.equals(name) || (title.startsWith(name) && title.endsWith("Chest"))) {
                 return true;
             }
@@ -85,7 +76,7 @@ public class DungeonChestValue {
             if (auctionPricing.containsKey(id)) {
                 currentValue += auctionPricing.get(id) * quantity;
             } else if (bazaarPricing.containsKey(id)) {
-                currentValue += bazaarPricing.get(id).get("sell") * quantity;
+                currentValue += bazaarPricing.get(id).sell() * quantity;
             }
         }
     }

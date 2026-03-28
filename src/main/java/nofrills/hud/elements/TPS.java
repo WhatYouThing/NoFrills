@@ -18,7 +18,7 @@ public class TPS extends SimpleTextElement {
     public List<Integer> tpsList = new ArrayList<>();
 
     public TPS(String text) {
-        super(Text.literal(text), new Feature("tpsElement"), "TPS Element");
+        super(Text.literal(text), new Feature("tpsElement"), "TPS Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));

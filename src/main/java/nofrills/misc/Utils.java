@@ -69,6 +69,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static nofrills.Main.*;
@@ -335,21 +336,6 @@ public class Utils {
         return entity.getDimensions(EntityPose.STANDING).getBoxAt(entity.getLerpedPos(tickProgress));
     }
 
-    /**
-     * Enable/disable glowing for a specific entity.
-     */
-    public static void setGlowing(Entity ent, boolean shouldGlow, RenderColor color) {
-        ((EntityRendering) ent).nofrills_mod$setGlowingColored(shouldGlow, color);
-    }
-
-    /**
-     * Checks if an entity is drawing the glow effect. Does not account for vanilla/server applied glows.
-     */
-    public static boolean isGlowing(Entity ent) {
-        return ((EntityRendering) ent).nofrills_mod$getGlowing();
-    }
-
-    @SuppressWarnings("unchecked")
     public static List<Entity> getEntities() {
         if (mc.world != null) {
             SimpleEntityLookup<Entity> lookup = (SimpleEntityLookup<Entity>) mc.world.entityManager.getLookup();
@@ -458,6 +444,63 @@ public class Utils {
     }
 
     /**
+     * Tries to parse the Bazaar/Auction ID tied to the name of the item.
+     */
+    public static String getMarketId(Text text) {
+        String name = toPlain(text);
+        if (hasItemQuantity(name)) {
+            name = name.substring(0, name.lastIndexOf(" ")).trim();
+        }
+        if (name.startsWith("Enchanted Book (") && name.endsWith(")")) {
+            String enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
+            String enchantName = toID(enchant.substring(0, enchant.lastIndexOf(" ")));
+            int enchantLevel = parseRoman(enchant.substring(enchant.lastIndexOf(" ") + 1));
+            Optional<Style> style = getStyle(text, enchant::equals);
+            if (style.isPresent() && hasColor(style.get(), Formatting.LIGHT_PURPLE) && !enchantName.startsWith("ULTIMATE_")) {
+                return format("ENCHANTMENT_ULTIMATE_{}_{}", enchantName, enchantLevel);
+            }
+            return format("ENCHANTMENT_{}_{}", enchantName, enchantLevel);
+        }
+        if (name.endsWith(" Essence")) {
+            return format("ESSENCE_{}", toID(name.substring(0, name.lastIndexOf(" "))));
+        }
+        if (name.endsWith(" Dye")) {
+            return format("DYE_{}", toID(name.substring(0, name.lastIndexOf(" "))));
+        }
+        if (name.startsWith("Master Skull - Tier ")) {
+            return toID(name.replace(" - ", " "));
+        }
+        if (name.startsWith("[Lvl 1] ")) {
+            String petName = name.substring(name.indexOf("]") + 2);
+            Optional<Style> styleOptional = getStyle(text, petName::equals);
+            String rarity = "COMMON";
+            if (styleOptional.isPresent()) {
+                Style style = styleOptional.get();
+                if (hasColor(style, Formatting.GOLD)) rarity = "LEGENDARY";
+                if (hasColor(style, Formatting.DARK_PURPLE)) rarity = "EPIC";
+                if (hasColor(style, Formatting.BLUE)) rarity = "RARE";
+                if (hasColor(style, Formatting.GREEN)) rarity = "UNCOMMON";
+            }
+            return format("{}_PET_{}", toID(petName), rarity);
+        }
+        if (name.endsWith(" Shard")) {
+            return ShardData.getId(name);
+        }
+        return switch (name) {
+            case "Shadow Warp" -> "SHADOW_WARP_SCROLL";
+            case "Wither Shield" -> "WITHER_SHIELD_SCROLL";
+            case "Implosion" -> "IMPLOSION_SCROLL";
+            case "Giant's Sword" -> "GIANTS_SWORD";
+            case "Warped Stone" -> "AOTE_STONE";
+            case "Spirit Boots" -> "THORNS_BOOTS";
+            case "Spirit Shortbow" -> "ITEM_SPIRIT_BOW";
+            case "Spirit Stone" -> "SPIRIT_DECOY";
+            case "Adaptive Blade" -> "STONE_BLADE";
+            default -> toID(name);
+        };
+    }
+
+    /**
      * Returns the Bazaar/Auction ID tied to the item.
      */
     public static String getMarketId(ItemStack stack) {
@@ -510,6 +553,10 @@ public class Utils {
         return id;
     }
 
+    public static boolean hasItemQuantity(String name) {
+        return Pattern.matches(".* x[0-9]*", name);
+    }
+
     public static GameProfile getTextures(ItemStack stack) {
         ProfileComponent profile = stack.getComponents().get(DataComponentTypes.PROFILE);
         if (!stack.isEmpty() && profile != null) {
@@ -542,16 +589,21 @@ public class Utils {
         return false;
     }
 
+    public static List<Text> getLoreText(ItemStack stack) {
+        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+        if (lore != null) {
+            return lore.lines();
+        }
+        return new ArrayList<>();
+    }
+
     /**
      * Returns every line of the stack's lore with no formatting, or else an empty list.
      */
     public static List<String> getLoreLines(ItemStack stack) {
         List<String> lines = new ArrayList<>();
-        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
-        if (lore != null) {
-            for (Text line : lore.lines()) {
-                lines.add(toPlain(line).trim());
-            }
+        for (Text line : getLoreText(stack)) {
+            lines.add(toPlain(line).trim());
         }
         return lines;
     }
@@ -642,7 +694,7 @@ public class Utils {
     }
 
     public static void checkUpdate(boolean notifyIfMatch) {
-        new Thread(() -> {
+        Thread.startVirtualThread(() -> {
             try {
                 String version = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata().getVersion().getFriendlyString();
                 InputStream connection = URI.create("https://raw.githubusercontent.com/WhatYouThing/NoFrills/refs/heads/main/gradle.properties").toURL().openStream();
@@ -658,15 +710,11 @@ public class Utils {
                 if (notifyIfMatch) {
                     info("§aNoFrills is up to date.");
                 }
-            } catch (IOException e) {
+            } catch (IOException exception) {
                 info("§cAn error occurred while checking for an update. Additional information can be found in the log.");
-                StringBuilder trace = new StringBuilder();
-                for (StackTraceElement element : e.getStackTrace()) {
-                    trace.append("\n\tat ").append(element.toString());
-                }
-                LOGGER.error("{}{}", e.getMessage(), trace);
+                LOGGER.error("NoFrills update check failed.", exception);
             }
-        }).start();
+        });
     }
 
     /**
@@ -833,6 +881,10 @@ public class Utils {
         return string.toUpperCase(Locale.ROOT);
     }
 
+    public static String toID(String string) {
+        return toUpper(string.replace("'s", "").replaceAll(" ", "_"));
+    }
+
     /**
      * Gets the string out of a Text object and removes any formatting codes.
      */
@@ -841,6 +893,23 @@ public class Utils {
             return Formatting.strip(text.getString());
         }
         return "";
+    }
+
+    public static Optional<Style> getStyle(Text text, Predicate<String> predicate) {
+        return text.visit((textStyle, textString) -> {
+            if (predicate.test(textString)) {
+                return Optional.of(textStyle);
+            }
+            return Optional.empty();
+        }, Style.EMPTY);
+    }
+
+    public static boolean hasColor(Style style, Formatting color) {
+        return color.getColorValue() != null && hasColor(style, color.getColorValue());
+    }
+
+    public static boolean hasColor(Style style, int hex) {
+        return style != null && style.getColor() != null && style.getColor().getRgb() == hex;
     }
 
     public static Optional<Integer> parseInt(String value) {

@@ -18,13 +18,12 @@ import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
-import java.util.HashMap;
 import java.util.Optional;
 
 import static nofrills.misc.NoFrillsAPI.*;
 
 public class PriceTooltips {
-    public static final Feature instance = new Feature("priceTooltips");
+    public static final Feature instance = new Feature("priceTooltips").requiresPricingAPI();
 
     public static final SettingBool auction = new SettingBool(false, "auction", instance.key());
     public static final SettingBool bazaar = new SettingBool(false, "bazaar", instance.key());
@@ -117,25 +116,25 @@ public class PriceTooltips {
             if (itemId.isEmpty()) return;
             int quantity = getStackQuantity(event.stack);
             if (mote.value() && npcPricing.containsKey(itemId) && SkyblockData.getArea().equals("The Rift")) {
-                HashMap<String, Double> prices = npcPricing.get(itemId);
-                if (prices.containsKey("mote")) {
+                NPCPrice prices = npcPricing.get(itemId);
+                if (prices.mote() != 0.0) {
                     double burgerBonus = 1 + 0.05 * burgers.value();
-                    event.addLine(buildLine("§dMotes Price", prices.get("mote") * burgerBonus, quantity));
+                    event.addLine(buildLine("§dMotes Price", prices.mote() * burgerBonus, quantity));
                 }
             }
             if (npc.value() && npcPricing.containsKey(itemId)) {
-                HashMap<String, Double> prices = npcPricing.get(itemId);
-                if (prices.containsKey("coin")) {
-                    event.addLine(buildLine("§eNPC Price", prices.get("coin"), quantity));
+                NPCPrice prices = npcPricing.get(itemId);
+                if (prices.coin() != 0.0) {
+                    event.addLine(buildLine("§eNPC Price", prices.coin(), quantity));
                 }
             }
             if (auction.value() && auctionPricing.containsKey(itemId)) {
                 event.addLine(buildLine("§eLowest BIN", auctionPricing.get(itemId), quantity));
             }
             if (bazaar.value() && bazaarPricing.containsKey(itemId)) {
-                HashMap<String, Double> prices = bazaarPricing.get(itemId);
-                event.addLine(buildLine("§eBazaar Buy", prices.get("buy"), quantity));
-                event.addLine(buildLine("§eBazaar Sell", prices.get("sell"), quantity));
+                BazaarPrice prices = bazaarPricing.get(itemId);
+                event.addLine(buildLine("§eBazaar Buy", prices.buy(), quantity));
+                event.addLine(buildLine("§eBazaar Sell", prices.sell(), quantity));
             }
             if (pricePaid.value() && event.customData != null && event.customData.contains("uuid") && paidData.value().has("prices")) {
                 String uuid = event.customData.getString("uuid", "");

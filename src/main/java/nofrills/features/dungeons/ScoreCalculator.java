@@ -15,10 +15,11 @@ import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
+import java.util.List;
 import java.util.Optional;
 
 public class ScoreCalculator {
-    public static final Feature instance = new Feature("scoreCalculator");
+    public static final Feature instance = new Feature("scoreCalculator").requiresPerksAPI();
 
     public static final SettingEnum<PaulState> paulState = new SettingEnum<>(PaulState.Auto, PaulState.class, "paulState", instance);
     public static final SettingBool sendMsg270 = new SettingBool(false, "sendMsg270", instance);
@@ -30,17 +31,18 @@ public class ScoreCalculator {
     public static final SettingBool showTitle300 = new SettingBool(false, "showTitle300", instance);
     public static final SettingString title300 = new SettingString("&c&l300", "title300", instance);
 
+    private static final List<String> scoreKeywords = List.of(
+            "kill",
+            "dead",
+            "score",
+            "smoke"
+    );
     private static int score = 0;
-    private static int deaths = 0;
     private static boolean bloodDone = false;
     private static boolean mimic = false;
     private static boolean prince = false;
     private static boolean sent270 = false;
     private static boolean sent300 = false;
-
-    public static boolean shouldUpdatePaul() {
-        return instance.isActive() && paulState.value().equals(PaulState.Auto);
-    }
 
     private static String getLineValue(String line) {
         if (line.contains("%")) {
@@ -154,8 +156,10 @@ public class ScoreCalculator {
     }
 
     private static int getDeathPenalty() {
-        if (deaths > 0) { // need to assume spirit pet on 1st death, api key application got declined a month after applying
-            return deaths * 2 - 1;
+        for (String line : SkyblockData.getTabListLines()) {
+            if (line.startsWith("Team Deaths: ")) { // need to assume spirit pet on 1st death, api key application got declined a month after applying
+                return Math.max(0, Utils.parseInt(getLineValue(line)).orElse(0) * 2 - 1);
+            }
         }
         return 0;
     }
@@ -239,17 +243,8 @@ public class ScoreCalculator {
 
     @EventHandler
     private static void onMsg(ChatMsgEvent event) {
-        if (instance.isActive() && Utils.isInDungeons()) {
-            String msg = event.messagePlain.trim();
-            if (msg.equals("[BOSS] The Watcher: You have proven yourself. You may pass.")) {
-                bloodDone = true;
-                return;
-            }
-            if (msg.startsWith(Utils.Symbols.skull)) {
-                if (event.messagePlain.endsWith(" ghost.") || event.messagePlain.endsWith(" died.")) {
-                    deaths += 1;
-                }
-            }
+        if (instance.isActive() && Utils.isInDungeons() && event.messagePlain.equals("[BOSS] The Watcher: You have proven yourself. You may pass.")) {
+            bloodDone = true;
         }
     }
 
@@ -257,13 +252,16 @@ public class ScoreCalculator {
     private static void onPartyMsg(PartyChatMsgEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
             String msg = Utils.toLower(event.message);
-            if (msg.contains("kill") || msg.contains("dead") || msg.contains("score")) {
-                if (msg.contains("mimic") && (Utils.isOnDungeonFloor("6") || Utils.isOnDungeonFloor("7"))) {
-                    setMimicKilled();
-                    return;
-                }
-                if (msg.contains("prince")) {
-                    setPrinceKilled();
+            for (String keyword : scoreKeywords) {
+                if (msg.contains(keyword)) {
+                    if (msg.contains("mimic")) {
+                        if (!DungeonUtil.isOnFloor("6") && !DungeonUtil.isOnFloor("7")) {
+                            continue;
+                        }
+                        setMimicKilled();
+                    } else if (msg.contains("prince")) {
+                        setPrinceKilled();
+                    }
                 }
             }
         }
@@ -272,7 +270,6 @@ public class ScoreCalculator {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         score = 0;
-        deaths = 0;
         bloodDone = false;
         mimic = false;
         prince = false;

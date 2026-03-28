@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import static nofrills.Main.mc;
@@ -62,7 +63,9 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
         boolean clicked = this.uiAdapter.mouseClicked(click, doubled);
         if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && !clicked) {
             List<FlowLayout> list = new ArrayList<>();
-            for (HudElement element : HudManager.getElements()) {
+            List<HudElement> elementList = new ArrayList<>(HudManager.getElements());
+            elementList.sort(Comparator.comparing(element -> element.elementLabel.getString()));
+            for (HudElement element : elementList) {
                 FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
                 layout.padding(Insets.of(5));
                 PlainLabel label = new PlainLabel(element.elementLabel);

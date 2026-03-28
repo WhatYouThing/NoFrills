@@ -1,6 +1,6 @@
 # NoFrills Mod
 
-It's in the name. Simple and effective Hypixel Skyblock mod for modern versions (1.20+) of Minecraft.
+It's in the name. Simple and effective Hypixel Skyblock mod for modern versions of Minecraft.
 
 ## Features
 
@@ -14,38 +14,35 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Price Tooltips**: Adds pricing information to item tooltips. Requires connectivity to the NoFrills API.
     - **Wardrobe Keybinds**: Adds hotkeys to the Skyblock Wardrobe.
     - **Chat Waypoints**: Automatically creates waypoints for coordinates sent in Party/Global chat.
-    - **Etherwarp Overlay**: Highlights the block you're targeting with the Ether Transmission ability.
+    - **Etherwarp Overlay**: Highlights the block you are targeting with the Ether Transmission ability.
     - **Fullbright**: You know him, you love him.
     - **No Render**: Prevent various things from appearing.
-    - **Pearl Refill**: Easily refill your Ender Pearls from your sacks with a keybind.
     - **Party Commands**: Provide various commands to your party members.
     - **Viewmodel**: Easily customize the appearance of your held item.
-    - **Custom Keybinds**: Create keybinds that run a custom command when pressed.
+    - **Command Keybinds**: Create keybinds that run a custom command when pressed.
+    - **Chat Rules**: Create custom rules that activate when a matching message is sent in chat.
+    - **Chat Tweaks**: Various features/improvements for the chat hud.
+    - **Item Protection**: Prevents you from accidentally dropping, selling or salvaging your important items.
+    - **Info Tooltips**: Adds various information about an item to its tooltip.
+    - **Skill Tracker**: Tracks the experience you gain for specific skills, similarly to SBE on 1.8.9.
+    - **Command Shortcuts**: Create shortcuts which send a specific message/command when ran.
 
 - **Tweaks**
 
     - **No Loading Screen**: Fully removes the loading terrain screen that appears when switching islands.
     - **Middle Click Override**: Replaces left clicks with middle clicks in applicable GUIs, making navigation smoother.
     - **No Front Perspective**: Removes the front facing camera perspective.
-    - **No Ability Place**: Prevents block items with abilities from being placeable client side, such as the
-      Egglocator.
-    - **Anti Swim**: Prevents the crawling and the swimming animations from activating.
-    - **Enchant Fix**: Fixes client side issues with certain vanilla enchants.
     - **Item Count Fix**: Prevents the game from hiding item counts for unstackable items.
     - **Middle Click Fix**: Allows the middle mouse button to work just as it does on 1.8.9.
-    - **No Drop Swing**: Don't swing your hand while dropping items.
     - **No Pearl Cooldown**: Removes the visual cooldown from Ender Pearls.
-    - **Old Sneak**: Restores the old sneaking eye height and hitbox size.
     - **Riding Camera Fix**: Removes the floaty camera movement effect while riding entities.
-    - **Snow Fix**: Adjusts snow layer collision to reduce lagbacks.
-    - **Animation Fix**: Fixes the ancient bug where certain animations can play twice, such as unsneaking.
-    - **Sneak Lag Fix**: Fixes lag backs that occur when you sneak while walking.
+    - **Animation Fix**: Fixes the sneaking/swimming animations being able to play twice.
     - **Double Use Fix**: Fixes Blaze Daggers and Fishing Rods being able to activate twice at once.
-    - **Old Safewalk**: Allows you to walk onto short blocks (such as carpet) while sneaking.
-    - **Disconnect Fix**: Patches any known kick/disconnect issues.
-    - **No Confirm Screen**: Removes the "Confirm Command Execution" screen and allows the command to run anyways.
+    - **Disconnect Fix**: Fixes Tarantula slayer disconnecting you due to corrupted packets.
+    - **No Confirm Screen**: Removes the "Confirm Command Execution" screen that prevents you from running certain
+      commands.
     - **No Cursor Reset**: Retains your cursor position between container screens.
-    - **No Skull Place**: Prevents skull block items from being placeable client side, similarly to 1.8.9.
+    - **Instant Sneak**: Removes the smooth sneaking/swimming animation.
 
 - **Misc**
 
@@ -60,6 +57,10 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Unfocused Tweaks**: Various optimizations for when you are tabbed out of Minecraft.
     - **GUI Keybinds**: Adds navigation keybinds to applicable Skyblock GUIs.
     - **Force Nametag**: Makes player nametags always visible, even if they are invisible and/or sneaking.
+    - **Hotbar Scroll Lock**: Prevents your hotbar going from the first to the last slot when scrolling, and vice versa.
+    - **Auto Tip**: Automatically runs /tipall every 15 minutes while connected to Hypixel.
+    - **Item Scale**: Changes the scale of items laying on the ground.
+    - **No Damage Splash**: Hides damage splash nametags.
 
 - **Solvers**
 
@@ -69,6 +70,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Diana Solver**: Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.
     - **Hoppity Solver**: Guesses Hoppity egg positions when using your Egglocator.
     - **Moonglade Beacon**: Solves the beacon tuning mini-game on Galatea.
+    - **Anvil Helper**: Highlights the enchanted books which you can safely combine while using the anvil.
 
 - **Fishing**
 
@@ -110,19 +112,21 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Melody Message**: Send start and progress messages when you get the Melody terminal in F7/M7.
     - **Quick Close**: Quickly close Dungeon secret and/or loot chests by pressing any of the movement keys (WASD).
     - **Chest Value**: Calculates the value of your Dungeons loot. Requires connectivity to the NoFrills API.
-    - **Tick Timers**: Displays a timer for various things during the F7/M7 boss fight.
     - **Relic Highlight**: Highlights the correct placement position of your M7 king relic.
+    - **Class Nametags**: Renders large nametags for your teammates, indicating their selected class and position.
+    - **Score Calculator**: Calculates the score in your dungeon runs.
+    - **Platform Highlight**: Highlights the 3x3 platform area which you mine as Healer in F7/M7 after terminal phase.
 
 - **Kuudra**
 
     - **Drain Message**: Send a message when you drain your mana using an End Stone Sword.
     - **Fresh Timer**: Shows a timer on screen for the Fresh Tools essence shop ability.
-    - **Kuudra Health**: Shows Kuudra's exact health on screen.
     - **Kuudra Hitbox**: Renders a hitbox for Kuudra.
     - **Waypoints**: Renders various waypoints in Kuudra.
     - **Pre Message**: Announces if no supply spawns at your pre spot (or your next pickup spot).
     - **Shop Cleaner**: Removes useless things from the perk shop.
     - **Chest Value**: Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.
+    - **Crate Priority**: Shows which crates to pull and/or grab after you collect your Pre.
 
 - **Slayer**
 
@@ -134,23 +138,24 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Ice Alert**: Shows a timer for when your Vampire boss is going to cast Twinclaws.
     - **Stake Alert**: Shows text on screen once you can vanquish your Vampire boss with the Steak Stake.
     - **Mute Vampire**: Prevents the Vampire Mania/Killer Springs sounds from playing.
-    - **Hits Shield Display**: Renders the needed hits for the Voidgloom Seraph hits shield phase.
     - **Egg Hits Display**: Renders the needed hits for the Tarantula Broodfather egg sack phase.
     - **Beacon Tracer**: Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.
     - **Mute Enderman**: Prevents the angry Enderman sounds from playing.
     - **Cocoon Alert**: Alerts you when your slayer boss is cocooned by your Primordial belt.
+    - **Spawn Alert**: Alerts you when your slayer boss is spawned.
 
 - **Mining**
 
     - **Ability Alert**: Alerts you when your Pickaxe Ability is available.
     - **Corpse Highlight**: Highlights corpses in the Glacite Mineshafts.
-    - **Better Sky Mall**: Compacts Sky Mall messages, and fully hides them if you are not mining.
     - **Ghost Vision**: Makes Ghosts easier to see in the Dwarven Mines.
     - **Scatha Mining**: Scatha mining features.
     - **End Node Highlight**: Highlights Ender Nodes.
     - **Temple Skip**: Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.
     - **Gemstone Desync Fix**: Fixes adjacent gemstone blocks not correctly updating when mining.
     - **Break Reset Fix**: Fixes item updates resetting your block breaking progress, also known as HSM.
+    - **Shaft Announce**: Sends a message with the mineshaft ID and the list of corpses upon entering a Glacite
+      Mineshaft.
 
 - **Farming**
 
@@ -158,6 +163,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Glowing Mushrooms**: Highlights Glowing Mushrooms.
     - **Plot Borders**: Renders borders for plots.
     - **Vacuum Solver**: Guesses Pest positions when using the Pest Tracker ability on your vacuum.
+    - **Watering Helper**: Improves the Greenhouse watering cans.
 
 </details>
 
@@ -174,14 +180,57 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
       sending them in the chat.
     - **queue**: Command that lets you queue for any Dungeon floor/Kuudra tier.
     - **getPearls**: Refills your Ender Pearls (up to 16) directly from your sacks.
+    - **getSuperboom**: Refills your Superboom TNTs (up to 64) directly from your sacks.
+    - **getLeaps**: Refills your Spirit Leaps (up to 16) directly from your sacks.
+    - **getDraft**: Refills your Architect's First Drafts (up to 1) directly from your sacks.
+    - **refill**: Refills a specific item up to the specific amount from your sacks.
     - **ping**: Checks your current ping.
     - **hudEditor**: Opens the NoFrills hud editor.
     - **debug**: Random commands for logging, debugging, or testing.
     - **shardTracker**: Commands for managing the Shard Tracker feature.
+    - **slotBinding**: Commands for managing the Slot Binding feature.
 - **Other Commands** (not under `/nofrills`)
     - **/yeet**: Instantly closes Minecraft.
 
 </details>
+
+<details>
+<summary>Click to expand HUD element list</summary>
+
+- **FPS**: Displays your FPS.
+- **TPS**: Displays the real time TPS of the server, and optionally the average TPS.
+- **Ping**: Displays your ping.
+- **Day**: Displays the day that the server world is on.
+- **Armor**: Displays your current armor set.
+- **Inventory**: Displays the contents of your inventory.
+- **Quiver**: Displays the type and the amount of arrows in your quiver.
+- **LagMeter**: Displays the time since the last received server tick.
+- **BossHealth**: Allows you to display the health of your own slayer boss, the dungeon bosses, and Kuudra.
+- **DungeonMap**: Displays the dungeon map while in Dungeons.
+- **DungeonScore**: Displays the current dungeon score. Used by the Score Calculator feature.
+- **PadTimer**: Displays a tick timer for the pads in the F7/M7 Storm phase.
+- **TerminalStartTimer**: Displays a tick timer for the start of the Goldor phase in F7/M7.
+- **GoldorTickTimer**: Displays a tick timer for the death tick in the F7/M7 Goldor phase.
+- **Power**: Displays the power blessing level while in Dungeons.
+- **SeaCreatures**: Displays the amount of nearby sea creatures. Used by the Cap Tracker feature.
+- **FishingBobber**: Displays the fishing hologram timer, and optionally the existence time of your bobber.
+- **ShardTrackerDisplay**: Displays information about tracked attribute shards. Used by the Shard Tracker feature.
+- **SkillTrackerDisplay**: Displays information about your skill EXP gain. Used by the Skill Tracker feature.
+
+</details>
+
+## Scam Warning
+
+**There are fake NoFrills websites and Discord servers floating around.** Here are some general rules of thumb to help
+you stay safe:
+
+- The official Discord server link is https://discord.com/invite/NENuTFvS7X.
+- The official Discord server does not require any form of verification.
+- The official Discord server does not have a vanity link, it is currently taken by a phishing server which tries to
+  steal your Microsoft account.
+- There is no official website where you can download the mod from. The Modrinth and the GitHub are the only safe
+  sources of the mod.
+- Microsoft does not care about your account safety. Never share your email address with anyone.
 
 ## Installation
 
@@ -189,6 +238,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
   your Minecraft version, and add it to your "mods" folder.
 - Additional dependencies needed to launch the mod:
     - [Fabric API](https://modrinth.com/mod/fabric-api)
+    - [owo-lib](https://modrinth.com/mod/owo-lib) (Prompts you to install if not present)
     - [Mod Menu](https://modrinth.com/mod/modmenu) (Optional, settings can be accessed with `/nofrills`, or `/nf`)
 - To finish off, open the mod's settings screen, and configure it to your liking. **Every feature is off by default**.
 

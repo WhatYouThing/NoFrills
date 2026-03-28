@@ -10,17 +10,18 @@ import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
+import nofrills.config.SettingEnum;
 import nofrills.events.BlockUpdateEvent;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
+import nofrills.misc.RenderStyle;
 import nofrills.misc.Utils;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 public class LividSolver {
     public static final Feature instance = new Feature("lividSolver");
@@ -28,8 +29,10 @@ public class LividSolver {
     public static final SettingBool title = new SettingBool(true, "title", instance);
     public static final SettingBool highlight = new SettingBool(true, "highlight", instance);
     public static final SettingBool tracer = new SettingBool(false, "tracer", instance);
-    public static final SettingColor color = new SettingColor(RenderColor.fromArgb(0xff00ff00), "color", instance.key());
-    public static final SettingColor tracerColor = new SettingColor(RenderColor.fromArgb(0xff00ff00), "tracerColor", instance.key());
+    public static final SettingEnum<RenderStyle> style = new SettingEnum<>(RenderStyle.Outline, RenderStyle.class, "style", instance);
+    public static final SettingColor outlineColor = new SettingColor(RenderColor.fromArgb(0xff00ff00), "color", instance);
+    public static final SettingColor fillColor = new SettingColor(RenderColor.fromHex(0x00ff00, 0.5f), "fillColor", instance);
+    public static final SettingColor tracerColor = new SettingColor(RenderColor.fromArgb(0xff00ff00), "tracerColor", instance);
 
     private static final HashMap<Block, Livid> lividData = buildLividData();
     private static final EntityCache lividCache = new EntityCache();
@@ -85,18 +88,16 @@ public class LividSolver {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (isActive()) {
-            CopyOnWriteArraySet<Entity> livids = lividCache.get();
-            if (livids.size() <= 1) return;
-            for (Entity livid : livids) {
+        if (isActive() && lividCache.size() > 1) {
+            for (Entity livid : lividCache.get()) {
                 if (Utils.toPlain(livid.getName()).equals(currentName)) {
                     float delta = event.tickCounter.getTickProgress(true);
+                    Box box = Utils.getLerpedBox(livid, delta);
                     if (highlight.value()) {
-                        Box box = Utils.getLerpedBox(livid, delta);
-                        event.drawOutline(box, false, color.value());
+                        event.drawStyled(box, style.value(), false, outlineColor.value(), fillColor.value());
                     }
                     if (tracer.value()) {
-                        event.drawTracer(livid.getLerpedPos(delta), tracerColor.value());
+                        event.drawTracer(box.getCenter(), tracerColor.value());
                     }
                     break;
                 }

@@ -30,7 +30,6 @@ public class WitherDragons {
     public static final SettingBool alert = new SettingBool(false, "alert", instance);
     public static final SettingDouble power = new SettingDouble(0.0, "power", instance);
     public static final SettingDouble powerEasy = new SettingDouble(0.0, "powerEasy", instance);
-    public static final SettingBool glow = new SettingBool(false, "glow", instance);
     public static final SettingBool boxes = new SettingBool(false, "boxes", instance);
     public static final SettingBool tracers = new SettingBool(false, "tracers", instance);
     public static final SettingBool stack = new SettingBool(false, "stack", instance);
@@ -357,9 +356,6 @@ public class WitherDragons {
         public void setEntity(EnderDragonEntity ent) {
             this.dragonCache.add(ent);
             this.health = ent.getHealth(); // store the health value on update, required as the client appears to reset it on the next tick
-            if (glow.value() && !Utils.isGlowing(ent)) {
-                Utils.setGlowing(ent, true, this.color);
-            }
         }
 
         public boolean isCollar(ArmorStandEntity entity) {

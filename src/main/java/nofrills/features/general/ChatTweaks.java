@@ -1,8 +1,12 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.util.Mth;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
@@ -10,6 +14,9 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static nofrills.Main.mc;
 
@@ -27,35 +34,47 @@ public class ChatTweaks {
 
     private static String getHoveredMsg(boolean singleLine) {
         ChatComponent chatHud = mc.gui.getChat();
-        // TODO
-//        double x = chatHud.screenToChatX(mc.mouseHandler.getScaledXPos(mc.getWindow()));
-//        double y = chatHud.screenToChatY(mc.mouseHandler.getScaledYPos(mc.getWindow()));
-//        int i = chatHud.getMessageLineIndexAt(x, y);
-//        if (i >= 0 && i < chatHud.trimmedMessages.size()) {
-//            StringBuilder builder = new StringBuilder();
-//            List<GuiMessage.Line> lines = new ArrayList<>();
-//            if (singleLine) {
-//                lines.addFirst(chatHud.trimmedMessages.get(i));
-//            } else {
-//                for (int index = i + 1; index < chatHud.trimmedMessages.size(); index++) {
-//                    GuiMessage.Line line = chatHud.trimmedMessages.get(index);
-//                    if (line.endOfEntry()) break;
-//                    lines.addFirst(line);
-//                }
-//                for (int index = i; index >= 0; index--) {
-//                    GuiMessage.Line line = chatHud.trimmedMessages.get(index);
-//                    lines.add(line);
-//                    if (line.endOfEntry()) break;
-//                }
-//            }
-//            for (GuiMessage.Line line : lines) {
-//                line.content().accept((index, style, codePoint) -> {
-//                    builder.appendCodePoint(codePoint);
-//                    return true;
-//                });
-//            }
-//            return ChatFormatting.stripFormatting(builder.toString());
-//        }
+        float mouseX = (float) mc.mouseHandler.getScaledXPos(mc.getWindow());
+        float mouseY = (float) mc.mouseHandler.getScaledYPos(mc.getWindow());
+        int chatBottom = Mth.floor((mc.getWindow().getGuiScaledHeight() - 40) / mc.options.chatScale().get());
+        int messageHeight = 9;
+        double chatLineSpacing = mc.options.chatLineSpacing().get();
+        int entryHeight = (int) (messageHeight * (chatLineSpacing + 1.0));
+        List<GuiMessage.Line> visibleMessages = chatHud.trimmedMessages.subList(chatHud.chatScrollbarPos, chatHud.trimmedMessages.size());
+        int i = -1;
+        for (int index = 0; index < visibleMessages.size(); index++) {
+            int entryBottom = chatBottom - index * entryHeight;
+            int entryTop = entryBottom - entryHeight;
+            if (ActiveTextCollector.isPointInRectangle(mouseX, mouseY, 0, entryTop, mc.options.chatWidth().get().floatValue() * 320.0f, entryBottom)) {
+                i = index;
+                break;
+            }
+        }
+        if (i >= 0) {
+            StringBuilder builder = new StringBuilder();
+            List<GuiMessage.Line> lines = new ArrayList<>();
+            if (singleLine) {
+                lines.addFirst(visibleMessages.get(i));
+            } else {
+                for (int index = i + 1; index < visibleMessages.size(); index++) {
+                    GuiMessage.Line line = visibleMessages.get(index);
+                    if (line.endOfEntry()) break;
+                    lines.addFirst(line);
+                }
+                for (int index = i; index >= 0; index--) {
+                    GuiMessage.Line line = visibleMessages.get(index);
+                    lines.add(line);
+                    if (line.endOfEntry()) break;
+                }
+            }
+            for (GuiMessage.Line line : lines) {
+                line.content().accept((index, style, codePoint) -> {
+                    builder.appendCodePoint(codePoint);
+                    return true;
+                });
+            }
+            return ChatFormatting.stripFormatting(builder.toString());
+        }
         return "";
     }
 

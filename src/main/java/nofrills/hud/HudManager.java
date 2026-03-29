@@ -2,10 +2,10 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.world.level.block.Blocks;
 import nofrills.events.*;
 import nofrills.features.fishing.CapTracker;
 import nofrills.hud.elements.*;
@@ -90,9 +90,9 @@ public class HudManager {
 
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
-        if (event.packet instanceof ClientboundPongResponsePacket pingPacket) {
+        if (event.packet instanceof ClientboundPongResponsePacket(long time)) {
             if (ping.isActive()) {
-                ping.setPing(Util.getMillis() - pingPacket.time());
+                ping.setPing(Util.getMillis() - time);
                 ping.ticks = 20;
             }
         }

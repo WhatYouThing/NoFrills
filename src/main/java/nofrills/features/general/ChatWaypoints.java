@@ -1,8 +1,8 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.chat.Component;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;

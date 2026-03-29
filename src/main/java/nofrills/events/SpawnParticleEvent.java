@@ -1,7 +1,7 @@
 package nofrills.events;
 
-import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.world.phys.Vec3;
 
 public class SpawnParticleEvent extends Cancellable {

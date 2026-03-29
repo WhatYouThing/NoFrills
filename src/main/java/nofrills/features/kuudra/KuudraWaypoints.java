@@ -1,9 +1,9 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Giant;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;

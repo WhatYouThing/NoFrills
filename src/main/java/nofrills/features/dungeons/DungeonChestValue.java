@@ -1,9 +1,9 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.ScreenOpenEvent;

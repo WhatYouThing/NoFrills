@@ -1,11 +1,11 @@
 package nofrills.mixin;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.Model;
+import net.minecraft.client.model.object.projectile.ArrowModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.layers.StuckInBodyLayer;
-import net.minecraft.client.model.object.projectile.ArrowModel;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import com.mojang.blaze3d.vertex.PoseStack;
 import nofrills.features.general.NoRender;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

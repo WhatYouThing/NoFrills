@@ -1,18 +1,18 @@
 package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.ChatFormatting;
-import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.component.ItemLore;
 import nofrills.config.Feature;
 import nofrills.events.PlaySoundEvent;
 import nofrills.events.ScreenOpenEvent;

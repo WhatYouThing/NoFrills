@@ -1,7 +1,6 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Camera;
 import net.minecraft.world.entity.Entity;
 import nofrills.features.tweaks.EyeHeightFix;

@@ -1,7 +1,7 @@
 package nofrills.events;
 
-import net.minecraft.world.entity.Entity;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import nofrills.misc.Utils;
 
 public class EntityNamedEvent {

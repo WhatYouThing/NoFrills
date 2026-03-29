@@ -3,8 +3,8 @@ package nofrills.hud.clickgui.components;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.util.EventSource;
 import io.wispforest.owo.util.EventStream;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.hud.clickgui.Settings;
 
 public class ToggleButton extends ButtonComponent {

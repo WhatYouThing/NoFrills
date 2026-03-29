@@ -1,7 +1,7 @@
 package nofrills.mixin;
 
-import net.minecraft.client.Options;
 import net.minecraft.client.CameraType;
+import net.minecraft.client.Options;
 import nofrills.features.tweaks.NoFrontPerspective;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

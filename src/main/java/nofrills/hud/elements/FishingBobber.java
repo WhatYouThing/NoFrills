@@ -1,9 +1,9 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.Entity;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;

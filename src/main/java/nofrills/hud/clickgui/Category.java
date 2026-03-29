@@ -1,9 +1,9 @@
 package nofrills.hud.clickgui;
 
 import io.wispforest.owo.ui.base.BaseUIComponent;
-import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.network.chat.Component;
 import nofrills.hud.clickgui.components.PlainLabel;

@@ -1,8 +1,8 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import nofrills.config.Feature;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;

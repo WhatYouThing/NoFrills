@@ -1,17 +1,17 @@
 package nofrills.misc;
 
-import net.minecraft.world.level.block.*;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class EtherwarpRaycastContext extends ClipContext {
     public EtherwarpRaycastContext(Vec3 start, Vec3 end, Block shapeType, Fluid fluidHandling, CollisionContext shapeContext) {
@@ -35,7 +35,8 @@ public class EtherwarpRaycastContext extends ClipContext {
             case LadderBlock ignored -> Shapes.empty();
             case StandingSignBlock ignored -> Shapes.block();
             case WallSignBlock ignored -> Shapes.block();
-            case SnowLayerBlock ignored -> state.getValue(BlockStateProperties.LAYERS) < 8 ? Shapes.empty() : Shapes.block();
+            case SnowLayerBlock ignored ->
+                    state.getValue(BlockStateProperties.LAYERS) < 8 ? Shapes.empty() : Shapes.block();
             default -> state.getCollisionShape(world, pos).isEmpty() ? Shapes.empty() : Shapes.block();
         };
     }

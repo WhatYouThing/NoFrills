@@ -2,11 +2,11 @@ package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
-import net.minecraft.world.scores.*;
-import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
+import net.minecraft.world.scores.*;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.events.ServerJoinEvent;
@@ -190,8 +190,8 @@ public class SkyblockData {
 
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
-        if (showPing && event.packet instanceof ClientboundPongResponsePacket pingPacket) {
-            Utils.infoFormat("§aPing: §f{}ms", Util.getMillis() - pingPacket.time());
+        if (showPing && event.packet instanceof ClientboundPongResponsePacket(long time)) {
+            Utils.infoFormat("§aPing: §f{}ms", Util.getMillis() - time);
             showPing = false;
         }
     }

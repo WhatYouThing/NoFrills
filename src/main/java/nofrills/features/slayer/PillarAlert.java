@@ -1,8 +1,8 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.events.EntityNamedEvent;

@@ -1,13 +1,13 @@
 package nofrills.hud;
 
-import io.wispforest.owo.ui.container.UIContainers;
+import com.mojang.blaze3d.platform.Window;
 import io.wispforest.owo.ui.container.DraggableContainer;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.input.MouseButtonEvent;
-import com.mojang.blaze3d.platform.Window;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import nofrills.config.*;
 import nofrills.hud.clickgui.Settings;

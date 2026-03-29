@@ -2,9 +2,9 @@ package nofrills.misc;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;

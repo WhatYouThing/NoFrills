@@ -1,9 +1,9 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.events.WorldRenderEvent;

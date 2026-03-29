@@ -2,9 +2,9 @@ package nofrills.features.tweaks;
 
 import com.google.common.collect.Sets;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.misc.Utils;

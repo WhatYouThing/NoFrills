@@ -1,8 +1,8 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Feature;
 import nofrills.features.dungeons.ScoreCalculator;
 import nofrills.hud.SimpleTextElement;

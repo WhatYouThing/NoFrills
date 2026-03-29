@@ -2,9 +2,9 @@ package nofrills.features.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ChatMsgEvent;

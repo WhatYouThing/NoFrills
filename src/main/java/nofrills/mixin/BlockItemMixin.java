@@ -1,9 +1,9 @@
 package nofrills.mixin;
 
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.level.block.state.BlockState;
 import nofrills.features.tweaks.NoAbilityPlace;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

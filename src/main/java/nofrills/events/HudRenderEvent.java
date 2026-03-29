@@ -1,8 +1,8 @@
 package nofrills.events;
 
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.DeltaTracker;
 
 public class HudRenderEvent {
     public GuiGraphicsExtractor context;

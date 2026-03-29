@@ -2,8 +2,8 @@ package nofrills.features.fishing;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;

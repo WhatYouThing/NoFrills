@@ -1,8 +1,8 @@
 package nofrills.features.hunting;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.world.item.Items;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.events.EntityNamedEvent;
 import nofrills.misc.Utils;

@@ -1,17 +1,17 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.world.level.block.*;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.AABB;
 import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
@@ -59,7 +59,8 @@ public class EtherwarpOverlay {
             case LilyPadBlock ignored -> !isAbove;
             case LanternBlock ignored -> !isAbove;
             case LadderBlock ignored -> isAbove;
-            case SnowLayerBlock ignored -> isAbove ? state.getValue(BlockStateProperties.LAYERS) < 8 : state.getValue(BlockStateProperties.LAYERS) == 8;
+            case SnowLayerBlock ignored ->
+                    isAbove ? state.getValue(BlockStateProperties.LAYERS) < 8 : state.getValue(BlockStateProperties.LAYERS) == 8;
             default ->
                     isAbove ? !state.canOcclude() && !state.isCollisionShapeFullBlock(mc.level, pos) : state.canOcclude() || state.isCollisionShapeFullBlock(mc.level, pos);
         };

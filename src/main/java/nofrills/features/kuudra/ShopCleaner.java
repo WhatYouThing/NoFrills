@@ -1,8 +1,8 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.SlotOptions;

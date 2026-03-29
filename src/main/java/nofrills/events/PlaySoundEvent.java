@@ -1,7 +1,7 @@
 package nofrills.events;
 
-import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.core.Holder;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.sounds.SoundEvent;
 
 

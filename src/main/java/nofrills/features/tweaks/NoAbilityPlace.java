@@ -2,8 +2,8 @@ package nofrills.features.tweaks;
 
 import com.google.common.collect.Sets;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import nofrills.config.Feature;
 import nofrills.misc.Utils;
 

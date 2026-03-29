@@ -1,7 +1,7 @@
 package nofrills.events;
 
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class AttackBlockEvent {
     public BlockHitResult blockHitResult;

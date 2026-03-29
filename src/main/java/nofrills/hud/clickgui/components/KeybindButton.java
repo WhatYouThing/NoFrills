@@ -1,10 +1,10 @@
 package nofrills.hud.clickgui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.util.EventSource;
 import io.wispforest.owo.util.EventStream;
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.network.chat.Component;
 import nofrills.misc.Rendering;
 import org.lwjgl.glfw.GLFW;

@@ -1,9 +1,9 @@
 package nofrills.hud.elements;
 
-import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.component.ItemComponent;
-import io.wispforest.owo.ui.container.UIContainers;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import io.wispforest.owo.ui.core.Sizing;

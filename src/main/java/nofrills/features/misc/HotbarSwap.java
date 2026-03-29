@@ -2,8 +2,8 @@ package nofrills.features.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.InputEvent;

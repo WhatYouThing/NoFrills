@@ -11,7 +11,6 @@ import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
-
 import static nofrills.Main.mc;
 
 public class ChatTweaks {

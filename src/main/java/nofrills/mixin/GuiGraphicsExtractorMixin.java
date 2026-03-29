@@ -7,8 +7,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import nofrills.features.misc.CommandTooltip;
 import nofrills.features.misc.TooltipScale;
@@ -39,8 +39,10 @@ public abstract class GuiGraphicsExtractorMixin {
 
     @ModifyExpressionValue(method = "componentHoverEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/HoverEvent$ShowText;value()Lnet/minecraft/network/chat/Component;"))
     private Component getHoveredText(Component original, @Local(argsOnly = true) Style style) {
-        if (CommandTooltip.instance.isActive() && style.getClickEvent() instanceof ClickEvent.RunCommand runCommand) {
-            return original.copy().append("\n\n").append(Utils.getShortTag().append(Utils.format("§7Command: {}", runCommand.command())));
+        if (CommandTooltip.instance.isActive() && style.getClickEvent() instanceof ClickEvent.RunCommand(
+                String command
+        )) {
+            return original.copy().append("\n\n").append(Utils.getShortTag().append(Utils.format("§7Command: {}", command)));
         }
         return original;
     }

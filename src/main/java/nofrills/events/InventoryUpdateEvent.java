@@ -1,7 +1,7 @@
 package nofrills.events;
 
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.world.item.ItemStack;
 
 public class InventoryUpdateEvent {
     public ClientboundContainerSetSlotPacket packet;

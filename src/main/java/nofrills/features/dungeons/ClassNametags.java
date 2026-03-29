@@ -2,8 +2,8 @@ package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;

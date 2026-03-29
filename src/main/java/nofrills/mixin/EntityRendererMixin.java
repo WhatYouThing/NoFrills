@@ -2,8 +2,8 @@ package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import nofrills.features.general.NoRender;
 import nofrills.features.misc.ForceNametag;
 import org.spongepowered.asm.mixin.Mixin;

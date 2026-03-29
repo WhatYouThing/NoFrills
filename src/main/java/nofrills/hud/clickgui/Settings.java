@@ -1,18 +1,17 @@
 package nofrills.hud.clickgui;
 
-import io.wispforest.owo.ui.base.BaseUIComponent;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
-import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
+import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.*;
 import nofrills.features.general.CommandKeybinds;
 import nofrills.hud.ColorPickerScreen;
@@ -86,7 +85,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     private static boolean isBinding(List<FlowLayout> settings, int button) {
         for (FlowLayout setting : settings) {
             for (UIComponent child : setting.children()) {
-                if (findKeybindButton((Component) child, button)) {
+                if (findKeybindButton(child, button)) {
                     return true;
                 }
             }
@@ -94,7 +93,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         return false;
     }
 
-    private static boolean findKeybindButton(Component child, int button) {
+    private static boolean findKeybindButton(UIComponent child, int button) {
         if (child instanceof KeybindButton keybind) {
             if (keybind.isBinding) {
                 keybind.bind(button);
@@ -102,7 +101,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             }
         } else if (child instanceof FlowLayout layout) {
             for (UIComponent layoutChild : layout.children()) {
-                if (findKeybindButton((Component) layoutChild, button)) {
+                if (findKeybindButton(layoutChild, button)) {
                     return true;
                 }
             }
@@ -158,10 +157,8 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
         this.scroll = UIContainers.verticalScroll(Sizing.content(), Sizing.fixed(getSettingsHeight(settings.children())), settings);
         this.scroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
-        BaseUIComponent label = new PlainLabel(this.title)
-                .color(textColor)
-                .horizontalTextAlignment(HorizontalAlignment.CENTER)
-                .verticalTextAlignment(VerticalAlignment.CENTER);
+        PlainLabel label = new PlainLabel(this.title);
+        label.color(textColor).horizontalTextAlignment(HorizontalAlignment.CENTER).verticalTextAlignment(VerticalAlignment.CENTER);
         ParentUIComponent header = UIContainers.verticalFlow(Sizing.fixed(width), Sizing.content())
                 .child(label)
                 .alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER)

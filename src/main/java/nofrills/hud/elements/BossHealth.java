@@ -2,9 +2,9 @@ package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.MagmaCube;
-import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;

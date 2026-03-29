@@ -1,11 +1,11 @@
 package nofrills.events;
 
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.world.Container;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+import net.minecraft.world.Container;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class SlotUpdateEvent {
     public ClientboundContainerSetSlotPacket packet;

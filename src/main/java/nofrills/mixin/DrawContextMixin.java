@@ -39,8 +39,10 @@ public abstract class DrawContextMixin {
 
     @ModifyExpressionValue(method = "drawHoverEvent", at = @At(value = "INVOKE", target = "Lnet/minecraft/text/HoverEvent$ShowText;value()Lnet/minecraft/text/Text;"))
     private Text getHoveredText(Text original, @Local(argsOnly = true) Style style) {
-        if (CommandTooltip.instance.isActive() && style.getClickEvent() instanceof ClickEvent.RunCommand runCommand) {
-            return original.copy().append("\n\n").append(Utils.getShortTag().append(Utils.format("§7Command: {}", runCommand.command())));
+        if (CommandTooltip.instance.isActive() && style.getClickEvent() instanceof ClickEvent.RunCommand(
+                String command
+        )) {
+            return original.copy().append("\n\n").append(Utils.getShortTag().append(Utils.format("§7Command: {}", command)));
         }
         return original;
     }

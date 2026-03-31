@@ -3,7 +3,6 @@ package nofrills.misc;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
@@ -23,17 +22,15 @@ public class EtherwarpRaycastContext extends RaycastContext {
     @Override
     public VoxelShape getBlockShape(BlockState state, BlockView world, BlockPos pos) {
         return switch (state.getBlock()) {
-            case DyedCarpetBlock ignored -> VoxelShapes.empty();
             case PlayerSkullBlock ignored -> VoxelShapes.empty();
             case SkullBlock ignored -> VoxelShapes.empty();
             case WallSkullBlock ignored -> VoxelShapes.empty();
-            case CarpetBlock ignored -> VoxelShapes.empty();
             case CocoaBlock ignored -> VoxelShapes.empty();
             case FlowerPotBlock ignored -> VoxelShapes.empty();
             case LadderBlock ignored -> VoxelShapes.empty();
             case SignBlock ignored -> VoxelShapes.fullCube();
             case WallSignBlock ignored -> VoxelShapes.fullCube();
-            case SnowBlock ignored -> state.get(Properties.LAYERS) < 8 ? VoxelShapes.empty() : VoxelShapes.fullCube();
+            case SnowBlock ignored -> VoxelShapes.fullCube();
             default -> state.getCollisionShape(world, pos).isEmpty() ? VoxelShapes.empty() : VoxelShapes.fullCube();
         };
     }

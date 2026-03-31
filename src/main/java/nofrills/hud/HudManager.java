@@ -90,9 +90,9 @@ public class HudManager {
 
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
-        if (event.packet instanceof PingResultS2CPacket pingPacket) {
+        if (event.packet instanceof PingResultS2CPacket(long startTime)) {
             if (ping.isActive()) {
-                ping.setPing(Util.getMeasuringTimeMs() - pingPacket.startTime());
+                ping.setPing(Util.getMeasuringTimeMs() - startTime);
                 ping.ticks = 20;
             }
         }

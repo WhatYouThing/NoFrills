@@ -136,7 +136,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(List.of(
                                 new Settings.Separator("Sound"),
-                                new Settings.Toggle("Warp Sound", EtherwarpOverlay.doSound, "Plays a custom sound effect as soon as you start teleporting to the target block.\nMakes the ability more responsive on high ping, but may produce false positives."),
+                                new Settings.Toggle("Warp Sound", EtherwarpOverlay.doSound, "Plays a custom sound effect upon teleporting."),
+                                new Settings.Toggle("Pingless Sound", EtherwarpOverlay.pinglessSound, "If enabled, the custom sound will play as soon as you click.\nMakes teleporting more responsive on high ping, but may produce false positives."),
                                 new Settings.TextInput("Sound", EtherwarpOverlay.sound, "The identifier of the sound to play."),
                                 new Settings.SliderDouble("Volume", 0.0, 5.0, 0.1, EtherwarpOverlay.volume, "The volume of the sound."),
                                 new Settings.SliderDouble("Pitch", 0.0, 2.0, 0.05, EtherwarpOverlay.pitch, "The pitch of the sound."),

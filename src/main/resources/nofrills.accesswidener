@@ -4,14 +4,9 @@ accessible field net/minecraft/component/type/NbtComponent nbt Lnet/minecraft/nb
 accessible field net/minecraft/client/world/ClientWorld entityManager Lnet/minecraft/world/entity/ClientEntityManager;
 accessible field net/minecraft/world/entity/SimpleEntityLookup index Lnet/minecraft/world/entity/EntityIndex;
 accessible field net/minecraft/world/entity/EntityIndex idToEntity Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
-accessible field net/minecraft/entity/mob/CreeperEntity CHARGED Lnet/minecraft/entity/data/TrackedData;
 accessible field net/minecraft/client/gui/hud/ChatHud visibleMessages Ljava/util/List;
 accessible field net/minecraft/entity/PlayerLikeEntity STANDING_DIMENSIONS Lnet/minecraft/entity/EntityDimensions;
 accessible class net/minecraft/client/render/WorldRenderer$Gizmos
-accessible method net/minecraft/client/gui/hud/ChatHud getChatScale ()D
-accessible method net/minecraft/client/gui/hud/ChatHud getLineHeight ()I
-accessible method net/minecraft/client/gui/hud/ChatHud isChatHidden ()Z
-accessible method net/minecraft/client/gui/hud/ChatHud getWidth ()I
 accessible field net/minecraft/client/gui/hud/ChatHud scrolledLines I
 accessible method net/minecraft/client/gui/DrawContext drawTexturedQuad (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lcom/mojang/blaze3d/textures/GpuTextureView;Lnet/minecraft/client/gl/GpuSampler;IIIIFFFFI)V
 accessible field net/minecraft/item/map/MapState decorations Ljava/util/Map;

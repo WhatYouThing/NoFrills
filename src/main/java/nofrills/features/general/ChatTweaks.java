@@ -1,6 +1,7 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.font.DrawnTextConsumer;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.screen.ChatScreen;
@@ -31,48 +32,38 @@ public class ChatTweaks {
     public static final SettingBool extraLines = new SettingBool(false, "extraLines", instance);
     public static final SettingInt lines = new SettingInt(1000, "lines", instance);
 
-    private static double[] getChatLinePos() {
-        ChatHud chatHud = mc.inGameHud.getChatHud();
-        double x = mc.mouse.getScaledX(mc.getWindow());
-        double y = mc.mouse.getScaledY(mc.getWindow());
-        double d = mc.getWindow().getScaledHeight() - y - 40.0;
-        return new double[]{x / chatHud.getChatScale() - 4.0, d / (chatHud.getChatScale() * chatHud.getLineHeight())};
-    }
-
-    // imported function from previous version of the game
-    private static int getChatLineIndex(double x, double y) {
-        ChatHud chatHud = mc.inGameHud.getChatHud();
-        if (chatHud.isChatFocused() && !chatHud.isChatHidden()) {
-            if (!(x < -4.0) && !(x > MathHelper.floor(chatHud.getWidth() / chatHud.getChatScale()))) {
-                int i = Math.min(chatHud.getVisibleLineCount(), chatHud.visibleMessages.size());
-                if (y >= 0.0 && y < i) {
-                    int j = MathHelper.floor(y + chatHud.scrolledLines);
-                    if (j >= 0 && j < chatHud.visibleMessages.size()) {
-                        return j;
-                    }
-                }
-            }
-        }
-        return -1;
-    }
-
     private static String getHoveredMsg(boolean singleLine) {
         ChatHud chatHud = mc.inGameHud.getChatHud();
-        double[] pos = getChatLinePos();
-        int i = getChatLineIndex(pos[0], pos[1]);
-        if (i >= 0 && i < chatHud.visibleMessages.size()) {
+        float mouseX = (float) mc.mouse.getScaledX(mc.getWindow());
+        float mouseY = (float) mc.mouse.getScaledY(mc.getWindow());
+        int chatBottom = MathHelper.floor((mc.getWindow().getScaledHeight() - 40) / mc.options.getChatScale().getValue());
+        int messageHeight = 9;
+        double chatLineSpacing = mc.options.getChatLineSpacing().getValue();
+        int entryHeight = (int) (messageHeight * (chatLineSpacing + 1.0));
+        int visibleEnd = Math.min(chatHud.visibleMessages.size(), chatHud.scrolledLines + ChatHud.getHeight(mc.options.getChatHeightFocused().getValue()) / entryHeight);
+        List<ChatHudLine.Visible> visibleMessages = chatHud.visibleMessages.subList(chatHud.scrolledLines, visibleEnd);
+        int i = -1;
+        for (int index = 0; index < visibleMessages.size(); index++) {
+            int entryBottom = chatBottom - index * entryHeight;
+            int entryTop = entryBottom - entryHeight;
+            if (DrawnTextConsumer.isWithinBounds(mouseX, mouseY, 0, entryTop, ChatHud.getWidth(mc.options.getChatWidth().getValue()), entryBottom)) {
+                i = index;
+                break;
+            }
+        }
+        if (i >= 0) {
             StringBuilder builder = new StringBuilder();
             List<ChatHudLine.Visible> lines = new ArrayList<>();
             if (singleLine) {
-                lines.addFirst(chatHud.visibleMessages.get(i));
+                lines.addFirst(visibleMessages.get(i));
             } else {
-                for (int index = i + 1; index < chatHud.visibleMessages.size(); index++) {
-                    ChatHudLine.Visible line = chatHud.visibleMessages.get(index);
+                for (int index = i + 1; index < visibleMessages.size(); index++) {
+                    ChatHudLine.Visible line = visibleMessages.get(index);
                     if (line.endOfEntry()) break;
                     lines.addFirst(line);
                 }
                 for (int index = i; index >= 0; index--) {
-                    ChatHudLine.Visible line = chatHud.visibleMessages.get(index);
+                    ChatHudLine.Visible line = visibleMessages.get(index);
                     lines.add(line);
                     if (line.endOfEntry()) break;
                 }
@@ -87,6 +78,7 @@ public class ChatTweaks {
         }
         return "";
     }
+
 
     @EventHandler
     private static void onInput(InputEvent event) {

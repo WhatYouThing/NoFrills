@@ -40,12 +40,13 @@ public class ChatTweaks {
         int messageHeight = 9;
         double chatLineSpacing = mc.options.chatLineSpacing().get();
         int entryHeight = (int) (messageHeight * (chatLineSpacing + 1.0));
-        List<GuiMessage.Line> visibleMessages = chatHud.trimmedMessages.subList(chatHud.chatScrollbarPos, chatHud.trimmedMessages.size());
+        int visibleEnd = Math.min(chatHud.trimmedMessages.size(), chatHud.chatScrollbarPos + ChatComponent.getHeight(mc.options.chatHeightFocused().get()) / entryHeight);
+        List<GuiMessage.Line> visibleMessages = chatHud.trimmedMessages.subList(chatHud.chatScrollbarPos, visibleEnd);
         int i = -1;
         for (int index = 0; index < visibleMessages.size(); index++) {
             int entryBottom = chatBottom - index * entryHeight;
             int entryTop = entryBottom - entryHeight;
-            if (ActiveTextCollector.isPointInRectangle(mouseX, mouseY, 0, entryTop, mc.options.chatWidth().get().floatValue() * 320.0f, entryBottom)) {
+            if (ActiveTextCollector.isPointInRectangle(mouseX, mouseY, 0, entryTop, ChatComponent.getWidth(mc.options.chatWidth().get()), entryBottom)) {
                 i = index;
                 break;
             }

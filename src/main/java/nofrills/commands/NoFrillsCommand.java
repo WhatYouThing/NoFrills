@@ -204,6 +204,14 @@ public class NoFrillsCommand {
                 Utils.refillItem("ARCHITECT_FIRST_DRAFT", 1);
                 return SINGLE_SUCCESS;
             })),
+            new ModCommand("getToxic", "Refills your Toxic Arrow Poison (up to 32) directly from your sacks.", literal("getToxic").executes(context -> {
+                Utils.refillItem("TOXIC_ARROW_POISON", 32);
+                return SINGLE_SUCCESS;
+            })),
+            new ModCommand("getTwilight", "Refills your Twilight Arrow Poison (up to 16) directly from your sacks.", literal("getTwilight").executes(context -> {
+                Utils.refillItem("TWILIGHT_ARROW_POISON", 16);
+                return SINGLE_SUCCESS;
+            })),
             new ModCommand("refill", "Refills a specific item up to the specific amount from your sacks.", literal("refill").executes(context -> {
                 return SINGLE_SUCCESS;
             }).then(argument("query", StringArgumentType.greedyString()).executes(context -> {

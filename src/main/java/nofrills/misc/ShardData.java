@@ -170,7 +170,8 @@ public class ShardData {
             "cavernshade",
             "dragonfly",
             "king minos",
-            "sphinx"
+            "sphinx",
+            "littlefoot"
     );
     public static final HashSet<String> legendaryShards = Sets.newHashSet(
             "tenebris",
@@ -208,7 +209,8 @@ public class ShardData {
             "starborn",
             "titanoboa",
             "thorn",
-            "scarf"
+            "scarf",
+            "nessie"
     );
 
     public static final List<HashSet<String>> shardSetList = List.of(

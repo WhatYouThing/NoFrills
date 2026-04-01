@@ -214,6 +214,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(NoDamageSplash.class);
         eventBus.subscribe(CroesusSolver.class);
         eventBus.subscribe(EquipmentHighlight.class);
+        eventBus.subscribe(CommissionHighlight.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

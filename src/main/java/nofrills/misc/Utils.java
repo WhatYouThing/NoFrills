@@ -36,6 +36,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.GenericContainerScreenHandler;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.ClickEvent;
@@ -827,6 +828,17 @@ public class Utils {
     }
 
     public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
+        return getContainerSlots(handler, false);
+    }
+
+    public static List<Slot> getContainerSlots(ScreenHandler handler, boolean inverse) {
+        if (handler instanceof GenericContainerScreenHandler containerHandler) {
+            return getContainerSlots(containerHandler, inverse);
+        }
+        return List.of();
+    }
+
+    public static List<Slot> getContainerSlots(ScreenHandler handler) {
         return getContainerSlots(handler, false);
     }
 

@@ -13,7 +13,7 @@ public class PadTimer extends TickTimerElement {
     private int totalTicks = 0;
 
     public PadTimer() {
-        super("Pad: §f{}", new Feature("padTimerElement"), "Pad Timer");
+        super("Pad: {}", new Feature("padTimerElement"), "Pad Timer");
         this.totalTime = new SettingBool(true, "totalTime", this.instance);
         this.setStartTicks(20);
         this.setRepeating(true);
@@ -25,7 +25,7 @@ public class PadTimer extends TickTimerElement {
 
     @Override
     public void updateTimer() {
-        String timer = Utils.format(this.timerText, this.ticksAsTime(this.ticks));
+        String timer = Utils.format(this.timerText, this.getTimeColor() + this.ticksAsTime(this.ticks));
         if (this.totalTime.value()) {
             timer += " §7(" + this.ticksAsTime(this.totalTicks) + ")";
         }

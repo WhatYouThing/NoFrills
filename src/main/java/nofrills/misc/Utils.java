@@ -416,6 +416,10 @@ public class Utils {
         );
     }
 
+    public static ItemStack getEntityHelmet(LivingEntity entity) {
+        return entity.getEquippedStack(EquipmentSlot.HEAD);
+    }
+
     /**
      * Returns the custom data compound of the provided ItemStack, or else null.
      */

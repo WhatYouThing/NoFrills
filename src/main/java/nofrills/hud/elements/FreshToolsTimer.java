@@ -6,7 +6,7 @@ import nofrills.hud.TickTimerElement;
 public class FreshToolsTimer extends TickTimerElement {
 
     public FreshToolsTimer() {
-        super("Fresh Tools: §f{}", new Feature("freshToolsTimerElement"), "Fresh Tools Timer");
+        super("Fresh Tools: {}", new Feature("freshToolsTimerElement"), "Fresh Tools Timer");
         this.setStartTicks(200);
         this.options = this.getBaseSettings();
         this.setDesc("Displays a timer for the Fresh Tools perk shop ability in Kuudra.\nUsed by the Fresh Timer feature.");

@@ -6,7 +6,7 @@ import nofrills.hud.TickTimerElement;
 public class GoldorTickTimer extends TickTimerElement {
 
     public GoldorTickTimer() {
-        super("Goldor Tick: §f{}", new Feature("goldorTickTimerElement"), "Goldor Tick Timer");
+        super("Goldor Tick: {}", new Feature("goldorTickTimerElement"), "Goldor Tick Timer");
         this.setStartTicks(60);
         this.setRepeating(true);
         this.options = this.getBaseSettings();

@@ -38,8 +38,19 @@ public class TickTimerElement extends SimpleTextElement {
         return Utils.formatDecimal(ticks / 20.0) + "s";
     }
 
+    public String getTimeColor() {
+        double percentage = (double) this.ticks / this.startTicks;
+        if (percentage > 0.66) {
+            return "§c";
+        }
+        if (percentage > 0.33) {
+            return "§6";
+        }
+        return "§a";
+    }
+
     public void updateTimer() {
-        this.setText(Utils.format(this.timerText, this.ticksAsTime(this.ticks)));
+        this.setText(Utils.format(this.timerText, this.getTimeColor() + this.ticksAsTime(this.ticks)));
     }
 
     public void tick() {

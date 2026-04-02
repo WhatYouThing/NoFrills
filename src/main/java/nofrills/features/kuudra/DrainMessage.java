@@ -20,7 +20,7 @@ public class DrainMessage {
     @EventHandler
     private static void onChatMsg(ChatMsgEvent event) {
         if (instance.isActive() && Utils.isInKuudra()) {
-            String msg = event.getPlainMessage();
+            String msg = event.msg();
             if (msg.startsWith("Used Extreme Focus!")) {
                 String mana = msg.replace("Used Extreme Focus! (", "").replace(" Mana)", "");
                 int players = 0;

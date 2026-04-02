@@ -10,6 +10,7 @@ public class TickTimerElement extends SimpleTextElement {
     protected int ticks = -1;
     protected int startTicks = 0;
     protected boolean repeating = false;
+    protected boolean autoPause = false;
 
     public TickTimerElement(String text, Feature instance, String label) {
         super(Text.literal(Utils.format(text, "N/A")), instance, label);
@@ -84,5 +85,13 @@ public class TickTimerElement extends SimpleTextElement {
 
     public void setRepeating(boolean repeating) {
         this.repeating = repeating;
+    }
+
+    public void setAutoPause() {
+        this.autoPause = true;
+    }
+
+    public boolean isAutoPause() {
+        return this.autoPause;
     }
 }

@@ -10,6 +10,7 @@ public class TimerElement extends SimpleTextElement {
     protected final String timerText;
     protected long duration = 0;
     protected long time = 0;
+    protected boolean autoPause = false;
 
     public TimerElement(String text, Feature instance, String label) {
         super(Text.literal(Utils.format(text, "N/A")), instance, label);
@@ -62,5 +63,13 @@ public class TimerElement extends SimpleTextElement {
     public void pause() {
         this.duration = 0;
         this.time = 0;
+    }
+
+    public void setAutoPause() {
+        this.autoPause = true;
+    }
+
+    public boolean isAutoPause() {
+        return this.autoPause;
     }
 }

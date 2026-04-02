@@ -11,5 +11,6 @@ public class GoldorTickTimer extends TickTimerElement {
         this.setRepeating(true);
         this.options = this.getBaseSettings();
         this.setDesc("Displays a tick timer for the death tick in the F7/M7 Goldor phase.");
+        this.setAutoPause();
     }
 }

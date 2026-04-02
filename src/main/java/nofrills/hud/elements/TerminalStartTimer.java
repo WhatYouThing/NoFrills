@@ -10,5 +10,6 @@ public class TerminalStartTimer extends TickTimerElement {
         this.setStartTicks(104);
         this.options = this.getBaseSettings();
         this.setDesc("Displays a tick timer for the start of the Goldor phase in F7/M7.");
+        this.setAutoPause();
     }
 }

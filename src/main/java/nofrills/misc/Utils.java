@@ -408,16 +408,22 @@ public class Utils {
      * Returns the armor that the entity is wearing.
      */
     public static List<ItemStack> getEntityArmor(LivingEntity entity) {
-        return List.of(
-                entity.getEquippedStack(EquipmentSlot.HEAD),
-                entity.getEquippedStack(EquipmentSlot.CHEST),
-                entity.getEquippedStack(EquipmentSlot.LEGS),
-                entity.getEquippedStack(EquipmentSlot.FEET)
-        );
+        if (entity != null) {
+            return List.of(
+                    entity.getEquippedStack(EquipmentSlot.HEAD),
+                    entity.getEquippedStack(EquipmentSlot.CHEST),
+                    entity.getEquippedStack(EquipmentSlot.LEGS),
+                    entity.getEquippedStack(EquipmentSlot.FEET)
+            );
+        }
+        return List.of();
     }
 
     public static ItemStack getEntityHelmet(LivingEntity entity) {
-        return entity.getEquippedStack(EquipmentSlot.HEAD);
+        if (entity != null) {
+            return entity.getEquippedStack(EquipmentSlot.HEAD);
+        }
+        return ItemStack.EMPTY;
     }
 
     /**

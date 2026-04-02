@@ -134,6 +134,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Duration", 1, 600, 1, ChatWaypoints.allDuration, "The duration (in seconds) that all chat waypoints should be rendered for."),
                                 new Settings.ColorPicker("Color", ChatWaypoints.allColor, "The color used for the all chat waypoints.")
                         ))),
+                        new Module("Builder Ruler Preview", BuilderRulerPreview.instance, "Highlights blocks that will be placed or destroyed by the Builder's Ruler.", new Settings(List.of(
+                                new Settings.Dropdown<>("Highlight Style", BuilderRulerPreview.highlightStyle, "The style of the highlight."),
+                                new Settings.ColorPicker("Place Fill", BuilderRulerPreview.placeColor, "Fill color for placement preview."),
+                                new Settings.ColorPicker("Place Outline", BuilderRulerPreview.outlinePlaceColor, "Outline color for placement preview."),
+                                new Settings.ColorPicker("Destroy Fill", BuilderRulerPreview.destroyColor, "Fill color for destroy preview."),
+                                new Settings.ColorPicker("Destroy Outline", BuilderRulerPreview.outlineDestroyColor, "Outline color for destroy preview.")
+                        ))),
                         new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(List.of(
                                 new Settings.Separator("Sound"),
                                 new Settings.Toggle("Warp Sound", EtherwarpOverlay.doSound, "Plays a custom sound effect upon teleporting."),

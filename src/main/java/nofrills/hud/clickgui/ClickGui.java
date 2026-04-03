@@ -610,7 +610,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Crystal Fill", BossHighlight.crystalFill, "The color of the filled box if your boss is using the Crystal attunement."),
                                 new Settings.ColorPicker("Crystal Outline", BossHighlight.crystalOutline, "The color of the outline box if your boss is using the Crystal attunement.")
                         ))),
-                        new Module("Pillar Alert", PillarAlert.instance, "Alerts you when your Blaze boss spawns a fire pillar.\nThis feature tries to prevent false flags by tracking the \"path\" that the pillars take."),
+                        new Module("Pillar Alert", PillarAlert.instance, "Displays the hits and the timer of your Blaze slayer fire pillars.\nThis feature tries to prevent false flags by tracking the \"path\" that the pillars take."),
                         new Module("No Attunement Spam", NoAttunementSpam.instance, "Filters the chat messages about using the wrong attunement on the Blaze boss."),
                         new Module("Kill Timer", KillTimer.instance, "Tracks how long your slayer boss took to kill."),
                         new Module("Chalice Highlight", ChaliceHighlight.instance, "Highlights the Blood Ichor chalices spawned by the T5 Vampire.", new Settings(List.of(

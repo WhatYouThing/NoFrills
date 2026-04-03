@@ -9,6 +9,7 @@ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -73,7 +74,8 @@ public class WitherDragons {
     }
 
     private static void announceSpawn(Dragon drag, boolean split) {
-        Utils.showTitleCustom(Utils.toUpper(drag.name) + " IS SPAWNING!", 60, -20, 4.0f, drag.color);
+        MutableText title = Text.literal(Utils.toUpper(drag.name) + " IS SPAWNING").setStyle(Style.EMPTY.withBold(true).withColor(drag.color.hex));
+        Utils.showTitle(title, Text.empty(), 0, 30, 10);
         Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
         if (split) {
             Utils.infoRaw(Text.literal(drag.name + " is your priority dragon.").withColor(drag.color.hex));

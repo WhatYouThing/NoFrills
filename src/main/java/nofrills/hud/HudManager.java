@@ -3,8 +3,11 @@ package nofrills.hud;
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import nofrills.events.*;
@@ -51,6 +54,8 @@ public class HudManager {
     public static final ShardTrackerDisplay shardTracker = new ShardTrackerDisplay();
     public static final SkillTrackerDisplay skillTracker = new SkillTrackerDisplay();
 
+    private static CustomTitle currentTitle = new CustomTitle(Text.empty(), 0);
+
     public static boolean isEditingHud() {
         return mc.currentScreen instanceof HudEditorScreen;
     }
@@ -72,12 +77,23 @@ public class HudManager {
         }
     }
 
+    public static void setCustomTitle(MutableText text, int ticks) {
+        currentTitle = new CustomTitle(text, ticks);
+    }
+
+    public static void setCustomTitle(String text, int ticks) {
+        setCustomTitle(Text.literal(text), ticks);
+    }
+
     @EventHandler
     private static void onRenderHud(HudRenderEvent event) {
         if (!isEditingHud()) {
             for (HudElement element : HudManager.elements) {
                 if (element.isAdded()) element.updatePosition();
             }
+        }
+        if (currentTitle.isActive()) {
+            currentTitle.draw(event.context);
         }
     }
 
@@ -97,6 +113,7 @@ public class HudManager {
                 timer.pause();
             }
         }
+        currentTitle.reset();
     }
 
     @EventHandler
@@ -170,6 +187,9 @@ public class HudManager {
         }
         if (skillTracker.isActive()) {
             skillTracker.tick();
+        }
+        if (currentTitle.isActive()) {
+            currentTitle.tick();
         }
     }
 
@@ -267,6 +287,39 @@ public class HudManager {
             if (event.pos.getX() == 7 && event.pos.getY() == 77 && event.pos.getZ() == 34) {
                 spiritBearTimer.start();
             }
+        }
+    }
+
+    public static class CustomTitle {
+        public MutableText text;
+        public int ticks;
+
+        public CustomTitle(MutableText text, int ticks) {
+            this.text = text;
+            this.ticks = ticks;
+        }
+
+        public boolean isActive() {
+            return this.ticks > 0;
+        }
+
+        public void tick() {
+            this.ticks--;
+        }
+
+        public void reset() {
+            this.ticks = 0;
+        }
+
+        public void draw(DrawContext context) {
+            context.getMatrices().pushMatrix();
+            context.getMatrices().translate(context.getScaledWindowWidth() * 0.5f, context.getScaledWindowHeight() * 0.5f);
+            context.getMatrices().pushMatrix();
+            context.getMatrices().scale(4.0F, 4.0F);
+            int width = mc.textRenderer.getWidth(this.text);
+            context.drawTextWithBackground(mc.textRenderer, this.text, -width / 2, -context.getScaledWindowHeight() / 12, width, -1);
+            context.getMatrices().popMatrix();
+            context.getMatrices().popMatrix();
         }
     }
 }

@@ -95,18 +95,14 @@ public class Utils {
             "Crimson Isle"
     );
 
-    public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        mc.inGameHud.setTitle(Text.of(title));
-        mc.inGameHud.setSubtitle(Text.of(subtitle));
+    public static void showTitle(MutableText title, MutableText subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        mc.inGameHud.setTitle(title);
+        mc.inGameHud.setSubtitle(subtitle);
         mc.inGameHud.setTitleTicks(fadeInTicks, stayTicks, fadeOutTicks);
     }
 
-    public static void showTitleCustom(String title, int stayTicks, int yOffset, float scale, RenderColor color) {
-        ((TitleRendering) mc.inGameHud).nofrills_mod$setRenderTitle(title, stayTicks, yOffset, scale, color);
-    }
-
-    public static boolean isRenderingCustomTitle() {
-        return ((TitleRendering) mc.inGameHud).nofrills_mod$isRenderingTitle();
+    public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        showTitle(Text.literal(title), Text.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks);
     }
 
     public static boolean isNearlyEqual(double a, double b, double eps) {

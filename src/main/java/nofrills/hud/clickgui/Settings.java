@@ -14,7 +14,6 @@ import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import nofrills.config.*;
-import nofrills.features.general.CommandKeybinds;
 import nofrills.hud.ColorPickerScreen;
 import nofrills.hud.clickgui.components.*;
 import nofrills.misc.Rendering;
@@ -74,7 +73,6 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             int childHeight = switch (child) {
                 case Description description -> 10 + ((PlainLabel) description.children().getLast()).getTextHeight();
                 case Separator ignored -> 20;
-                case CommandKeybinds.Setting ignored -> 51;
                 case CustomHeight customHeight -> customHeight.heightOverride;
                 default -> 30;
             };
@@ -330,7 +328,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.child(buildResetButton(btn -> this.setting.reset()).positioning(Positioning.relative(100, 50)));
             ButtonComponent editButton = UIComponents.button(Text.literal("Edit Color"), (btn) -> {
                 ColorPickerScreen pickerScreen = ColorPickerScreen.build(this.setting, this.previous);
-                pickerScreen.setTitle(Text.literal(!Utils.toLower(name).endsWith(" color") ? name + " Color" : name));
+                pickerScreen.setTitle(Text.literal(!Utils.toLower(name).endsWith("color") ? name + " Color" : name));
                 mc.setScreen(pickerScreen);
             });
             editButton.horizontalSizing(Sizing.fixed(60));

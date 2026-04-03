@@ -182,13 +182,11 @@ public class ChatRules {
             input.tooltip(Text.literal("The name of this chat rule."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("name", value)));
             ToggleButton mainToggle = new ToggleButton(this.getData().get("enabled").getAsBoolean());
-            mainToggle.verticalSizing(Sizing.fixed(18));
-            mainToggle.margins(Insets.of(1, 0, 0, 3));
+            mainToggle.sizing(Sizing.fixed(50), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 3));
             mainToggle.tooltip(Text.literal("The main toggle for this chat rule."));
             mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));
             ButtonComponent editButton = UIComponents.button(Text.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildRuleSettings()));
-            editButton.verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
-            editButton.horizontalSizing(Sizing.fixed(49));
+            editButton.sizing(Sizing.fixed(48), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             editButton.renderer(Settings.buttonRendererWhite);
             ButtonComponent delete = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("rules").getAsJsonArray().remove(this.index));
@@ -277,7 +275,7 @@ public class ChatRules {
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
             input.text(this.getData().has("classFilter") ? this.getData().get("classFilter").getAsString() : "");
-            input.tooltip(Text.literal("A list of dungeon classes that this rule requires to work.\nFor example: \"mage archer\" will disable the rule if you are not playing as either Mage or Archer.\n\nLeave empty to disable class filtering."));
+            input.tooltip(Text.literal("A list of dungeon classes that this rule requires to work.\nFor example: \"mage archer\" will disable the rule\nif your selected class is not either Mage or Archer.\n\nLeave empty to disable class filtering."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("classFilter", value)));
             layout.child(label);
             layout.child(input);
@@ -292,7 +290,7 @@ public class ChatRules {
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
             input.text(this.getData().has("islandFilter") ? this.getData().get("islandFilter").getAsString() : "");
-            input.tooltip(Text.literal("A list of islands that this rule requires to work.\nFor example: \"catacombs kuudra\" will disable the rule if the area is not either Kuudra or Dungeons.\n\nLeave empty to disable island filtering."));
+            input.tooltip(Text.literal("A list of islands that this rule requires to work.\nFor example: \"catacombs kuudra\" will disable the rule\nif your current area is not either Kuudra or Dungeons.\n\nLeave empty to disable island filtering."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("islandFilter", value)));
             layout.child(label);
             layout.child(input);
@@ -392,6 +390,7 @@ public class ChatRules {
     }
 
     public static class ChatRulesSettings extends Settings {
+
         public ChatRulesSettings(List<FlowLayout> settings) {
             super(settings);
         }
@@ -401,5 +400,4 @@ public class ChatRules {
             mc.setScreen(buildSettings());
         }
     }
-
 }

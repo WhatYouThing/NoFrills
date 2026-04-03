@@ -59,6 +59,7 @@ public class EtherwarpOverlay {
             case LanternBlock ignored -> !isAbove;
             case LadderBlock ignored -> false;
             case AirBlock ignored -> true;
+            case TorchBlock ignored -> true;
             case EndPortalBlock ignored -> isAbove;
             case DoorBlock ignored -> !isAbove;
             case BrewingStandBlock ignored -> !isAbove;

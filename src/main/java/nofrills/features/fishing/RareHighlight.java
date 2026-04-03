@@ -24,6 +24,10 @@ public class RareHighlight {
 
     private static final EntityCache cache = new EntityCache();
 
+    private static boolean isMob(Entity entity) {
+        return Utils.isMob(entity) && !cache.has(entity);
+    }
+
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {
         if (instance.isActive() && event.entity instanceof ArmorStandEntity stand && !Utils.isInDungeons()) {
@@ -48,7 +52,7 @@ public class RareHighlight {
         if (instance.isActive() && SeaCreatureData.isSeaCreature(event.namePlain) && !Utils.isInDungeons()) {
             for (SeaCreatureData.SeaCreature creature : SeaCreatureData.list) {
                 if (creature.rare && creature.glow && event.namePlain.contains(creature.name)) {
-                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, Utils::isMob));
+                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, RareHighlight::isMob));
                     if (owner != null) {
                         cache.add(owner);
                         if (owner.hasVehicle()) {

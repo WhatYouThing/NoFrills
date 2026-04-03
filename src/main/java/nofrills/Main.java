@@ -148,6 +148,9 @@ public class Main implements ModInitializer {
         eventBus.subscribe(PartyCommands.class);
         eventBus.subscribe(NoRender.class);
         eventBus.subscribe(EtherwarpOverlay.class);
+        eventBus.subscribe(EtherwarpOverlay.class);
+        eventBus.subscribe(BuilderRulerPreview.class);
+        eventBus.subscribe(ChatWaypoints.class);
         eventBus.subscribe(ChatWaypoints.class);
         eventBus.subscribe(AutoSprint.class);
         eventBus.subscribe(RareHighlight.class);

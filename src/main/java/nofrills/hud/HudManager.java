@@ -48,6 +48,7 @@ public class HudManager {
     public static final FishingBobber bobber = new FishingBobber("Bobber: §7Inactive");
     public static final ShardTrackerDisplay shardTracker = new ShardTrackerDisplay();
     public static final SkillTrackerDisplay skillTracker = new SkillTrackerDisplay();
+    public static final BuilderRulerCounter builderRulerCounter = new BuilderRulerCounter("Place: §f0 §7/ §f0");
 
     public static boolean isEditingHud() {
         return mc.currentScreen instanceof HudEditorScreen;

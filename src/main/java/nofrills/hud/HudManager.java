@@ -31,6 +31,8 @@ public class HudManager {
     public static final LagMeter lagMeter = new LagMeter("Last server tick was 0.00s ago");
     public static final PickaxeAbilityTimer pickAbilityTimer = new PickaxeAbilityTimer();
     public static final QueueCooldownTimer queueCooldownTimer = new QueueCooldownTimer();
+    public static final SlayerHealth slayerHealth = new SlayerHealth();
+    public static final SlayerTimer slayerTimer = new SlayerTimer();
     public static final BossHealth bossHealth = new BossHealth();
     public static final DungeonMap dungeonMap = new DungeonMap();
     public static final DungeonScore dungeonScore = new DungeonScore();
@@ -150,6 +152,12 @@ public class HudManager {
         }
         if (inventory.isActive()) {
             inventory.updateInventory();
+        }
+        if (slayerHealth.isActive()) {
+            slayerHealth.update();
+        }
+        if (slayerTimer.isActive()) {
+            slayerTimer.update();
         }
         if (bossHealth.isActive()) {
             bossHealth.update();

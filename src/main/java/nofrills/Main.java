@@ -119,8 +119,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(BeaconTuningSolver.class);
         eventBus.subscribe(CalendarDate.class);
         eventBus.subscribe(ChaliceHighlight.class);
-        eventBus.subscribe(IceAlert.class);
-        eventBus.subscribe(StakeAlert.class);
         eventBus.subscribe(NoAttunementSpam.class);
         eventBus.subscribe(MuteVampire.class);
         eventBus.subscribe(KillTimer.class);
@@ -201,7 +199,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ChatTweaks.class);
         eventBus.subscribe(SpawnAlert.class);
         eventBus.subscribe(CratePriority.class);
-        eventBus.subscribe(MuteEnderman.class);
         eventBus.subscribe(ClassNametags.class);
         eventBus.subscribe(InfoTooltips.class);
         eventBus.subscribe(AnvilHelper.class);

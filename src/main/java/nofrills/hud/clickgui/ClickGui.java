@@ -616,12 +616,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Chalice Highlight", ChaliceHighlight.instance, "Highlights the Blood Ichor chalices spawned by the T5 Vampire.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", ChaliceHighlight.color, "The color of the chalice highlight.")
                         ))),
-                        new Module("Ice Alert", IceAlert.instance, "Shows a timer for when your Vampire boss is going to cast Twinclaws."),
-                        new Module("Stake Alert", StakeAlert.instance, "Shows text on screen once you can vanquish your Vampire boss with the Steak Stake."),
-                        new Module("Mute Vampire", MuteVampire.instance, "Prevents the Vampire Mania/Killer Springs sounds from playing.", new Settings(List.of(
-                                new Settings.Toggle("Mania", MuteVampire.mania, "Mutes the loud Mania sounds while in the Chateau."),
-                                new Settings.Toggle("Killer Springs", MuteVampire.springs, "Mutes the Wither sound spam that occurs when your boss spawns a Killer Spring.")
-                        ))),
+                        new Module("Mute Vampire", MuteVampire.instance, "Prevents the Vampire Mania/Killer Springs sounds from playing."),
                         new Module("Egg Hits Display", EggHitsDisplay.instance, "Renders the needed hits for the Tarantula Broodfather egg sack phase.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", EggHitsDisplay.color, "The color of the text."),
                                 new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, EggHitsDisplay.scale, "The scale of the text.")

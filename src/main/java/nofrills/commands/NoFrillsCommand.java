@@ -3,36 +3,25 @@ package nofrills.commands;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.MinecraftProfileTextures;
-import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.PlayerHeadItem;
-import net.minecraft.util.math.Vec3d;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGui;
+import nofrills.misc.DebugStuff;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
-import java.util.List;
 import java.util.Optional;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
-import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 import static nofrills.misc.SkyblockData.instances;
 
@@ -234,59 +223,22 @@ public class NoFrillsCommand {
             new ModCommand("debug", "Random commands for logging, debugging, or testing.", literal("debug").executes(context -> {
                 return SINGLE_SUCCESS;
             }).then(literal("dumpHeadTextures").executes(context -> {
-                List<EquipmentSlot> searchedSlots = List.of(
-                        EquipmentSlot.HEAD,
-                        EquipmentSlot.MAINHAND,
-                        EquipmentSlot.OFFHAND
-                );
-                for (Entity ent : Utils.getEntities()) {
-                    if (ent instanceof LivingEntity living) {
-                        for (EquipmentSlot slot : searchedSlots) {
-                            ItemStack stack = living.getEquippedStack(slot);
-                            GameProfile textures = Utils.getTextures(stack);
-                            if (textures != null && stack.getItem() instanceof PlayerHeadItem) {
-                                Vec3d pos = living.getEntityPos();
-                                LOGGER.info(Utils.format("\n\tURL - {}\n\tSlot - {}\n\tEntity Name - {}\n\tHead Name - {}\n\tPosition - {} {} {}",
-                                        Utils.getTextureUrl(textures),
-                                        Utils.toUpper(slot.name()),
-                                        living.getName().getString(),
-                                        stack.getName().getString(),
-                                        pos.getX(),
-                                        pos.getY(),
-                                        pos.getZ()
-                                ));
-                            }
-                        }
-                    }
-                }
-                Utils.info("Dumped head texture URL's to latest.log.");
+                DebugStuff.dumpHeadTextures();
                 return SINGLE_SUCCESS;
             })).then(literal("dumpPlayerTextures").executes(context -> {
-                MinecraftSessionService service = mc.getApiServices().sessionService();
-                for (Entity ent : Utils.getEntities()) {
-                    if (ent instanceof PlayerEntity player) {
-                        if (player.getGameProfile() != null) {
-                            MinecraftProfileTextures textures = service.getTextures(player.getGameProfile());
-                            Vec3d pos = player.getEntityPos();
-                            if (textures.skin() == null) {
-                                continue;
-                            }
-                            LOGGER.info(Utils.format("\n\tURL - {}\n\tEntity Name - {}\n\tPosition - {} {} {}",
-                                    textures.skin().getUrl(),
-                                    player.getName().getString(),
-                                    pos.getX(),
-                                    pos.getY(),
-                                    pos.getZ()
-                            ));
-                        }
-                    }
-                }
-                Utils.info("Dumped player texture URL's to latest.log.");
+                DebugStuff.dumpPlayerTextures();
                 return SINGLE_SUCCESS;
             })).then(literal("dumpTabList").executes(context -> {
-                for (String line : Utils.getTabListLines()) {
-                    Utils.info(line);
-                }
+                DebugStuff.dumpTabList();
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpNameTags").executes(context -> {
+                DebugStuff.dumpNameTags();
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpTabListFooter").executes(context -> {
+                DebugStuff.dumpTabListFooter();
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpBossBarLabel").executes(context -> {
+                DebugStuff.dumpBossBarLabel();
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("shardTracker", "Commands for managing the Shard Tracker feature.", literal("shardTracker").executes(context -> {

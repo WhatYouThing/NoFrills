@@ -1048,6 +1048,28 @@ public class Utils {
         return builder.toString();
     }
 
+    public static String getPercentageColor(double percentage, boolean inverse) {
+        if (percentage > 0.66) {
+            return inverse ? "§a" : "§c";
+        }
+        if (percentage > 0.33) {
+            return "§6";
+        }
+        return inverse ? "§c" : "§a";
+    }
+
+    public static String getPercentageColor(float percentage, boolean inverse) {
+        return getPercentageColor((double) percentage, inverse);
+    }
+
+    public static String getPercentageColor(double percentage) {
+        return getPercentageColor(percentage, false);
+    }
+
+    public static String getPercentageColor(float percentage) {
+        return getPercentageColor((double) percentage, false);
+    }
+
     public static void setScreen(Screen screen) {
         mc.send(() -> mc.setScreen(screen));
     }

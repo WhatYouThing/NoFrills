@@ -40,14 +40,7 @@ public class TickTimerElement extends SimpleTextElement {
     }
 
     public String getTimeColor() {
-        double percentage = (double) this.ticks / this.startTicks;
-        if (percentage > 0.66) {
-            return "§c";
-        }
-        if (percentage > 0.33) {
-            return "§6";
-        }
-        return "§a";
+        return Utils.getPercentageColor((double) this.ticks / this.startTicks);
     }
 
     public void updateTimer() {

@@ -36,14 +36,7 @@ public class TimerElement extends SimpleTextElement {
     }
 
     public String getTimeColor(long timeLeft) {
-        double percentage = (double) timeLeft / this.duration;
-        if (percentage > 0.66) {
-            return "§c";
-        }
-        if (percentage > 0.33) {
-            return "§6";
-        }
-        return "§a";
+        return Utils.getPercentageColor((double) timeLeft / this.duration);
     }
 
     public void updateTimer() {

@@ -93,6 +93,7 @@ public class EtherwarpOverlay {
                 BlockState state = mc.world.getBlockState(pos);
                 return switch (state.getBlock()) {
                     case FenceBlock ignored -> Optional.of(pos.up(1));
+                    case FenceGateBlock ignored -> Optional.of(pos.up(1));
                     case WallBlock ignored -> Optional.of(pos.up(1));
                     default -> Optional.of(pos);
                 };

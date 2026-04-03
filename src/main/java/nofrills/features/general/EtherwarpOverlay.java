@@ -14,6 +14,8 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.RenderStyle;
 import nofrills.misc.Utils;
 
+import java.util.Optional;
+
 import static nofrills.Main.mc;
 
 public class EtherwarpOverlay {
@@ -55,11 +57,13 @@ public class EtherwarpOverlay {
             case AzaleaBlock ignored -> !isAbove;
             case LilyPadBlock ignored -> !isAbove;
             case LanternBlock ignored -> !isAbove;
-            case LadderBlock ignored -> isAbove;
+            case LadderBlock ignored -> false;
+            case AirBlock ignored -> true;
             case EndPortalBlock ignored -> isAbove;
             case DoorBlock ignored -> !isAbove;
             case BrewingStandBlock ignored -> !isAbove;
             case SnowBlock ignored -> !isAbove;
+            case PressurePlateBlock ignored -> !isAbove;
             default ->
                     isAbove ? !state.isOpaque() && !state.isFullCube(mc.world, pos) : state.isOpaque() || state.isFullCube(mc.world, pos);
         };
@@ -80,31 +84,43 @@ public class EtherwarpOverlay {
         return 0;
     }
 
+    private static Optional<BlockPos> doRaycast(int distance, float delta) {
+        if (mc.player != null && mc.world != null) {
+            HitResult hitResult = Utils.raycastFullBlock(mc.player, distance, delta);
+            if (hitResult.getType().equals(HitResult.Type.BLOCK) && hitResult instanceof BlockHitResult blockHitResult) {
+                BlockPos pos = blockHitResult.getBlockPos();
+                BlockState state = mc.world.getBlockState(pos);
+                return switch (state.getBlock()) {
+                    case FenceBlock ignored -> Optional.of(pos.up(1));
+                    case WallBlock ignored -> Optional.of(pos.up(1));
+                    default -> Optional.of(pos);
+                };
+            }
+        }
+        return Optional.empty();
+    }
+
     private static void playCustomSound() {
         Utils.playSound(sound.value(), volume.valueFloat(), pitch.valueFloat());
     }
 
     private static void playPinglessSound() {
         int dist = getWarpDistance();
-        if (dist > 0 && mc.player != null) {
-            HitResult hitResult = Utils.raycastFullBlock(mc.player, dist, mc.getRenderTickCounter().getTickProgress(true));
-            if (hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHitResult) {
-                BlockPos pos = blockHitResult.getBlockPos();
+        if (dist > 0) {
+            doRaycast(dist, mc.getRenderTickCounter().getTickProgress(true)).ifPresent(pos -> {
                 if (isBlockValid(pos, 0) && isBlockValid(pos, 1) && isBlockValid(pos, 2)) {
                     playCustomSound();
                 }
-            }
+            });
         }
     }
 
     @EventHandler
     public static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && mc.player != null) {
+        if (instance.isActive()) {
             int dist = getWarpDistance();
             if (dist > 0) {
-                HitResult hitResult = Utils.raycastFullBlock(mc.player, dist, event.tickCounter.getTickProgress(true));
-                if (hitResult.getType() == HitResult.Type.BLOCK && hitResult instanceof BlockHitResult blockHitResult) {
-                    BlockPos pos = blockHitResult.getBlockPos();
+                doRaycast(dist, event.tickCounter.getTickProgress(true)).ifPresent(pos -> {
                     boolean valid = isBlockValid(pos, 0) && isBlockValid(pos, 1) && isBlockValid(pos, 2);
                     Box box = Box.enclosing(pos, pos);
                     event.drawStyled(
@@ -114,7 +130,7 @@ public class EtherwarpOverlay {
                             valid ? outlineCorrect.value() : outlineWrong.value(),
                             valid ? fillCorrect.value() : fillWrong.value()
                     );
-                }
+                });
             }
         }
     }

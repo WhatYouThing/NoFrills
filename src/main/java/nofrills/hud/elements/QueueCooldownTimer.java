@@ -8,9 +8,7 @@ import java.util.regex.Pattern;
 import static nofrills.Main.mc;
 
 public class QueueCooldownTimer extends TimerElement {
-    public final Pattern pattern = Pattern.compile(
-            "-----------------------------\\n.*" + mc.getSession().getUsername() + " entered .*!\\n-----------------------------"
-    );
+    public final Pattern pattern = Pattern.compile("-*\\n.*" + mc.getSession().getUsername() + " entered .*!\\n-*");
 
     public QueueCooldownTimer() {
         super("Queue Cooldown: {}", new Feature("queueCooldownTimerElement"), "Queue Cooldown Timer");

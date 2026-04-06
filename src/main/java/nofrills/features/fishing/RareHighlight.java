@@ -1,17 +1,13 @@
 package nofrills.features.fishing;
 
-import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
-import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.*;
 
@@ -26,25 +22,6 @@ public class RareHighlight {
 
     private static boolean isMob(Entity entity) {
         return Utils.isMob(entity) && !cache.has(entity);
-    }
-
-    @EventHandler
-    private static void onUpdated(EntityUpdatedEvent event) {
-        if (instance.isActive() && event.entity instanceof ArmorStandEntity stand && !Utils.isInDungeons()) {
-            ItemStack helmet = stand.getEquippedStack(EquipmentSlot.HEAD);
-            if (helmet.isEmpty()) return;
-            GameProfile textures = Utils.getTextures(helmet);
-            if (textures != null) {
-                for (SeaCreatureData.SeaCreature creature : SeaCreatureData.list) {
-                    for (String texture : creature.textures) {
-                        if (Utils.isTextureEqual(textures, texture)) {
-                            cache.add(stand);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @EventHandler

@@ -329,6 +329,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Damage Splash", NoDamageSplash.instance, "Hides damage splash nametags.", new Settings(
                                 new Settings.Toggle("Slayer Only", NoDamageSplash.slayerOnly, "Only hide damage splashes while a slayer boss is alive."),
                                 new Settings.Toggle("Dungeons Only", NoDamageSplash.dungeonsOnly, "Only hide damage splashes while in Dungeons.")
+                        )),
+                        new Module("Block List", BlockList.instance, "Allows you to keep a client side player block list.", new Settings(
+                                new Settings.Description("Usage", "You can manage this feature with /nf blockList."),
+                                new Settings.Toggle("Auto Kick", BlockList.autoKick, "Automatically kicks blocked players if they join your party with party finder.")
                         ))
                 )),
                 new Category("Solvers", List.of(

@@ -1023,6 +1023,10 @@ public class Utils {
         return formatSeparator((double) number);
     }
 
+    public static long getMeasuringTime() {
+        return Util.getMeasuringTimeMs();
+    }
+
     public static String ticksToTime(long ticks) {
         if (ticks < 20) {
             return "0s";

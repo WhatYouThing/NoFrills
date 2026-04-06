@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
@@ -11,6 +12,7 @@ import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.hunting.ShardTracker;
+import nofrills.features.misc.BlockList;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.DebugStuff;
@@ -293,6 +295,34 @@ public class NoFrillsCommand {
                     return SINGLE_SUCCESS;
                 }
                 Utils.info("§7Could not find the provided Slot Binding preset.");
+                return SINGLE_SUCCESS;
+            })))),
+            new ModCommand("blockList", "Commands for managing the Block List feature.", literal("blockList").executes(context -> {
+                BlockList.printEntries(1);
+                return SINGLE_SUCCESS;
+            }).then(literal("add").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
+                String name = StringArgumentType.getString(context, "playerName");
+                BlockList.addPlayer(name, "Unspecified");
+                return SINGLE_SUCCESS;
+            }).then(argument("blockReason", StringArgumentType.string()).executes(context -> {
+                String name = StringArgumentType.getString(context, "playerName");
+                String reason = StringArgumentType.getString(context, "blockReason");
+                BlockList.addPlayer(name, reason);
+                return SINGLE_SUCCESS;
+            })))).then(literal("remove").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
+                String name = StringArgumentType.getString(context, "playerName");
+                BlockList.removePlayer(name);
+                return SINGLE_SUCCESS;
+            }))).then(literal("list").executes(context -> {
+                BlockList.printEntries(1);
+                return SINGLE_SUCCESS;
+            }).then(argument("page", IntegerArgumentType.integer(1)).executes(context -> {
+                int page = IntegerArgumentType.getInteger(context, "page");
+                BlockList.printEntries(page);
                 return SINGLE_SUCCESS;
             }))))
     };

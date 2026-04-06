@@ -116,7 +116,7 @@ public class SkillTracker {
         return new JsonObject();
     }
 
-    public static void saveData() {
+    private static void saveData() {
         Thread.startVirtualThread(() -> {
             try {
                 Utils.atomicWrite(sessionPath, data.toString());

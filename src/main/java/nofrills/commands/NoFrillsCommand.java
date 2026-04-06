@@ -298,22 +298,21 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             })))),
             new ModCommand("blockList", "Commands for managing the Block List feature.", literal("blockList").executes(context -> {
-                BlockList.printEntries(1);
                 return SINGLE_SUCCESS;
             }).then(literal("add").executes(context -> {
                 return SINGLE_SUCCESS;
-            }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
+            }).then(argument("playerName", StringArgumentType.word()).executes(context -> {
                 String name = StringArgumentType.getString(context, "playerName");
                 BlockList.addPlayer(name, "Unspecified");
                 return SINGLE_SUCCESS;
-            }).then(argument("blockReason", StringArgumentType.string()).executes(context -> {
+            }).then(argument("blockReason", StringArgumentType.greedyString()).executes(context -> {
                 String name = StringArgumentType.getString(context, "playerName");
                 String reason = StringArgumentType.getString(context, "blockReason");
                 BlockList.addPlayer(name, reason);
                 return SINGLE_SUCCESS;
             })))).then(literal("remove").executes(context -> {
                 return SINGLE_SUCCESS;
-            }).then(argument("playerName", StringArgumentType.string()).executes(context -> {
+            }).then(argument("playerName", StringArgumentType.word()).executes(context -> {
                 String name = StringArgumentType.getString(context, "playerName");
                 BlockList.removePlayer(name);
                 return SINGLE_SUCCESS;

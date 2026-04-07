@@ -44,7 +44,7 @@ public class MiddleClickOverride {
             "Attribute Transfer",
             "Hunting Box",
             "Composter",
-            "Midas Anvil",
+            "Midas Anvil"
     );
     private static final HashSet<String> matchWhitelist = Sets.newHashSet(
             "Your Equipment and Stats",

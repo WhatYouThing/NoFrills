@@ -42,7 +42,9 @@ public class MiddleClickOverride {
             "Pet Sitter",
             "Transfer to Profile",
             "Attribute Transfer",
-            "Hunting Box"
+            "Hunting Box",
+            "Composter",
+            "Midas Anvil",
     );
     private static final HashSet<String> matchWhitelist = Sets.newHashSet(
             "Your Equipment and Stats",

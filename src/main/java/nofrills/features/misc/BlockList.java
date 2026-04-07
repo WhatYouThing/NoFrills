@@ -149,12 +149,12 @@ public class BlockList {
             return;
         }
         if (!entries.isEmpty()) {
-            int start = Math.min(10 * (page - 1), entries.size());
-            int end = Math.min(10 * page - 1, entries.size());
+            int start = Math.min(10 * (page - 1), entries.size() - 1);
+            int end = Math.min((10 * page - 1) + 1, entries.size());
             List<JsonObject> sublist = entries.subList(start, end);
             MutableText message = Text.literal(Utils.format("§aBlock List (page {} out of {})", page, maxPage));
             for (int i = start; i < end; i++) {
-                JsonObject entry = sublist.get(i);
+                JsonObject entry = sublist.get(i - 10 * (page - 1));
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(entry.get("timestamp").getAsLong());
                 MutableText tooltip = Text.literal(Utils.format("Block reason: {}\nBlock date: {}",

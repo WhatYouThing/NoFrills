@@ -14,23 +14,27 @@ public class AutoSprint {
 
     private static boolean wasSprinting = false;
 
+    private static void setSprinting(boolean sprinting) {
+        if (mc.options.getSprintToggled().getValue()) {
+            if (mc.options.sprintKey.isPressed() == !sprinting) {
+                mc.options.sprintKey.setPressed(true);
+            }
+        } else {
+            mc.options.sprintKey.setPressed(sprinting);
+        }
+    }
+
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && mc.player != null) {
             if (waterCheck.value() && mc.player.isTouchingWater()) {
                 if (wasSprinting) {
-                    mc.options.sprintKey.setPressed(false);
+                    setSprinting(false);
                     wasSprinting = false;
                 }
                 return;
             }
-            if (mc.options.getSprintToggled().getValue()) {
-                if (!mc.options.sprintKey.isPressed()) {
-                    mc.options.sprintKey.setPressed(true);
-                }
-            } else {
-                mc.options.sprintKey.setPressed(true);
-            }
+            setSprinting(true);
             wasSprinting = mc.options.sprintKey.isPressed();
         }
     }

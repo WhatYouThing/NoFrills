@@ -8,6 +8,8 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.general.SlotBinding;
@@ -19,6 +21,7 @@ import nofrills.misc.DebugStuff;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -322,6 +325,25 @@ public class NoFrillsCommand {
             }).then(argument("page", IntegerArgumentType.integer(1)).executes(context -> {
                 int page = IntegerArgumentType.getInteger(context, "page");
                 BlockList.printEntries(page);
+                return SINGLE_SUCCESS;
+            }))).then(literal("find").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(argument("playerName", StringArgumentType.word()).executes(context -> {
+                String name = StringArgumentType.getString(context, "playerName");
+                List<JsonObject> results = BlockList.searchPlayer(name);
+                if (!results.isEmpty()) {
+                    MutableText message = Text.literal(Utils.format("§aFound {} result(s) in Block List: §f", results.size()));
+                    for (int i = 0; i < results.size(); i++) {
+                        JsonObject result = results.get(i);
+                        if (i > 0) {
+                            message.append(", ");
+                        }
+                        message.append(BlockList.buildEntryLine(result, result.get("name").getAsString()));
+                    }
+                    Utils.infoRaw(message);
+                } else {
+                    Utils.infoFormat("§7Found 0 results in the Block List.");
+                }
                 return SINGLE_SUCCESS;
             }))))
     };

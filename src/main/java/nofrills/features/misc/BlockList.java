@@ -65,6 +65,13 @@ public class BlockList {
         });
     }
 
+    public static List<JsonObject> getEntries() {
+        return data.asMap().values().stream()
+                .map(JsonElement::getAsJsonObject)
+                .sorted(Comparator.comparingLong(object -> object.get("timestamp").getAsLong()))
+                .collect(Collectors.toList());
+    }
+
     private static void fetchUuid(String name, Consumer<Optional<FetchResult>> callback) {
         if (resultCache.containsKey(name)) {
             CachedResult cached = resultCache.get(name);
@@ -119,26 +126,26 @@ public class BlockList {
     }
 
     public static void removePlayer(String name) {
-        fetchUuid(name, (res) -> {
-            if (res.isEmpty()) {
-                Utils.infoFormat("§cCould not fetch UUID for player {}, not removing from the block list.", name);
-                return;
-            }
-            FetchResult result = res.get();
-            if (data.remove(result.uuid()) != null) {
-                Utils.infoFormat("§aSuccessfully removed {} from the block list.", result.name());
-                saveData();
-            } else {
-                Utils.infoFormat("§c{} is not on the block list.", name);
-            }
-        });
+        if (data.entrySet().removeIf(entry -> entry.getValue().getAsJsonObject().get("name").toString().equalsIgnoreCase(name))) {
+            Utils.infoFormat("§aSuccessfully removed {} from the block list.", name);
+            saveData();
+        } else {
+            Utils.infoFormat("§c{} is not on the block list.", name);
+        }
     }
 
-    public static List<JsonObject> getEntries() {
-        return data.asMap().values().stream()
-                .map(JsonElement::getAsJsonObject)
-                .sorted(Comparator.comparingLong(object -> object.get("timestamp").getAsLong()))
-                .collect(Collectors.toList());
+    public static List<JsonObject> searchPlayer(String name) {
+        return getEntries().stream().filter(object -> Utils.toLower(object.get("name").toString()).contains(Utils.toLower(name))).toList();
+    }
+
+    public static MutableText buildEntryLine(JsonObject entry, String text) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(entry.get("timestamp").getAsLong());
+        MutableText tooltip = Text.literal(Utils.format("§7Blocked reason: {}\n§7Blocked date: {}",
+                entry.get("reason").getAsString(),
+                Utils.parseDate(calendar)
+        ));
+        return Text.literal(text).setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(tooltip)));
     }
 
     public static void printEntries(int page) {
@@ -155,15 +162,7 @@ public class BlockList {
             MutableText message = Text.literal(Utils.format("§aBlock List (page {} out of {})", page, maxPage));
             for (int i = start; i < end; i++) {
                 JsonObject entry = sublist.get(i - 10 * (page - 1));
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(entry.get("timestamp").getAsLong());
-                MutableText tooltip = Text.literal(Utils.format("Block reason: {}\nBlock date: {}",
-                        entry.get("reason").getAsString(),
-                        Utils.parseDate(calendar)
-                ));
-                MutableText text = Text.literal(Utils.format("\n §f{}. {}", i + 1, entry.get("name").getAsString()))
-                        .setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(tooltip)));
-                message.append(text);
+                message.append(buildEntryLine(entry, Utils.format("\n §f{}. {}", i + 1, entry.get("name").getAsString())));
             }
             Utils.infoRaw(message);
         } else {

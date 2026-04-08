@@ -60,11 +60,13 @@ public class EtherwarpOverlay {
             case LadderBlock ignored -> false;
             case AirBlock ignored -> true;
             case TorchBlock ignored -> true;
-            case EndPortalBlock ignored -> isAbove;
+            case EndPortalBlock ignored -> false;
+            case FlowerPotBlock ignored -> !isAbove;
             case DoorBlock ignored -> !isAbove;
             case BrewingStandBlock ignored -> !isAbove;
             case SnowBlock ignored -> !isAbove;
             case PressurePlateBlock ignored -> !isAbove;
+            case WeightedPressurePlateBlock ignored -> !isAbove;
             default ->
                     isAbove ? !state.isOpaque() && !state.isFullCube(mc.world, pos) : state.isOpaque() || state.isFullCube(mc.world, pos);
         };

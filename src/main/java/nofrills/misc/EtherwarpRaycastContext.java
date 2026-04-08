@@ -31,8 +31,8 @@ public class EtherwarpRaycastContext extends RaycastContext {
             case SignBlock ignored -> VoxelShapes.fullCube();
             case WallSignBlock ignored -> VoxelShapes.fullCube();
             case SnowBlock ignored -> VoxelShapes.fullCube();
-            case EndPortalBlock ignored -> VoxelShapes.fullCube();
             case PressurePlateBlock ignored -> VoxelShapes.fullCube();
+            case WeightedPressurePlateBlock ignored -> VoxelShapes.fullCube();
             default -> state.getCollisionShape(world, pos).isEmpty() ? VoxelShapes.empty() : VoxelShapes.fullCube();
         };
     }

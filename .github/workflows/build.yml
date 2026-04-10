@@ -23,10 +23,10 @@ jobs:
       - name: build
         run: ./gradlew build
       - name: capture build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.0
         with:
-          name: Artifacts
-          path: build/libs/
+          path: build/libs/*
+          archive: false
       - name: post beta
         if: ${{ success() }}
         run: |

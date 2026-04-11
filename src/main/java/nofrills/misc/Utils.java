@@ -2,6 +2,8 @@ package nofrills.misc;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
@@ -77,6 +79,7 @@ import static nofrills.Main.*;
 
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "Hub",
             "Galatea",
@@ -692,6 +695,10 @@ public class Utils {
             Files.move(tempPath, path, StandardCopyOption.REPLACE_EXISTING);
         }
         Files.deleteIfExists(tempPath);
+    }
+
+    public static void atomicWrite(Path path, JsonObject content) throws IOException {
+        atomicWrite(path, GSON.toJson(content));
     }
 
     private static int getVersionNumber(String version) {

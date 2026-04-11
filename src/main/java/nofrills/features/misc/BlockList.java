@@ -42,8 +42,6 @@ public class BlockList {
     private static final JsonObject data = loadData();
     private static final ConcurrentHashMap<String, CachedResult> resultCache = new ConcurrentHashMap<>();
 
-    private static final long lastCleanup = Utils.getMeasuringTime();
-
     private static JsonObject loadData() {
         if (Files.exists(listPath)) {
             try {
@@ -58,7 +56,7 @@ public class BlockList {
     private static void saveData() {
         Thread.startVirtualThread(() -> {
             try {
-                Utils.atomicWrite(listPath, data.toString());
+                Utils.atomicWrite(listPath, data);
             } catch (Exception exception) {
                 LOGGER.error("Unable to save NoFrills Block List file!", exception);
             }

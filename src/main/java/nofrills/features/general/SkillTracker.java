@@ -119,7 +119,7 @@ public class SkillTracker {
     private static void saveData() {
         Thread.startVirtualThread(() -> {
             try {
-                Utils.atomicWrite(sessionPath, data.toString());
+                Utils.atomicWrite(sessionPath, data);
             } catch (Exception exception) {
                 LOGGER.error("Unable to save NoFrills Skill Tracker file!", exception);
             }

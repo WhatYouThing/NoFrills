@@ -74,14 +74,14 @@ public class DungeonMap extends HudElement {
         }
         super.draw(context, mouseX, mouseY, partialTicks, delta);
         MapState mapState = DungeonUtil.getMap();
+        Matrix3x2fStack matrices = context.getMatrices();
+        matrices.pushMatrix();
+        float scale = this.scale.valueFloat();
+        if (scale != 1.0f) {
+            this.applyScaling(context, scale);
+        }
+        matrices.translate(this.x(), this.y());
         if (mapState != null && this.parameters != null) {
-            Matrix3x2fStack matrices = context.getMatrices();
-            matrices.pushMatrix();
-            float scale = this.scale.valueFloat();
-            if (scale != 1.0f && !this.isEditingHud()) {
-                this.applyScaling(context, scale);
-            }
-            matrices.translate(this.x(), this.y());
             context.drawTexturedQuad(RenderPipelines.GUI_TEXTURED, mapTexture.getGlTextureView(), mapTexture.getSampler(), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
             int index = 0;
             ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
@@ -105,10 +105,10 @@ public class DungeonMap extends HudElement {
                     this.drawMarker(context, decor, decor.x(), decor.z(), decor.rotation(), this.playerMarkerScale.valueFloat());
                 }
             }
-            matrices.popMatrix();
         } else if (this.isEditingHud()) {
-            context.drawCenteredTextWithShadow(mc.textRenderer, "Dungeon Map", (int) (this.x + this.width * 0.5), (int) (this.y + this.height * 0.5) - 4, 0xffffffff);
+            context.drawCenteredTextWithShadow(mc.textRenderer, "Dungeon Map", (int) (this.width * 0.5), (int) (this.height * 0.5) - 4, RenderColor.white.argb);
         }
+        matrices.popMatrix();
     }
 
     private MapParameters getMapParameters() {

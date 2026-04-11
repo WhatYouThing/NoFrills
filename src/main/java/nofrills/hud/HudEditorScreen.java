@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.text.Text;
 import nofrills.features.misc.AutoSave;
+import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.components.ToggleButton;
 import nofrills.misc.RenderColor;
@@ -16,6 +17,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import static nofrills.Main.mc;
@@ -63,19 +65,32 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
         boolean clicked = this.uiAdapter.mouseClicked(click, doubled);
         if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && !clicked) {
             List<FlowLayout> list = new ArrayList<>();
-            List<HudElement> elementList = new ArrayList<>(HudManager.getElements());
-            elementList.sort(Comparator.comparing(element -> element.elementLabel.getString()));
-            for (HudElement element : elementList) {
-                FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-                layout.padding(Insets.of(5));
-                PlainLabel label = new PlainLabel(element.elementLabel);
-                label.tooltip(element.elementDesc);
-                label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-                ToggleButton toggle = new ToggleButton(element.isAdded());
-                toggle.onToggled().subscribe(element.added::set);
-                layout.child(label);
-                layout.child(toggle);
-                list.add(layout);
+            HashMap<HudElement.Category, List<HudElement>> categories = new HashMap<>();
+            for (HudElement element : HudManager.getElements()) {
+                if (!categories.containsKey(element.getCategory())) {
+                    categories.put(element.getCategory(), new ArrayList<>());
+                }
+                categories.get(element.getCategory()).add(element);
+            }
+            for (HudElement.Category category : HudElement.Category.values()) {
+                List<HudElement> elements = categories.getOrDefault(category, new ArrayList<>());
+                if (elements.isEmpty()) {
+                    continue;
+                }
+                list.add(new Settings.Separator(category.name()));
+                elements.sort(Comparator.comparing(element -> element.elementLabel.getString()));
+                for (HudElement element : elements) {
+                    FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+                    layout.padding(Insets.of(5));
+                    PlainLabel label = new PlainLabel(element.elementLabel);
+                    label.tooltip(element.elementDesc);
+                    label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+                    ToggleButton toggle = new ToggleButton(element.isAdded());
+                    toggle.onToggled().subscribe(element.added::set);
+                    layout.child(label);
+                    layout.child(toggle);
+                    list.add(layout);
+                }
             }
             HudSettings settings = new HudSettings(list);
             settings.setTitle(Text.literal("HUD Elements"));

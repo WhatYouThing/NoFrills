@@ -39,6 +39,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     public FlowLayout layout;
     public HudSettings options;
     public boolean toggling = false;
+    public Category category = Category.Misc;
 
     public HudElement(FlowLayout layout, Feature instance, String label) {
         super(Sizing.content(), Sizing.content(), layout);
@@ -194,6 +195,14 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         this.elementDesc = Text.literal(description);
     }
 
+    public Category getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     public boolean isEditingHud() {
         return HudManager.isEditingHud();
     }
@@ -230,5 +239,15 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         Left,
         Middle,
         Right
+    }
+
+    public enum Category {
+        Info,
+        Dungeons,
+        Kuudra,
+        Slayer,
+        Fishing,
+        Mining,
+        Misc
     }
 }

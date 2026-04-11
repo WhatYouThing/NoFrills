@@ -55,15 +55,18 @@ public class PriceTooltips {
     private static void saveData() {
         Thread.startVirtualThread(() -> {
             try {
-                JsonObject oldData = Config.get().has(instance.key()) ? Config.get().get(instance.key()).getAsJsonObject() : null;
-                if (oldData != null && oldData.has("paidData")) {
-                    for (Map.Entry<String, JsonElement> entry : oldData.get("paidData").getAsJsonObject().get("prices").getAsJsonObject().entrySet()) {
-                        data.addProperty(entry.getKey(), entry.getValue().getAsLong());
+                JsonObject parent = Config.get().has(instance.key()) ? Config.get().get(instance.key()).getAsJsonObject() : null;
+                if (parent != null && parent.has("paidData")) {
+                    JsonObject oldData = parent.get("paidData").getAsJsonObject();
+                    if (oldData.has("prices")) {
+                        for (Map.Entry<String, JsonElement> entry : oldData.get("prices").getAsJsonObject().entrySet()) {
+                            data.addProperty(entry.getKey(), entry.getValue().getAsLong());
+                        }
                     }
                 } // automatically converts from old to 0.4.11+ price paid data storage format
                 Utils.atomicWrite(paidPath, data);
-                if (oldData != null && oldData.remove("paidData") != null) {
-                    Config.saveAsync();
+                if (parent != null && parent.remove("paidData") != null) {
+                    Config.save();
                 }
             } catch (Exception exception) {
                 LOGGER.error("Unable to save NoFrills Price Paid file!", exception);

@@ -14,6 +14,7 @@ public class SlayerHealth extends SimpleTextElement {
         super(Text.literal("Slayer Health"), new Feature("slayerHealthElement"), "Slayer Health");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the name and health hologram of your slayer boss.");
+        this.setCategory(Category.Slayer);
     }
 
     @Override

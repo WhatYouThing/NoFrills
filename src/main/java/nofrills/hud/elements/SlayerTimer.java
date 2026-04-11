@@ -14,6 +14,7 @@ public class SlayerTimer extends SimpleTextElement {
         super(Text.literal("Slayer Timer"), new Feature("slayerTimerElement"), "Slayer Timer");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the timer hologram of your slayer boss.");
+        this.setCategory(Category.Slayer);
     }
 
     @Override

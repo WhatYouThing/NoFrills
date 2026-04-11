@@ -30,6 +30,7 @@ public class FishingBobber extends SimpleTextElement {
                 new Settings.Toggle("Bobber Timer", this.timer, "Displays how long your fishing bobber has existed for, useful for Slugfish.")
         ));
         this.setDesc("Displays the fishing hologram timer, and optionally the existence time of your bobber.");
+        this.setCategory(Category.Fishing);
     }
 
     @Override

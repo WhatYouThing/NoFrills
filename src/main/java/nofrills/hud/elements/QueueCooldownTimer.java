@@ -14,5 +14,6 @@ public class QueueCooldownTimer extends TimerElement {
         super("Queue Cooldown: {}", new Feature("queueCooldownTimerElement"), "Queue Cooldown Timer");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the cooldown for queueing for instances (Dungeons, Kuudra etc.).");
+        this.setCategory(Category.Info);
     }
 }

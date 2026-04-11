@@ -27,6 +27,7 @@ public class Quiver extends SimpleTextElement {
                 new Settings.Toggle("Only If Bow", this.onlyBow, "Automatically hides the element if you are not holding a bow.")
         ));
         this.setDesc("Displays the type and the amount of arrows in your quiver.");
+        this.setCategory(Category.Info);
     }
 
     @Override

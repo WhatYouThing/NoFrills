@@ -18,6 +18,7 @@ public class ShardTrackerDisplay extends SimpleTextElement {
                 new Settings.Toggle("Hide If None", hideIfNone, "Hides the element if you are not tracking any shards (or the Shard Tracker is disabled).")
         ));
         this.setDesc("Displays information about tracked attribute shards. Used by the Shard Tracker feature.");
+        this.setCategory(Category.Misc);
     }
 
     @Override

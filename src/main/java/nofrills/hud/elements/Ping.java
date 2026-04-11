@@ -23,6 +23,7 @@ public class Ping extends SimpleTextElement {
                 new Settings.Toggle("Average", average, "Tracks and adds your average ping to the element.")
         ));
         this.setDesc("Displays your ping.");
+        this.setCategory(Category.Info);
     }
 
     @Override

@@ -22,6 +22,7 @@ public class FPS extends SimpleTextElement {
                 new Settings.Toggle("Average", average, "Tracks and adds the average FPS to the element.")
         ));
         this.setDesc("Displays your FPS.");
+        this.setCategory(Category.Info);
     }
 
     @Override

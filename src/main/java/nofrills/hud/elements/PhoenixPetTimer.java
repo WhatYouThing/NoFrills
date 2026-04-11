@@ -9,5 +9,6 @@ public class PhoenixPetTimer extends TimerElement {
         super("Phoenix Pet: {}", new Feature("phoenixPetTimerElement"), "Phoenix Pet Timer");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the cooldown of the Phoenix Pet Rekindle ability.");
+        this.setCategory(Category.Dungeons);
     }
 }

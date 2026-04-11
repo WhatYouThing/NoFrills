@@ -12,6 +12,7 @@ public class Day extends SimpleTextElement {
         super(Text.literal(text), new Feature("dayElement"), "Day Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the day that the server world is on.");
+        this.setCategory(Category.Info);
     }
 
     @Override

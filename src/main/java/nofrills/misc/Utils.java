@@ -298,21 +298,10 @@ public class Utils {
     }
 
     /**
-     * Checks if a PlayerEntity is a real player, and not an enemy or NPC. Some NPCs might falsely return true for a few seconds after spawning.
+     * Checks if a PlayerEntity is a real player, and not an enemy or NPC.
      */
     public static boolean isPlayer(PlayerEntity entity) {
-        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
-        if (handler != null) {
-            PlayerListEntry listEntry = handler.getPlayerListEntry(entity.getUuid());
-            if (listEntry != null) {
-                String displayName = listEntry.getProfile().name();
-                if (displayName != null) {
-                    String name = Formatting.strip(displayName);
-                    return !name.isEmpty() && !name.contains(" ");
-                }
-            }
-        }
-        return entity == mc.player;
+        return entity.getUuid().version() == 4;
     }
 
     /**

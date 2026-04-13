@@ -1,6 +1,7 @@
 package nofrills.mixin;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -9,6 +10,7 @@ import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.PlayerEntity;
 import nofrills.events.HudRenderEvent;
 import nofrills.features.general.ChatTweaks;
 import nofrills.features.general.NoRender;
@@ -25,6 +27,13 @@ import static nofrills.Main.mc;
 @Mixin(InGameHud.class)
 public abstract class InGameHudMixin {
 
+    @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
+    private static void onRenderArmorBar(DrawContext context, PlayerEntity player, int y, int i, int healthBarLines, int x, CallbackInfo ci) {
+        if (NoRender.instance.isActive() && NoRender.armorBar.value()) {
+            ci.cancel();
+        }
+    }
+
     @Shadow
     public abstract TextRenderer getTextRenderer();
 
@@ -32,6 +41,13 @@ public abstract class InGameHudMixin {
     private void onRender(DrawContext context, RenderTickCounter tickCounter, CallbackInfo ci) {
         if (!mc.options.hudHidden) {
             eventBus.post(new HudRenderEvent(context, this.getTextRenderer(), tickCounter));
+        }
+    }
+
+    @Inject(method = "renderFood", at = @At("HEAD"), cancellable = true)
+    private void onRenderFoodBar(DrawContext context, PlayerEntity player, int top, int right, CallbackInfo ci) {
+        if (NoRender.instance.isActive() && NoRender.foodBar.value()) {
+            ci.cancel();
         }
     }
 
@@ -71,8 +87,11 @@ public abstract class InGameHudMixin {
         HudManager.registerElements();
     }
 
-    @WrapWithCondition(method = "clear", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;clear(Z)V"))
-    private boolean shouldClearChat(ChatHud instance, boolean clearHistory) {
-        return !(ChatTweaks.instance.isActive() && ChatTweaks.keepHistory.value());
+    @WrapOperation(method = "clear", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;clear(Z)V"))
+    private void onClearChat(ChatHud instance, boolean clearHistory, Operation<Void> original) {
+        if (ChatTweaks.instance.isActive() && ChatTweaks.keepHistory.value()) {
+            return;
+        }
+        original.call(instance, clearHistory);
     }
 }

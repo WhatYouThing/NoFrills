@@ -317,7 +317,7 @@ public class HudManager {
             context.getMatrices().pushMatrix();
             context.getMatrices().scale(4.0F, 4.0F);
             int width = mc.textRenderer.getWidth(this.text);
-            context.drawTextWithBackground(mc.textRenderer, this.text, -width / 2, -context.getScaledWindowHeight() / 12, width, -1);
+            context.drawTextWithBackground(mc.textRenderer, this.text, -width / 2, -context.getScaledWindowHeight() / 20, width, -1);
             context.getMatrices().popMatrix();
             context.getMatrices().popMatrix();
         }

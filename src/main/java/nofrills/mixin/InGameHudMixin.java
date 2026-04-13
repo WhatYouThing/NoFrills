@@ -58,6 +58,13 @@ public abstract class InGameHudMixin {
         }
     }
 
+    @Inject(method = "renderHeldItemTooltip", at = @At("HEAD"), cancellable = true)
+    private void onRenderSelectedItemName(DrawContext context, CallbackInfo ci) {
+        if (NoRender.instance.isActive() && NoRender.selectedItemName.value()) {
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "renderNauseaOverlay", at = @At("HEAD"), cancellable = true)
     private void onRenderNausea(DrawContext context, float nauseaStrength, CallbackInfo ci) {
         if (NoRender.instance.isActive() && NoRender.nausea.value()) {

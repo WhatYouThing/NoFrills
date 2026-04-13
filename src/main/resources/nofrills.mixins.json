@@ -24,6 +24,7 @@
     "GameRendererMixin",
     "HandledScreenAccessor",
     "HandledScreenMixin",
+    "HeldItemRendererAccessor",
     "HeldItemRendererMixin",
     "InGameHudMixin",
     "InGameOverlayRendererMixin",

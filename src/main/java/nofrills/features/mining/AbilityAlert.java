@@ -53,10 +53,12 @@ public class AbilityAlert {
 
     private static String getWidget() {
         if (!toolData.isEmpty()) {
-            for (String line : Utils.getTabListLines()) {
-                int index = line.indexOf(":");
-                if (index != -1 && line.contains(toolData.ability)) {
-                    return line;
+            List<String> lines = Utils.getTabListLines();
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.equals("Pickaxe Ability:") && i + 1 < lines.size()) {
+                    String next = lines.get(i + 1);
+                    return next.contains(":") ? next : "";
                 }
             }
         }
@@ -98,10 +100,7 @@ public class AbilityAlert {
                     setCooldown(1); // instantly skips cooldown if the server does, such as if the player enters a mineshaft
                 }
                 if (ticks == 0 && duration.endsWith("s")) {
-                    int durationTicks = Utils.parseInt(duration.replace("s", "")).orElse(0);
-                    if (durationTicks > 6) {
-                        setCooldown(durationTicks * 20);
-                    }
+                    Utils.parseInt(duration.replace("s", "")).ifPresent(durationTicks -> setCooldown(durationTicks * 20 + 20));
                 }
             }
             if (ticks > 0) {

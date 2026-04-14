@@ -63,7 +63,7 @@ public class BossHealth extends SimpleTextElement {
                 if (kuudra == null) {
                     this.setHealth("§lKuudra", bar.getPercent());
                 } else {
-                    this.setHealth("§lKuudra", kuudra.getHealth() / kuudra.getMaxHealth());
+                    this.setHealth("§lKuudra", kuudra.getHealth() / 100000);
                 }
                 return;
             }

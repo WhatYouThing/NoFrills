@@ -21,7 +21,6 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
@@ -115,7 +114,7 @@ public class BlockList {
                 JsonObject object = new JsonObject();
                 object.addProperty("name", result.name());
                 object.addProperty("reason", reason);
-                object.addProperty("timestamp", Instant.now().toEpochMilli());
+                object.addProperty("timestamp", Utils.getTimestamp());
                 data.add(result.uuid(), object);
                 Utils.infoFormat("§aSuccessfully added {} to the block list.", result.name());
             }
@@ -187,10 +186,10 @@ public class BlockList {
     private static void onMessage(ChatMsgEvent event) {
         if (instance.isActive() && autoKick.value() && event.msg().startsWith("Party Finder >") && event.msg().contains("joined")) {
             String name = event.msg().replace("Party Finder >", "").trim().split(" ", 2)[0];
-            if (name.equalsIgnoreCase(mc.getSession().getUsername())) {
+            if (name.equalsIgnoreCase(mc.player.getName().getString())) {
                 return;
             }
-            Optional<Style> style = Utils.getStyle(event.message, (string) -> string.equals(name));
+            Optional<Style> style = Utils.getStyle(event.message, (string) -> string.trim().startsWith(name));
             forEntry(name, (obj) -> {
                 if (obj.isPresent()) {
                     JsonObject object = obj.get();

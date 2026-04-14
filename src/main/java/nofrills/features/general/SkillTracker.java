@@ -130,7 +130,7 @@ public class SkillTracker {
         JsonObject obj = new JsonObject();
         obj.addProperty("active", false);
         obj.addProperty("countedTicks", 0L);
-        obj.addProperty("totalTicks", 0L);
+        obj.addProperty("timestamp", Utils.getTimestamp());
         obj.addProperty("pauseTicks", 0L);
         obj.addProperty("lastPart", "");
         obj.addProperty("lastExp", 0.0);
@@ -175,7 +175,9 @@ public class SkillTracker {
                 obj.addProperty("countedTicks", obj.get("countedTicks").getAsLong() + 1);
                 obj.addProperty("pauseTicks", obj.get("pauseTicks").getAsLong() + 1);
             }
-            obj.addProperty("totalTicks", obj.get("totalTicks").getAsLong() + 1);
+            if (obj.has("totalTicks")) {
+                obj.addProperty("totalTicks", obj.get("totalTicks").getAsLong() + 1);
+            }
         }
     }
 
@@ -197,13 +199,15 @@ public class SkillTracker {
             SettingColor color = getSessionColor(skill);
             MutableText sessionText = color != null ? Text.literal(skill).withColor(color.value().argb) : Text.literal(skill);
             JsonObject obj = data.has(skill) ? data.get(skill).getAsJsonObject() : getDefaultData();
-            long totalTicks = obj.get("totalTicks").getAsLong();
+            String elapsed = obj.has("totalTicks")
+                    ? Utils.ticksToTime(obj.get("totalTicks").getAsLong())
+                    : Utils.millisecondsToTime(Utils.getTimestamp() - obj.get("timestamp").getAsLong());
             long countedTicks = obj.get("countedTicks").getAsLong();
             double currentExp = obj.get("currentExp").getAsDouble();
             sessionText.append(Utils.format("\nEXP Per Hour: {}", Utils.formatSeparator(currentExp / (countedTicks / 72000.0))));
             sessionText.append(Utils.format("\nEXP Gained: {}", Utils.formatSeparator(currentExp)));
             sessionText.append(Utils.format("\nTime Counted: {}", Utils.ticksToTime(countedTicks)));
-            sessionText.append(Utils.format("\nTime Elapsed: {}", Utils.ticksToTime(totalTicks)));
+            sessionText.append(Utils.format("\nTime Elapsed: {}", elapsed));
             text.append("\n").append(sessionText);
         }
         return text;

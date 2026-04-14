@@ -24,10 +24,10 @@ public class PartyFinder {
     private static void onMessage(ChatMsgEvent event) {
         if (instance.isActive() && buttons.value() && event.msg().startsWith("Party Finder >") && event.msg().contains("joined")) {
             String name = event.msg().replace("Party Finder >", "").trim().split(" ", 2)[0];
-            if (name.equalsIgnoreCase(mc.getSession().getUsername())) {
+            if (name.equalsIgnoreCase(mc.player.getName().getString())) {
                 return;
             }
-            Optional<Style> style = Utils.getStyle(event.message, (string) -> string.equals(name));
+            Optional<Style> style = Utils.getStyle(event.message, (string) -> string.trim().startsWith(name));
             MutableText message = Text.literal("§7Options for ")
                     .append(Text.literal(name).setStyle(style.orElse(Style.EMPTY.withFormatting(Formatting.GRAY)))).append("§7: ")
                     .append(Text.literal("§b§l[COPY NAME]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.CopyToClipboard(name)))).append(" ")

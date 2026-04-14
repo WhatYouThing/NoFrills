@@ -69,6 +69,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -1022,6 +1023,10 @@ public class Utils {
         return Util.getMeasuringTimeMs();
     }
 
+    public static long getTimestamp() {
+        return Instant.now().toEpochMilli();
+    }
+
     public static String ticksToTime(long ticks) {
         if (ticks < 20) {
             return "0s";
@@ -1041,6 +1046,10 @@ public class Utils {
             }
         }
         return builder.toString();
+    }
+
+    public static String millisecondsToTime(long ms) {
+        return ticksToTime(ms / 50);
     }
 
     public static String getPercentageColor(double percentage, boolean inverse) {

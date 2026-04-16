@@ -19,8 +19,10 @@ public abstract class DataTrackerMixin {
 
     @Inject(method = "writeUpdatedEntries", at = @At("HEAD"))
     private void onWriteEntries(List<DataTracker.SerializedEntry<?>> entries, CallbackInfo ci) {
-        if (DisconnectFix.active()) {
-            entries.removeIf(entry -> entry.id() > this.entries.length - 1);
+        if (DisconnectFix.instance.isActive()) {
+            entries.removeIf(
+                    entry -> entry.id() > this.entries.length - 1 || this.entries[entry.id()].get().getClass() != entry.value().getClass()
+            );
         }
     }
 }

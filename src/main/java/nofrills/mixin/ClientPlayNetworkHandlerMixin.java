@@ -1,7 +1,8 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -19,6 +20,7 @@ import net.minecraft.text.Text;
 import nofrills.events.*;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
+import nofrills.features.tweaks.DisconnectFix;
 import nofrills.features.tweaks.NoConfirmScreen;
 import nofrills.hud.HudManager;
 import nofrills.misc.SkyblockData;
@@ -28,10 +30,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static nofrills.Main.eventBus;
-import static nofrills.Main.mc;
+import static nofrills.Main.*;
 
 @Mixin(ClientPlayNetworkHandler.class)
 public class ClientPlayNetworkHandlerMixin {
@@ -45,6 +47,19 @@ public class ClientPlayNetworkHandlerMixin {
                     break;
                 }
             }
+        }
+    }
+
+    @WrapOperation(method = "onEntityTrackerUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/data/DataTracker;writeUpdatedEntries(Ljava/util/List;)V"))
+    private void onWriteTrackerUpdate(DataTracker instance, List<DataTracker.SerializedEntry<?>> entries, Operation<Void> original) {
+        if (DisconnectFix.instance.isActive()) {
+            try {
+                original.call(instance, entries);
+            } catch (Exception exception) {
+                LOGGER.error("Disconnect Fix caught exception in corrupted packet.", exception);
+            }
+        } else {
+            original.call(instance, entries);
         }
     }
 
@@ -100,9 +115,12 @@ public class ClientPlayNetworkHandlerMixin {
         return original;
     }
 
-    @WrapWithCondition(method = "onItemPickupAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleManager;addParticle(Lnet/minecraft/client/particle/Particle;)V"))
-    private boolean onAddPickupParticle(ParticleManager instance, Particle particle, @Local Entity entity) {
-        return !(NoRender.instance.isActive() && NoRender.expOrbs.value() && entity instanceof ExperienceOrbEntity);
+    @WrapOperation(method = "onItemPickupAnimation", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/particle/ParticleManager;addParticle(Lnet/minecraft/client/particle/Particle;)V"))
+    private void onAddPickupParticle(ParticleManager instance, Particle particle, Operation<Void> original, @Local Entity entity) {
+        if (NoRender.instance.isActive() && NoRender.expOrbs.value() && entity instanceof ExperienceOrbEntity) {
+            return;
+        }
+        original.call(instance, particle);
     }
 
     @Inject(method = "onScoreboardObjectiveUpdate", at = @At("TAIL"))

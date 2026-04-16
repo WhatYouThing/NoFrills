@@ -15,7 +15,6 @@
     "ClientPlayNetworkHandlerMixin",
     "ClientWorldMixin",
     "CreeperEntityMixin",
-    "DataTrackerMixin",
     "DrawContextMixin",
     "EndermanEntityMixin",
     "EntityRendererMixin",

@@ -14,6 +14,7 @@ import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.hunting.ShardTracker;
+import nofrills.features.misc.AutoRequeue;
 import nofrills.features.misc.BlockList;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGui;
@@ -345,7 +346,17 @@ public class NoFrillsCommand {
                     Utils.infoFormat("§7Found 0 results in the Block List.");
                 }
                 return SINGLE_SUCCESS;
-            }))))
+            })))),
+            new ModCommand("autoRequeue", "Commands for managing the Auto Requeue feature.", literal("autoRequeue").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(literal("pause").executes(context -> {
+                AutoRequeue.setPaused();
+                return SINGLE_SUCCESS;
+            })).then(literal("unpause").executes(context -> {
+                AutoRequeue.paused = false;
+                Utils.info("§aAuto Requeue unpaused.");
+                return SINGLE_SUCCESS;
+            }))),
     };
 
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {

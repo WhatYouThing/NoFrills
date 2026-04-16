@@ -10,6 +10,7 @@ import nofrills.config.*;
 import nofrills.events.PartyChatMsgEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.misc.AutoRequeue;
+import nofrills.hud.HudManager;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -41,12 +42,6 @@ public class PartyCommands {
             new KickCommand()
     );
     private static boolean downtimeNeeded = false;
-
-    private static void showDowntimeReminder() {
-        Utils.showTitle("§6§lDOWNTIME", "", 5, 60, 5);
-        Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.0f);
-        downtimeNeeded = false;
-    }
 
     public static String listInstancesFormatted() {
         StringBuilder builder = new StringBuilder();
@@ -114,7 +109,9 @@ public class PartyCommands {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && downtimeNeeded && Utils.isInstanceOver()) {
-            showDowntimeReminder();
+            HudManager.setCustomTitle("§6Downtime", 60);
+            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_BASS, 1.0f, 0.0f);
+            downtimeNeeded = false;
         }
     }
 
@@ -246,8 +243,6 @@ public class PartyCommands {
                 if (AutoRequeue.instance.isActive()) {
                     AutoRequeue.setPaused();
                 }
-            } else {
-                showDowntimeReminder();
             }
         }
     }

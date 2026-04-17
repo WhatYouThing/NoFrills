@@ -76,13 +76,17 @@ public class AbilityAlert {
     private static void onChat(ChatMsgEvent event) {
         if (instance.isActive() && !Utils.isInDungeons() && isUsedMessage(event.messagePlain)) {
             if (!toolData.isEmpty() && getWidget().isEmpty()) {
+                if (pickAbilityTimer.isActive()) {
+                    pickAbilityTimer.setCurrentAbility(toolData.ability);
+                }
                 if (override.value() > 0) {
                     setCooldown(override.value());
                 } else {
                     for (String line : Utils.getLoreLines(toolData.tool).reversed()) {
                         if (line.startsWith("Cooldown: ")) {
                             String duration = line.substring(line.indexOf(":") + 2).replace("s", "");
-                            setCooldown(Utils.parseInt(duration).orElse(0) * 20);
+                            Utils.parseInt(duration).ifPresent(seconds -> setCooldown(seconds * 20));
+                            break;
                         }
                     }
                 }
@@ -96,11 +100,17 @@ public class AbilityAlert {
             String widget = getWidget();
             if (!widget.isEmpty()) {
                 String duration = widget.substring(widget.indexOf(":") + 2);
+                if (pickAbilityTimer.isActive()) {
+                    pickAbilityTimer.setCurrentAbility(widget.substring(0, widget.indexOf(":")));
+                }
                 if (ticks > 1 && duration.equals("Available")) {
                     setCooldown(1); // instantly skips cooldown if the server does, such as if the player enters a mineshaft
                 }
                 if (ticks == 0 && duration.endsWith("s")) {
-                    Utils.parseInt(duration.replace("s", "")).ifPresent(durationTicks -> setCooldown(durationTicks * 20 + 20));
+                    Utils.parseInt(duration.replace("s", "")).ifPresent(seconds -> {
+                        if (seconds < 10) return;
+                        setCooldown(seconds * 20 + 20);
+                    });
                 }
             }
             if (ticks > 0) {

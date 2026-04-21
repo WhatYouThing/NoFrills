@@ -207,8 +207,8 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     public void updatePosition() {
         Window window = mc.getWindow();
         int width = window.getScaledWidth(), height = window.getScaledHeight();
-        this.xOffset = Math.clamp(this.xPos.value() * width, 0, Math.clamp(width - this.width, 0, width));
-        this.yOffset = Math.clamp(this.yPos.value() * height, 0, Math.clamp(height - this.height, 0, height));
+        this.xOffset = Math.clamp(this.xPos.value() * width, 0, Math.clamp(width - this.width(), 0, width));
+        this.yOffset = Math.clamp(this.yPos.value() * height, 0, Math.clamp(height - this.height(), 0, height));
         this.updateX(0);
         this.updateY(0);
     }

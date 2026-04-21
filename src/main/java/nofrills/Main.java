@@ -215,6 +215,8 @@ public class Main implements ModInitializer {
         eventBus.subscribe(CommissionHighlight.class);
         eventBus.subscribe(BlockList.class);
         eventBus.subscribe(NoGhostPlace.class);
+        eventBus.subscribe(DebugStuff.class);
+        eventBus.subscribe(PhantomleafSolver.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

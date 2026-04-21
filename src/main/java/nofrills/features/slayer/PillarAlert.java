@@ -67,15 +67,14 @@ public class PillarAlert {
         if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze) && event.isSound(SoundEvents.ENTITY_CHICKEN_EGG)) {
             Entity spawner = SlayerUtil.getSpawnerEntity();
             if (spawner == null) return;
-            Vec3d pos = new Vec3d(event.packet.getX(), event.packet.getY(), event.packet.getZ());
             if (pillarData.isEmpty()) {
-                if (Utils.horizontalDistance(pos, spawner.getEntityPos()) <= 1.5) {
-                    pillarData.add(pos);
+                if (Utils.horizontalDistance(event.pos, spawner.getEntityPos()) <= 1.5) {
+                    pillarData.add(event.pos);
                     pillarClearTicks = 60;
                 }
             } else {
-                if (Utils.horizontalDistance(pos, pillarData.getLast()) <= 4) {
-                    pillarData.add(pos);
+                if (Utils.horizontalDistance(event.pos, pillarData.getLast()) <= 4) {
+                    pillarData.add(event.pos);
                     pillarClearTicks = 60;
                 }
             }

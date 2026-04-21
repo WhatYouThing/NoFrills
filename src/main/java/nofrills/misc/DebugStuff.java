@@ -3,6 +3,7 @@ package nofrills.misc;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
@@ -13,6 +14,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import nofrills.events.PlaySoundEvent;
+import nofrills.events.ServerJoinEvent;
+import nofrills.events.ServerTickEvent;
 
 import java.util.List;
 
@@ -20,6 +24,8 @@ import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
 public class DebugStuff {
+    private static int tickCounter = 0;
+    private static boolean logSounds = false;
 
     public static void dumpHeadTextures() {
         List<EquipmentSlot> searchedSlots = List.of(
@@ -101,5 +107,40 @@ public class DebugStuff {
         if (!bossBars.isEmpty()) {
             Utils.infoRaw(bossBars.getFirst().getName().copy());
         }
+    }
+
+    public static void toggleLogSounds() {
+        logSounds = !logSounds;
+        if (logSounds) {
+            Utils.info("Sound logging enabled.");
+        } else {
+            Utils.info("Sound logging disabled.");
+        }
+    }
+
+    @EventHandler
+    private static void onSound(PlaySoundEvent event) {
+        if (logSounds) {
+            Utils.infoFormat("Sound event: x: {}, y: {}, z: {}, volume: {}, pitch: {}, category: {}, identifier: {}, at tick: {}",
+                    event.pos.getX(),
+                    event.pos.getY(),
+                    event.pos.getZ(),
+                    event.volume(),
+                    event.pitch(),
+                    event.packet.getCategory().getName(),
+                    event.packet.getSound().getIdAsString(),
+                    tickCounter
+            );
+        }
+    }
+
+    @EventHandler
+    private static void onServerTick(ServerTickEvent event) {
+        tickCounter++;
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        tickCounter = 0;
     }
 }

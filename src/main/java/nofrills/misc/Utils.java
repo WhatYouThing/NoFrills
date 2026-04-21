@@ -53,6 +53,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
+import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.entity.SimpleEntityLookup;
 import nofrills.mixin.BossBarHudAccessor;
 import nofrills.mixin.HandledScreenAccessor;
@@ -295,6 +296,17 @@ public class Utils {
     public static boolean isOnHypixel() {
         ServerInfo info = mc.getCurrentServerEntry();
         return info != null && toLower(info.address).endsWith("hypixel.net");
+    }
+
+    public static boolean hasWorldBorderVignette() {
+        if (mc.player != null && mc.world != null) {
+            WorldBorder worldBorder = mc.world.getWorldBorder();
+            double g = worldBorder.getDistanceInsideBorder(mc.player);
+            double d = Math.min(worldBorder.getShrinkingSpeed() * worldBorder.getWarningTime(), Math.abs(worldBorder.getSizeLerpTarget() - worldBorder.getSize()));
+            double e = Math.max(worldBorder.getWarningBlocks(), d);
+            return g < e;
+        }
+        return false;
     }
 
     /**

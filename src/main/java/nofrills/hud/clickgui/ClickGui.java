@@ -329,8 +329,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Scale", 0.0, 10.0, 0.01, ItemScale.scale, "The scale multiplier.")
                         ))),
                         new Module("No Damage Splash", NoDamageSplash.instance, "Hides damage splash nametags.", new Settings(
-                                new Settings.Toggle("Slayer Only", NoDamageSplash.slayerOnly, "Only hide damage splashes while a slayer boss is alive."),
-                                new Settings.Toggle("Dungeons Only", NoDamageSplash.dungeonsOnly, "Only hide damage splashes while in Dungeons.")
+                                new Settings.Dropdown<>("Hide Mode", NoDamageSplash.mode, "Allows you to control when damage splash nametags should be hidden.\n\nAlways: always hides damage splashes.\nSlayerOnly: only hides damage splashes while your Slayer boss is alive.\nDungeonsOnly: only hides damage splashes while in Dungeons.\nBoth: combines the SlayerOnly and DungeonsOnly modes.")
                         )),
                         new Module("Block List", BlockList.instance, "Allows you to keep a client side player block list.", new Settings(
                                 new Settings.Description("Usage", "You can manage this feature with /nf blockList."),

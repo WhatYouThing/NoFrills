@@ -2,7 +2,7 @@ package nofrills.features.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
-import nofrills.config.SettingBool;
+import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
@@ -12,26 +12,37 @@ import java.util.regex.Pattern;
 public class NoDamageSplash {
     public static final Feature instance = new Feature("noDamageSplash");
 
-    public static final SettingBool slayerOnly = new SettingBool(false, "slayerOnly", instance.key());
-    public static final SettingBool dungeonsOnly = new SettingBool(false, "dungeonsOnly", instance.key());
+    public static final SettingEnum<HideMode> mode = new SettingEnum<>(HideMode.Always, HideMode.class, "mode", instance);
 
-    private static final Pattern pattern = Pattern.compile("[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)"); // pattern from skyhanni
+    private static final Pattern pattern = Pattern.compile("[0-9]*");
 
-    public static boolean active() {
-        boolean isActive = instance.isActive();
-        if (isActive) {
-            if (!Utils.isInDungeons()) {
-                if (slayerOnly.value()) return SlayerUtil.bossAlive;
-                if (dungeonsOnly.value()) return false;
-            }
+    private static boolean isActive() {
+        if (instance.isActive()) {
+            return switch (mode.value()) {
+                case Always -> true;
+                case SlayerOnly -> SlayerUtil.bossAlive;
+                case DungeonsOnly -> Utils.isInDungeons();
+                case Both -> SlayerUtil.bossAlive || Utils.isInDungeons();
+            };
         }
-        return isActive;
+        return false;
+    }
+
+    private static boolean isSplash(String name) {
+        return pattern.matcher(Utils.toAscii(name.replaceAll(",", ""))).matches();
     }
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (active() && pattern.matcher(event.namePlain.replaceAll(",", "")).matches()) {
+        if (isActive() && isSplash(event.namePlain)) {
             event.entity.setCustomNameVisible(false);
         }
+    }
+
+    public enum HideMode {
+        Always,
+        SlayerOnly,
+        DungeonsOnly,
+        Both
     }
 }

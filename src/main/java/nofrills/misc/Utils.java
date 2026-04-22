@@ -150,14 +150,14 @@ public class Utils {
         for (int i = 0; i <= 35; i++) {
             ItemStack stack = inv.getStack(i);
             if (stack.isEmpty()) continue;
-            String id = Utils.getSkyblockId(stack).replaceAll("_", " ");
-            String name = Utils.toPlain(stack.getName());
+            String id = getSkyblockId(stack).replaceAll("_", " ");
+            String name = toPlain(stack.getName());
             if (query.equalsIgnoreCase(id) || query.equalsIgnoreCase(name)) {
                 total += stack.getCount();
             }
         }
         if (total < amount) {
-            Utils.sendMessage(Utils.format("/gfs {} {}", refill_query, amount - total));
+            sendMessage(format("/gfs {} {}", refill_query, amount - total));
         }
     }
 
@@ -681,7 +681,7 @@ public class Utils {
     public static void atomicWrite(Path path, String content) throws IOException {
         Path parent = path.getParent();
         String fileName = path.getFileName().toString();
-        Path tempPath = parent.resolve(Utils.format("{}-Temp-{}.{}",
+        Path tempPath = parent.resolve(format("{}-Temp-{}.{}",
                 fileName.substring(0, fileName.indexOf(".")),
                 Util.getMeasuringTimeMs(),
                 fileName.substring(fileName.indexOf(".") + 1)
@@ -921,6 +921,10 @@ public class Utils {
             return Formatting.strip(text.getString());
         }
         return "";
+    }
+
+    public static String toAscii(String string) {
+        return string.chars().filter(c -> c <= 127).mapToObj(c -> String.valueOf((char) c)).collect(Collectors.joining());
     }
 
     public static Optional<Style> getStyle(Text text, Predicate<String> predicate) {

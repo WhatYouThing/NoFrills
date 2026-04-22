@@ -472,7 +472,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve Select", TerminalSolvers.select, "Solves the \"Select all\" terminal."),
                                 new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal.")
                         ))),
-                        new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.\nAlso displays timers for the 1st Gyro and Sadan's last giant, useful if you are Mage.", new Settings(List.of(
+                        new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.", new Settings(List.of(
                                 new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text."),
                                 new Settings.ColorPicker("Text Color", TerracottaTimer.color, "The color of the timer text.")
                         ))),
@@ -583,13 +583,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Kuudra Hitbox", KuudraHitbox.instance, "Renders a hitbox for Kuudra.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", KuudraHitbox.color, "The color of the hitbox.")
                         ))),
-                        new Module("Waypoints", KuudraWaypoints.instance, "Renders various waypoints in Kuudra.", new Settings(List.of(
-                                new Settings.Toggle("Supplies", KuudraWaypoints.supply, "Renders beacons for every supply crate."),
-                                new Settings.ColorPicker("Supply Color", KuudraWaypoints.supplyColor, "The color of the supply crate beacons."),
-                                new Settings.Toggle("Drop-offs", KuudraWaypoints.drop, "Renders beacons for every available supply drop-off point."),
-                                new Settings.ColorPicker("Drop-off Color", KuudraWaypoints.dropColor, "The color of the drop-off beacons."),
-                                new Settings.Toggle("Build Piles", KuudraWaypoints.build, "Renders beacons for every unfinished Ballista build pile."),
-                                new Settings.ColorPicker("Piles Color", KuudraWaypoints.buildColor, "The color of the build pile beacons.")
+                        new Module("Build Pile Highlight", BuildPileHighlight.instance, "Renders beacons for the supply build piles in Kuudra.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", BuildPileHighlight.color, "The color of the beacons.")
+                        ))),
+                        new Module("Supply Highlight", SupplyHighlight.instance, "Renders beacons for the supply crates in Kuudra.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", SupplyHighlight.color, "The color of the beacons.")
+                        ))),
+                        new Module("Drop Off Highlight", DropOffHighlight.instance, "Renders beacons for the supply drop off points in Kuudra.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", DropOffHighlight.color, "The color of the beacons.")
                         ))),
                         new Module("Pre Message", PreMessage.instance, "Announces if no supply spawns at your pre spot (or your next pickup spot)."),
                         new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop."),

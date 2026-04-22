@@ -130,7 +130,9 @@ public class Main implements ModInitializer {
         eventBus.subscribe(CorpseHighlight.class);
         eventBus.subscribe(AbilityAlert.class);
         eventBus.subscribe(PreMessage.class);
-        eventBus.subscribe(KuudraWaypoints.class);
+        eventBus.subscribe(BuildPileHighlight.class);
+        eventBus.subscribe(SupplyHighlight.class);
+        eventBus.subscribe(DropOffHighlight.class);
         eventBus.subscribe(KuudraHitbox.class);
         eventBus.subscribe(FreshTimer.class);
         eventBus.subscribe(DrainMessage.class);

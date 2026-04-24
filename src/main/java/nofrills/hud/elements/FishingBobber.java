@@ -19,6 +19,8 @@ import static nofrills.Main.mc;
 public class FishingBobber extends SimpleTextElement {
     public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
     public final SettingBool timer = new SettingBool(false, "timer", instance.key());
+    public final SettingBool hideHologram = new SettingBool(false, "hideHologram", instance.key());
+    public final SettingBool compact = new SettingBool(false, "compact", instance.key());
     public final EntityCache cache = new EntityCache();
 
     public int timerTicks = 0;
@@ -27,7 +29,9 @@ public class FishingBobber extends SimpleTextElement {
         super(Text.literal(text), new Feature("bobberElement"), "Fishing Bobber");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Inactive", this.inactive, "Hides the element if your fishing bobber is inactive."),
-                new Settings.Toggle("Bobber Timer", this.timer, "Displays how long your fishing bobber has existed for, useful for Slugfish.")
+                new Settings.Toggle("Bobber Timer", this.timer, "Displays how long your fishing bobber has existed for, useful for Slugfish."),
+                new Settings.Toggle("Hide Hologram", this.hideHologram, "Hides the bobber timer hologram that appears above your bobber."),
+                new Settings.Toggle("Compact Mode", this.compact, "Makes the element more compact by removing the prefix.")
         ));
         this.setDesc("Displays the fishing hologram timer, and optionally the existence time of your bobber.");
         this.setCategory(Category.Fishing);
@@ -40,11 +44,11 @@ public class FishingBobber extends SimpleTextElement {
         } else if (!this.isEditingHud() && this.inactive.value() && !this.isBobberActive()) {
             return;
         }
-        MutableText text = Text.literal("Bobber: ");
+        MutableText text = this.compact.value() ? Text.literal("") : Text.literal("Bobber: ");
         if (this.isBobberActive()) {
             Entity hologram = this.cache.getFirst();
             if (hologram != null && hologram.hasCustomName()) {
-                text.append(hologram.getName());
+                text.append(hologram.getCustomName());
             } else {
                 text.append("§aActive");
             }
@@ -59,12 +63,14 @@ public class FishingBobber extends SimpleTextElement {
     }
 
     public boolean isBobberActive() {
-        return mc.player != null && mc.player.fishHook != null;
+        return mc.player != null && (mc.player.fishHook != null || this.cache.getFirst() != null);
     }
 
     public void onNamed(EntityNamedEvent event) {
-        if (event.namePlain.length() != 3) return;
-        if (event.namePlain.equals("!!!") || event.namePlain.indexOf(".") == 1) {
+        if (event.namePlain.equals("!!!") || event.namePlain.equals("?") || (event.namePlain.indexOf(".") == 1 && event.namePlain.length() == 3)) {
+            if (this.hideHologram.value()) {
+                event.entity.setCustomNameVisible(false);
+            }
             this.cache.add(event.entity);
         }
     }

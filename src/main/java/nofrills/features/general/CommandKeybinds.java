@@ -9,6 +9,7 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.screen.ingame.AnvilScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.text.Text;
 import nofrills.config.Feature;
@@ -69,6 +70,13 @@ public class CommandKeybinds {
         return settings;
     }
 
+    private static boolean isValidScreen() {
+        if (allowInGui.value() && mc.currentScreen instanceof HandledScreen) {
+            return !(mc.currentScreen instanceof AnvilScreen);
+        }
+        return mc.currentScreen == null;
+    }
+
     private static Modifier getModifierType(String modifier) {
         for (Modifier value : Modifier.values()) {
             if (value.name().equals(modifier)) {
@@ -90,7 +98,7 @@ public class CommandKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && ((allowInGui.value() && mc.currentScreen instanceof HandledScreen) || mc.currentScreen == null)) {
+        if (instance.isActive() && isValidScreen()) {
             if (data.value().has("binds")) {
                 for (JsonElement entry : data.value().get("binds").getAsJsonArray()) {
                     JsonObject bind = entry.getAsJsonObject();

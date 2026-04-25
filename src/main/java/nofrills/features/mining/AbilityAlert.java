@@ -52,13 +52,13 @@ public class AbilityAlert {
     }
 
     private static String getWidget() {
-        if (!toolData.isEmpty()) {
-            List<String> lines = Utils.getTabListLines();
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.equals("Pickaxe Ability:") && i + 1 < lines.size()) {
-                    String next = lines.get(i + 1);
-                    return next.contains(":") ? next : "";
+        List<String> lines = Utils.getTabListLines();
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.equals("Pickaxe Ability:") && i + 1 < lines.size()) {
+                String next = lines.get(i + 1);
+                if (next.contains(": ") && (next.endsWith("s") || next.endsWith("Available"))) {
+                    return next;
                 }
             }
         }

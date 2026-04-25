@@ -159,6 +159,9 @@ public class SkillTracker {
     }
 
     public static boolean isSessionPaused(String skill) {
+        if (Utils.isOnAlphaNetwork()) {
+            return true;
+        }
         if (data.has(skill)) {
             if (skill.equals("Catacombs") && Utils.isInDungeons()) {
                 return false;

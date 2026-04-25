@@ -292,9 +292,21 @@ public class Utils {
         return SkyblockData.isInSkyblock();
     }
 
-    public static boolean isOnHypixel() {
+    public static String getServerAddress() {
         ServerInfo info = mc.getCurrentServerEntry();
-        return info != null && toLower(info.address).endsWith("hypixel.net");
+        if (info != null) {
+            return toLower(info.address).trim();
+        }
+        return "";
+    }
+
+    public static boolean isOnHypixel() {
+        String address = getServerAddress();
+        return address.equals("hypixel.net") || address.endsWith(".hypixel.net");
+    }
+
+    public static boolean isOnAlphaNetwork() {
+        return getServerAddress().equals("alpha.hypixel.net");
     }
 
     /**

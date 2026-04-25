@@ -19,6 +19,7 @@ import nofrills.misc.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
@@ -236,8 +237,13 @@ public class HudManager {
 
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
-        if (queueCooldownTimer.isActive() && queueCooldownTimer.pattern.matcher(event.msg()).matches()) {
-            queueCooldownTimer.start(30000);
+        if (queueCooldownTimer.isActive()) {
+            for (Pattern pattern : queueCooldownTimer.patterns) {
+                if (pattern.matcher(event.msg()).matches()) {
+                    queueCooldownTimer.start(30000);
+                    break;
+                }
+            }
         }
         if (spiritMaskTimer.isActive() && event.msg().equals("Second Wind Activated! Your Spirit Mask saved your life!")) {
             spiritMaskTimer.start(30000);

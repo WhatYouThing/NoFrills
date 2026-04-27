@@ -4,7 +4,6 @@ accessible field net/minecraft/world/item/component/CustomData tag Lnet/minecraf
 accessible field net/minecraft/client/multiplayer/ClientLevel entityStorage Lnet/minecraft/world/level/entity/TransientEntitySectionManager;
 accessible field net/minecraft/world/level/entity/LevelEntityGetterAdapter visibleEntities Lnet/minecraft/world/level/entity/EntityLookup;
 accessible field net/minecraft/world/level/entity/EntityLookup byId Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
-accessible field net/minecraft/world/entity/monster/Creeper DATA_IS_POWERED Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/client/gui/components/ChatComponent chatScrollbarPos I
 accessible method net/minecraft/client/gui/components/ChatComponent addMessage (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V
 accessible field net/minecraft/client/gui/components/ChatComponent trimmedMessages Ljava/util/List;

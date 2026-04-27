@@ -1,15 +1,13 @@
 package nofrills.hud.elements;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.GuiTextRenderState;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -68,6 +66,7 @@ public class DungeonMap extends HudElement {
                 new Settings.Toggle("Debug", this.debug, "Outputs debug information about the map's behavior.")
         ));
         this.setDesc("Displays the dungeon map while in Dungeons.");
+        this.setCategory(Category.Dungeons);
     }
 
     @Override
@@ -79,15 +78,15 @@ public class DungeonMap extends HudElement {
         }
         super.draw(context, mouseX, mouseY, partialTicks, delta);
         MapItemSavedData mapState = DungeonUtil.getMap();
+        Matrix3x2fStack matrices = context.pose();
+        matrices.pushMatrix();
+        float scale = this.scale.valueFloat();
+        if (scale != 1.0f) {
+            this.applyScaling(context, scale);
+        }
+        matrices.translate(this.x(), this.y());
         if (mapState != null && this.parameters != null) {
-            Matrix3x2fStack matrices = context.pose();
-            matrices.pushMatrix();
-            float scale = this.scale.valueFloat();
-            if (scale != 1.0f && !this.isEditingHud()) {
-                this.applyScaling(context, scale);
-            }
-            matrices.translate(this.x(), this.y());
-            context.innerBlit(RenderPipelines.GUI_TEXTURED, mapTexture.getTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
+            context.innerBlit(RenderPipelines.GUI_TEXTURED, mapTexture.getTextureView(), mapTexture.getSampler(), 0, 0, 128, 128, 0.0F, 1.0F, 0.0F, 1.0F, -1);
             int index = 0;
             ClientPacketListener networkHandler = mc.getConnection();
             for (MapDecoration decor : mapState.decorations.values()) {
@@ -110,10 +109,10 @@ public class DungeonMap extends HudElement {
                     this.drawMarker(context, decor, decor.x(), decor.y(), decor.rot(), this.playerMarkerScale.valueFloat());
                 }
             }
-            matrices.popMatrix();
         } else if (this.isEditingHud()) {
-            context.centeredText(mc.font, "Dungeon Map", (int) (this.x + this.width * 0.5), (int) (this.y + this.height * 0.5) - 4, 0xffffffff);
+            context.centeredText(mc.font, "Dungeon Map", (int) (this.width * 0.5), (int) (this.height * 0.5) - 4, RenderColor.white.argb);
         }
+        matrices.popMatrix();
     }
 
     private MapParameters getMapParameters() {
@@ -137,8 +136,8 @@ public class DungeonMap extends HudElement {
         matrices.rotate((float) (Math.PI / 180.0) * rot * 360.0F / 16.0F);
         matrices.scale(scale, scale);
         matrices.translate(-0.125F, 0.125F);
-        GpuTextureView view = mc.getTextureManager().getTexture(sprite.atlasLocation()).getTextureView();
-        context.innerBlit(RenderPipelines.GUI_TEXTURED, view, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST), -1, -1, 1, 1, sprite.getU0(), sprite.getU1(), sprite.getV1(), sprite.getV0(), -1);
+        AbstractTexture texture = mc.getTextureManager().getTexture(sprite.atlasLocation());
+        context.innerBlit(RenderPipelines.GUI_TEXTURED, texture.getTextureView(), texture.getSampler(), -1, -1, 1, 1, sprite.getU0(), sprite.getU1(), sprite.getV1(), sprite.getV0(), -1);
         matrices.popMatrix();
     }
 

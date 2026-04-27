@@ -3,6 +3,7 @@ package nofrills.features.mining;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingString;
+import nofrills.events.ChatMsgEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.events.WorldTickEvent;
@@ -18,6 +19,7 @@ public class ShaftAnnounce {
     public static final SettingString msg = new SettingString("/pc !ptme Entered Mineshaft: {id}. Corpses: {corpses}.", "msg", instance);
 
     private static int ticks = 120;
+    private static boolean enteringShaft = false;
 
     private static String getShaftId() {
         for (String line : SkyblockData.getLines()) {
@@ -64,6 +66,13 @@ public class ShaftAnnounce {
     }
 
     @EventHandler
+    private static void onMsg(ChatMsgEvent event) {
+        if (instance.isActive() && Utils.isInArea("Dwarven Mines") && event.messagePlain.equals("Sending to Mineshaft...")) {
+            enteringShaft = true;
+        }
+    }
+
+    @EventHandler
     private static void onServerTick(ServerTickEvent event) {
         if (instance.isActive() && Utils.isInArea("Mineshaft") && ticks > 0) {
             ticks--;
@@ -72,6 +81,11 @@ public class ShaftAnnounce {
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
-        ticks = 120;
+        if (enteringShaft) {
+            ticks = 120;
+            enteringShaft = false;
+        } else {
+            ticks = 0;
+        }
     }
 }

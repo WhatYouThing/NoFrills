@@ -15,12 +15,14 @@ import nofrills.config.Config;
 import nofrills.config.Feature;
 import nofrills.config.SettingJson;
 import nofrills.events.ChatMsgEvent;
+import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.components.ToggleButton;
 import nofrills.misc.DungeonUtil;
+import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -49,10 +51,13 @@ public class ChatRules {
                 obj.addProperty("matchType", MatchType.Equals.name());
                 obj.addProperty("cancel", false);
                 obj.addProperty("classFilter", "");
+                obj.addProperty("islandFilter", "");
                 obj.addProperty("title", "");
                 obj.addProperty("titleFadeIn", 0);
                 obj.addProperty("titleStay", 30);
                 obj.addProperty("titleFadeOut", 10);
+                obj.addProperty("customTitle", "");
+                obj.addProperty("customTitleStay", 40);
                 obj.addProperty("sound", "");
                 obj.addProperty("soundVolume", 1.0f);
                 obj.addProperty("soundPitch", 1.0f);
@@ -99,6 +104,13 @@ public class ChatRules {
                 return false;
             }
         }
+        if (rule.has("islandFilter")) {
+            String filter = rule.get("islandFilter").getAsString();
+            String island = SkyblockData.getArea();
+            if (!filter.isEmpty() && !island.isEmpty() && !Utils.toLower(filter).contains(Utils.toLower(island))) {
+                return false;
+            }
+        }
         boolean caseSensitive = rule.get("caseSensitive").getAsBoolean();
         String match = caseSensitive ? rule.get("match").getAsString() : Utils.toLower(rule.get("match").getAsString());
         String message = caseSensitive ? msg : Utils.toLower(msg);
@@ -127,6 +139,11 @@ public class ChatRules {
                     String title = obj.get("title").getAsString();
                     if (!title.isEmpty()) {
                         Utils.showTitle(title.replaceAll("&", "§"), "", obj.get("titleFadeIn").getAsInt(), obj.get("titleStay").getAsInt(), obj.get("titleFadeOut").getAsInt());
+                    }
+                    String customTitle = obj.has("customTitle") ? obj.get("customTitle").getAsString() : "";
+                    if (!customTitle.isEmpty()) {
+                        int ticks = obj.has("customTitleStay") ? obj.get("customTitleStay").getAsInt() : 40;
+                        HudManager.setCustomTitle(customTitle.replaceAll("&", "§"), ticks);
                     }
                     String sound = obj.get("sound").getAsString();
                     if (!sound.isEmpty()) {
@@ -165,13 +182,11 @@ public class ChatRules {
             input.tooltip(Component.literal("The name of this chat rule."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("name", value)));
             ToggleButton mainToggle = new ToggleButton(this.getData().get("enabled").getAsBoolean());
-            mainToggle.verticalSizing(Sizing.fixed(18));
-            mainToggle.margins(Insets.of(1, 0, 0, 3));
+            mainToggle.sizing(Sizing.fixed(50), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 3));
             mainToggle.tooltip(Component.literal("The main toggle for this chat rule."));
             mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));
             ButtonComponent editButton = UIComponents.button(Component.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildRuleSettings()));
-            editButton.verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
-            editButton.horizontalSizing(Sizing.fixed(49));
+            editButton.sizing(Sizing.fixed(48), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             editButton.renderer(Settings.buttonRendererWhite);
             ButtonComponent delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("rules").getAsJsonArray().remove(this.index));
@@ -260,8 +275,23 @@ public class ChatRules {
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
             input.text(this.getData().has("classFilter") ? this.getData().get("classFilter").getAsString() : "");
-            input.tooltip(Component.literal("The list of selected dungeon classes that this rule requires to work.\nFor example: \"mage archer\" will disable the rule if not playing as either Mage or Archer.\n\nLeave empty to disable class filtering."));
+            input.tooltip(Component.literal("A list of dungeon classes that this rule requires to work.\nFor example: \"mage archer\" will disable the rule\nif your selected class is not either Mage or Archer.\n\nLeave empty to disable class filtering."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("classFilter", value)));
+            layout.child(label);
+            layout.child(input);
+            return layout;
+        }
+
+        public FlowLayout buildIslandFilterSetting() {
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+            layout.padding(Insets.of(5));
+            layout.horizontalAlignment(HorizontalAlignment.LEFT);
+            PlainLabel label = new PlainLabel(Component.literal("Island Filter"));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
+            input.text(this.getData().has("islandFilter") ? this.getData().get("islandFilter").getAsString() : "");
+            input.tooltip(Component.literal("A list of islands that this rule requires to work.\nFor example: \"catacombs kuudra\" will disable the rule\nif your current area is not either Kuudra or Dungeons.\n\nLeave empty to disable island filtering."));
+            input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("islandFilter", value)));
             layout.child(label);
             layout.child(input);
             return layout;
@@ -297,6 +327,26 @@ public class ChatRules {
             return layout;
         }
 
+        public FlowLayout buildCustomTitleSetting() {
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+            layout.padding(Insets.of(5));
+            layout.horizontalAlignment(HorizontalAlignment.LEFT);
+            PlainLabel label = new PlainLabel(Component.literal("Custom Title"));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            FlatTextbox inputTitle = new FlatTextbox(Sizing.fixed(140));
+            inputTitle.text(this.getData().has("customTitle") ? this.getData().get("customTitle").getAsString() : "");
+            inputTitle.tooltip(Component.literal("The custom title to show on screen if the rule matches. Leave blank to disable.\nYou can use the & symbol to insert formatting codes.\n\nThis option uses its own rendering to help prevent issues where titles override each other."));
+            inputTitle.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("customTitle", value)));
+            FlatTextbox inputStay = new FlatTextbox(Sizing.fixed(25));
+            inputStay.text(String.valueOf(this.getData().has("customTitleStay") ? this.getData().get("customTitleStay").getAsInt() : 40));
+            inputStay.tooltip(Component.literal("The amount of ticks the title should stay for."));
+            inputStay.onChanged().subscribe(value -> Utils.parseInt(value).ifPresent(integer -> data.edit(obj -> this.getData(obj).addProperty("customTitleStay", integer))));
+            layout.child(label);
+            layout.child(inputTitle);
+            layout.child(inputStay);
+            return layout;
+        }
+
         public FlowLayout buildSoundSetting() {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
@@ -329,7 +379,9 @@ public class ChatRules {
             list.add(this.buildCaseSensitiveSetting());
             list.add(this.buildCancelSetting());
             list.add(this.buildClassFilterSetting());
+            list.add(this.buildIslandFilterSetting());
             list.add(this.buildTitleSetting());
+            list.add(this.buildCustomTitleSetting());
             list.add(this.buildSoundSetting());
             ChatRulesSettings settings = new ChatRulesSettings(list);
             settings.setTitle(Component.literal("Chat Rule: " + this.getData().get("name").getAsString()));
@@ -338,6 +390,7 @@ public class ChatRules {
     }
 
     public static class ChatRulesSettings extends Settings {
+
         public ChatRulesSettings(List<FlowLayout> settings) {
             super(settings);
         }
@@ -347,5 +400,4 @@ public class ChatRules {
             mc.setScreen(buildSettings());
         }
     }
-
 }

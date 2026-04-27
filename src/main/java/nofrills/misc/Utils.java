@@ -2,6 +2,8 @@ package nofrills.misc;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
@@ -17,7 +19,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
@@ -42,6 +43,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -68,6 +70,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -77,6 +80,7 @@ import static nofrills.Main.*;
 
 public class Utils {
     public static final GuiMessageTag noFrillsIndicator = new GuiMessageTag(0x5ca0bf, null, Component.nullToEmpty("Message from NoFrills mod."), "NoFrills Mod");
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final HashSet<String> modernIslands = Sets.newHashSet(
             "Hub",
             "Galatea",
@@ -84,7 +88,9 @@ public class Utils {
             "Spider's Den",
             "The Barn",
             "The End",
-            "The Park"
+            "The Park",
+            "Crimson Isle",
+            "Jerry's Workshop"
     );
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",
@@ -93,18 +99,14 @@ public class Utils {
             "Crimson Isle"
     );
 
-    public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        mc.gui.setTitle(Component.nullToEmpty(title));
-        mc.gui.setSubtitle(Component.nullToEmpty(subtitle));
+    public static void showTitle(MutableComponent title, MutableComponent subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        mc.gui.setTitle(title);
+        mc.gui.setSubtitle(subtitle);
         mc.gui.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
     }
 
-    public static void showTitleCustom(String title, int stayTicks, int yOffset, float scale, RenderColor color) {
-        ((TitleRendering) mc.gui).nofrills_mod$setRenderTitle(title, stayTicks, yOffset, scale, color);
-    }
-
-    public static boolean isRenderingCustomTitle() {
-        return ((TitleRendering) mc.gui).nofrills_mod$isRenderingTitle();
+    public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        showTitle(Component.literal(title), Component.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks);
     }
 
     public static boolean isNearlyEqual(double a, double b, double eps) {
@@ -148,14 +150,14 @@ public class Utils {
         for (int i = 0; i <= 35; i++) {
             ItemStack stack = inv.getItem(i);
             if (stack.isEmpty()) continue;
-            String id = Utils.getSkyblockId(stack).replaceAll("_", " ");
-            String name = Utils.toPlain(stack.getHoverName());
+            String id = getSkyblockId(stack).replaceAll("_", " ");
+            String name = toPlain(stack.getHoverName());
             if (query.equalsIgnoreCase(id) || query.equalsIgnoreCase(name)) {
                 total += stack.getCount();
             }
         }
         if (total < amount) {
-            Utils.sendMessage(Utils.format("/gfs {} {}", refill_query, amount - total));
+            sendMessage(format("/gfs {} {}", refill_query, amount - total));
         }
     }
 
@@ -291,27 +293,28 @@ public class Utils {
         return SkyblockData.isInSkyblock();
     }
 
-    public static boolean isOnHypixel() {
+    public static String getServerAddress() {
         ServerData info = mc.getCurrentServer();
-        return info != null && toLower(info.ip).endsWith("hypixel.net");
+        if (info != null) {
+            return toLower(info.ip).trim();
+        }
+        return "";
+    }
+
+    public static boolean isOnHypixel() {
+        String address = getServerAddress();
+        return address.equals("hypixel.net") || address.endsWith(".hypixel.net");
+    }
+
+    public static boolean isOnAlphaNetwork() {
+        return getServerAddress().equals("alpha.hypixel.net");
     }
 
     /**
-     * Checks if a PlayerEntity is a real player, and not an enemy or NPC. Some NPCs might falsely return true for a few seconds after spawning.
+     * Checks if a PlayerEntity is a real player, and not an enemy or NPC.
      */
     public static boolean isPlayer(Player entity) {
-        ClientPacketListener handler = mc.getConnection();
-        if (handler != null) {
-            PlayerInfo listEntry = handler.getPlayerInfo(entity.getUUID());
-            if (listEntry != null) {
-                String displayName = listEntry.getProfile().name();
-                if (displayName != null) {
-                    String name = ChatFormatting.stripFormatting(displayName);
-                    return !name.isEmpty() && !name.contains(" ");
-                }
-            }
-        }
-        return entity == mc.player;
+        return entity.getUUID().version() == 4;
     }
 
     /**
@@ -406,12 +409,22 @@ public class Utils {
      * Returns the armor that the entity is wearing.
      */
     public static List<ItemStack> getEntityArmor(LivingEntity entity) {
-        return List.of(
-                entity.getItemBySlot(EquipmentSlot.HEAD),
-                entity.getItemBySlot(EquipmentSlot.CHEST),
-                entity.getItemBySlot(EquipmentSlot.LEGS),
-                entity.getItemBySlot(EquipmentSlot.FEET)
-        );
+        if (entity != null) {
+            return List.of(
+                    entity.getItemBySlot(EquipmentSlot.HEAD),
+                    entity.getItemBySlot(EquipmentSlot.CHEST),
+                    entity.getItemBySlot(EquipmentSlot.LEGS),
+                    entity.getItemBySlot(EquipmentSlot.FEET)
+            );
+        }
+        return List.of();
+    }
+
+    public static ItemStack getEntityHelmet(LivingEntity entity) {
+        if (entity != null) {
+            return entity.getItemBySlot(EquipmentSlot.HEAD);
+        }
+        return ItemStack.EMPTY;
     }
 
     /**
@@ -669,7 +682,7 @@ public class Utils {
     public static void atomicWrite(Path path, String content) throws IOException {
         Path parent = path.getParent();
         String fileName = path.getFileName().toString();
-        Path tempPath = parent.resolve(Utils.format("{}-Temp-{}.{}",
+        Path tempPath = parent.resolve(format("{}-Temp-{}.{}",
                 fileName.substring(0, fileName.indexOf(".")),
                 Util.getMillis(),
                 fileName.substring(fileName.indexOf(".") + 1)
@@ -684,6 +697,10 @@ public class Utils {
             Files.move(tempPath, path, StandardCopyOption.REPLACE_EXISTING);
         }
         Files.deleteIfExists(tempPath);
+    }
+
+    public static void atomicWrite(Path path, JsonObject content) throws IOException {
+        atomicWrite(path, GSON.toJson(content));
     }
 
     private static int getVersionNumber(String version) {
@@ -753,12 +770,12 @@ public class Utils {
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
     public static HitResult raycastFullBlock(Entity entity, double maxDistance, float tickDelta) {
-        Vec3 height = entity.getPosition(tickDelta).add(0, isOnModernIsland() && !isInDungeons() ? 1.27 : 1.54, 0);
+        Vec3 height = entity.getPosition(tickDelta).add(0, isOnModernIsland() ? 1.27 : 1.54, 0);
         Vec3 camPos = entity.getEyePosition(tickDelta);
         Vec3 rot = entity.getViewVector(tickDelta);
         Vec3 pos = new Vec3(camPos.x(), height.y(), camPos.z());
         Vec3 end = pos.add(rot.x * maxDistance, rot.y * maxDistance, rot.z * maxDistance);
-        EtherwarpRaycastContext context = new EtherwarpRaycastContext(pos, end, ClipContext.Block.OUTLINE, net.minecraft.world.level.ClipContext.Fluid.ANY, entity);
+        EtherwarpRaycastContext context = new EtherwarpRaycastContext(pos, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.ANY, entity);
         return entity.level().clip(context);
     }
 
@@ -829,6 +846,17 @@ public class Utils {
         return getContainerSlots(handler, false);
     }
 
+    public static List<Slot> getContainerSlots(AbstractContainerMenu handler, boolean inverse) {
+        if (handler instanceof ChestMenu containerHandler) {
+            return getContainerSlots(containerHandler, inverse);
+        }
+        return List.of();
+    }
+
+    public static List<Slot> getContainerSlots(AbstractContainerMenu handler) {
+        return getContainerSlots(handler, false);
+    }
+
     public static ItemStack getHeldItem() {
         return mc.player != null ? mc.player.getMainHandItem() : ItemStack.EMPTY;
     }
@@ -894,6 +922,10 @@ public class Utils {
             return ChatFormatting.stripFormatting(text.getString());
         }
         return "";
+    }
+
+    public static String toAscii(String string) {
+        return string.chars().filter(c -> c <= 127).mapToObj(c -> String.valueOf((char) c)).collect(Collectors.joining());
     }
 
     public static Optional<Style> getStyle(Component text, Predicate<String> predicate) {
@@ -1004,6 +1036,14 @@ public class Utils {
         return formatSeparator((double) number);
     }
 
+    public static long getMeasuringTime() {
+        return Util.getMillis();
+    }
+
+    public static long getTimestamp() {
+        return Instant.now().toEpochMilli();
+    }
+
     public static String ticksToTime(long ticks) {
         if (ticks < 20) {
             return "0s";
@@ -1023,6 +1063,32 @@ public class Utils {
             }
         }
         return builder.toString();
+    }
+
+    public static String millisecondsToTime(long ms) {
+        return ticksToTime(ms / 50);
+    }
+
+    public static String getPercentageColor(double percentage, boolean inverse) {
+        if (percentage > 0.66) {
+            return inverse ? "§a" : "§c";
+        }
+        if (percentage > 0.33) {
+            return "§6";
+        }
+        return inverse ? "§c" : "§a";
+    }
+
+    public static String getPercentageColor(float percentage, boolean inverse) {
+        return getPercentageColor((double) percentage, inverse);
+    }
+
+    public static String getPercentageColor(double percentage) {
+        return getPercentageColor(percentage, false);
+    }
+
+    public static String getPercentageColor(float percentage) {
+        return getPercentageColor((double) percentage, false);
     }
 
     public static void setScreen(Screen screen) {

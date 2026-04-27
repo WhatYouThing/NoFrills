@@ -32,6 +32,7 @@ import nofrills.features.slayer.*;
 import nofrills.features.solvers.*;
 import nofrills.features.tweaks.DoubleUseFix;
 import nofrills.features.tweaks.NoCursorReset;
+import nofrills.features.tweaks.NoGhostPlace;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.hud.elements.DungeonMap;
@@ -119,8 +120,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(BeaconTuningSolver.class);
         eventBus.subscribe(CalendarDate.class);
         eventBus.subscribe(ChaliceHighlight.class);
-        eventBus.subscribe(IceAlert.class);
-        eventBus.subscribe(StakeAlert.class);
         eventBus.subscribe(NoAttunementSpam.class);
         eventBus.subscribe(MuteVampire.class);
         eventBus.subscribe(KillTimer.class);
@@ -131,7 +130,9 @@ public class Main implements ModInitializer {
         eventBus.subscribe(CorpseHighlight.class);
         eventBus.subscribe(AbilityAlert.class);
         eventBus.subscribe(PreMessage.class);
-        eventBus.subscribe(KuudraWaypoints.class);
+        eventBus.subscribe(BuildPileHighlight.class);
+        eventBus.subscribe(SupplyHighlight.class);
+        eventBus.subscribe(DropOffHighlight.class);
         eventBus.subscribe(KuudraHitbox.class);
         eventBus.subscribe(FreshTimer.class);
         eventBus.subscribe(DrainMessage.class);
@@ -201,7 +202,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(ChatTweaks.class);
         eventBus.subscribe(SpawnAlert.class);
         eventBus.subscribe(CratePriority.class);
-        eventBus.subscribe(MuteEnderman.class);
         eventBus.subscribe(ClassNametags.class);
         eventBus.subscribe(InfoTooltips.class);
         eventBus.subscribe(AnvilHelper.class);
@@ -214,6 +214,11 @@ public class Main implements ModInitializer {
         eventBus.subscribe(NoDamageSplash.class);
         eventBus.subscribe(CroesusSolver.class);
         eventBus.subscribe(EquipmentHighlight.class);
+        eventBus.subscribe(CommissionHighlight.class);
+        eventBus.subscribe(BlockList.class);
+        eventBus.subscribe(NoGhostPlace.class);
+        eventBus.subscribe(DebugStuff.class);
+        eventBus.subscribe(PhantomleafSolver.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMillis() - start);
     }

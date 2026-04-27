@@ -37,8 +37,11 @@ public class NoRender {
     public static final SettingBool fireOverlay = new SettingBool(false, "fireOverlay", instance.key());
     public static final SettingBool breakParticles = new SettingBool(false, "breakParticles", instance.key());
     public static final SettingBool bossBar = new SettingBool(false, "bossBar", instance.key());
+    public static final SettingBool armorBar = new SettingBool(false, "armorBar", instance.key());
+    public static final SettingBool foodBar = new SettingBool(false, "foodBar", instance.key());
     public static final SettingBool fog = new SettingBool(false, "fog", instance.key());
     public static final SettingBool effectDisplay = new SettingBool(false, "effectDisplay", instance.key());
+    public static final SettingBool selectedItemName = new SettingBool(false, "selectedItemName", instance.key());
     public static final SettingBool deadEntities = new SettingBool(false, "deadEntities", instance.key());
     public static final SettingBool deadPoof = new SettingBool(false, "deadPoof", instance.key());
     public static final SettingBool lightning = new SettingBool(false, "lightning", instance.key());

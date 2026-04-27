@@ -16,7 +16,7 @@ public class ChatMsgEvent extends Cancellable {
         return this.message;
     }
 
-    public String getPlainMessage() {
+    public String msg() {
         return this.messagePlain;
     }
 }

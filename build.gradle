@@ -17,6 +17,11 @@ repositories {
     }
 
     maven {
+        name = "jitpack-maven"
+        url = 'https://jitpack.io'
+    }
+
+    maven {
         name = "meteor-maven"
         url = "https://maven.meteordev.org/releases"
     }
@@ -29,11 +34,6 @@ repositories {
     maven {
         name = "jama-maven"
         url = "https://mvn.topobyte.de"
-    }
-
-    maven {
-        name = "jitpack-maven"
-        url = "https://jitpack.io"
     }
 }
 

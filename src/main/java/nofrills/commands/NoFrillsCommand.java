@@ -3,26 +3,22 @@ package nofrills.commands;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.minecraft.MinecraftProfileTextures;
-import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PlayerHeadItem;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Config;
 import nofrills.features.general.PartyCommands;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.hunting.ShardTracker;
+import nofrills.features.misc.AutoRequeue;
+import nofrills.features.misc.BlockList;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGui;
+import nofrills.misc.DebugStuff;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -32,7 +28,6 @@ import java.util.Optional;
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
-import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 import static nofrills.misc.SkyblockData.instances;
 
@@ -204,6 +199,14 @@ public class NoFrillsCommand {
                 Utils.refillItem("ARCHITECT_FIRST_DRAFT", 1);
                 return SINGLE_SUCCESS;
             })),
+            new ModCommand("getToxic", "Refills your Toxic Arrow Poison (up to 32) directly from your sacks.", literal("getToxic").executes(context -> {
+                Utils.refillItem("TOXIC_ARROW_POISON", 32);
+                return SINGLE_SUCCESS;
+            })),
+            new ModCommand("getTwilight", "Refills your Twilight Arrow Poison (up to 16) directly from your sacks.", literal("getTwilight").executes(context -> {
+                Utils.refillItem("TWILIGHT_ARROW_POISON", 16);
+                return SINGLE_SUCCESS;
+            })),
             new ModCommand("refill", "Refills a specific item up to the specific amount from your sacks.", literal("refill").executes(context -> {
                 return SINGLE_SUCCESS;
             }).then(argument("query", StringArgumentType.greedyString()).executes(context -> {
@@ -226,59 +229,25 @@ public class NoFrillsCommand {
             new ModCommand("debug", "Random commands for logging, debugging, or testing.", literal("debug").executes(context -> {
                 return SINGLE_SUCCESS;
             }).then(literal("dumpHeadTextures").executes(context -> {
-                List<EquipmentSlot> searchedSlots = List.of(
-                        EquipmentSlot.HEAD,
-                        EquipmentSlot.MAINHAND,
-                        EquipmentSlot.OFFHAND
-                );
-                for (Entity ent : Utils.getEntities()) {
-                    if (ent instanceof LivingEntity living) {
-                        for (EquipmentSlot slot : searchedSlots) {
-                            ItemStack stack = living.getItemBySlot(slot);
-                            GameProfile textures = Utils.getTextures(stack);
-                            if (textures != null && stack.getItem() instanceof PlayerHeadItem) {
-                                Vec3 pos = living.position();
-                                LOGGER.info(Utils.format("\n\tURL - {}\n\tSlot - {}\n\tEntity Name - {}\n\tHead Name - {}\n\tPosition - {} {} {}",
-                                        Utils.getTextureUrl(textures),
-                                        Utils.toUpper(slot.name()),
-                                        living.getName().getString(),
-                                        stack.getHoverName().getString(),
-                                        pos.x(),
-                                        pos.y(),
-                                        pos.z()
-                                ));
-                            }
-                        }
-                    }
-                }
-                Utils.info("Dumped head texture URL's to latest.log.");
+                DebugStuff.dumpHeadTextures();
                 return SINGLE_SUCCESS;
             })).then(literal("dumpPlayerTextures").executes(context -> {
-                MinecraftSessionService service = mc.services().sessionService();
-                for (Entity ent : Utils.getEntities()) {
-                    if (ent instanceof Player player) {
-                        if (player.getGameProfile() != null) {
-                            MinecraftProfileTextures textures = service.getTextures(player.getGameProfile());
-                            Vec3 pos = player.position();
-                            if (textures.skin() == null) {
-                                continue;
-                            }
-                            LOGGER.info(Utils.format("\n\tURL - {}\n\tEntity Name - {}\n\tPosition - {} {} {}",
-                                    textures.skin().getUrl(),
-                                    player.getName().getString(),
-                                    pos.x(),
-                                    pos.y(),
-                                    pos.z()
-                            ));
-                        }
-                    }
-                }
-                Utils.info("Dumped player texture URL's to latest.log.");
+                DebugStuff.dumpPlayerTextures();
                 return SINGLE_SUCCESS;
             })).then(literal("dumpTabList").executes(context -> {
-                for (String line : Utils.getTabListLines()) {
-                    Utils.info(line);
-                }
+                DebugStuff.dumpTabList();
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpNameTags").executes(context -> {
+                DebugStuff.dumpNameTags();
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpTabListFooter").executes(context -> {
+                DebugStuff.dumpTabListFooter();
+                return SINGLE_SUCCESS;
+            })).then(literal("dumpBossBarLabel").executes(context -> {
+                DebugStuff.dumpBossBarLabel();
+                return SINGLE_SUCCESS;
+            })).then(literal("toggleLogSounds").executes(context -> {
+                DebugStuff.toggleLogSounds();
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("shardTracker", "Commands for managing the Shard Tracker feature.", literal("shardTracker").executes(context -> {
@@ -334,7 +303,63 @@ public class NoFrillsCommand {
                 }
                 Utils.info("§7Could not find the provided Slot Binding preset.");
                 return SINGLE_SUCCESS;
-            }))))
+            })))),
+            new ModCommand("blockList", "Commands for managing the Block List feature.", literal("blockList").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(literal("add").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(argument("playerName", StringArgumentType.word()).executes(context -> {
+                String name = StringArgumentType.getString(context, "playerName");
+                BlockList.addPlayer(name, "Unspecified");
+                return SINGLE_SUCCESS;
+            }).then(argument("blockReason", StringArgumentType.greedyString()).executes(context -> {
+                String name = StringArgumentType.getString(context, "playerName");
+                String reason = StringArgumentType.getString(context, "blockReason");
+                BlockList.addPlayer(name, reason);
+                return SINGLE_SUCCESS;
+            })))).then(literal("remove").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(argument("playerName", StringArgumentType.word()).executes(context -> {
+                String name = StringArgumentType.getString(context, "playerName");
+                BlockList.removePlayer(name);
+                return SINGLE_SUCCESS;
+            }))).then(literal("list").executes(context -> {
+                BlockList.printEntries(1);
+                return SINGLE_SUCCESS;
+            }).then(argument("page", IntegerArgumentType.integer(1)).executes(context -> {
+                int page = IntegerArgumentType.getInteger(context, "page");
+                BlockList.printEntries(page);
+                return SINGLE_SUCCESS;
+            }))).then(literal("find").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(argument("playerName", StringArgumentType.word()).executes(context -> {
+                String name = StringArgumentType.getString(context, "playerName");
+                List<JsonObject> results = BlockList.searchPlayer(name);
+                if (!results.isEmpty()) {
+                    MutableComponent message = Component.literal(Utils.format("§aFound {} result(s) in Block List: §f", results.size()));
+                    for (int i = 0; i < results.size(); i++) {
+                        JsonObject result = results.get(i);
+                        if (i > 0) {
+                            message.append(", ");
+                        }
+                        message.append(BlockList.buildEntryLine(result, result.get("name").getAsString()));
+                    }
+                    Utils.infoRaw(message);
+                } else {
+                    Utils.infoFormat("§7Found 0 results in the Block List.");
+                }
+                return SINGLE_SUCCESS;
+            })))),
+            new ModCommand("autoRequeue", "Commands for managing the Auto Requeue feature.", literal("autoRequeue").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(literal("pause").executes(context -> {
+                AutoRequeue.setPaused();
+                return SINGLE_SUCCESS;
+            })).then(literal("unpause").executes(context -> {
+                AutoRequeue.paused = false;
+                Utils.info("§aAuto Requeue unpaused.");
+                return SINGLE_SUCCESS;
+            }))),
     };
 
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {

@@ -76,7 +76,7 @@ public class ChatWaypoints {
 
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
-        String msg = event.getPlainMessage();
+        String msg = event.msg();
         if (instance.isActive() && allWaypoints.value()) {
             if (msg.startsWith("[NPC]") || msg.startsWith("[BOSS]") || msg.startsWith("Guild > ") || msg.startsWith("Party > ")) {
                 return;

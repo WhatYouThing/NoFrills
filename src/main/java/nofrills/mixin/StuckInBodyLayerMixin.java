@@ -22,7 +22,7 @@ public abstract class StuckInBodyLayerMixin {
     private Model<?> model;
 
     @Inject(method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/AvatarRenderState;FF)V", at = @At("HEAD"), cancellable = true)
-    private void beforeRenderFeature(PoseStack matrixStack, SubmitNodeCollector orderedRenderCommandQueue, int i, AvatarRenderState playerEntityRenderState, float f, float g, CallbackInfo ci) {
+    private void beforeRenderFeature(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, AvatarRenderState state, float f, float g, CallbackInfo ci) {
         if (NoRender.instance.isActive() && NoRender.stuckArrows.value() && this.model instanceof ArrowModel) {
             ci.cancel();
         }

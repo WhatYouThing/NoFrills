@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
@@ -73,7 +74,8 @@ public class WitherDragons {
     }
 
     private static void announceSpawn(Dragon drag, boolean split) {
-        Utils.showTitleCustom(Utils.toUpper(drag.name) + " IS SPAWNING!", 60, -20, 4.0f, drag.color);
+        MutableComponent title = Component.literal(Utils.toUpper(drag.name) + " IS SPAWNING").setStyle(Style.EMPTY.withBold(true).withColor(drag.color.hex));
+        Utils.showTitle(title, Component.empty(), 0, 30, 10);
         Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
         if (split) {
             Utils.infoRaw(Component.literal(drag.name + " is your priority dragon.").withColor(drag.color.hex));

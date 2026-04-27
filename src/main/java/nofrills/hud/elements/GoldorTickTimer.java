@@ -6,10 +6,12 @@ import nofrills.hud.TickTimerElement;
 public class GoldorTickTimer extends TickTimerElement {
 
     public GoldorTickTimer() {
-        super("Goldor Tick: §f{}", new Feature("goldorTickTimerElement"), "Goldor Tick Timer");
+        super("Goldor Tick: {}", new Feature("goldorTickTimerElement"), "Goldor Tick Timer");
         this.setStartTicks(60);
         this.setRepeating(true);
         this.options = this.getBaseSettings();
         this.setDesc("Displays a tick timer for the death tick in the F7/M7 Goldor phase.");
+        this.setAutoPause();
+        this.setCategory(Category.Dungeons);
     }
 }

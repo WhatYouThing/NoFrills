@@ -1,7 +1,5 @@
 package nofrills.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.fabricmc.loader.api.FabricLoader;
@@ -15,7 +13,6 @@ import static nofrills.Main.LOGGER;
 public class Config {
     private static final Path folderPath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills");
     private static final Path filePath = folderPath.resolve("Configuration.json");
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static JsonObject data = new JsonObject();
     private static int hash = 0;
 
@@ -38,7 +35,7 @@ public class Config {
 
     public static void save() {
         try {
-            Utils.atomicWrite(filePath, GSON.toJson(data));
+            Utils.atomicWrite(filePath, data);
         } catch (Exception exception) {
             LOGGER.error("Unable to save NoFrills config file!", exception);
         }

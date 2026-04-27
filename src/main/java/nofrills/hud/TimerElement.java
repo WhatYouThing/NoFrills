@@ -8,7 +8,9 @@ import nofrills.misc.Utils;
 
 public class TimerElement extends SimpleTextElement {
     protected final String timerText;
+    protected long duration = 0;
     protected long time = 0;
+    protected boolean autoPause = false;
 
     public TimerElement(String text, Feature instance, String label) {
         super(Component.literal(Utils.format(text, "N/A")), instance, label);
@@ -26,27 +28,45 @@ public class TimerElement extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public String ticksAsTime(long time) {
+    public String millisecondsAsTime(long time) {
         if (time < 0) {
             return "0.00s";
         }
         return Utils.formatDecimal(time * 0.001) + "s";
     }
 
+    public String getTimeColor(long timeLeft) {
+        return Utils.getPercentageColor((double) timeLeft / this.duration);
+    }
+
+    public String getTimerText() {
+        return this.timerText;
+    }
+
     public void updateTimer() {
         long timeLeft = this.time - Util.getMillis();
         if (timeLeft > 0) {
-            this.setText(Utils.format(this.timerText, this.ticksAsTime(timeLeft)));
+            this.setText(Utils.format(this.getTimerText(), this.getTimeColor(timeLeft) + this.millisecondsAsTime(timeLeft)));
         } else if (this.time != 0) {
-            this.time = 0;
+            this.pause();
         }
     }
 
     public void start(long duration) {
+        this.duration = duration;
         this.time = duration + Util.getMillis();
     }
 
     public void pause() {
+        this.duration = 0;
         this.time = 0;
+    }
+
+    public void setAutoPause() {
+        this.autoPause = true;
+    }
+
+    public boolean isAutoPause() {
+        return this.autoPause;
     }
 }

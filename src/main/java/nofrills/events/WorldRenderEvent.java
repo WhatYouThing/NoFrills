@@ -167,4 +167,8 @@ public class WorldRenderEvent {
     public void drawTracer(Vec3 pos, RenderColor color) {
         this.drawTracer(pos, 4.0f, color);
     }
+
+    public float delta() {
+        return this.tickCounter.getGameTimeDeltaPartialTick(true);
+    }
 }

@@ -50,10 +50,6 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     @Shadow
     @Final
     protected T menu;
-    @Shadow
-    protected int topPos;
-    @Shadow
-    protected int leftPos;
     @Unique
     List<LeapOverlay.LeapButton> leapButtons = new ArrayList<>();
 
@@ -155,14 +151,6 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
             ci.cancel();
         }
     }
-
-    // TODO: mixin into InventoryScreen.extractBackground
-//    @Inject(method = "extractBackground", at = @At("HEAD"), cancellable = true)
-//    private void onRenderBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-//        if (LeapOverlay.isLeapMenu(this.title.getString())) {
-//            ci.cancel();
-//        }
-//    }
 
     @Inject(method = "extractSlot", at = @At("HEAD"))
     private void onRenderSlot(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {

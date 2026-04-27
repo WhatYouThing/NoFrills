@@ -2,6 +2,8 @@ package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -19,6 +21,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import nofrills.events.*;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
+import nofrills.features.tweaks.DisconnectFix;
 import nofrills.features.tweaks.NoConfirmScreen;
 import nofrills.hud.HudManager;
 import nofrills.misc.SkyblockData;
@@ -28,10 +31,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import static nofrills.Main.eventBus;
-import static nofrills.Main.mc;
+import static nofrills.Main.*;
 
 @Mixin(ClientPacketListener.class)
 public class ClientPacketListenerMixin {
@@ -45,6 +48,19 @@ public class ClientPacketListenerMixin {
                     break;
                 }
             }
+        }
+    }
+
+    @WrapOperation(method = "handleSetEntityData", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/syncher/SynchedEntityData;assignValues(Ljava/util/List;)V"))
+    private void onWriteTrackerUpdate(SynchedEntityData instance, List<SynchedEntityData.DataValue<?>> items, Operation<Void> original) {
+        if (DisconnectFix.instance.isActive()) {
+            try {
+                original.call(instance, items);
+            } catch (Exception exception) {
+                LOGGER.error("Disconnect Fix caught exception in corrupted packet.", exception);
+            }
+        } else {
+            original.call(instance, items);
         }
     }
 

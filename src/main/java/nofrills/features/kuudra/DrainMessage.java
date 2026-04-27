@@ -20,7 +20,7 @@ public class DrainMessage {
     @EventHandler
     private static void onChatMsg(ChatMsgEvent event) {
         if (instance.isActive() && Utils.isInKuudra()) {
-            String msg = event.getPlainMessage();
+            String msg = event.msg();
             if (msg.startsWith("Used Extreme Focus!")) {
                 String mana = msg.replace("Used Extreme Focus! (", "").replace(" Mana)", "");
                 int players = 0;
@@ -39,7 +39,7 @@ public class DrainMessage {
                 }
             }
             if (hide.value()) {
-                if (msg.startsWith("You now have") && msg.contains("Damage Resistance for 5 seconds")) {
+                if (msg.startsWith("You now have ") && msg.endsWith("% damage on your next hit within 5s!")) {
                     event.cancel();
                 }
                 if (msg.equals("Your Extreme Focus has worn off.")) {

@@ -12,6 +12,7 @@ public class Power extends SimpleTextElement {
         super(Component.literal(text), new Feature("powerElement"), "Power Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the power blessing level while in Dungeons.");
+        this.setCategory(Category.Dungeons);
     }
 
     @Override

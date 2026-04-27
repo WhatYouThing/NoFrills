@@ -19,7 +19,7 @@ public class KuudraHitbox {
         if (instance.isActive() && Utils.isInKuudra()) {
             MagmaCube kuudra = KuudraUtil.getKuudraEntity();
             if (kuudra != null) {
-                event.drawOutline(Utils.getLerpedBox(kuudra, event.tickCounter.getGameTimeDeltaPartialTick(true)), false, color.value());
+                event.drawOutline(Utils.getLerpedBox(kuudra, event.delta()), false, color.value());
             }
         }
     }

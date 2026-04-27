@@ -2,9 +2,13 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import nofrills.events.*;
 import nofrills.features.fishing.CapTracker;
@@ -14,6 +18,8 @@ import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
@@ -28,9 +34,15 @@ public class HudManager {
     public static final Quiver quiver = new Quiver("Quiver: §fN/A");
     public static final LagMeter lagMeter = new LagMeter("Last server tick was 0.00s ago");
     public static final PickaxeAbilityTimer pickAbilityTimer = new PickaxeAbilityTimer();
+    public static final QueueCooldownTimer queueCooldownTimer = new QueueCooldownTimer();
+    public static final SlayerHealth slayerHealth = new SlayerHealth();
+    public static final SlayerTimer slayerTimer = new SlayerTimer();
     public static final BossHealth bossHealth = new BossHealth();
     public static final DungeonMap dungeonMap = new DungeonMap();
     public static final DungeonScore dungeonScore = new DungeonScore();
+    public static final SpiritMaskTimer spiritMaskTimer = new SpiritMaskTimer();
+    public static final PhoenixPetTimer phoenixPetTimer = new PhoenixPetTimer();
+    public static final BonzoMaskTimer bonzoMaskTimer = new BonzoMaskTimer();
     public static final SpiritBearTimer spiritBearTimer = new SpiritBearTimer();
     public static final TerracottaGyroTimer terraGyroTimer = new TerracottaGyroTimer();
     public static final PadTimer padTimer = new PadTimer();
@@ -42,6 +54,8 @@ public class HudManager {
     public static final FishingBobber bobber = new FishingBobber("Bobber: §7Inactive");
     public static final ShardTrackerDisplay shardTracker = new ShardTrackerDisplay();
     public static final SkillTrackerDisplay skillTracker = new SkillTrackerDisplay();
+
+    private static CustomTitle currentTitle = new CustomTitle(Component.empty(), 0);
 
     public static boolean isEditingHud() {
         return mc.screen instanceof HudEditorScreen;
@@ -64,12 +78,23 @@ public class HudManager {
         }
     }
 
+    public static void setCustomTitle(MutableComponent text, int ticks) {
+        currentTitle = new CustomTitle(text, ticks);
+    }
+
+    public static void setCustomTitle(String text, int ticks) {
+        setCustomTitle(Component.literal(text), ticks);
+    }
+
     @EventHandler
     private static void onRenderHud(HudRenderEvent event) {
         if (!isEditingHud()) {
             for (HudElement element : HudManager.elements) {
                 if (element.isAdded()) element.updatePosition();
             }
+        }
+        if (currentTitle.isActive()) {
+            currentTitle.draw(event.context);
         }
     }
 
@@ -80,12 +105,16 @@ public class HudManager {
         fps.reset();
         lagMeter.setTickTime(0);
         bossHealth.reset();
-        terraGyroTimer.pause();
-        padTimer.pause();
-        terminalStartTimer.pause();
-        goldorTickTimer.pause();
-        freshToolsTimer.pause();
         dungeonMap.reset();
+        for (HudElement element : elements) {
+            if (element instanceof TickTimerElement tickTimer && tickTimer.isAutoPause()) {
+                tickTimer.pause();
+            }
+            if (element instanceof TimerElement timer && timer.isAutoPause()) {
+                timer.pause();
+            }
+        }
+        currentTitle.reset();
     }
 
     @EventHandler
@@ -142,6 +171,12 @@ public class HudManager {
         if (inventory.isActive()) {
             inventory.updateInventory();
         }
+        if (slayerHealth.isActive()) {
+            slayerHealth.update();
+        }
+        if (slayerTimer.isActive()) {
+            slayerTimer.update();
+        }
         if (bossHealth.isActive()) {
             bossHealth.update();
         }
@@ -153,6 +188,9 @@ public class HudManager {
         }
         if (skillTracker.isActive()) {
             skillTracker.tick();
+        }
+        if (currentTitle.isActive()) {
+            currentTitle.tick();
         }
     }
 
@@ -184,7 +222,9 @@ public class HudManager {
             }
         }
         if (Utils.isInKuudra()) {
-            freshToolsTimer.tick();
+            if (freshToolsTimer.isActive()) {
+                freshToolsTimer.tick();
+            }
         }
     }
 
@@ -197,6 +237,31 @@ public class HudManager {
 
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
+        if (queueCooldownTimer.isActive()) {
+            for (Pattern pattern : queueCooldownTimer.patterns) {
+                if (pattern.matcher(event.msg()).matches()) {
+                    queueCooldownTimer.start(30000);
+                    break;
+                }
+            }
+        }
+        if (spiritMaskTimer.isActive() && event.msg().equals("Second Wind Activated! Your Spirit Mask saved your life!")) {
+            spiritMaskTimer.start(30000);
+        }
+        if (phoenixPetTimer.isActive() && event.msg().equals("Your Phoenix Pet saved you from certain death!")) {
+            phoenixPetTimer.start(60000);
+        }
+        if (bonzoMaskTimer.isActive() && event.msg().replace("⚚ ", "").equals("Your Bonzo's Mask saved your life!")) {
+            ItemStack helmet = Utils.getEntityHelmet(mc.player);
+            Optional<String> line = Utils.getLoreLines(helmet).stream().filter(l -> l.startsWith("Cooldown: ")).findFirst();
+            if (line.isPresent()) {
+                String cooldown = line.get();
+                String duration = cooldown.substring(cooldown.indexOf(":") + 2).replace("s", "");
+                bonzoMaskTimer.start((long) Math.ceil(Utils.parseDouble(duration).orElse(180.0) * 1000));
+            } else {
+                bonzoMaskTimer.start(180000);
+            }
+        }
         if (Utils.isOnDungeonFloor("7")) {
             switch (event.messagePlain) {
                 case "[BOSS] Storm: Pathetic Maxor, just like expected." -> {
@@ -228,6 +293,39 @@ public class HudManager {
             if (event.pos.getX() == 7 && event.pos.getY() == 77 && event.pos.getZ() == 34) {
                 spiritBearTimer.start();
             }
+        }
+    }
+
+    public static class CustomTitle {
+        public MutableComponent text;
+        public int ticks;
+
+        public CustomTitle(MutableComponent text, int ticks) {
+            this.text = text;
+            this.ticks = ticks;
+        }
+
+        public boolean isActive() {
+            return this.ticks > 0;
+        }
+
+        public void tick() {
+            this.ticks--;
+        }
+
+        public void reset() {
+            this.ticks = 0;
+        }
+
+        public void draw(GuiGraphicsExtractor context) {
+            context.pose().pushMatrix();
+            context.pose().translate(context.guiWidth() * 0.5f, context.guiHeight() * 0.5f);
+            context.pose().pushMatrix();
+            context.pose().scale(4.0F, 4.0F);
+            int width = mc.font.width(this.text);
+            context.textWithBackdrop(mc.font, this.text, -width / 2, -context.guiHeight() / 20, width, -1);
+            context.pose().popMatrix();
+            context.pose().popMatrix();
         }
     }
 }

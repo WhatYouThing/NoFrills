@@ -9,11 +9,13 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
-import nofrills.config.*;
+import nofrills.config.Feature;
+import nofrills.config.SettingBool;
+import nofrills.config.SettingColor;
+import nofrills.config.SettingDouble;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -30,8 +32,6 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     public final SettingBool hideTablist;
     public final SettingBool hideF3;
     public final SettingDouble scale;
-    public final SettingEnum<HorizontalScaleAlignment> hScaleAlign;
-    public final SettingEnum<VerticalScaleAlignment> vScaleAlign;
     public final SettingBool useBackground;
     public final SettingColor background;
     public final Identifier identifier;
@@ -40,6 +40,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     public FlowLayout layout;
     public HudSettings options;
     public boolean toggling = false;
+    public Category category = Category.Misc;
 
     public HudElement(FlowLayout layout, Feature instance, String label) {
         super(Sizing.content(), Sizing.content(), layout);
@@ -51,8 +52,6 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         this.hideTablist = new SettingBool(false, "hideInTablist", instance);
         this.hideF3 = new SettingBool(false, "hideInF3", instance);
         this.scale = new SettingDouble(1.0, "scale", instance);
-        this.hScaleAlign = new SettingEnum<>(HorizontalScaleAlignment.Top, HorizontalScaleAlignment.class, "hScaleAlign", instance);
-        this.vScaleAlign = new SettingEnum<>(VerticalScaleAlignment.Left, VerticalScaleAlignment.class, "vScaleAlign", instance);
         this.useBackground = new SettingBool(false, "useBackground", instance);
         this.background = new SettingColor(RenderColor.fromArgb(0x40000000), "background", instance);
         this.identifier = Identifier.fromNamespaceAndPath("nofrills", Utils.toLower(label.replaceAll(" ", "_")));
@@ -81,7 +80,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     @Override
     public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         float scale = this.scale.valueFloat();
-        if (scale != 1.0f && !this.isEditingHud()) {
+        if (scale != 1.0f) {
             context.pose().pushMatrix();
             this.applyScaling(context, scale);
             super.draw(context, mouseX, mouseY, partialTicks, delta);
@@ -118,27 +117,27 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     }
 
     @Override
-    public @Nullable UIComponent childAt(int x, int y) {
+    public UIComponent childAt(int x, int y) {
         if (this.isInBoundingBox(x, y)) { // gets rid of the forehead
             return this;
         }
         return super.childAt(x, y);
     }
 
+    @Override
+    public int height() {
+        float scale = this.scale.valueFloat();
+        return scale != 1.0 ? (int) Math.ceil(super.height() * scale) : super.height();
+    }
+
+    @Override
+    public int width() {
+        float scale = this.scale.valueFloat();
+        return scale != 1.0 ? (int) Math.ceil(super.width() * scale) : super.width();
+    }
+
     public void applyScaling(OwoUIGraphics context, float scale) {
-        float originalX = (float) (this.xOffset - this.xOffset * scale);
-        float originalY = (float) (this.yOffset - this.yOffset * scale);
-        float alignX = switch (this.vScaleAlign.value()) {
-            case Left -> 0.0f;
-            case Middle -> this.height * 0.25f;
-            case Right -> this.height * 0.5f;
-        };
-        float alignY = switch (this.hScaleAlign.value()) {
-            case Top -> 0.0f;
-            case Middle -> this.width * 0.25f;
-            case Bottom -> this.width * 0.5f;
-        };
-        context.pose().translate(originalX + alignX, originalY + alignY);
+        context.pose().translate((float) (this.xOffset - this.xOffset * scale), (float) (this.yOffset - this.yOffset * scale));
         context.pose().scale(scale, scale);
     }
 
@@ -181,9 +180,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         List<FlowLayout> list = new ArrayList<>(extra);
         list.add(new Settings.Toggle("Hide In Tablist", this.hideTablist, "Automatically hide this element while the tablist is visible."));
         list.add(new Settings.Toggle("Hide In F3", this.hideF3, "Automatically hide this element while the F3 screen is visible."));
-        list.add(new Settings.SliderDouble("Scale", 0.1, 5.0, 0.01, this.scale, "The scale multiplier of this element.\n\nDue to technical limitations the bounding box of the element is not scaled.\nThe scale is only visual and appears only outside of the HUD editor."));
-        list.add(new Settings.Dropdown<>("Horizontal Scale Alignment", this.hScaleAlign, "The horizontal alignment of the scaled element according to its original bounding box."));
-        list.add(new Settings.Dropdown<>("Vertical Scale Alignment", this.vScaleAlign, "The vertical alignment of the scaled element according to its original bounding box."));
+        list.add(new Settings.SliderDouble("Scale", 0.25, 5.0, 0.01, this.scale, "The scale multiplier of this element."));
         list.add(new Settings.Toggle("Use Background", this.useBackground, "Draw a background for this element."));
         list.add(new Settings.ColorPicker("Background", this.background, "The color of the background."));
         HudSettings settings = new HudSettings(list);
@@ -195,6 +192,14 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         this.elementDesc = Component.literal(description);
     }
 
+    public Category getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
+    }
+
     public boolean isEditingHud() {
         return HudManager.isEditingHud();
     }
@@ -202,8 +207,8 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     public void updatePosition() {
         Window window = mc.getWindow();
         int width = window.getGuiScaledWidth(), height = window.getGuiScaledHeight();
-        this.xOffset = Math.clamp(this.xPos.value() * width, 0, Math.clamp(width - this.width, 0, width));
-        this.yOffset = Math.clamp(this.yPos.value() * height, 0, Math.clamp(height - this.height, 0, height));
+        this.xOffset = Math.clamp(this.xPos.value() * width, 0, Math.clamp(width - this.width(), 0, width));
+        this.yOffset = Math.clamp(this.yPos.value() * height, 0, Math.clamp(height - this.height(), 0, height));
         this.updateX(0);
         this.updateY(0);
     }
@@ -221,15 +226,13 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         return this.identifier;
     }
 
-    public enum HorizontalScaleAlignment {
-        Top,
-        Middle,
-        Bottom
-    }
-
-    public enum VerticalScaleAlignment {
-        Left,
-        Middle,
-        Right
+    public enum Category {
+        Info,
+        Dungeons,
+        Kuudra,
+        Slayer,
+        Fishing,
+        Mining,
+        Misc
     }
 }

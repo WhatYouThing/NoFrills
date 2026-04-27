@@ -3,14 +3,11 @@ package nofrills.features.misc;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
-import nofrills.config.SettingKeybind;
 import nofrills.events.ChatMsgEvent;
-import nofrills.events.InputEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
@@ -18,10 +15,8 @@ public class AutoRequeue {
     public static final Feature instance = new Feature("autoRequeue");
 
     public static final SettingInt delay = new SettingInt(100, "delay", instance.key());
-    public static final SettingKeybind pauseBind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "pauseBind", instance.key());
 
     public static boolean paused = false;
-    public static boolean message = false;
     public static int ticks = 0;
 
     private static boolean isPartyMemberUpdateMsg(String msg) {
@@ -37,18 +32,16 @@ public class AutoRequeue {
 
     public static void setPaused() {
         if (!paused) {
-            message = true;
+            mc.schedule(() -> Utils.info("§aAuto Requeue paused for the current instance."));
             paused = true;
+        } else {
+            mc.schedule(() -> Utils.info("§7Auto Requeue is already paused."));
         }
     }
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive()) {
-            if (message) {
-                Utils.info("§aAuto Requeue paused for the current instance.");
-                message = false;
-            }
             if (ticks != -1 && !paused && SkyblockData.isInstanceOver()) {
                 if (ticks == 0) {
                     Utils.infoFormat("§aAutomatically requeuing in {} seconds.", Utils.formatDecimal(delay.value() / 20.0f));
@@ -59,16 +52,6 @@ public class AutoRequeue {
                     ticks = -1;
                 }
             }
-        }
-    }
-
-    @EventHandler
-    private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen == null && pauseBind.isKey(event.key) && SkyblockData.isInInstance()) {
-            if (event.action == GLFW.GLFW_PRESS) {
-                setPaused();
-            }
-            event.cancel();
         }
     }
 

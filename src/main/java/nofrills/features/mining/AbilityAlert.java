@@ -52,11 +52,13 @@ public class AbilityAlert {
     }
 
     private static String getWidget() {
-        if (!toolData.isEmpty()) {
-            for (String line : Utils.getTabListLines()) {
-                int index = line.indexOf(":");
-                if (index != -1 && line.contains(toolData.ability)) {
-                    return line;
+        List<String> lines = Utils.getTabListLines();
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (line.equals("Pickaxe Ability:") && i + 1 < lines.size()) {
+                String next = lines.get(i + 1);
+                if (next.contains(": ") && (next.endsWith("s") || next.endsWith("Available"))) {
+                    return next;
                 }
             }
         }
@@ -74,13 +76,17 @@ public class AbilityAlert {
     private static void onChat(ChatMsgEvent event) {
         if (instance.isActive() && !Utils.isInDungeons() && isUsedMessage(event.messagePlain)) {
             if (!toolData.isEmpty() && getWidget().isEmpty()) {
+                if (pickAbilityTimer.isActive()) {
+                    pickAbilityTimer.setCurrentAbility(toolData.ability);
+                }
                 if (override.value() > 0) {
                     setCooldown(override.value());
                 } else {
                     for (String line : Utils.getLoreLines(toolData.tool).reversed()) {
                         if (line.startsWith("Cooldown: ")) {
                             String duration = line.substring(line.indexOf(":") + 2).replace("s", "");
-                            setCooldown(Utils.parseInt(duration).orElse(0) * 20);
+                            Utils.parseInt(duration).ifPresent(seconds -> setCooldown(seconds * 20));
+                            break;
                         }
                     }
                 }
@@ -94,14 +100,17 @@ public class AbilityAlert {
             String widget = getWidget();
             if (!widget.isEmpty()) {
                 String duration = widget.substring(widget.indexOf(":") + 2);
+                if (pickAbilityTimer.isActive()) {
+                    pickAbilityTimer.setCurrentAbility(widget.substring(0, widget.indexOf(":")));
+                }
                 if (ticks > 1 && duration.equals("Available")) {
                     setCooldown(1); // instantly skips cooldown if the server does, such as if the player enters a mineshaft
                 }
                 if (ticks == 0 && duration.endsWith("s")) {
-                    int durationTicks = Utils.parseInt(duration.replace("s", "")).orElse(0);
-                    if (durationTicks > 6) {
-                        setCooldown(durationTicks * 20);
-                    }
+                    Utils.parseInt(duration.replace("s", "")).ifPresent(seconds -> {
+                        if (seconds < 10) return;
+                        setCooldown(seconds * 20 + 20);
+                    });
                 }
             }
             if (ticks > 0) {

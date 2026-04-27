@@ -116,10 +116,10 @@ public class SkillTracker {
         return new JsonObject();
     }
 
-    public static void saveData() {
+    private static void saveData() {
         Thread.startVirtualThread(() -> {
             try {
-                Utils.atomicWrite(sessionPath, data.toString());
+                Utils.atomicWrite(sessionPath, data);
             } catch (Exception exception) {
                 LOGGER.error("Unable to save NoFrills Skill Tracker file!", exception);
             }
@@ -130,7 +130,7 @@ public class SkillTracker {
         JsonObject obj = new JsonObject();
         obj.addProperty("active", false);
         obj.addProperty("countedTicks", 0L);
-        obj.addProperty("totalTicks", 0L);
+        obj.addProperty("timestamp", Utils.getTimestamp());
         obj.addProperty("pauseTicks", 0L);
         obj.addProperty("lastPart", "");
         obj.addProperty("lastExp", 0.0);
@@ -159,6 +159,9 @@ public class SkillTracker {
     }
 
     public static boolean isSessionPaused(String skill) {
+        if (Utils.isOnAlphaNetwork()) {
+            return true;
+        }
         if (data.has(skill)) {
             if (skill.equals("Catacombs") && Utils.isInDungeons()) {
                 return false;
@@ -175,7 +178,9 @@ public class SkillTracker {
                 obj.addProperty("countedTicks", obj.get("countedTicks").getAsLong() + 1);
                 obj.addProperty("pauseTicks", obj.get("pauseTicks").getAsLong() + 1);
             }
-            obj.addProperty("totalTicks", obj.get("totalTicks").getAsLong() + 1);
+            if (obj.has("totalTicks")) {
+                obj.addProperty("totalTicks", obj.get("totalTicks").getAsLong() + 1);
+            }
         }
     }
 
@@ -197,13 +202,15 @@ public class SkillTracker {
             SettingColor color = getSessionColor(skill);
             MutableComponent sessionText = color != null ? Component.literal(skill).withColor(color.value().argb) : Component.literal(skill);
             JsonObject obj = data.has(skill) ? data.get(skill).getAsJsonObject() : getDefaultData();
-            long totalTicks = obj.get("totalTicks").getAsLong();
+            String elapsed = obj.has("totalTicks")
+                    ? Utils.ticksToTime(obj.get("totalTicks").getAsLong())
+                    : Utils.millisecondsToTime(Utils.getTimestamp() - obj.get("timestamp").getAsLong());
             long countedTicks = obj.get("countedTicks").getAsLong();
             double currentExp = obj.get("currentExp").getAsDouble();
             sessionText.append(Utils.format("\nEXP Per Hour: {}", Utils.formatSeparator(currentExp / (countedTicks / 72000.0))));
             sessionText.append(Utils.format("\nEXP Gained: {}", Utils.formatSeparator(currentExp)));
             sessionText.append(Utils.format("\nTime Counted: {}", Utils.ticksToTime(countedTicks)));
-            sessionText.append(Utils.format("\nTime Elapsed: {}", Utils.ticksToTime(totalTicks)));
+            sessionText.append(Utils.format("\nTime Elapsed: {}", elapsed));
             text.append("\n").append(sessionText);
         }
         return text;

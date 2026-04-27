@@ -136,7 +136,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(List.of(
                                 new Settings.Separator("Sound"),
-                                new Settings.Toggle("Warp Sound", EtherwarpOverlay.doSound, "Plays a custom sound effect as soon as you start teleporting to the target block.\nMakes the ability more responsive on high ping, but may produce false positives."),
+                                new Settings.Toggle("Warp Sound", EtherwarpOverlay.doSound, "Plays a custom sound effect upon teleporting."),
+                                new Settings.Toggle("Pingless Sound", EtherwarpOverlay.pinglessSound, "If enabled, the custom sound will play as soon as you click.\nMakes teleporting more responsive on high ping, but may produce false positives."),
                                 new Settings.TextInput("Sound", EtherwarpOverlay.sound, "The identifier of the sound to play."),
                                 new Settings.SliderDouble("Volume", 0.0, 5.0, 0.1, EtherwarpOverlay.volume, "The volume of the sound."),
                                 new Settings.SliderDouble("Pitch", 0.0, 2.0, 0.05, EtherwarpOverlay.pitch, "The pitch of the sound."),
@@ -158,8 +159,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Fire Overlay", NoRender.fireOverlay, "Removes the fire overlay."),
                                 new Settings.Toggle("Break Particles", NoRender.breakParticles, "Removes the particles that appear when breaking blocks."),
                                 new Settings.Toggle("Boss Bar", NoRender.bossBar, "Hides the boss health bar that appears at the top of the screen."),
+                                new Settings.Toggle("Armor Bar", NoRender.armorBar, "Removes the armor bar from your hotbar."),
+                                new Settings.Toggle("Food Bar", NoRender.foodBar, "Removes the food bar from your hotbar."),
                                 new Settings.Toggle("Fog", NoRender.fog, "Hides terrain and ambient fog."),
                                 new Settings.Toggle("Effect Display", NoRender.effectDisplay, "Removes the potion effect display from the inventory and the top right of the screen."),
+                                new Settings.Toggle("Selected Item Name", NoRender.selectedItemName, "Hides the selected item name text which appears above the hotbar."),
                                 new Settings.Toggle("Dead Entities", NoRender.deadEntities, "Hides entities that are in their death animation, and their health bars (if applicable)."),
                                 new Settings.Toggle("Dead Poof", NoRender.deadPoof, "Tries to hide the death \"poof\" particles that appear after a dead entity is deleted."),
                                 new Settings.Toggle("Lightning", NoRender.lightning, "Hides lightning strikes."),
@@ -193,7 +197,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("No Equip Animation", Viewmodel.noEquip, "Removes the item swapping animation."),
                                 new Settings.Toggle("No Bow Swing", Viewmodel.noBowSwing, "Removes the swing animation for all bows."),
                                 new Settings.Toggle("Apply To Hand", Viewmodel.applyToHand, "Applies the viewmodel changes to the empty hand."),
-                                new Settings.SliderInt("Swing Speed", 0, 20, 1, Viewmodel.speed, "Apply a custom swing speed. Set to 0 to disable."),
+                                new Settings.SliderInt("Swing Speed", 0, 100, 1, Viewmodel.speed, "Apply a custom swing speed. Set to 0 to disable."),
                                 new Settings.SliderDouble("Offset X", -2, 2, 0.01, Viewmodel.offsetX, "The X axis offset position of your held item."),
                                 new Settings.SliderDouble("Offset Y", -2, 2, 0.01, Viewmodel.offsetY, "The Y axis offset position of your held item."),
                                 new Settings.SliderDouble("Offset Z", -2, 2, 0.01, Viewmodel.offsetZ, "The Z axis offset position of your held item."),
@@ -278,7 +282,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", EyeHeightFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock."),
                                 new Settings.Toggle("Old Island Only", EyeHeightFix.modernCheck, "Prevent the feature from activating on islands using modern Minecraft versions (such as Galatea).")
                         )),
-                        new Module("No Ability Place", NoAbilityPlace.instance, "Prevents ghost blocks from appearing when using block items with right click abilities.")
+                        new Module("No Ghost Place", NoGhostPlace.instance, "Prevents ghost blocks from appearing when placing non-placeable Skyblock block items.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(
@@ -296,8 +300,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Last Override", 1, 9, 1, HotbarSwap.override, "Specify a replacement hotbar slot in cases where you swap with the 9th (unused) hotbar slot.")
                         ))),
                         new Module("Auto Requeue", AutoRequeue.instance, "Automatically starts a new Dungeons/Kuudra run once finished.", new Settings(List.of(
-                                new Settings.SliderInt("Delay", 0, 400, 5, AutoRequeue.delay, "The delay (in ticks) until the new run is started."),
-                                new Settings.Keybind("Pause Keybind", AutoRequeue.pauseBind, "A keybind that allows you to manually pause Auto Requeue on demand.")
+                                new Settings.SliderInt("Delay", 0, 400, 5, AutoRequeue.delay, "The delay (in ticks) until the new run is started.")
                         ))),
                         new Module("Party Finder", PartyFinder.instance, "Various features for your monkey finding adventures.", new Settings(List.of(
                                 new Settings.Toggle("Buttons", PartyFinder.buttons, "Adds various buttons in chat whenever anyone joins your party, such as kick or copy name.")
@@ -326,8 +329,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Scale", 0.0, 10.0, 0.01, ItemScale.scale, "The scale multiplier.")
                         ))),
                         new Module("No Damage Splash", NoDamageSplash.instance, "Hides damage splash nametags.", new Settings(
-                                new Settings.Toggle("Slayer Only", NoDamageSplash.slayerOnly, "Only hide damage splashes while a slayer boss is alive."),
-                                new Settings.Toggle("Dungeons Only", NoDamageSplash.dungeonsOnly, "Only hide damage splashes while in Dungeons.")
+                                new Settings.Dropdown<>("Hide Mode", NoDamageSplash.mode, "Allows you to control when damage splash nametags should be hidden.\n\nAlways: always hides damage splashes.\nSlayerOnly: only hides damage splashes while your Slayer boss is alive.\nDungeonsOnly: only hides damage splashes while in Dungeons.\nBoth: combines the SlayerOnly and DungeonsOnly modes.")
+                        )),
+                        new Module("Block List", BlockList.instance, "Allows you to keep a client side player block list.", new Settings(
+                                new Settings.Description("Usage", "You can manage this feature with /nf blockList."),
+                                new Settings.Toggle("Auto Kick", BlockList.autoKick, "Automatically kicks blocked players if they join your party with party finder.")
                         ))
                 )),
                 new Category("Solvers", List.of(
@@ -466,7 +472,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve Select", TerminalSolvers.select, "Solves the \"Select all\" terminal."),
                                 new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal.")
                         ))),
-                        new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.\nAlso displays timers for the 1st Gyro and Sadan's last giant, useful if you are Mage.", new Settings(List.of(
+                        new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.", new Settings(List.of(
                                 new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text."),
                                 new Settings.ColorPicker("Text Color", TerracottaTimer.color, "The color of the timer text.")
                         ))),
@@ -577,13 +583,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Kuudra Hitbox", KuudraHitbox.instance, "Renders a hitbox for Kuudra.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", KuudraHitbox.color, "The color of the hitbox.")
                         ))),
-                        new Module("Waypoints", KuudraWaypoints.instance, "Renders various waypoints in Kuudra.", new Settings(List.of(
-                                new Settings.Toggle("Supplies", KuudraWaypoints.supply, "Renders beacons for every supply crate."),
-                                new Settings.ColorPicker("Supply Color", KuudraWaypoints.supplyColor, "The color of the supply crate beacons."),
-                                new Settings.Toggle("Drop-offs", KuudraWaypoints.drop, "Renders beacons for every available supply drop-off point."),
-                                new Settings.ColorPicker("Drop-off Color", KuudraWaypoints.dropColor, "The color of the drop-off beacons."),
-                                new Settings.Toggle("Build Piles", KuudraWaypoints.build, "Renders beacons for every unfinished Ballista build pile."),
-                                new Settings.ColorPicker("Piles Color", KuudraWaypoints.buildColor, "The color of the build pile beacons.")
+                        new Module("Build Pile Highlight", BuildPileHighlight.instance, "Renders beacons for the supply build piles in Kuudra.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", BuildPileHighlight.color, "The color of the beacons.")
+                        ))),
+                        new Module("Supply Highlight", SupplyHighlight.instance, "Renders beacons for the supply crates in Kuudra.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", SupplyHighlight.color, "The color of the beacons.")
+                        ))),
+                        new Module("Drop Off Highlight", DropOffHighlight.instance, "Renders beacons for the supply drop off points in Kuudra.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", DropOffHighlight.color, "The color of the beacons.")
                         ))),
                         new Module("Pre Message", PreMessage.instance, "Announces if no supply spawns at your pre spot (or your next pickup spot)."),
                         new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop."),
@@ -609,18 +616,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Crystal Fill", BossHighlight.crystalFill, "The color of the filled box if your boss is using the Crystal attunement."),
                                 new Settings.ColorPicker("Crystal Outline", BossHighlight.crystalOutline, "The color of the outline box if your boss is using the Crystal attunement.")
                         ))),
-                        new Module("Pillar Alert", PillarAlert.instance, "Alerts you when your Blaze boss spawns a fire pillar.\nThis feature tries to prevent false flags by tracking the \"path\" that the pillars take."),
+                        new Module("Pillar Alert", PillarAlert.instance, "Displays the hits and the timer of your Blaze slayer fire pillars.\nThis feature tries to prevent false flags by tracking the \"path\" that the pillars take."),
                         new Module("No Attunement Spam", NoAttunementSpam.instance, "Filters the chat messages about using the wrong attunement on the Blaze boss."),
                         new Module("Kill Timer", KillTimer.instance, "Tracks how long your slayer boss took to kill."),
                         new Module("Chalice Highlight", ChaliceHighlight.instance, "Highlights the Blood Ichor chalices spawned by the T5 Vampire.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", ChaliceHighlight.color, "The color of the chalice highlight.")
                         ))),
-                        new Module("Ice Alert", IceAlert.instance, "Shows a timer for when your Vampire boss is going to cast Twinclaws."),
-                        new Module("Stake Alert", StakeAlert.instance, "Shows text on screen once you can vanquish your Vampire boss with the Steak Stake."),
-                        new Module("Mute Vampire", MuteVampire.instance, "Prevents the Vampire Mania/Killer Springs sounds from playing.", new Settings(List.of(
-                                new Settings.Toggle("Mania", MuteVampire.mania, "Mutes the loud Mania sounds while in the Chateau."),
-                                new Settings.Toggle("Killer Springs", MuteVampire.springs, "Mutes the Wither sound spam that occurs when your boss spawns a Killer Spring.")
-                        ))),
+                        new Module("Mute Vampire", MuteVampire.instance, "Prevents the Vampire Mania/Killer Springs sounds from playing."),
                         new Module("Egg Hits Display", EggHitsDisplay.instance, "Renders the needed hits for the Tarantula Broodfather egg sack phase.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", EggHitsDisplay.color, "The color of the text."),
                                 new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, EggHitsDisplay.scale, "The scale of the text.")
@@ -669,7 +671,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress, also known as HSM."),
                         new Module("Shaft Announce", ShaftAnnounce.instance, "Sends a message with the mineshaft ID and the list of corpses upon entering a Glacite Mineshaft.", new Settings(List.of(
                                 new Settings.TextInput("Message", ShaftAnnounce.msg, "The message to send.\n\nReplaces {id} with the ID of the mineshaft, for example: \"JASP_1\".\nReplaces {corpses} with the list of corpses in the mineshaft, for example: \"2x Lapis, 1x Umber\".")
-                        )))
+                        ))),
+                        new Module("Commission Highlight", CommissionHighlight.instance, "Highlights completed commissions in the commissions menu.", new Settings(
+                                new Settings.ColorPicker("Color", CommissionHighlight.color, "The color of the highlight.")
+                        ))
                 )),
                 new Category("Farming", List.of(
                         new Module("Space Farmer", SpaceFarmer.instance, "Allows you to farm by holding space bar, sneak and press space to activate.\nThis feature will also lock your view once you start holding space."),
@@ -696,7 +701,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Equipment Highlight", EquipmentHighlight.instance, "Highlights your farming and pest spawning equipment in the equipment menu.", new Settings(
                                 new Settings.ColorPicker("Farm Color", EquipmentHighlight.farmColor, "The color of the farming equipment highlight."),
                                 new Settings.ColorPicker("Pest Color", EquipmentHighlight.pestColor, "The color of the pest spawning equipment highlight.")
-                        ))
+                        )),
+                        new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.")
                 ))
         );
         this.categories.getLast().margins(Insets.of(5, 0, 3, 3));

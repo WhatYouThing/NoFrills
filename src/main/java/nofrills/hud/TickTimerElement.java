@@ -10,6 +10,7 @@ public class TickTimerElement extends SimpleTextElement {
     protected int ticks = -1;
     protected int startTicks = 0;
     protected boolean repeating = false;
+    protected boolean autoPause = false;
 
     public TickTimerElement(String text, Feature instance, String label) {
         super(Component.literal(Utils.format(text, "N/A")), instance, label);
@@ -38,8 +39,12 @@ public class TickTimerElement extends SimpleTextElement {
         return Utils.formatDecimal(ticks / 20.0) + "s";
     }
 
+    public String getTimeColor() {
+        return Utils.getPercentageColor((double) this.ticks / this.startTicks);
+    }
+
     public void updateTimer() {
-        this.setText(Utils.format(this.timerText, this.ticksAsTime(this.ticks)));
+        this.setText(Utils.format(this.timerText, this.getTimeColor() + this.ticksAsTime(this.ticks)));
     }
 
     public void tick() {
@@ -73,5 +78,13 @@ public class TickTimerElement extends SimpleTextElement {
 
     public void setRepeating(boolean repeating) {
         this.repeating = repeating;
+    }
+
+    public void setAutoPause() {
+        this.autoPause = true;
+    }
+
+    public boolean isAutoPause() {
+        return this.autoPause;
     }
 }

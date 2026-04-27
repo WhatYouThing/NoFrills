@@ -30,7 +30,7 @@
     "KeyboardHandlerMixin",
     "LevelMixin",
     "LevelRendererMixin",
-    "LightmapMixin",
+    "LightmapRenderStateExtractorMixin",
     "LivingEntityMixin",
     "LivingEntityRendererMixin",
     "LocalPlayerMixin",

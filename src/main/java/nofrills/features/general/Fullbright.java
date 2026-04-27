@@ -16,9 +16,6 @@ public class Fullbright {
     public static final SettingEnum<Mode> mode = new SettingEnum<>(Mode.Ambient, Mode.class, "mode", instance);
     public static final SettingBool noEffect = new SettingBool(false, "noEffect", instance);
 
-    public static final float gamma = 1600.0f;
-    public static final float ambient = 1.0f;
-
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && mc.player != null) {

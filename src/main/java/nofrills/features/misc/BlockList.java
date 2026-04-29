@@ -123,7 +123,7 @@ public class BlockList {
     }
 
     public static void removePlayer(String name) {
-        if (data.entrySet().removeIf(entry -> entry.getValue().getAsJsonObject().get("name").toString().equalsIgnoreCase(name))) {
+        if (data.entrySet().removeIf(entry -> entry.getValue().getAsJsonObject().get("name").getAsString().equalsIgnoreCase(name))) {
             Utils.infoFormat("§aSuccessfully removed {} from the block list.", name);
             saveData();
         } else {
@@ -132,7 +132,7 @@ public class BlockList {
     }
 
     public static List<JsonObject> searchPlayer(String name) {
-        return getEntries().stream().filter(object -> Utils.toLower(object.get("name").toString()).contains(Utils.toLower(name))).toList();
+        return getEntries().stream().filter(object -> Utils.toLower(object.get("name").getAsString()).contains(Utils.toLower(name))).toList();
     }
 
     public static MutableText buildEntryLine(JsonObject entry, String text) {

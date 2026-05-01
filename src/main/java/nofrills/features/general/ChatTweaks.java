@@ -28,6 +28,7 @@ public class ChatTweaks {
     public static final SettingBool trimOnCopy = new SettingBool(false, "trimOnCopy", instance);
     public static final SettingBool msgOnCopy = new SettingBool(false, "msgOnCopy", instance);
     public static final SettingInt copyMsgLength = new SettingInt(50, "copyMsgLength", instance);
+    public static final SettingBool compactChat = new SettingBool(false, "compactChat", instance);
     public static final SettingBool keepHistory = new SettingBool(false, "keepHistory", instance);
     public static final SettingBool extraLines = new SettingBool(false, "extraLines", instance);
     public static final SettingInt lines = new SettingInt(1000, "lines", instance);

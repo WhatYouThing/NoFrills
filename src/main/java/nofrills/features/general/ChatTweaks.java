@@ -36,17 +36,18 @@ public class ChatTweaks {
         ChatHud chatHud = mc.inGameHud.getChatHud();
         float mouseX = (float) mc.mouse.getScaledX(mc.getWindow());
         float mouseY = (float) mc.mouse.getScaledY(mc.getWindow());
-        int chatBottom = MathHelper.floor((mc.getWindow().getScaledHeight() - 40) / mc.options.getChatScale().getValue());
-        int messageHeight = 9;
-        double chatLineSpacing = mc.options.getChatLineSpacing().getValue();
-        int entryHeight = (int) (messageHeight * (chatLineSpacing + 1.0));
-        int visibleEnd = Math.min(chatHud.visibleMessages.size(), chatHud.scrolledLines + ChatHud.getHeight(mc.options.getChatHeightFocused().getValue()) / entryHeight);
+        int chatBottom = MathHelper.floor((mc.getWindow().getScaledHeight() - 40));
+        double chatScale = mc.options.getChatScale().getValue();
+        int entryHeight = (int) (9.0 * (mc.options.getChatLineSpacing().getValue() + 1.0));
+        int chatHeight = ChatHud.getHeight(mc.options.getChatHeightFocused().getValue());
+        int chatWidth = ChatHud.getWidth(mc.options.getChatWidth().getValue());
+        int visibleEnd = Math.min(chatHud.visibleMessages.size(), chatHud.scrolledLines + chatHeight / entryHeight);
         List<ChatHudLine.Visible> visibleMessages = chatHud.visibleMessages.subList(chatHud.scrolledLines, visibleEnd);
         int i = -1;
         for (int index = 0; index < visibleMessages.size(); index++) {
-            int entryBottom = chatBottom - index * entryHeight;
-            int entryTop = entryBottom - entryHeight;
-            if (DrawnTextConsumer.isWithinBounds(mouseX, mouseY, 0, entryTop, ChatHud.getWidth(mc.options.getChatWidth().getValue()), entryBottom)) {
+            int entryBottom = (int) (chatBottom - index * (entryHeight * chatScale));
+            int entryTop = (int) (entryBottom - (entryHeight * chatScale));
+            if (DrawnTextConsumer.isWithinBounds(mouseX, mouseY, 0, entryTop, chatWidth, entryBottom)) {
                 i = index;
                 break;
             }

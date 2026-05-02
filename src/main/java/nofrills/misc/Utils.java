@@ -918,7 +918,7 @@ public class Utils {
      */
     public static String toPlain(Text text) {
         if (text != null) {
-            return Formatting.strip(text.getString());
+            return text.getString().replaceAll("(?i)§[0-9A-Z]", "");
         }
         return "";
     }

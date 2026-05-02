@@ -40,6 +40,7 @@
     "SoundSystemMixin",
     "StatusEffectsDisplayMixin",
     "StuckObjectsFeatureRendererMixin",
+    "TextVisitFactoryMixin",
     "WorldMixin",
     "WorldRendererMixin"
   ],

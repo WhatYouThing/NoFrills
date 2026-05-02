@@ -335,7 +335,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Block List", BlockList.instance, "Allows you to keep a client side player block list.", new Settings(
                                 new Settings.Description("Usage", "You can manage this feature with /nf blockList."),
                                 new Settings.Toggle("Auto Kick", BlockList.autoKick, "Automatically kicks blocked players if they join your party with party finder.")
-                        ))
+                        )),
+                        new Module("Streamer Mode", StreamerMode.instance, "When nicked, replaces your nick with your real username and hides the lobby ID.")
                 )),
                 new Category("Solvers", List.of(
                         new Module("Experiment Solver", ExperimentSolver.instance, "Solves the Experimentation Table mini-games and prevents wrong clicks.", new Settings(List.of(

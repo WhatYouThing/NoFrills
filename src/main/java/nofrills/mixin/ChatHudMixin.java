@@ -3,14 +3,10 @@ package nofrills.mixin;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
-import net.minecraft.client.gui.hud.MessageIndicator;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.MathHelper;
 import nofrills.features.general.ChatTweaks;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Final;
@@ -21,8 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static nofrills.Main.mc;
 
 @Mixin(ChatHud.class)
 public abstract class ChatHudMixin {
@@ -56,12 +50,13 @@ public abstract class ChatHudMixin {
         return original;
     }
 
-    @WrapOperation(method = "addVisibleMessage", at = @At(value = "NEW", target = "(ILnet/minecraft/text/OrderedText;Lnet/minecraft/client/gui/hud/MessageIndicator;Z)Lnet/minecraft/client/gui/hud/ChatHudLine$Visible;"))
-    private ChatHudLine.Visible onAddVisibleMessage(int addedTime, OrderedText content, MessageIndicator indicator, boolean endOfEntry, Operation<ChatHudLine.Visible> original, @Local(argsOnly = true) ChatHudLine message) {
-        if (ChatTweaks.instance.isActive() && ChatTweaks.compactChat.value() && endOfEntry) {
+    @WrapOperation(method = "addMessage(Lnet/minecraft/text/Text;Lnet/minecraft/network/message/MessageSignatureData;Lnet/minecraft/client/gui/hud/MessageIndicator;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;addVisibleMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V"))
+    private void onAddVisibleMessage(ChatHud instance, ChatHudLine message, Operation<Void> original) {
+        if (ChatTweaks.instance.isActive() && ChatTweaks.compactChat.value()) {
             String string = message.content().getString().trim();
             if (string.isEmpty() || Pattern.matches("-*", string)) {
-                return original.call(addedTime, content, indicator, true);
+                original.call(instance, message);
+                return;
             }
             List<ChatHudLine> matching = new ArrayList<>();
             for (ChatHudLine msg : this.messages) {
@@ -77,11 +72,11 @@ public abstract class ChatHudMixin {
                         message.signature(),
                         message.indicator()
                 );
-                OrderedText line = withCount.breakLines(mc.textRenderer, MathHelper.floor(this.getWidth() / this.getChatScale())).getLast();
                 this.visibleMessages.removeIf(visible -> matching.stream().anyMatch(match -> visible.addedTime() == match.creationTick()));
-                return original.call(addedTime, line, indicator, true);
+                original.call(instance, withCount);
+                return;
             }
         }
-        return original.call(addedTime, content, indicator, endOfEntry);
+        original.call(instance, message);
     }
 }

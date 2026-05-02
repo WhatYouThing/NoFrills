@@ -31,9 +31,6 @@ public abstract class ChatHudMixin {
     @Shadow
     protected abstract int getWidth();
 
-    @Shadow
-    protected abstract double getChatScale();
-
     @ModifyExpressionValue(method = "addMessage(Lnet/minecraft/client/gui/hud/ChatHudLine;)V", at = @At(value = "CONSTANT", args = "intValue=100"))
     private int getLimit(int original) {
         if (ChatTweaks.instance.isActive() && ChatTweaks.extraLines.value()) {
@@ -54,7 +51,7 @@ public abstract class ChatHudMixin {
     private void onAddVisibleMessage(ChatHud instance, ChatHudLine message, Operation<Void> original) {
         if (ChatTweaks.instance.isActive() && ChatTweaks.compactChat.value()) {
             String string = message.content().getString().trim();
-            if (string.isEmpty() || Pattern.matches("-*", string)) {
+            if (string.isEmpty() || Pattern.matches("-*", string) || Pattern.matches("▬*", string)) {
                 original.call(instance, message);
                 return;
             }

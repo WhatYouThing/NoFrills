@@ -112,7 +112,7 @@ public abstract class InGameHudMixin {
     @ModifyExpressionValue(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud$SidebarEntry;name:Lnet/minecraft/text/Text;", opcode = Opcodes.GETFIELD))
     private Text onGetEntryName(Text original) {
         if (StreamerMode.isActive()) {
-            Optional<String> replacement = StreamerMode.replaceIfNeeded(Utils.toPlain(original));
+            Optional<String> replacement = StreamerMode.replaceIfNeeded(Utils.toPlain(original).trim());
             if (replacement.isPresent()) {
                 String string = replacement.get().trim();
                 return Text.literal("§7" + string.replace(" ", " §8"));

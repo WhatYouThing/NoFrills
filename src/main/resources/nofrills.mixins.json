@@ -37,6 +37,7 @@
     "MouseMixin",
     "PaneBlockMixin",
     "PlayerListHudAccessor",
+    "PlayerSkinProviderMixin",
     "SoundSystemMixin",
     "StatusEffectsDisplayMixin",
     "StuckObjectsFeatureRendererMixin",

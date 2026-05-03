@@ -6,7 +6,6 @@ import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.util.math.random.Random;
 import nofrills.config.Feature;
-import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.ServerJoinEvent;
@@ -23,7 +22,6 @@ public class StreamerMode {
     public static final Feature instance = new Feature("streamerMode");
 
     public static final SettingString baseName = new SettingString("nostrils-{}{}{}{}", "baseName", instance);
-    public static final SettingBool debug = new SettingBool(false, "debug", instance);
 
     private static final List<String> lobbyPrefixes = List.of(
             "mini",
@@ -111,9 +109,6 @@ public class StreamerMode {
                     continue;
                 if (playerName.isEmpty()) {
                     playerName = name;
-                    if (debug.value()) {
-                        Utils.infoFormat("player name: {}, session name: {}", playerName, sessionName);
-                    }
                     continue;
                 }
                 String lower = Utils.toLower(name);

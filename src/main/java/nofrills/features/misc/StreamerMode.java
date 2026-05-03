@@ -9,6 +9,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -149,14 +150,20 @@ public class StreamerMode {
     }
 
     @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        if (instance.isActive()) {
-            playerToNick.clear();
-            uuidToPlayer.clear();
+    private static void onUpdated(EntityUpdatedEvent event) {
+        if (instance.isActive() && event.entity.equals(mc.player)) {
             playerName = mc.player.getName().getString();
             if (debug.value()) {
                 Utils.infoFormat("player name: {}, session name: {}", playerName, sessionName);
             }
+        }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        if (instance.isActive()) {
+            playerToNick.clear();
+            uuidToPlayer.clear();
         }
     }
 }

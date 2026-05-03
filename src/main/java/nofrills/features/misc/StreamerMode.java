@@ -2,19 +2,20 @@ package nofrills.features.misc;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerRemoveS2CPacket;
 import net.minecraft.util.math.random.Random;
 import nofrills.config.Feature;
+import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.ServerJoinEvent;
-import nofrills.events.WorldTickEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
@@ -22,6 +23,7 @@ public class StreamerMode {
     public static final Feature instance = new Feature("streamerMode");
 
     public static final SettingString baseName = new SettingString("nostrils-{}{}{}{}", "baseName", instance);
+    public static final SettingBool debug = new SettingBool(false, "debug", instance);
 
     private static final List<String> lobbyPrefixes = List.of(
             "mini",
@@ -35,6 +37,7 @@ public class StreamerMode {
             "Mineshaft"
     );
     private static final ConcurrentHashMap<String, String> playerToNick = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<UUID, String> uuidToPlayer = new ConcurrentHashMap<>();
     private static final Random random = Random.createLocal();
     private static final CopyOnWriteArrayList<String> lobbyIDs = new CopyOnWriteArrayList<>();
     private static final String sessionName = mc.getSession().getUsername();
@@ -48,6 +51,24 @@ public class StreamerMode {
             return msg.substring(msg.lastIndexOf(" ") + 1).replace("...", "");
         }
         return "";
+    }
+
+    private static String generateNick() {
+        String nick = baseName.value().trim();
+        int count = 0;
+        int lastIndex = -2;
+        while (lastIndex != -1) {
+            int index = nick.indexOf("{}", lastIndex + 2);
+            if (index != -1) {
+                count++;
+            }
+            lastIndex = index;
+        }
+        String digits = String.valueOf(random.nextInt((int) Math.pow(10, count)));
+        if (digits.length() < count) {
+            digits = "0".repeat(count - digits.length()) + digits;
+        }
+        return Utils.format(nick, (Object[]) digits.split(""));
     }
 
     public static boolean isActive() {
@@ -81,39 +102,30 @@ public class StreamerMode {
         return Optional.empty();
     }
 
-    @EventHandler
-    private static void onTick(WorldTickEvent event) {
+    public static void onPlayerListUpdate(PlayerListS2CPacket packet) {
         if (instance.isActive()) {
-            List<String> list = Utils.getTabListLines();
-            List<String> names = new ArrayList<>();
-            for (String line : list) {
-                if (line.equals("Info")) break;
-                if (list.isEmpty() || !Pattern.matches("\\[[0-9]*] .*", line)) continue;
-                int nameStart = line.lastIndexOf("]") + 2;
-                int nameEnd = line.indexOf(" ", nameStart);
-                String name = Utils.toLower(line.substring(nameStart, nameEnd != -1 ? nameEnd : line.length())).trim();
-                if (name.equalsIgnoreCase(sessionName)) continue;
-                if (!playerToNick.containsKey(name)) {
-                    String nick = baseName.value().trim();
-                    int count = 0;
-                    int lastIndex = -2;
-                    while (lastIndex != -1) {
-                        int index = nick.indexOf("{}", lastIndex + 2);
-                        if (index != -1) {
-                            count++;
-                        }
-                        lastIndex = index;
-                    }
-                    String digits = String.valueOf(random.nextInt((int) Math.pow(10, count)));
-                    if (digits.length() < count) {
-                        digits = "0".repeat(count - digits.length()) + digits;
-                    }
-                    playerToNick.put(name, Utils.format(nick, (Object[]) digits.split("")));
+            for (PlayerListS2CPacket.Entry entry : packet.getEntries()) {
+                if (entry.displayName() != null || entry.profile() == null) continue;
+                String name = entry.profile().name();
+                if (name.trim().isEmpty() || name.contains(" ") || name.startsWith("!") || name.trim().equals(playerName))
+                    continue;
+                String lower = Utils.toLower(name);
+                if (!playerToNick.containsKey(lower)) {
+                    playerToNick.put(lower, generateNick());
+                    uuidToPlayer.put(entry.profileId(), lower);
                 }
-                names.add(name);
             }
-            if (!playerToNick.isEmpty()) {
-                playerToNick.entrySet().removeIf(entry -> !names.contains(entry.getKey()));
+        }
+    }
+
+    public static void onPlayerListRemove(PlayerRemoveS2CPacket packet) {
+        if (instance.isActive()) {
+            for (UUID uuid : packet.profileIds()) {
+                if (uuidToPlayer.containsKey(uuid)) {
+                    String name = uuidToPlayer.get(uuid);
+                    playerToNick.remove(name);
+                    uuidToPlayer.remove(uuid);
+                }
             }
         }
     }
@@ -139,7 +151,12 @@ public class StreamerMode {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         if (instance.isActive()) {
+            playerToNick.clear();
+            uuidToPlayer.clear();
             playerName = mc.player.getName().getString();
+            if (debug.value()) {
+                Utils.infoFormat("player name: {}, session name: {}", playerName, sessionName);
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.text.Text;
 import nofrills.events.*;
 import nofrills.features.general.NoRender;
+import nofrills.features.misc.StreamerMode;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.DisconnectFix;
 import nofrills.features.tweaks.NoConfirmScreen;
@@ -136,6 +137,12 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onPlayerList", at = @At("TAIL"))
     private void onTabListUpdate(PlayerListS2CPacket packet, CallbackInfo ci) {
         SkyblockData.markTabListDirty();
+        StreamerMode.onPlayerListUpdate(packet);
+    }
+
+    @Inject(method = "onPlayerRemove", at = @At("TAIL"))
+    private void onTabListRemove(PlayerRemoveS2CPacket packet, CallbackInfo ci) {
+        StreamerMode.onPlayerListRemove(packet);
     }
 
     @Inject(method = "onGameJoin", at = @At("TAIL"))

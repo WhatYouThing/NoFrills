@@ -4,8 +4,8 @@ import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.util.EventSource;
 import io.wispforest.owo.util.EventStream;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.MutableText;
+import nofrills.config.SettingKeybind;
 import nofrills.misc.Rendering;
 import org.lwjgl.glfw.GLFW;
 
@@ -15,7 +15,6 @@ public class KeybindButton extends ButtonComponent {
     private final EventStream<KeybindChanged> changedEvents = KeybindChanged.newStream();
     private final List<Integer> keybindBlacklist = List.of(
             GLFW.GLFW_KEY_UNKNOWN,
-            GLFW.GLFW_MOUSE_BUTTON_LEFT,
             GLFW.GLFW_KEY_ESCAPE
     );
     public MutableText unbound = net.minecraft.text.Text.literal("Not Bound").withColor(0xffffff);
@@ -42,12 +41,7 @@ public class KeybindButton extends ButtonComponent {
     }
 
     public net.minecraft.text.Text getKeyLabel(int keycode) {
-        InputUtil.Key input = InputUtil.Type.KEYSYM.createFromCode(keycode);
-        if (input.getLocalizedText().getString().equals(input.getTranslationKey())) { // fall back to a mouse key if the keyboard key has no translation
-            return InputUtil.Type.MOUSE.createFromCode(keycode).getLocalizedText();
-        } else {
-            return input.getLocalizedText();
-        }
+        return SettingKeybind.asInputConstant(keycode).getLocalizedText();
     }
 
     public void bind(int key) {

@@ -683,7 +683,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 )),
                 new Category("Farming", List.of(
                         new Module("Mouse Lock", MouseLock.instance, "Locks your player view with a keybind. Toggleable while on the Garden.", new Settings(
-                                new Settings.Keybind("Keybind", MouseLock.keybind, "The key to toggle the mouse lock.")
+                                new Settings.Keybind("Keybind", MouseLock.keybind, "The key to toggle the mouse lock."),
+                                new Settings.Toggle("Rebind Keys", MouseLock.rebind, "Rebinds your break and your jump keys while the feature is active."),
+                                new Settings.Keybind("Active Break Key", MouseLock.breakKeyActive, "The key to set breaking to while active."),
+                                new Settings.Keybind("Active Jump Key", MouseLock.jumpKeyActive, "The key to set jumping to while active."),
+                                new Settings.Keybind("Inactive Break Key", MouseLock.breakKeyInactive, "The key to set breaking to when deactivated."),
+                                new Settings.Keybind("Inactive Jump Key", MouseLock.jumpKeyInactive, "The key to set jumping to when deactivated.")
                         )),
                         new Module("Glowing Mushrooms", GlowingMushroom.instance, "Highlights Glowing Mushrooms.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", GlowingMushroom.color, "The color of the highlight.")

@@ -9,7 +9,6 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
-import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -108,8 +107,15 @@ public class StreamerMode {
             for (PlayerListS2CPacket.Entry entry : packet.getEntries()) {
                 if (entry.displayName() != null || entry.profile() == null) continue;
                 String name = entry.profile().name();
-                if (name.trim().isEmpty() || name.contains(" ") || name.startsWith("!") || name.trim().equals(playerName))
+                if (name.trim().isEmpty() || name.contains(" ") || name.startsWith("!") || name.equals(playerName))
                     continue;
+                if (playerName.isEmpty()) {
+                    playerName = name;
+                    if (debug.value()) {
+                        Utils.infoFormat("player name: {}, session name: {}", playerName, sessionName);
+                    }
+                    continue;
+                }
                 String lower = Utils.toLower(name);
                 if (!playerToNick.containsKey(lower)) {
                     playerToNick.put(lower, generateNick());
@@ -150,20 +156,11 @@ public class StreamerMode {
     }
 
     @EventHandler
-    private static void onUpdated(EntityUpdatedEvent event) {
-        if (instance.isActive() && event.entity.equals(mc.player)) {
-            playerName = mc.player.getName().getString();
-            if (debug.value()) {
-                Utils.infoFormat("player name: {}, session name: {}", playerName, sessionName);
-            }
-        }
-    }
-
-    @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         if (instance.isActive()) {
             playerToNick.clear();
             uuidToPlayer.clear();
+            playerName = "";
         }
     }
 }

@@ -155,7 +155,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(RareAnnounce.class);
         eventBus.subscribe(MuteDrake.class);
         eventBus.subscribe(CapTracker.class);
-        eventBus.subscribe(SpaceFarmer.class);
+        eventBus.subscribe(MouseLock.class);
         eventBus.subscribe(GlowingMushroom.class);
         eventBus.subscribe(WitherDragons.class);
         eventBus.subscribe(TerracottaTimer.class);

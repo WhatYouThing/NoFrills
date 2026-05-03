@@ -682,7 +682,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))
                 )),
                 new Category("Farming", List.of(
-                        new Module("Space Farmer", SpaceFarmer.instance, "Allows you to farm by holding space bar, sneak and press space to activate.\nThis feature will also lock your view once you start holding space."),
+                        new Module("Mouse Lock", MouseLock.instance, "Locks your player view with a keybind. Toggleable while on the Garden.", new Settings(
+                                new Settings.Keybind("Keybind", MouseLock.keybind, "The key to toggle the mouse lock.")
+                        )),
                         new Module("Glowing Mushrooms", GlowingMushroom.instance, "Highlights Glowing Mushrooms.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", GlowingMushroom.color, "The color of the highlight.")
                         ))),

@@ -16,6 +16,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static nofrills.Main.mc;
+
 public class StreamerMode {
     public static final Feature instance = new Feature("streamerMode");
 
@@ -36,8 +38,7 @@ public class StreamerMode {
     private static final ConcurrentHashMap<UUID, String> uuidToPlayer = new ConcurrentHashMap<>();
     private static final Random random = Random.createLocal();
     private static final CopyOnWriteArrayList<String> lobbyIDs = new CopyOnWriteArrayList<>();
-    //private static final String sessionName = mc.getSession().getUsername();
-    private static final String sessionName = "mc.getSession().getUsername()";
+    private static final String sessionName = mc.getSession().getUsername();
     private static String playerName = "";
 
     private static String parseLobbyID(String msg) {

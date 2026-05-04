@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
@@ -59,15 +60,9 @@ public class StreamerMode {
 
     private static String generateNick() {
         String nick = baseName.value().trim();
-        int count = 0;
-        int lastIndex = -2;
-        while (lastIndex != -1) {
-            int index = nick.indexOf("{}", lastIndex + 2);
-            if (index != -1) {
-                count++;
-            }
-            lastIndex = index;
-        }
+        Pattern pattern = Pattern.compile("\\{}");
+        int count = (int) pattern.matcher(nick).results().count();
+        if (count == 0) return nick;
         String digits = String.valueOf(random.nextInt((int) Math.pow(10, count)));
         if (digits.length() < count) {
             digits = "0".repeat(count - digits.length()) + digits;

@@ -5,8 +5,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.Vec3d;
 
-
-public class PlaySoundEvent extends Cancellable {
+public final class PlaySoundEvent extends Cancellable {
     public PlaySoundS2CPacket packet;
     public Vec3d pos;
 

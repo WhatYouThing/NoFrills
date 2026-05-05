@@ -4,7 +4,7 @@ import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.util.math.Vec3d;
 
-public class SpawnParticleEvent extends Cancellable {
+public final class SpawnParticleEvent extends Cancellable {
     public ParticleS2CPacket packet;
     public ParticleType<?> type;
     public Vec3d pos;

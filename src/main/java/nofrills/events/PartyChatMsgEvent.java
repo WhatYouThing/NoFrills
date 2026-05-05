@@ -2,7 +2,7 @@ package nofrills.events;
 
 import static nofrills.Main.mc;
 
-public class PartyChatMsgEvent extends Cancellable {
+public final class PartyChatMsgEvent extends Cancellable {
 
     public String message;
     public String sender;

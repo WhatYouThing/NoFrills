@@ -2,7 +2,7 @@ package nofrills.events;
 
 import net.minecraft.text.Text;
 
-public class ChatMsgEvent extends Cancellable {
+public final class ChatMsgEvent extends Cancellable {
     public Text message;
     public String messagePlain;
 

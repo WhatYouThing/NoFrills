@@ -2,7 +2,7 @@ package nofrills.events;
 
 import net.minecraft.text.Text;
 
-public class OverlayMsgEvent extends Cancellable {
+public final class OverlayMsgEvent extends Cancellable {
     public Text message;
     public String messagePlain;
 

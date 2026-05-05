@@ -17,7 +17,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class Armor extends HudElement {
+public final class Armor extends HudElement {
     public final SettingEnum<Alignment> align = new SettingEnum<>(Alignment.Horizontal, Alignment.class, "align", instance.key());
     private FlowLayout content;
     private Alignment lastAlign;

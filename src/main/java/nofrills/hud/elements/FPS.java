@@ -11,7 +11,7 @@ import nofrills.misc.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FPS extends SimpleTextElement {
+public final class FPS extends SimpleTextElement {
     public final SettingBool average = new SettingBool(false, "average", instance.key());
     public int ticks = 20;
     public List<Integer> fpsList = new ArrayList<>();

@@ -3,7 +3,7 @@ package nofrills.hud.elements;
 import nofrills.config.Feature;
 import nofrills.hud.TimerElement;
 
-public class SpiritMaskTimer extends TimerElement {
+public final class SpiritMaskTimer extends TimerElement {
 
     public SpiritMaskTimer() {
         super("Spirit Mask: {}", new Feature("spiritMaskTimerElement"), "Spirit Mask Timer");

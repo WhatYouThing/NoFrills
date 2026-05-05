@@ -3,7 +3,9 @@ package nofrills.hud;
 import io.wispforest.owo.ui.container.DraggableContainer;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
+import io.wispforest.owo.ui.container.WrappingParentUIComponent;
 import io.wispforest.owo.ui.core.*;
+import io.wispforest.owo.ui.base.BaseParentUIComponent;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.util.Window;
 import net.minecraft.text.MutableText;
@@ -23,7 +25,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class HudElement extends DraggableContainer<FlowLayout> {
+public abstract class HudElement extends DraggableContainer<FlowLayout> {
     public final MutableText elementLabel;
     public final Feature instance;
     public final SettingBool added;
@@ -42,7 +44,7 @@ public class HudElement extends DraggableContainer<FlowLayout> {
     public boolean toggling = false;
     public Category category = Category.Misc;
 
-    public HudElement(FlowLayout layout, Feature instance, String label) {
+    protected HudElement(FlowLayout layout, Feature instance, String label) {
         super(Sizing.content(), Sizing.content(), layout);
         this.elementLabel = Text.literal(label);
         this.instance = instance;
@@ -62,7 +64,26 @@ public class HudElement extends DraggableContainer<FlowLayout> {
         this.foreheadSize(0);
         this.allowOverflow(true);
         this.child(this.layout);
-        HudManager.addNew(this);
+    }
+
+    @Override
+    public final BaseParentUIComponent positioning(Positioning positioning) {
+        return super.positioning(positioning);
+    }
+
+    @Override
+    public final DraggableContainer<FlowLayout> foreheadSize(int size) {
+        return super.foreheadSize(size);
+    }
+
+    @Override
+    public final ParentUIComponent allowOverflow(boolean allow) {
+        return super.allowOverflow(allow);
+    }
+
+    @Override
+    public final WrappingParentUIComponent<FlowLayout> child(FlowLayout layout) {
+        return super.child(layout);
     }
 
     public HudElement(Feature instance, String label) {

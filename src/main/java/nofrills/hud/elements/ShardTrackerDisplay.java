@@ -9,7 +9,7 @@ import nofrills.hud.clickgui.Settings;
 
 import java.util.List;
 
-public class ShardTrackerDisplay extends SimpleTextElement {
+public final class ShardTrackerDisplay extends SimpleTextElement {
     public final SettingBool hideIfNone = new SettingBool(false, "hideIfNone", instance);
 
     public ShardTrackerDisplay() {

@@ -71,7 +71,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 21
-    it.options.compilerArgs += '-Xlint:all,-this-escape'
+    it.options.compilerArgs += '-Xlint:all'
 }
 
 java {

@@ -6,7 +6,7 @@ import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.text.Text;
 
-public class EnumCollapsible extends CollapsibleContainer {
+public final class EnumCollapsible extends CollapsibleContainer {
 
     public EnumCollapsible(String title) {
         super(Sizing.content(), Sizing.content(), Text.empty(), false);

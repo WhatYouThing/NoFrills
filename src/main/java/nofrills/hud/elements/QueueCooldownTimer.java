@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
-public class QueueCooldownTimer extends TimerElement {
+public final class QueueCooldownTimer extends TimerElement {
     public final String name = mc.getSession().getUsername();
     public final List<Pattern> patterns = List.of(
             Pattern.compile("-*\\n.*" + name + " entered .*!\\n-*"),

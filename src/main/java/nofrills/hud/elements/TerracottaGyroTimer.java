@@ -3,7 +3,7 @@ package nofrills.hud.elements;
 import nofrills.config.Feature;
 import nofrills.hud.TickTimerElement;
 
-public class TerracottaGyroTimer extends TickTimerElement {
+public final class TerracottaGyroTimer extends TickTimerElement {
 
     public TerracottaGyroTimer() {
         super("Gyro: {}", new Feature("terracottaGyroTimerElement"), "Terracotta Gyro Timer");

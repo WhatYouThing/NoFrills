@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
-public class KeybindButton extends ButtonComponent {
+public final class KeybindButton extends ButtonComponent {
     private final EventStream<KeybindChanged> changedEvents = KeybindChanged.newStream();
     private final List<Integer> keybindBlacklist = List.of(
             GLFW.GLFW_KEY_UNKNOWN,

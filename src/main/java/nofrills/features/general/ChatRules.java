@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
-public class ChatRules {
+public final class ChatRules {
     public static final Feature instance = new Feature("chatRules");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
@@ -166,7 +166,7 @@ public class ChatRules {
         Regex
     }
 
-    public static class Setting extends FlowLayout {
+    public static final class Setting extends FlowLayout {
         public int index;
 
         public Setting(int index) {
@@ -389,8 +389,7 @@ public class ChatRules {
         }
     }
 
-    public static class ChatRulesSettings extends Settings {
-
+    public static final class ChatRulesSettings extends Settings {
         public ChatRulesSettings(List<FlowLayout> settings) {
             super(settings);
         }

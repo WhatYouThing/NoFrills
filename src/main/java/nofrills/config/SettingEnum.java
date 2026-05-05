@@ -1,6 +1,6 @@
 package nofrills.config;
 
-public class SettingEnum<T extends Enum<T>> extends SettingGeneric {
+public final class SettingEnum<T extends Enum<T>> extends SettingGeneric {
     public final T[] values;
     private T current;
 

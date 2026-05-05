@@ -14,7 +14,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
-public class BossHealth extends SimpleTextElement {
+public final class BossHealth extends SimpleTextElement {
     private final SettingBool dungeon = new SettingBool(true, "dungeon", this.instance);
     private final SettingBool kuudra = new SettingBool(true, "kuudra", this.instance);
     private boolean visible = false;

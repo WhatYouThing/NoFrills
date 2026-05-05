@@ -10,7 +10,7 @@ import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
-public class Module extends FlowLayout {
+public final class Module extends FlowLayout {
     public boolean active = false;
     public Feature feature;
     public Text activeText;

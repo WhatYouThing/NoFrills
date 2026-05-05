@@ -3,7 +3,7 @@ package nofrills.hud.elements;
 import nofrills.config.Feature;
 import nofrills.hud.TimerElement;
 
-public class PickaxeAbilityTimer extends TimerElement {
+public final class PickaxeAbilityTimer extends TimerElement {
     private String currentAbility = "";
 
     public PickaxeAbilityTimer() {

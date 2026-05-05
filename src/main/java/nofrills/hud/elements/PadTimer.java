@@ -8,7 +8,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
-public class PadTimer extends TickTimerElement {
+public final class PadTimer extends TickTimerElement {
     public SettingBool totalTime;
     private int totalTicks = 0;
 

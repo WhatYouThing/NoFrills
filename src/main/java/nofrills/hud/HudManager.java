@@ -25,35 +25,36 @@ import static nofrills.Main.mc;
 
 public class HudManager {
     public static final List<HudElement> elements = new ArrayList<>();
-    public static final FPS fps = new FPS("FPS: §f0");
-    public static final TPS tps = new TPS("TPS: §f20.00");
-    public static final Ping ping = new Ping("Ping: §f0ms");
-    public static final Day day = new Day("Day: §f0");
-    public static final Armor armor = new Armor();
-    public static final Inventory inventory = new Inventory();
-    public static final Quiver quiver = new Quiver("Quiver: §fN/A");
-    public static final LagMeter lagMeter = new LagMeter("Last server tick was 0.00s ago");
-    public static final PickaxeAbilityTimer pickAbilityTimer = new PickaxeAbilityTimer();
-    public static final QueueCooldownTimer queueCooldownTimer = new QueueCooldownTimer();
-    public static final SlayerHealth slayerHealth = new SlayerHealth();
-    public static final SlayerTimer slayerTimer = new SlayerTimer();
-    public static final BossHealth bossHealth = new BossHealth();
-    public static final DungeonMap dungeonMap = new DungeonMap();
-    public static final DungeonScore dungeonScore = new DungeonScore();
-    public static final SpiritMaskTimer spiritMaskTimer = new SpiritMaskTimer();
-    public static final PhoenixPetTimer phoenixPetTimer = new PhoenixPetTimer();
-    public static final BonzoMaskTimer bonzoMaskTimer = new BonzoMaskTimer();
-    public static final SpiritBearTimer spiritBearTimer = new SpiritBearTimer();
-    public static final TerracottaGyroTimer terraGyroTimer = new TerracottaGyroTimer();
-    public static final PadTimer padTimer = new PadTimer();
-    public static final TerminalStartTimer terminalStartTimer = new TerminalStartTimer();
-    public static final GoldorTickTimer goldorTickTimer = new GoldorTickTimer();
-    public static final Power power = new Power("Power: §f0");
-    public static final FreshToolsTimer freshToolsTimer = new FreshToolsTimer();
-    public static final SeaCreatures seaCreatures = new SeaCreatures("Sea Creatures: §70");
-    public static final FishingBobber bobber = new FishingBobber("Bobber: §7Inactive");
-    public static final ShardTrackerDisplay shardTracker = new ShardTrackerDisplay();
-    public static final SkillTrackerDisplay skillTracker = new SkillTrackerDisplay();
+
+    public static final FPS fps = register(new FPS("FPS: §f0"));
+    public static final TPS tps = register(new TPS("TPS: §f20.00"));
+    public static final Ping ping = register(new Ping("Ping: §f0ms"));
+    public static final Day day = register( new Day("Day: §f0"));
+    public static final Armor armor = register(new Armor());
+    public static final Inventory inventory = register(new Inventory());
+    public static final Quiver quiver = register(new Quiver("Quiver: §fN/A"));
+    public static final LagMeter lagMeter = register(new LagMeter("Last server tick was 0.00s ago"));
+    public static final PickaxeAbilityTimer pickAbilityTimer = register(new PickaxeAbilityTimer());
+    public static final QueueCooldownTimer queueCooldownTimer = register(new QueueCooldownTimer());
+    public static final SlayerHealth slayerHealth = register(new SlayerHealth());
+    public static final SlayerTimer slayerTimer = register(new SlayerTimer());
+    public static final BossHealth bossHealth = register(new BossHealth());
+    public static final DungeonMap dungeonMap = register(new DungeonMap());
+    public static final DungeonScore dungeonScore = register(new DungeonScore());
+    public static final SpiritMaskTimer spiritMaskTimer = register(new SpiritMaskTimer());
+    public static final PhoenixPetTimer phoenixPetTimer = register(new PhoenixPetTimer());
+    public static final BonzoMaskTimer bonzoMaskTimer = register(new BonzoMaskTimer());
+    public static final SpiritBearTimer spiritBearTimer = register(new SpiritBearTimer());
+    public static final TerracottaGyroTimer terraGyroTimer = register(new TerracottaGyroTimer());
+    public static final PadTimer padTimer = register(new PadTimer());
+    public static final TerminalStartTimer terminalStartTimer = register(new TerminalStartTimer());
+    public static final GoldorTickTimer goldorTickTimer = register(new GoldorTickTimer());
+    public static final Power power = register(new Power("Power: §f0"));
+    public static final FreshToolsTimer freshToolsTimer = register(new FreshToolsTimer());
+    public static final SeaCreatures seaCreatures = register(new SeaCreatures("Sea Creatures: §70"));
+    public static final FishingBobber bobber = register(new FishingBobber("Bobber: §7Inactive"));
+    public static final ShardTrackerDisplay shardTracker = register(new ShardTrackerDisplay());
+    public static final SkillTrackerDisplay skillTracker = register(new SkillTrackerDisplay());
 
     private static CustomTitle currentTitle = new CustomTitle(Text.empty(), 0);
 
@@ -65,8 +66,9 @@ public class HudManager {
         return elements;
     }
 
-    public static void addNew(HudElement element) {
+    public static <T extends HudElement> T register(T element) {
         elements.add(element);
+        return element;
     }
 
     public static void registerElements() {

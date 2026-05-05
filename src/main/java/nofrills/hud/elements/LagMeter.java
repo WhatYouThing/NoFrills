@@ -11,7 +11,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
-public class LagMeter extends SimpleTextElement {
+public final class LagMeter extends SimpleTextElement {
     public final SettingInt min = new SettingInt(500, "min", instance.key());
     public long lastTick = 0;
 

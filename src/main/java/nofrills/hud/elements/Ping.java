@@ -11,7 +11,7 @@ import nofrills.misc.Utils;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Ping extends SimpleTextElement {
+public final class Ping extends SimpleTextElement {
     public final SettingBool average = new SettingBool(false, "average", instance.key());
     public int ticks = 20;
     public long lastPing = 0;

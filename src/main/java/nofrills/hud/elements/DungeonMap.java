@@ -30,7 +30,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class DungeonMap extends HudElement {
+public final class DungeonMap extends HudElement {
     public static NativeImageBackedTexture mapTexture;
     private final SpriteAtlasTexture atlasTexture = mc.getAtlasManager().getAtlasTexture(Atlases.MAP_DECORATIONS);
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);

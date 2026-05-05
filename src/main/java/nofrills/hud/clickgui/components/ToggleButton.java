@@ -6,7 +6,7 @@ import io.wispforest.owo.util.EventStream;
 import net.minecraft.text.MutableText;
 import nofrills.hud.clickgui.Settings;
 
-public class ToggleButton extends ButtonComponent {
+public final class ToggleButton extends ButtonComponent {
     public static final MutableText enabledText = net.minecraft.text.Text.literal("Enabled").withColor(0x55ff55);
     public static final MutableText disabledText = net.minecraft.text.Text.literal("Disabled").withColor(0xff5555);
     private final EventStream<ToggleChanged> changedEvents = ToggleChanged.newStream();

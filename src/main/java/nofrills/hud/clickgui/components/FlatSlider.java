@@ -5,7 +5,7 @@ import io.wispforest.owo.ui.core.CursorStyle;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import org.lwjgl.glfw.GLFW;
 
-public class FlatSlider extends SlimSliderComponent {
+public final class FlatSlider extends SlimSliderComponent {
     public int trackColor;
     public int sliderColor;
 

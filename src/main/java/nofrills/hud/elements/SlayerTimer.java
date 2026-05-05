@@ -7,7 +7,7 @@ import nofrills.config.Feature;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.SlayerUtil;
 
-public class SlayerTimer extends SimpleTextElement {
+public final class SlayerTimer extends SimpleTextElement {
     private boolean visible = false;
 
     public SlayerTimer() {

@@ -3,7 +3,7 @@ package nofrills.hud.elements;
 import nofrills.config.Feature;
 import nofrills.hud.TimerElement;
 
-public class PhoenixPetTimer extends TimerElement {
+public final class PhoenixPetTimer extends TimerElement {
 
     public PhoenixPetTimer() {
         super("Phoenix Pet: {}", new Feature("phoenixPetTimerElement"), "Phoenix Pet Timer");

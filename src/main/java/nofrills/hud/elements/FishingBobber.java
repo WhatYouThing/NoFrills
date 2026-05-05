@@ -16,7 +16,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class FishingBobber extends SimpleTextElement {
+public final class FishingBobber extends SimpleTextElement {
     public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
     public final SettingBool timer = new SettingBool(false, "timer", instance.key());
     public final SettingBool hideHologram = new SettingBool(false, "hideHologram", instance.key());

@@ -14,7 +14,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class Category extends FlowLayout {
+public final class Category extends FlowLayout {
     public List<Module> features;
     public ScrollContainer<FlowLayout> scroll;
     public int categoryWidth = 0;

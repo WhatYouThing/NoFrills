@@ -6,7 +6,7 @@ import io.wispforest.owo.util.EventSource;
 import io.wispforest.owo.util.EventStream;
 import nofrills.hud.clickgui.Settings;
 
-public class EnumButton<T extends Enum<T>> extends ButtonComponent {
+public final class EnumButton<T extends Enum<T>> extends ButtonComponent {
     private final T[] values;
     private final T defaultValue;
     private final EventStream<TextBoxComponent.OnChanged> changedEvents = TextBoxComponent.OnChanged.newStream();

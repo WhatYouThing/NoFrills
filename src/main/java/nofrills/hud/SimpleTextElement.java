@@ -19,7 +19,7 @@ import nofrills.misc.RenderColor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleTextElement extends HudElement {
+public abstract class SimpleTextElement extends HudElement {
     public final SettingEnum<TextAlignment> textAlignment;
     public final SettingBool textShadow;
     public final SettingColor textColor;
@@ -27,7 +27,7 @@ public class SimpleTextElement extends HudElement {
     public MutableText defaultText;
     public LabelComponent label;
 
-    public SimpleTextElement(MutableText text, Feature instance, String label) {
+    protected SimpleTextElement(MutableText text, Feature instance, String label) {
         super(UIContainers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
         this.textAlignment = new SettingEnum<>(TextAlignment.Left, TextAlignment.class, "align", instance);
         this.textShadow = new SettingBool(true, "shadow", instance);
@@ -81,7 +81,7 @@ public class SimpleTextElement extends HudElement {
         this.label.text(this.defaultText);
     }
 
-    public int getTextColor() {
+    public final int getTextColor() {
         return this.textColor.value().hex;
     }
 

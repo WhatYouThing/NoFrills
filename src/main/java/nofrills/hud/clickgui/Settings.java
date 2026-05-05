@@ -180,7 +180,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         return this;
     }
 
-    public static class Toggle extends FlowLayout {
+    public static final class Toggle extends FlowLayout {
         public SettingBool setting;
         public ToggleButton toggle;
 
@@ -203,7 +203,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class SliderDouble extends FlowLayout {
+    public static final class SliderDouble extends FlowLayout {
         public SettingDouble setting;
 
         public SliderDouble(String name, double min, double max, double step, SettingDouble setting, String tooltip) {
@@ -240,7 +240,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class SliderInt extends FlowLayout {
+    public static final class SliderInt extends FlowLayout {
         public SettingInt setting;
 
         public SliderInt(String name, int min, int max, int step, SettingInt setting, String tooltip) {
@@ -277,7 +277,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class Dropdown<T extends Enum<T>> extends FlowLayout {
+    public static final class Dropdown<T extends Enum<T>> extends FlowLayout {
         public SettingEnum<T> setting;
 
         public Dropdown(String name, SettingEnum<T> setting, String tooltip) {
@@ -310,7 +310,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class ColorPicker extends FlowLayout {
+    public static final class ColorPicker extends FlowLayout {
         public SettingColor setting;
         public Screen previous;
 
@@ -339,7 +339,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class Separator extends FlowLayout {
+    public static final class Separator extends FlowLayout {
         public Separator(String name) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
@@ -360,7 +360,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class Description extends FlowLayout {
+    public static final class Description extends FlowLayout {
 
         public Description(String name, String description) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
@@ -376,7 +376,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class TextInput extends FlowLayout {
+    public static final class TextInput extends FlowLayout {
         public SettingString setting;
 
         public TextInput(String name, SettingString setting, String tooltip) {
@@ -399,7 +399,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class Keybind extends FlowLayout {
+    public static final class Keybind extends FlowLayout {
         public SettingKeybind setting;
         public KeybindButton button;
 
@@ -423,7 +423,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class BigButton extends FlowLayout {
+    public static final class BigButton extends FlowLayout {
         public ButtonComponent button;
 
         public BigButton(String name, Consumer<ButtonComponent> onPress) {
@@ -437,7 +437,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class DoubleInput extends FlowLayout {
+    public static final class DoubleInput extends FlowLayout {
         public SettingDouble setting;
 
         public DoubleInput(String name, SettingDouble setting, String tooltip) {
@@ -460,7 +460,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static class CustomHeight extends FlowLayout {
+    public static final class CustomHeight extends FlowLayout {
         public int heightOverride;
 
         public CustomHeight(int height) {

@@ -312,6 +312,11 @@ public class SlotBinding {
         public boolean equals(Object object) {
             return object instanceof BoundSlot boundSlot && this.id == boundSlot.id;
         }
+
+        @Override
+        public int hashCode() {
+            return Integer.hashCode(this.id);
+        }
     }
 
     public static class Setting extends FlowLayout {

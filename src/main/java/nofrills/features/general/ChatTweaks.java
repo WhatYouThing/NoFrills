@@ -5,7 +5,6 @@ import net.minecraft.client.font.DrawnTextConsumer;
 import net.minecraft.client.gui.hud.ChatHud;
 import net.minecraft.client.gui.hud.ChatHudLine;
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -28,7 +27,6 @@ public class ChatTweaks {
     public static final SettingBool trimOnCopy = new SettingBool(false, "trimOnCopy", instance);
     public static final SettingBool msgOnCopy = new SettingBool(false, "msgOnCopy", instance);
     public static final SettingInt copyMsgLength = new SettingInt(50, "copyMsgLength", instance);
-    public static final SettingBool compactChat = new SettingBool(false, "compactChat", instance);
     public static final SettingBool keepHistory = new SettingBool(false, "keepHistory", instance);
     public static final SettingBool extraLines = new SettingBool(false, "extraLines", instance);
     public static final SettingInt lines = new SettingInt(1000, "lines", instance);
@@ -44,43 +42,33 @@ public class ChatTweaks {
         int chatWidth = ChatHud.getWidth(mc.options.getChatWidth().getValue());
         int visibleEnd = Math.min(chatHud.visibleMessages.size(), chatHud.scrolledLines + chatHeight / entryHeight);
         List<ChatHudLine.Visible> visibleMessages = chatHud.visibleMessages.subList(chatHud.scrolledLines, visibleEnd);
-        int i = -1;
         for (int index = 0; index < visibleMessages.size(); index++) {
             int entryBottom = (int) (chatBottom - index * (entryHeight * chatScale));
             int entryTop = (int) (entryBottom - (entryHeight * chatScale));
             if (DrawnTextConsumer.isWithinBounds(mouseX, mouseY, 0, entryTop, chatWidth, entryBottom)) {
-                i = index;
-                break;
-            }
-        }
-        if (i >= 0) {
-            StringBuilder builder = new StringBuilder();
-            List<ChatHudLine.Visible> lines = new ArrayList<>();
-            if (singleLine) {
-                lines.addFirst(visibleMessages.get(i));
-            } else {
-                for (int index = i + 1; index < visibleMessages.size(); index++) {
-                    ChatHudLine.Visible line = visibleMessages.get(index);
-                    if (line.endOfEntry()) break;
-                    lines.addFirst(line);
+                if (singleLine) {
+                    return Utils.toPlain(visibleMessages.get(index).content());
                 }
-                for (int index = i; index >= 0; index--) {
-                    ChatHudLine.Visible line = visibleMessages.get(index);
-                    lines.add(line);
-                    if (line.endOfEntry()) break;
-                }
+                return Utils.toPlain(getFullMessage(visibleMessages, index).stream().map(ChatHudLine.Visible::content).toList());
             }
-            for (ChatHudLine.Visible line : lines) {
-                line.content().accept((index, style, codePoint) -> {
-                    builder.appendCodePoint(codePoint);
-                    return true;
-                });
-            }
-            return Formatting.strip(builder.toString());
         }
         return "";
     }
 
+    public static List<ChatHudLine.Visible> getFullMessage(List<ChatHudLine.Visible> visible, int index) {
+        List<ChatHudLine.Visible> lines = new ArrayList<>();
+        for (int i = index + 1; i < visible.size(); i++) {
+            ChatHudLine.Visible line = visible.get(i);
+            if (line.endOfEntry()) break;
+            lines.addFirst(line);
+        }
+        for (int i = index; i >= 0; i--) {
+            ChatHudLine.Visible line = visible.get(i);
+            lines.add(line);
+            if (line.endOfEntry()) break;
+        }
+        return lines;
+    }
 
     @EventHandler
     private static void onInput(InputEvent event) {

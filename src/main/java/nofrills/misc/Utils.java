@@ -40,10 +40,7 @@ import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
@@ -913,14 +910,35 @@ public class Utils {
         return toUpper(string.replace("'s", "").replaceAll(" ", "_"));
     }
 
+    public static String toPlain(String string) {
+        return string.replaceAll("(?i)§[0-9A-Z]", "");
+    }
+
     /**
      * Gets the string out of a Text object and removes any formatting codes.
      */
     public static String toPlain(Text text) {
         if (text != null) {
-            return text.getString().replaceAll("(?i)§[0-9A-Z]", "");
+            return toPlain(text.getString());
         }
         return "";
+    }
+
+    public static String toPlain(OrderedText ordered) {
+        StringBuilder builder = new StringBuilder();
+        ordered.accept((index, style, codePoint) -> {
+            builder.appendCodePoint(codePoint);
+            return true;
+        });
+        return toPlain(builder.toString());
+    }
+
+    public static String toPlain(List<OrderedText> list) {
+        StringBuilder builder = new StringBuilder();
+        for (OrderedText ordered : list) {
+            builder.append(toPlain(ordered));
+        }
+        return builder.toString();
     }
 
     public static String toAscii(String string) {

@@ -219,7 +219,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Trim On Copy", ChatTweaks.trimOnCopy, "Trims copied chat messages to remove any leading/trailing space characters."),
                                 new Settings.Toggle("Message On Copy", ChatTweaks.msgOnCopy, "Sends a feedback message in chat after copying any message."),
                                 new Settings.SliderInt("Feedback Limit", 0, 512, 1, ChatTweaks.copyMsgLength, "The max length of the copied message within the feedback message.\nHelps to prevent the chat from filling up when copying large messages."),
-                                new Settings.Toggle("Compact Chat", ChatTweaks.compactChat, "Stacks identical chat messages into single lines."),
                                 new Settings.Toggle("Keep History", ChatTweaks.keepHistory, "Prevents the chat history from clearing on disconnect."),
                                 new Settings.Toggle("Extra Lines", ChatTweaks.extraLines, "Overrides the chat line limit. Allows you to keep more messages in the chat history."),
                                 new Settings.SliderInt("Lines", 100, 5000, 10, ChatTweaks.lines, "The chat line limit override.")

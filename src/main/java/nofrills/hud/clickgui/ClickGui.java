@@ -712,7 +712,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Farm Color", EquipmentHighlight.farmColor, "The color of the farming equipment highlight."),
                                 new Settings.ColorPicker("Pest Color", EquipmentHighlight.pestColor, "The color of the pest spawning equipment highlight.")
                         )),
-                        new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.")
+                        new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation."),
+                        new Module("Mute Composter", MuteComposter.instance, "Prevents the composter sounds from playing.")
                 ))
         );
         this.categories.getLast().margins(Insets.of(5, 0, 3, 3));

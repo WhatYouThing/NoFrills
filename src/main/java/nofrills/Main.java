@@ -220,6 +220,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(DebugStuff.class);
         eventBus.subscribe(PhantomleafSolver.class);
         eventBus.subscribe(StreamerMode.class);
+        eventBus.subscribe(MuteComposter.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

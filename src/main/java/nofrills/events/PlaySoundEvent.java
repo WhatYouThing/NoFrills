@@ -16,11 +16,15 @@ public class PlaySoundEvent extends Cancellable {
         this.pos = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
     }
 
+    public boolean isSound(String identifier) {
+        return packet.getSound().value().id().toString().equals(identifier);
+    }
+
     /**
      * Returns true if the SoundEvent from the packet matches the provided SoundEvent.
      */
     public boolean isSound(SoundEvent sound) {
-        return packet.getSound().value().id().equals(sound.id());
+        return this.isSound(sound.toString());
     }
 
     public boolean isSound(RegistryEntry.Reference<SoundEvent> sound) {

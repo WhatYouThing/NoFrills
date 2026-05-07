@@ -106,7 +106,7 @@ public class StreamerMode {
             for (PlayerListS2CPacket.Entry entry : packet.getEntries()) {
                 if (entry.displayName() != null || entry.profile() == null) continue;
                 String name = entry.profile().name();
-                if (name.trim().isEmpty() || name.contains(" ") || name.startsWith("!") || name.equals(playerName))
+                if (name.isBlank() || name.contains(" ") || name.startsWith("!") || name.equals(playerName))
                     continue;
                 if (playerName.isEmpty()) {
                     playerName = name;

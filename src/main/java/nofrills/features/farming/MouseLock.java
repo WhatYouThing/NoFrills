@@ -37,7 +37,7 @@ public class MouseLock {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && keybind.isKey(event.key) && Utils.isInGarden()) {
+        if (instance.isActive() && keybind.isKey(event.key) && mc.currentScreen == null && Utils.isInGarden()) {
             if (event.action == GLFW.GLFW_PRESS) {
                 locked = !locked;
                 Utils.info(locked ? "§aMouse lock activated." : "§cMouse lock deactivated.");

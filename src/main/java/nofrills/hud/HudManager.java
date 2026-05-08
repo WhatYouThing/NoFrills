@@ -29,7 +29,7 @@ public class HudManager {
     public static final FPS fps = register(new FPS("FPS: §f0"));
     public static final TPS tps = register(new TPS("TPS: §f20.00"));
     public static final Ping ping = register(new Ping("Ping: §f0ms"));
-    public static final Day day = register( new Day("Day: §f0"));
+    public static final Day day = register(new Day("Day: §f0"));
     public static final Armor armor = register(new Armor());
     public static final Inventory inventory = register(new Inventory());
     public static final Quiver quiver = register(new Quiver("Quiver: §fN/A"));

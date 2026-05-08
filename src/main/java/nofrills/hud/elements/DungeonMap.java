@@ -124,7 +124,7 @@ public final class DungeonMap extends HudElement {
         return decor.type().value().equals(MapDecorationTypes.FRAME.value());
     }
 
-    protected void drawMarker(OwoUIGraphics context, MapDecoration decor, byte x, byte z, byte rot, float scale) {
+    private void drawMarker(OwoUIGraphics context, MapDecoration decor, byte x, byte z, byte rot, float scale) {
         Sprite sprite = this.atlasTexture.getSprite(decor.getAssetId());
         Matrix3x2fStack matrices = context.getMatrices();
         matrices.pushMatrix();
@@ -137,7 +137,7 @@ public final class DungeonMap extends HudElement {
         matrices.popMatrix();
     }
 
-    protected void drawMarkerHead(OwoUIGraphics context, Identifier texture, byte x, byte z, byte rot, float scale) {
+    private void drawMarkerHead(OwoUIGraphics context, Identifier texture, byte x, byte z, byte rot, float scale) {
         Matrix3x2fStack matrices = context.getMatrices();
         matrices.pushMatrix();
         matrices.translate(x / 2.0F + 64.0F, z / 2.0F + 64.0F);
@@ -148,7 +148,7 @@ public final class DungeonMap extends HudElement {
         matrices.popMatrix();
     }
 
-    protected void drawMarkerLabel(OwoUIGraphics context, DungeonUtil.Teammate teammate, byte x, byte z, float scale) {
+    private void drawMarkerLabel(OwoUIGraphics context, DungeonUtil.Teammate teammate, byte x, byte z, float scale) {
         NameMode mode = this.playerNameMode.value();
         if (mode.equals(NameMode.Disabled)) {
             return;

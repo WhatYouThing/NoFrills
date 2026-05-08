@@ -16,14 +16,14 @@ public final class PlaySoundEvent extends Cancellable {
     }
 
     public boolean isSound(String identifier) {
-        return packet.getSound().value().id().toString().equals(identifier);
+        return packet.getSound().value().id().toString().equalsIgnoreCase(identifier);
     }
 
     /**
      * Returns true if the SoundEvent from the packet matches the provided SoundEvent.
      */
     public boolean isSound(SoundEvent sound) {
-        return this.isSound(sound.toString());
+        return this.isSound(sound.id().toString());
     }
 
     public boolean isSound(RegistryEntry.Reference<SoundEvent> sound) {

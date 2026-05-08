@@ -1,11 +1,11 @@
 package nofrills.hud;
 
+import io.wispforest.owo.ui.base.BaseParentUIComponent;
 import io.wispforest.owo.ui.container.DraggableContainer;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.container.WrappingParentUIComponent;
 import io.wispforest.owo.ui.core.*;
-import io.wispforest.owo.ui.base.BaseParentUIComponent;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.util.Window;
 import net.minecraft.text.MutableText;
@@ -66,6 +66,10 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
         this.child(this.layout);
     }
 
+    public HudElement(Feature instance, String label) {
+        this(UIContainers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
+    }
+
     @Override
     public final BaseParentUIComponent positioning(Positioning positioning) {
         return super.positioning(positioning);
@@ -84,10 +88,6 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
     @Override
     public final WrappingParentUIComponent<FlowLayout> child(FlowLayout layout) {
         return super.child(layout);
-    }
-
-    public HudElement(Feature instance, String label) {
-        this(UIContainers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
     }
 
     @Override

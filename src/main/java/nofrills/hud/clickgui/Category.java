@@ -19,7 +19,7 @@ public final class Category extends FlowLayout {
     public ScrollContainer<FlowLayout> scroll;
     public int categoryWidth = 0;
 
-    protected Category(String title, List<Module> children) {
+    Category(String title, List<Module> children) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
         this.margins(Insets.of(5, 0, 3, 0));
         Color color = Color.ofArgb(0xff5ca0bf);

@@ -4,9 +4,9 @@ import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -14,7 +14,6 @@ import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
 import java.util.List;
-import java.util.Optional;
 
 import static nofrills.Main.mc;
 
@@ -40,20 +39,20 @@ public final class Quiver extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void update() {
-        if (mc.player == null) return;
-        ItemStack stack = mc.player.getInventory().getStack(8);
+    public void update(ItemStack stack) {
         Item item = stack.getItem();
         if (item.equals(Items.ARROW) || item.equals(Items.FEATHER)) {
             for (Text text : Utils.getLoreText(stack)) {
                 String line = Utils.toPlain(text);
-                if (line.startsWith("Active Arrow: ")) {
-                    String info = line.substring(line.indexOf(":") + 2);
-                    String name = info.substring(0, info.indexOf("(") - 1).replace(" Arrow", "");
-                    String quantity = info.substring(info.indexOf("(") + 1, info.indexOf(")"));
-                    Optional<Style> style = Utils.getStyle(text, str -> str.startsWith(name));
-                    MutableText arrowName = Text.literal(name).setStyle(style.orElse(Style.EMPTY));
-                    this.setText(Text.literal("Quiver: ").append(arrowName).append(Utils.format(" §7(§e{}§7)", quantity)));
+                if (line.startsWith("Arrows Remaining: ")) {
+                    String name = Utils.toPlain(stack.getName());
+                    String quantity = line.substring(line.indexOf(":") + 2);
+                    Style nameStyle = Utils.getStyle(stack.getName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(Formatting.WHITE));
+                    Style quantityStyle = Utils.getStyle(text, s -> s.trim().startsWith(quantity)).orElse(Style.EMPTY.withColor(Formatting.WHITE));
+                    this.setText(Text.literal("Quiver: ")
+                            .append(Text.literal(name.replace(" Arrow", "")).setStyle(nameStyle))
+                            .append(Text.literal(" x" + quantity).setStyle(quantityStyle))
+                    );
                     break;
                 }
             }

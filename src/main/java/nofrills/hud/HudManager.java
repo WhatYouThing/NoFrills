@@ -182,9 +182,6 @@ public class HudManager {
         if (bossHealth.isActive()) {
             bossHealth.update();
         }
-        if (quiver.isActive()) {
-            quiver.update();
-        }
         if (dungeonScore.isActive()) {
             dungeonScore.tick();
         }
@@ -294,6 +291,15 @@ public class HudManager {
         if (spiritBearTimer.isActive() && event.newState.getBlock().equals(Blocks.SEA_LANTERN) && Utils.isInDungeonBoss("4")) {
             if (event.pos.getX() == 7 && event.pos.getY() == 77 && event.pos.getZ() == 34) {
                 spiritBearTimer.start();
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onInventory(InventoryUpdateEvent event) {
+        if (event.slotId == 44) { // 9th hotbar slot
+            if (quiver.isActive()) {
+                quiver.update(event.stack);
             }
         }
     }

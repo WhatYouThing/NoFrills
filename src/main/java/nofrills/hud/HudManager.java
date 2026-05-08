@@ -53,6 +53,7 @@ public class HudManager {
     public static final FreshToolsTimer freshToolsTimer = register(new FreshToolsTimer());
     public static final SeaCreatures seaCreatures = register(new SeaCreatures("Sea Creatures: §70"));
     public static final FishingBobber bobber = register(new FishingBobber("Bobber: §7Inactive"));
+    public static final FishingBag fishingBag = register(new FishingBag("Bait: §fN/A"));
     public static final ShardTrackerDisplay shardTracker = register(new ShardTrackerDisplay());
     public static final SkillTrackerDisplay skillTracker = register(new SkillTrackerDisplay());
 
@@ -300,6 +301,9 @@ public class HudManager {
         if (event.slotId == 44) { // 9th hotbar slot
             if (quiver.isActive()) {
                 quiver.update(event.stack);
+            }
+            if (fishingBag.isActive()) {
+                fishingBag.update(event.stack);
             }
         }
     }

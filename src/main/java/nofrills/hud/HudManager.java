@@ -11,7 +11,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import nofrills.events.*;
-import nofrills.features.fishing.CapTracker;
 import nofrills.hud.elements.*;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
@@ -156,9 +155,6 @@ public class HudManager {
                 }
             }
         }
-        if (seaCreatures.isActive()) {
-            seaCreatures.setCount(CapTracker.seaCreatures.size());
-        }
         if (fps.isActive()) {
             if (fps.ticks > 0) {
                 fps.ticks -= 1;
@@ -230,6 +226,9 @@ public class HudManager {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
+        if (seaCreatures.isActive()) {
+            seaCreatures.onNamed(event);
+        }
         if (bobber.isActive()) {
             bobber.onNamed(event);
         }

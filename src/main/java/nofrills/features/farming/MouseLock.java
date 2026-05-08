@@ -31,8 +31,10 @@ public class MouseLock {
     }
 
     private static void reloadOptions() {
-        mc.options.write();
-        mc.options.load();
+        Thread.startVirtualThread(() -> {
+            mc.options.write();
+            mc.options.load();
+        });
     }
 
     @EventHandler

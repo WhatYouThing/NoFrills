@@ -13,7 +13,10 @@ import net.minecraft.client.input.KeyInput;
 import net.minecraft.text.Text;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.*;
-import nofrills.features.fishing.*;
+import nofrills.features.fishing.MuteDrake;
+import nofrills.features.fishing.RadarSolver;
+import nofrills.features.fishing.RareAnnounce;
+import nofrills.features.fishing.RareHighlight;
 import nofrills.features.general.*;
 import nofrills.features.hunting.*;
 import nofrills.features.kuudra.*;
@@ -384,14 +387,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         )))
                 )),
                 new Category("Fishing", List.of(
-                        new Module("Cap Tracker", CapTracker.instance, "Tracks the sea creature cap. Mostly for barn fishing.", new Settings(List.of(
-                                new Settings.SliderInt("Target", 1, 60, 1, CapTracker.target, "The amount of sea creatures to consider as the limit."),
-                                new Settings.Toggle("Show Title", CapTracker.title, "Shows a title on screen once the cap is reached."),
-                                new Settings.Toggle("Play Sound", CapTracker.sound, "Plays a sound effect once the cap is reached."),
-                                new Settings.Toggle("Send Message", CapTracker.sendMsg, "Sends a specific message once the cap is reached."),
-                                new Settings.TextInput("Message", CapTracker.msg, "The message to send."),
-                                new Settings.SliderInt("Kill Delay", 5, 120, 1, CapTracker.delay, "The delay (in seconds) until the cap starts being tracked again after it is reached.")
-                        ))),
                         new Module("Mute Drake", MuteDrake.instance, "Prevents the Reindrake from blowing up your ears with gifts."),
                         new Module("Rare Highlight", RareHighlight.instance, "Highlights rare/profitable sea creatures.", new Settings(List.of(
                                 new Settings.Dropdown<>("Highlight Style", RareHighlight.style, "The style of the highlight."),

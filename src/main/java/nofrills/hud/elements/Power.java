@@ -6,7 +6,7 @@ import nofrills.config.Feature;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.Utils;
 
-public class Power extends SimpleTextElement {
+public final class Power extends SimpleTextElement {
 
     public Power(String text) {
         super(Text.literal(text), new Feature("powerElement"), "Power Display");

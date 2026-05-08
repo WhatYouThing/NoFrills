@@ -3,7 +3,7 @@ package nofrills.hud.elements;
 import nofrills.config.Feature;
 import nofrills.hud.TickTimerElement;
 
-public class SpiritBearTimer extends TickTimerElement {
+public final class SpiritBearTimer extends TickTimerElement {
 
     public SpiritBearTimer() {
         super("Spirit Bear: {}", new Feature("spiritBearTimerElement"), "Spirit Bear Timer");

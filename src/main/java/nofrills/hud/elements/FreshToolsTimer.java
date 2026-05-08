@@ -3,7 +3,7 @@ package nofrills.hud.elements;
 import nofrills.config.Feature;
 import nofrills.hud.TickTimerElement;
 
-public class FreshToolsTimer extends TickTimerElement {
+public final class FreshToolsTimer extends TickTimerElement {
 
     public FreshToolsTimer() {
         super("Fresh Tools: {}", new Feature("freshToolsTimerElement"), "Fresh Tools Timer");

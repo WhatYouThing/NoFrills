@@ -7,7 +7,7 @@ import nofrills.config.Feature;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.SlayerUtil;
 
-public class SlayerHealth extends SimpleTextElement {
+public final class SlayerHealth extends SimpleTextElement {
     private boolean visible = false;
 
     public SlayerHealth() {

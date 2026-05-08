@@ -31,7 +31,7 @@ import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.arg
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 import static nofrills.Main.mc;
 
-public class CommandShortcuts {
+public final class CommandShortcuts {
     public static final Feature instance = new Feature("commandShortcuts");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
@@ -89,7 +89,7 @@ public class CommandShortcuts {
         return settings;
     }
 
-    public static class Setting extends FlowLayout {
+    public static final class Setting extends FlowLayout {
         public int index;
         public FlowLayout options;
         public FlatTextbox shortcutInput;

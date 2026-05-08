@@ -19,7 +19,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class Inventory extends HudElement {
+public final class Inventory extends HudElement {
     public final SettingEnum<HideMode> hideMode;
     private final FlowLayout content;
 

@@ -3,7 +3,7 @@ package nofrills.hud.elements;
 import nofrills.config.Feature;
 import nofrills.hud.TickTimerElement;
 
-public class GoldorTickTimer extends TickTimerElement {
+public final class GoldorTickTimer extends TickTimerElement {
 
     public GoldorTickTimer() {
         super("Goldor Tick: {}", new Feature("goldorTickTimerElement"), "Goldor Tick Timer");

@@ -6,7 +6,7 @@ import io.wispforest.owo.ui.core.Sizing;
 import net.minecraft.client.gui.DrawContext;
 import nofrills.misc.Rendering;
 
-public class FlatTextbox extends TextBoxComponent {
+public final class FlatTextbox extends TextBoxComponent {
     public int borderColor = 0xff5ca0bf;
 
     public FlatTextbox(Sizing horizontalSizing) {

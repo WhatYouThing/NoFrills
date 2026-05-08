@@ -53,6 +53,8 @@ dependencies {
     include "de.topobyte:jama:${project.jama_version}"
 
     modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:${project.devauth_version}")
+
+    compileOnly("com.google.errorprone:error_prone_annotations:2.49.0")
 }
 
 loom {
@@ -69,6 +71,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 21
+    it.options.compilerArgs += '-Xlint:all'
 }
 
 java {

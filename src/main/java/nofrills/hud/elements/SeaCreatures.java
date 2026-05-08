@@ -10,7 +10,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
-public class SeaCreatures extends SimpleTextElement {
+public final class SeaCreatures extends SimpleTextElement {
     public final SettingBool zero = new SettingBool(false, "zero", instance);
     private boolean active = false;
 

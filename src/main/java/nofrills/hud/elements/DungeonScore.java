@@ -9,7 +9,7 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
-public class DungeonScore extends SimpleTextElement {
+public final class DungeonScore extends SimpleTextElement {
 
     public DungeonScore() {
         super(Text.literal("Score: §fN/A"), new Feature("dungeonScoreElement"), "Dungeon Score");

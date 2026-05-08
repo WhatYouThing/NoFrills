@@ -3,7 +3,7 @@ package nofrills.hud.elements;
 import nofrills.config.Feature;
 import nofrills.hud.TimerElement;
 
-public class BonzoMaskTimer extends TimerElement {
+public final class BonzoMaskTimer extends TimerElement {
 
     public BonzoMaskTimer() {
         super("Bonzo Mask: {}", new Feature("bonzoMaskTimerElement"), "Bonzo Mask Timer");

@@ -11,7 +11,7 @@ import nofrills.misc.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TPS extends SimpleTextElement {
+public final class TPS extends SimpleTextElement {
     public final SettingBool average = new SettingBool(false, "average", instance.key());
     public int clientTicks = 20;
     public int serverTicks = 0;

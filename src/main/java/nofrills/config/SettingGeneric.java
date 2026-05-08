@@ -24,7 +24,7 @@ public class SettingGeneric {
         this(defaultValue, key, instance.key());
     }
 
-    public JsonElement parse(Object value) {
+    public final JsonElement parse(Object value) {
         return switch (value) {
             case Boolean bool -> new JsonPrimitive(bool);
             case String string -> new JsonPrimitive(string);
@@ -37,7 +37,7 @@ public class SettingGeneric {
         };
     }
 
-    public void update() {
+    public final void update() {
         if (this.value == null || this.hash != Config.getHash()) {
             if (Config.get().has(this.parent)) {
                 JsonObject data = Config.get().getAsJsonObject(this.parent);
@@ -49,7 +49,7 @@ public class SettingGeneric {
         }
     }
 
-    public JsonElement get() {
+    public final JsonElement get() {
         this.update();
         return this.value;
     }

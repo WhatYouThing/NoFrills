@@ -36,7 +36,7 @@ import java.util.zip.GZIPInputStream;
 
 import static nofrills.Main.mc;
 
-public class ShardTracker {
+public final class ShardTracker {
     public static final Feature instance = new Feature("shardTracker");
 
     public static final SettingBool boxApply = new SettingBool(false, "load", instance.key());
@@ -380,7 +380,7 @@ public class ShardTracker {
         Bazaar
     }
 
-    public static class Shard {
+    public static final class Shard {
         public String name;
         public int quantity;
         public ShardSource source;
@@ -396,7 +396,7 @@ public class ShardTracker {
         }
     }
 
-    public static class Setting extends FlowLayout {
+    public static final class Setting extends FlowLayout {
         public int index;
         public FlatTextbox inputName;
         public FlatTextbox inputObtained;

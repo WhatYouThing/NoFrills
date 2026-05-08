@@ -32,7 +32,7 @@ import java.util.Optional;
 
 import static nofrills.Main.mc;
 
-public class SlotBinding {
+public final class SlotBinding {
     public static final Feature instance = new Feature("slotBinding");
 
     public static final SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "keybind", instance.key());
@@ -261,7 +261,7 @@ public class SlotBinding {
         }
     }
 
-    public static class BoundSlot {
+    public static final class BoundSlot {
         public int id;
 
         public BoundSlot(int id) {
@@ -312,9 +312,14 @@ public class SlotBinding {
         public boolean equals(Object object) {
             return object instanceof BoundSlot boundSlot && this.id == boundSlot.id;
         }
+
+        @Override
+        public int hashCode() {
+            return Integer.hashCode(this.id);
+        }
     }
 
-    public static class Setting extends FlowLayout {
+    public static final class Setting extends FlowLayout {
         public int index;
 
         public Setting(int index) {

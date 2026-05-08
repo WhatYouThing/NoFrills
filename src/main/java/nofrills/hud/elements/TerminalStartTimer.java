@@ -3,7 +3,7 @@ package nofrills.hud.elements;
 import nofrills.config.Feature;
 import nofrills.hud.TickTimerElement;
 
-public class TerminalStartTimer extends TickTimerElement {
+public final class TerminalStartTimer extends TickTimerElement {
 
     public TerminalStartTimer() {
         super("Terminal Start: {}", new Feature("terminalStartTimerElement"), "Terminal Start Timer");

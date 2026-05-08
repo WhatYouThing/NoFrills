@@ -27,7 +27,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class CommandKeybinds {
+public final class CommandKeybinds {
     public static final Feature instance = new Feature("customKeybinds");
 
     public static final SettingBool allowInGui = new SettingBool(false, "allowInGui", instance.key());
@@ -143,7 +143,7 @@ public class CommandKeybinds {
         Alt
     }
 
-    public static class Setting extends FlowLayout {
+    public static final class Setting extends FlowLayout {
         public int index;
 
         public Setting(int index) {
@@ -259,8 +259,7 @@ public class CommandKeybinds {
         }
     }
 
-    public static class CommandKeybindsSettings extends Settings {
-
+    public static final class CommandKeybindsSettings extends Settings {
         public CommandKeybindsSettings(List<FlowLayout> settings) {
             super(settings);
         }

@@ -18,7 +18,7 @@ import java.util.Optional;
 
 import static nofrills.Main.mc;
 
-public class Quiver extends SimpleTextElement {
+public final class Quiver extends SimpleTextElement {
     public final SettingBool onlyBow = new SettingBool(true, "onlyBow", this.instance);
 
     public Quiver(String text) {

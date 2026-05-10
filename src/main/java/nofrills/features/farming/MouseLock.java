@@ -30,13 +30,6 @@ public class MouseLock {
         option.setPressed(false);
     }
 
-    private static void reloadOptions() {
-        Thread.startVirtualThread(() -> {
-            mc.options.write();
-            mc.options.load();
-        });
-    }
-
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && keybind.isKey(event.key) && mc.currentScreen == null && Utils.isInGarden()) {
@@ -46,7 +39,7 @@ public class MouseLock {
                 if (rebind.value()) {
                     bindOption(mc.options.attackKey, locked ? breakKeyActive : breakKeyInactive);
                     bindOption(mc.options.jumpKey, locked ? jumpKeyActive : jumpKeyInactive);
-                    reloadOptions();
+                    KeyBinding.updateKeysByCode();
                 }
             }
             event.cancel();
@@ -60,7 +53,7 @@ public class MouseLock {
             if (rebind.value()) {
                 bindOption(mc.options.attackKey, breakKeyInactive);
                 bindOption(mc.options.jumpKey, jumpKeyInactive);
-                reloadOptions();
+                KeyBinding.updateKeysByCode();
             }
         }
     }

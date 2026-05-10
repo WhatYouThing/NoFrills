@@ -158,7 +158,7 @@ public class CommandKeybinds {
             input.text(this.getData().has("name") ? this.getData().get("name").getAsString() : "New Keybind");
             input.tooltip(Component.literal("The name of this command keybind."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("name", value)));
-            ToggleButton mainToggle = new ToggleButton(this.getData().get("enabled").getAsBoolean());
+            ToggleButton mainToggle = new ToggleButton(this.getData().has("enabled") && this.getData().get("enabled").getAsBoolean());
             mainToggle.sizing(Sizing.fixed(50), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 3));
             mainToggle.tooltip(Component.literal("The main toggle for this command keybind."));
             mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));

@@ -11,8 +11,6 @@ import nofrills.events.ServerJoinEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
 
-import static nofrills.Main.mc;
-
 public class MimicMessage {
     public static final Feature instance = new Feature("mimicMessage");
 
@@ -38,7 +36,7 @@ public class MimicMessage {
             if (Utils.isTextureEqual(textures, "e19c12543bc7792605ef68e1f8749ae8f2a381d9085d4d4b780ba1282d3597a0")) {
                 cache.add(zombie);
             }
-            if (!zombie.isAlive() && cache.has(zombie)) {
+            if (zombie.isDead() && cache.has(zombie)) {
                 processDeath();
             }
         }
@@ -46,7 +44,7 @@ public class MimicMessage {
 
     @EventHandler
     private static void onRemoved(EntityRemovedEvent event) {
-        if (!mimicKilled && cache.has(event.entity) && event.entity.distanceTo(mc.player) <= 64.0) {
+        if (!mimicKilled && event.entity instanceof ZombieEntity zombie && zombie.isDead() && cache.has(event.entity)) {
             processDeath();
         }
     }

@@ -297,7 +297,7 @@ public class HudManager {
 
     @EventHandler
     private static void onInventory(InventoryUpdateEvent event) {
-        if (event.slotId == 44) { // 9th hotbar slot
+        if (event.slotId == 44 || event.slotId == 9) { // 44 - 9th hotbar slot, 9 - top left inventory slot
             if (quiver.isActive()) {
                 quiver.update(event.stack);
             }

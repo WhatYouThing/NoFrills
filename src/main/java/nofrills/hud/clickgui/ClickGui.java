@@ -339,7 +339,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Auto Kick", BlockList.autoKick, "Automatically kicks blocked players if they join your party with party finder.")
                         )),
                         new Module("Streamer Mode", StreamerMode.instance, "While nicked: replaces your nick with your real username, hides the lobby ID, and hides all player names.", new Settings(
-                                new Settings.TextInput("Base Name", StreamerMode.baseName, "The name to use to hide the names of other players. Replaces \"{}\" with random digits.")
+                                new Settings.TextInput("Base Name", StreamerMode.baseName, "The name to use to hide the names of other players. Replaces placeholders \"{}\" with random digits.")
                         ))
                 )),
                 new Category("Solvers", List.of(

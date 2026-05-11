@@ -12,6 +12,9 @@ import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardEntry;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.text.Text;
 import nofrills.events.HudRenderEvent;
 import nofrills.features.general.ChatTweaks;
@@ -19,14 +22,15 @@ import nofrills.features.general.NoRender;
 import nofrills.features.misc.StreamerMode;
 import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
@@ -109,14 +113,14 @@ public abstract class InGameHudMixin {
         original.call(instance, clearHistory);
     }
 
-    @ModifyExpressionValue(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/hud/InGameHud$SidebarEntry;name:Lnet/minecraft/text/Text;", opcode = Opcodes.GETFIELD))
-    private Text onGetEntryName(Text original) {
+    @ModifyExpressionValue(method = "renderScoreboardSidebar(Lnet/minecraft/client/gui/DrawContext;Lnet/minecraft/scoreboard/ScoreboardObjective;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/scoreboard/Scoreboard;getScoreboardEntries(Lnet/minecraft/scoreboard/ScoreboardObjective;)Ljava/util/Collection;"))
+    private Collection<ScoreboardEntry> onGetScoreboardEntries(Collection<ScoreboardEntry> original, @Local Scoreboard scoreboard) {
         if (StreamerMode.isActive()) {
-            Optional<String> replacement = StreamerMode.replaceIfNeeded(Utils.toPlain(original).trim());
-            if (replacement.isPresent()) {
-                String string = replacement.get().trim();
-                return Text.literal("§7" + string.replace(" ", " §8"));
-            }
+            return original.stream().filter(entry -> {
+                Team team = scoreboard.getScoreHolderTeam(entry.owner());
+                Text name = Team.decorateName(team, entry.name());
+                return StreamerMode.replaceIfNeeded(Utils.toPlain(name).trim()).isEmpty();
+            }).collect(Collectors.toCollection(ArrayList::new));
         }
         return original;
     }

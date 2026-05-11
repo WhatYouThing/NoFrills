@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.entity.Entity;
@@ -19,7 +20,6 @@ import net.minecraft.network.packet.s2c.play.*;
 import net.minecraft.text.Text;
 import nofrills.events.*;
 import nofrills.features.general.NoRender;
-import nofrills.features.misc.StreamerMode;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.DisconnectFix;
 import nofrills.features.tweaks.NoConfirmScreen;
@@ -33,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static nofrills.Main.*;
 
@@ -137,12 +138,16 @@ public class ClientPlayNetworkHandlerMixin {
     @Inject(method = "onPlayerList", at = @At("TAIL"))
     private void onTabListUpdate(PlayerListS2CPacket packet, CallbackInfo ci) {
         SkyblockData.markTabListDirty();
-        StreamerMode.onPlayerListUpdate(packet);
     }
 
-    @Inject(method = "onPlayerRemove", at = @At("TAIL"))
-    private void onTabListRemove(PlayerRemoveS2CPacket packet, CallbackInfo ci) {
-        StreamerMode.onPlayerListRemove(packet);
+    @Inject(method = "onPlayerList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/SocialInteractionsManager;setPlayerOnline(Lnet/minecraft/client/network/PlayerListEntry;)V"))
+    private void onTabListAddPlayer(PlayerListS2CPacket packet, CallbackInfo ci, @Local PlayerListS2CPacket.Entry entry, @Local PlayerListEntry playerListEntry) {
+        eventBus.post(new PlayerJoinedEvent(entry.profileId(), playerListEntry));
+    }
+
+    @Inject(method = "onPlayerRemove", at = @At(value = "INVOKE", target = "Ljava/util/Set;remove(Ljava/lang/Object;)Z"))
+    private void onTabListRemove(PlayerRemoveS2CPacket packet, CallbackInfo ci, @Local UUID uuid, @Local PlayerListEntry entry) {
+        eventBus.post(new PlayerLeftEvent(uuid, entry));
     }
 
     @Inject(method = "onGameJoin", at = @At("TAIL"))

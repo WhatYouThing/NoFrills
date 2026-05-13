@@ -1001,6 +1001,12 @@ public class Utils {
         );
     }
 
+    public static String parseDate(long timestamp) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp);
+        return parseDate(calendar);
+    }
+
     public static int difference(int first, int second) {
         return Math.abs(Math.abs(first) - Math.abs(second));
     }

@@ -13,6 +13,7 @@ import nofrills.config.Config;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.PlayerJoinedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.Utils;
 
@@ -21,7 +22,6 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +36,7 @@ public class BlockList {
     public static final Feature instance = new Feature("blockList");
 
     public static final SettingBool autoKick = new SettingBool(true, "autoKick", instance);
+    public static final SettingBool joinAlert = new SettingBool(false, "joinAlert", instance);
 
     private static final Path listPath = Config.getFolderPath().resolve("BlockList.json");
     private static final JsonObject data = loadData();
@@ -101,7 +102,7 @@ public class BlockList {
     public static void addPlayer(String name, String reason) {
         fetchUuid(name, (res) -> {
             if (res.isEmpty()) {
-                Utils.infoFormat("§cCould not fetch UUID for player {}, not adding to the block list.", name);
+                Utils.infoFormat("§cCould not find UUID for player {}, not adding to the block list.", name);
                 return;
             }
             FetchResult result = res.get();
@@ -109,7 +110,7 @@ public class BlockList {
                 JsonObject object = data.get(result.uuid()).getAsJsonObject();
                 object.addProperty("name", result.name());
                 object.addProperty("reason", reason);
-                Utils.infoFormat("§a{} is already blocked, updated block reason.", result.name());
+                Utils.infoFormat("§a{} is already blocked, updated the block reason.", result.name());
             } else {
                 JsonObject object = new JsonObject();
                 object.addProperty("name", result.name());
@@ -135,14 +136,17 @@ public class BlockList {
         return getEntries().stream().filter(object -> Utils.toLower(object.get("name").getAsString()).contains(Utils.toLower(name))).toList();
     }
 
-    public static MutableText buildEntryLine(JsonObject entry, String text) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(entry.get("timestamp").getAsLong());
-        MutableText tooltip = Text.literal(Utils.format("§7Blocked reason: {}\n§7Blocked date: {}",
+    public static MutableText buildEntryLine(JsonObject entry, MutableText text) {
+        MutableText tooltip = Text.literal(Utils.format("§7Block reason: {}\n§7Blocked date: {}\n§7Last known username: {}",
                 entry.get("reason").getAsString(),
-                Utils.parseDate(calendar)
+                Utils.parseDate(entry.get("timestamp").getAsLong()),
+                entry.get("name").getAsString()
         ));
-        return Text.literal(text).setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(tooltip)));
+        return text.setStyle(text.getStyle().withHoverEvent(new HoverEvent.ShowText(tooltip)));
+    }
+
+    public static MutableText buildEntryLine(JsonObject entry, String text) {
+        return buildEntryLine(entry, Text.literal(text));
     }
 
     public static void printEntries(int page) {
@@ -189,18 +193,28 @@ public class BlockList {
             if (name.equalsIgnoreCase(mc.player.getName().getString())) {
                 return;
             }
-            Optional<Style> style = Utils.getStyle(event.message, (string) -> string.trim().startsWith(name));
             forEntry(name, (obj) -> {
+                Optional<Style> style = Utils.getStyle(event.message, (string) -> string.trim().startsWith(name));
                 if (obj.isPresent()) {
-                    JsonObject object = obj.get();
-                    MutableText message = Text.literal("§cAutomatically kicking blocked player ")
-                            .append(Text.literal(name).setStyle(style.orElse(Style.EMPTY.withFormatting(Formatting.GRAY)))).append("§c.")
-                            .append(Utils.format("\n §f- Block reason: {}", object.get("reason").getAsString()))
-                            .append(Utils.format("\n §f- Last known username: {}", object.get("name").getAsString()));
-                    Utils.infoRaw(message);
+                    Style nameColor = style.orElse(Style.EMPTY.withFormatting(Formatting.GRAY));
+                    Utils.infoRaw(buildEntryLine(obj.get(), Text.literal("§c§lAutomatically kicking blocked player §r")
+                            .append(Text.literal(name).setStyle(nameColor)).append("§c§l."))
+                    );
                     Utils.sendMessage("/party kick " + name);
                 }
             });
+        }
+    }
+
+    @EventHandler
+    private static void onPlayerJoin(PlayerJoinedEvent event) {
+        if (instance.isActive() && joinAlert.value() && event.isRealPlayer()) {
+            String uuid = event.uuid.toString().replaceAll("-", "");
+            if (data.has(uuid)) {
+                Utils.infoRaw(buildEntryLine(data.get(uuid).getAsJsonObject(),
+                        Utils.format("§c§lDetected a blocked player in this lobby: §r§c{}§r§c§l.", event.entry.getProfile().name()))
+                );
+            }
         }
     }
 
@@ -227,7 +241,7 @@ public class BlockList {
         }
 
         public boolean isExpired() {
-            return this.lastAccess + 600000L <= Utils.getMeasuringTime();
+            return this.lastAccess + 1800000L <= Utils.getMeasuringTime();
         }
     }
 }

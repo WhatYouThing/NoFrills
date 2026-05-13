@@ -27,6 +27,7 @@ import nofrills.features.fishing.RadarSolver;
 import nofrills.features.fishing.RareAnnounce;
 import nofrills.features.fishing.RareHighlight;
 import nofrills.features.general.*;
+import nofrills.features.general.partycommands.PartyCommands;
 import nofrills.features.hunting.*;
 import nofrills.features.kuudra.*;
 import nofrills.features.mining.*;

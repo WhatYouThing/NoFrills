@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.PartyChatMsgEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SkyblockData;
@@ -59,6 +60,16 @@ public class AutoRequeue {
     private static void onChatMsg(ChatMsgEvent event) {
         if (instance.isActive() && !paused && isPartyMemberUpdateMsg(event.messagePlain) && SkyblockData.isInInstance()) {
             setPaused();
+        }
+    }
+
+    @EventHandler
+    private static void onPartyMsg(PartyChatMsgEvent event) {
+        if (instance.isActive() && !paused && SkyblockData.isInInstance()) {
+            String msg = Utils.toLower(event.message).trim();
+            if (msg.equals("!dt") || msg.startsWith("!dt ")) {
+                setPaused();
+            }
         }
     }
 

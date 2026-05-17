@@ -201,10 +201,11 @@ public class HudManager {
         if (bobber.isActive()) {
             bobber.onServerTick();
         }
-        if (Utils.isOnDungeonFloor("6")) {
-            if (terraGyroTimer.isActive()) {
-                terraGyroTimer.tick();
-            }
+        if (spiritBearTimer.isActive() && Utils.isOnDungeonFloor("4")) {
+            spiritBearTimer.tick();
+        }
+        if (terraGyroTimer.isActive() && Utils.isOnDungeonFloor("6")) {
+            terraGyroTimer.tick();
         }
         if (Utils.isOnDungeonFloor("7")) {
             if (padTimer.isActive()) {
@@ -217,10 +218,8 @@ public class HudManager {
                 goldorTickTimer.tick();
             }
         }
-        if (Utils.isInKuudra()) {
-            if (freshToolsTimer.isActive()) {
-                freshToolsTimer.tick();
-            }
+        if (freshToolsTimer.isActive() && Utils.isInKuudra()) {
+            freshToolsTimer.tick();
         }
     }
 

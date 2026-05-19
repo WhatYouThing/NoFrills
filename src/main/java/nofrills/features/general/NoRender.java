@@ -93,38 +93,6 @@ public class NoRender {
         return false;
     }
 
-    private static List<Predicate<Entity>> initEntityPredicates() {
-        String skullTexture = "2f24ed6875304fa4a1f0c785b2cb6a6a72563e9f3e24ea55e18178452119aa66";
-        HashSet<Block> treeBlocks = Sets.newHashSet(
-                Blocks.MANGROVE_WOOD,
-                Blocks.MANGROVE_LEAVES,
-                Blocks.STRIPPED_SPRUCE_WOOD,
-                Blocks.AZALEA_LEAVES
-        );
-        return List.of(
-                (entity -> deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()),
-                (entity -> fallingBlocks.value() && entity instanceof FallingBlockEntity),
-                (entity -> {
-                    if (treeBits.value() && entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
-                        return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
-                    }
-                    return false;
-                }),
-                (entity -> lightning.value() && entity instanceof LightningEntity),
-                (entity -> expOrbs.value() && entity instanceof ExperienceOrbEntity),
-                (entity -> {
-                    if (soulweaverSkulls.value() && entity instanceof ArmorStandEntity stand) {
-                        ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
-                        if (!helmet.isEmpty() && helmet.getItem().equals(Items.PLAYER_HEAD)) {
-                            GameProfile profile = Utils.getTextures(helmet);
-                            return Utils.isTextureEqual(profile, skullTexture) && Utils.isInDungeons();
-                        }
-                    }
-                    return false;
-                })
-        );
-    }
-
     private static boolean isPoofParticle(ParticleS2CPacket packet) {
         if (packet.getCount() == 1 && packet.getSpeed() == 0.0f) {
             for (float offset : List.of(packet.getOffsetX(), packet.getOffsetY(), packet.getOffsetZ())) {
@@ -181,7 +149,6 @@ public class NoRender {
         private final List<Predicate<Entity>> predicates;
 
         public EntityPredicates() {
-            String skullTexture = "2f24ed6875304fa4a1f0c785b2cb6a6a72563e9f3e24ea55e18178452119aa66";
             HashSet<Block> treeBlocks = Sets.newHashSet(
                     Blocks.MANGROVE_WOOD,
                     Blocks.MANGROVE_LEAVES,
@@ -200,11 +167,11 @@ public class NoRender {
                     (entity -> lightning.value() && entity instanceof LightningEntity),
                     (entity -> expOrbs.value() && entity instanceof ExperienceOrbEntity),
                     (entity -> {
-                        if (soulweaverSkulls.value() && entity instanceof ArmorStandEntity stand) {
-                            ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
-                            if (!helmet.isEmpty() && helmet.getItem().equals(Items.PLAYER_HEAD)) {
+                        if (soulweaverSkulls.value() && entity instanceof ArmorStandEntity stand && Utils.isInDungeons()) {
+                            ItemStack helmet = Utils.getEntityHelmet(stand);
+                            if (helmet.getItem().equals(Items.PLAYER_HEAD)) {
                                 GameProfile profile = Utils.getTextures(helmet);
-                                return Utils.isTextureEqual(profile, skullTexture) && Utils.isInDungeons();
+                                return profile != null && Utils.getTexturePayload(profile).orElse("").hashCode() == -1020507406;
                             }
                         }
                         return false;

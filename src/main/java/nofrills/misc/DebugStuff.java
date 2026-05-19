@@ -1,10 +1,11 @@
 package nofrills.misc;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.hud.ClientBossBar;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ProfileComponent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -19,6 +20,7 @@ import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
 
 import java.util.List;
+import java.util.Optional;
 
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
@@ -37,11 +39,15 @@ public class DebugStuff {
             if (ent instanceof LivingEntity living) {
                 for (EquipmentSlot slot : searchedSlots) {
                     ItemStack stack = living.getEquippedStack(slot);
-                    GameProfile textures = Utils.getTextures(stack);
-                    if (textures != null && stack.getItem() instanceof PlayerHeadItem) {
+                    if (stack.getItem() instanceof PlayerHeadItem) {
+                        ProfileComponent profile = stack.get(DataComponentTypes.PROFILE);
+                        if (profile == null || profile.getGameProfile() == null) continue;
+                        Optional<String> payload = Utils.getTexturePayload(profile.getGameProfile());
                         Vec3d pos = living.getEntityPos();
-                        LOGGER.info(Utils.format("\n\tURL - {}\n\tSlot - {}\n\tEntity Name - {}\n\tHead Name - {}\n\tPosition - {} {} {}",
-                                Utils.getTextureUrl(textures),
+                        LOGGER.info(Utils.format("\n\tURL - {}\n\tPayload - {}\n\tPayload hashcode - {}\n\tSlot - {}\n\tEntity Name - {}\n\tHead Name - {}\n\tPosition - {} {} {}",
+                                Utils.getTextureUrl(profile.getGameProfile()),
+                                payload.orElse("null"),
+                                payload.orElse("").hashCode(),
                                 Utils.toUpper(slot.name()),
                                 living.getName().getString(),
                                 stack.getName().getString(),

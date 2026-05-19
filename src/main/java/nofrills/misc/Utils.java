@@ -568,11 +568,16 @@ public class Utils {
     }
 
     public static GameProfile getTextures(ItemStack stack) {
-        ProfileComponent profile = stack.getComponents().get(DataComponentTypes.PROFILE);
-        if (!stack.isEmpty() && profile != null) {
+        ProfileComponent profile = stack.get(DataComponentTypes.PROFILE);
+        if (profile != null) {
             return profile.getGameProfile();
         }
         return null;
+    }
+
+    public static Optional<String> getTexturePayload(GameProfile profile) {
+        Optional<Property> payload = profile.properties().values().stream().findFirst();
+        return payload.map(Property::value);
     }
 
     public static String getTextureUrl(GameProfile profile) {

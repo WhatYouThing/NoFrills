@@ -30,13 +30,13 @@ import static nofrills.Main.mc;
 public final class CommandKeybinds {
     public static final Feature instance = new Feature("customKeybinds");
 
-    public static final SettingBool allowInGui = new SettingBool(false, "allowInGui", instance.key());
+    public static final SettingBool allowAllInGui = new SettingBool(false, "allowInGui", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
-        Settings.Toggle allowInGuiToggle = new Settings.Toggle("Allow in GUI", allowInGui, "Allow keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
-        list.add(allowInGuiToggle);
+        Settings.Toggle allowAllInGuiToggle = new Settings.Toggle("Allow All in GUI", allowAllInGui, "Allow all keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
+        list.add(allowAllInGuiToggle);
         Settings.BigButton button = new Settings.BigButton("Add New Keybind", btn -> {
             data.edit(object -> {
                 if (!object.has("binds")) {
@@ -47,6 +47,7 @@ public final class CommandKeybinds {
                 obj.addProperty("key", GLFW.GLFW_KEY_UNKNOWN);
                 obj.addProperty("command", "");
                 obj.addProperty("enabled", true);
+                obj.addProperty("allowInGui", false);
                 obj.addProperty("modifier", Modifier.Any.name());
                 obj.addProperty("islandFilter", "");
                 object.get("binds").getAsJsonArray().add(obj);
@@ -70,8 +71,8 @@ public final class CommandKeybinds {
         return settings;
     }
 
-    private static boolean isValidScreen() {
-        if (allowInGui.value() && mc.currentScreen instanceof HandledScreen) {
+    private static boolean isValidScreen(boolean allowBindInGui) {
+        if ((allowAllInGui.value() || allowBindInGui) && mc.currentScreen instanceof HandledScreen) {
             return !(mc.currentScreen instanceof AnvilScreen);
         }
         return mc.currentScreen == null;
@@ -98,11 +99,14 @@ public final class CommandKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && isValidScreen()) {
+        if (instance.isActive()) {
             if (data.value().has("binds")) {
                 for (JsonElement entry : data.value().get("binds").getAsJsonArray()) {
                     JsonObject bind = entry.getAsJsonObject();
                     if (!bind.has("enabled") || !bind.get("enabled").getAsBoolean()) {
+                        continue;
+                    }
+                    if (!isValidScreen(bind.has("allowInGui") && bind.get("allowInGui").getAsBoolean())) {
                         continue;
                     }
                     if (bind.get("key").getAsInt() != event.key) {
@@ -201,6 +205,21 @@ public final class CommandKeybinds {
             return layout;
         }
 
+        public FlowLayout buildAllowInGuiSetting() {
+            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+            layout.padding(Insets.of(5));
+            layout.horizontalAlignment(HorizontalAlignment.LEFT);
+            PlainLabel label = new PlainLabel(Text.literal("Allow in GUI"));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            ToggleButton allowInGuiToggle = new ToggleButton(this.getData().has("allowInGui") && this.getData().get("allowInGui").getAsBoolean());
+            allowInGuiToggle.sizing(Sizing.fixed(50), Sizing.fixed(20));
+            allowInGuiToggle.tooltip(Text.literal("Allow this keybind to work while any container GUI (inventory/chest/furnace/etc.) is open."));
+            allowInGuiToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("allowInGui", toggle)));
+            layout.child(label);
+            layout.child(allowInGuiToggle);
+            return layout;
+        }
+
         public FlowLayout buildKeybindSetting() {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
@@ -250,6 +269,7 @@ public final class CommandKeybinds {
         public CommandKeybindsSettings buildKeybindSettings() {
             List<FlowLayout> list = new ArrayList<>();
             list.add(this.buildCommandInputSetting());
+            list.add(this.buildAllowInGuiSetting());
             list.add(this.buildKeybindSetting());
             list.add(this.buildModifierSetting());
             list.add(this.buildIslandFilterSetting());

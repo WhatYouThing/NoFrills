@@ -30,21 +30,19 @@ public class RecipeLookup {
                 Slot focused = Utils.getFocusedSlot();
                 if (focused != null) {
                     ItemStack stack = focused.getStack();
+                    if (stack.isEmpty()) return;
                     String itemId = Utils.getSkyblockId(stack);
                     if (!itemId.isEmpty()) {
-                        if (itemId.contains("GENERATOR")) {
-                            int index = itemId.lastIndexOf("_");
-                            Utils.sendMessage("/recipe " + itemId.substring(0, index));
-                        } else if (itemId.equals("PET")) {
+                        if (itemId.equals("PET")) {
                             NbtCompound data = Utils.getCustomData(stack);
+                            if (!data.contains("petInfo")) return;
                             JsonObject petData = JsonParser.parseString(data.getString("petInfo").orElse("")).getAsJsonObject();
-                            String petName = petData.get("type").getAsString().replaceAll("_", " ");
-                            Utils.sendMessage("/recipe " + petName);
+                            Utils.sendMessage("/recipe " + Utils.uppercaseFirst(Utils.toLower(petData.get("type").getAsString()), true));
                         } else {
-                            Utils.sendMessage("/recipe " + itemId);
+                            Utils.sendMessage("/viewrecipe " + itemId);
                         }
                         event.cancel();
-                    } else if (!stack.isEmpty() && mc.currentScreen.getTitle().getString().startsWith("Museum")) {
+                    } else if (mc.currentScreen.getTitle().getString().startsWith("Museum")) {
                         String entryName = Utils.toPlain(stack.getName());
                         if (entryName.endsWith("Armor") || entryName.endsWith("Set") || entryName.endsWith("Equipment")) {
                             String[] words = entryName.split(" ");

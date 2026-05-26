@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.command.CommandRegistryAccess;
@@ -20,6 +21,7 @@ import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.OverlayMsgEvent;
 import nofrills.events.PartyChatMsgEvent;
+import nofrills.events.WorldRenderEvent;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.*;
 import nofrills.features.fishing.MuteDrake;
@@ -89,6 +91,11 @@ public class Main implements ModInitializer {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             DungeonMap.mapTexture = new NativeImageBackedTexture("NoFrills Dungeon Map", 128, 128, true);
             client.getTextureManager().registerTexture(Identifier.of("nofrills", "dungeon_map_texture"), DungeonMap.mapTexture);
+        });
+
+        WorldRenderEvents.END_MAIN.register(event -> {
+            eventBus.post(new WorldRenderEvent(mc.getRenderTickCounter(), event.gameRenderer().getCamera(), event.matrices(), event.worldState()));
+            WorldRenderEvent.immediate.draw();
         });
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {

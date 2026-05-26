@@ -52,14 +52,12 @@ public class WorldRenderEvent {
     public RenderTickCounter tickCounter;
     public Camera camera;
     public MatrixStack matrices;
-    public WorldRenderer.Gizmos gizmos;
     public WorldRenderState state;
 
-    public WorldRenderEvent(RenderTickCounter tickCounter, Camera camera, MatrixStack matrices, WorldRenderer.Gizmos gizmos, WorldRenderState state) {
+    public WorldRenderEvent(RenderTickCounter tickCounter, Camera camera, MatrixStack matrices, WorldRenderState state) {
         this.tickCounter = tickCounter;
         this.camera = camera;
         this.matrices = matrices;
-        this.gizmos = gizmos;
         this.state = state;
     }
 

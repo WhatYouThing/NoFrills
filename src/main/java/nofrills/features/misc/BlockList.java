@@ -9,10 +9,11 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import nofrills.config.Config;
+import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.GameShutdownEvent;
 import nofrills.events.PlayerJoinedEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.Utils;
@@ -20,8 +21,6 @@ import nofrills.misc.Utils;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -38,33 +37,11 @@ public class BlockList {
     public static final SettingBool autoKick = new SettingBool(true, "autoKick", instance);
     public static final SettingBool joinAlert = new SettingBool(false, "joinAlert", instance);
 
-    private static final Path listPath = Config.getFolderPath().resolve("BlockList.json");
-    private static final JsonObject data = loadData();
+    private static final DataFile data = new DataFile("BlockList.json");
     private static final ConcurrentHashMap<String, CachedResult> resultCache = new ConcurrentHashMap<>();
 
-    private static JsonObject loadData() {
-        if (Files.exists(listPath)) {
-            try {
-                return JsonParser.parseString(Files.readString(listPath)).getAsJsonObject();
-            } catch (Exception exception) {
-                LOGGER.error("Unable to load NoFrills Block List file!", exception);
-            }
-        }
-        return new JsonObject();
-    }
-
-    private static void saveData() {
-        Thread.startVirtualThread(() -> {
-            try {
-                Utils.atomicWrite(listPath, data);
-            } catch (Exception exception) {
-                LOGGER.error("Unable to save NoFrills Block List file!", exception);
-            }
-        });
-    }
-
     public static List<JsonObject> getEntries() {
-        return data.asMap().values().stream()
+        return data.get().asMap().values().stream()
                 .map(JsonElement::getAsJsonObject)
                 .sorted(Comparator.comparingLong(object -> object.get("timestamp").getAsLong()))
                 .collect(Collectors.toList());
@@ -106,8 +83,8 @@ public class BlockList {
                 return;
             }
             FetchResult result = res.get();
-            if (data.has(result.uuid())) {
-                JsonObject object = data.get(result.uuid()).getAsJsonObject();
+            if (data.get().has(result.uuid())) {
+                JsonObject object = data.get().get(result.uuid()).getAsJsonObject();
                 object.addProperty("name", result.name());
                 object.addProperty("reason", reason);
                 Utils.infoFormat("§a{} is already blocked, updated the block reason.", result.name());
@@ -116,17 +93,17 @@ public class BlockList {
                 object.addProperty("name", result.name());
                 object.addProperty("reason", reason);
                 object.addProperty("timestamp", Utils.getTimestamp());
-                data.add(result.uuid(), object);
+                data.get().add(result.uuid(), object);
                 Utils.infoFormat("§aSuccessfully added {} to the block list.", result.name());
             }
-            saveData();
+            data.save();
         });
     }
 
     public static void removePlayer(String name) {
-        if (data.entrySet().removeIf(entry -> entry.getValue().getAsJsonObject().get("name").getAsString().equalsIgnoreCase(name))) {
+        if (data.get().entrySet().removeIf(entry -> entry.getValue().getAsJsonObject().get("name").getAsString().equalsIgnoreCase(name))) {
             Utils.infoFormat("§aSuccessfully removed {} from the block list.", name);
-            saveData();
+            data.save();
         } else {
             Utils.infoFormat("§c{} is not on the block list.", name);
         }
@@ -175,8 +152,8 @@ public class BlockList {
         fetchUuid(name, (res) -> {
             if (res.isPresent()) {
                 FetchResult result = res.get();
-                if (data.has(result.uuid())) {
-                    callback.accept(Optional.of(data.get(result.uuid()).getAsJsonObject()));
+                if (data.get().has(result.uuid())) {
+                    callback.accept(Optional.of(data.get().get(result.uuid()).getAsJsonObject()));
                 } else {
                     callback.accept(Optional.empty());
                 }
@@ -210,11 +187,18 @@ public class BlockList {
     private static void onPlayerJoin(PlayerJoinedEvent event) {
         if (instance.isActive() && joinAlert.value() && event.isRealPlayer()) {
             String uuid = event.uuid.toString().replaceAll("-", "");
-            if (data.has(uuid)) {
-                Utils.infoRaw(buildEntryLine(data.get(uuid).getAsJsonObject(),
+            if (data.get().has(uuid)) {
+                Utils.infoRaw(buildEntryLine(data.get().get(uuid).getAsJsonObject(),
                         Utils.format("§c§lDetected a blocked player in this lobby: §r§c{}§r§c§l.", event.entry.getProfile().name()))
                 );
             }
+        }
+    }
+
+    @EventHandler
+    private static void onShutdown(GameShutdownEvent event) {
+        if (instance.isActive()) {
+            data.saveBlocking();
         }
     }
 

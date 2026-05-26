@@ -31,7 +31,10 @@ import nofrills.misc.Utils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
 import static nofrills.Main.mc;
@@ -264,11 +267,9 @@ public final class ShardTracker {
             return new Shard(msg, 1, ShardSource.TreeGift);
         }
         if (msg.startsWith("You bought ") && msg.endsWith("!")) {
-            msg = Utils.toLower(msg.replace("You bought ", "").replace("!", "").trim());
-            for (HashSet<String> set : ShardData.shardSetList) {
-                if (set.contains(msg)) {
-                    return new Shard(msg, 1, ShardSource.Bought);
-                }
+            msg = msg.replace("You bought ", "").replace("!", "").trim();
+            if (!ShardData.getShardSkill(msg).isEmpty()) {
+                return new Shard(msg, 1, ShardSource.Bought);
             }
         }
         return null;
@@ -297,7 +298,7 @@ public final class ShardTracker {
         if (instance.isActive() && !event.messagePlain.isEmpty() && Utils.isInSkyblock()) {
             Shard shard = getShardFromMsg(event.messagePlain.trim());
             if (shard != null && data.value().has("shards")) {
-                if (shard.source.equals(ShardSource.Absorbed) && ShardData.fishingShards.contains(shard.name)) {
+                if (shard.source.equals(ShardSource.Absorbed) && ShardData.getShardSkill(shard.name).equals("Fishing")) {
                     return;
                 }
                 JsonObject tracked = getTrackedShard(shard.name);

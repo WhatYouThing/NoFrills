@@ -1,225 +1,16 @@
 package nofrills.misc;
 
-import com.google.common.collect.Sets;
+import com.google.gson.JsonObject;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
+import nofrills.config.DataFile;
+import nofrills.events.GameShutdownEvent;
+import nofrills.events.SlotUpdateEvent;
 
-import java.util.HashSet;
 import java.util.List;
 
 public class ShardData {
-    // shards that come from treasure catches, they can randomly go the inventory instead of hunting box and cannot be trusted
-    public static final HashSet<String> fishingShards = Sets.newHashSet(
-            "azure",
-            "cod",
-            "verdant",
-            "salmon",
-            "piranha",
-            "abyssal lanternfish",
-            "silentdepth",
-            "inferno koi",
-            "shinyfish"
-    );
-    public static final HashSet<String> commonShards = Sets.newHashSet(
-            "grove",
-            "mist",
-            "flash",
-            "phanpyre",
-            "cod",
-            "phanflare",
-            "night squid",
-            "lapis zombie",
-            "hideonleaf",
-            "verdant",
-            "chill",
-            "bogged",
-            "voracious spider",
-            "hideongift",
-            "birries",
-            "tank zombie",
-            "crow",
-            "tadgang",
-            "zealot",
-            "coralot",
-            "harpy",
-            "mudworm",
-            "golden ghoul",
-            "azure",
-            "bezal",
-            "yog",
-            "boreal owl",
-            "newt",
-            "miner zombie",
-            "cretan bull"
-    );
-    public static final HashSet<String> uncommonShards = Sets.newHashSet(
-            "bramble",
-            "tide",
-            "quake",
-            "sparrow",
-            "goldfin",
-            "troglobyte",
-            "hideoncave",
-            "salamander",
-            "cuboa",
-            "pest",
-            "mossybit",
-            "rain slime",
-            "seer",
-            "heron",
-            "obsidian defender",
-            "salmon",
-            "viper",
-            "praying mantis",
-            "zombie soldier",
-            "bambuleaf",
-            "sycophant",
-            "seagull",
-            "ent",
-            "soul of the alpha",
-            "mochibear",
-            "magma slug",
-            "flaming spider",
-            "kiwi",
-            "bruiser",
-            "stridersurfer",
-            "rana",
-            "termite"
-    );
-    public static final HashSet<String> rareShards = Sets.newHashSet(
-            "sylvan",
-            "cascade",
-            "bolt",
-            "bambloom",
-            "toad",
-            "glacite walker",
-            "beaconmite",
-            "lizard king",
-            "python",
-            "invisibug",
-            "piranha",
-            "hideongeon",
-            "lapis skeleton",
-            "cropeetle",
-            "drowned",
-            "star sentry",
-            "hideondra",
-            "abyssal lanternfish",
-            "arachne",
-            "bitbug",
-            "revenant",
-            "silentdepth",
-            "skeletor",
-            "thyst",
-            "quartzfang",
-            "hideonring",
-            "snowfin",
-            "kada knight",
-            "carrot king",
-            "wither specter",
-            "matcho",
-            "ladybug",
-            "lumisquid",
-            "crocodile",
-            "bullfrog",
-            "dreadwing",
-            "joydive",
-            "stalagmight",
-            "fungloom",
-            "eel",
-            "king cobra",
-            "lava flame",
-            "draconic",
-            "falcon",
-            "inferno koi",
-            "wither",
-            "gecko",
-            "hummingbird",
-            "minotaur"
-    );
-    public static final HashSet<String> epicShards = Sets.newHashSet(
-            "terra",
-            "cryo",
-            "aero",
-            "pandarai",
-            "leviathan",
-            "alligator",
-            "fenlord",
-            "basilisk",
-            "iguana",
-            "moray eel",
-            "lunar moth",
-            "fire eel",
-            "bal",
-            "hideonsack",
-            "water hydra",
-            "flare",
-            "loch emperor",
-            "prince",
-            "komodo dragon",
-            "mimic",
-            "shellwise",
-            "barbarian duke x",
-            "toucan",
-            "hellwisp",
-            "caiman",
-            "firefly",
-            "sea serpent",
-            "ghost",
-            "xyz",
-            "leatherback",
-            "cavernshade",
-            "dragonfly",
-            "king minos",
-            "sphinx",
-            "littlefoot"
-    );
-    public static final HashSet<String> legendaryShards = Sets.newHashSet(
-            "tenebris",
-            "blizzard",
-            "tempest",
-            "chameleon",
-            "tiamat",
-            "wyvern",
-            "tortoise",
-            "end stone protector",
-            "naga",
-            "lapis creeper",
-            "wartybug",
-            "spike",
-            "kraken",
-            "taurus",
-            "daemon",
-            "moltenfish",
-            "shinyfish",
-            "ananke",
-            "hideonbox",
-            "lord jawbus",
-            "burningsoul",
-            "cinderbat",
-            "megalith",
-            "power dragon",
-            "condor",
-            "sun fish",
-            "apex dragon",
-            "dodo",
-            "jormung",
-            "etherdrake",
-            "galaxy fish",
-            "molthorn",
-            "starborn",
-            "titanoboa",
-            "thorn",
-            "scarf",
-            "nessie"
-    );
-
-    public static final List<HashSet<String>> shardSetList = List.of(
-            legendaryShards,
-            epicShards,
-            rareShards,
-            uncommonShards,
-            commonShards
-    );
+    private static final DataFile data = new DataFile("ShardData.json");
 
     public static String getId(ItemStack stack) {
         if (isShard(stack)) {
@@ -236,22 +27,28 @@ public class ShardData {
     }
 
     public static String parseId(String name) {
-        for (HashSet<String> set : shardSetList) {
-            for (String shard : set) {
-                if (name.equals(shard) || name.startsWith(shard + " ")) {
-                    return switch (shard) {
-                        case "cinderbat" -> "SHARD_CINDER_BAT";
-                        case "abyssal lanternfish" -> "SHARD_ABYSSAL_LANTERN";
-                        case "stridersurfer" -> "SHARD_STRIDER_SURFER";
-                        case "bogged" -> "SHARD_SEA_ARCHER";
-                        case "loch emperor" -> "SHARD_SEA_EMPEROR";
-                        case "end stone protector" -> "SHARD_ENDSTONE_PROTECTOR";
-                        default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
-                    };
-                }
+        for (String shard : data.get().keySet()) {
+            if (name.equals(shard) || name.startsWith(shard + " ")) {
+                return switch (shard) {
+                    case "cinderbat" -> "SHARD_CINDER_BAT";
+                    case "abyssal lanternfish" -> "SHARD_ABYSSAL_LANTERN";
+                    case "stridersurfer" -> "SHARD_STRIDER_SURFER";
+                    case "bogged" -> "SHARD_SEA_ARCHER";
+                    case "loch emperor" -> "SHARD_SEA_EMPEROR";
+                    case "end stone protector" -> "SHARD_ENDSTONE_PROTECTOR";
+                    default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
+                };
             }
         }
         return "";
+    }
+
+    public static String getShardSkill(String name) {
+        return data.get().has(name) ? data.get().get(name).getAsJsonObject().get("skill").getAsString() : "";
+    }
+
+    public static String getShardRarity(String name) {
+        return data.get().has(name) ? data.get().get(name).getAsJsonObject().get("rarity").getAsString() : "";
     }
 
     private static boolean isShard(ItemStack stack) {
@@ -281,27 +78,78 @@ public class ShardData {
     private static String getSource(ItemStack stack) {
         for (String line : Utils.getLoreLines(stack)) {
             if (line.startsWith("Source: ") && line.contains(" Shard")) {
-                return Utils.toLower(line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1));
+                return line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1);
             }
         }
         return "";
     }
 
+    private static void addToCache(String source, String skill, String rarity) {
+        JsonObject object = new JsonObject();
+        object.addProperty("skill", skill);
+        object.addProperty("rarity", rarity);
+        data.get().add(Utils.toLower(source), object);
+    }
+
     public static String getColorPrefix(String shard) {
-        if (legendaryShards.contains(shard)) return "§6";
-        if (epicShards.contains(shard)) return "§5";
-        if (rareShards.contains(shard)) return "§9";
-        if (uncommonShards.contains(shard)) return "§a";
-        if (commonShards.contains(shard)) return "§f";
-        return "§7";
+        String rarity = getShardRarity(shard);
+        return switch (rarity) {
+            case "LEGENDARY" -> "§6";
+            case "EPIC" -> "§5";
+            case "RARE" -> "§9";
+            case "UNCOMMON" -> "§a";
+            case "COMMON" -> "§f";
+            default -> "§7";
+        };
     }
 
     public static int getColorHex(String shard) {
-        if (legendaryShards.contains(shard)) return 0xffffaa00;
-        if (epicShards.contains(shard)) return 0xffaa00aa;
-        if (rareShards.contains(shard)) return 0xff5555ff;
-        if (uncommonShards.contains(shard)) return 0xff55ff55;
-        if (commonShards.contains(shard)) return 0xffffffff;
-        return 0xffaaaaaa;
+        String rarity = getShardRarity(shard);
+        return switch (rarity) {
+            case "LEGENDARY" -> 0xffffaa00;
+            case "EPIC" -> 0xffaa00aa;
+            case "RARE" -> 0xff5555ff;
+            case "UNCOMMON" -> 0xff55ff55;
+            case "COMMON" -> 0xffffffff;
+            default -> 0xffaaaaaa;
+        };
+    }
+
+    @EventHandler
+    private static void onSlotUpdate(SlotUpdateEvent event) {
+        if (event.stack.isEmpty() || event.isInventory) return;
+        if (event.title.equals("Hunting Box")) {
+            List<String> lines = Utils.getLoreLines(event.stack);
+            if (lines.stream().noneMatch(line -> line.startsWith("Owned: ") && line.contains(" Shard"))) return;
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.contains(" (") && !line.contains(" (ID ") && line.endsWith(")")) {
+                    addToCache(
+                            Utils.toPlain(event.stack.getName()),
+                            line.substring(line.indexOf("(") + 1, line.indexOf(")")),
+                            lines.getLast().substring(0, lines.getLast().indexOf(" "))
+                    );
+                    break;
+                }
+            }
+        } else if (event.title.equals("Attribute Menu")) {
+            List<String> lines = Utils.getLoreLines(event.stack);
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.startsWith("Source: ") && line.contains(" Shard") && line.endsWith(")")) {
+                    addToCache(
+                            line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1),
+                            lines.getFirst(),
+                            lines.get(i + 1).substring(line.indexOf(":") + 2)
+                    );
+                    break;
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onShutdown(GameShutdownEvent event) {
+        data.saveBlocking();
     }
 }

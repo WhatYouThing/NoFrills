@@ -10,7 +10,7 @@ public class AutoSave {
 
     public static void save() {
         if (hash != Config.getHash()) {
-            Config.saveAsync();
+            Config.save();
             hash = Config.getHash();
         }
     }

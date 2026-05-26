@@ -28,12 +28,12 @@ public class Config {
                 LOGGER.error("Unable to load NoFrills config file!", exception);
             }
         } else {
-            save();
+            saveBlocking();
         }
         computeHash();
     }
 
-    public static void save() {
+    public static void saveBlocking() {
         try {
             Utils.atomicWrite(filePath, data);
         } catch (Exception exception) {
@@ -41,8 +41,8 @@ public class Config {
         }
     }
 
-    public static void saveAsync() {
-        Thread.startVirtualThread(Config::save);
+    public static void save() {
+        Thread.startVirtualThread(Config::saveBlocking);
     }
 
     public static int getHash() {

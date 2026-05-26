@@ -118,6 +118,7 @@ public class Main implements ModInitializer {
         eventBus.registerLambdaFactory(MOD_ID, (lookupInMethod, glass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, glass, MethodHandles.lookup()));
 
         eventBus.subscribe(SkyblockData.class);
+        eventBus.subscribe(ShardData.class);
         eventBus.subscribe(SlotOptions.class);
         eventBus.subscribe(EntityCache.class);
         eventBus.subscribe(NoFrillsAPI.class);

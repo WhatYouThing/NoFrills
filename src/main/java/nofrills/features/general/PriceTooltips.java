@@ -1,31 +1,24 @@
 package nofrills.features.general;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import nofrills.config.Config;
+import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
+import nofrills.events.GameShutdownEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
-import static nofrills.Main.LOGGER;
 import static nofrills.misc.NoFrillsAPI.*;
 
 public class PriceTooltips {
@@ -38,41 +31,7 @@ public class PriceTooltips {
     public static final SettingInt burgers = new SettingInt(0, "burgers", instance.key());
     public static final SettingBool pricePaid = new SettingBool(false, "pricePaid", instance);
 
-    private static final Path paidPath = Config.getFolderPath().resolve("PricePaid.json");
-    private static final JsonObject data = loadData();
-
-    private static JsonObject loadData() {
-        if (Files.exists(paidPath)) {
-            try {
-                return JsonParser.parseString(Files.readString(paidPath)).getAsJsonObject();
-            } catch (Exception exception) {
-                LOGGER.error("Unable to load NoFrills Price Paid file!", exception);
-            }
-        }
-        return new JsonObject();
-    }
-
-    private static void saveData() {
-        Thread.startVirtualThread(() -> {
-            try {
-                JsonObject parent = Config.get().has(instance.key()) ? Config.get().get(instance.key()).getAsJsonObject() : null;
-                if (parent != null && parent.has("paidData")) {
-                    JsonObject oldData = parent.get("paidData").getAsJsonObject();
-                    if (oldData.has("prices")) {
-                        for (Map.Entry<String, JsonElement> entry : oldData.get("prices").getAsJsonObject().entrySet()) {
-                            data.addProperty(entry.getKey(), entry.getValue().getAsLong());
-                        }
-                    }
-                } // automatically converts from old to 0.4.11+ price paid data storage format
-                Utils.atomicWrite(paidPath, data);
-                if (parent != null && parent.remove("paidData") != null) {
-                    Config.save();
-                }
-            } catch (Exception exception) {
-                LOGGER.error("Unable to save NoFrills Price Paid file!", exception);
-            }
-        });
-    }
+    private static final DataFile data = new DataFile("PricePaid.json");
 
     public static int getStackQuantity(ItemStack stack) {
         for (String line : Utils.getLoreLines(stack)) {
@@ -119,12 +78,10 @@ public class PriceTooltips {
     }
 
     private static String getPurchasedUUID(ScreenHandler handler) {
-        if (handler instanceof GenericContainerScreenHandler containerHandler) {
-            for (Slot slot : Utils.getContainerSlots(containerHandler)) {
-                NbtCompound data = Utils.getCustomData(slot.getStack());
-                if (data != null && data.contains("uuid")) {
-                    return data.getString("uuid", "");
-                }
+        for (Slot slot : Utils.getContainerSlots(handler)) {
+            NbtCompound data = Utils.getCustomData(slot.getStack());
+            if (data != null && data.contains("uuid")) {
+                return data.getString("uuid", "");
             }
         }
         return "";
@@ -179,8 +136,8 @@ public class PriceTooltips {
             }
             if (pricePaid.value() && event.customData != null && event.customData.contains("uuid")) {
                 String uuid = event.customData.getString("uuid", "");
-                if (!uuid.isEmpty() && data.has(uuid)) {
-                    event.addLine(buildLine("§ePrice Paid", data.get(uuid).getAsLong(), 1));
+                if (!uuid.isEmpty() && data.get().has(uuid)) {
+                    event.addLine(buildLine("§ePrice Paid", data.get().get(uuid).getAsLong(), 1));
                 }
             }
         }
@@ -196,9 +153,16 @@ public class PriceTooltips {
             long cost = getPurchasedCost(stack);
             String uuid = getPurchasedUUID(event.handler);
             if (cost > 0L && !uuid.isEmpty()) {
-                data.addProperty(uuid, cost);
-                saveData();
+                data.get().addProperty(uuid, cost);
+                data.save();
             }
+        }
+    }
+
+    @EventHandler
+    private static void onShutdown(GameShutdownEvent event) {
+        if (instance.isActive()) {
+            data.saveBlocking();
         }
     }
 }

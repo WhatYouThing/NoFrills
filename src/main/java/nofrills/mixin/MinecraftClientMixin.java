@@ -97,7 +97,8 @@ public abstract class MinecraftClientMixin {
 
     @Inject(method = "stop", at = @At("HEAD"))
     private void beforeStop(CallbackInfo ci) {
-        Config.save();
+        eventBus.post(new GameShutdownEvent());
+        Config.saveBlocking();
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiler/Profiler;swap(Ljava/lang/String;)V", args = "ldc=yield"))

@@ -19,7 +19,7 @@ import org.joml.Vector4f;
 import static nofrills.Main.mc;
 
 public class WorldRenderEvent {
-    public static final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(2048));
+    public static final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(0));
 
     private static final RenderPipeline DEBUG_FILLED_BOX_NO_CULL_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
@@ -49,13 +49,12 @@ public class WorldRenderEvent {
                     .build()
     );
 
-    public RenderTickCounter tickCounter;
+    public RenderTickCounter tickCounter = mc.getRenderTickCounter();
     public Camera camera;
     public MatrixStack matrices;
     public WorldRenderState state;
 
-    public WorldRenderEvent(RenderTickCounter tickCounter, Camera camera, MatrixStack matrices, WorldRenderState state) {
-        this.tickCounter = tickCounter;
+    public WorldRenderEvent(Camera camera, MatrixStack matrices, WorldRenderState state) {
         this.camera = camera;
         this.matrices = matrices;
         this.state = state;

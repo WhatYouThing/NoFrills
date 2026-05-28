@@ -14,10 +14,8 @@ public class ShardData {
 
     public static String getId(ItemStack stack) {
         if (isShard(stack)) {
-            String name = Utils.toPlain(stack.getName());
             String source = getSource(stack);
-            String shardName = Utils.toLower(!source.isEmpty() ? source : name);
-            return parseId(shardName);
+            return getId(!source.isEmpty() ? source : Utils.toPlain(stack.getName()));
         }
         return "";
     }

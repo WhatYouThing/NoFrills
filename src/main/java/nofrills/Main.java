@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.texture.NativeImageBackedTexture;
 import net.minecraft.command.CommandRegistryAccess;
@@ -21,7 +20,6 @@ import nofrills.config.Config;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.OverlayMsgEvent;
 import nofrills.events.PartyChatMsgEvent;
-import nofrills.events.WorldRenderEvent;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.*;
 import nofrills.features.fishing.MuteDrake;
@@ -93,18 +91,11 @@ public class Main implements ModInitializer {
             client.getTextureManager().registerTexture(Identifier.of("nofrills", "dungeon_map_texture"), DungeonMap.mapTexture);
         });
 
-        WorldRenderEvents.END_MAIN.register(event -> {
-            eventBus.post(new WorldRenderEvent(mc.getRenderTickCounter(), event.gameRenderer().getCamera(), event.matrices(), event.worldState()));
-            WorldRenderEvent.immediate.draw();
-        });
-
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             String msg = Utils.toPlain(message);
-
             if (overlay) {
                 return !eventBus.post(new OverlayMsgEvent(message, msg)).isCancelled();
             }
-
             boolean cancelled = eventBus.post(new ChatMsgEvent(message, msg)).isCancelled();
             if (msg.startsWith("Party > ") && msg.contains(": ")) {
                 int nameStart = msg.contains("]") & msg.indexOf("]") < msg.indexOf(":") ? msg.indexOf("]") : msg.indexOf(">");

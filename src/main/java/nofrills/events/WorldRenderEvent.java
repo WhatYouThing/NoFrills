@@ -143,6 +143,17 @@ public class WorldRenderEvent {
         mc.textRenderer.draw(text, -mc.textRenderer.getWidth(text) / 2f, 1.0f, color.argb, true, matrices, immediate, throughWalls ? TextRenderer.TextLayerType.SEE_THROUGH : TextRenderer.TextLayerType.NORMAL, 0, LightmapTextureManager.MAX_LIGHT_COORDINATE);
     }
 
+    public void drawDistanceScaledText(Vec3d pos, Text text, float baseScale, float scaling, boolean throughWalls, RenderColor color) {
+        double dist = this.camera.getCameraPos().distanceTo(pos);
+        float distScale = (float) (1 + dist * scaling);
+        float scale = Math.max(baseScale * distScale, baseScale);
+        this.drawText(pos, text, scale, throughWalls, color);
+    }
+
+    public void drawDistanceScaledText(Vec3d pos, Text text, float baseScale, boolean throughWalls, RenderColor color) {
+        this.drawDistanceScaledText(pos, text, baseScale, 0.1f, throughWalls, color);
+    }
+
     public void drawBeam(Vec3d pos, int height, boolean throughWalls, RenderColor color) {
         this.drawFilled(Box.of(pos, 0.5, 0, 0.5).stretch(0, height, 0), throughWalls, color);
     }

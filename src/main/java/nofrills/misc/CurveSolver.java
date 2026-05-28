@@ -6,13 +6,30 @@ import net.minecraft.util.math.Vec3d;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static nofrills.Main.mc;
 
 public class CurveSolver {
     private final List<Vec3d> particleList = new ArrayList<>();
     private final PolynomialFitter3D fitter3D = new PolynomialFitter3D();
-    private Vec3d lastPos = null;
+    private final int activeDuration;
+    private final int clearDuration;
+    private final double arriveDistance;
+    private Vec3d solvedPos = null;
+    private Vec3d startPos = null;
+    private int activeTicks = 0;
+    private int clearTicks = 0;
+
+    public CurveSolver(int activeTicks, int clearTicks, double arriveDistance) {
+        this.activeDuration = activeTicks;
+        this.clearDuration = clearTicks;
+        this.arriveDistance = arriveDistance;
+    }
+
+    public CurveSolver() {
+        this(40, 2400, 16.0);
+    }
 
     private double[][] arrayPush(double[][] target, double[] value) {
         int length = target.length;
@@ -21,34 +38,63 @@ public class CurveSolver {
         return array;
     }
 
+    public void start() {
+        this.resetFitter();
+        this.activeTicks = this.activeDuration;
+        this.clearTicks = this.clearDuration;
+        this.startPos = mc.player.getEyePos();
+    }
+
+    public void tick() {
+        if (this.activeTicks > 0) {
+            this.activeTicks -= 1;
+            if (this.activeTicks == 0) {
+                this.resetFitter();
+            }
+        }
+        if (this.clearTicks > 0) {
+            this.clearTicks -= 1;
+            if (this.clearTicks == 0) {
+                this.clear();
+            }
+        }
+        if (this.solvedPos != null && this.solvedPos.distanceTo(mc.player.getEntityPos()) < this.arriveDistance) {
+            this.solvedPos = null;
+        }
+    }
+
+    public boolean active() {
+        return this.activeTicks > 0;
+    }
+
     public void addPos(Vec3d pos) {
         this.fitter3D.addPoint(this.particleList.size(), pos);
         this.particleList.add(pos);
+        this.activeTicks = this.activeDuration;
+        this.clearTicks = this.clearDuration;
         if (this.particleList.size() > 3) {
-            this.lastPos = solve();
+            this.solvedPos = solve();
         }
     }
 
     public double getLastDist(Vec3d pos) {
-        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) : mc.player.getEyePos().distanceTo(pos);
+        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) : this.startPos.distanceTo(pos);
     }
 
-    public boolean isWithinDist(Vec3d pos, double eyeDist, double lastDist) {
-        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) <= lastDist : mc.player.getEyePos().distanceTo(pos) <= eyeDist;
-    }
-
-    public Vec3d getSolvedPos() {
-        return this.lastPos;
-    }
-
-    public void resetSolvedPos() {
-        this.lastPos = null;
+    public Optional<Vec3d> getSolvedPos() {
+        return this.solvedPos != null ? Optional.of(this.solvedPos) : Optional.empty();
     }
 
     public void resetFitter() {
         this.particleList.clear();
         this.fitter3D.clear();
-        this.resetSolvedPos();
+    }
+
+    public void clear() {
+        this.resetFitter();
+        this.solvedPos = null;
+        this.activeTicks = 0;
+        this.clearTicks = 0;
     }
 
     private double calculateT(double[] vec) {

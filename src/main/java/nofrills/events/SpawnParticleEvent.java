@@ -2,6 +2,7 @@ package nofrills.events;
 
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
 import net.minecraft.particle.ParticleType;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 
 public final class SpawnParticleEvent extends Cancellable {
@@ -20,5 +21,9 @@ public final class SpawnParticleEvent extends Cancellable {
         return this.type.equals(type) && this.packet.getCount() == count && this.packet.getSpeed() == (float) speed
                 && this.packet.getOffsetX() == (float) offsetX && this.packet.getOffsetY() == (float) offsetY
                 && this.packet.getOffsetZ() == (float) offsetZ;
+    }
+
+    public boolean isCurveParticle() {
+        return this.matchParameters(ParticleTypes.ENCHANT, 10, -2.0f, 0.0f, 0.0f, 0.0f);
     }
 }

@@ -51,6 +51,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.entity.SimpleEntityLookup;
+import nofrills.events.InputEvent;
 import nofrills.mixin.BossBarHudAccessor;
 import nofrills.mixin.HandledScreenAccessor;
 import nofrills.mixin.PlayerListHudAccessor;
@@ -364,28 +365,12 @@ public class Utils {
         return getOtherEntities(from, Box.of(from.getEntityPos(), dist, dist, dist), filter);
     }
 
-    public static float getTextScale(double dist, float base, float scaling) {
-        float distScale = (float) (1 + dist * scaling);
-        return Math.max(base * distScale, base);
-    }
-
-    public static float getTextScale(double dist, float base) {
-        return getTextScale(dist, base, 0.1f);
-    }
-
-    public static float getTextScale(Vec3d pos, float base, float scaling) {
-        if (mc.player != null) {
-            return getTextScale(mc.player.getEntityPos().distanceTo(pos), base, scaling);
-        }
-        return 0.0f;
-    }
-
-    public static float getTextScale(Vec3d pos, float base) {
-        return getTextScale(pos, base, 0.1f);
-    }
-
     public static boolean matchesKey(KeyBinding binding, KeyInput keyInput, MouseInput mouseInput) {
         return (keyInput != null && binding.matchesKey(keyInput)) || (mouseInput != null && binding.matchesMouse(new Click(0, 0, mouseInput)));
+    }
+
+    public static boolean matchesKey(KeyBinding binding, InputEvent event) {
+        return matchesKey(binding, event.keyInput, event.mouseInput);
     }
 
     public static boolean matchesKey(KeyBinding binding, KeyInput keyInput) {
@@ -578,8 +563,25 @@ public class Utils {
     }
 
     public static Optional<String> getTexturePayload(GameProfile profile) {
-        Optional<Property> payload = profile.properties().values().stream().findFirst();
-        return payload.map(Property::value);
+        for (Property property : profile.properties().values()) {
+            if (property.name().equals("textures")) {
+                return Optional.of(property.value());
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static boolean hasTexturePayload(ItemStack stack, int payloadHashCode) {
+        GameProfile profile = getTextures(stack);
+        if (profile != null) {
+            Optional<String> payload = getTexturePayload(profile);
+            return payload.isPresent() && payload.get().hashCode() == payloadHashCode;
+        }
+        return false;
+    }
+
+    public static boolean hasTexturePayload(ItemStack stack, String payload) {
+        return hasTexturePayload(stack, payload.hashCode());
     }
 
     public static String getTextureUrl(GameProfile profile) {
@@ -773,7 +775,7 @@ public class Utils {
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
     public static HitResult raycastFullBlock(Entity entity, double maxDistance, float tickDelta) {
-        Vec3d height = entity.getLerpedPos(tickDelta).add(0, isOnModernIsland() ? 1.27 : 1.54, 0);
+        Vec3d height = entity.getLerpedPos(tickDelta).add(0, isOnModernIsland() ? entity.getEyeHeight(entity.getPose()) : 1.54, 0);
         Vec3d camPos = entity.getCameraPosVec(tickDelta);
         Vec3d rot = entity.getRotationVec(tickDelta);
         Vec3d pos = new Vec3d(camPos.getX(), height.getY(), camPos.getZ());

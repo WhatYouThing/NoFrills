@@ -7,7 +7,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -38,19 +37,14 @@ public class HoppitySolver {
             "e5e36165819fd2850f98552edcd763ff986313119283c126ace0c4cc495e76a8"
     );
     private static SlopEgg currentEgg = null;
-    private static int ticks = 0;
 
     private static boolean isHoldingEgglocator() {
         return Utils.getSkyblockId(Utils.getHeldItem()).equals("EGGLOCATOR");
     }
 
-    private static boolean isEgglocatorParticle(SpawnParticleEvent event) {
-        return event.matchParameters(ParticleTypes.ENCHANT, 10, -2.0f, 0.0f, 0.0f, 0.0f);
-    }
-
     private static boolean isEgg(Entity entity) {
         if (entity instanceof ArmorStandEntity stand) {
-            ItemStack helmet = Utils.getEntityArmor(stand).getFirst();
+            ItemStack helmet = Utils.getEntityHelmet(stand);
             if (helmet.getItem().equals(Items.PLAYER_HEAD)) {
                 GameProfile textures = Utils.getTextures(helmet);
                 for (String texture : textureList) {
@@ -64,20 +58,12 @@ public class HoppitySolver {
     }
 
     private static boolean isSlopSeason() {
-        if (instance.isActive()) {
-            for (String line : SkyblockData.getLines()) {
-                if (line.startsWith("Spring") || line.startsWith("Early Spring") || line.startsWith("Late Spring")) {
-                    return true;
-                }
+        for (String line : SkyblockData.getLines()) {
+            if (line.startsWith("Spring") || line.startsWith("Early Spring") || line.startsWith("Late Spring")) {
+                return true;
             }
         }
         return false;
-    }
-
-    private static void onLocatingStart() {
-        currentEgg = null;
-        solver.resetFitter();
-        ticks = 40;
     }
 
     private static void eggInteract(Entity entity) {
@@ -89,47 +75,49 @@ public class HoppitySolver {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (isSlopSeason() && isEgglocatorParticle(event) && ticks > 0 && solver.getLastDist(event.pos) <= 5.0) {
+        if (instance.isActive() && event.isCurveParticle() && solver.active() && solver.getLastDist(event.pos) <= 5.0 && isSlopSeason()) {
             solver.addPos(event.pos);
-            Vec3d solved = solver.getSolvedPos();
-            if (solved != null) {
+            solver.getSolvedPos().ifPresent(solved -> {
                 if (currentEgg != null && !currentEgg.guess && currentEgg.getBox().getCenter().distanceTo(solved) <= 5.0) {
                     return;
                 }
                 currentEgg = new SlopEgg(solved, true);
-            }
+            });
         }
     }
 
     @EventHandler
     private static void onUseItem(InteractItemEvent event) {
-        if (isSlopSeason() && isHoldingEgglocator()) onLocatingStart();
+        if (instance.isActive() && isSlopSeason() && isHoldingEgglocator()) {
+            solver.start();
+        }
     }
 
     @EventHandler
     private static void onUseBlock(InteractBlockEvent event) {
-        if (isSlopSeason() && isHoldingEgglocator()) onLocatingStart();
+        if (instance.isActive() && isSlopSeason() && isHoldingEgglocator()) {
+            solver.start();
+        }
     }
 
     @EventHandler
     private static void onInteractEntity(InteractEntityEvent event) {
-        if (isSlopSeason()) eggInteract(event.entity);
+        if (instance.isActive() && isSlopSeason()) {
+            eggInteract(event.entity);
+        }
     }
 
     @EventHandler
     private static void onAttackEntity(AttackEntityEvent event) {
-        if (isSlopSeason()) eggInteract(event.entity);
+        if (instance.isActive() && isSlopSeason()) {
+            eggInteract(event.entity);
+        }
     }
 
     @EventHandler
     private static void onTick(ServerTickEvent event) {
-        if (isSlopSeason()) {
-            if (ticks > 0) {
-                ticks--;
-                if (ticks == 0) {
-                    solver.resetFitter();
-                }
-            }
+        if (instance.isActive() && isSlopSeason()) {
+            solver.tick();
             if (currentEgg != null && currentEgg.guess) {
                 List<Entity> nearest = Utils.getOtherEntities(null, currentEgg.getBox().expand(2.0), HoppitySolver::isEgg);
                 if (!nearest.isEmpty()) {
@@ -141,13 +129,12 @@ public class HoppitySolver {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (isSlopSeason() && currentEgg != null) {
+        if (instance.isActive() && currentEgg != null && isSlopSeason()) {
             Box box = currentEgg.getBox();
             Vec3d textPos = box.getCenter().add(0.0, 1.0, 0.0);
             Text label = currentEgg.guess ? Text.literal("Guess") : Text.literal("Egg");
-            float scale = Utils.getTextScale(textPos, 0.05f);
             event.drawFilled(box, true, color.value());
-            event.drawText(textPos, label, scale, true, color.valueWithAlpha(1.0f));
+            event.drawDistanceScaledText(textPos, label, 0.05f, true, color.valueWithAlpha(1.0f));
             if (tracer.value()) {
                 event.drawTracer(box.getCenter(), tracerColor.value());
             }
@@ -157,8 +144,7 @@ public class HoppitySolver {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         currentEgg = null;
-        solver.resetFitter();
-        ticks = 0;
+        solver.clear();
     }
 
     public static class SlopEgg {

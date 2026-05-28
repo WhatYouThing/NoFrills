@@ -1,7 +1,6 @@
 package nofrills.features.general;
 
 import com.google.common.collect.Sets;
-import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -170,8 +169,7 @@ public class NoRender {
                         if (soulweaverSkulls.value() && entity instanceof ArmorStandEntity stand && Utils.isInDungeons()) {
                             ItemStack helmet = Utils.getEntityHelmet(stand);
                             if (helmet.getItem().equals(Items.PLAYER_HEAD)) {
-                                GameProfile profile = Utils.getTextures(helmet);
-                                return profile != null && Utils.getTexturePayload(profile).orElse("").hashCode() == -1020507406;
+                                return Utils.hasTexturePayload(helmet, -1020507406);
                             }
                         }
                         return false;

@@ -360,7 +360,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Diana Solver", DianaSolver.instance, "Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.", new Settings(List.of(
                                 new Settings.Separator("Burrows"),
-                                new Settings.Dropdown<>("Guess Mode", DianaSolver.guessMode, "Which spade particle to use for calculating the burrow position.\nThis option shouldn't have any difference in most cases."),
                                 new Settings.Toggle("Guess Tracer", DianaSolver.guessTracer, "Draws a tracer towards the guessed burrow."),
                                 new Settings.ColorPicker("Tracer Color", DianaSolver.guessTracerColor, "The color of the guessed burrow tracer."),
                                 new Settings.ColorPicker("Guess Color", DianaSolver.guessColor, "The color of the guessed burrow beacon."),

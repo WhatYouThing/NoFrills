@@ -2,16 +2,12 @@ package nofrills.features.farming;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
-import nofrills.events.InputEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.SpawnParticleEvent;
-import nofrills.events.WorldRenderEvent;
+import nofrills.events.*;
 import nofrills.misc.CurveSolver;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -36,61 +32,48 @@ public class VacuumSolver {
             "INFINI_VACUUM",
             "INFINI_VACUUM_HOOVERIUS"
     );
-    private static Vec3d currentPos = null;
-    private static int ticks = 0;
 
     private static boolean isHoldingVacuum() {
         return hooverStore.contains(Utils.getSkyblockId(Utils.getHeldItem()));
     }
 
-    private static boolean isVacuumParticle(SpawnParticleEvent event) {
-        return event.matchParameters(ParticleTypes.ENCHANT, 10, -2.0f, 0.0f, 0.0f, 0.0f);
-    }
-
-    private static void onVacuumStart() {
-        currentPos = null;
-        solver.resetFitter();
-        ticks = 40;
-    }
-
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (instance.isActive() && isVacuumParticle(event) && ticks > 0 && solver.getLastDist(event.pos) <= 5.0) {
+        if (instance.isActive() && solver.active() && event.isCurveParticle() && solver.getLastDist(event.pos) <= 5.0) {
             solver.addPos(event.pos);
-            if (solver.getSolvedPos() != null) {
-                currentPos = solver.getSolvedPos();
-            }
         }
     }
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && Utils.matchesKey(mc.options.attackKey, event.keyInput, event.mouseInput) && event.action == GLFW.GLFW_PRESS) {
-            if (Utils.isInGarden() && isHoldingVacuum()) onVacuumStart();
+        if (instance.isActive() && Utils.matchesKey(mc.options.attackKey, event) && event.action == GLFW.GLFW_PRESS && Utils.isInGarden() && isHoldingVacuum()) {
+            solver.start();
         }
     }
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && currentPos != null) {
-            if (mc.player.getEntityPos().distanceTo(currentPos) <= 16.0) {
-                currentPos = null;
-                return;
-            }
-            Vec3d textPos = currentPos.subtract(0.0, 0.25, 0.0);
-            float scale = Utils.getTextScale(textPos, 0.05f);
-            event.drawBeam(currentPos, 256, true, color.value());
-            event.drawText(textPos, Text.literal("Pest"), scale, true, color.valueWithAlpha(1.0f));
-            if (tracer.value()) {
-                event.drawTracer(currentPos, tracerColor.value());
-            }
+        if (instance.isActive()) {
+            solver.getSolvedPos().ifPresent(pos -> {
+                Vec3d textPos = pos.subtract(0.0, 0.25, 0.0);
+                event.drawBeam(pos, 256, true, color.value());
+                event.drawDistanceScaledText(textPos, Text.literal("Pest"), 0.05f, true, color.valueWithAlpha(1.0f));
+                if (tracer.value()) {
+                    event.drawTracer(pos, tracerColor.value());
+                }
+            });
+        }
+    }
+
+    @EventHandler
+    private static void onServerTick(ServerTickEvent event) {
+        if (instance.isActive()) {
+            solver.tick();
         }
     }
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
-        currentPos = null;
-        solver.resetFitter();
-        ticks = 0;
+        solver.clear();
     }
 }

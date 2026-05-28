@@ -86,7 +86,9 @@ public class Utils {
             "The End",
             "The Park",
             "Crimson Isle",
-            "Jerry's Workshop"
+            "Jerry's Workshop",
+            "Backwater Bayou",
+            "Lotus Atoll"
     );
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",

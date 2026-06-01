@@ -13,15 +13,31 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.World;
 import nofrills.features.general.Fullbright;
 import nofrills.features.general.Viewmodel;
+import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin extends Entity {
+public abstract class LivingEntityMixin extends Entity implements Rendering.GlowRendering {
+
+    @Unique
+    Rendering.GlowParameters nofrills_mod$glowParameters = null;
+
     public LivingEntityMixin(EntityType<?> type, World world) {
         super(type, world);
+    }
+
+    @Override
+    public void nofrills_mod$setGlowingParameters(Rendering.GlowParameters parameters) {
+        this.nofrills_mod$glowParameters = parameters;
+    }
+
+    @Override
+    public Rendering.GlowParameters nofrills_mod$getGlowingParameters() {
+        return this.nofrills_mod$glowParameters;
     }
 
     @Shadow

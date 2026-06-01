@@ -4,12 +4,15 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.entity.state.LivingEntityRenderState;
 import net.minecraft.client.render.state.WorldRenderState;
 import net.minecraft.client.util.ObjectAllocator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import nofrills.events.WorldRenderEvent;
 import nofrills.features.general.NoRender;
+import nofrills.misc.Rendering;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
@@ -46,6 +49,18 @@ public abstract class WorldRendererMixin {
     private boolean onBeforeRenderEntity(boolean original, @Local Entity entity) {
         if (NoRender.instance.isActive() && NoRender.shouldCancelRender(entity)) {
             return false;
+        }
+        return original;
+    }
+
+    @ModifyExpressionValue(method = "fillEntityRenderStates", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/WorldRenderer;getAndUpdateRenderState(Lnet/minecraft/entity/Entity;F)Lnet/minecraft/client/render/entity/state/EntityRenderState;"))
+    private EntityRenderState onFillEntityState(EntityRenderState original, @Local Entity entity) {
+        if (original instanceof LivingEntityRenderState) {
+            Rendering.GlowParameters parameters = ((Rendering.GlowRendering) entity).nofrills_mod$getGlowingParameters();
+            if (parameters != null) {
+                ((Rendering.GlowRendering) original).nofrills_mod$setGlowingParameters(parameters);
+                original.outlineColor = parameters.color().hex;
+            }
         }
         return original;
     }

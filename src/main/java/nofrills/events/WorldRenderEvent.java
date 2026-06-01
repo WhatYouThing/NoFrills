@@ -60,7 +60,7 @@ public class WorldRenderEvent {
         this.state = state;
     }
 
-    private void drawQuad(Vec3d first, Vec3d second, Vec3d third, Vec3d fourth, VertexConsumer consumer, RenderColor color) {
+    public void drawQuad(Vec3d first, Vec3d second, Vec3d third, Vec3d fourth, VertexConsumer consumer, RenderColor color) {
         MatrixStack.Entry entry = this.matrices.peek();
         Vec3d camPos = this.camera.getCameraPos();
         consumer.vertex(entry, (float) (first.getX() - camPos.getX()), (float) (first.getY() - camPos.getY()), (float) (first.getZ() - camPos.getZ())).color(color.argb);
@@ -69,7 +69,7 @@ public class WorldRenderEvent {
         consumer.vertex(entry, (float) (fourth.getX() - camPos.getX()), (float) (fourth.getY() - camPos.getY()), (float) (fourth.getZ() - camPos.getZ())).color(color.argb);
     }
 
-    private void drawLine(Vec3d start, Vec3d end, float width, VertexConsumer consumer, RenderColor color) {
+    public void drawLine(Vec3d start, Vec3d end, float width, VertexConsumer consumer, RenderColor color) {
         MatrixStack.Entry entry = this.matrices.peek();
         Vec3d camPos = this.camera.getCameraPos();
         Vector4f vector4f = new Vector4f().set(start.getX() - camPos.getX(), start.getY() - camPos.getY(), start.getZ() - camPos.getZ(), 1.0);

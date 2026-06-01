@@ -4,6 +4,8 @@ import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.WorldTickEvent;
+import nofrills.misc.RenderColor;
+import nofrills.misc.Rendering;
 
 import static nofrills.Main.mc;
 
@@ -27,6 +29,7 @@ public class AutoSprint {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && mc.player != null) {
+            Rendering.setGlowing(mc.player, false, RenderColor.green);
             if (waterCheck.value() && mc.player.isTouchingWater()) {
                 if (wasSprinting) {
                     setSprinting(false);

@@ -505,7 +505,7 @@ public class Utils {
             }
             case "RUNE", "UNIQUE_RUNE" -> {
                 NbtCompound runeData = data.getCompound("runes").orElse(null);
-                if (runeData != null) {
+                if (runeData != null && !runeData.getKeys().isEmpty()) {
                     String runeId = (String) runeData.getKeys().toArray()[0];
                     return format("{}_{}_RUNE", runeId, runeData.getInt(runeId).orElse(0));
                 }
@@ -513,13 +513,10 @@ public class Utils {
             }
             case "ENCHANTED_BOOK" -> {
                 NbtCompound enchantData = data.getCompound("enchantments").orElse(null);
-                if (enchantData != null) {
-                    Set<String> enchants = enchantData.getKeys();
-                    if (enchants.size() == 1) {
-                        String enchantId = (String) enchantData.getKeys().toArray()[0];
-                        int enchantLevel = enchantData.getInt(enchantId).orElse(0);
-                        return format("ENCHANTMENT_{}_{}", toUpper(enchantId), enchantLevel);
-                    }
+                if (enchantData != null && enchantData.getKeys().size() == 1) {
+                    String enchantId = (String) enchantData.getKeys().toArray()[0];
+                    int enchantLevel = enchantData.getInt(enchantId).orElse(0);
+                    return format("ENCHANTMENT_{}_{}", toUpper(enchantId), enchantLevel);
                 }
                 return "ENCHANTMENT_UNKNOWN";
             }

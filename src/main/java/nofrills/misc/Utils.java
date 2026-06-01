@@ -78,19 +78,6 @@ import static nofrills.Main.*;
 public class Utils {
     public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final HashSet<String> modernIslands = Sets.newHashSet(
-            "Hub",
-            "Galatea",
-            "Gold Mine",
-            "Spider's Den",
-            "The Barn",
-            "The End",
-            "The Park",
-            "Crimson Isle",
-            "Jerry's Workshop",
-            "Backwater Bayou",
-            "Lotus Atoll"
-    );
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",
             "Kuudra",
@@ -280,8 +267,8 @@ public class Utils {
     /**
      * Returns true if the current island is running on a modern Minecraft version and/or running under prediction-based Watchdog.
      */
-    public static boolean isOnModernIsland() {
-        return modernIslands.contains(SkyblockData.getArea());
+    public static boolean isOnModernIsland() { // TODO: clean up features depending on this function
+        return true;
     }
 
     public static boolean isInstanceOver() {
@@ -775,7 +762,7 @@ public class Utils {
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
     public static HitResult raycastFullBlock(Entity entity, double maxDistance, float tickDelta) {
-        Vec3d height = entity.getLerpedPos(tickDelta).add(0, isOnModernIsland() ? entity.getEyeHeight(entity.getPose()) : 1.54, 0);
+        Vec3d height = entity.getLerpedPos(tickDelta).add(0, entity.getStandingEyeHeight(), 0);
         Vec3d camPos = entity.getCameraPosVec(tickDelta);
         Vec3d rot = entity.getRotationVec(tickDelta);
         Vec3d pos = new Vec3d(camPos.getX(), height.getY(), camPos.getZ());

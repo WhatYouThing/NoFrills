@@ -223,6 +223,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(PhantomleafSolver.class);
         eventBus.subscribe(StreamerMode.class);
         eventBus.subscribe(MuteComposter.class);
+        eventBus.subscribe(DupeClassAlert.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMeasuringTimeMs() - start);
     }

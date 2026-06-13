@@ -21,7 +21,7 @@ public final class FishingBobber extends SimpleTextElement {
     public final SettingBool timer = new SettingBool(false, "timer", instance.key());
     public final SettingBool hideHologram = new SettingBool(false, "hideHologram", instance.key());
     public final SettingBool compact = new SettingBool(false, "compact", instance.key());
-    public final EntityCache cache = new EntityCache();
+    public final EntityCache cache = EntityCache.create();
 
     public int timerTicks = 0;
 

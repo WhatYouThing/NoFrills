@@ -938,6 +938,13 @@ public class Utils {
         return string.chars().filter(c -> c <= 127).mapToObj(c -> String.valueOf((char) c)).collect(Collectors.joining());
     }
 
+    public static MutableText toMutable(Text text) {
+        if (text instanceof MutableText mutable) {
+            return mutable;
+        }
+        return text.copy();
+    }
+
     public static Optional<Style> getStyle(Text text, Predicate<String> predicate) {
         return text.visit((textStyle, textString) -> {
             if (predicate.test(textString)) {

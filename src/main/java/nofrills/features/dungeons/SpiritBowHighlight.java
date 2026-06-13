@@ -19,7 +19,7 @@ public class SpiritBowHighlight {
 
     public static final SettingColor color = new SettingColor(RenderColor.fromArgb(0xaaaf00ff), "color", instance.key());
 
-    private static final EntityCache spiritBows = new EntityCache();
+    private static final EntityCache spiritBows = EntityCache.create();
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {

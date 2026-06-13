@@ -20,7 +20,7 @@ public class KeyHighlight {
     public static final SettingColor color = new SettingColor(RenderColor.fromArgb(0x8000ff00), "color", instance.key());
     public static final SettingColor tracerColor = new SettingColor(RenderColor.fromArgb(0xff00ff00), "tracerColor", instance.key());
 
-    private static final EntityCache keyCache = new EntityCache();
+    private static final EntityCache keyCache = EntityCache.create();
 
     private static boolean isKey(String name) {
         return name.equals("Wither Key") || name.equals("Blood Key");

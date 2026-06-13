@@ -18,7 +18,7 @@ public class RareHighlight {
     public static final SettingColor outlineColor = new SettingColor(new RenderColor(255, 170, 0, 255), "color", instance);
     public static final SettingColor fillColor = new SettingColor(new RenderColor(255, 170, 0, 127), "fillColor", instance);
 
-    private static final EntityCache cache = new EntityCache();
+    private static final EntityCache cache = EntityCache.create();
 
     private static boolean isMob(Entity entity) {
         return Utils.isMob(entity) && !cache.has(entity);

@@ -47,7 +47,7 @@ public class ClassNametags {
                 if (!dungeonClass.isEmpty() && color != null) {
                     Vec3d pos = player.getLerpedPos(event.tickCounter.getTickProgress(true)).add(0.0, 3.25, 0.0);
                     MutableText text = Text.literal(Utils.format("§e[{}]§r {}", dungeonClass.substring(0, 1), name));
-                    event.drawText(pos, text, scale.valueFloat() * 0.1f, true, color);
+                    event.drawDistanceScaledText(pos, text, scale.valueFloat() * 0.1f, true, color);
                 }
             }
         }

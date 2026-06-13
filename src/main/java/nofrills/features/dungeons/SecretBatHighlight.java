@@ -17,7 +17,7 @@ public class SecretBatHighlight {
     public static final SettingColor outlineColor = new SettingColor(new RenderColor(85, 255, 85, 255), "color", instance);
     public static final SettingColor fillColor = new SettingColor(new RenderColor(85, 255, 85, 127), "fillColor", instance);
 
-    private static final EntityCache cache = new EntityCache();
+    private static final EntityCache cache = EntityCache.create();
 
     @EventHandler
     private static void onUpdated(EntityUpdatedEvent event) {

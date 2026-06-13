@@ -18,7 +18,7 @@ public class SupplyHighlight {
 
     public static final SettingColor color = new SettingColor(new RenderColor(0, 255, 255, 170), "color", instance);
 
-    private static final EntityCache cache = new EntityCache();
+    private static final EntityCache cache = EntityCache.create();
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {

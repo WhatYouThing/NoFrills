@@ -304,8 +304,8 @@ public class WitherDragons {
                 ),
                 new Box(7, 5, 80, 37, 28, 110)
         );
-        public final EntityCache dragonCache = new EntityCache();
-        public final EntityCache collarCache = new EntityCache();
+        public final EntityCache dragonCache = EntityCache.create();
+        public final EntityCache collarCache = EntityCache.create();
         public String name;
         public int archPriority;
         public int bersPriority;

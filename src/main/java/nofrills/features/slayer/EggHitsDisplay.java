@@ -22,7 +22,7 @@ public class EggHitsDisplay {
     public static final SettingDouble scale = new SettingDouble(0.1, "scale", instance);
 
     private static final Pattern eggRegex = Pattern.compile("[0-9]+s [0-9]+/[0-9]+");
-    private static final EntityCache cache = new EntityCache();
+    private static final EntityCache cache = EntityCache.create();
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {

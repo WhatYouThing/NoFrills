@@ -1,6 +1,7 @@
 package nofrills.misc;
 
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.AbstractSet;
 import java.util.Iterator;
@@ -44,7 +45,7 @@ public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E> {
         this.map.clear();
     }
 
-    public Spliterator<E> spliterator() {
+    public @NonNull Spliterator<E> spliterator() {
         return this.map.keySet().spliterator();
     }
 }

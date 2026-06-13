@@ -19,8 +19,13 @@ public class EntityCache {
 
     private final ConcurrentHashSet<Entity> entities = new ConcurrentHashSet<>();
 
-    public EntityCache() {
-        instances.add(this);
+    private EntityCache() {
+    }
+
+    public static EntityCache create() {
+        EntityCache cache = new EntityCache();
+        instances.add(cache);
+        return cache;
     }
 
     @EventHandler(priority = EventPriority.LOW)

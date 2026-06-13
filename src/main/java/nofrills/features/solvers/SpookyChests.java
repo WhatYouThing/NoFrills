@@ -28,8 +28,8 @@ public class SpookyChests {
     public static final SettingBool tracer = new SettingBool(false, "tracer", instance);
     public static final SettingColor color = new SettingColor(new RenderColor(1.0f, 0.67f, 0.0f, 0.67f), "color", instance);
 
-    private static final EntityCache chestList = new EntityCache();
-    private static final EntityCache clickedList = new EntityCache();
+    private static final EntityCache chestList = EntityCache.create();
+    private static final EntityCache clickedList = EntityCache.create();
 
     private static boolean isSpooky() {
         for (String line : SkyblockData.getLines()) {

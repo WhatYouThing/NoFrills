@@ -16,7 +16,7 @@ public class CinderbatHighlight {
 
     public static final SettingColor color = new SettingColor(RenderColor.fromHex(0x00ff00), "color", instance.key());
 
-    private static final EntityCache cinderbatList = new EntityCache();
+    private static final EntityCache cinderbatList = EntityCache.create();
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {

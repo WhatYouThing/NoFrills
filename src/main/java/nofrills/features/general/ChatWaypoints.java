@@ -125,7 +125,7 @@ public class ChatWaypoints {
                 }
                 RenderColor color = waypoint.party ? partyColor.value() : allColor.value();
                 event.drawFilledWithBeam(waypoint.box, 256, true, color);
-                event.drawText(waypoint.box.getCenter().add(0, 1, 0), waypoint.name, 0.05f, true, RenderColor.white);
+                event.drawDistanceScaledText(waypoint.box.getCenter().add(0, 1, 0), waypoint.name, 0.05f, true, RenderColor.white);
             }
         }
     }

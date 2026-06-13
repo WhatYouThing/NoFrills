@@ -35,7 +35,7 @@ public class LividSolver {
     public static final SettingColor tracerColor = new SettingColor(RenderColor.fromArgb(0xff00ff00), "tracerColor", instance);
 
     private static final HashMap<Block, Livid> lividData = buildLividData();
-    private static final EntityCache lividCache = new EntityCache();
+    private static final EntityCache lividCache = EntityCache.create();
     private static String currentName = "";
 
     private static boolean isActive() {

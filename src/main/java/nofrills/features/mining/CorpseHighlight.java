@@ -38,7 +38,7 @@ public class CorpseHighlight {
     public static final SettingColor vanguardOutline = new SettingColor(new RenderColor(255, 85, 255, 255), "vanguardOutline", instance);
     public static final SettingColor vanguardFill = new SettingColor(new RenderColor(255, 85, 255, 127), "vanguardFill", instance);
 
-    private static final EntityCache cache = new EntityCache();
+    private static final EntityCache cache = EntityCache.create();
     private static final HashSet<Integer> openedCorpses = new HashSet<>();
 
     private static boolean isActive() {

@@ -4,12 +4,12 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
 import net.minecraft.util.DyeColor;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.config.SettingColor;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.SlotClickEvent;
@@ -26,11 +26,19 @@ import java.util.List;
 public class TerminalSolvers {
     public static final Feature instance = new Feature("terminalSolvers");
 
-    public static final SettingBool panes = new SettingBool(false, "panes", instance.key());
-    public static final SettingBool startsWith = new SettingBool(false, "startsWith", instance.key());
-    public static final SettingBool select = new SettingBool(false, "select", instance.key());
-    public static final SettingBool inOrder = new SettingBool(false, "inOrder", instance.key());
-    public static final SettingBool colors = new SettingBool(false, "colors", instance.key());
+    public static final SettingBool panes = new SettingBool(false, "panes", instance);
+    public static final SettingColor panesColor = new SettingColor(RenderColor.fromArgb(0xff5ca0bf), "panesColor", instance);
+    public static final SettingBool startsWith = new SettingBool(false, "startsWith", instance);
+    public static final SettingColor startsWithColor = new SettingColor(RenderColor.fromArgb(0xff5ca0bf), "startsWithColor", instance);
+    public static final SettingBool select = new SettingBool(false, "select", instance);
+    public static final SettingColor selectColor = new SettingColor(RenderColor.fromArgb(0xff5ca0bf), "selectColor", instance);
+    public static final SettingBool inOrder = new SettingBool(false, "inOrder", instance);
+    public static final SettingColor inOrderColorFirst = new SettingColor(RenderColor.fromArgb(0xff5ca0bf), "inOrderColorFirst", instance);
+    public static final SettingColor inOrderColorSecond = new SettingColor(RenderColor.fromArgb(0xff45788f), "inOrderColorSecond", instance);
+    public static final SettingColor inOrderColorThird = new SettingColor(RenderColor.fromArgb(0xff2e505f), "inOrderColorThird", instance);
+    public static final SettingBool colors = new SettingBool(false, "colors", instance);
+    public static final SettingColor colorsColorFirst = new SettingColor(RenderColor.fromArgb(0xff5ca0bf), "colorsColorFirst", instance);
+    public static final SettingColor colorsColorSecond = new SettingColor(RenderColor.fromArgb(0xff45788f), "colorsColorSecond", instance);
 
     private static final List<Item> colorsOrder = List.of(
             Items.GREEN_STAINED_GLASS_PANE,
@@ -39,10 +47,11 @@ public class TerminalSolvers {
             Items.RED_STAINED_GLASS_PANE,
             Items.BLUE_STAINED_GLASS_PANE
     );
-    private static final List<ItemStack> optionStacks = List.of(SlotOptions.FIRST, SlotOptions.SECOND, SlotOptions.THIRD);
-    private static final RenderColor colorFirst = RenderColor.fromArgb(0xff5ca0bf);
-    private static final RenderColor colorSecond = new RenderColor(colorFirst.r * 0.75f, colorFirst.g * 0.75f, colorFirst.b * 0.75f, colorFirst.a);
-    private static final RenderColor colorThird = new RenderColor(colorFirst.r * 0.5f, colorFirst.g * 0.5f, colorFirst.b * 0.5f, colorFirst.a);
+    private static final List<ItemStack> optionStacks = List.of(
+            SlotOptions.FIRST,
+            SlotOptions.SECOND,
+            SlotOptions.THIRD
+    );
     private static int lastSyncId = -1;
 
     public static TerminalType getTerminalType(String title) {
@@ -103,7 +112,7 @@ public class TerminalSolvers {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("7") && !event.isInventory && event.slot != null) {
+        if (instance.isActive() && !event.isInventory && event.slot != null && Utils.isOnDungeonFloor("7")) {
             TerminalType type = getTerminalType(event.title);
             if (!isTypeEnabled(type)) return;
             if (type.equals(TerminalType.Panes)) {
@@ -188,7 +197,7 @@ public class TerminalSolvers {
 
     @EventHandler
     private static void onSlotClick(SlotClickEvent event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("7") && event.slot != null && event.handler.syncId != lastSyncId) {
+        if (instance.isActive() && event.slot != null && event.handler.syncId != lastSyncId && Utils.isOnDungeonFloor("7")) {
             TerminalType type = getTerminalType(event.title);
             if (!isTypeEnabled(type)) return;
             lastSyncId = event.handler.syncId;
@@ -197,7 +206,7 @@ public class TerminalSolvers {
                 case InOrder -> {
                     ItemStack spoofed = SlotOptions.getSpoofed(event.slot);
                     int count = spoofed.getCount();
-                    for (Slot slot : Utils.getContainerSlots((GenericContainerScreenHandler) event.handler)) {
+                    for (Slot slot : Utils.getContainerSlots(event.handler)) {
                         ItemStack slotStack = slot.getStack();
                         int slotCount = slotStack.getCount();
                         if (slotStack.getItem().equals(Items.RED_STAINED_GLASS_PANE) && slotCount > count) {
@@ -242,14 +251,20 @@ public class TerminalSolvers {
             if (!isTypeEnabled(type)) return;
             switch (type) {
                 case Panes, StartsWith, Select -> {
-                    for (Slot slot : Utils.getContainerSlots((GenericContainerScreenHandler) event.handler)) {
+                    for (Slot slot : Utils.getContainerSlots(event.handler)) {
                         if (SlotOptions.isSpoofed(slot) && !SlotOptions.isDisabled(slot)) {
-                            event.drawFill(slot.id, colorFirst);
+                            RenderColor color = switch (type) {
+                                case Panes -> panesColor.value();
+                                case StartsWith -> startsWithColor.value();
+                                case Select -> selectColor.value();
+                                default -> RenderColor.white;
+                            };
+                            event.drawFill(slot.id, color);
                         }
                     }
                 }
                 case InOrder -> {
-                    for (Slot slot : Utils.getContainerSlots((GenericContainerScreenHandler) event.handler)) {
+                    for (Slot slot : Utils.getContainerSlots(event.handler)) {
                         if (SlotOptions.isSpoofed(slot)) {
                             ItemStack spoofed = SlotOptions.getSpoofed(slot);
                             if (spoofed.getItem().equals(SlotOptions.BACKGROUND.getItem())) continue;
@@ -257,9 +272,9 @@ public class TerminalSolvers {
                             for (int i = 0; i < optionStacks.size(); i++) {
                                 if (item.equals(optionStacks.get(i).getItem())) {
                                     event.drawFill(slot.id, switch (i) {
-                                        case 0 -> colorFirst;
-                                        case 1 -> colorSecond;
-                                        default -> colorThird;
+                                        case 0 -> inOrderColorFirst.value();
+                                        case 1 -> inOrderColorSecond.value();
+                                        default -> inOrderColorThird.value();
                                     });
                                 }
                             }
@@ -268,15 +283,15 @@ public class TerminalSolvers {
                     }
                 }
                 case Colors -> {
-                    for (Slot slot : Utils.getContainerSlots((GenericContainerScreenHandler) event.handler)) {
+                    for (Slot slot : Utils.getContainerSlots(event.handler)) {
                         if (SlotOptions.isSpoofed(slot) && !SlotOptions.isDisabled(slot)) {
                             ItemStack spoofed = SlotOptions.getSpoofed(slot);
                             String count = String.valueOf(spoofed.getCount());
                             if (spoofed.getItem().equals(SlotOptions.FIRST.getItem())) {
-                                event.drawFill(slot.id, colorFirst);
+                                event.drawFill(slot.id, colorsColorFirst.value());
                                 event.drawLabel(slot.id, Text.literal(count));
                             } else {
-                                event.drawFill(slot.id, colorSecond);
+                                event.drawFill(slot.id, colorsColorSecond.value());
                                 event.drawLabel(slot.id, Text.literal("-" + count));
                             }
                         }

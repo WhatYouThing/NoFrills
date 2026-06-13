@@ -66,7 +66,7 @@ public class SecretChime {
             "TREASURE_TALISMAN",
             "REVIVE_STONE"
     );
-    private static final EntityCache entityCache = new EntityCache();
+    private static final EntityCache entityCache = EntityCache.create();
     private static final int[] essenceUUID = new int[]{-520885975, -2036449846, -1794878266, 1726902051};
     private static boolean clickedThisTick = false;
 

@@ -16,7 +16,7 @@ public class MimicMessage {
 
     public static final SettingString msg = new SettingString("/pc Mimic Killed!", "msg", instance);
 
-    private static final EntityCache cache = new EntityCache();
+    private static final EntityCache cache = EntityCache.create();
     private static boolean mimicKilled = false;
 
     private static void processDeath() {

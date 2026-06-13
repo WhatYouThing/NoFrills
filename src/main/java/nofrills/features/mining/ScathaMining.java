@@ -21,7 +21,7 @@ public class ScathaMining {
     public static final SettingBool alert = new SettingBool(false, "alert", instance.key());
     public static final SettingBool cooldown = new SettingBool(false, "cooldown", instance.key());
 
-    private static final EntityCache wormsCache = new EntityCache();
+    private static final EntityCache wormsCache = EntityCache.create();
     private static int spawnCooldown = 0;
 
     private static boolean active() {

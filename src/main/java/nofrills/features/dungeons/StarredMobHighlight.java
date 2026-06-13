@@ -23,7 +23,7 @@ public class StarredMobHighlight {
     public static final SettingColor outlineColor = new SettingColor(RenderColor.fromArgb(0xff00ffff), "color", instance);
     public static final SettingColor fillColor = new SettingColor(RenderColor.fromHex(0x00ffff, 0.5f), "fillColor", instance);
 
-    private static final EntityCache cache = new EntityCache();
+    private static final EntityCache cache = EntityCache.create();
 
     private static boolean isDungeonMob(Entity entity) {
         if (entity instanceof ArmorStandEntity) {

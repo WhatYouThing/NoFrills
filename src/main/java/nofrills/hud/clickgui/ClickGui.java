@@ -191,7 +191,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Dropdown<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommands: !warp | !w"),
                                 new Settings.Dropdown<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves (or another player) to party leader on demand.\n\nCommands: !ptme | !pt"),
                                 new Settings.Dropdown<>("All Invite", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand.\n\nCommand: !allinv"),
-                                new Settings.Toggle("Downtime", PartyCommands.downtime, "Allows party members to schedule a downtime reminder for the end of your Kuudra/Dungeons run.\nThis command will also pause Auto Requeue automatically.\n\nCommand: !dt"),
+                                new Settings.Toggle("Downtime", PartyCommands.downtime, "Allows party members to schedule a downtime reminder for the end of your Kuudra/Dungeons run.\n\nCommand: !dt"),
                                 new Settings.Dropdown<>("Instance Queue", PartyCommands.queue, Utils.format("Allows party members to queue for any instance on demand.\n\nCommand List: {}", PartyCommands.listInstancesFormatted())),
                                 new Settings.Dropdown<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords"),
                                 new Settings.Dropdown<>("Kick", PartyCommands.kick, "Allows party members to kick specific players on demand.\n\nCommands: !kick | !k")
@@ -466,10 +466,18 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Terminal Solvers", TerminalSolvers.instance, "Solves terminals and prevents wrong clicks in F7/M7. Also hides item tooltips in every terminal.", new Settings(List.of(
                                 new Settings.Toggle("Solve Panes", TerminalSolvers.panes, "Solves the \"Correct all panes\" terminal."),
+                                new Settings.ColorPicker("Panes Color", TerminalSolvers.panesColor, "The button color used in the Panes terminal."),
                                 new Settings.Toggle("Solve In Order", TerminalSolvers.inOrder, "Solves the \"Click in order\" Among Us task."),
+                                new Settings.ColorPicker("In Order First Color", TerminalSolvers.inOrderColorFirst, "The first button color used in the In Order terminal."),
+                                new Settings.ColorPicker("In Order Second Color", TerminalSolvers.inOrderColorSecond, "The second button color used in the In Order terminal."),
+                                new Settings.ColorPicker("In Order Third Color", TerminalSolvers.inOrderColorThird, "The third button color used in the In Order terminal."),
                                 new Settings.Toggle("Solve Starts With", TerminalSolvers.startsWith, "Solves the \"What starts with\" terminal."),
+                                new Settings.ColorPicker("Starts With Color", TerminalSolvers.startsWithColor, "The button color used in the Starts With terminal."),
                                 new Settings.Toggle("Solve Select", TerminalSolvers.select, "Solves the \"Select all\" terminal."),
-                                new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal.")
+                                new Settings.ColorPicker("Select Color", TerminalSolvers.selectColor, "The button color used in the Select terminal."),
+                                new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal."),
+                                new Settings.ColorPicker("Colors First Color", TerminalSolvers.colorsColorFirst, "The left click button color used in the Colors terminal."),
+                                new Settings.ColorPicker("Colors Second Color", TerminalSolvers.colorsColorSecond, "The right click button color used in the Colors terminal.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.", new Settings(List.of(
                                 new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text."),

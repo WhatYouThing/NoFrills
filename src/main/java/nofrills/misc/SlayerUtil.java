@@ -27,10 +27,10 @@ public class SlayerUtil {
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
     private static final Predicate<Entity> predicate = entity -> entity.isAlive() && Utils.isMob(entity);
-    private static final EntityCache spawnerCache = new EntityCache();
-    private static final EntityCache timerCache = new EntityCache();
-    private static final EntityCache nameCache = new EntityCache();
-    private static final EntityCache bossCache = new EntityCache();
+    private static final EntityCache spawnerCache = EntityCache.create();
+    private static final EntityCache timerCache = EntityCache.create();
+    private static final EntityCache nameCache = EntityCache.create();
+    private static final EntityCache bossCache = EntityCache.create();
     public static boolean bossAlive = false;
     public static SlayerBoss currentBoss = null;
 

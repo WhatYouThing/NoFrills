@@ -24,7 +24,7 @@ public class KuudraUtil {
             "Shoot Ballista at",
             "Mine Kuudra's pods"
     );
-    private static final EntityCache kuudraCache = new EntityCache();
+    private static final EntityCache kuudraCache = EntityCache.create();
     private static PickupSpot preSpot = null;
     private static Phase currentPhase = Phase.Starting;
 

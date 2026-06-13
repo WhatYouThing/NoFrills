@@ -24,7 +24,7 @@ public class DupeClassAlert {
                 if (pattern.matcher(line).matches()) {
                     String prefix = line.substring(line.indexOf("[") + 1, line.indexOf("]"));
                     if (classes.contains(prefix)) {
-                        HudManager.setCustomTitle("§cDupe Class", 1);
+                        HudManager.setCustomTitle("§cDuplicate Class", 1);
                         break;
                     }
                     classes.add(prefix);

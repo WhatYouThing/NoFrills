@@ -29,7 +29,7 @@ public class BossHighlight {
     public static final SettingColor crystalFill = new SettingColor(RenderColor.fromArgb(0x5500ffff), "crystalFill", instance.key());
     public static final SettingColor crystalOutline = new SettingColor(RenderColor.fromArgb(0xff00ffff), "crystalOutline", instance.key());
 
-    private static final EntityCache blazeCache = new EntityCache();
+    private static final EntityCache blazeCache = EntityCache.create();
     private static final ConcurrentHashMap<Integer, String> attunementMap = new ConcurrentHashMap<>();
 
     @EventHandler

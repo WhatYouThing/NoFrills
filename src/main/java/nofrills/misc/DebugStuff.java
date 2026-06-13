@@ -13,8 +13,11 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
+import nofrills.events.EntityNamedEvent;
 import nofrills.events.PlaySoundEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
@@ -26,8 +29,17 @@ import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
 public class DebugStuff {
-    private static int tickCounter = 0;
+    private static long tickCounter = 0;
     private static boolean logSounds = false;
+    private static boolean logNametags = false;
+
+    private static void print(MutableText text) {
+        Utils.infoRaw(text.setStyle(text.getStyle().withHoverEvent(new HoverEvent.ShowText(Text.literal("at tick: " + tickCounter)))));
+    }
+
+    private static void print(String message, Object... values) {
+        print(Text.literal(Utils.format(message, values)));
+    }
 
     public static void dumpHeadTextures() {
         List<EquipmentSlot> searchedSlots = List.of(
@@ -124,19 +136,34 @@ public class DebugStuff {
         }
     }
 
+    public static void toggleLogNametags() {
+        logNametags = !logNametags;
+        if (logNametags) {
+            Utils.info("Nametag logging enabled.");
+        } else {
+            Utils.info("Nametag logging disabled.");
+        }
+    }
+
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
         if (logSounds) {
-            Utils.infoFormat("Sound event: x: {}, y: {}, z: {}, volume: {}, pitch: {}, category: {}, identifier: {}, at tick: {}",
-                    event.pos.getX(),
-                    event.pos.getY(),
-                    event.pos.getZ(),
+            print("sound: {}, category: {}, volume: {}, pitch: {}, x: {}, y: {}, z: {}",
+                    event.packet.getSound().value().id(),
+                    event.packet.getCategory().getName(),
                     event.volume(),
                     event.pitch(),
-                    event.packet.getCategory().getName(),
-                    event.packet.getSound().getIdAsString(),
-                    tickCounter
+                    event.pos.getX(),
+                    event.pos.getY(),
+                    event.pos.getZ()
             );
+        }
+    }
+
+    @EventHandler
+    private static void onNamed(EntityNamedEvent event) {
+        if (logNametags) {
+            print(Utils.toMutable(event.name));
         }
     }
 

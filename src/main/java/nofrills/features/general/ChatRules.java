@@ -10,17 +10,16 @@ import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import nofrills.config.Config;
 import nofrills.config.Feature;
 import nofrills.config.SettingJson;
 import nofrills.events.ChatMsgEvent;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.Settings;
-import nofrills.hud.clickgui.components.EnumButton;
-import nofrills.hud.clickgui.components.FlatTextbox;
-import nofrills.hud.clickgui.components.PlainLabel;
-import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.hud.clickgui.components.*;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -353,7 +352,22 @@ public class ChatRules {
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Component.literal("Sound"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            FlatTextbox inputSound = new FlatTextbox(Sizing.fixed(150));
+            ValidatorFlatTextbox inputSound = new ValidatorFlatTextbox(Sizing.fixed(150));
+            inputSound.setValidator(obj -> {
+                String text = obj.getValue();
+                Identifier identifier = Identifier.tryParse(text);
+                SoundManager soundManager = mc.getSoundManager();
+                if (text.isEmpty() || identifier == null) {
+                    obj.borderColor = 0xff5ca0bf;
+                    return true;
+                } else if (soundManager.getSoundEvent(identifier) == null) {
+                    obj.borderColor = 0xffbf5a5a;
+                    return false;
+                } else {
+                    obj.borderColor = 0xff5abf5a;
+                    return true;
+                }
+            });
             inputSound.text(this.getData().get("sound").getAsString());
             inputSound.tooltip(Component.literal("The sound identifier to play if the rule matches. Leave blank to disable."));
             inputSound.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("sound", value)));

@@ -25,4 +25,15 @@ public class TooltipRenderEvent {
         } catch (UnsupportedOperationException ignored) {
         }
     }
+
+    public static final class Before extends Cancellable {
+        public ItemStack stack;
+        public String title;
+
+        public Before(ItemStack stack, String title) {
+            this.setCancelled(false);
+            this.stack = stack;
+            this.title = title;
+        }
+    }
 }

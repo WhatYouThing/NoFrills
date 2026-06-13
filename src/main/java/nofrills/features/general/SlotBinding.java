@@ -20,6 +20,7 @@ import net.minecraft.text.Text;
 import nofrills.config.*;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenRenderEvent;
+import nofrills.events.TooltipRenderEvent;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.misc.RenderColor;
@@ -45,10 +46,6 @@ public final class SlotBinding {
 
     private static final BoundSlot emptySlot = new BoundSlot(-1);
     public static BoundSlot lastSlot = emptySlot;
-
-    public static boolean isBinding() {
-        return instance.isActive() && lastSlot.isValid();
-    }
 
     public static List<BoundSlot> getHotbarSlots() {
         List<BoundSlot> list = new ArrayList<>();
@@ -258,6 +255,13 @@ public final class SlotBinding {
                 event.drawBorder(focused.id, binding.value());
                 event.drawLine(lastSlot.id, event.focusedSlot.id, lineWidth.value(), binding.value());
             }
+        }
+    }
+
+    @EventHandler
+    private static void onBeforeTooltip(TooltipRenderEvent.Before event) {
+        if (instance.isActive() && lastSlot.isValid()) {
+            event.cancel();
         }
     }
 

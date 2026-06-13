@@ -17,12 +17,9 @@ import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.features.dungeons.LeapOverlay;
-import nofrills.features.dungeons.TerminalSolvers;
 import nofrills.features.general.NoRender;
-import nofrills.features.general.SlotBinding;
 import nofrills.features.tweaks.MiddleClickFix;
 import nofrills.features.tweaks.MiddleClickOverride;
-import nofrills.misc.ScreenOptions;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
@@ -30,20 +27,18 @@ import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static nofrills.Main.eventBus;
 
 @Mixin(HandledScreen.class)
-public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen implements ScreenOptions {
+public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen {
     @Shadow
     @Nullable
     protected Slot focusedSlot;
@@ -54,16 +49,9 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     protected int y;
     @Shadow
     protected int x;
-    @Unique
-    List<LeapOverlay.LeapButton> leapButtons = new ArrayList<>();
 
     protected HandledScreenMixin(Text title) {
         super(title);
-    }
-
-    @Override
-    public void nofrills_mod$addLeapButton(LeapOverlay.LeapTarget target) {
-        leapButtons.add(new LeapOverlay.LeapButton(target, leapButtons.size()));
     }
 
     @WrapOperation(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", ordinal = 1))
@@ -108,8 +96,11 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     }
 
     @Inject(method = "drawMouseoverTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/DrawContext;drawTooltip(Lnet/minecraft/client/font/TextRenderer;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/util/Identifier;)V"), cancellable = true)
-    private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci) {
-        if (TerminalSolvers.shouldHideTooltips(this.title.getString()) || NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isDisabled(focusedSlot) || SlotBinding.isBinding()) {
+    private void onDrawTooltip(DrawContext context, int x, int y, CallbackInfo ci, @Local ItemStack itemStack) {
+        if (eventBus.post(new TooltipRenderEvent.Before(itemStack, this.getTitle().getString())).isCancelled()) {
+            ci.cancel();
+        }
+        if (NoRender.shouldHideTooltip(focusedSlot, this.title.getString()) || SlotOptions.isDisabled(focusedSlot)) {
             ci.cancel();
         }
     }
@@ -149,7 +140,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (LeapOverlay.isLeapMenu(this.title.getString())) {
-            for (LeapOverlay.LeapButton button : leapButtons) {
+            for (LeapOverlay.LeapButton button : LeapOverlay.getLeapButtons()) {
                 button.render(context, mouseX, mouseY, delta);
             }
             ci.cancel();
@@ -184,7 +175,7 @@ public abstract class HandledScreenMixin<T extends ScreenHandler> extends Screen
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
         if (LeapOverlay.isLeapMenu(this.title.getString()) && click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
-            for (LeapOverlay.LeapButton leapButton : leapButtons) {
+            for (LeapOverlay.LeapButton leapButton : LeapOverlay.getLeapButtons()) {
                 if (leapButton.isHovered(click.x(), click.y())) {
                     leapButton.click(this.handler);
                     cir.setReturnValue(true);

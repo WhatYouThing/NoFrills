@@ -3,16 +3,22 @@ package nofrills.features.dungeons;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
+import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
 import nofrills.config.*;
+import nofrills.events.InputEvent;
+import nofrills.events.ScreenCloseEvent;
 import nofrills.events.ScreenOpenEvent;
-import nofrills.misc.*;
+import nofrills.misc.DungeonUtil;
+import nofrills.misc.RenderColor;
+import nofrills.misc.Rendering;
+import nofrills.misc.Utils;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,6 +33,10 @@ public class LeapOverlay {
     public static final SettingBool send = new SettingBool(false, "send", instance.key());
     public static final SettingString message = new SettingString("/pc Leaped to {name}!", "message", instance.key());
     public static final SettingDouble scale = new SettingDouble(3.0, "scale", instance.key());
+    public static final SettingKeybind firstKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "firstKey", instance);
+    public static final SettingKeybind secondKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "secondKey", instance);
+    public static final SettingKeybind thirdKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "thirdKey", instance);
+    public static final SettingKeybind fourthKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "fourthKey", instance);
     public static final SettingColor healer = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", instance.key());
     public static final SettingColor mage = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", instance.key());
     public static final SettingColor bers = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", instance.key());
@@ -35,16 +45,21 @@ public class LeapOverlay {
     public static final RenderColor nameColor = RenderColor.fromHex(0xffffff);
     public static final RenderColor deadColor = RenderColor.fromHex(0xaaaaaa);
 
+    private static final List<LeapButton> leapButtons = new ArrayList<>();
     private static final String leapMenuName = "Spirit Leap";
-    protected static boolean sentLeapMsg = false;
+    private static boolean sentLeapMsg = false;
 
     public static boolean isLeapMenu(String title) {
-        return instance.isActive() && Utils.isInDungeons() && title.equals(leapMenuName);
+        return instance.isActive() && title.equals(leapMenuName) && Utils.isInDungeons();
+    }
+
+    public static List<LeapButton> getLeapButtons() {
+        return leapButtons;
     }
 
     @EventHandler
     private static void onScreenOpen(ScreenOpenEvent event) {
-        if (instance.isActive() && event.screen.getTitle().getString().equals(leapMenuName) && Utils.isInDungeons()) {
+        if (isLeapMenu(event.screen.getTitle().getString())) {
             String self = mc.player.getName().getString();
             List<DungeonUtil.Teammate> teammates = DungeonUtil.getAliveTeammates(true);
             List<LeapTarget> targets = new ArrayList<>();
@@ -62,9 +77,29 @@ public class LeapOverlay {
                     targets.add(LeapTarget.empty());
                 }
             }
+            leapButtons.clear();
             sentLeapMsg = false;
             for (LeapTarget target : targets) {
-                ((ScreenOptions) event.screen).nofrills_mod$addLeapButton(target);
+                leapButtons.add(new LeapOverlay.LeapButton(target, leapButtons.size()));
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onScreenClose(ScreenCloseEvent event) {
+        leapButtons.clear();
+    }
+
+    @EventHandler
+    private static void onInput(InputEvent event) {
+        if (mc.currentScreen != null && isLeapMenu(mc.currentScreen.getTitle().getString())) {
+            List<SettingKeybind> leapKeys = List.of(firstKey, secondKey, thirdKey, fourthKey);
+            for (int i = 0; i < leapKeys.size(); i++) {
+                if (leapKeys.get(i).isKey(event.key) && leapButtons.size() >= i + 1) {
+                    leapButtons.get(i).click(((GenericContainerScreen) mc.currentScreen).getScreenHandler());
+                    event.cancel();
+                    return;
+                }
             }
         }
     }
@@ -135,7 +170,7 @@ public class LeapOverlay {
         }
 
         public void click(ScreenHandler handler) {
-            for (Slot slot : Utils.getContainerSlots((GenericContainerScreenHandler) handler)) {
+            for (Slot slot : Utils.getContainerSlots(handler)) {
                 ItemStack stack = slot.getStack();
                 if (!stack.getItem().equals(Items.PLAYER_HEAD)) continue;
                 List<String> lore = Utils.getLoreLines(stack);
@@ -149,7 +184,7 @@ public class LeapOverlay {
                     return;
                 }
             }
-            Utils.infoFormat("§7Could not leap to §f{}§7, the screen might not be built yet and/or the player might be dead.");
+            Utils.infoFormat("§7Could not leap to {}, valid teleport button not found.", this.player.getString());
         }
 
         public void drawText(DrawContext context, Text text, int x, int y, float scale, RenderColor color) {

@@ -10,10 +10,7 @@ import net.minecraft.util.DyeColor;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
-import nofrills.events.ScreenRenderEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.SlotClickEvent;
-import nofrills.events.SlotUpdateEvent;
+import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
@@ -73,14 +70,6 @@ public class TerminalSolvers {
             case Colors -> colors.value();
             case None, Melody -> false;
         };
-    }
-
-    public static boolean isInTerminal(String title) {
-        return !getTerminalType(title).equals(TerminalType.None);
-    }
-
-    public static boolean shouldHideTooltips(String title) {
-        return instance.isActive() && isInTerminal(title);
     }
 
     private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
@@ -302,10 +291,15 @@ public class TerminalSolvers {
     }
 
     @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        if (instance.isActive()) {
-            lastSyncId = -1;
+    private static void onBeforeTooltip(TooltipRenderEvent.Before event) {
+        if (instance.isActive() && !getTerminalType(event.title).equals(TerminalType.None)) {
+            event.cancel();
         }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        lastSyncId = -1;
     }
 
     public enum TerminalType {

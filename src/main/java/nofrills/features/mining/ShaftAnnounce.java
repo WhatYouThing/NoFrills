@@ -85,7 +85,7 @@ public class ShaftAnnounce {
             ticks = 120;
             enteringShaft = false;
         } else {
-            ticks = 0;
+            ticks = -1;
         }
     }
 }

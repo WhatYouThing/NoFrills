@@ -676,9 +676,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Outline Color", EndNodeHighlight.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", EndNodeHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
-                        new Module("Temple Skip", TempleSkip.instance, "Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.\n\nUsage:\n1. Stand on top of the highlighted stone block.\n2. Look straight up at the highlighted bedrock and throw 2 Ender Pearls by holding right click.\n3. Hold jump to enter the temple after you get teleported into the bedrock.", new Settings(List.of(
-                                new Settings.ColorPicker("Color", TempleSkip.color, "The color of the skip highlight.")
-                        ))),
                         new Module("Gemstone Desync Fix", GemstoneDesyncFix.instance, "Fixes adjacent gemstone blocks not correctly updating when mining."),
                         new Module("Break Reset Fix", BreakResetFix.instance, "Fixes item updates resetting your block breaking progress, also known as HSM."),
                         new Module("Shaft Announce", ShaftAnnounce.instance, "Sends a message with the mineshaft ID and the list of corpses upon entering a Glacite Mineshaft.", new Settings(List.of(

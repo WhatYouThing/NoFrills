@@ -172,7 +172,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(CommandKeybinds.class);
         eventBus.subscribe(EndNodeHighlight.class);
         eventBus.subscribe(HotbarSwap.class);
-        eventBus.subscribe(TempleSkip.class);
         eventBus.subscribe(SecretBatHighlight.class);
         eventBus.subscribe(AutoRequeue.class);
         eventBus.subscribe(ShopCleaner.class);

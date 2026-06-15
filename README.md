@@ -264,6 +264,9 @@ you stay safe:
 ## Incompatibilities
 
 - Some highlight features might not render correctly with Iris shaders active.
+- Input boxes in the mod's GUI won't detect any changes with the Caxton mod installed.
+    - The popular Skyblock Enhanced modpack comes with this mod included. Due to the presence of AI generated mods
+      within the pack, it is recommended that you either use different modpack, or create your own mod folder.
 - The mod may not work with third party loaders such as Lunar or Feather, only Fabric is supported.
     - If you aren't using Fabric already, it is recommended you upgrade to either
       the [Modrinth App](https://modrinth.com/app) or the [Prism Launcher](https://prismlauncher.org/). Automatic mod

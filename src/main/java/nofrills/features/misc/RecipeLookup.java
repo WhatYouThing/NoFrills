@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.Slot;
 import nofrills.config.Feature;
+import nofrills.config.SettingEnum;
 import nofrills.config.SettingKeybind;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
@@ -21,6 +22,7 @@ import static nofrills.Main.mc;
 public class RecipeLookup {
     public static final Feature instance = new Feature("recipeLookup");
 
+    public static final SettingEnum<Mode> mode = new SettingEnum<>(Mode.Recipe, Mode.class, "mode", instance);
     public static final SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "bind", instance.key());
 
     @EventHandler
@@ -39,7 +41,13 @@ public class RecipeLookup {
                             JsonObject petData = JsonParser.parseString(data.getString("petInfo").orElse("")).getAsJsonObject();
                             Utils.sendMessage("/recipe " + Utils.uppercaseFirst(Utils.toLower(petData.get("type").getAsString()), true));
                         } else {
-                            Utils.sendMessage("/viewrecipe " + itemId);
+                            String command;
+                            if (mode.value() == Mode.Viewrecipe) {
+                                command = "/viewrecipe ";
+                            } else {
+                                command = "/recipe ";
+                            }
+                            Utils.sendMessage(command + itemId);
                         }
                         event.cancel();
                     } else if (mc.currentScreen.getTitle().getString().startsWith("Museum")) {
@@ -50,9 +58,27 @@ public class RecipeLookup {
                         }
                         Utils.sendMessage("/recipe " + entryName);
                         event.cancel();
+                    } else if (stack.getCustomName().getString().equals("Accept Offer")) {
+                        // will only give recipe of the first item (in case of multi-item requests like Bartender)
+                        // might be worth revisiting later with a stateful approach
+                        String target = Utils.getLoreLines(stack).stream()
+                                .dropWhile(s -> !s.contains("Items Required:"))
+                                .skip(1)
+                                .findFirst()
+                                .orElse("");
+                        if (!target.isEmpty()) {
+                            int index = target.lastIndexOf(" x");
+                            target = index > 0 ? target.substring(0, index) : target;
+                            Utils.sendMessage("/recipe " + target);
+                        }
                     }
                 }
             }
         }
+    }
+
+    public enum Mode {
+        Recipe,
+        Viewrecipe
     }
 }

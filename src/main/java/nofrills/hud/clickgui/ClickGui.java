@@ -294,6 +294,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Custom Scale", 0.0, 4.0, 0.01, TooltipScale.scale, "The custom scale multiplier. Ignored if using Dynamic mode.")
                         ))),
                         new Module("Recipe Lookup", RecipeLookup.instance, "Search up recipes for the hovered item with a keybind.", new Settings(List.of(
+                                new Settings.Dropdown<>("Mode", RecipeLookup.mode, "The command that is used to check normal items."),
                                 new Settings.Keybind("Keybind", RecipeLookup.keybind, "The key that activates the feature.")
                         ))),
                         new Module("Update Checker", UpdateChecker.instance, "Checks if a NoFrills update is available the first time you join any world/server."),

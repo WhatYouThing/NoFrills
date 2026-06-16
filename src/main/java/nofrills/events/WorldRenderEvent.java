@@ -19,7 +19,7 @@ import org.joml.Vector4f;
 import static nofrills.Main.mc;
 
 public class WorldRenderEvent {
-    public static final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(0));
+    private static final VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(new BufferAllocator(0));
 
     private static final RenderPipeline DEBUG_FILLED_BOX_NO_CULL_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.POSITION_COLOR_SNIPPET)
@@ -49,18 +49,21 @@ public class WorldRenderEvent {
                     .build()
     );
 
-    public RenderTickCounter tickCounter = mc.getRenderTickCounter();
-    public Camera camera;
-    public MatrixStack matrices;
-    public WorldRenderState state;
+    public final RenderTickCounter tickCounter = mc.getRenderTickCounter();
+    public final Camera camera;
+    public final MatrixStack matrices;
+    public final WorldRenderState state;
 
     public WorldRenderEvent(Camera camera, MatrixStack matrices, WorldRenderState state) {
         this.camera = camera;
         this.matrices = matrices;
         this.state = state;
+
+        this.drawDistanceScaledText(new Vec3d(0.0, 0.0, 0.0), Text.literal("wuh"), 0.1f, true, RenderColor.white);
+        this.drawText(new Vec3d(0.0, -1.0, 0.0), Text.literal("buh"), 0.1f, true, RenderColor.white);
     }
 
-    private void drawQuad(Vec3d first, Vec3d second, Vec3d third, Vec3d fourth, VertexConsumer consumer, RenderColor color) {
+    public void drawQuad(Vec3d first, Vec3d second, Vec3d third, Vec3d fourth, VertexConsumer consumer, RenderColor color) {
         MatrixStack.Entry entry = this.matrices.peek();
         Vec3d camPos = this.camera.getCameraPos();
         consumer.vertex(entry, (float) (first.getX() - camPos.getX()), (float) (first.getY() - camPos.getY()), (float) (first.getZ() - camPos.getZ())).color(color.argb);
@@ -69,7 +72,7 @@ public class WorldRenderEvent {
         consumer.vertex(entry, (float) (fourth.getX() - camPos.getX()), (float) (fourth.getY() - camPos.getY()), (float) (fourth.getZ() - camPos.getZ())).color(color.argb);
     }
 
-    private void drawLine(Vec3d start, Vec3d end, float width, VertexConsumer consumer, RenderColor color) {
+    public void drawLine(Vec3d start, Vec3d end, float width, VertexConsumer consumer, RenderColor color) {
         MatrixStack.Entry entry = this.matrices.peek();
         Vec3d camPos = this.camera.getCameraPos();
         Vector4f vector4f = new Vector4f().set(start.getX() - camPos.getX(), start.getY() - camPos.getY(), start.getZ() - camPos.getZ(), 1.0);
@@ -147,7 +150,7 @@ public class WorldRenderEvent {
         double dist = this.camera.getCameraPos().distanceTo(pos);
         float distScale = (float) (1 + dist * scaling);
         float scale = Math.max(baseScale * distScale, baseScale);
-        this.drawText(pos, text, scale, throughWalls, color);
+        this.drawText(pos.add(0.0, dist * 0.1, 0.0), text, scale, throughWalls, color);
     }
 
     public void drawDistanceScaledText(Vec3d pos, Text text, float baseScale, boolean throughWalls, RenderColor color) {
@@ -176,5 +179,9 @@ public class WorldRenderEvent {
 
     public float delta() {
         return this.tickCounter.getTickProgress(true);
+    }
+
+    public void draw() {
+        immediate.draw();
     }
 }

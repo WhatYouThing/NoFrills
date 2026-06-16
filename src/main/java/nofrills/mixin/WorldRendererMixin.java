@@ -36,10 +36,7 @@ public abstract class WorldRendererMixin {
     private void afterRenderWorld(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f basicProjectionMatrix, Matrix4f projectionMatrix, GpuBufferSlice fogBuffer, Vector4f fogColor, boolean renderSky, CallbackInfo ci, @Local FrameGraphBuilder frameGraphBuilder) {
         FramePass framePass = frameGraphBuilder.createPass("nofrills$world_render");
         this.framebufferSet.mainFramebuffer = framePass.transfer(this.framebufferSet.mainFramebuffer);
-        framePass.setRenderer(() -> {
-            eventBus.post(new WorldRenderEvent(camera, new MatrixStack(), this.worldRenderState));
-            WorldRenderEvent.immediate.draw();
-        });
+        framePass.setRenderer(() -> eventBus.post(new WorldRenderEvent(camera, new MatrixStack(), this.worldRenderState)).draw());
     }
 
     @ModifyExpressionValue(method = "fillEntityRenderStates", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderManager;shouldRender(Lnet/minecraft/entity/Entity;Lnet/minecraft/client/render/Frustum;DDD)Z"))

@@ -58,9 +58,6 @@ public class WorldRenderEvent {
         this.camera = camera;
         this.matrices = matrices;
         this.state = state;
-
-        this.drawDistanceScaledText(new Vec3d(0.0, 0.0, 0.0), Text.literal("wuh"), 0.1f, true, RenderColor.white);
-        this.drawText(new Vec3d(0.0, -1.0, 0.0), Text.literal("buh"), 0.1f, true, RenderColor.white);
     }
 
     public void drawQuad(Vec3d first, Vec3d second, Vec3d third, Vec3d fourth, VertexConsumer consumer, RenderColor color) {

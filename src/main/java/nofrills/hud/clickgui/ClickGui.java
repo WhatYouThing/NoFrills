@@ -386,7 +386,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Moonglade Beacon", BeaconTuningSolver.instance, "Solves the beacon tuning mini-game on Galatea."),
                         new Module("Anvil Helper", AnvilHelper.instance, "Highlights the enchanted books which you can safely combine while using the anvil.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", AnvilHelper.color, "The color of the highlight.")
-                        )))
+                        ))),
+                        new Module("Active Pet Highlight", ActivePetHighlight.instance, "Highlights your selected pet while in the pets menu.", new Settings(
+                                new Settings.ColorPicker("Color", ActivePetHighlight.color, "The color of the highlight.")
+                        ))
                 )),
                 new Category("Fishing", List.of(
                         new Module("Mute Drake", MuteDrake.instance, "Prevents the Reindrake from blowing up your ears with gifts."),

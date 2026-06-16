@@ -39,6 +39,7 @@ public class NoRender {
     public static final SettingBool foodBar = new SettingBool(false, "foodBar", instance.key());
     public static final SettingBool fog = new SettingBool(false, "fog", instance.key());
     public static final SettingBool effectDisplay = new SettingBool(false, "effectDisplay", instance.key());
+    public static final SettingBool recipeBook = new SettingBool(false, "recipeBook", instance.key());
     public static final SettingBool selectedItemName = new SettingBool(false, "selectedItemName", instance.key());
     public static final SettingBool deadEntities = new SettingBool(false, "deadEntities", instance.key());
     public static final SettingBool deadPoof = new SettingBool(false, "deadPoof", instance.key());

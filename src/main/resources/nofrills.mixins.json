@@ -38,6 +38,7 @@
     "PaneBlockMixin",
     "PlayerListEntryMixin",
     "PlayerListHudAccessor",
+    "RecipeBookScreenMixin",
     "SoundSystemMixin",
     "StatusEffectsDisplayMixin",
     "StuckObjectsFeatureRendererMixin",

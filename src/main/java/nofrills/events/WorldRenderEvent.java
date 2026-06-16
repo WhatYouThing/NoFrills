@@ -147,7 +147,7 @@ public class WorldRenderEvent {
         double dist = this.camera.getCameraPos().distanceTo(pos);
         float distScale = (float) (1 + dist * scaling);
         float scale = Math.max(baseScale * distScale, baseScale);
-        this.drawText(pos.add(0.0, dist * 0.1, 0.0), text, scale, throughWalls, color);
+        this.drawText(pos.add(0.0, dist * baseScale, 0.0), text, scale, throughWalls, color);
     }
 
     public void drawDistanceScaledText(Vec3d pos, Text text, float baseScale, boolean throughWalls, RenderColor color) {

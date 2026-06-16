@@ -23,7 +23,7 @@ public class ActivePetHighlight {
     }
 
     @EventHandler
-    private static void onScreenRender(SlotUpdateEvent event) {
+    private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && event.slot != null && !event.isInventory && titlePattern.matcher(event.title).matches() && isEquippedPet(event.stack)) {
             SlotOptions.setBackground(event.slot, color.value());
         }

@@ -5,6 +5,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -127,15 +128,15 @@ public class HudManager {
                 ping.ticks = 20;
             }
         }
+        if (day.isActive() && event.packet instanceof WorldTimeUpdateS2CPacket timePacket) {
+            day.setDay(timePacket.timeOfDay() / 24000L);
+        }
     }
 
     @EventHandler
     private static void onWorldTick(WorldTickEvent event) {
         if (power.isActive()) {
             power.setPower(DungeonUtil.getPower());
-        }
-        if (day.isActive() && mc.world != null) {
-            day.setDay(mc.world.getLevelProperties().getTimeOfDay() / 24000L);
         }
         if (ping.isActive()) { // pings every second when element is enabled, waits until ping result is received
             if (ping.ticks > 0) {

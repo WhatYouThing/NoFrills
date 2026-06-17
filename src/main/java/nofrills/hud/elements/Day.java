@@ -7,6 +7,7 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.misc.Utils;
 
 public final class Day extends SimpleTextElement {
+    private long day = 0;
 
     public Day(String text) {
         super(Text.literal(text), new Feature("dayElement"), "Day Display");
@@ -18,11 +19,12 @@ public final class Day extends SimpleTextElement {
     @Override
     public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (this.shouldRender()) {
+            this.setText(Utils.format("Day: §f{}", this.day));
             super.draw(context, mouseX, mouseY, partialTicks, delta);
         }
     }
 
     public void setDay(long day) {
-        this.setText(Utils.format("Day: §f{}", day));
+        this.day = day;
     }
 }

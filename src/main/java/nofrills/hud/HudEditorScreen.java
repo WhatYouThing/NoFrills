@@ -86,7 +86,12 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
                     label.tooltip(element.elementDesc);
                     label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
                     ToggleButton toggle = new ToggleButton(element.isAdded());
-                    toggle.onToggled().subscribe(element.added::set);
+                    toggle.onToggled().subscribe(value -> {
+                        if (value && !element.instance.isActive()) {
+                            element.instance.setActive(true);
+                        }
+                        element.added.set(value);
+                    });
                     layout.child(label);
                     layout.child(toggle);
                     list.add(layout);

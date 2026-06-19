@@ -14,7 +14,6 @@ public class ShardData {
 
     public static String getId(ItemStack stack) {
         if (isShard(stack)) {
-            String name = Utils.toPlain(stack.getHoverName());
             String source = getSource(stack);
             return getId(!source.isEmpty() ? source : Utils.toPlain(stack.getHoverName()));
         }
@@ -22,24 +21,20 @@ public class ShardData {
     }
 
     public static String getId(String name) {
-        return parseId(Utils.toLower(name));
+        return parseId(name);
     }
 
     public static String parseId(String name) {
-        for (String shard : data.get().keySet()) {
-            if (name.equals(shard) || name.startsWith(shard + " ")) {
-                return switch (shard) {
-                    case "cinderbat" -> "SHARD_CINDER_BAT";
-                    case "abyssal lanternfish" -> "SHARD_ABYSSAL_LANTERN";
-                    case "stridersurfer" -> "SHARD_STRIDER_SURFER";
-                    case "bogged" -> "SHARD_SEA_ARCHER";
-                    case "loch emperor" -> "SHARD_SEA_EMPEROR";
-                    case "end stone protector" -> "SHARD_ENDSTONE_PROTECTOR";
-                    default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
-                };
-            }
-        }
-        return "";
+        String shard = Utils.toLower(name);
+        return switch (shard.contains(" shard") ? shard.substring(0, shard.indexOf(" shard")).trim() : shard.trim()) {
+            case "cinderbat" -> "SHARD_CINDER_BAT";
+            case "abyssal lanternfish" -> "SHARD_ABYSSAL_LANTERN";
+            case "stridersurfer" -> "SHARD_STRIDER_SURFER";
+            case "bogged" -> "SHARD_SEA_ARCHER";
+            case "loch emperor" -> "SHARD_SEA_EMPEROR";
+            case "end stone protector" -> "SHARD_ENDSTONE_PROTECTOR";
+            default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
+        };
     }
 
     public static String getShardSkill(String name) {

@@ -1,7 +1,7 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
@@ -18,7 +18,7 @@ public class SpawnAlert {
         if (instance.isActive()) {
             if (!spawned && SlayerUtil.bossAlive) {
                 Utils.showTitle("§c§lBOSS SPAWNED!", "", 0, 30, 10);
-                Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
+                Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
                 spawned = true;
             } else if (!SlayerUtil.bossAlive) {
                 spawned = false;

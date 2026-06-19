@@ -10,17 +10,16 @@ import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.text.Text;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import nofrills.config.Config;
 import nofrills.config.Feature;
 import nofrills.config.SettingJson;
 import nofrills.events.ChatMsgEvent;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.Settings;
-import nofrills.hud.clickgui.components.EnumButton;
-import nofrills.hud.clickgui.components.FlatTextbox;
-import nofrills.hud.clickgui.components.PlainLabel;
-import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.hud.clickgui.components.*;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -79,7 +78,7 @@ public final class ChatRules {
 
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Chat Rules"));
+        settings.setTitle(Component.literal("Chat Rules"));
         return settings;
     }
 
@@ -179,16 +178,16 @@ public final class ChatRules {
             FlatTextbox input = new FlatTextbox(Sizing.fixed(140));
             input.margins(Insets.of(0, 0, 0, 6));
             input.text(this.getData().get("name").getAsString());
-            input.tooltip(Text.literal("The name of this chat rule."));
+            input.tooltip(Component.literal("The name of this chat rule."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("name", value)));
             ToggleButton mainToggle = new ToggleButton(this.getData().get("enabled").getAsBoolean());
             mainToggle.sizing(Sizing.fixed(50), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 3));
-            mainToggle.tooltip(Text.literal("The main toggle for this chat rule."));
+            mainToggle.tooltip(Component.literal("The main toggle for this chat rule."));
             mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));
-            ButtonComponent editButton = UIComponents.button(Text.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildRuleSettings()));
+            ButtonComponent editButton = UIComponents.button(Component.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildRuleSettings()));
             editButton.sizing(Sizing.fixed(48), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             editButton.renderer(Settings.buttonRendererWhite);
-            ButtonComponent delete = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            ButtonComponent delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("rules").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });
@@ -213,11 +212,11 @@ public final class ChatRules {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Match Text"));
+            PlainLabel label = new PlainLabel(Component.literal("Match Text"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
             input.text(this.getData().get("match").getAsString());
-            input.tooltip(Text.literal("The text/regex this rule would match with."));
+            input.tooltip(Component.literal("The text/regex this rule would match with."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("match", value)));
             layout.child(label);
             layout.child(input);
@@ -228,11 +227,11 @@ public final class ChatRules {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Match Type"));
+            PlainLabel label = new PlainLabel(Component.literal("Match Type"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             EnumButton<MatchType> button = new EnumButton<>(this.getData().get("matchType").getAsString(), MatchType.Equals, MatchType.class);
             button.horizontalSizing(Sizing.fixed(80));
-            button.tooltip(Text.literal("The type of match to perform.\n\nEquals: Message must be equal to the matching text.\nContains: Message must contain the matching text.\nStartsWith: Message must start with the matching text.\nEndsWith: Message must end with the matching text.\nRegex: Message must match the Java regular expression, advanced users only."));
+            button.tooltip(Component.literal("The type of match to perform.\n\nEquals: Message must be equal to the matching text.\nContains: Message must contain the matching text.\nStartsWith: Message must start with the matching text.\nEndsWith: Message must end with the matching text.\nRegex: Message must match the Java regular expression, advanced users only."));
             button.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("matchType", value)));
             layout.child(label);
             layout.child(button);
@@ -243,10 +242,10 @@ public final class ChatRules {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Case Sensitive"));
+            PlainLabel label = new PlainLabel(Component.literal("Case Sensitive"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             ToggleButton button = new ToggleButton(this.getData().get("caseSensitive").getAsBoolean());
-            button.tooltip(Text.literal("If enabled, the rule will account for character casing."));
+            button.tooltip(Component.literal("If enabled, the rule will account for character casing."));
             button.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("caseSensitive", toggle)));
             layout.child(label);
             layout.child(button);
@@ -257,10 +256,10 @@ public final class ChatRules {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Cancel Message"));
+            PlainLabel label = new PlainLabel(Component.literal("Cancel Message"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             ToggleButton button = new ToggleButton(this.getData().get("cancel").getAsBoolean());
-            button.tooltip(Text.literal("If enabled, the rule will hide/cancel matching chat messages."));
+            button.tooltip(Component.literal("If enabled, the rule will hide/cancel matching chat messages."));
             button.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("cancel", toggle)));
             layout.child(label);
             layout.child(button);
@@ -271,11 +270,11 @@ public final class ChatRules {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Class Filter"));
+            PlainLabel label = new PlainLabel(Component.literal("Class Filter"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
             input.text(this.getData().has("classFilter") ? this.getData().get("classFilter").getAsString() : "");
-            input.tooltip(Text.literal("A list of dungeon classes that this rule requires to work.\nFor example: \"mage archer\" will disable the rule\nif your selected class is not either Mage or Archer.\n\nLeave empty to disable class filtering."));
+            input.tooltip(Component.literal("A list of dungeon classes that this rule requires to work.\nFor example: \"mage archer\" will disable the rule\nif your selected class is not either Mage or Archer.\n\nLeave empty to disable class filtering."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("classFilter", value)));
             layout.child(label);
             layout.child(input);
@@ -286,11 +285,11 @@ public final class ChatRules {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Island Filter"));
+            PlainLabel label = new PlainLabel(Component.literal("Island Filter"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
             input.text(this.getData().has("islandFilter") ? this.getData().get("islandFilter").getAsString() : "");
-            input.tooltip(Text.literal("A list of islands that this rule requires to work.\nFor example: \"catacombs kuudra\" will disable the rule\nif your current area is not either Kuudra or Dungeons.\n\nLeave empty to disable island filtering."));
+            input.tooltip(Component.literal("A list of islands that this rule requires to work.\nFor example: \"catacombs kuudra\" will disable the rule\nif your current area is not either Kuudra or Dungeons.\n\nLeave empty to disable island filtering."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("islandFilter", value)));
             layout.child(label);
             layout.child(input);
@@ -301,23 +300,23 @@ public final class ChatRules {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Title"));
+            PlainLabel label = new PlainLabel(Component.literal("Title"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox inputTitle = new FlatTextbox(Sizing.fixed(140));
             inputTitle.text(this.getData().get("title").getAsString());
-            inputTitle.tooltip(Text.literal("The title to show on screen if the rule matches. Leave blank to disable.\nYou can use the & symbol to insert formatting codes."));
+            inputTitle.tooltip(Component.literal("The title to show on screen if the rule matches. Leave blank to disable.\nYou can use the & symbol to insert formatting codes."));
             inputTitle.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("title", value)));
             FlatTextbox inputFadeIn = new FlatTextbox(Sizing.fixed(25));
             inputFadeIn.text(String.valueOf(this.getData().get("titleFadeIn").getAsInt()));
-            inputFadeIn.tooltip(Text.literal("The amount of ticks the title should fade in for."));
+            inputFadeIn.tooltip(Component.literal("The amount of ticks the title should fade in for."));
             inputFadeIn.onChanged().subscribe(value -> Utils.parseInt(value).ifPresent(integer -> data.edit(obj -> this.getData(obj).addProperty("titleFadeIn", integer))));
             FlatTextbox inputStay = new FlatTextbox(Sizing.fixed(25));
             inputStay.text(String.valueOf(this.getData().get("titleStay").getAsInt()));
-            inputStay.tooltip(Text.literal("The amount of ticks the title should stay for."));
+            inputStay.tooltip(Component.literal("The amount of ticks the title should stay for."));
             inputStay.onChanged().subscribe(value -> Utils.parseInt(value).ifPresent(integer -> data.edit(obj -> this.getData(obj).addProperty("titleStay", integer))));
             FlatTextbox inputFadeOut = new FlatTextbox(Sizing.fixed(25));
             inputFadeOut.text(String.valueOf(this.getData().get("titleFadeOut").getAsInt()));
-            inputFadeOut.tooltip(Text.literal("The amount of ticks the title should fade out for."));
+            inputFadeOut.tooltip(Component.literal("The amount of ticks the title should fade out for."));
             inputFadeOut.onChanged().subscribe(value -> Utils.parseInt(value).ifPresent(integer -> data.edit(obj -> this.getData(obj).addProperty("titleFadeOut", integer))));
             layout.child(label);
             layout.child(inputTitle);
@@ -331,15 +330,15 @@ public final class ChatRules {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Custom Title"));
+            PlainLabel label = new PlainLabel(Component.literal("Custom Title"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox inputTitle = new FlatTextbox(Sizing.fixed(140));
             inputTitle.text(this.getData().has("customTitle") ? this.getData().get("customTitle").getAsString() : "");
-            inputTitle.tooltip(Text.literal("The custom title to show on screen if the rule matches. Leave blank to disable.\nYou can use the & symbol to insert formatting codes.\n\nThis option uses its own rendering to help prevent issues where titles override each other."));
+            inputTitle.tooltip(Component.literal("The custom title to show on screen if the rule matches. Leave blank to disable.\nYou can use the & symbol to insert formatting codes.\n\nThis option uses its own rendering to help prevent issues where titles override each other."));
             inputTitle.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("customTitle", value)));
             FlatTextbox inputStay = new FlatTextbox(Sizing.fixed(25));
             inputStay.text(String.valueOf(this.getData().has("customTitleStay") ? this.getData().get("customTitleStay").getAsInt() : 40));
-            inputStay.tooltip(Text.literal("The amount of ticks the title should stay for."));
+            inputStay.tooltip(Component.literal("The amount of ticks the title should stay for."));
             inputStay.onChanged().subscribe(value -> Utils.parseInt(value).ifPresent(integer -> data.edit(obj -> this.getData(obj).addProperty("customTitleStay", integer))));
             layout.child(label);
             layout.child(inputTitle);
@@ -351,19 +350,34 @@ public final class ChatRules {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Sound"));
+            PlainLabel label = new PlainLabel(Component.literal("Sound"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            FlatTextbox inputSound = new FlatTextbox(Sizing.fixed(150));
+            ValidatorFlatTextbox inputSound = new ValidatorFlatTextbox(Sizing.fixed(150));
+            inputSound.setValidator(obj -> {
+                String text = obj.getValue();
+                Identifier identifier = Identifier.tryParse(text);
+                SoundManager soundManager = mc.getSoundManager();
+                if (text.isEmpty() || identifier == null) {
+                    obj.borderColor = 0xff5ca0bf;
+                    return true;
+                } else if (soundManager.getSoundEvent(identifier) == null) {
+                    obj.borderColor = 0xffbf5a5a;
+                    return false;
+                } else {
+                    obj.borderColor = 0xff5abf5a;
+                    return true;
+                }
+            });
             inputSound.text(this.getData().get("sound").getAsString());
-            inputSound.tooltip(Text.literal("The sound identifier to play if the rule matches. Leave blank to disable."));
+            inputSound.tooltip(Component.literal("The sound identifier to play if the rule matches. Leave blank to disable."));
             inputSound.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("sound", value)));
             FlatTextbox inputVolume = new FlatTextbox(Sizing.fixed(25));
             inputVolume.text(String.valueOf(this.getData().get("soundVolume").getAsFloat()));
-            inputVolume.tooltip(Text.literal("The volume of the sound."));
+            inputVolume.tooltip(Component.literal("The volume of the sound."));
             inputVolume.onChanged().subscribe(value -> Utils.parseDouble(value).ifPresent(val -> data.edit(obj -> this.getData(obj).addProperty("soundVolume", val.floatValue()))));
             FlatTextbox inputPitch = new FlatTextbox(Sizing.fixed(25));
             inputPitch.text(String.valueOf(this.getData().get("soundPitch").getAsFloat()));
-            inputPitch.tooltip(Text.literal("The pitch of the sound."));
+            inputPitch.tooltip(Component.literal("The pitch of the sound."));
             inputPitch.onChanged().subscribe(value -> Utils.parseDouble(value).ifPresent(val -> data.edit(obj -> this.getData(obj).addProperty("soundPitch", val.floatValue()))));
             layout.child(label);
             layout.child(inputSound);
@@ -384,7 +398,7 @@ public final class ChatRules {
             list.add(this.buildCustomTitleSetting());
             list.add(this.buildSoundSetting());
             ChatRulesSettings settings = new ChatRulesSettings(list);
-            settings.setTitle(Text.literal("Chat Rule: " + this.getData().get("name").getAsString()));
+            settings.setTitle(Component.literal("Chat Rule: " + this.getData().get("name").getAsString()));
             return settings;
         }
     }
@@ -395,7 +409,7 @@ public final class ChatRules {
         }
 
         @Override
-        public void close() {
+        public void onClose() {
             mc.setScreen(buildSettings());
         }
     }

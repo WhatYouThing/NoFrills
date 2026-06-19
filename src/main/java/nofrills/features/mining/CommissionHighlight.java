@@ -1,9 +1,9 @@
 package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.ScreenRenderEvent;
@@ -19,12 +19,12 @@ public class CommissionHighlight {
     private static void onScreenRender(ScreenRenderEvent.Before event) {
         if (instance.isActive() && event.title.equals("Commissions")) {
             for (Slot slot : Utils.getContainerSlots(event.handler)) {
-                ItemStack stack = slot.getStack();
+                ItemStack stack = slot.getItem();
                 if (stack.isEmpty() || !stack.getItem().equals(Items.WRITABLE_BOOK) || !Utils.getSkyblockId(stack).isEmpty())
                     continue;
                 for (String line : Utils.getLoreLines(stack)) {
                     if (line.equals("COMPLETED")) {
-                        event.drawFill(slot.id, color.value());
+                        event.drawFill(slot.index, color.value());
                     }
                 }
             }

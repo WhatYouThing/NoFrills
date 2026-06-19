@@ -1,7 +1,7 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -18,7 +18,7 @@ public final class TPS extends SimpleTextElement {
     public List<Integer> tpsList = new ArrayList<>();
 
     public TPS(String text) {
-        super(Text.literal(text), new Feature("tpsElement"), "TPS Display");
+        super(Component.literal(text), new Feature("tpsElement"), "TPS Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));

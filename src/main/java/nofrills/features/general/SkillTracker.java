@@ -9,8 +9,8 @@ import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.VerticalAlignment;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
@@ -64,7 +64,7 @@ public class SkillTracker {
         for (String skill : skills) {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
-            PlainLabel label = new PlainLabel(Text.literal(skill));
+            PlainLabel label = new PlainLabel(Component.literal(skill));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             ToggleButton toggle = new ToggleButton(isSessionActive(skill));
             toggle.margins(Insets.of(0, 0, 0, 5));
@@ -75,7 +75,7 @@ public class SkillTracker {
                 data.get().get(skill).getAsJsonObject().addProperty("active", value);
                 data.save();
             });
-            ButtonComponent reset = UIComponents.button(Text.literal("Reset Session"), button -> {
+            ButtonComponent reset = UIComponents.button(Component.literal("Reset Session"), _ -> {
                 data.get().add(skill, getDefaultData());
                 mc.setScreen(buildSettings());
                 data.save();
@@ -97,7 +97,7 @@ public class SkillTracker {
 
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Skill Tracker"));
+        settings.setTitle(Component.literal("Skill Tracker"));
         return settings;
     }
 
@@ -167,15 +167,15 @@ public class SkillTracker {
         }
     }
 
-    public static MutableText getText() {
+    public static MutableComponent getText() {
         List<String> active = skills.stream().filter(SkillTracker::isSessionActive).toList();
-        MutableText text = Text.literal("Skill Tracker");
+        MutableComponent text = Component.literal("Skill Tracker");
         if (active.isEmpty()) {
             return text.append("\n§7None tracked.");
         }
         for (String skill : active) {
             SettingColor color = getSessionColor(skill);
-            MutableText sessionText = color != null ? Text.literal(skill).withColor(color.value().argb) : Text.literal(skill);
+            MutableComponent sessionText = color != null ? Component.literal(skill).withColor(color.value().argb) : Component.literal(skill);
             JsonObject obj = data.get().has(skill) ? data.get().get(skill).getAsJsonObject() : getDefaultData();
             String elapsed = obj.has("totalTicks")
                     ? Utils.ticksToTime(obj.get("totalTicks").getAsLong())

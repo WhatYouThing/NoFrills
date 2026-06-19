@@ -1,12 +1,12 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -21,7 +21,7 @@ public final class Quiver extends SimpleTextElement {
     public final SettingBool onlyBow = new SettingBool(true, "onlyBow", this.instance);
 
     public Quiver(String text) {
-        super(Text.literal(text), new Feature("quiverElement"), "Quiver Display");
+        super(Component.literal(text), new Feature("quiverElement"), "Quiver Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Only If Bow", this.onlyBow, "Automatically hides the element if you are not holding a bow.")
         ));
@@ -42,16 +42,16 @@ public final class Quiver extends SimpleTextElement {
     public void update(ItemStack stack) {
         Item item = stack.getItem();
         if (item.equals(Items.ARROW) || item.equals(Items.FEATHER)) {
-            for (Text text : Utils.getLoreText(stack)) {
+            for (Component text : Utils.getLoreText(stack)) {
                 String line = Utils.toPlain(text);
                 if (line.startsWith("Arrows Remaining: ")) {
-                    String name = Utils.toPlain(stack.getName());
+                    String name = Utils.toPlain(stack.getHoverName());
                     String quantity = line.substring(line.indexOf(":") + 2);
-                    Style nameStyle = Utils.getStyle(stack.getName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(Formatting.WHITE));
-                    Style quantityStyle = Utils.getStyle(text, s -> s.trim().startsWith(quantity)).orElse(Style.EMPTY.withColor(Formatting.WHITE));
-                    this.setText(Text.literal("Quiver: ")
-                            .append(Text.literal(name.replace(" Arrow", "")).setStyle(nameStyle))
-                            .append(Text.literal(" x" + quantity).setStyle(quantityStyle))
+                    Style nameStyle = Utils.getStyle(stack.getHoverName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
+                    Style quantityStyle = Utils.getStyle(text, s -> s.trim().startsWith(quantity)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
+                    this.setText(Component.literal("Quiver: ")
+                            .append(Component.literal(name.replace(" Arrow", "")).setStyle(nameStyle))
+                            .append(Component.literal(" x" + quantity).setStyle(quantityStyle))
                     );
                     break;
                 }

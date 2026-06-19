@@ -11,50 +11,55 @@ import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.hud.ClientBossBar;
-import net.minecraft.client.gui.hud.MessageIndicator;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.input.MouseInput;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.network.ServerInfo;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.LoreComponent;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.component.type.ProfileComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityPose;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.c2s.query.QueryPingC2SPacket;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.protocol.ping.ServerboundPingRequestPacket;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.entity.SimpleEntityLookup;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.ItemLore;
+import net.minecraft.world.item.component.ResolvableProfile;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.entity.LevelEntityGetterAdapter;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import nofrills.events.InputEvent;
-import nofrills.mixin.BossBarHudAccessor;
-import nofrills.mixin.HandledScreenAccessor;
-import nofrills.mixin.PlayerListHudAccessor;
+import nofrills.mixin.AbstractContainerScreenAccessor;
+import nofrills.mixin.BossHealthOverlayAccessor;
+import nofrills.mixin.PlayerTabOverlayAccessor;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -76,7 +81,7 @@ import java.util.stream.Collectors;
 import static nofrills.Main.*;
 
 public class Utils {
-    public static final MessageIndicator noFrillsIndicator = new MessageIndicator(0x5ca0bf, null, Text.of("Message from NoFrills mod."), "NoFrills Mod");
+    public static final GuiMessageTag noFrillsIndicator = new GuiMessageTag(0x5ca0bf, null, Component.nullToEmpty("Message from NoFrills mod."), "NoFrills Mod");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",
@@ -85,14 +90,14 @@ public class Utils {
             "Crimson Isle"
     );
 
-    public static void showTitle(MutableText title, MutableText subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        mc.inGameHud.setTitle(title);
-        mc.inGameHud.setSubtitle(subtitle);
-        mc.inGameHud.setTitleTicks(fadeInTicks, stayTicks, fadeOutTicks);
+    public static void showTitle(MutableComponent title, MutableComponent subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        mc.gui.setTitle(title);
+        mc.gui.setSubtitle(subtitle);
+        mc.gui.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
     }
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        showTitle(Text.literal(title), Text.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks);
+        showTitle(Component.literal(title), Component.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks);
     }
 
     public static boolean isNearlyEqual(double a, double b, double eps) {
@@ -108,36 +113,36 @@ public class Utils {
     }
 
     public static void playSound(SoundEvent event, float volume, float pitch) {
-        mc.getSoundManager().play(PositionedSoundInstance.master(event, pitch, volume));
+        mc.getSoundManager().play(SimpleSoundInstance.forUI(event, pitch, volume));
     }
 
-    public static void playSound(RegistryEntry.Reference<SoundEvent> event, float volume, float pitch) {
+    public static void playSound(Holder.Reference<SoundEvent> event, float volume, float pitch) {
         playSound(event.value(), volume, pitch);
     }
 
     public static void playSound(String event, float volume, float pitch) {
-        playSound(SoundEvent.of(Identifier.of(event)), volume, pitch);
+        playSound(SoundEvent.createVariableRangeEvent(Identifier.parse(event)), volume, pitch);
     }
 
     public static void sendMessage(String message) {
         if (mc.player != null && !message.isEmpty()) {
             if (message.startsWith("/")) {
-                mc.player.networkHandler.sendChatCommand(message.substring(1));
+                mc.player.connection.sendCommand(message.substring(1));
             } else {
-                mc.player.networkHandler.sendChatMessage(message);
+                mc.player.connection.sendChat(message);
             }
         }
     }
 
     public static void refillItem(String refill_query, int amount) {
         int total = 0;
-        PlayerInventory inv = mc.player.getInventory();
+        Inventory inv = mc.player.getInventory();
         String query = refill_query.replaceAll("_", " ");
         for (int i = 0; i <= 35; i++) {
-            ItemStack stack = inv.getStack(i);
+            ItemStack stack = inv.getItem(i);
             if (stack.isEmpty()) continue;
             String id = getSkyblockId(stack).replaceAll("_", " ");
-            String name = toPlain(stack.getName());
+            String name = toPlain(stack.getHoverName());
             if (query.equalsIgnoreCase(id) || query.equalsIgnoreCase(name)) {
                 total += stack.getCount();
             }
@@ -147,41 +152,41 @@ public class Utils {
         }
     }
 
-    public static MutableText getTag() {
-        return Text.literal("[NoFrills] ").withColor(0x5ca0bf);
+    public static MutableComponent getTag() {
+        return Component.literal("[NoFrills] ").withColor(0x5ca0bf);
     }
 
-    public static MutableText getShortTag() {
-        return Text.literal("[NF] ").withColor(0x5ca0bf);
+    public static MutableComponent getShortTag() {
+        return Component.literal("[NF] ").withColor(0x5ca0bf);
     }
 
     public static void info(String message) {
-        infoRaw(Text.literal(message));
+        infoRaw(Component.literal(message));
     }
 
     public static void infoButton(String message, String command) {
         ClickEvent click = new ClickEvent.RunCommand(command);
-        infoRaw(Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click)));
+        infoRaw(Component.literal(message).setStyle(Style.EMPTY.withClickEvent(click)));
     }
 
     public static void infoLink(String message, String url) {
         ClickEvent click = new ClickEvent.OpenUrl(URI.create(url));
-        infoRaw(Text.literal(message).setStyle(Style.EMPTY.withClickEvent(click)));
+        infoRaw(Component.literal(message).setStyle(Style.EMPTY.withClickEvent(click)));
     }
 
-    public static void infoRaw(MutableText message) {
-        if (message.getStyle() == null || message.getStyle().getColor() == null) {
-            message = message.withColor(0xffffff);
+    public static void infoRaw(MutableComponent message) {
+        if (message.getStyle().getColor() == null) {
+            message.withColor(0xffffff);
         }
-        mc.inGameHud.getChatHud().addMessage(getTag().append(message), null, noFrillsIndicator);
+        mc.gui.getChat().addMessage(getTag().append(message), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator);
     }
 
     public static void infoFormat(String message, Object... values) {
-        infoRaw(Text.literal(format(message, values)));
+        infoRaw(Component.literal(format(message, values)));
     }
 
     public static String getCoordsFormatted(String format) {
-        BlockPos pos = mc.player.getBlockPos();
+        BlockPos pos = mc.player.blockPosition();
         return format(format, pos.getX(), pos.getY(), pos.getZ());
 
     }
@@ -280,9 +285,9 @@ public class Utils {
     }
 
     public static String getServerAddress() {
-        ServerInfo info = mc.getCurrentServerEntry();
+        ServerData info = mc.getCurrentServer();
         if (info != null) {
-            return toLower(info.address).trim();
+            return toLower(info.ip).trim();
         }
         return "";
     }
@@ -299,15 +304,15 @@ public class Utils {
     /**
      * Checks if a PlayerEntity is a real player, and not an enemy or NPC.
      */
-    public static boolean isPlayer(PlayerEntity entity) {
-        return entity.getUuid().version() == 4;
+    public static boolean isPlayer(Player entity) {
+        return entity.getUUID().version() == 4;
     }
 
     /**
      * Check if the provided entity is a living entity (and in the case of player entities, if it isn't a real player).
      */
     public static boolean isMob(Entity entity) {
-        if (entity instanceof PlayerEntity player) {
+        if (entity instanceof Player player) {
             return !isPlayer(player);
         }
         return entity instanceof LivingEntity;
@@ -322,19 +327,19 @@ public class Utils {
     /**
      * Returns the entity's bounding box at their interpolated position.
      */
-    public static Box getLerpedBox(Entity entity, float tickProgress) {
-        return entity.getDimensions(EntityPose.STANDING).getBoxAt(entity.getLerpedPos(tickProgress));
+    public static AABB getLerpedBox(Entity entity, float tickProgress) {
+        return entity.getDimensions(Pose.STANDING).makeBoundingBox(entity.getPosition(tickProgress));
     }
 
     public static List<Entity> getEntities() {
-        if (mc.world != null) {
-            SimpleEntityLookup<Entity> lookup = (SimpleEntityLookup<Entity>) mc.world.entityManager.getLookup();
-            return new ArrayList<>(lookup.index.idToEntity.values());
+        if (mc.level != null) {
+            LevelEntityGetterAdapter<Entity> lookup = (LevelEntityGetterAdapter<Entity>) mc.level.entityStorage.getEntityGetter();
+            return new ArrayList<>(lookup.visibleEntities.byId.values());
         }
         return new ArrayList<>();
     }
 
-    public static List<Entity> getOtherEntities(Entity except, Box box, Predicate<? super Entity> filter) {
+    public static List<Entity> getOtherEntities(Entity except, AABB box, Predicate<? super Entity> filter) {
         List<Entity> entities = new ArrayList<>();
         for (Entity ent : getEntities()) {
             if (ent != null && ent != except && (filter == null || filter.test(ent)) && ent.getBoundingBox().intersects(box)) {
@@ -345,33 +350,33 @@ public class Utils {
     }
 
     public static List<Entity> getOtherEntities(Entity from, double distX, double distY, double distZ, Predicate<? super Entity> filter) {
-        return getOtherEntities(from, Box.of(from.getEntityPos(), distX, distY, distZ), filter);
+        return getOtherEntities(from, AABB.ofSize(from.position(), distX, distY, distZ), filter);
     }
 
     public static List<Entity> getOtherEntities(Entity from, double dist, Predicate<? super Entity> filter) {
-        return getOtherEntities(from, Box.of(from.getEntityPos(), dist, dist, dist), filter);
+        return getOtherEntities(from, AABB.ofSize(from.position(), dist, dist, dist), filter);
     }
 
-    public static boolean matchesKey(KeyBinding binding, KeyInput keyInput, MouseInput mouseInput) {
-        return (keyInput != null && binding.matchesKey(keyInput)) || (mouseInput != null && binding.matchesMouse(new Click(0, 0, mouseInput)));
+    public static boolean matchesKey(KeyMapping binding, KeyEvent keyInput, MouseButtonInfo mouseInput) {
+        return (keyInput != null && binding.matches(keyInput)) || (mouseInput != null && binding.matchesMouse(new MouseButtonEvent(0, 0, mouseInput)));
     }
 
-    public static boolean matchesKey(KeyBinding binding, InputEvent event) {
+    public static boolean matchesKey(KeyMapping binding, InputEvent event) {
         return matchesKey(binding, event.keyInput, event.mouseInput);
     }
 
-    public static boolean matchesKey(KeyBinding binding, KeyInput keyInput) {
+    public static boolean matchesKey(KeyMapping binding, KeyEvent keyInput) {
         return matchesKey(binding, keyInput, null);
     }
 
-    public static boolean matchesKey(KeyBinding binding, MouseInput mouseInput) {
+    public static boolean matchesKey(KeyMapping binding, MouseButtonInfo mouseInput) {
         return matchesKey(binding, null, mouseInput);
     }
 
     public static void sendPingPacket() {
-        ClientPlayNetworkHandler handler = mc.getNetworkHandler();
+        ClientPacketListener handler = mc.getConnection();
         if (handler != null) {
-            handler.sendPacket(new QueryPingC2SPacket(Util.getMeasuringTimeMs()));
+            handler.send(new ServerboundPingRequestPacket(Util.getMillis()));
         }
     }
 
@@ -381,10 +386,10 @@ public class Utils {
     public static List<ItemStack> getEntityArmor(LivingEntity entity) {
         if (entity != null) {
             return List.of(
-                    entity.getEquippedStack(EquipmentSlot.HEAD),
-                    entity.getEquippedStack(EquipmentSlot.CHEST),
-                    entity.getEquippedStack(EquipmentSlot.LEGS),
-                    entity.getEquippedStack(EquipmentSlot.FEET)
+                    entity.getItemBySlot(EquipmentSlot.HEAD),
+                    entity.getItemBySlot(EquipmentSlot.CHEST),
+                    entity.getItemBySlot(EquipmentSlot.LEGS),
+                    entity.getItemBySlot(EquipmentSlot.FEET)
             );
         }
         return List.of();
@@ -392,7 +397,7 @@ public class Utils {
 
     public static ItemStack getEntityHelmet(LivingEntity entity) {
         if (entity != null) {
-            return entity.getEquippedStack(EquipmentSlot.HEAD);
+            return entity.getItemBySlot(EquipmentSlot.HEAD);
         }
         return ItemStack.EMPTY;
     }
@@ -400,11 +405,11 @@ public class Utils {
     /**
      * Returns the custom data compound of the provided ItemStack, or else null.
      */
-    public static NbtCompound getCustomData(ItemStack stack) {
+    public static CompoundTag getCustomData(ItemStack stack) {
         if (stack != null && !stack.isEmpty()) {
-            NbtComponent data = stack.get(DataComponentTypes.CUSTOM_DATA);
+            CustomData data = stack.get(DataComponents.CUSTOM_DATA);
             if (data != null) {
-                return data.nbt;
+                return data.tag;
             }
         }
         return null;
@@ -413,7 +418,7 @@ public class Utils {
     /**
      * Returns the Skyblock item ID from the provided NbtCompound, or else an empty string.
      */
-    public static String getSkyblockId(NbtCompound customData) {
+    public static String getSkyblockId(CompoundTag customData) {
         if (customData != null && customData.contains("id")) {
             return customData.getString("id").orElse("");
         }
@@ -430,7 +435,7 @@ public class Utils {
     /**
      * Tries to parse the Bazaar/Auction ID tied to the name of the item.
      */
-    public static String getMarketId(Text text) {
+    public static String getMarketId(Component text) {
         String name = toPlain(text);
         if (hasItemQuantity(name)) {
             name = name.substring(0, name.lastIndexOf(" ")).trim();
@@ -440,7 +445,7 @@ public class Utils {
             String enchantName = toID(enchant.substring(0, enchant.lastIndexOf(" ")));
             int enchantLevel = parseRoman(enchant.substring(enchant.lastIndexOf(" ") + 1));
             Optional<Style> style = getStyle(text, enchant::equals);
-            if (style.isPresent() && hasColor(style.get(), Formatting.LIGHT_PURPLE) && !enchantName.startsWith("ULTIMATE_")) {
+            if (style.isPresent() && hasColor(style.get(), ChatFormatting.LIGHT_PURPLE) && !enchantName.startsWith("ULTIMATE_")) {
                 return format("ENCHANTMENT_ULTIMATE_{}_{}", enchantName, enchantLevel);
             }
             return format("ENCHANTMENT_{}_{}", enchantName, enchantLevel);
@@ -460,10 +465,10 @@ public class Utils {
             String rarity = "COMMON";
             if (styleOptional.isPresent()) {
                 Style style = styleOptional.get();
-                if (hasColor(style, Formatting.GOLD)) rarity = "LEGENDARY";
-                if (hasColor(style, Formatting.DARK_PURPLE)) rarity = "EPIC";
-                if (hasColor(style, Formatting.BLUE)) rarity = "RARE";
-                if (hasColor(style, Formatting.GREEN)) rarity = "UNCOMMON";
+                if (hasColor(style, ChatFormatting.GOLD)) rarity = "LEGENDARY";
+                if (hasColor(style, ChatFormatting.DARK_PURPLE)) rarity = "EPIC";
+                if (hasColor(style, ChatFormatting.BLUE)) rarity = "RARE";
+                if (hasColor(style, ChatFormatting.GREEN)) rarity = "UNCOMMON";
             }
             return format("{}_PET_{}", toID(petName), rarity);
         }
@@ -488,7 +493,7 @@ public class Utils {
      * Returns the Bazaar/Auction ID tied to the item.
      */
     public static String getMarketId(ItemStack stack) {
-        NbtCompound data = getCustomData(stack);
+        CompoundTag data = getCustomData(stack);
         String id = getSkyblockId(data);
         String shardId = ShardData.getId(stack);
         if (!shardId.isEmpty()) {
@@ -504,17 +509,17 @@ public class Utils {
                 return "UNKNOWN_PET";
             }
             case "RUNE", "UNIQUE_RUNE" -> {
-                NbtCompound runeData = data.getCompound("runes").orElse(null);
-                if (runeData != null && !runeData.getKeys().isEmpty()) {
-                    String runeId = (String) runeData.getKeys().toArray()[0];
+                CompoundTag runeData = data.getCompound("runes").orElse(null);
+                if (runeData != null && !runeData.keySet().isEmpty()) {
+                    String runeId = (String) runeData.keySet().toArray()[0];
                     return format("{}_{}_RUNE", runeId, runeData.getInt(runeId).orElse(0));
                 }
                 return "EMPTY_RUNE";
             }
             case "ENCHANTED_BOOK" -> {
-                NbtCompound enchantData = data.getCompound("enchantments").orElse(null);
-                if (enchantData != null && enchantData.getKeys().size() == 1) {
-                    String enchantId = (String) enchantData.getKeys().toArray()[0];
+                CompoundTag enchantData = data.getCompound("enchantments").orElse(null);
+                if (enchantData != null && enchantData.keySet().size() == 1) {
+                    String enchantId = (String) enchantData.keySet().toArray()[0];
                     int enchantLevel = enchantData.getInt(enchantId).orElse(0);
                     return format("ENCHANTMENT_{}_{}", toUpper(enchantId), enchantLevel);
                 }
@@ -539,9 +544,9 @@ public class Utils {
     }
 
     public static GameProfile getTextures(ItemStack stack) {
-        ProfileComponent profile = stack.get(DataComponentTypes.PROFILE);
+        ResolvableProfile profile = stack.getComponents().get(DataComponents.PROFILE);
         if (profile != null) {
-            return profile.getGameProfile();
+            return profile.partialProfile();
         }
         return null;
     }
@@ -570,7 +575,7 @@ public class Utils {
 
     public static String getTextureUrl(GameProfile profile) {
         if (profile != null) {
-            MinecraftSessionService service = mc.getApiServices().sessionService();
+            MinecraftSessionService service = mc.services().sessionService();
             Property property = service.getPackedTextures(profile);
             MinecraftProfileTextures textures = service.unpackTextures(property);
             if (textures.skin() != null) {
@@ -592,8 +597,8 @@ public class Utils {
         return false;
     }
 
-    public static List<Text> getLoreText(ItemStack stack) {
-        LoreComponent lore = stack.getComponents().get(DataComponentTypes.LORE);
+    public static List<Component> getLoreText(ItemStack stack) {
+        ItemLore lore = stack.getComponents().get(DataComponents.LORE);
         if (lore != null) {
             return lore.lines();
         }
@@ -605,7 +610,7 @@ public class Utils {
      */
     public static List<String> getLoreLines(ItemStack stack) {
         List<String> lines = new ArrayList<>();
-        for (Text line : getLoreText(stack)) {
+        for (Component line : getLoreText(stack)) {
             lines.add(toPlain(line).trim());
         }
         return lines;
@@ -649,8 +654,8 @@ public class Utils {
     public static BlockPos findGround(BlockPos pos, int maxDistance) {
         int dist = Math.clamp(maxDistance, 0, 256);
         for (int i = 0; i <= dist; i++) {
-            BlockPos below = pos.down(i);
-            if (!mc.world.getBlockState(below).isAir()) {
+            BlockPos below = pos.below(i);
+            if (!mc.level.getBlockState(below).isAir()) {
                 return below;
             }
         }
@@ -673,7 +678,7 @@ public class Utils {
         String fileName = path.getFileName().toString();
         Path tempPath = parent.resolve(format("{}-Temp-{}.{}",
                 fileName.substring(0, fileName.indexOf(".")),
-                Util.getMeasuringTimeMs(),
+                Util.getMillis(),
                 fileName.substring(fileName.indexOf(".") + 1)
         ));
         if (!Files.exists(parent)) {
@@ -728,8 +733,8 @@ public class Utils {
      * Checks if our player entity is currently within an area, made from 2 sets of coordinates.
      */
     public static boolean isInZone(double x1, double y1, double z1, double x2, double y2, double z2) {
-        Box area = new Box(x1, y1, z1, x2, y2, z2);
-        return area.contains(mc.player.getEntityPos());
+        AABB area = new AABB(x1, y1, z1, x2, y2, z2);
+        return area.contains(mc.player.position());
     }
 
     /**
@@ -745,27 +750,27 @@ public class Utils {
         return entity == mc.player;
     }
 
-    public static float horizontalDistance(Vec3d from, Vec3d to) {
-        float x = (float) (from.getX() - to.getX());
-        float z = (float) (from.getZ() - to.getZ());
-        return MathHelper.sqrt(x * x + z * z);
+    public static float horizontalDistance(Vec3 from, Vec3 to) {
+        float x = (float) (from.x() - to.x());
+        float z = (float) (from.z() - to.z());
+        return Mth.sqrt(x * x + z * z);
     }
 
     public static float horizontalDistance(Entity from, Entity to) {
-        return horizontalDistance(from.getEntityPos(), to.getEntityPos());
+        return horizontalDistance(from.position(), to.position());
     }
 
     /**
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
     public static HitResult raycastFullBlock(Entity entity, double maxDistance, float tickDelta) {
-        Vec3d height = entity.getLerpedPos(tickDelta).add(0, entity.getStandingEyeHeight(), 0);
-        Vec3d camPos = entity.getCameraPosVec(tickDelta);
-        Vec3d rot = entity.getRotationVec(tickDelta);
-        Vec3d pos = new Vec3d(camPos.getX(), height.getY(), camPos.getZ());
-        Vec3d end = pos.add(rot.x * maxDistance, rot.y * maxDistance, rot.z * maxDistance);
-        EtherwarpRaycastContext context = new EtherwarpRaycastContext(pos, end, RaycastContext.ShapeType.OUTLINE, net.minecraft.world.RaycastContext.FluidHandling.ANY, entity);
-        return entity.getEntityWorld().raycast(context);
+        Vec3 height = entity.getPosition(tickDelta).add(0, isOnModernIsland() ? 1.27 : 1.54, 0);
+        Vec3 camPos = entity.getEyePosition(tickDelta);
+        Vec3 rot = entity.getViewVector(tickDelta);
+        Vec3 pos = new Vec3(camPos.x(), height.y(), camPos.z());
+        Vec3 end = pos.add(rot.x * maxDistance, rot.y * maxDistance, rot.z * maxDistance);
+        EtherwarpRaycastContext context = new EtherwarpRaycastContext(pos, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.ANY, entity);
+        return entity.level().clip(context);
     }
 
     /**
@@ -774,10 +779,10 @@ public class Utils {
     public static Entity findNametagOwner(Entity armorStand, List<Entity> otherEntities) {
         Entity entity = null;
         float lowestDist = 2.0f;
-        double maxY = armorStand.getEntityPos().getY();
+        double maxY = armorStand.position().y();
         for (Entity ent : otherEntities) {
-            float dist = horizontalDistance(ent.getEntityPos(), armorStand.getEntityPos());
-            if (!(ent instanceof ArmorStandEntity) && ent.getEntityPos().getY() < maxY && dist < lowestDist) {
+            float dist = horizontalDistance(ent.position(), armorStand.position());
+            if (!(ent instanceof ArmorStand) && ent.position().y() < maxY && dist < lowestDist) {
                 entity = ent;
                 lowestDist = dist;
             }
@@ -789,8 +794,8 @@ public class Utils {
      * Checks if the provided ItemStack has a glint override flag. Ignores the default flag to work correctly with items such as Nether Stars.
      */
     public static boolean hasGlint(ItemStack stack) {
-        Optional<? extends Boolean> component = stack.getComponentChanges().get(DataComponentTypes.ENCHANTMENT_GLINT_OVERRIDE);
-        return component != null && component.isPresent();
+        Boolean component = stack.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE);
+        return component != null && component;
     }
 
     public static List<String> getTabListLines() {
@@ -802,7 +807,7 @@ public class Utils {
      */
     public static List<String> getFooterLines() {
         List<String> list = new ArrayList<>();
-        Text footer = ((PlayerListHudAccessor) mc.inGameHud.getPlayerListHud()).getFooter();
+        Component footer = ((PlayerTabOverlayAccessor) mc.gui.getTabList()).getFooter();
         if (footer != null) {
             String[] lines = footer.getString().split("\n");
             for (String line : lines) {
@@ -815,8 +820,8 @@ public class Utils {
         return list;
     }
 
-    public static List<ClientBossBar> getBossBars() {
-        return ((BossBarHudAccessor) mc.inGameHud.getBossBarHud()).getBossBars().values().stream().toList();
+    public static List<LerpingBossEvent> getBossBars() {
+        return ((BossHealthOverlayAccessor) mc.gui.getBossOverlay()).getEvents().values().stream().toList();
     }
 
     /**
@@ -824,34 +829,34 @@ public class Utils {
      *
      * @param inverse if true, returns the slots that are part of the player inventory instead of the container itself.
      */
-    public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler, boolean inverse) {
+    public static List<Slot> getContainerSlots(ChestMenu handler, boolean inverse) {
         if (inverse) {
-            return handler.slots.stream().filter(slot -> slot.id >= handler.getRows() * 9).toList();
+            return handler.slots.stream().filter(slot -> slot.index >= handler.getRowCount() * 9).toList();
         }
-        return handler.slots.stream().filter(slot -> slot.id < handler.getRows() * 9).toList();
+        return handler.slots.stream().filter(slot -> slot.index < handler.getRowCount() * 9).toList();
     }
 
-    public static List<Slot> getContainerSlots(GenericContainerScreenHandler handler) {
+    public static List<Slot> getContainerSlots(ChestMenu handler) {
         return getContainerSlots(handler, false);
     }
 
-    public static List<Slot> getContainerSlots(ScreenHandler handler, boolean inverse) {
-        if (handler instanceof GenericContainerScreenHandler containerHandler) {
+    public static List<Slot> getContainerSlots(AbstractContainerMenu handler, boolean inverse) {
+        if (handler instanceof ChestMenu containerHandler) {
             return getContainerSlots(containerHandler, inverse);
         }
         return List.of();
     }
 
-    public static List<Slot> getContainerSlots(ScreenHandler handler) {
+    public static List<Slot> getContainerSlots(AbstractContainerMenu handler) {
         return getContainerSlots(handler, false);
     }
 
     public static ItemStack getHeldItem() {
-        return mc.player != null ? mc.player.getMainHandStack() : ItemStack.EMPTY;
+        return mc.player != null ? mc.player.getMainHandItem() : ItemStack.EMPTY;
     }
 
     public static Slot getFocusedSlot() {
-        return mc.currentScreen != null ? ((HandledScreenAccessor) mc.currentScreen).getFocusedSlot() : null;
+        return mc.screen != null ? ((AbstractContainerScreenAccessor) mc.screen).getHoveredSlot() : null;
     }
 
     private static int romanToInt(Character roman) {
@@ -910,14 +915,14 @@ public class Utils {
     /**
      * Gets the string out of a Text object and removes any formatting codes.
      */
-    public static String toPlain(Text text) {
+    public static String toPlain(Component text) {
         if (text != null) {
             return toPlain(text.getString());
         }
         return "";
     }
 
-    public static String toPlain(OrderedText ordered) {
+    public static String toPlain(FormattedCharSequence ordered) {
         StringBuilder builder = new StringBuilder();
         ordered.accept((index, style, codePoint) -> {
             builder.appendCodePoint(codePoint);
@@ -926,9 +931,9 @@ public class Utils {
         return toPlain(builder.toString());
     }
 
-    public static String toPlain(List<OrderedText> list) {
+    public static String toPlain(List<FormattedCharSequence> list) {
         StringBuilder builder = new StringBuilder();
-        for (OrderedText ordered : list) {
+        for (FormattedCharSequence ordered : list) {
             builder.append(toPlain(ordered));
         }
         return builder.toString();
@@ -938,14 +943,14 @@ public class Utils {
         return string.chars().filter(c -> c <= 127).mapToObj(c -> String.valueOf((char) c)).collect(Collectors.joining());
     }
 
-    public static MutableText toMutable(Text text) {
-        if (text instanceof MutableText mutable) {
+    public static MutableComponent toMutable(Component text) {
+        if (text instanceof MutableComponent mutable) {
             return mutable;
         }
         return text.copy();
     }
 
-    public static Optional<Style> getStyle(Text text, Predicate<String> predicate) {
+    public static Optional<Style> getStyle(Component text, Predicate<String> predicate) {
         return text.visit((textStyle, textString) -> {
             if (predicate.test(textString)) {
                 return Optional.of(textStyle);
@@ -954,12 +959,12 @@ public class Utils {
         }, Style.EMPTY);
     }
 
-    public static boolean hasColor(Style style, Formatting color) {
-        return color.getColorValue() != null && hasColor(style, color.getColorValue());
+    public static boolean hasColor(Style style, ChatFormatting color) {
+        return color.getColor() != null && hasColor(style, color.getColor());
     }
 
     public static boolean hasColor(Style style, int hex) {
-        return style != null && style.getColor() != null && style.getColor().getRgb() == hex;
+        return style != null && style.getColor() != null && style.getColor().getValue() == hex;
     }
 
     public static Optional<Integer> parseInt(String value) {
@@ -1060,7 +1065,7 @@ public class Utils {
     }
 
     public static long getMeasuringTime() {
-        return Util.getMeasuringTimeMs();
+        return Util.getMillis();
     }
 
     public static long getTimestamp() {
@@ -1115,7 +1120,7 @@ public class Utils {
     }
 
     public static void setScreen(Screen screen) {
-        mc.send(() -> mc.setScreen(screen));
+        mc.schedule(() -> mc.setScreen(screen));
     }
 
     public static class Symbols {

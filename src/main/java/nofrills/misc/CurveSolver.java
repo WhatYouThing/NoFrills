@@ -1,7 +1,7 @@
 package nofrills.misc;
 
 import jama.Matrix;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,13 +11,13 @@ import java.util.Optional;
 import static nofrills.Main.mc;
 
 public class CurveSolver {
-    private final List<Vec3d> particleList = new ArrayList<>();
+    private final List<Vec3> particleList = new ArrayList<>();
     private final PolynomialFitter3D fitter3D = new PolynomialFitter3D();
     private final int activeDuration;
     private final int clearDuration;
     private final double arriveDistance;
-    private Vec3d solvedPos = null;
-    private Vec3d startPos = null;
+    private Vec3 solvedPos = null;
+    private Vec3 startPos = null;
     private int activeTicks = 0;
     private int clearTicks = 0;
 
@@ -42,7 +42,7 @@ public class CurveSolver {
         this.resetFitter();
         this.activeTicks = this.activeDuration;
         this.clearTicks = this.clearDuration;
-        this.startPos = mc.player.getEyePos();
+        this.startPos = mc.player.getEyePosition();
     }
 
     public void tick() {
@@ -58,7 +58,7 @@ public class CurveSolver {
                 this.clear();
             }
         }
-        if (this.solvedPos != null && this.solvedPos.distanceTo(mc.player.getEntityPos()) < this.arriveDistance) {
+        if (this.solvedPos != null && this.solvedPos.distanceTo(mc.player.position()) < this.arriveDistance) {
             this.solvedPos = null;
         }
     }
@@ -67,7 +67,7 @@ public class CurveSolver {
         return this.activeTicks > 0;
     }
 
-    public void addPos(Vec3d pos) {
+    public void addPos(Vec3 pos) {
         this.fitter3D.addPoint(this.particleList.size(), pos);
         this.particleList.add(pos);
         this.activeTicks = this.activeDuration;
@@ -77,11 +77,11 @@ public class CurveSolver {
         }
     }
 
-    public double getLastDist(Vec3d pos) {
+    public double getLastDist(Vec3 pos) {
         return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) : this.startPos.distanceTo(pos);
     }
 
-    public Optional<Vec3d> getSolvedPos() {
+    public Optional<Vec3> getSolvedPos() {
         return this.solvedPos != null ? Optional.of(this.solvedPos) : Optional.empty();
     }
 
@@ -102,7 +102,7 @@ public class CurveSolver {
         return 7 / (Math.sqrt(9 * Math.pow(y, 2) + 7 * (Math.pow(x, 2) + Math.pow(z, 2) + Math.pow(y, 2))) - 3 * y);
     }
 
-    private Vec3d solve() {
+    private Vec3 solve() {
         double[][] res = fitter3D.fit();
         double[] deriv_0 = new double[3];
         for (int i = 0; i < 3; i++) {
@@ -118,7 +118,7 @@ public class CurveSolver {
             term *= end_t;
         }
         acc[1] -= 0.5;
-        return new Vec3d(acc[0], acc[1], acc[2]);
+        return new Vec3(acc[0], acc[1], acc[2]);
     }
 
     public class PolynomialFitter {
@@ -166,10 +166,10 @@ public class CurveSolver {
         public PolynomialFitter3D() {
         }
 
-        public void addPoint(double t, Vec3d point) {
-            this.fitters[0].addPoint(t, point.getX());
-            this.fitters[1].addPoint(t, point.getY());
-            this.fitters[2].addPoint(t, point.getZ());
+        public void addPoint(double t, Vec3 point) {
+            this.fitters[0].addPoint(t, point.x());
+            this.fitters[1].addPoint(t, point.y());
+            this.fitters[2].addPoint(t, point.z());
         }
 
         public double[][] fit() {

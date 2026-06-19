@@ -1,7 +1,7 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -17,7 +17,7 @@ public final class FPS extends SimpleTextElement {
     public List<Integer> fpsList = new ArrayList<>();
 
     public FPS(String text) {
-        super(Text.literal(text), new Feature("fpsElement"), "FPS Display");
+        super(Component.literal(text), new Feature("fpsElement"), "FPS Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds the average FPS to the element.")
         ));

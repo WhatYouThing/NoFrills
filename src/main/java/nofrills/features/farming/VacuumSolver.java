@@ -2,8 +2,8 @@ package nofrills.features.farming;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -46,7 +46,7 @@ public class VacuumSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && Utils.matchesKey(mc.options.attackKey, event) && event.action == GLFW.GLFW_PRESS && Utils.isInGarden() && isHoldingVacuum()) {
+        if (instance.isActive() && Utils.matchesKey(mc.options.keyAttack, event) && event.action == GLFW.GLFW_PRESS && Utils.isInGarden() && isHoldingVacuum()) {
             solver.start();
         }
     }
@@ -55,9 +55,9 @@ public class VacuumSolver {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive()) {
             solver.getSolvedPos().ifPresent(pos -> {
-                Vec3d textPos = pos.subtract(0.0, 0.25, 0.0);
+                Vec3 textPos = pos.subtract(0.0, 0.25, 0.0);
                 event.drawBeam(pos, 256, true, color.value());
-                event.drawDistanceScaledText(textPos, Text.literal("Pest"), 0.05f, true, color.valueWithAlpha(1.0f));
+                event.drawDistanceScaledText(textPos, Component.literal("Pest"), 0.05f, true, color.valueWithAlpha(1.0f));
                 if (tracer.value()) {
                     event.drawTracer(pos, tracerColor.value());
                 }

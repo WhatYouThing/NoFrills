@@ -1,7 +1,7 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.Utils;
@@ -10,7 +10,7 @@ public final class Day extends SimpleTextElement {
     private long day = 0;
 
     public Day(String text) {
-        super(Text.literal(text), new Feature("dayElement"), "Day Display");
+        super(Component.literal(text), new Feature("dayElement"), "Day Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the day that the server world is on.");
         this.setCategory(Category.Info);

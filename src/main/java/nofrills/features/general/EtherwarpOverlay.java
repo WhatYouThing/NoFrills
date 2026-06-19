@@ -1,13 +1,14 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.*;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
@@ -38,21 +39,21 @@ public class EtherwarpOverlay {
 
     private static boolean isBlockValid(BlockPos pos, int offset) {
         boolean isAbove = offset > 0;
-        BlockState state = mc.world.getBlockState(pos.up(offset));
+        BlockState state = mc.level.getBlockState(pos.above(offset));
         return switch (state.getBlock()) {
-            case DyedCarpetBlock ignored -> !isAbove;
-            case PlayerSkullBlock ignored -> !isAbove;
+            case WoolCarpetBlock ignored -> !isAbove;
+            case PlayerHeadBlock ignored -> !isAbove;
             case SkullBlock ignored -> !isAbove;
             case WallSkullBlock ignored -> !isAbove;
             case CarpetBlock ignored -> !isAbove;
-            case TrapdoorBlock ignored -> !isAbove;
+            case TrapDoorBlock ignored -> !isAbove;
             case HopperBlock ignored -> !isAbove;
             case StainedGlassPaneBlock ignored -> !isAbove;
-            case PaneBlock ignored -> !isAbove;
+            case IronBarsBlock ignored -> !isAbove;
             case AbstractCauldronBlock ignored -> !isAbove;
             case WallBannerBlock ignored -> !isAbove;
             case BannerBlock ignored -> !isAbove;
-            case SignBlock ignored -> !isAbove;
+            case StandingSignBlock ignored -> !isAbove;
             case WallSignBlock ignored -> !isAbove;
             case AzaleaBlock ignored -> !isAbove;
             case LilyPadBlock ignored -> !isAbove;
@@ -64,19 +65,19 @@ public class EtherwarpOverlay {
             case FlowerPotBlock ignored -> !isAbove;
             case DoorBlock ignored -> !isAbove;
             case BrewingStandBlock ignored -> !isAbove;
-            case SnowBlock ignored -> !isAbove;
+            case SnowLayerBlock ignored -> !isAbove;
             case PressurePlateBlock ignored -> !isAbove;
             case WeightedPressurePlateBlock ignored -> !isAbove;
             default ->
-                    isAbove ? !state.isOpaque() && !state.isFullCube(mc.world, pos) : state.isOpaque() || state.isFullCube(mc.world, pos);
+                    isAbove ? !state.canOcclude() && !state.isCollisionShapeFullBlock(mc.level, pos) : state.canOcclude() || state.isCollisionShapeFullBlock(mc.level, pos);
         };
     }
 
     private static int getWarpDistance() {
-        NbtCompound data = Utils.getCustomData(Utils.getHeldItem());
+        CompoundTag data = Utils.getCustomData(Utils.getHeldItem());
         String itemId = Utils.getSkyblockId(data);
         if (data != null && !itemId.isEmpty()) {
-            if (data.getByte("ethermerge").orElse((byte) 0) == 1 && mc.options.sneakKey.isPressed()) {
+            if (data.getByte("ethermerge").orElse((byte) 0) == 1 && mc.options.keyShift.isDown()) {
                 if (itemId.equals("ASPECT_OF_THE_END") || itemId.equals("ASPECT_OF_THE_VOID")) {
                     return baseDistance + data.getInt("tuned_transmission").orElse(0);
                 }
@@ -88,15 +89,15 @@ public class EtherwarpOverlay {
     }
 
     private static Optional<BlockPos> doRaycast(int distance, float delta) {
-        if (mc.player != null && mc.world != null) {
+        if (mc.player != null && mc.level != null) {
             HitResult hitResult = Utils.raycastFullBlock(mc.player, distance, delta);
             if (hitResult.getType().equals(HitResult.Type.BLOCK) && hitResult instanceof BlockHitResult blockHitResult) {
                 BlockPos pos = blockHitResult.getBlockPos();
-                BlockState state = mc.world.getBlockState(pos);
+                BlockState state = mc.level.getBlockState(pos);
                 return switch (state.getBlock()) {
-                    case FenceBlock ignored -> Optional.of(pos.up(1));
-                    case FenceGateBlock ignored -> Optional.of(pos.up(1));
-                    case WallBlock ignored -> Optional.of(pos.up(1));
+                    case FenceBlock ignored -> Optional.of(pos.above(1));
+                    case FenceGateBlock ignored -> Optional.of(pos.above(1));
+                    case WallBlock ignored -> Optional.of(pos.above(1));
                     default -> Optional.of(pos);
                 };
             }
@@ -111,7 +112,7 @@ public class EtherwarpOverlay {
     private static void playPinglessSound() {
         int dist = getWarpDistance();
         if (dist > 0) {
-            doRaycast(dist, mc.getRenderTickCounter().getTickProgress(true)).ifPresent(pos -> {
+            doRaycast(dist, mc.getDeltaTracker().getGameTimeDeltaPartialTick(true)).ifPresent(pos -> {
                 if (isBlockValid(pos, 0) && isBlockValid(pos, 1) && isBlockValid(pos, 2)) {
                     playCustomSound();
                 }
@@ -124,9 +125,9 @@ public class EtherwarpOverlay {
         if (instance.isActive()) {
             int dist = getWarpDistance();
             if (dist > 0) {
-                doRaycast(dist, event.tickCounter.getTickProgress(true)).ifPresent(pos -> {
+                doRaycast(dist, event.delta()).ifPresent(pos -> {
                     boolean valid = isBlockValid(pos, 0) && isBlockValid(pos, 1) && isBlockValid(pos, 2);
-                    Box box = Box.enclosing(pos, pos);
+                    AABB box = AABB.encapsulatingFullBlocks(pos, pos);
                     event.drawStyled(
                             box,
                             highlightStyle.value(),
@@ -157,7 +158,7 @@ public class EtherwarpOverlay {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && event.isSound(SoundEvents.ENTITY_ENDER_DRAGON_HURT) && event.packet.getPitch() == 0.53968257f) {
+        if (instance.isActive() && event.isSound(SoundEvents.ENDER_DRAGON_HURT) && event.packet.getPitch() == 0.53968257f) {
             if (cancelSound.value()) {
                 event.cancel();
             }

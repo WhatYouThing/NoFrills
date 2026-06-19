@@ -1,8 +1,8 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
@@ -25,7 +25,7 @@ public class DrainMessage {
                 String mana = msg.replace("Used Extreme Focus! (", "").replace(" Mana)", "");
                 int players = 0;
                 for (Entity ent : Utils.getEntities()) {
-                    if (ent instanceof PlayerEntity player && player != mc.player) {
+                    if (ent instanceof Player player && player != mc.player) {
                         if (Utils.isPlayer(player) && !player.isInvisible() && player.distanceTo(mc.player) <= 5) {
                             players++;
                         }

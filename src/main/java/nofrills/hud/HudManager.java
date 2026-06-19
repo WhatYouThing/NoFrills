@@ -2,15 +2,15 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
-import net.minecraft.network.packet.s2c.query.PingResultS2CPacket;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import nofrills.events.*;
 import nofrills.hud.elements.*;
 import nofrills.misc.DungeonUtil;
@@ -32,7 +32,7 @@ public class HudManager {
     public static final Ping ping = register(new Ping("Ping: §f0ms"));
     public static final Day day = register(new Day("Day: §f0"));
     public static final Armor armor = register(new Armor());
-    public static final Inventory inventory = register(new Inventory());
+    public static final InventoryOverlay inventory = register(new InventoryOverlay());
     public static final Quiver quiver = register(new Quiver("Quiver: §fN/A"));
     public static final LagMeter lagMeter = register(new LagMeter("Last server tick was 0.00s ago"));
     public static final PickaxeAbilityTimer pickAbilityTimer = register(new PickaxeAbilityTimer());
@@ -58,10 +58,10 @@ public class HudManager {
     public static final ShardTrackerDisplay shardTracker = register(new ShardTrackerDisplay());
     public static final SkillTrackerDisplay skillTracker = register(new SkillTrackerDisplay());
 
-    private static CustomTitle currentTitle = new CustomTitle(Text.empty(), 0);
+    private static CustomTitle currentTitle = new CustomTitle(Component.empty(), 0);
 
     public static boolean isEditingHud() {
-        return mc.currentScreen instanceof HudEditorScreen;
+        return mc.screen instanceof HudEditorScreen;
     }
 
     public static List<HudElement> getElements() {
@@ -82,12 +82,12 @@ public class HudManager {
         }
     }
 
-    public static void setCustomTitle(MutableText text, int ticks) {
+    public static void setCustomTitle(MutableComponent text, int ticks) {
         currentTitle = new CustomTitle(text, ticks);
     }
 
     public static void setCustomTitle(String text, int ticks) {
-        setCustomTitle(Text.literal(text), ticks);
+        setCustomTitle(Component.literal(text), ticks);
     }
 
     @EventHandler
@@ -123,14 +123,18 @@ public class HudManager {
 
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
-        if (event.packet instanceof PingResultS2CPacket(long startTime)) {
+        if (event.packet instanceof ClientboundPongResponsePacket(long time)) {
             if (ping.isActive()) {
-                ping.setPing(Util.getMeasuringTimeMs() - startTime);
+                ping.setPing(Util.getMillis() - time);
                 ping.ticks = 20;
             }
         }
-        if (day.isActive() && event.packet instanceof WorldTimeUpdateS2CPacket timePacket) {
-            day.setDay(timePacket.timeOfDay() / 24000L);
+        if (day.isActive() && event.packet instanceof ClientboundSetTimePacket timePacket && mc.level != null) {
+            mc.level.dimensionType().defaultClock().ifPresent(clock -> {
+                if (timePacket.clockUpdates().containsKey(clock)) {
+                    day.setDay(timePacket.clockUpdates().get(clock).totalTicks() / 24000L);
+                }
+            });
         }
     }
 
@@ -161,7 +165,7 @@ public class HudManager {
             if (fps.ticks > 0) {
                 fps.ticks -= 1;
                 if (fps.ticks == 0) {
-                    fps.setFps(mc.getCurrentFps());
+                    fps.setFps(mc.getFps());
                     fps.ticks = 20;
                 }
             }
@@ -195,7 +199,7 @@ public class HudManager {
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
         if (lagMeter.isActive()) {
-            lagMeter.setTickTime(Util.getMeasuringTimeMs());
+            lagMeter.setTickTime(Util.getMillis());
         }
         if (tps.isActive()) {
             tps.serverTicks += 1;
@@ -309,10 +313,10 @@ public class HudManager {
     }
 
     public static class CustomTitle {
-        public MutableText text;
+        public MutableComponent text;
         public int ticks;
 
-        public CustomTitle(MutableText text, int ticks) {
+        public CustomTitle(MutableComponent text, int ticks) {
             this.text = text;
             this.ticks = ticks;
         }
@@ -329,15 +333,15 @@ public class HudManager {
             this.ticks = 0;
         }
 
-        public void draw(DrawContext context) {
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate(context.getScaledWindowWidth() * 0.5f, context.getScaledWindowHeight() * 0.5f);
-            context.getMatrices().pushMatrix();
-            context.getMatrices().scale(4.0F, 4.0F);
-            int width = mc.textRenderer.getWidth(this.text);
-            context.drawTextWithBackground(mc.textRenderer, this.text, -width / 2, -context.getScaledWindowHeight() / 20, width, -1);
-            context.getMatrices().popMatrix();
-            context.getMatrices().popMatrix();
+        public void draw(GuiGraphicsExtractor context) {
+            context.pose().pushMatrix();
+            context.pose().translate(context.guiWidth() * 0.5f, context.guiHeight() * 0.5f);
+            context.pose().pushMatrix();
+            context.pose().scale(4.0F, 4.0F);
+            int width = mc.font.width(this.text);
+            context.textWithBackdrop(mc.font, this.text, -width / 2, -context.guiHeight() / 20, width, -1);
+            context.pose().popMatrix();
+            context.pose().popMatrix();
         }
     }
 }

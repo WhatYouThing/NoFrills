@@ -2,8 +2,7 @@ package nofrills.features.misc;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.player.SkinTextures;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.world.entity.player.PlayerSkin;
 import nofrills.config.Feature;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
@@ -13,10 +12,7 @@ import nofrills.events.ServerJoinEvent;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Supplier;
@@ -29,7 +25,7 @@ public class StreamerMode {
 
     public static final SettingString baseName = new SettingString("nostrils-{}{}{}{}", "baseName", instance);
 
-    public static final Supplier<SkinTextures> skinSupplier = mc.getSkinProvider().supplySkinTextures(
+    public static final Supplier<PlayerSkin> skinSupplier = mc.getSkinManager().createLookup(
             mc.getGameProfile(),
             false
     );
@@ -45,9 +41,9 @@ public class StreamerMode {
             "Mineshaft"
     );
     private static final ConcurrentHashMap<String, String> playerToNick = new ConcurrentHashMap<>();
-    private static final Random random = Random.createLocal();
+    private static final Random random = new Random();
     private static final CopyOnWriteArrayList<String> lobbyIDs = new CopyOnWriteArrayList<>();
-    private static final String sessionName = mc.getSession().getUsername();
+    private static final String sessionName = mc.getUser().getName();
     private static String playerName = "";
 
     private static String parseLobbyID(String msg) {

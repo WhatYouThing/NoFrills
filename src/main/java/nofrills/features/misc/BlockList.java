@@ -4,11 +4,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -113,17 +113,13 @@ public class BlockList {
         return getEntries().stream().filter(object -> Utils.toLower(object.get("name").getAsString()).contains(Utils.toLower(name))).toList();
     }
 
-    public static MutableText buildEntryLine(JsonObject entry, MutableText text) {
-        MutableText tooltip = Text.literal(Utils.format("§7Block reason: {}\n§7Blocked date: {}\n§7Last known username: {}",
+    public static MutableComponent buildEntryLine(JsonObject entry, MutableComponent text) {
+        MutableComponent tooltip = Component.literal(Utils.format("§7Block reason: {}\n§7Blocked date: {}\n§7Last known username: {}",
                 entry.get("reason").getAsString(),
                 Utils.parseDate(entry.get("timestamp").getAsLong()),
                 entry.get("name").getAsString()
         ));
-        return text.setStyle(text.getStyle().withHoverEvent(new HoverEvent.ShowText(tooltip)));
-    }
-
-    public static MutableText buildEntryLine(JsonObject entry, String text) {
-        return buildEntryLine(entry, Text.literal(text));
+        return text.setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(tooltip)));
     }
 
     public static void printEntries(int page) {
@@ -137,10 +133,10 @@ public class BlockList {
             int start = Math.min(10 * (page - 1), entries.size() - 1);
             int end = Math.min((10 * page - 1) + 1, entries.size());
             List<JsonObject> sublist = entries.subList(start, end);
-            MutableText message = Text.literal(Utils.format("§aBlock List (page {} out of {})", page, maxPage));
+            MutableComponent message = Component.literal(Utils.format("§aBlock List (page {} out of {})", page, maxPage));
             for (int i = start; i < end; i++) {
                 JsonObject entry = sublist.get(i - 10 * (page - 1));
-                message.append(buildEntryLine(entry, Utils.format("\n §f{}. {}", i + 1, entry.get("name").getAsString())));
+                message.append(buildEntryLine(entry, Component.literal(Utils.format("\n §f{}. {}", i + 1, entry.get("name").getAsString()))));
             }
             Utils.infoRaw(message);
         } else {
@@ -173,9 +169,9 @@ public class BlockList {
             forEntry(name, (obj) -> {
                 Optional<Style> style = Utils.getStyle(event.message, (string) -> string.trim().startsWith(name));
                 if (obj.isPresent()) {
-                    Style nameColor = style.orElse(Style.EMPTY.withFormatting(Formatting.GRAY));
-                    Utils.infoRaw(buildEntryLine(obj.get(), Text.literal("§c§lAutomatically kicking blocked player §r")
-                            .append(Text.literal(name).setStyle(nameColor)).append("§c§l."))
+                    Style nameColor = style.orElse(Style.EMPTY.applyFormat(ChatFormatting.GRAY));
+                    Utils.infoRaw(buildEntryLine(obj.get(), Component.literal("§c§lAutomatically kicking blocked player §r")
+                            .append(Component.literal(name).setStyle(nameColor)).append("§c§l."))
                     );
                     Utils.sendMessage("/party kick " + name);
                 }
@@ -189,7 +185,7 @@ public class BlockList {
             String uuid = event.uuid.toString().replaceAll("-", "");
             if (data.get().has(uuid)) {
                 Utils.infoRaw(buildEntryLine(data.get().get(uuid).getAsJsonObject(),
-                        Utils.format("§c§lDetected a blocked player in this lobby: §r§c{}§r§c§l.", event.entry.getProfile().name()))
+                        Component.literal(Utils.format("§c§lDetected a blocked player in this lobby: §r§c{}§r§c§l.", event.entry.getProfile().name())))
                 );
             }
         }

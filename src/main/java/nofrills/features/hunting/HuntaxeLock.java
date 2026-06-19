@@ -1,8 +1,8 @@
 package nofrills.features.hunting;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.events.InteractBlockEvent;
 import nofrills.events.InteractItemEvent;

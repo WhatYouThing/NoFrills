@@ -1,32 +1,32 @@
 package nofrills.events;
 
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.Holder;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.phys.Vec3;
 
-public final class PlaySoundEvent extends Cancellable {
-    public PlaySoundS2CPacket packet;
-    public Vec3d pos;
+public class PlaySoundEvent extends Cancellable {
+    public ClientboundSoundPacket packet;
+    public Vec3 pos;
 
-    public PlaySoundEvent(PlaySoundS2CPacket packet) {
+    public PlaySoundEvent(ClientboundSoundPacket packet) {
         this.setCancelled(false);
         this.packet = packet;
-        this.pos = new Vec3d(packet.getX(), packet.getY(), packet.getZ());
+        this.pos = new Vec3(packet.getX(), packet.getY(), packet.getZ());
     }
 
     public boolean isSound(String identifier) {
-        return packet.getSound().value().id().toString().equalsIgnoreCase(identifier);
+        return packet.getSound().value().location().toString().equalsIgnoreCase(identifier);
     }
 
     /**
      * Returns true if the SoundEvent from the packet matches the provided SoundEvent.
      */
     public boolean isSound(SoundEvent sound) {
-        return this.isSound(sound.id().toString());
+        return this.isSound(sound.location().toString());
     }
 
-    public boolean isSound(RegistryEntry.Reference<SoundEvent> sound) {
+    public boolean isSound(Holder.Reference<SoundEvent> sound) {
         return this.isSound(sound.value());
     }
 

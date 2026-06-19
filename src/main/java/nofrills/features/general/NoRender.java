@@ -2,20 +2,20 @@ package nofrills.features.general;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.render.fog.FogData;
-import net.minecraft.entity.*;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.entity.passive.SheepEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.particle.ParticleType;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
@@ -84,7 +84,7 @@ public class NoRender {
         if (title.startsWith("Ultrasequencer (")) {
             return false;
         }
-        return instance.isActive() && emptyTooltips.value() && slot != null && slot.getStack().getName().getString().trim().isEmpty();
+        return instance.isActive() && emptyTooltips.value() && slot != null && slot.getItem().getHoverName().getString().trim().isEmpty();
     }
 
     public static boolean shouldCancelRender(Entity entity) {
@@ -96,9 +96,9 @@ public class NoRender {
         return false;
     }
 
-    private static boolean isPoofParticle(ParticleS2CPacket packet) {
-        if (packet.getCount() == 1 && packet.getSpeed() == 0.0f) {
-            for (float offset : new float[]{packet.getOffsetX(), packet.getOffsetY(), packet.getOffsetZ()}) {
+    private static boolean isPoofParticle(SpawnParticleEvent event) {
+        if (event.packet.getCount() == 1 && event.packet.getMaxSpeed() == 0.0f) {
+            for (float offset : new float[]{event.packet.getXDist(), event.packet.getYDist(), event.packet.getZDist()}) {
                 if (offset >= 0.1f || offset <= -0.1f || offset == 0.0f) {
                     return false;
                 }
@@ -109,7 +109,7 @@ public class NoRender {
     }
 
     private static boolean isCoatingParticle(SpawnParticleEvent event) {
-        if (event.packet.getParameters() instanceof DustParticleEffect dustParticle) {
+        if (event.packet.getParticle() instanceof DustParticleOptions dustParticle) {
             Vector3f color = dustParticle.getColor();
             if ((color.x == 1.0f && color.y == 1.0f && color.z == 1.0f) || (color.x == 1.0f && color.y == 0.6f && color.z == 0.0f)) {
                 return event.matchParameters(ParticleTypes.DUST, 0, 1.0, 1.0, 1.0, 1.0)
@@ -137,7 +137,7 @@ public class NoRender {
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive()) {
-            if (deadPoof.value() && event.type.equals(ParticleTypes.POOF) && isPoofParticle(event.packet)) {
+            if (deadPoof.value() && event.type.equals(ParticleTypes.POOF) && isPoofParticle(event)) {
                 event.cancel();
                 return;
             }
@@ -180,15 +180,15 @@ public class NoRender {
                     (entity -> deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()),
                     (entity -> fallingBlocks.value() && entity instanceof FallingBlockEntity),
                     (entity -> {
-                        if (treeBits.value() && entity instanceof DisplayEntity.BlockDisplayEntity blockDisplay) {
+                        if (treeBits.value() && entity instanceof Display.BlockDisplay blockDisplay) {
                             return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
                         }
                         return false;
                     }),
-                    (entity -> lightning.value() && entity instanceof LightningEntity),
-                    (entity -> expOrbs.value() && entity instanceof ExperienceOrbEntity),
+                    (entity -> lightning.value() && entity instanceof LightningBolt),
+                    (entity -> expOrbs.value() && entity instanceof ExperienceOrb),
                     (entity -> {
-                        if (soulweaverSkulls.value() && entity instanceof ArmorStandEntity stand && Utils.isInDungeons()) {
+                        if (soulweaverSkulls.value() && entity instanceof ArmorStand stand && Utils.isInDungeons()) {
                             ItemStack helmet = Utils.getEntityHelmet(stand);
                             if (helmet.getItem().equals(Items.PLAYER_HEAD)) {
                                 return Utils.hasTexturePayload(helmet, -1020507406);
@@ -196,11 +196,11 @@ public class NoRender {
                         }
                         return false;
                     }),
-                    (entity -> guidedSheep.value() && entity instanceof SheepEntity sheep && sheep.getHealth() == 8.0f && Utils.isInDungeons()),
+                    (entity -> guidedSheep.value() && entity instanceof Sheep sheep && sheep.getHealth() == 8.0f && Utils.isInDungeons()),
                     (entity -> {
                         if (bonePlating.value() && entity instanceof ItemEntity item) {
-                            ItemStack stack = item.getStack();
-                            return stack.getItem().equals(Items.BONE_MEAL) && stack.getName().getString().equals("Bone Meal") && Utils.isInDungeons();
+                            ItemStack stack = item.getItem();
+                            return stack.getItem().equals(Items.BONE_MEAL) && stack.getHoverName().getString().equals("Bone Meal") && Utils.isInDungeons();
                         }
                         return false;
                     })

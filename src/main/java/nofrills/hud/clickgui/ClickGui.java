@@ -8,9 +8,9 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.network.chat.Component;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.*;
 import nofrills.features.fishing.MuteDrake;
@@ -56,7 +56,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public boolean keyPressed(KeyInput input) {
+    public boolean keyPressed(KeyEvent input) {
         if (input.key() != GLFW.GLFW_KEY_LEFT && input.key() != GLFW.GLFW_KEY_RIGHT && input.key() != GLFW.GLFW_KEY_PAGE_DOWN && input.key() != GLFW.GLFW_KEY_PAGE_UP) {
             return super.keyPressed(input);
         } else {
@@ -84,14 +84,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void drawComponentTooltip(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.drawComponentTooltip(context, mouseX, mouseY, delta);
         this.mouseX = mouseX;
         this.mouseY = mouseY;
-        int height = context.getScaledWindowHeight();
-        context.drawTextWithShadow(this.textRenderer, "Left click a feature to toggle", 1, height - 30, RenderColor.white.argb);
-        context.drawTextWithShadow(this.textRenderer, "Right click a feature open its settings", 1, height - 20, RenderColor.white.argb);
-        context.drawTextWithShadow(this.textRenderer, "Scrolling supported in each category and the screen itself", 1, height - 10, RenderColor.white.argb);
+        int height = context.guiHeight();
+        context.text(this.font, "Left click a feature to toggle", 1, height - 30, RenderColor.white.argb);
+        context.text(this.font, "Right click a feature open its settings", 1, height - 20, RenderColor.white.argb);
+        context.text(this.font, "Scrolling supported in each category and the screen itself", 1, height - 10, RenderColor.white.argb);
     }
 
     @Override
@@ -735,7 +735,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.mainScroll = UIContainers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
         this.mainScroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
         root.child(this.mainScroll);
-        ButtonComponent hudEditorButton = UIComponents.button(Text.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
+        ButtonComponent hudEditorButton = UIComponents.button(Component.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
         hudEditorButton.margins(Insets.of(0, 3, 0, 3));
         hudEditorButton.positioning(Positioning.relative(100, 100));
         hudEditorButton.renderer((context, button, delta) -> {
@@ -790,11 +790,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void close() {
+    public void onClose() {
         if (AutoSave.instance.isActive()) AutoSave.save();
         if (this.uiAdapter != null) {
             this.uiAdapter.dispose();
         }
-        super.close();
+        super.onClose();
     }
 }

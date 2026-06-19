@@ -6,8 +6,8 @@ import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -23,11 +23,11 @@ public abstract class SimpleTextElement extends HudElement {
     public final SettingEnum<TextAlignment> textAlignment;
     public final SettingBool textShadow;
     public final SettingColor textColor;
-    public MutableText text;
-    public MutableText defaultText;
+    public MutableComponent text;
+    public MutableComponent defaultText;
     public LabelComponent label;
 
-    protected SimpleTextElement(MutableText text, Feature instance, String label) {
+    protected SimpleTextElement(MutableComponent text, Feature instance, String label) {
         super(UIContainers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
         this.textAlignment = new SettingEnum<>(TextAlignment.Left, TextAlignment.class, "align", instance);
         this.textShadow = new SettingBool(true, "shadow", instance);
@@ -70,10 +70,10 @@ public abstract class SimpleTextElement extends HudElement {
     }
 
     public void setText(String text) {
-        this.label.text(Text.literal(text).withColor(this.getTextColor()));
+        this.label.text(Component.literal(text).withColor(this.getTextColor()));
     }
 
-    public void setText(MutableText text) {
+    public void setText(MutableComponent text) {
         this.label.text(text.withColor(this.getTextColor()));
     }
 

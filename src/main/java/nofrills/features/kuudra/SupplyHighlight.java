@@ -1,9 +1,9 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.GiantEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.Giant;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.WorldRenderEvent;
@@ -24,7 +24,7 @@ public class SupplyHighlight {
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInKuudra() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
             for (Entity ent : Utils.getEntities()) {
-                if (ent instanceof GiantEntity) {
+                if (ent instanceof Giant) {
                     cache.add(ent);
                 }
             }
@@ -35,12 +35,12 @@ public class SupplyHighlight {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInKuudra() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect) && !cache.empty()) {
             for (Entity supply : cache.get()) {
-                Vec3d pos = supply.getLerpedPos(event.delta());
-                float yaw = supply.getYaw(event.delta());
-                Vec3d supplyPos = new Vec3d(
-                        pos.getX() + (3.7 * Math.cos((yaw + 130) * (Math.PI / 180))),
+                Vec3 pos = supply.getPosition(event.delta());
+                float yaw = supply.getViewXRot(event.delta());
+                Vec3 supplyPos = new Vec3(
+                        pos.x + (3.7 * Math.cos((yaw + 130) * (Math.PI / 180))),
                         75,
-                        pos.getZ() + (3.7 * Math.sin((yaw + 130) * (Math.PI / 180)))
+                        pos.y + (3.7 * Math.sin((yaw + 130) * (Math.PI / 180)))
                 );
                 event.drawBeam(supplyPos, 256, false, color.value());
             }

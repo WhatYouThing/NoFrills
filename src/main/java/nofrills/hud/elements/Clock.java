@@ -1,7 +1,7 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -16,7 +16,7 @@ public final class Clock extends SimpleTextElement {
     public final SettingBool format24 = new SettingBool(false, "format24", instance.key());
 
     public Clock(String text) {
-        super(Text.literal(text), new Feature("clockElement"), "Clock Display");
+        super(Component.literal(text), new Feature("clockElement"), "Clock Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("24H Format", this.format24, "Use 24H format instead of 12H.")
         ));

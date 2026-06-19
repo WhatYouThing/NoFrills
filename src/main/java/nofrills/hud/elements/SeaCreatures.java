@@ -1,7 +1,7 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
@@ -18,7 +18,7 @@ public final class SeaCreatures extends SimpleTextElement {
     private final EntityCache cache = EntityCache.create();
 
     public SeaCreatures(String text) {
-        super(Text.literal(text), new Feature("seaCreaturesElement"), "Sea Creatures");
+        super(Component.literal(text), new Feature("seaCreaturesElement"), "Sea Creatures");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
         ));

@@ -1,8 +1,8 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.DyedColorComponent;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.DyedItemColor;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.TooltipRenderEvent;
@@ -24,15 +24,15 @@ public class InfoTooltips {
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && event.customData != null) {
             if (dungeonQuality.value()) {
-                int boost = event.customData.getInt("baseStatBoostPercentage", 0);
-                int tier = event.customData.getInt("item_tier", 0);
+                int boost = event.customData.getIntOr("baseStatBoostPercentage", 0);
+                int tier = event.customData.getIntOr("item_tier", 0);
                 if (boost != 0) {
                     String color = boost == 50 ? "§6§l" : "§6";
                     event.addLine(Utils.getShortTag().append(Utils.format("§bQuality: {}{}/50, Tier {}", color, boost, tier)));
                 }
             }
             if (createdDate.value()) {
-                long timestamp = event.customData.getLong("timestamp", 0L);
+                long timestamp = event.customData.getLongOr("timestamp", 0L);
                 if (timestamp != 0) {
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTimeInMillis(timestamp);
@@ -40,14 +40,14 @@ public class InfoTooltips {
                 }
             }
             if (hexColor.value()) {
-                DyedColorComponent color = event.stack.get(DataComponentTypes.DYED_COLOR);
+                DyedItemColor color = event.stack.get(DataComponents.DYED_COLOR);
                 if (color != null) {
                     String hex = Utils.toLower(String.format(Locale.ROOT, "#%06X", color.rgb()));
                     event.addLine(Utils.getShortTag().append(Utils.format("§bDye Color: §6{}", hex)));
                 }
             }
             if (museumDonated.value()) {
-                byte donated = event.customData.getByte("donated_museum", (byte) 0);
+                byte donated = event.customData.getByteOr("donated_museum", (byte) 0);
                 if (donated != 0) {
                     event.addLine(Utils.getShortTag().append("§bDonated to Museum"));
                 }

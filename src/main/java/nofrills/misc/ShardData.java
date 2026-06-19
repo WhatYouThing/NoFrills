@@ -2,7 +2,7 @@ package nofrills.misc;
 
 import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import nofrills.config.DataFile;
 import nofrills.events.GameShutdownEvent;
 import nofrills.events.SlotUpdateEvent;
@@ -14,8 +14,9 @@ public class ShardData {
 
     public static String getId(ItemStack stack) {
         if (isShard(stack)) {
+            String name = Utils.toPlain(stack.getHoverName());
             String source = getSource(stack);
-            return getId(!source.isEmpty() ? source : Utils.toPlain(stack.getName()));
+            return getId(!source.isEmpty() ? source : Utils.toPlain(stack.getHoverName()));
         }
         return "";
     }
@@ -51,7 +52,7 @@ public class ShardData {
 
     private static boolean isShard(ItemStack stack) {
         String id = Utils.getSkyblockId(stack);
-        String name = Utils.toPlain(stack.getName());
+        String name = Utils.toPlain(stack.getHoverName());
         if (id.equals("ATTRIBUTE_SHARD") || name.contains(" Shard")) {
             return true;
         }
@@ -123,7 +124,7 @@ public class ShardData {
                 String line = lines.get(i);
                 if (line.contains(" (") && !line.contains(" (ID ") && line.endsWith(")")) {
                     addToCache(
-                            Utils.toPlain(event.stack.getName()),
+                            Utils.toPlain(event.stack.getHoverName()),
                             line.substring(line.indexOf("(") + 1, line.indexOf(")")),
                             lines.getLast().substring(0, lines.getLast().indexOf(" "))
                     );

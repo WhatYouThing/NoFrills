@@ -1,15 +1,15 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import nofrills.config.*;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenCloseEvent;
@@ -92,11 +92,11 @@ public class LeapOverlay {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (mc.currentScreen != null && isLeapMenu(mc.currentScreen.getTitle().getString())) {
+        if (mc.screen != null && isLeapMenu(mc.screen.getTitle().getString())) {
             List<SettingKeybind> leapKeys = List.of(firstKey, secondKey, thirdKey, fourthKey);
             for (int i = 0; i < leapKeys.size(); i++) {
                 if (leapKeys.get(i).isKey(event.key) && leapButtons.size() >= i + 1) {
-                    leapButtons.get(i).click(((GenericContainerScreen) mc.currentScreen).getScreenHandler());
+                    leapButtons.get(i).click(((AbstractContainerScreen<?>) mc.screen).getMenu());
                     event.cancel();
                     return;
                 }
@@ -120,9 +120,9 @@ public class LeapOverlay {
         }
     }
 
-    public static class LeapButton implements Drawable {
-        public final Text player;
-        public final Text dungeonClass;
+    public static class LeapButton implements Renderable {
+        public final Component player;
+        public final Component dungeonClass;
         public final boolean dead;
         private final RenderColor nameColor;
         private final RenderColor classColor;
@@ -137,8 +137,8 @@ public class LeapOverlay {
         public int maxY = 0;
 
         public LeapButton(LeapTarget target, int index) {
-            this.player = Text.literal(target.name);
-            this.dungeonClass = Text.literal(target.dungeonClass);
+            this.player = Component.literal(target.name);
+            this.dungeonClass = Component.literal(target.dungeonClass);
             this.dead = target.dead;
             this.nameColor = LeapOverlay.nameColor;
             this.classColor = switch (target.dungeonClass) {
@@ -157,26 +157,26 @@ public class LeapOverlay {
             this.offsetY = index <= 1 ? 0.25f : 0.55f;
         }
 
-        private int getX(DrawContext context, float xOffset) {
-            return (int) Math.floor(context.getScaledWindowWidth() * xOffset);
+        private int getX(GuiGraphicsExtractor context, float xOffset) {
+            return (int) Math.floor(context.guiWidth() * xOffset);
         }
 
-        private int getY(DrawContext context, float yOffset) {
-            return (int) Math.floor(context.getScaledWindowHeight() * yOffset);
+        private int getY(GuiGraphicsExtractor context, float yOffset) {
+            return (int) Math.floor(context.guiHeight() * yOffset);
         }
 
         public boolean isHovered(double mouseX, double mouseY) {
             return !this.player.getString().isEmpty() && mouseX >= this.minX && mouseX <= this.maxX && mouseY >= this.minY && mouseY <= this.maxY;
         }
 
-        public void click(ScreenHandler handler) {
+        public void click(AbstractContainerMenu handler) {
             for (Slot slot : Utils.getContainerSlots(handler)) {
-                ItemStack stack = slot.getStack();
+                ItemStack stack = slot.getItem();
                 if (!stack.getItem().equals(Items.PLAYER_HEAD)) continue;
                 List<String> lore = Utils.getLoreLines(stack);
-                if (!lore.isEmpty() && Utils.toPlain(stack.getName()).equals(this.player.getString()) && lore.getFirst().equals("Click to teleport!")) {
-                    mc.interactionManager.clickSlot(handler.syncId, slot.id, 0, SlotActionType.PICKUP, mc.player);
-                    handler.setCursorStack(ItemStack.EMPTY);
+                if (!lore.isEmpty() && Utils.toPlain(stack.getHoverName()).equals(this.player.getString()) && lore.getFirst().equals("Click to teleport!")) {
+                    mc.gameMode.handleContainerInput(handler.containerId, slot.index, 0, ContainerInput.PICKUP, mc.player);
+                    handler.setCarried(ItemStack.EMPTY);
                     if (LeapOverlay.send.value() && !LeapOverlay.message.value().isEmpty() && !sentLeapMsg) {
                         Utils.sendMessage(LeapOverlay.message.value().replace("{name}", this.player.getString()));
                         sentLeapMsg = true;
@@ -187,16 +187,16 @@ public class LeapOverlay {
             Utils.infoFormat("§7Could not leap to {}, valid teleport button not found.", this.player.getString());
         }
 
-        public void drawText(DrawContext context, Text text, int x, int y, float scale, RenderColor color) {
-            context.getMatrices().pushMatrix();
-            context.getMatrices().translate(x - x * scale, y - y * scale);
-            context.getMatrices().scale(scale);
-            context.drawCenteredTextWithShadow(mc.textRenderer, text, x, y, color.argb);
-            context.getMatrices().popMatrix();
+        public void drawText(GuiGraphicsExtractor context, Component text, int x, int y, float scale, RenderColor color) {
+            context.pose().pushMatrix();
+            context.pose().translate(x - x * scale, y - y * scale);
+            context.pose().scale(scale);
+            context.centeredText(mc.font, text, x, y, color.argb);
+            context.pose().popMatrix();
         }
 
         @Override
-        public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+        public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
             this.minX = getX(context, this.offsetX);
             this.minY = getY(context, this.offsetY);
             this.maxX = getX(context, this.offsetX + 0.2f);
@@ -205,14 +205,14 @@ public class LeapOverlay {
             if (!this.player.getString().isEmpty()) {
                 Rendering.drawBorder(context, minX, minY, maxX - minX, maxY - minY, border);
             }
-            float textScale = (float) (scale.value() / mc.options.getGuiScale().getValue());
+            float textScale = (float) (scale.value() / mc.options.guiScale().get());
             int textX = this.minX + (this.maxX - this.minX) / 2;
             int playerTextY = (int) (this.minY + (this.maxY - this.minY) * 0.25);
             int classTextY = (int) (this.minY + (this.maxY - this.minY) * 0.5);
             int deadTextY = (int) (this.minY + (this.maxY - this.minY) * 0.75);
             this.drawText(context, this.player, textX, playerTextY, textScale, this.nameColor);
             this.drawText(context, this.dungeonClass, textX, classTextY, textScale, this.classColor);
-            if (this.dead) this.drawText(context, Text.literal("DEAD"), textX, deadTextY, textScale, deadColor);
+            if (this.dead) this.drawText(context, Component.literal("DEAD"), textX, deadTextY, textScale, deadColor);
         }
     }
 }

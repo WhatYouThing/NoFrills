@@ -1,12 +1,12 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -74,7 +74,7 @@ public class TerminalSolvers {
 
     private static boolean checkStackColor(ItemStack stack, DyeColor color, String colorName) {
         Item item = stack.getItem();
-        if (Utils.toPlain(stack.getName()).trim().isEmpty()) {
+        if (Utils.toPlain(stack.getHoverName()).trim().isEmpty()) {
             return false;
         }
         if (stack.getItem().toString().startsWith("minecraft:" + colorName)) {
@@ -109,14 +109,14 @@ public class TerminalSolvers {
             }
             if (type.equals(TerminalType.StartsWith)) {
                 String character = Utils.toLower(String.valueOf(event.title.charAt(event.title.indexOf("'") + 1)));
-                String name = Utils.toLower(Utils.toPlain(event.stack.getName())).trim();
+                String name = Utils.toLower(Utils.toPlain(event.stack.getHoverName())).trim();
                 solveSlot(event.slot, !name.isEmpty() && name.startsWith(character) && !Utils.hasGlint(event.stack));
             }
             if (type.equals(TerminalType.Select)) {
                 String color = event.title.replace("Select all the", "").replace("items!", "").trim();
                 String colorName = color.equals("SILVER") ? "light_gray" : Utils.toLower(color).replace(" ", "_");
                 for (DyeColor dye : DyeColor.values()) {
-                    if (dye.getId().equals(colorName)) {
+                    if (dye.getName().equals(colorName)) {
                         solveSlot(event.slot, !Utils.hasGlint(event.stack) && checkStackColor(event.stack, dye, colorName));
                         break;
                     }
@@ -125,7 +125,7 @@ public class TerminalSolvers {
             if (type.equals(TerminalType.InOrder)) {
                 List<Slot> orderSlots = new ArrayList<>();
                 for (Slot slot : Utils.getContainerSlots(event.handler)) {
-                    Item item = slot.getStack().getItem();
+                    Item item = slot.getItem().getItem();
                     SlotOptions.setDisabled(event.slot, true);
                     if (item.equals(Items.RED_STAINED_GLASS_PANE) || item.equals(Items.LIME_STAINED_GLASS_PANE)) {
                         orderSlots.add(slot);
@@ -134,15 +134,15 @@ public class TerminalSolvers {
                     }
                 }
                 if (orderSlots.size() == 14) { // scuffed way to ensure every slot is sent in by the server
-                    orderSlots.removeIf(slot -> slot.getStack().getItem().equals(Items.LIME_STAINED_GLASS_PANE));
+                    orderSlots.removeIf(slot -> slot.getItem().getItem().equals(Items.LIME_STAINED_GLASS_PANE));
                     if (orderSlots.isEmpty()) {
                         return;
                     }
-                    orderSlots.sort(Comparator.comparingInt(slot -> slot.getStack().getCount()));
+                    orderSlots.sort(Comparator.comparingInt(slot -> slot.getItem().getCount()));
                     for (int i = 0; i < optionStacks.size(); i++) {
                         if (orderSlots.size() > i) {
                             Slot slot = orderSlots.get(i);
-                            solveSlot(slot, SlotOptions.stackWithCount(optionStacks.get(i), slot.getStack().getCount()), i == 0);
+                            solveSlot(slot, SlotOptions.stackWithCount(optionStacks.get(i), slot.getItem().getCount()), i == 0);
                         }
                     }
                 }
@@ -151,14 +151,14 @@ public class TerminalSolvers {
                 List<Slot> colorSlots = new ArrayList<>();
                 for (Slot slot : Utils.getContainerSlots(event.handler)) {
                     solveSlot(event.slot, false);
-                    if (colorsOrder.contains(slot.getStack().getItem()) && !colorSlots.contains(slot)) {
+                    if (colorsOrder.contains(slot.getItem().getItem()) && !colorSlots.contains(slot)) {
                         colorSlots.add(slot);
                     }
                 }
                 if (colorSlots.size() == 9) {
                     int[] colorCounts = {0, 0, 0, 0, 0};
                     for (Slot slot : colorSlots) {
-                        colorCounts[colorsOrder.indexOf(slot.getStack().getItem())] += 1;
+                        colorCounts[colorsOrder.indexOf(slot.getItem().getItem())] += 1;
                     }
                     int mostCommon = -1, highestCommon = 0;
                     for (int i = 0; i < 5; i++) {
@@ -168,7 +168,7 @@ public class TerminalSolvers {
                         }
                     }
                     for (Slot slot : colorSlots) {
-                        int target = Math.negateExact(mostCommon - colorsOrder.indexOf(slot.getStack().getItem()));
+                        int target = Math.negateExact(mostCommon - colorsOrder.indexOf(slot.getItem().getItem()));
                         if (Math.abs(target) > 2) {
                             int offset = Math.abs(target) == 4 ? 3 : 1;
                             target = Math.negateExact(target) + (target > 0 ? offset : -offset);
@@ -186,17 +186,17 @@ public class TerminalSolvers {
 
     @EventHandler
     private static void onSlotClick(SlotClickEvent event) {
-        if (instance.isActive() && event.slot != null && event.handler.syncId != lastSyncId && Utils.isOnDungeonFloor("7")) {
+        if (instance.isActive() && Utils.isOnDungeonFloor("7") && event.slot != null && event.handler.containerId != lastSyncId) {
             TerminalType type = getTerminalType(event.title);
             if (!isTypeEnabled(type)) return;
-            lastSyncId = event.handler.syncId;
+            lastSyncId = event.handler.containerId;
             switch (type) {
                 case Panes, StartsWith, Select -> solveSlot(event.slot, false);
                 case InOrder -> {
                     ItemStack spoofed = SlotOptions.getSpoofed(event.slot);
                     int count = spoofed.getCount();
                     for (Slot slot : Utils.getContainerSlots(event.handler)) {
-                        ItemStack slotStack = slot.getStack();
+                        ItemStack slotStack = slot.getItem();
                         int slotCount = slotStack.getCount();
                         if (slotStack.getItem().equals(Items.RED_STAINED_GLASS_PANE) && slotCount > count) {
                             for (int i = 0; i < optionStacks.size(); i++) {
@@ -248,7 +248,7 @@ public class TerminalSolvers {
                                 case Select -> selectColor.value();
                                 default -> RenderColor.white;
                             };
-                            event.drawFill(slot.id, color);
+                            event.drawFill(slot.index, color);
                         }
                     }
                 }
@@ -260,14 +260,14 @@ public class TerminalSolvers {
                             Item item = spoofed.getItem();
                             for (int i = 0; i < optionStacks.size(); i++) {
                                 if (item.equals(optionStacks.get(i).getItem())) {
-                                    event.drawFill(slot.id, switch (i) {
+                                    event.drawFill(slot.index, switch (i) {
                                         case 0 -> inOrderColorFirst.value();
                                         case 1 -> inOrderColorSecond.value();
                                         default -> inOrderColorThird.value();
                                     });
                                 }
                             }
-                            event.drawLabel(slot.id, Text.literal(String.valueOf(spoofed.getCount())));
+                            event.drawLabel(slot.index, Component.literal(String.valueOf(spoofed.getCount())));
                         }
                     }
                 }
@@ -277,11 +277,11 @@ public class TerminalSolvers {
                             ItemStack spoofed = SlotOptions.getSpoofed(slot);
                             String count = String.valueOf(spoofed.getCount());
                             if (spoofed.getItem().equals(SlotOptions.FIRST.getItem())) {
-                                event.drawFill(slot.id, colorsColorFirst.value());
-                                event.drawLabel(slot.id, Text.literal(count));
+                                event.drawFill(slot.index, colorsColorFirst.value());
+                                event.drawLabel(slot.index, Component.literal(count));
                             } else {
-                                event.drawFill(slot.id, colorsColorSecond.value());
-                                event.drawLabel(slot.id, Text.literal("-" + count));
+                                event.drawFill(slot.index, colorsColorSecond.value());
+                                event.drawLabel(slot.index, Component.literal("-" + count));
                             }
                         }
                     }

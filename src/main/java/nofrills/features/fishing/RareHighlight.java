@@ -1,9 +1,9 @@
 package nofrills.features.fishing;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
@@ -32,9 +32,9 @@ public class RareHighlight {
                     Entity owner = Utils.findNametagOwner(event.entity, Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, RareHighlight::isMob));
                     if (owner != null) {
                         cache.add(owner);
-                        if (owner.hasVehicle()) {
+                        if (owner.isPassenger()) {
                             cache.add(owner.getVehicle());
-                        } else if (owner.hasPassengers()) {
+                        } else if (owner.isVehicle()) {
                             cache.add(owner.getFirstPassenger());
                         }
                     }
@@ -46,11 +46,11 @@ public class RareHighlight {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !cache.empty()) {
-            float delta = event.tickCounter.getTickProgress(true);
+            float delta = event.tickCounter.getGameTimeDeltaPartialTick(true);
             for (Entity ent : cache.get()) {
                 if (!ent.isAlive()) continue;
-                Box box = ent instanceof ArmorStandEntity
-                        ? Box.of(ent.getLerpedPos(delta).add(0.0, ent.getStandingEyeHeight(), 0.0), 1.0, 1.0, 1.0)
+                AABB box = ent instanceof ArmorStand
+                        ? AABB.ofSize(ent.getPosition(delta).add(0.0, ent.getEyeHeight(), 0.0), 1.0, 1.0, 1.0)
                         : Utils.getLerpedBox(ent, delta);
                 event.drawStyled(box, style.value(), false, outlineColor.value(), fillColor.value());
             }

@@ -1,8 +1,8 @@
 package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.Utils;
@@ -22,15 +22,15 @@ public class CalendarDate {
         return 0;
     }
 
-    private static Text buildLine(String prefix, Calendar calendar) {
-        return Text.literal(Utils.format("{}: §b{}", prefix, Utils.parseDate(calendar)));
+    private static Component buildLine(String prefix, Calendar calendar) {
+        return Component.literal(Utils.format("{}: §b{}", prefix, Utils.parseDate(calendar)));
     }
 
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
-        if (instance.isActive() && mc.currentScreen instanceof GenericContainerScreen container) {
+        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
             if (container.getTitle().getString().equals("Calendar and Events")) {
-                for (Text line : event.lines) {
+                for (Component line : event.lines) {
                     String l = Utils.toPlain(line);
                     if (l.startsWith("Starts in: ")) {
                         String time = l.substring(l.indexOf(":")).trim();
@@ -43,9 +43,9 @@ public class CalendarDate {
                         if (second % 5 != 0) { // scuffed patch for when the second is slightly off in the GUI
                             calendar.add(Calendar.SECOND, 5 - (second % 5));
                         }
-                        event.addLine(Text.of(""));
+                        event.addLine(Component.nullToEmpty(""));
                         event.addLine(Utils.getShortTag().append(buildLine("§eDate of Event", calendar)));
-                        String stackName = Utils.toPlain(event.stack.getName());
+                        String stackName = Utils.toPlain(event.stack.getHoverName());
                         if (stackName.endsWith("Spooky Festival")) {
                             calendar.add(Calendar.HOUR, -1);
                             event.addLine(Utils.getShortTag().append(buildLine("§6Fear Mongerer Arrives", calendar)));

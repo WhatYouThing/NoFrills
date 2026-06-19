@@ -5,8 +5,8 @@ import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingEnum;
 import nofrills.hud.HudElement;
@@ -65,10 +65,10 @@ public final class Armor extends HudElement {
     private List<ItemStack> getArmorItems() {
         if (this.isEditingHud()) {
             return List.of(
-                    Items.LEATHER_HELMET.getDefaultStack(),
-                    Items.LEATHER_CHESTPLATE.getDefaultStack(),
-                    Items.LEATHER_LEGGINGS.getDefaultStack(),
-                    Items.LEATHER_BOOTS.getDefaultStack()
+                    Items.LEATHER_HELMET.getDefaultInstance(),
+                    Items.LEATHER_CHESTPLATE.getDefaultInstance(),
+                    Items.LEATHER_LEGGINGS.getDefaultInstance(),
+                    Items.LEATHER_BOOTS.getDefaultInstance()
             );
         }
         if (mc.player != null) {

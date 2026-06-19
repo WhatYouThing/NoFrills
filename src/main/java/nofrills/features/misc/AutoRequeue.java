@@ -33,10 +33,10 @@ public class AutoRequeue {
 
     public static void setPaused() {
         if (!paused) {
-            mc.send(() -> Utils.info("§aAuto Requeue paused for the current instance."));
+            mc.schedule(() -> Utils.info("§aAuto Requeue paused for the current instance."));
             paused = true;
         } else {
-            mc.send(() -> Utils.info("§7Auto Requeue is already paused."));
+            mc.schedule(() -> Utils.info("§7Auto Requeue is already paused."));
         }
     }
 

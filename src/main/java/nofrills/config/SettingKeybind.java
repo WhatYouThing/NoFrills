@@ -1,6 +1,6 @@
 package nofrills.config;
 
-import net.minecraft.client.util.InputUtil;
+import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 
 public class SettingKeybind extends SettingInt {
@@ -12,10 +12,10 @@ public class SettingKeybind extends SettingInt {
         this(defaultValue, key, instance.key());
     }
 
-    public static InputUtil.Key asInputConstant(int key) {
-        InputUtil.Key keyboard = InputUtil.Type.KEYSYM.createFromCode(key);
-        if (keyboard.getLocalizedText().getString().equals(keyboard.getTranslationKey())) { // fall back to a mouse key if the keyboard key has no translation
-            return InputUtil.Type.MOUSE.createFromCode(key);
+    public static InputConstants.Key asInputConstant(int key) {
+        InputConstants.Key keyboard = InputConstants.Type.KEYSYM.getOrCreate(key);
+        if (keyboard.getDisplayName().getString().equals(keyboard.getName())) { // fall back to a mouse key if the keyboard key has no translation
+            return InputConstants.Type.MOUSE.getOrCreate(key);
         } else {
             return keyboard;
         }
@@ -33,7 +33,7 @@ public class SettingKeybind extends SettingInt {
         return key != GLFW.GLFW_KEY_UNKNOWN && key == this.value();
     }
 
-    public InputUtil.Key asInputConstant() {
+    public InputConstants.Key asInputConstant() {
         return asInputConstant(this.key());
     }
 }

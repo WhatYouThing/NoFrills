@@ -2,9 +2,9 @@ package nofrills.features.dungeons;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Box;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
@@ -35,13 +35,13 @@ public class MinibossHighlight {
     );
 
     private static boolean isMiniboss(Entity ent) {
-        if (ent instanceof PlayerEntity player && !Utils.isPlayer(player)) {
+        if (ent instanceof Player player && !Utils.isPlayer(player)) {
             String name = player.getName().getString();
             if (!minibossList.contains(name)) {
                 return false;
             }
             if (Utils.isInDungeonBoss("4")) {
-                return player.getEntityPos().getY() < 76.0; // prevents the Floor 4 "crowd" NPC's from getting highlighted
+                return player.position().y() < 76.0; // prevents the Floor 4 "crowd" NPC's from getting highlighted
             } else {
                 return !name.equals("Spirit Bear"); // prevents the Spirit Bear spawned by the Watcher from getting highlighted
             }
@@ -61,7 +61,7 @@ public class MinibossHighlight {
         if (instance.isActive() && Utils.isInDungeons()) {
             for (Entity ent : cache.get()) {
                 if (!ent.isAlive()) continue;
-                Box box = Utils.getLerpedBox(ent, event.tickCounter.getTickProgress(true));
+                AABB box = Utils.getLerpedBox(ent, event.tickCounter.getGameTimeDeltaPartialTick(true));
                 event.drawStyled(box, style.value(), false, outlineColor.value(), fillColor.value());
             }
         }

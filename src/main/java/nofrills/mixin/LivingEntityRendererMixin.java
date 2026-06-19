@@ -2,9 +2,9 @@ package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import net.minecraft.client.render.entity.LivingEntityRenderer;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import nofrills.features.misc.ForceNametag;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,23 +14,23 @@ import static nofrills.Main.mc;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
-    @ModifyExpressionValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isSneaky()Z"))
+    @ModifyExpressionValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDiscrete()Z"))
     private boolean isSneaking(boolean original, T livingEntity) {
-        if (ForceNametag.isActive() && livingEntity instanceof PlayerEntity) {
+        if (ForceNametag.isActive() && livingEntity instanceof Player) {
             return false;
         }
         return original;
     }
 
-    @ModifyExpressionValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/entity/player/PlayerEntity;)Z"))
+    @ModifyExpressionValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/world/entity/player/Player;)Z"))
     private boolean isInvisible(boolean original, T livingEntity) {
-        if (ForceNametag.isActive() && livingEntity instanceof PlayerEntity player && Utils.isPlayer(player)) {
+        if (ForceNametag.isActive() && livingEntity instanceof Player player && Utils.isPlayer(player)) {
             return false;
         }
         return original;
     }
 
-    @ModifyReturnValue(method = "hasLabel(Lnet/minecraft/entity/LivingEntity;D)Z", at = @At("RETURN"))
+    @ModifyReturnValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At("RETURN"))
     protected boolean hasLabel(boolean original, T livingEntity) {
         if (ForceNametag.isActive() && ForceNametag.self.value() && livingEntity.equals(mc.player)) {
             return true;

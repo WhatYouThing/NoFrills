@@ -2,7 +2,7 @@ package nofrills.features.dungeons;
 
 import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import nofrills.config.Feature;
 import nofrills.config.SettingString;
 import nofrills.events.EntityRemovedEvent;
@@ -31,12 +31,12 @@ public class MimicMessage {
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (!mimicKilled && event.entity instanceof ZombieEntity zombie && zombie.isBaby() && Utils.isInDungeons()) {
+        if (!mimicKilled && event.entity instanceof Zombie zombie && zombie.isBaby() && Utils.isInDungeons()) {
             GameProfile textures = Utils.getTextures(Utils.getEntityArmor(zombie).getFirst());
             if (Utils.isTextureEqual(textures, "e19c12543bc7792605ef68e1f8749ae8f2a381d9085d4d4b780ba1282d3597a0")) {
                 cache.add(zombie);
             }
-            if (zombie.isDead() && cache.has(zombie)) {
+            if (zombie.isDeadOrDying() && cache.has(zombie)) {
                 processDeath();
             }
         }
@@ -44,7 +44,7 @@ public class MimicMessage {
 
     @EventHandler
     private static void onRemoved(EntityRemovedEvent event) {
-        if (!mimicKilled && event.entity instanceof ZombieEntity zombie && zombie.isDead() && cache.has(event.entity)) {
+        if (!mimicKilled && event.entity instanceof Zombie zombie && zombie.isDeadOrDying() && cache.has(event.entity)) {
             processDeath();
         }
     }

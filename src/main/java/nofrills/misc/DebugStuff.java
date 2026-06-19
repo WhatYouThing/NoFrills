@@ -4,22 +4,21 @@ import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.client.gui.hud.ClientBossBar;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ProfileComponent;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.PlayerHeadItem;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.PlayerHeadItem;
+import net.minecraft.world.item.component.ResolvableProfile;
+import net.minecraft.world.phys.Vec3;
 import nofrills.events.*;
 import org.joml.Vector3f;
 
@@ -35,12 +34,12 @@ public class DebugStuff {
     private static boolean logNametags = false;
     private static boolean logParticles = false;
 
-    private static void print(MutableText text) {
-        Utils.infoRaw(text.setStyle(text.getStyle().withHoverEvent(new HoverEvent.ShowText(Text.literal("at tick: " + tickCounter)))));
+    private static void print(MutableComponent text) {
+        Utils.infoRaw(text.setStyle(text.getStyle().withHoverEvent(new HoverEvent.ShowText(Component.literal("at tick: " + tickCounter)))));
     }
 
     private static void print(String message, Object... values) {
-        print(Text.literal(Utils.format(message, values)));
+        print(Component.literal(Utils.format(message, values)));
     }
 
     public static void dumpHeadTextures() {
@@ -52,22 +51,22 @@ public class DebugStuff {
         for (Entity ent : Utils.getEntities()) {
             if (ent instanceof LivingEntity living) {
                 for (EquipmentSlot slot : searchedSlots) {
-                    ItemStack stack = living.getEquippedStack(slot);
+                    ItemStack stack = living.getItemBySlot(slot);
                     if (stack.getItem() instanceof PlayerHeadItem) {
-                        ProfileComponent profile = stack.get(DataComponentTypes.PROFILE);
-                        if (profile == null || profile.getGameProfile() == null) continue;
-                        Optional<String> payload = Utils.getTexturePayload(profile.getGameProfile());
-                        Vec3d pos = living.getEntityPos();
+                        ResolvableProfile profile = stack.get(DataComponents.PROFILE);
+                        if (profile == null) continue;
+                        Optional<String> payload = Utils.getTexturePayload(profile.partialProfile());
+                        Vec3 pos = living.position();
                         LOGGER.info(Utils.format("\n\tURL - {}\n\tPayload - {}\n\tPayload hashcode - {}\n\tSlot - {}\n\tEntity Name - {}\n\tHead Name - {}\n\tPosition - {} {} {}",
-                                Utils.getTextureUrl(profile.getGameProfile()),
+                                Utils.getTextureUrl(profile.partialProfile()),
                                 payload.orElse("null"),
                                 payload.orElse("").hashCode(),
                                 Utils.toUpper(slot.name()),
                                 living.getName().getString(),
-                                stack.getName().getString(),
-                                pos.getX(),
-                                pos.getY(),
-                                pos.getZ()
+                                stack.getHoverName().getString(),
+                                pos.x,
+                                pos.y,
+                                pos.z
                         ));
                     }
                 }
@@ -77,23 +76,21 @@ public class DebugStuff {
     }
 
     public static void dumpPlayerTextures() {
-        MinecraftSessionService service = mc.getApiServices().sessionService();
+        MinecraftSessionService service = mc.services().sessionService();
         for (Entity ent : Utils.getEntities()) {
-            if (ent instanceof PlayerEntity player) {
-                if (player.getGameProfile() != null) {
-                    MinecraftProfileTextures textures = service.getTextures(player.getGameProfile());
-                    Vec3d pos = player.getEntityPos();
-                    if (textures.skin() == null) {
-                        continue;
-                    }
-                    LOGGER.info(Utils.format("\n\tURL - {}\n\tEntity Name - {}\n\tPosition - {} {} {}",
-                            textures.skin().getUrl(),
-                            player.getName().getString(),
-                            pos.getX(),
-                            pos.getY(),
-                            pos.getZ()
-                    ));
+            if (ent instanceof Player player) {
+                MinecraftProfileTextures textures = service.getTextures(player.getGameProfile());
+                Vec3 pos = player.position();
+                if (textures.skin() == null) {
+                    continue;
                 }
+                LOGGER.info(Utils.format("\n\tURL - {}\n\tEntity Name - {}\n\tPosition - {} {} {}",
+                        textures.skin().getUrl(),
+                        player.getName().getString(),
+                        pos.x,
+                        pos.y,
+                        pos.z
+                ));
             }
         }
         Utils.info("Dumped player texture URLs to latest.log.");
@@ -107,8 +104,8 @@ public class DebugStuff {
 
     public static void dumpNameTags() {
         for (Entity entity : Utils.getEntities()) {
-            if (entity instanceof ArmorStandEntity stand) {
-                Text name = stand.getCustomName();
+            if (entity instanceof ArmorStand stand) {
+                Component name = stand.getCustomName();
                 if (name != null) {
                     Utils.infoRaw(name.copy());
                 }
@@ -123,7 +120,7 @@ public class DebugStuff {
     }
 
     public static void dumpBossBarLabel() {
-        List<ClientBossBar> bossBars = Utils.getBossBars();
+        List<LerpingBossEvent> bossBars = Utils.getBossBars();
         if (!bossBars.isEmpty()) {
             Utils.infoRaw(bossBars.getFirst().getName().copy());
         }
@@ -160,13 +157,13 @@ public class DebugStuff {
     private static void onSound(PlaySoundEvent event) {
         if (logSounds) {
             print("sound: {}, category: {}, volume: {}, pitch: {}, x: {}, y: {}, z: {}",
-                    event.packet.getSound().value().id(),
-                    event.packet.getCategory().getName(),
+                    event.packet.getSound().value().location(),
+                    event.packet.getSource().getName(),
                     event.volume(),
                     event.pitch(),
-                    event.pos.getX(),
-                    event.pos.getY(),
-                    event.pos.getZ()
+                    event.pos.x,
+                    event.pos.y,
+                    event.pos.z
             );
         }
     }
@@ -182,19 +179,19 @@ public class DebugStuff {
     private static void onParticle(SpawnParticleEvent event) {
         if (logParticles) {
             String msg = Utils.format("particle: {}, count: {}, speed: {}, offsetX: {}, offsetY: {}, offsetZ: {}, force: {}, important: {}, x: {}, y: {}, z: {}",
-                    Registries.PARTICLE_TYPE.getId(event.type),
+                    event.getParticleId(),
                     event.packet.getCount(),
-                    event.packet.getSpeed(),
-                    event.packet.getOffsetX(),
-                    event.packet.getOffsetY(),
-                    event.packet.getOffsetZ(),
-                    event.packet.shouldForceSpawn(),
-                    event.packet.isImportant(),
+                    event.packet.getMaxSpeed(),
+                    event.packet.getXDist(),
+                    event.packet.getYDist(),
+                    event.packet.getZDist(),
+                    event.packet.isOverrideLimiter(),
+                    event.packet.alwaysShow(),
                     event.packet.getX(),
                     event.packet.getY(),
                     event.packet.getZ()
             );
-            if (event.packet.getParameters() instanceof DustParticleEffect dustParticle) {
+            if (event.packet.getParticle() instanceof DustParticleOptions dustParticle) {
                 Vector3f color = dustParticle.getColor();
                 msg = Utils.format("{}, color: {} {} {}", msg, color.x, color.y, color.z);
             }

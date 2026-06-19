@@ -1,10 +1,10 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityNamedEvent;
@@ -20,10 +20,10 @@ public class DropOffHighlight {
 
     private static final EntityCache cache = EntityCache.create();
 
-    private static Vec3d getGround(Vec3d pos) {
-        BlockPos blockPos = BlockPos.ofFloored(pos.getX(), Math.max(pos.getY(), 75), pos.getZ());
+    private static Vec3 getGround(Vec3 pos) {
+        BlockPos blockPos = BlockPos.containing(pos.x, Math.max(pos.y, 75), pos.z);
         BlockPos ground = Utils.findGround(blockPos, 4);
-        return new Vec3d(pos.getX(), ground.toCenterPos().add(0, 0.5, 0).getY(), pos.getZ());
+        return new Vec3(pos.x, ground.getCenter().add(0, 0.5, 0).y, pos.z);
     }
 
     @EventHandler
@@ -37,11 +37,11 @@ public class DropOffHighlight {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInKuudra() && !cache.empty()) {
             for (Entity drop : cache.get()) {
-                Text name = drop.getCustomName();
+                Component name = drop.getCustomName();
                 if (name == null) continue;
                 String string = Utils.toPlain(name);
                 if (string.equals("BRING SUPPLY CHEST HERE")) {
-                    event.drawBeam(getGround(drop.getLerpedPos(event.delta())), 256, false, color.value());
+                    event.drawBeam(getGround(drop.getPosition(event.delta())), 256, false, color.value());
                 }
             }
         }

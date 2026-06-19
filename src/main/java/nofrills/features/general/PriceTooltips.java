@@ -1,12 +1,12 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.Text;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -77,34 +77,34 @@ public class PriceTooltips {
         return 0L;
     }
 
-    private static String getPurchasedUUID(ScreenHandler handler) {
+    private static String getPurchasedUUID(AbstractContainerMenu handler) {
         for (Slot slot : Utils.getContainerSlots(handler)) {
-            NbtCompound data = Utils.getCustomData(slot.getStack());
+            CompoundTag data = Utils.getCustomData(slot.getItem());
             if (data != null && data.contains("uuid")) {
-                return data.getString("uuid", "");
+                return data.getStringOr("uuid", "");
             }
         }
         return "";
     }
 
-    private static Text buildLine(String name, double price, int quantity) {
+    private static Component buildLine(String name, double price, int quantity) {
         String line = Utils.format(
                 "{}: §6{} {}",
                 name,
                 Utils.formatSeparator(price * quantity),
                 quantity > 1 ? Utils.format("§8({}x {})", Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
-        return Utils.getShortTag().append(Text.literal(line).withColor(0xffffff));
+        return Utils.getShortTag().append(Component.literal(line).withColor(0xffffff));
     }
 
-    private static Text buildLine(String name, long price, int quantity) {
+    private static Component buildLine(String name, long price, int quantity) {
         String line = Utils.format(
                 "{}: §6{} {}",
                 name,
                 Utils.formatSeparator(price * quantity),
                 quantity > 1 ? Utils.format("§8({}x {})", Utils.formatSeparator(quantity), Utils.formatSeparator(price)) : ""
         ).trim();
-        return Utils.getShortTag().append(Text.literal(line).withColor(0xffffff));
+        return Utils.getShortTag().append(Component.literal(line).withColor(0xffffff));
     }
 
     @EventHandler
@@ -135,7 +135,7 @@ public class PriceTooltips {
                 event.addLine(buildLine("§eBazaar Sell", prices.sell(), quantity));
             }
             if (pricePaid.value() && event.customData != null && event.customData.contains("uuid")) {
-                String uuid = event.customData.getString("uuid", "");
+                String uuid = event.customData.getStringOr("uuid", "");
                 if (!uuid.isEmpty() && data.get().has(uuid)) {
                     event.addLine(buildLine("§ePrice Paid", data.get().get(uuid).getAsLong(), 1));
                 }
@@ -146,7 +146,7 @@ public class PriceTooltips {
     @EventHandler
     private static void onSlotClick(SlotClickEvent event) {
         if (instance.isActive() && pricePaid.value() && event.slot != null && event.title.equals("Confirm Purchase")) {
-            ItemStack stack = event.slot.getStack();
+            ItemStack stack = event.slot.getItem();
             if (!stack.getItem().equals(Items.GREEN_TERRACOTTA)) {
                 return;
             }

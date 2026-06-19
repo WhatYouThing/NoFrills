@@ -1,7 +1,7 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -18,7 +18,7 @@ public final class Ping extends SimpleTextElement {
     public List<Long> pingList = new CopyOnWriteArrayList<>();
 
     public Ping(String text) {
-        super(Text.literal(text), new Feature("pingElement"), "Ping Display");
+        super(Component.literal(text), new Feature("pingElement"), "Ping Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds your average ping to the element.")
         ));

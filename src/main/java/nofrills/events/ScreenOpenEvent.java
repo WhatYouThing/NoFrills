@@ -1,6 +1,6 @@
 package nofrills.events;
 
-import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screens.Screen;
 
 public class ScreenOpenEvent {
     public Screen screen;

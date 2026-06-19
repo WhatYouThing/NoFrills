@@ -3,14 +3,14 @@ package nofrills.features.solvers;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -43,7 +43,7 @@ public class HoppitySolver {
     }
 
     private static boolean isEgg(Entity entity) {
-        if (entity instanceof ArmorStandEntity stand) {
+        if (entity instanceof ArmorStand stand) {
             ItemStack helmet = Utils.getEntityHelmet(stand);
             if (helmet.getItem().equals(Items.PLAYER_HEAD)) {
                 GameProfile textures = Utils.getTextures(helmet);
@@ -67,7 +67,7 @@ public class HoppitySolver {
     }
 
     private static void eggInteract(Entity entity) {
-        if (currentEgg != null && isEgg(entity) && currentEgg.pos.equals(entity.getEyePos())) {
+        if (currentEgg != null && isEgg(entity) && currentEgg.pos.equals(entity.getEyePosition())) {
             solver.resetFitter();
             currentEgg = null;
         }
@@ -119,9 +119,9 @@ public class HoppitySolver {
         if (instance.isActive() && isSlopSeason()) {
             solver.tick();
             if (currentEgg != null && currentEgg.guess) {
-                List<Entity> nearest = Utils.getOtherEntities(null, currentEgg.getBox().expand(2.0), HoppitySolver::isEgg);
+                List<Entity> nearest = Utils.getOtherEntities(null, currentEgg.getBox().inflate(2.0), HoppitySolver::isEgg);
                 if (!nearest.isEmpty()) {
-                    currentEgg = new SlopEgg(nearest.getFirst().getEyePos(), false);
+                    currentEgg = new SlopEgg(nearest.getFirst().getEyePosition(), false);
                 }
             }
         }
@@ -130,9 +130,9 @@ public class HoppitySolver {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && currentEgg != null && isSlopSeason()) {
-            Box box = currentEgg.getBox();
-            Vec3d textPos = box.getCenter().add(0.0, 1.0, 0.0);
-            Text label = currentEgg.guess ? Text.literal("Guess") : Text.literal("Egg");
+            AABB box = currentEgg.getBox();
+            Vec3 textPos = box.getCenter().add(0.0, 1.0, 0.0);
+            Component label = currentEgg.guess ? Component.literal("Guess") : Component.literal("Egg");
             event.drawFilled(box, true, color.value());
             event.drawDistanceScaledText(textPos, label, 0.05f, true, color.valueWithAlpha(1.0f));
             if (tracer.value()) {
@@ -148,19 +148,19 @@ public class HoppitySolver {
     }
 
     public static class SlopEgg {
-        public Vec3d pos;
+        public Vec3 pos;
         public boolean guess;
-        public Box box = null;
+        public AABB box = null;
 
-        public SlopEgg(Vec3d pos, boolean guess) {
+        public SlopEgg(Vec3 pos, boolean guess) {
             this.pos = pos;
             this.guess = guess;
         }
 
-        public Box getBox() {
+        public AABB getBox() {
             if (this.box == null) {
-                BlockPos blockPos = BlockPos.ofFloored(this.pos);
-                this.box = Box.enclosing(blockPos, blockPos);
+                BlockPos blockPos = BlockPos.containing(this.pos);
+                this.box = AABB.encapsulatingFullBlocks(blockPos, blockPos);
             }
             return this.box;
         }

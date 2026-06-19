@@ -1,11 +1,11 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -20,7 +20,7 @@ public final class FishingBag extends SimpleTextElement {
     public final SettingBool onlyRod = new SettingBool(true, "onlyRod", this.instance);
 
     public FishingBag(String text) {
-        super(Text.literal(text), new Feature("fishingBagElement"), "Fishing Bag Display");
+        super(Component.literal(text), new Feature("fishingBagElement"), "Fishing Bag Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Only If Rod", this.onlyRod, "Automatically hides the element if you are not holding a fishing rod.")
         ));
@@ -39,17 +39,17 @@ public final class FishingBag extends SimpleTextElement {
     }
 
     public void update(ItemStack stack) {
-        String name = Utils.toPlain(stack.getName());
+        String name = Utils.toPlain(stack.getHoverName());
         if (name.endsWith(" Bait")) {
-            for (Text text : Utils.getLoreText(stack)) {
+            for (Component text : Utils.getLoreText(stack)) {
                 String line = Utils.toPlain(text);
                 if (line.startsWith("Bait Remaining: ")) {
                     String quantity = line.substring(line.indexOf(":") + 2);
-                    Style nameStyle = Utils.getStyle(stack.getName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(Formatting.WHITE));
-                    Style quantityStyle = Utils.getStyle(text, s -> s.trim().startsWith(quantity)).orElse(Style.EMPTY.withColor(Formatting.WHITE));
-                    this.setText(Text.literal("Bait: ")
-                            .append(Text.literal(name.replace(" Bait", "")).setStyle(nameStyle))
-                            .append(Text.literal(" x" + quantity).setStyle(quantityStyle))
+                    Style nameStyle = Utils.getStyle(stack.getHoverName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
+                    Style quantityStyle = Utils.getStyle(text, s -> s.trim().startsWith(quantity)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
+                    this.setText(Component.literal("Bait: ")
+                            .append(Component.literal(name.replace(" Bait", "")).setStyle(nameStyle))
+                            .append(Component.literal(" x" + quantity).setStyle(quantityStyle))
                     );
                     break;
                 }

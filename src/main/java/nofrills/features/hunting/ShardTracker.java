@@ -12,9 +12,9 @@ import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
@@ -48,7 +48,7 @@ public final class ShardTracker {
     public static final SettingBool filterDirect = new SettingBool(false, "filterDirect", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
 
-    public static final MutableText displayNone = Text.literal("Shard Tracker\n§7None tracked.");
+    public static final MutableComponent displayNone = Component.literal("Shard Tracker\n§7None tracked.");
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
@@ -62,14 +62,14 @@ public final class ShardTracker {
             mc.setScreen(buildSettings());
         });
         clearButton.button.verticalSizing(Sizing.fixed(18));
-        clearButton.button.tooltip(Text.literal("Clears the list of your tracked shards."));
+        clearButton.button.tooltip(Component.literal("Clears the list of your tracked shards."));
         list.add(clearButton);
         Settings.BigButton importButton = new Settings.BigButton("Import Shard Tree", btn -> {
             importTreeData();
             mc.setScreen(buildSettings());
         });
         importButton.button.verticalSizing(Sizing.fixed(18));
-        importButton.button.tooltip(Text.literal("Pastes the list of shards that you need to get."));
+        importButton.button.tooltip(Component.literal("Pastes the list of shards that you need to get."));
         list.add(importButton);
         Settings.BigButton button = new Settings.BigButton("Add New Shard", btn -> {
             data.edit(object -> {
@@ -98,13 +98,13 @@ public final class ShardTracker {
 
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Shard Tracker"));
+        settings.setTitle(Component.literal("Shard Tracker"));
         refreshDisplay();
         return settings;
     }
 
     public static void importTreeData() {
-        String clipboard = mc.keyboard.getClipboard();
+        String clipboard = mc.keyboardHandler.getClipboard();
         JsonArray treeData = parseTreeData(clipboard);
         if (treeData == null) {
             Utils.info("§cFailed to import the fusion tree from the SkyShards calculator, no valid data found in your clipboard.");
@@ -170,7 +170,7 @@ public final class ShardTracker {
     }
 
     private static boolean isInFusion() {
-        if (mc.currentScreen instanceof GenericContainerScreen container) {
+        if (mc.screen instanceof ContainerScreen container) {
             String title = container.getTitle().getString();
             return title.equals("Fusion Box") || title.equals("Confirm Fusion");
         }
@@ -329,7 +329,7 @@ public final class ShardTracker {
             if (!shards.isEmpty()) {
                 for (String line : Utils.getLoreLines(event.stack)) {
                     if (line.startsWith("Owned: ")) {
-                        String name = Utils.toLower(Utils.toPlain(event.stack.getName()));
+                        String name = Utils.toLower(Utils.toPlain(event.stack.getHoverName()));
                         JsonObject tracked = getTrackedShard(name);
                         if (tracked != null) {
                             data.edit(object -> tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack)));
@@ -412,7 +412,7 @@ public final class ShardTracker {
             this.index = index;
             this.inputName = new FlatTextbox(Sizing.fixed(80));
             this.inputName.margins(Insets.of(0, 0, 0, 5));
-            this.inputName.tooltip(Text.literal("The name of the shard you want to track."));
+            this.inputName.tooltip(Component.literal("The name of the shard you want to track."));
             this.inputName.text(getData().get("name").getAsString());
             this.inputName.borderColor = ShardData.getColorHex(getData().get("name").getAsString());
             this.inputName.onChanged().subscribe(value -> {
@@ -422,7 +422,7 @@ public final class ShardTracker {
             });
             this.inputObtained = new FlatTextbox(Sizing.fixed(50));
             this.inputObtained.margins(Insets.of(0, 0, 0, 5));
-            this.inputObtained.tooltip(Text.literal("The amount of this shard that you currently have."));
+            this.inputObtained.tooltip(Component.literal("The amount of this shard that you currently have."));
             this.inputObtained.text(String.valueOf(getData().get("obtained").getAsLong()));
             this.inputObtained.onChanged().subscribe(text -> {
                 Optional<Long> value = Utils.parseLong(text);
@@ -433,7 +433,7 @@ public final class ShardTracker {
             });
             this.inputNeeded = new FlatTextbox(Sizing.fixed(50));
             this.inputNeeded.margins(Insets.of(0, 0, 0, 5));
-            this.inputNeeded.tooltip(Text.literal("The amount of this shard that you want to obtain. Set to 0 for no target amount."));
+            this.inputNeeded.tooltip(Component.literal("The amount of this shard that you want to obtain. Set to 0 for no target amount."));
             this.inputNeeded.text(String.valueOf(getData().get("needed").getAsLong()));
             this.inputNeeded.onChanged().subscribe(text -> {
                 Optional<Long> value = Utils.parseLong(text);
@@ -451,8 +451,8 @@ public final class ShardTracker {
             });
             this.inputSource.margins(Insets.of(1, 0, 0, 0));
             this.inputSource.sizing(Sizing.fixed(48), Sizing.fixed(18));
-            this.inputSource.tooltip(Text.literal("The source that this shard is obtained from. Click to rotate."));
-            this.delete = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            this.inputSource.tooltip(Component.literal("The source that this shard is obtained from. Click to rotate."));
+            this.delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("shards").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });
@@ -476,8 +476,8 @@ public final class ShardTracker {
             return this.getData(data.value());
         }
 
-        public MutableText getSourceInputLabel(String source) {
-            return Text.literal(Utils.format("{}{}", getSourceColor(source), source));
+        public MutableComponent getSourceInputLabel(String source) {
+            return Component.literal(Utils.format("{}{}", getSourceColor(source), source));
         }
     }
 }

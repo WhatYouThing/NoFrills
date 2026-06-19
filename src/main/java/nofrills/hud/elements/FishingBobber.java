@@ -1,9 +1,9 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.entity.Entity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.Entity;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
@@ -26,7 +26,7 @@ public final class FishingBobber extends SimpleTextElement {
     public int timerTicks = 0;
 
     public FishingBobber(String text) {
-        super(Text.literal(text), new Feature("bobberElement"), "Fishing Bobber");
+        super(Component.literal(text), new Feature("bobberElement"), "Fishing Bobber");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Inactive", this.inactive, "Hides the element if your fishing bobber is inactive."),
                 new Settings.Toggle("Bobber Timer", this.timer, "Displays how long your fishing bobber has existed for, useful for Slugfish."),
@@ -44,7 +44,7 @@ public final class FishingBobber extends SimpleTextElement {
         } else if (!this.isEditingHud() && this.inactive.value() && !this.isBobberActive()) {
             return;
         }
-        MutableText text = this.compact.value() ? Text.literal("") : Text.literal("Bobber: ");
+        MutableComponent text = this.compact.value() ? Component.literal("") : Component.literal("Bobber: ");
         if (this.isBobberActive()) {
             Entity hologram = this.cache.getFirst();
             if (hologram != null && hologram.hasCustomName()) {
@@ -63,7 +63,7 @@ public final class FishingBobber extends SimpleTextElement {
     }
 
     public boolean isBobberActive() {
-        return mc.player != null && (mc.player.fishHook != null || this.cache.getFirst() != null);
+        return mc.player != null && (mc.player.fishing != null || this.cache.getFirst() != null);
     }
 
     public void onNamed(EntityNamedEvent event) {

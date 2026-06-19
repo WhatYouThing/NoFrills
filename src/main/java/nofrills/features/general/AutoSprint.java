@@ -15,19 +15,19 @@ public class AutoSprint {
     private static boolean wasSprinting = false;
 
     private static void setSprinting(boolean sprinting) {
-        if (mc.options.getSprintToggled().getValue()) {
-            if (mc.options.sprintKey.isPressed() == !sprinting) {
-                mc.options.sprintKey.setPressed(true);
+        if (mc.options.toggleSprint().get()) {
+            if (mc.options.keySprint.isDown() == !sprinting) {
+                mc.options.keySprint.setDown(true);
             }
         } else {
-            mc.options.sprintKey.setPressed(sprinting);
+            mc.options.keySprint.setDown(sprinting);
         }
     }
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && mc.player != null) {
-            if (waterCheck.value() && mc.player.isTouchingWater()) {
+            if (waterCheck.value() && mc.player.isInWater()) {
                 if (wasSprinting) {
                     setSprinting(false);
                     wasSprinting = false;
@@ -35,7 +35,7 @@ public class AutoSprint {
                 return;
             }
             setSprinting(true);
-            wasSprinting = mc.options.sprintKey.isPressed();
+            wasSprinting = mc.options.keySprint.isDown();
         }
     }
 }

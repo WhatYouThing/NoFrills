@@ -1,7 +1,7 @@
 package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.ChatMsgEvent;
 import nofrills.misc.Utils;
@@ -13,7 +13,7 @@ public class CocoonAlert {
     private static void onChat(ChatMsgEvent event) {
         if (instance.isActive() && Utils.isInSkyblock() && event.messagePlain.trim().equals("YOU COCOONED YOUR SLAYER BOSS")) {
             Utils.showTitle("§c§lCOCOON!", "", 0, 30, 10);
-            Utils.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1, 0);
+            Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
         }
     }
 }

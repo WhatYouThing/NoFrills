@@ -1,8 +1,8 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Feature;
 import nofrills.features.dungeons.ScoreCalculator;
 import nofrills.hud.SimpleTextElement;
@@ -12,7 +12,7 @@ import nofrills.misc.Utils;
 public final class DungeonScore extends SimpleTextElement {
 
     public DungeonScore() {
-        super(Text.literal("Score: §fN/A"), new Feature("dungeonScoreElement"), "Dungeon Score");
+        super(Component.literal("Score: §fN/A"), new Feature("dungeonScoreElement"), "Dungeon Score");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the current dungeon score. Used by the Score Calculator feature.");
         this.setCategory(Category.Dungeons);
@@ -33,8 +33,8 @@ public final class DungeonScore extends SimpleTextElement {
         if (score > 0) {
             int color = this.getScoreColor(score);
             String label = this.getScoreLabel(score);
-            MutableText text = Text.literal(Utils.format("{}{}§r §7({})", score >= 300 ? "§l" : "", score, label)).withColor(color);
-            this.setText(Text.literal("Score: ").append(text));
+            MutableComponent text = Component.literal(Utils.format("{}{}§r §7({})", score >= 300 ? "§l" : "", score, label)).withColor(color);
+            this.setText(Component.literal("Score: ").append(text));
         } else {
             this.setDefaultText();
         }

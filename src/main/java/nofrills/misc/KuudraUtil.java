@@ -1,9 +1,9 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.MagmaCubeEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.phys.Vec3;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 
@@ -32,8 +32,8 @@ public class KuudraUtil {
         return currentPhase;
     }
 
-    public static MagmaCubeEntity getKuudraEntity() {
-        return (MagmaCubeEntity) kuudraCache.getFirst();
+    public static MagmaCube getKuudraEntity() {
+        return (MagmaCube) kuudraCache.getFirst();
     }
 
     public static PickupSpot getPreSpot() {
@@ -42,12 +42,12 @@ public class KuudraUtil {
 
     private static void updateKuudraEntity() {
         if (kuudraCache.empty()) {
-            MagmaCubeEntity kuudra = null;
+            MagmaCube kuudra = null;
             double maxY = 0;
             int cubesFound = 0;
             for (Entity ent : Utils.getEntities()) {
-                if (ent instanceof MagmaCubeEntity cube && cube.getSize() == 30) {
-                    double y = ent.getEntityPos().getY();
+                if (ent instanceof MagmaCube cube && cube.getSize() == 30) {
+                    double y = ent.position().y();
                     cubesFound++;
                     if (y > maxY) {
                         kuudra = cube;
@@ -87,7 +87,7 @@ public class KuudraUtil {
 
     private static void updatePreSpot() {
         if (mc.player != null && preSpot == null && currentPhase.equals(Phase.Collect)) {
-            Vec3d pos = mc.player.getEntityPos();
+            Vec3 pos = mc.player.position();
             for (PickupSpot pickupSpot : KuudraUtil.pickupSpots) {
                 if (pickupSpot.spot.distanceTo(pos) < pickupSpot.playerDist) {
                     preSpot = pickupSpot;
@@ -144,14 +144,14 @@ public class KuudraUtil {
         public static final PickupSpot Shop = new PickupSpot("Shop", -81.0, 76.0, -143.0, 18, 0);
 
         public String name;
-        public Vec3d spot;
+        public Vec3 spot;
         public double supplyDist;
         public double playerDist;
         public SpotType secondary;
 
         public PickupSpot(String name, double x, double y, double z, double supplyDist, double playerDist) {
             this.name = name;
-            this.spot = new Vec3d(x, y, z);
+            this.spot = new Vec3(x, y, z);
             this.supplyDist = supplyDist;
             this.playerDist = playerDist;
             this.secondary = SpotType.None;

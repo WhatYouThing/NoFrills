@@ -1,7 +1,7 @@
 package nofrills.features.farming;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.KeyMapping;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingKeybind;
@@ -24,22 +24,22 @@ public class MouseLock {
 
     public static boolean locked = false;
 
-    private static void bindOption(KeyBinding option, SettingKeybind key) {
+    private static void bindOption(KeyMapping option, SettingKeybind key) {
         if (!key.bound()) return;
-        option.setBoundKey(key.asInputConstant());
-        option.setPressed(false);
+        option.setKey(key.asInputConstant());
+        option.setDown(false);
     }
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && keybind.isKey(event.key) && mc.currentScreen == null && Utils.isInGarden()) {
+        if (instance.isActive() && keybind.isKey(event.key) && mc.screen == null && Utils.isInGarden()) {
             if (event.action == GLFW.GLFW_PRESS) {
                 locked = !locked;
                 Utils.info(locked ? "§aMouse lock activated." : "§cMouse lock deactivated.");
                 if (rebind.value()) {
-                    bindOption(mc.options.attackKey, locked ? breakKeyActive : breakKeyInactive);
-                    bindOption(mc.options.jumpKey, locked ? jumpKeyActive : jumpKeyInactive);
-                    KeyBinding.updateKeysByCode();
+                    bindOption(mc.options.keyAttack, locked ? breakKeyActive : breakKeyInactive);
+                    bindOption(mc.options.keyJump, locked ? jumpKeyActive : jumpKeyInactive);
+                    KeyMapping.resetMapping();
                 }
             }
             event.cancel();
@@ -51,9 +51,9 @@ public class MouseLock {
         if (instance.isActive()) {
             locked = false;
             if (rebind.value()) {
-                bindOption(mc.options.attackKey, breakKeyInactive);
-                bindOption(mc.options.jumpKey, jumpKeyInactive);
-                KeyBinding.updateKeysByCode();
+                bindOption(mc.options.keyAttack, breakKeyInactive);
+                bindOption(mc.options.keyJump, jumpKeyInactive);
+                KeyMapping.resetMapping();
             }
         }
     }

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import static nofrills.Main.mc;
 
 public final class QueueCooldownTimer extends TimerElement {
-    public final String name = mc.getSession().getUsername();
+    public final String name = mc.getUser().getName();
     public final List<Pattern> patterns = List.of(
             Pattern.compile("-*\\n.*" + name + " entered .*!\\n-*"),
             Pattern.compile("-*\\n.*" + name + " queued for .*!\\nThe party is in position #.* of the queue!\\n-*")

@@ -1,9 +1,9 @@
 package nofrills.features.farming;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.*;
 import nofrills.hud.HudManager;
@@ -17,7 +17,7 @@ public class PhantomleafSolver {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && event.isSound(SoundEvents.BLOCK_NOTE_BLOCK_BASEDRUM) && ticks > 0 && Utils.isInGarden()) {
+        if (instance.isActive() && event.isSound(SoundEvents.NOTE_BLOCK_BASEDRUM) && ticks > 0 && Utils.isInGarden()) {
             lastVolume = event.volume();
         }
     }
@@ -46,7 +46,9 @@ public class PhantomleafSolver {
 
     @EventHandler
     private static void onPacket(ReceivePacketEvent event) {
-        if (instance.isActive() && event.packet instanceof SubtitleS2CPacket(Text text) && Utils.isInGarden()) {
+        if (instance.isActive() && event.packet instanceof ClientboundSetSubtitleTextPacket(
+                Component text
+        ) && Utils.isInGarden()) {
             String subtitle = Utils.toPlain(text).trim();
             if (subtitle.startsWith("(") && subtitle.contains(Utils.Symbols.heart) && subtitle.endsWith(")")) {
                 ticks = 40;

@@ -5,9 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import nofrills.config.Feature;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.ConcurrentHashSet;
@@ -35,9 +35,9 @@ public class NoGhostPlace {
             "SNOW_HOWITZER"
     );
 
-    public static boolean isNonPlaceable(ItemPlacementContext context) {
+    public static boolean isNonPlaceable(BlockPlaceContext context) {
         if (context != null) {
-            ItemStack stack = context.getStack();
+            ItemStack stack = context.getItemInHand();
             String id = Utils.getSkyblockId(stack);
             if (stack.getItem() instanceof BlockItem && !id.isEmpty()) {
                 return items.contains(id) || abilityWhitelist.contains(id) || id.startsWith("ABIPHONE") || Utils.hasRightClickAbility(stack);

@@ -15,7 +15,7 @@ import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Positioning;
 import io.wispforest.owo.ui.core.Sizing;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingJson;
 import nofrills.hud.clickgui.Settings;
@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
-import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.argument;
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommands.literal;
 import static nofrills.Main.mc;
 
 public final class CommandShortcuts {
@@ -85,7 +85,7 @@ public final class CommandShortcuts {
 
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Command Shortcuts"));
+        settings.setTitle(Component.literal("Command Shortcuts"));
         return settings;
     }
 
@@ -107,16 +107,16 @@ public final class CommandShortcuts {
             this.shortcutInput = new FlatTextbox(Sizing.fixed(118));
             this.shortcutInput.margins(Insets.of(0, 0, 0, 5));
             this.shortcutInput.text(this.getData(data.value()).get("shortcut").getAsString());
-            this.shortcutInput.tooltip(Text.literal("The command name of this shortcut. Example: /dn"));
+            this.shortcutInput.tooltip(Component.literal("The command name of this shortcut. Example: /dn"));
             this.shortcutInput.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("shortcut", value)));
 
             this.messageInput = new FlatTextbox(Sizing.fixed(118));
             this.messageInput.margins(Insets.of(0, 0, 0, 5));
             this.messageInput.text(this.getData(data.value()).get("message").getAsString());
-            this.messageInput.tooltip(Text.literal("The message/command that this shortcut will send. Example: /warp dungeon_hub"));
+            this.messageInput.tooltip(Component.literal("The message/command that this shortcut will send. Example: /warp dungeon_hub"));
             this.messageInput.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("message", value)));
 
-            this.delete = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            this.delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("shortcuts").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });

@@ -1,11 +1,11 @@
 package nofrills.features.misc;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ChatMsgEvent;
@@ -28,12 +28,12 @@ public class PartyFinder {
                 return;
             }
             Optional<Style> style = Utils.getStyle(event.message, (string) -> string.trim().startsWith(name));
-            MutableText message = Text.literal("§7Options for ")
-                    .append(Text.literal(name).setStyle(style.orElse(Style.EMPTY.withFormatting(Formatting.GRAY)))).append("§7: ")
-                    .append(Text.literal("§b§l[COPY NAME]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.CopyToClipboard(name)))).append(" ")
-                    .append(Text.literal("§a§l[PROFILE VIEWER]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/pv " + name)))).append(" ")
-                    .append(Text.literal("§c§l[KICK]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/party kick " + name)))).append(" ")
-                    .append(Text.literal("§e§l[BLOCK]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/ignore add " + name))));
+            MutableComponent message = Component.literal("§7Options for ")
+                    .append(Component.literal(name).setStyle(style.orElse(Style.EMPTY.applyFormat(ChatFormatting.GRAY)))).append("§7: ")
+                    .append(Component.literal("§b§l[COPY NAME]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.CopyToClipboard(name)))).append(" ")
+                    .append(Component.literal("§a§l[PROFILE VIEWER]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/pv " + name)))).append(" ")
+                    .append(Component.literal("§c§l[KICK]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/party kick " + name)))).append(" ")
+                    .append(Component.literal("§e§l[BLOCK]").setStyle(Style.EMPTY.withClickEvent(new ClickEvent.RunCommand("/ignore add " + name))));
             Utils.infoRaw(message);
         }
     }

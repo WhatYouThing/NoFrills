@@ -2,7 +2,7 @@ package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.Entity;
 import nofrills.events.EntityRemovedEvent;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.ServerJoinEvent;

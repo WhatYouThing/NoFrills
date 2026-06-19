@@ -13,9 +13,9 @@ public class AutoTip {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && Utils.isOnHypixel() && Util.getMeasuringTimeMs() > time) {
+        if (instance.isActive() && Utils.isOnHypixel() && Util.getMillis() > time) {
             Utils.sendMessage("/tipall");
-            time = Util.getMeasuringTimeMs() + 900000;
+            time = Util.getMillis() + 900000;
         }
     }
 }

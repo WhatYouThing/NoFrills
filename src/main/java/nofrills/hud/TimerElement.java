@@ -1,7 +1,7 @@
 package nofrills.hud;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import nofrills.config.Feature;
 import nofrills.misc.Utils;
@@ -13,7 +13,7 @@ public class TimerElement extends SimpleTextElement {
     protected boolean autoPause = false;
 
     public TimerElement(String text, Feature instance, String label) {
-        super(Text.literal(Utils.format(text, "N/A")), instance, label);
+        super(Component.literal(Utils.format(text, "N/A")), instance, label);
         this.timerText = text;
     }
 
@@ -44,7 +44,7 @@ public class TimerElement extends SimpleTextElement {
     }
 
     public void updateTimer() {
-        long timeLeft = this.time - Util.getMeasuringTimeMs();
+        long timeLeft = this.time - Util.getMillis();
         if (timeLeft > 0) {
             this.setText(Utils.format(this.getTimerText(), this.getTimeColor(timeLeft) + this.millisecondsAsTime(timeLeft)));
         } else if (this.time != 0) {
@@ -54,7 +54,7 @@ public class TimerElement extends SimpleTextElement {
 
     public void start(long duration) {
         this.duration = duration;
-        this.time = duration + Util.getMeasuringTimeMs();
+        this.time = duration + Util.getMillis();
     }
 
     public void pause() {

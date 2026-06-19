@@ -9,9 +9,9 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screen.ingame.AnvilScreen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AnvilScreen;
+import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
@@ -67,15 +67,15 @@ public final class CommandKeybinds {
 
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
-        settings.setTitle(Text.literal("Command Keybinds"));
+        settings.setTitle(Component.literal("Command Keybinds"));
         return settings;
     }
 
     private static boolean isValidScreen(boolean allowBindInGui) {
-        if ((allowAllInGui.value() || allowBindInGui) && mc.currentScreen instanceof HandledScreen) {
-            return !(mc.currentScreen instanceof AnvilScreen);
+        if ((allowAllInGui.value() || allowBindInGui) && mc.screen instanceof AbstractContainerScreen<?>) {
+            return !(mc.screen instanceof AnvilScreen);
         }
-        return mc.currentScreen == null;
+        return mc.screen == null;
     }
 
     private static Modifier getModifierType(String modifier) {
@@ -160,16 +160,16 @@ public final class CommandKeybinds {
             FlatTextbox input = new FlatTextbox(Sizing.fixed(140));
             input.margins(Insets.of(0, 0, 0, 6));
             input.text(this.getData().has("name") ? this.getData().get("name").getAsString() : "New Keybind");
-            input.tooltip(Text.literal("The name of this command keybind."));
+            input.tooltip(Component.literal("The name of this command keybind."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("name", value)));
             ToggleButton mainToggle = new ToggleButton(this.getData().has("enabled") && this.getData().get("enabled").getAsBoolean());
             mainToggle.sizing(Sizing.fixed(50), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 3));
-            mainToggle.tooltip(Text.literal("The main toggle for this command keybind."));
+            mainToggle.tooltip(Component.literal("The main toggle for this command keybind."));
             mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));
-            ButtonComponent editButton = UIComponents.button(Text.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildKeybindSettings()));
+            ButtonComponent editButton = UIComponents.button(Component.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildKeybindSettings()));
             editButton.sizing(Sizing.fixed(48), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             editButton.renderer(Settings.buttonRendererWhite);
-            ButtonComponent delete = UIComponents.button(Text.literal("Delete").withColor(0xffffff), button -> {
+            ButtonComponent delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("binds").getAsJsonArray().remove(this.index));
                 mc.setScreen(buildSettings());
             });
@@ -194,11 +194,11 @@ public final class CommandKeybinds {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Command"));
+            PlainLabel label = new PlainLabel(Component.literal("Command"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
             input.text(this.getData().get("command").getAsString());
-            input.tooltip(Text.literal("The message/command that this keybind will send."));
+            input.tooltip(Component.literal("The message/command that this keybind will send."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("command", value)));
             layout.child(label);
             layout.child(input);
@@ -209,11 +209,11 @@ public final class CommandKeybinds {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Allow in GUI"));
+            PlainLabel label = new PlainLabel(Component.literal("Allow in GUI"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             ToggleButton allowInGuiToggle = new ToggleButton(this.getData().has("allowInGui") && this.getData().get("allowInGui").getAsBoolean());
             allowInGuiToggle.sizing(Sizing.fixed(50), Sizing.fixed(20));
-            allowInGuiToggle.tooltip(Text.literal("Allow this keybind to work while any container GUI (inventory/chest/furnace/etc.) is open."));
+            allowInGuiToggle.tooltip(Component.literal("Allow this keybind to work while any container GUI (inventory/chest/furnace/etc.) is open."));
             allowInGuiToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("allowInGui", toggle)));
             layout.child(label);
             layout.child(allowInGuiToggle);
@@ -224,12 +224,12 @@ public final class CommandKeybinds {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Keybind"));
+            PlainLabel label = new PlainLabel(Component.literal("Keybind"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             KeybindButton keybind = new KeybindButton();
             keybind.verticalSizing(Sizing.fixed(20)).horizontalSizing(Sizing.fixed(100));
             keybind.bind(this.getData(data.value()).get("key").getAsInt());
-            keybind.tooltip(Text.literal("The key bound to this command."));
+            keybind.tooltip(Component.literal("The key bound to this command."));
             keybind.onBound().subscribe(key -> data.edit(object -> this.getData(object).addProperty("key", key)));
             layout.child(label);
             layout.child(keybind);
@@ -240,12 +240,12 @@ public final class CommandKeybinds {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Modifier Key"));
+            PlainLabel label = new PlainLabel(Component.literal("Modifier Key"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             EnumButton<Modifier> modifier = new EnumButton<>(this.getData(data.value()).has("modifier") ? this.getData(data.value()).get("modifier").getAsString() : "Any", Modifier.Any, Modifier.class);
             modifier.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("modifier", value)));
             modifier.sizing(Sizing.fixed(80), Sizing.fixed(20));
-            modifier.tooltip(Text.literal("The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held."));
+            modifier.tooltip(Component.literal("The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held."));
             layout.child(label);
             layout.child(modifier);
             return layout;
@@ -255,11 +255,11 @@ public final class CommandKeybinds {
             FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             layout.padding(Insets.of(5));
             layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Text.literal("Island Filter"));
+            PlainLabel label = new PlainLabel(Component.literal("Island Filter"));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
             input.text(this.getData().has("islandFilter") ? this.getData().get("islandFilter").getAsString() : "");
-            input.tooltip(Text.literal("A list of islands that this keybind requires to work.\nFor example: \"catacombs kuudra\" will disable the keybind\nif your current area is not either Kuudra or Dungeons.\n\nLeave empty to disable island filtering."));
+            input.tooltip(Component.literal("A list of islands that this keybind requires to work.\nFor example: \"catacombs kuudra\" will disable the keybind\nif your current area is not either Kuudra or Dungeons.\n\nLeave empty to disable island filtering."));
             input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("islandFilter", value)));
             layout.child(label);
             layout.child(input);
@@ -274,7 +274,7 @@ public final class CommandKeybinds {
             list.add(this.buildModifierSetting());
             list.add(this.buildIslandFilterSetting());
             CommandKeybindsSettings settings = new CommandKeybindsSettings(list);
-            settings.setTitle(Text.literal("Command Keybind: " + (this.getData().has("name") ? this.getData().get("name").getAsString() : "New Keybind")));
+            settings.setTitle(Component.literal("Command Keybind: " + (this.getData().has("name") ? this.getData().get("name").getAsString() : "New Keybind")));
             return settings;
         }
     }
@@ -285,7 +285,7 @@ public final class CommandKeybinds {
         }
 
         @Override
-        public void close() {
+        public void onClose() {
             mc.setScreen(buildSettings());
         }
     }

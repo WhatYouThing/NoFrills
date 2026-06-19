@@ -1,8 +1,8 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import nofrills.config.Feature;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.SlayerUtil;
@@ -11,7 +11,7 @@ public final class SlayerTimer extends SimpleTextElement {
     private boolean visible = false;
 
     public SlayerTimer() {
-        super(Text.literal("Slayer Timer"), new Feature("slayerTimerElement"), "Slayer Timer");
+        super(Component.literal("Slayer Timer"), new Feature("slayerTimerElement"), "Slayer Timer");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the timer hologram of your slayer boss.");
         this.setCategory(Category.Slayer);
@@ -28,7 +28,7 @@ public final class SlayerTimer extends SimpleTextElement {
     }
 
     public void update() {
-        ArmorStandEntity entity = SlayerUtil.getTimerEntity();
+        ArmorStand entity = SlayerUtil.getTimerEntity();
         if (entity == null || entity.getCustomName() == null) {
             if (this.visible) {
                 this.setText(this.defaultText);

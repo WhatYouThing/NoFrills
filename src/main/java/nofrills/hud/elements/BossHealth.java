@@ -1,9 +1,9 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import net.minecraft.client.gui.hud.ClientBossBar;
-import net.minecraft.entity.mob.MagmaCubeEntity;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.monster.MagmaCube;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
@@ -23,7 +23,7 @@ public final class BossHealth extends SimpleTextElement {
     private float kuudraDPS = 0.0f;
 
     public BossHealth() {
-        super(Text.literal("Boss Health"), new Feature("bossHealthElement"), "Boss Health");
+        super(Component.literal("Boss Health"), new Feature("bossHealthElement"), "Boss Health");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Dungeon", this.dungeon, "If enabled, the health of the dungeon bosses is displayed."),
                 new Settings.Toggle("Kuudra", this.kuudra, "If enabled, the health of Kuudra is displayed.")
@@ -43,25 +43,25 @@ public final class BossHealth extends SimpleTextElement {
     }
 
     public void update() {
-        List<ClientBossBar> bossBars = Utils.getBossBars();
+        List<LerpingBossEvent> bossBars = Utils.getBossBars();
         if (bossBars.isEmpty()) {
             this.visible = false;
             return;
         }
-        ClientBossBar bar = bossBars.getFirst();
+        LerpingBossEvent bar = bossBars.getFirst();
         if (dungeon.value() && Utils.isInDungeons() && !Utils.isInstanceOver()) {
             String name = Utils.toPlain(bar.getName());
             if ((DungeonUtil.isInBossRoom() && !DungeonUtil.isInDragonPhase()) || name.equals("The Watcher")) {
-                this.setHealth("§l" + name, bar.getPercent());
+                this.setHealth("§l" + name, bar.getProgress());
                 return;
             }
         }
         if (kuudra.value() && Utils.isInKuudra() && !Utils.isInstanceOver()) {
-            MagmaCubeEntity kuudra = KuudraUtil.getKuudraEntity();
+            MagmaCube kuudra = KuudraUtil.getKuudraEntity();
             KuudraUtil.Phase phase = KuudraUtil.getCurrentPhase();
             if (phase.equals(KuudraUtil.Phase.DPS)) {
                 if (kuudra == null) {
-                    this.setHealth("§lKuudra", bar.getPercent());
+                    this.setHealth("§lKuudra", bar.getProgress());
                 } else {
                     this.setHealth("§lKuudra", kuudra.getHealth() / 100000);
                 }

@@ -1,8 +1,8 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
@@ -16,16 +16,13 @@ public class Fullbright {
     public static final SettingEnum<Mode> mode = new SettingEnum<>(Mode.Ambient, Mode.class, "mode", instance);
     public static final SettingBool noEffect = new SettingBool(false, "noEffect", instance);
 
-    public static final float gamma = 1600.0f;
-    public static final float ambient = 1.0f;
-
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && mc.player != null) {
             if (mode.value().equals(Mode.Potion)) {
-                mc.player.addStatusEffect(new StatusEffectInstance(StatusEffects.NIGHT_VISION, 840));
+                mc.player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 840));
             } else if (noEffect.value()) {
-                mc.player.removeStatusEffect(StatusEffects.NIGHT_VISION);
+                mc.player.removeEffect(MobEffects.NIGHT_VISION);
             }
         }
     }

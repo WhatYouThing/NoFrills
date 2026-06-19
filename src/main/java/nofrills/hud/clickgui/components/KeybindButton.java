@@ -4,7 +4,7 @@ import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.util.EventSource;
 import io.wispforest.owo.util.EventStream;
-import net.minecraft.text.MutableText;
+import net.minecraft.network.chat.Component;
 import nofrills.config.SettingKeybind;
 import nofrills.misc.Rendering;
 import org.lwjgl.glfw.GLFW;
@@ -17,12 +17,12 @@ public final class KeybindButton extends ButtonComponent {
             GLFW.GLFW_KEY_UNKNOWN,
             GLFW.GLFW_KEY_ESCAPE
     );
-    public MutableText unbound = net.minecraft.text.Text.literal("Not Bound").withColor(0xffffff);
-    public MutableText binding = net.minecraft.text.Text.literal("Press Key...").withColor(0xffffff);
+    public Component unbound = Component.literal("Not Bound").withColor(0xffffff);
+    public Component binding = Component.literal("Press Key...").withColor(0xffffff);
     public boolean isBinding = false;
 
     public KeybindButton() {
-        super(net.minecraft.text.Text.empty(), button -> {
+        super(Component.empty(), button -> {
         });
         this.onPress(button -> {
             if (this.isBinding) {
@@ -40,8 +40,8 @@ public final class KeybindButton extends ButtonComponent {
         this.setMessage(this.unbound);
     }
 
-    public net.minecraft.text.Text getKeyLabel(int keycode) {
-        return SettingKeybind.asInputConstant(keycode).getLocalizedText();
+    public Component getKeyLabel(int keycode) {
+        return SettingKeybind.asInputConstant(keycode).getDisplayName();
     }
 
     public void bind(int key) {

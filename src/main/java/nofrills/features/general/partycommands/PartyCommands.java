@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.*;
 import nofrills.events.PartyChatMsgEvent;
 import nofrills.events.WorldTickEvent;
@@ -110,7 +110,7 @@ public class PartyCommands {
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && downtimeNeeded && Utils.isInstanceOver()) {
             HudManager.setCustomTitle("§6Downtime", 60);
-            Utils.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 1.0f, 0.0f);
+            Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
             downtimeNeeded = false;
         }
     }

@@ -5,7 +5,7 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import nofrills.hud.clickgui.components.PlainLabel;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ public final class Category extends FlowLayout {
         FlowLayout modules = UIContainers.verticalFlow(Sizing.content(), Sizing.content());
         this.features = new ArrayList<>(children);
         for (Module module : this.features) {
-            this.categoryWidth = Math.max(this.categoryWidth, mc.textRenderer.getWidth(module.activeText.getString()) + 10);
+            this.categoryWidth = Math.max(this.categoryWidth, mc.font.width(module.activeText.getString()) + 10);
         }
         this.features.sort(Comparator.comparing(module -> module.activeText.getString()));
         for (Module module : this.features) {
@@ -37,7 +37,7 @@ public final class Category extends FlowLayout {
         ScrollContainer<FlowLayout> scroll = UIContainers.verticalScroll(Sizing.content(), Sizing.fill(80), modules)
                 .scrollbarThiccness(2)
                 .scrollbar(ScrollContainer.Scrollbar.flat(color));
-        BaseUIComponent label = new PlainLabel(Text.literal(title))
+        BaseUIComponent label = new PlainLabel(Component.literal(title))
                 .color(textColor)
                 .horizontalTextAlignment(HorizontalAlignment.CENTER)
                 .verticalTextAlignment(VerticalAlignment.CENTER);

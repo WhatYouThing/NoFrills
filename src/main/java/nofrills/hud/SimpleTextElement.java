@@ -64,7 +64,7 @@ public abstract class SimpleTextElement extends HudElement {
     public HudSettings getBaseSettings(List<FlowLayout> extra) {
         List<FlowLayout> list = new ArrayList<>(extra);
         list.add(new Settings.Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."));
-        list.add(new Settings.Dropdown<>("Alignment", this.textAlignment, "The alignment of the element's text."));
+        list.add(new Settings.EnumToggle<>("Alignment", this.textAlignment, "The alignment of the element's text."));
         list.add(new Settings.ColorPicker("Text Color", this.textColor, "The base color of the element's text."));
         return super.getBaseSettings(list);
     }

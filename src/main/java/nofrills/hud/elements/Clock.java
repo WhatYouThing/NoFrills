@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public class Clock extends SimpleTextElement {
+public final class Clock extends SimpleTextElement {
     public final SettingBool format24 = new SettingBool(false, "format24", instance.key());
 
     public Clock(String text) {
@@ -27,21 +27,14 @@ public class Clock extends SimpleTextElement {
     @Override
     public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (this.shouldRender()) {
-            if (this.isActive()) {
-                this.updateTime();
-            }
+            this.updateTime();
             super.draw(context, mouseX, mouseY, partialTicks, delta);
         }
     }
 
     public void updateTime() {
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter;
-        if (format24.value()) {
-            formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        } else {
-            formatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
-        }
+        DateTimeFormatter formatter = format24.value() ? DateTimeFormatter.ofPattern("HH:mm:ss") : DateTimeFormatter.ofPattern("hh:mm:ss a");
         this.setText(Utils.format("Time: §f{}", now.format(formatter)));
     }
 }

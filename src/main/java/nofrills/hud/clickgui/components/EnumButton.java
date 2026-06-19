@@ -39,7 +39,7 @@ public final class EnumButton<T extends Enum<T>> extends ButtonComponent {
 
     public void setValue(T value) {
         this.value = value;
-        this.setMessage(net.minecraft.text.Text.of(value.name()));
+        this.setMessage(net.minecraft.text.Text.literal(value.name()));
         this.changedEvents.sink().onChanged(this.value.name());
     }
 

@@ -113,7 +113,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Price Paid", PriceTooltips.pricePaid, "Tracks and displays the amount you've paid for a specific item in a BIN auction.")
                         ))),
                         new Module("Wardrobe Keybinds", WardrobeKeybinds.instance, "Adds hotkeys to the Skyblock Wardrobe.", new Settings(List.of(
-                                new Settings.Dropdown<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),
+                                new Settings.EnumToggle<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),
                                 new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with a keybind."),
                                 new Settings.Toggle("Sound Effect", WardrobeKeybinds.sound, "Plays a sound effect upon using a keybind."),
                                 new Settings.Keybind("Custom Slot 1", WardrobeKeybinds.custom1, "Your custom keybind for the 1st wardrobe slot."),
@@ -147,14 +147,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Pitch", 0.0, 2.0, 0.05, EtherwarpOverlay.pitch, "The pitch of the sound."),
                                 new Settings.Toggle("Cancel Sound", EtherwarpOverlay.cancelSound, "Prevents the intended Ether Transmission sound effect from playing."),
                                 new Settings.Separator("Highlight"),
-                                new Settings.Dropdown<>("Highlight Style", EtherwarpOverlay.highlightStyle, "The style of the highlight"),
+                                new Settings.EnumToggle<>("Highlight Style", EtherwarpOverlay.highlightStyle, "The style of the highlight"),
                                 new Settings.ColorPicker("Correct Fill", EtherwarpOverlay.fillCorrect, "The fill color used when your Etherwarp target is considered valid."),
                                 new Settings.ColorPicker("Wrong Fill", EtherwarpOverlay.fillWrong, "The fill color used when your Etherwarp target is considered invalid."),
                                 new Settings.ColorPicker("Correct Outline", EtherwarpOverlay.outlineCorrect, "The outline color used when your Etherwarp target is considered valid."),
                                 new Settings.ColorPicker("Wrong Outline", EtherwarpOverlay.outlineWrong, "The outline color used when your Etherwarp target is considered invalid.")
                         ))),
                         new Module("Fullbright", Fullbright.instance, "You know him, you love him.", new Settings(List.of(
-                                new Settings.Dropdown<>("Mode", Fullbright.mode, "The lighting mode.\n\nAmbient: Increases dimension ambient light, most reliable.\nGamma: Increases the Minecraft brightness setting to a high value.\nPotion: Permanently applies the Night Vision potion effect to your player."),
+                                new Settings.EnumToggle<>("Mode", Fullbright.mode, "The lighting mode.\n\nAmbient: Increases dimension ambient light, most reliable.\nGamma: Increases the Minecraft brightness setting to a high value.\nPotion: Permanently applies the Night Vision potion effect to your player."),
                                 new Settings.Toggle("No Effect", Fullbright.noEffect, "Removes the Night Vision effect while active. Ignored if you use the Potion mode.")
                         ))),
                         new Module("No Render", NoRender.instance, "Prevent various things from appearing.", new Settings(List.of(
@@ -182,7 +182,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Bone Plating", NoRender.bonePlating, "Hides the Bone Plating Archer ability (floating bone meal item) in Dungeons."),
                                 new Settings.Toggle("Tree Bits", NoRender.treeBits, "Hides the flying wood and leaves blocks that appear when chopping trees on the Galatea."),
                                 new Settings.Toggle("Nausea", NoRender.nausea, "Prevents the nausea screen wobble and/or green overlay from rendering."),
-                                new Settings.Dropdown<>("Vignette", NoRender.vignette, "The type of vignette overlay to hide.\n\nNone: Don't hide the vignette.\nAmbient: Hides the dark vignette that appears when in darkness.\nDanger: Hides the red (world border) vignette.\nBoth: Always hides the vignette."),
+                                new Settings.EnumToggle<>("Vignette", NoRender.vignette, "The type of vignette overlay to hide.\n\nNone: Don't hide the vignette.\nAmbient: Hides the dark vignette that appears when in darkness.\nDanger: Hides the red (world border) vignette.\nBoth: Always hides the vignette."),
                                 new Settings.Toggle("Exp Orbs", NoRender.expOrbs, "Prevents experience orbs from rendering."),
                                 new Settings.Toggle("Stuck Arrows", NoRender.stuckArrows, "Prevents arrows stuck to entities from rendering.")
                         ))),
@@ -190,13 +190,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Description("Usage", "Run the \"/nf partyCommands\" command to see more information."),
                                 new Settings.TextInput("Prefixes", PartyCommands.prefixes, "List of valid prefixes for these commands, separated by space."),
                                 new Settings.Toggle("Self Commands", PartyCommands.self, "Allows you to trigger your own party commands and grants you whitelisted status, not recommended."),
-                                new Settings.Dropdown<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommands: !warp | !w"),
-                                new Settings.Dropdown<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves (or another player) to party leader on demand.\n\nCommands: !ptme | !pt"),
-                                new Settings.Dropdown<>("All Invite", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand.\n\nCommand: !allinv"),
+                                new Settings.EnumToggle<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommands: !warp | !w"),
+                                new Settings.EnumToggle<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves (or another player) to party leader on demand.\n\nCommands: !ptme | !pt"),
+                                new Settings.EnumToggle<>("All Invite", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand.\n\nCommand: !allinv"),
                                 new Settings.Toggle("Downtime", PartyCommands.downtime, "Allows party members to schedule a downtime reminder for the end of your Kuudra/Dungeons run.\n\nCommand: !dt"),
-                                new Settings.Dropdown<>("Instance Queue", PartyCommands.queue, Utils.format("Allows party members to queue for any instance on demand.\n\nCommand List: {}", PartyCommands.listInstancesFormatted())),
-                                new Settings.Dropdown<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords"),
-                                new Settings.Dropdown<>("Kick", PartyCommands.kick, "Allows party members to kick specific players on demand.\n\nCommands: !kick | !k")
+                                new Settings.EnumToggle<>("Instance Queue", PartyCommands.queue, Utils.format("Allows party members to queue for any instance on demand.\n\nCommand List: {}", PartyCommands.listInstancesFormatted())),
+                                new Settings.EnumToggle<>("Coords", PartyCommands.coords, "Allows party members to get your coordinates on demand.\n\nCommand: !coords"),
+                                new Settings.EnumToggle<>("Kick", PartyCommands.kick, "Allows party members to kick specific players on demand.\n\nCommands: !kick | !k")
                         ))),
                         new Module("Viewmodel", Viewmodel.instance, "Easily customize the appearance of your held item.", new Settings(List.of(
                                 new Settings.Toggle("No Haste", Viewmodel.noHaste, "Prevents Haste and Mining Fatigue from affecting your swing speed."),
@@ -292,11 +292,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(
-                                new Settings.Dropdown<>("Mode", TooltipScale.mode, "The scaling mode.\n\nDynamic: Automatically scales down tooltips so that they always fit the screen.\nCustom: Scales tooltips using the Custom Scale value."),
+                                new Settings.EnumToggle<>("Mode", TooltipScale.mode, "The scaling mode.\n\nDynamic: Automatically scales down tooltips so that they always fit the screen.\nCustom: Scales tooltips using the Custom Scale value."),
                                 new Settings.SliderDouble("Custom Scale", 0.0, 4.0, 0.01, TooltipScale.scale, "The custom scale multiplier. Ignored if using Dynamic mode.")
                         ))),
                         new Module("Recipe Lookup", RecipeLookup.instance, "Search up recipes for the hovered item with a keybind.", new Settings(List.of(
-                                new Settings.Dropdown<>("Mode", RecipeLookup.mode, "The command that is used to check normal items."),
+                                new Settings.EnumToggle<>("Mode", RecipeLookup.mode, "The command that is used to check normal items."),
                                 new Settings.Keybind("Keybind", RecipeLookup.keybind, "The key that activates the feature.")
                         ))),
                         new Module("Update Checker", UpdateChecker.instance, "Checks if a NoFrills update is available the first time you join any world/server."),
@@ -336,7 +336,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderDouble("Scale", 0.0, 10.0, 0.01, ItemScale.scale, "The scale multiplier.")
                         ))),
                         new Module("No Damage Splash", NoDamageSplash.instance, "Hides damage splash nametags.", new Settings(
-                                new Settings.Dropdown<>("Hide Mode", NoDamageSplash.mode, "Allows you to control when damage splash nametags should be hidden.\n\nAlways: always hides damage splashes.\nSlayerOnly: only hides damage splashes while your Slayer boss is alive.\nDungeonsOnly: only hides damage splashes while in Dungeons.\nBoth: combines the SlayerOnly and DungeonsOnly modes.")
+                                new Settings.EnumToggle<>("Hide Mode", NoDamageSplash.mode, "Allows you to control when damage splash nametags should be hidden.\n\nAlways: always hides damage splashes.\nSlayerOnly: only hides damage splashes while your Slayer boss is alive.\nDungeonsOnly: only hides damage splashes while in Dungeons.\nBoth: combines the SlayerOnly and DungeonsOnly modes.")
                         )),
                         new Module("Block List", BlockList.instance, "Allows you to keep a client side player block list.", new Settings(
                                 new Settings.Description("Usage", "You can manage this feature with /nf blockList."),
@@ -396,7 +396,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 new Category("Fishing", List.of(
                         new Module("Mute Drake", MuteDrake.instance, "Prevents the Reindrake from blowing up your ears with gifts."),
                         new Module("Rare Highlight", RareHighlight.instance, "Highlights rare/profitable sea creatures.", new Settings(List.of(
-                                new Settings.Dropdown<>("Highlight Style", RareHighlight.style, "The style of the highlight."),
+                                new Settings.EnumToggle<>("Highlight Style", RareHighlight.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Outline Color", RareHighlight.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", RareHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
@@ -442,12 +442,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Inverted Block", DeviceSolvers.alignBlockInvert, "Prevents wrong rotations only while sneaking instead of only while not sneaking.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
-                                new Settings.Dropdown<>("Highlight Style", StarredMobHighlight.style, "The style of the starred mob highlight."),
+                                new Settings.EnumToggle<>("Highlight Style", StarredMobHighlight.style, "The style of the starred mob highlight."),
                                 new Settings.ColorPicker("Outline Color", StarredMobHighlight.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", StarredMobHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
                         new Module("Miniboss Highlight", MinibossHighlight.instance, "Highlights minibosses.", new Settings(List.of(
-                                new Settings.Dropdown<>("Highlight Style", MinibossHighlight.style, "The style of the miniboss highlight."),
+                                new Settings.EnumToggle<>("Highlight Style", MinibossHighlight.style, "The style of the miniboss highlight."),
                                 new Settings.ColorPicker("Outline Color", MinibossHighlight.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", MinibossHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
@@ -500,12 +500,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Kill Areas", WitherDragons.boxes, "Renders the kill areas of every alive dragon."),
                                 new Settings.Toggle("Tracers", WitherDragons.tracers, "Draws tracer lines to spawning dragons."),
                                 new Settings.Toggle("Stack Waypoints", WitherDragons.stack, "Renders waypoints for stacking your Last Breath arrows."),
-                                new Settings.Dropdown<>("Waypoint Type", WitherDragons.stackType, "The type of the arrow stack waypoints.\n\nSimple: Highlights the exact spawn position of a spawning dragon.\nAdvanced: Highlights each individual hitbox of a spawning dragon."),
+                                new Settings.EnumToggle<>("Waypoint Type", WitherDragons.stackType, "The type of the arrow stack waypoints.\n\nSimple: Highlights the exact spawn position of a spawning dragon.\nAdvanced: Highlights each individual hitbox of a spawning dragon."),
                                 new Settings.Toggle("Spawn Timer", WitherDragons.timer, "Renders timers for exactly when a dragon should finish spawning."),
                                 new Settings.Toggle("Dragon Health", WitherDragons.health, "Renders the exact health of the dragons.")
                         ))),
                         new Module("Secret Bat Highlight", SecretBatHighlight.instance, "Highlights secret bats.", new Settings(List.of(
-                                new Settings.Dropdown<>("Highlight Style", SecretBatHighlight.style, "The style of the highlight."),
+                                new Settings.EnumToggle<>("Highlight Style", SecretBatHighlight.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Outline Color", SecretBatHighlight.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", SecretBatHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
@@ -513,7 +513,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Title", LividSolver.title, "Show a title on screen once the Livid color is identified."),
                                 new Settings.Toggle("Highlight", LividSolver.highlight, "Renders an outline for the correct Livid."),
                                 new Settings.Toggle("Tracer", LividSolver.tracer, "Renders a tracer towards the correct Livid."),
-                                new Settings.Dropdown<>("Highlight Style", LividSolver.style, "The style of the correct Livid highlight."),
+                                new Settings.EnumToggle<>("Highlight Style", LividSolver.style, "The style of the correct Livid highlight."),
                                 new Settings.ColorPicker("Outline Color", LividSolver.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", LividSolver.fillColor, "The color of the fill style highlight."),
                                 new Settings.ColorPicker("Tracer Color", LividSolver.tracerColor, "The color of the tracer.")
@@ -565,7 +565,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Tank Color", ClassNametags.tank, "The text color for Tank.")
                         ))),
                         new Module("Score Calculator", ScoreCalculator.instance, "Calculates the score in your dungeon runs.", new Settings(List.of(
-                                new Settings.Dropdown<>("Paul State", ScoreCalculator.paulState, "Allows you to force the state of Paul's EZPZ perk.\nSet to Auto to automatically check for EZPZ through the NoFrills API."),
+                                new Settings.EnumToggle<>("Paul State", ScoreCalculator.paulState, "Allows you to force the state of Paul's EZPZ perk.\nSet to Auto to automatically check for EZPZ through the NoFrills API."),
                                 new Settings.Toggle("Send 270 Message", ScoreCalculator.sendMsg270, "If enabled, send a message upon reaching 270 (S) score."),
                                 new Settings.TextInput("270 Message", ScoreCalculator.msg270, "The message to send when 270 (S) score is reached."),
                                 new Settings.Toggle("Show 270 Title", ScoreCalculator.showTitle270, "If enabled, show a title on screen upon reaching 270 (S) score."),
@@ -623,7 +623,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Boss Highlight", BossHighlight.instance, "Highlights your slayer boss.", new Settings(List.of(
                                 new Settings.ColorPicker("Fill Color", BossHighlight.fillColor, "The color of the filled box highlight (if applicable)."),
                                 new Settings.ColorPicker("Outline Color", BossHighlight.outlineColor, "The color of the outline box highlight (if applicable)."),
-                                new Settings.Dropdown<>("Highlight Style", BossHighlight.highlightStyle, "The style of the highlight."),
+                                new Settings.EnumToggle<>("Highlight Style", BossHighlight.highlightStyle, "The style of the highlight."),
                                 new Settings.Separator("Inferno Demonlord"),
                                 new Settings.ColorPicker("Ashen Fill", BossHighlight.ashenFill, "The color of the filled box if your boss is using the Ashen attunement."),
                                 new Settings.ColorPicker("Ashen Outline", BossHighlight.ashenOutline, "The color of the outline box if your boss is using the Ashen attunement."),
@@ -658,7 +658,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Corpse Highlight", CorpseHighlight.instance, "Highlights corpses in the Glacite Mineshafts.", new Settings(List.of(
                                 new Settings.Toggle("Hide Opened", CorpseHighlight.hideOpened, "Removes the highlight from corpses you've already opened."),
-                                new Settings.Dropdown<>("Highlight Style", CorpseHighlight.style, "The style of the corpse highlight."),
+                                new Settings.EnumToggle<>("Highlight Style", CorpseHighlight.style, "The style of the corpse highlight."),
                                 new Settings.ColorPicker("Lapis Outline", CorpseHighlight.lapisOutline, "The color of the Lapis corpse outline style highlight."),
                                 new Settings.ColorPicker("Lapis Fill", CorpseHighlight.lapisFill, "The color of the Lapis corpse fill style highlight."),
                                 new Settings.ColorPicker("Tungsten Outline", CorpseHighlight.mineralOutline, "The color of the Tungsten corpse outline style highlight."),
@@ -669,7 +669,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Vanguard Fill", CorpseHighlight.vanguardFill, "The color of the Vanguard corpse fill style highlight.")
                         ))),
                         new Module("Ghost Vision", GhostVision.instance, "Makes Ghosts easier to see in the Dwarven Mines.", new Settings(List.of(
-                                new Settings.Dropdown<>("Highlight Style", GhostVision.style, "The style of the highlight."),
+                                new Settings.EnumToggle<>("Highlight Style", GhostVision.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Fill Color", GhostVision.fill, "The color of the filled box over each Ghost."),
                                 new Settings.ColorPicker("Outline Color", GhostVision.outline, "The color of the outline box over each Ghost.")
                         ))),
@@ -678,7 +678,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Cooldown", ScathaMining.cooldown, "Tracks the Worm spawn cooldown for you.")
                         ))),
                         new Module("End Node Highlight", EndNodeHighlight.instance, "Highlights End Nodes.", new Settings(List.of(
-                                new Settings.Dropdown<>("Highlight Style", EndNodeHighlight.style, "The style of the highlight."),
+                                new Settings.EnumToggle<>("Highlight Style", EndNodeHighlight.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Outline Color", EndNodeHighlight.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", EndNodeHighlight.fillColor, "The color of the fill style highlight.")
                         ))),

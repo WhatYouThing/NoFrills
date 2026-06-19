@@ -54,6 +54,10 @@ public class SettingGeneric {
         return this.value;
     }
 
+    public final JsonElement getDefault() {
+        return this.defaultValue;
+    }
+
     public void set(JsonElement value, boolean recompute) {
         if (!Config.get().has(this.parent)) {
             Config.get().add(this.parent, new JsonObject());

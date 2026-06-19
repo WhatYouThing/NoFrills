@@ -277,35 +277,25 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static final class Dropdown<T extends Enum<T>> extends FlowLayout {
+    public static final class EnumToggle<T extends Enum<T>> extends FlowLayout {
         public SettingEnum<T> setting;
 
-        public Dropdown(String name, SettingEnum<T> setting, String tooltip) {
+        public EnumToggle(String name, SettingEnum<T> setting, String tooltip) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.setting = setting;
             PlainLabel label = new PlainLabel(Text.literal(name).withColor(0xffffff));
-            EnumCollapsible dropdown = new EnumCollapsible(this.setting.value().name());
+            EnumButton<T> button = new EnumButton<>(this.setting.value().name(), this.setting.defaultValue(), this.setting.values);
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Text.literal(tooltip));
-            dropdown.surface(Surface.flat(0xff101010).and(Surface.outline(0xff5ca0bf)));
-            for (T value : this.setting.values) {
-                ButtonComponent button = UIComponents.button(Text.of(value.name()), btn -> {
-                    dropdown.setLabel(value.name());
-                    this.setting.set(value);
-                    dropdown.toggleExpansion();
-                });
-                button.sizing(Sizing.content(), Sizing.fixed(12));
-                button.renderer((context, btn, delta) -> {
-                });
-                dropdown.child(button);
-            }
+            button.setMessage(Text.literal(this.setting.value().name()));
+            button.onChanged().subscribe(value -> this.setting.set(this.setting.toConstant(value)));
             this.child(label);
-            this.child(dropdown);
+            this.child(button);
             this.child(buildResetButton(btn -> {
                 this.setting.reset();
-                dropdown.setLabel(this.setting.value().name());
+                button.setMessage(Text.literal(this.setting.defaultValue().name()));
             }));
         }
     }

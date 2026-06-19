@@ -29,7 +29,7 @@ public final class Armor extends HudElement {
         this.layout.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         this.layout.child(this.content);
         this.options = this.getBaseSettings(List.of(
-                new Settings.Dropdown<>("Alignment", align, "The alignment direction of the element.")
+                new Settings.EnumToggle<>("Alignment", align, "The alignment direction of the element.")
         ));
         this.setDesc("Displays your current armor set.");
         this.setCategory(Category.Info);

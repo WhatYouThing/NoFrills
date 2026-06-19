@@ -23,11 +23,11 @@ public class ScoreCalculator {
 
     public static final SettingEnum<PaulState> paulState = new SettingEnum<>(PaulState.Auto, PaulState.class, "paulState", instance);
     public static final SettingBool sendMsg270 = new SettingBool(false, "sendMsg270", instance);
-    public static final SettingString msg270 = new SettingString("/pc 270 Score!", "msg270", instance);
+    public static final SettingString msg270 = new SettingString("/pc 270 Score", "msg270", instance);
     public static final SettingBool showTitle270 = new SettingBool(false, "showTitle270", instance);
     public static final SettingString title270 = new SettingString("&c&l270", "title270", instance);
     public static final SettingBool sendMsg300 = new SettingBool(false, "sendMsg300", instance);
-    public static final SettingString msg300 = new SettingString("/pc 300 Score!", "msg300", instance);
+    public static final SettingString msg300 = new SettingString("/pc 300 Score", "msg300", instance);
     public static final SettingBool showTitle300 = new SettingBool(false, "showTitle300", instance);
     public static final SettingString title300 = new SettingString("&c&l300", "title300", instance);
 

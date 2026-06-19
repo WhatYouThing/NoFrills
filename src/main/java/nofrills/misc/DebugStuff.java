@@ -3,6 +3,7 @@ package nofrills.misc;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.hud.ClientBossBar;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ProfileComponent;
@@ -13,14 +14,14 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.PlayerHeadItem;
+import net.minecraft.particle.DustParticleEffect;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Vec3d;
-import nofrills.events.EntityNamedEvent;
-import nofrills.events.PlaySoundEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.ServerTickEvent;
+import nofrills.events.*;
+import org.joml.Vector3f;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public class DebugStuff {
     private static long tickCounter = 0;
     private static boolean logSounds = false;
     private static boolean logNametags = false;
+    private static boolean logParticles = false;
 
     private static void print(MutableText text) {
         Utils.infoRaw(text.setStyle(text.getStyle().withHoverEvent(new HoverEvent.ShowText(Text.literal("at tick: " + tickCounter)))));
@@ -145,6 +147,15 @@ public class DebugStuff {
         }
     }
 
+    public static void toggleLogParticles() {
+        logParticles = !logParticles;
+        if (logParticles) {
+            Utils.info("Particle logging enabled.");
+        } else {
+            Utils.info("Particle logging disabled.");
+        }
+    }
+
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
         if (logSounds) {
@@ -164,6 +175,30 @@ public class DebugStuff {
     private static void onNamed(EntityNamedEvent event) {
         if (logNametags) {
             print(Utils.toMutable(event.name));
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    private static void onParticle(SpawnParticleEvent event) {
+        if (logParticles) {
+            String msg = Utils.format("particle: {}, count: {}, speed: {}, offsetX: {}, offsetY: {}, offsetZ: {}, force: {}, important: {}, x: {}, y: {}, z: {}",
+                    Registries.PARTICLE_TYPE.getId(event.type),
+                    event.packet.getCount(),
+                    event.packet.getSpeed(),
+                    event.packet.getOffsetX(),
+                    event.packet.getOffsetY(),
+                    event.packet.getOffsetZ(),
+                    event.packet.shouldForceSpawn(),
+                    event.packet.isImportant(),
+                    event.packet.getX(),
+                    event.packet.getY(),
+                    event.packet.getZ()
+            );
+            if (event.packet.getParameters() instanceof DustParticleEffect dustParticle) {
+                Vector3f color = dustParticle.getColor();
+                msg = Utils.format("{}, color: {} {} {}", msg, color.x, color.y, color.z);
+            }
+            print(msg);
         }
     }
 

@@ -12,6 +12,7 @@ import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.ParticleS2CPacket;
+import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.particle.ParticleType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.slot.Slot;
@@ -21,6 +22,7 @@ import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.misc.Utils;
+import org.joml.Vector3f;
 
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +50,7 @@ public class NoRender {
     public static final SettingBool entityFire = new SettingBool(false, "entityFire", instance.key());
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
     public static final SettingBool iceSpray = new SettingBool(false, "iceSpray", instance.key());
+    public static final SettingBool powderCoating = new SettingBool(false, "powderCoating", instance.key());
     public static final SettingBool soulweaverSkulls = new SettingBool(false, "soulweaverSkulls", instance.key());
     public static final SettingBool guidedSheep = new SettingBool(false, "guidedSheep", instance.key());
     public static final SettingBool bonePlating = new SettingBool(false, "bonePlating", instance.key());
@@ -95,12 +98,23 @@ public class NoRender {
 
     private static boolean isPoofParticle(ParticleS2CPacket packet) {
         if (packet.getCount() == 1 && packet.getSpeed() == 0.0f) {
-            for (float offset : List.of(packet.getOffsetX(), packet.getOffsetY(), packet.getOffsetZ())) {
+            for (float offset : new float[]{packet.getOffsetX(), packet.getOffsetY(), packet.getOffsetZ()}) {
                 if (offset >= 0.1f || offset <= -0.1f || offset == 0.0f) {
                     return false;
                 }
             }
             return true;
+        }
+        return false;
+    }
+
+    private static boolean isCoatingParticle(SpawnParticleEvent event) {
+        if (event.packet.getParameters() instanceof DustParticleEffect dustParticle) {
+            Vector3f color = dustParticle.getColor();
+            if ((color.x == 1.0f && color.y == 1.0f && color.z == 1.0f) || (color.x == 1.0f && color.y == 0.6f && color.z == 0.0f)) {
+                return event.matchParameters(ParticleTypes.DUST, 0, 1.0, 1.0, 1.0, 1.0)
+                        || event.matchParameters(ParticleTypes.DUST, 0, 1.0, 1.0, 0.6, 0.0);
+            }
         }
         return false;
     }
@@ -125,14 +139,21 @@ public class NoRender {
         if (instance.isActive()) {
             if (deadPoof.value() && event.type.equals(ParticleTypes.POOF) && isPoofParticle(event.packet)) {
                 event.cancel();
+                return;
             }
             if (explosions.value() && explosionParticles.contains(event.type)) {
                 event.cancel();
+                return;
             }
             if (mageBeam.value() && event.type.equals(ParticleTypes.FIREWORK) && Utils.isInDungeons()) {
                 event.cancel();
+                return;
             }
             if (iceSpray.value() && event.matchParameters(ParticleTypes.POOF, 3, 0.0, 0.0, 0.0, 0.0)) {
+                event.cancel();
+                return;
+            }
+            if (powderCoating.value() && isCoatingParticle(event)) {
                 event.cancel();
             }
         }

@@ -176,6 +176,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Entity Fire", NoRender.entityFire, "Hides the fire effect that appears on burning mobs."),
                                 new Settings.Toggle("Mage Beam", NoRender.mageBeam, "Prevents the server from spawning the Mage Beam particles in Dungeons."),
                                 new Settings.Toggle("Ice Spray", NoRender.iceSpray, "Prevents the server from spawning the Ice Spray Wand particles."),
+                                new Settings.Toggle("Powder Coating", NoRender.powderCoating, "Prevents the server from spawning Divan's Powder Coating particles on your armor."),
                                 new Settings.Toggle("Soulweaver Skulls", NoRender.soulweaverSkulls, "Hides the floating skulls that appear while wearing the Soulweaver Gloves in Dungeons."),
                                 new Settings.Toggle("Guided Sheep", NoRender.guidedSheep, "Hides the Guided Sheep Mage ability in Dungeons."),
                                 new Settings.Toggle("Bone Plating", NoRender.bonePlating, "Hides the Bone Plating Archer ability (floating bone meal item) in Dungeons."),

@@ -17,7 +17,6 @@ public class DoubleUseFix {
     public static final Feature instance = new Feature("doubleUseFix");
 
     public static final SettingBool skyblockCheck = new SettingBool(false, "skyblockCheck", instance.key());
-    public static final SettingBool modernCheck = new SettingBool(false, "modernCheck", instance.key());
 
     private static type getDisableType() {
         ItemStack held = Utils.getHeldItem();
@@ -31,16 +30,13 @@ public class DoubleUseFix {
     }
 
     public static boolean active() {
-        boolean isActive = instance.isActive();
-        if (isActive) {
-            if (skyblockCheck.value() && !Utils.isInSkyblock()) {
-                return false;
+        if (instance.isActive()) {
+            if (skyblockCheck.value()) {
+                return Utils.isInSkyblock();
             }
-            if (modernCheck.value() && Utils.isOnModernIsland()) {
-                return false;
-            }
+            return true;
         }
-        return isActive;
+        return false;
     }
 
     @EventHandler

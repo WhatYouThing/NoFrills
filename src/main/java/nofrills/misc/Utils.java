@@ -269,13 +269,6 @@ public class Utils {
         return isInArea("Hub");
     }
 
-    /**
-     * Returns true if the current island is running on a modern Minecraft version and/or running under prediction-based Watchdog.
-     */
-    public static boolean isOnModernIsland() { // TODO: clean up features depending on this function
-        return true;
-    }
-
     public static boolean isInstanceOver() {
         return SkyblockData.isInstanceOver();
     }
@@ -764,7 +757,7 @@ public class Utils {
      * Modified version of Minecraft's raycast function, which considers every block hit as a 1x1 cube, matching how Hypixel performs their raycast for the Ether Transmission ability.
      */
     public static HitResult raycastFullBlock(Entity entity, double maxDistance, float tickDelta) {
-        Vec3 height = entity.getPosition(tickDelta).add(0, isOnModernIsland() ? 1.27 : 1.54, 0);
+        Vec3 height = entity.getPosition(tickDelta).add(0, entity.getEyeHeight(), 0);
         Vec3 camPos = entity.getEyePosition(tickDelta);
         Vec3 rot = entity.getViewVector(tickDelta);
         Vec3 pos = new Vec3(camPos.x(), height.y(), camPos.z());

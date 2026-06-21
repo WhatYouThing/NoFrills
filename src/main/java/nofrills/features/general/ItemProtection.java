@@ -26,7 +26,7 @@ import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.*;
 
 public class ItemProtection {
-    public static final Feature instance = new Feature("itemProtection").requiresPricingAPI();
+    public static final Feature instance = new Feature("itemProtection", Feature.Flags.UsePricingAPI);
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingKeybind uuidKey = new SettingKeybind(-1, "uuidKey", instance);

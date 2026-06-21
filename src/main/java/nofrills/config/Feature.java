@@ -1,16 +1,27 @@
 package nofrills.config;
 
 import com.google.gson.JsonObject;
-import nofrills.misc.NoFrillsAPI;
+
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Feature {
+    public static final CopyOnWriteArrayList<Feature> withFlags = new CopyOnWriteArrayList<>();
     public String key;
     private int hash = 0;
     private boolean value = false;
+    private List<Flags> flags;
 
     public Feature(String key) {
         this.key = key;
         this.value = this.isActive();
+        this.flags = List.of();
+    }
+
+    public Feature(String key, Flags... featureFlags) {
+        this(key);
+        this.flags = List.of(featureFlags);
+        withFlags.add(this);
     }
 
     public String key() {
@@ -43,13 +54,18 @@ public class Feature {
         Config.computeHash();
     }
 
-    public Feature requiresPricingAPI() {
-        NoFrillsAPI.pricingFeatures.add(this);
-        return this;
+    public List<Flags> getFlags() {
+        return this.flags;
     }
 
-    public Feature requiresPerksAPI() {
-        NoFrillsAPI.perksFeatures.add(this);
-        return this;
+    public boolean hasFlag(Flags flag) {
+        return this.getFlags().contains(flag);
+    }
+
+    public enum Flags {
+        UsePricingAPI,
+        UseElectionAPI,
+        UseNonPlaceableAPI,
+        UseMuseumAPI
     }
 }

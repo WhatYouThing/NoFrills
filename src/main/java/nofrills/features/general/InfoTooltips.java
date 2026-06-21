@@ -6,18 +6,21 @@ import net.minecraft.world.item.component.DyedItemColor;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.TooltipRenderEvent;
+import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.Utils;
 
 import java.util.Calendar;
 import java.util.Locale;
 
+import static nofrills.misc.NoFrillsAPI.museumData;
+
 public class InfoTooltips {
-    public static final Feature instance = new Feature("infoTooltips");
+    public static final Feature instance = new Feature("infoTooltips", Feature.Flags.UseMuseumAPI);
 
     public static final SettingBool dungeonQuality = new SettingBool(false, "dungeonQuality", instance);
     public static final SettingBool createdDate = new SettingBool(false, "createdDate", instance);
     public static final SettingBool hexColor = new SettingBool(false, "hexColor", instance);
-    public static final SettingBool museumDonated = new SettingBool(false, "museumDonated", instance);
+    public static final SettingBool museum = new SettingBool(false, "museumDonated", instance);
     public static final SettingBool skyblockId = new SettingBool(false, "skyblockId", instance);
 
     @EventHandler
@@ -27,7 +30,7 @@ public class InfoTooltips {
                 int boost = event.customData.getIntOr("baseStatBoostPercentage", 0);
                 int tier = event.customData.getIntOr("item_tier", 0);
                 if (boost != 0) {
-                    String color = boost == 50 ? "§6§l" : "§6";
+                    String color = boost == 50 ? "§c§l" : "§6";
                     event.addLine(Utils.getShortTag().append(Utils.format("§bQuality: {}{}/50, Tier {}", color, boost, tier)));
                 }
             }
@@ -46,10 +49,16 @@ public class InfoTooltips {
                     event.addLine(Utils.getShortTag().append(Utils.format("§bDye Color: §6{}", hex)));
                 }
             }
-            if (museumDonated.value()) {
-                byte donated = event.customData.getByteOr("donated_museum", (byte) 0);
-                if (donated != 0) {
-                    event.addLine(Utils.getShortTag().append("§bDonated to Museum"));
+            if (museum.value()) {
+                String id = Utils.getSkyblockId(event.customData).replace("STARRED_", "");
+                if (museumData.containsKey(id)) {
+                    NoFrillsAPI.MuseumData data = museumData.get(id);
+                    String category = Utils.uppercaseFirst(Utils.toLower(data.category()), true);
+                    byte donated = event.customData.getByteOr("donated_museum", (byte) 0);
+                    event.addLine(Utils.getShortTag().append(Utils.format("§bMuseum: §6{}{}",
+                            category,
+                            donated != 0 ? " §a(Donated)" : ""
+                    )));
                 }
             }
             if (skyblockId.value()) {

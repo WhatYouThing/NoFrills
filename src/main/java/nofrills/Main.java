@@ -36,7 +36,6 @@ import nofrills.features.slayer.*;
 import nofrills.features.solvers.*;
 import nofrills.features.tweaks.DoubleUseFix;
 import nofrills.features.tweaks.NoCursorReset;
-import nofrills.features.tweaks.NoGhostPlace;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.hud.elements.DungeonMap;
@@ -217,7 +216,6 @@ public class Main implements ModInitializer {
         eventBus.subscribe(EquipmentHighlight.class);
         eventBus.subscribe(CommissionHighlight.class);
         eventBus.subscribe(BlockList.class);
-        eventBus.subscribe(NoGhostPlace.class);
         eventBus.subscribe(DebugStuff.class);
         eventBus.subscribe(PhantomleafSolver.class);
         eventBus.subscribe(StreamerMode.class);

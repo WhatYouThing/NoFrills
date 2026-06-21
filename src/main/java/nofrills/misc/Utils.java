@@ -486,11 +486,17 @@ public class Utils {
      * Returns the Bazaar/Auction ID tied to the item.
      */
     public static String getMarketId(ItemStack stack) {
-        CompoundTag data = getCustomData(stack);
-        String id = getSkyblockId(data);
         String shardId = ShardData.getId(stack);
         if (!shardId.isEmpty()) {
             return shardId;
+        }
+        CompoundTag data = getCustomData(stack);
+        if (data == null) {
+            return "";
+        }
+        String id = getSkyblockId(data);
+        if (data.getIntOr("baseStatBoostPercentage", 0) == 50) {
+            return format("{}_MAX_BOOST_TIER_{}", id, data.getIntOr("item_tier", 0));
         }
         switch (id) {
             case "PET" -> {

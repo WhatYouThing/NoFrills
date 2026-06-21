@@ -23,7 +23,7 @@ import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
 public class CroesusSolver {
-    public static final Feature instance = new Feature("croesusSolver").requiresPricingAPI();
+    public static final Feature instance = new Feature("croesusSolver", Feature.Flags.UsePricingAPI);
 
     public static final SettingColor profitColor = new SettingColor(RenderColor.fromHex(0x55FF55), "profitColor", instance);
     public static final SettingColor profitSecondaryColor = new SettingColor(RenderColor.fromHex(0xFFFF55), "profitSecondaryColor", instance);

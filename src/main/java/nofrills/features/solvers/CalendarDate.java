@@ -28,34 +28,32 @@ public class CalendarDate {
 
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
-            if (container.getTitle().getString().equals("Calendar and Events")) {
-                for (Component line : event.lines) {
-                    String l = Utils.toPlain(line);
-                    if (l.startsWith("Starts in: ")) {
-                        String time = l.substring(l.indexOf(":")).trim();
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.add(Calendar.DAY_OF_MONTH, parseTime(time, "d"));
-                        calendar.add(Calendar.HOUR, parseTime(time, "h"));
-                        calendar.add(Calendar.MINUTE, parseTime(time, "m"));
-                        calendar.add(Calendar.SECOND, parseTime(time, "s"));
-                        int second = calendar.get(Calendar.SECOND);
-                        if (second % 5 != 0) { // scuffed patch for when the second is slightly off in the GUI
-                            calendar.add(Calendar.SECOND, 5 - (second % 5));
-                        }
-                        event.addLine(Component.nullToEmpty(""));
-                        event.addLine(Utils.getShortTag().append(buildLine("§eDate of Event", calendar)));
-                        String stackName = Utils.toPlain(event.stack.getHoverName());
-                        if (stackName.endsWith("Spooky Festival")) {
-                            calendar.add(Calendar.HOUR, -1);
-                            event.addLine(Utils.getShortTag().append(buildLine("§6Fear Mongerer Arrives", calendar)));
-                        } else if (stackName.endsWith("Season of Jerry")) {
-                            calendar.add(Calendar.HOUR, -7);
-                            calendar.add(Calendar.MINUTE, -40);
-                            event.addLine(Utils.getShortTag().append(buildLine("§cWorkshop Opens", calendar)));
-                        }
-                        return;
+        if (instance.isActive() && mc.screen instanceof ContainerScreen container && container.getTitle().getString().equals("Calendar and Events")) {
+            for (Component line : event.lines) {
+                String l = Utils.toPlain(line);
+                if (l.startsWith("Starts in: ")) {
+                    String time = l.substring(l.indexOf(":")).trim();
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.add(Calendar.DAY_OF_MONTH, parseTime(time, "d"));
+                    calendar.add(Calendar.HOUR, parseTime(time, "h"));
+                    calendar.add(Calendar.MINUTE, parseTime(time, "m"));
+                    calendar.add(Calendar.SECOND, parseTime(time, "s"));
+                    int second = calendar.get(Calendar.SECOND);
+                    if (second % 5 != 0) { // scuffed patch for when the second is slightly off in the GUI
+                        calendar.add(Calendar.SECOND, 5 - (second % 5));
                     }
+                    event.addLine(Component.nullToEmpty(""));
+                    event.addLine(Utils.getShortTag().append(buildLine("§eDate of Event", calendar)));
+                    String stackName = Utils.toPlain(event.stack.getHoverName());
+                    if (stackName.endsWith("Spooky Festival")) {
+                        calendar.add(Calendar.HOUR, -1);
+                        event.addLine(Utils.getShortTag().append(buildLine("§6Fear Mongerer Arrives", calendar)));
+                    } else if (stackName.endsWith("Season of Jerry")) {
+                        calendar.add(Calendar.HOUR, -7);
+                        calendar.add(Calendar.MINUTE, -40);
+                        event.addLine(Utils.getShortTag().append(buildLine("§cWorkshop Opens", calendar)));
+                    }
+                    break;
                 }
             }
         }

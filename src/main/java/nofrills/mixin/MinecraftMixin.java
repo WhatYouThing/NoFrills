@@ -1,6 +1,7 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LevelLoadingScreen;
@@ -100,19 +101,19 @@ public abstract class MinecraftMixin {
         Config.saveBlocking();
     }
 
-//    @ModifyExpressionValue(method = "renderFrame", at = @At(value = "FIELD", target = ""))
-//    private boolean skipRender(boolean original) {
-//        if (mc.level != null && UnfocusedTweaks.active() && UnfocusedTweaks.noWorldRender.value()) {
-//            return true;
-//        }
-//        return original;
-//    }
+    @ModifyReturnValue(method = "isGameLoadFinished", at = @At("RETURN"))
+    private boolean isGameLoadFinished(boolean original) {
+        if (UnfocusedTweaks.active() && UnfocusedTweaks.noWorldRender.value()) {
+            return false;
+        }
+        return original;
+    }
 
     @ModifyExpressionValue(method = "renderFrame", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/FramerateLimitTracker;getFramerateLimit()I"))
     private int skipLimiter(int original) {
         if (UnfocusedTweaks.active() && UnfocusedTweaks.fpsLimit.value() > 0) {
             return UnfocusedTweaks.fpsLimit.value();
-        } // TODO: do something about it
+        }
         if (UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.noVanilla.value()) {
             return mc.options.framerateLimit().get();
         }

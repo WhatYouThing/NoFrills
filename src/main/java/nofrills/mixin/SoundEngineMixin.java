@@ -11,7 +11,7 @@ public abstract class SoundEngineMixin {
 
     @ModifyExpressionValue(method = "calculateVolume(FLnet/minecraft/sounds/SoundSource;)F", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Options;getFinalSoundSourceVolume(Lnet/minecraft/sounds/SoundSource;)F"))
     private float onGetCategoryVolume(float original) {
-        if (UnfocusedTweaks.active() && UnfocusedTweaks.muteSounds.value()) {
+        if (UnfocusedTweaks.isActive() && UnfocusedTweaks.muteSounds.value()) {
             return 0.0f;
         }
         return original;

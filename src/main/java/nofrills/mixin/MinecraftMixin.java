@@ -103,7 +103,7 @@ public abstract class MinecraftMixin {
 
     @ModifyReturnValue(method = "isGameLoadFinished", at = @At("RETURN"))
     private boolean isGameLoadFinished(boolean original) {
-        if (UnfocusedTweaks.active() && UnfocusedTweaks.noWorldRender.value()) {
+        if (UnfocusedTweaks.isActive() && UnfocusedTweaks.noWorldRender.value()) {
             return false;
         }
         return original;
@@ -111,7 +111,7 @@ public abstract class MinecraftMixin {
 
     @ModifyExpressionValue(method = "renderFrame", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/FramerateLimitTracker;getFramerateLimit()I"))
     private int skipLimiter(int original) {
-        if (UnfocusedTweaks.active() && UnfocusedTweaks.fpsLimit.value() > 0) {
+        if (UnfocusedTweaks.isActive() && UnfocusedTweaks.fpsLimit.value() > 0) {
             return UnfocusedTweaks.fpsLimit.value();
         }
         if (UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.noVanilla.value()) {

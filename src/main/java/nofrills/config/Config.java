@@ -21,14 +21,14 @@ public class Config {
     }
 
     public static void load() {
-        if (Files.exists(filePath)) {
-            try {
+        try {
+            if (Files.isReadable(filePath)) {
                 data = JsonParser.parseString(Files.readString(filePath)).getAsJsonObject();
-            } catch (Exception exception) {
-                LOGGER.error("Unable to load NoFrills config file!", exception);
+            } else {
+                saveBlocking();
             }
-        } else {
-            saveBlocking();
+        } catch (Exception exception) {
+            LOGGER.error("Unable to load NoFrills config file!", exception);
         }
         computeHash();
     }

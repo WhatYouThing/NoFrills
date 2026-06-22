@@ -1,7 +1,6 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -36,47 +35,38 @@ public class ChatTweaks {
         ChatComponent chatHud = mc.gui.getChat();
         float mouseX = (float) mc.mouseHandler.getScaledXPos(mc.getWindow());
         float mouseY = (float) mc.mouseHandler.getScaledYPos(mc.getWindow());
-        int chatBottom = Mth.floor((mc.getWindow().getGuiScaledHeight() - 40) / mc.options.chatScale().get());
-        int messageHeight = 9;
-        double chatLineSpacing = mc.options.chatLineSpacing().get();
-        int entryHeight = (int) (messageHeight * (chatLineSpacing + 1.0));
-        int visibleEnd = Math.min(chatHud.trimmedMessages.size(), chatHud.chatScrollbarPos + ChatComponent.getHeight(mc.options.chatHeightFocused().get()) / entryHeight);
-        List<GuiMessage.Line> visibleMessages = chatHud.trimmedMessages.subList(chatHud.chatScrollbarPos, visibleEnd);
-        int i = -1;
-        for (int index = 0; index < visibleMessages.size(); index++) {
-            int entryBottom = chatBottom - index * entryHeight;
-            int entryTop = entryBottom - entryHeight;
+        int chatBottom = Mth.floor((mc.getWindow().getGuiScaledHeight() - 40));
+        double chatScale = mc.options.chatScale().get();
+        int entryHeight = (int) (9.0 * (mc.options.chatLineSpacing().get() + 1.0));
+        int chatHeight = ChatComponent.getHeight(mc.options.chatHeightFocused().get());
+        int visibleEnd = Math.min(chatHud.trimmedMessages.size(), chatHud.chatScrollbarPos + chatHeight / entryHeight);
+        List<GuiMessage.Line> visible = chatHud.trimmedMessages.subList(chatHud.chatScrollbarPos, visibleEnd);
+        for (int index = 0; index < visible.size(); index++) {
+            int entryBottom = (int) (chatBottom - index * (entryHeight * chatScale));
+            int entryTop = (int) (entryBottom - (entryHeight * chatScale));
             if (ActiveTextCollector.isPointInRectangle(mouseX, mouseY, 0, entryTop, ChatComponent.getWidth(mc.options.chatWidth().get()), entryBottom)) {
-                i = index;
-                break;
-            }
-        }
-        if (i >= 0) {
-            StringBuilder builder = new StringBuilder();
-            List<GuiMessage.Line> lines = new ArrayList<>();
-            if (singleLine) {
-                lines.addFirst(visibleMessages.get(i));
-            } else {
-                for (int index = i + 1; index < visibleMessages.size(); index++) {
-                    GuiMessage.Line line = visibleMessages.get(index);
-                    if (line.endOfEntry()) break;
-                    lines.addFirst(line);
+                if (singleLine) {
+                    return Utils.toPlain(visible.get(index).content());
                 }
-                for (int index = i; index >= 0; index--) {
-                    GuiMessage.Line line = visibleMessages.get(index);
-                    lines.add(line);
-                    if (line.endOfEntry()) break;
-                }
+                return Utils.toPlain(getFullMessage(visible, index).stream().map(GuiMessage.Line::content).toList());
             }
-            for (GuiMessage.Line line : lines) {
-                line.content().accept((index, style, codePoint) -> {
-                    builder.appendCodePoint(codePoint);
-                    return true;
-                });
-            }
-            return ChatFormatting.stripFormatting(builder.toString());
         }
         return "";
+    }
+
+    public static List<GuiMessage.Line> getFullMessage(List<GuiMessage.Line> visible, int index) {
+        List<GuiMessage.Line> lines = new ArrayList<>();
+        for (int i = index + 1; i < visible.size(); i++) {
+            GuiMessage.Line line = visible.get(i);
+            if (line.endOfEntry()) break;
+            lines.addFirst(line);
+        }
+        for (int i = index; i >= 0; i--) {
+            GuiMessage.Line line = visible.get(i);
+            lines.add(line);
+            if (line.endOfEntry()) break;
+        }
+        return lines;
     }
 
     @EventHandler

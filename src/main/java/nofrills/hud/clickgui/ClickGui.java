@@ -645,7 +645,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Mute Enderman", MuteEnderman.instance, "Prevents the angry Enderman sounds from playing."),
                         new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt."),
-                        new Module("Spawn Alert", SpawnAlert.instance, "Alerts you when your slayer boss is spawned.")
+                        new Module("Spawn Alert", SpawnAlert.instance, "Alerts you when your slayer boss is spawned."),
+                        new Module("Miniboss Highlight", SlayerMinibossHighlight.instance, "Highlights slayer minibosses.", new Settings(List.of(
+                                new Settings.EnumToggle<>("Highlight Style", SlayerMinibossHighlight.style, "The style of the highlight."),
+                                new Settings.ColorPicker("Fill Color", SlayerMinibossHighlight.fillColor, "The color of the filled box."),
+                                new Settings.ColorPicker("Outline Color", SlayerMinibossHighlight.outlineColor, "The color of the outline box.")
+                        )))
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new Settings(List.of(

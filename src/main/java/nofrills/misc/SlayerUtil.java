@@ -13,6 +13,7 @@ import net.minecraft.world.entity.monster.spider.Spider;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
+import nofrills.events.ChatMsgEvent;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.WorldTickEvent;
 
@@ -37,6 +38,7 @@ public class SlayerUtil {
     private static final EntityCache timerCache = EntityCache.create();
     private static final EntityCache nameCache = EntityCache.create();
     private static final EntityCache bossCache = EntityCache.create();
+    private static final ConcurrentHashSet<String> minibossNameCache = new ConcurrentHashSet<>();
     public static boolean bossAlive = false;
     public static SlayerBoss currentBoss = null;
 
@@ -72,6 +74,10 @@ public class SlayerUtil {
         return (LivingEntity) bossCache.getFirst();
     }
 
+    public static ConcurrentHashSet<String> getMinibossNames() {
+        return minibossNameCache;
+    }
+
     public static void updateQuestState(List<String> lines) {
         bossAlive = lines.contains("Slay the boss!");
         for (String line : lines) {
@@ -94,6 +100,13 @@ public class SlayerUtil {
     private static void onNamed(EntityNamedEvent event) {
         if (currentBoss != null && isSpawner(event.namePlain)) {
             spawnerCache.add(event.entity);
+        }
+    }
+
+    @EventHandler
+    private static void onMessage(ChatMsgEvent event) {
+        if (currentBoss != null && event.msg().startsWith("SLAYER MINI-BOSS ")) {
+            minibossNameCache.add(event.msg().replace("SLAYER MINI-BOSS ", "").replace(" has spawned!", "").trim());
         }
     }
 

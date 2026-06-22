@@ -222,6 +222,7 @@ public class Main implements ModInitializer {
         eventBus.subscribe(MuteComposter.class);
         eventBus.subscribe(DupeClassAlert.class);
         eventBus.subscribe(ActivePetHighlight.class);
+        eventBus.subscribe(SlayerMinibossHighlight.class);
 
         LOGGER.info("It's time to get real, NoFrills mod initialized in {}ms.", Util.getMillis() - start);
     }

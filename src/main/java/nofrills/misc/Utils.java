@@ -306,9 +306,9 @@ public class Utils {
      */
     public static boolean isMob(Entity entity) {
         if (entity instanceof Player player) {
-            return !isPlayer(player);
+            return !isPlayer(player) && player.isAlive();
         }
-        return entity instanceof LivingEntity;
+        return entity instanceof LivingEntity && entity.isAlive();
     }
 
     public static boolean isBaseHealth(LivingEntity entity, float health) {
@@ -780,8 +780,9 @@ public class Utils {
         float lowestDist = 2.0f;
         double maxY = armorStand.position().y();
         for (Entity ent : otherEntities) {
+            if (ent instanceof ArmorStand) continue;
             float dist = horizontalDistance(ent.position(), armorStand.position());
-            if (!(ent instanceof ArmorStand) && ent.position().y() < maxY && dist < lowestDist) {
+            if (ent.position().y() < maxY && dist < lowestDist) {
                 entity = ent;
                 lowestDist = dist;
             }

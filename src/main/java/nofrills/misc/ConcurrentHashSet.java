@@ -10,8 +10,8 @@ import java.util.Spliterator;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConcurrentHashSet<E> extends AbstractSet<E> implements Set<E> {
-    static final Object PRESENT = new Object();
-    transient ConcurrentHashMap<E, Object> map;
+    private static final Object PRESENT = new Object();
+    private final ConcurrentHashMap<E, Object> map;
 
     public ConcurrentHashSet() {
         this.map = new ConcurrentHashMap<>();

@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.ChatMsgEvent;
+import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
 
 public class CocoonAlert {
@@ -11,9 +12,9 @@ public class CocoonAlert {
 
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
-        if (instance.isActive() && Utils.isInSkyblock() && event.messagePlain.trim().equals("YOU COCOONED YOUR SLAYER BOSS")) {
-            Utils.showTitle("§c§lCOCOON!", "", 0, 30, 10);
-            Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
+        if (instance.isActive() && event.messagePlain.trim().equals("YOU COCOONED YOUR SLAYER BOSS")) {
+            HudManager.setCustomTitle("§c§lCOCOON!", 40);
+            Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
         }
     }
 }

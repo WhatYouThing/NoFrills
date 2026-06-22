@@ -650,7 +650,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.EnumToggle<>("Highlight Style", SlayerMinibossHighlight.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Fill Color", SlayerMinibossHighlight.fillColor, "The color of the filled box."),
                                 new Settings.ColorPicker("Outline Color", SlayerMinibossHighlight.outlineColor, "The color of the outline box.")
-                        )))
+                        ))),
+                        new Module("Miniboss Alert", SlayerMinibossAlert.instance, "Alerts you when a slayer miniboss is spawned.")
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new Settings(List.of(

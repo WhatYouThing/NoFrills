@@ -8,6 +8,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
@@ -16,14 +17,14 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class FishingBobber extends SimpleTextElement {
+public final class FishingBobber extends SimpleTextElement implements TickableHudElement {
     public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
     public final SettingBool timer = new SettingBool(false, "timer", instance.key());
     public final SettingBool hideHologram = new SettingBool(false, "hideHologram", instance.key());
     public final SettingBool compact = new SettingBool(false, "compact", instance.key());
     public final EntityCache cache = EntityCache.create();
 
-    public int timerTicks = 0;
+    private int timerTicks = 0;
 
     public FishingBobber(String text) {
         super(Component.literal(text), new Feature("bobberElement"), "Fishing Bobber");
@@ -62,6 +63,15 @@ public final class FishingBobber extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
+    @Override
+    public void onServerTick() {
+        if (this.isBobberActive()) {
+            this.timerTicks++;
+        } else if (this.timerTicks != 0) {
+            this.timerTicks = 0;
+        }
+    }
+
     public boolean isBobberActive() {
         return mc.player != null && (mc.player.fishing != null || this.cache.getFirst() != null);
     }
@@ -72,14 +82,6 @@ public final class FishingBobber extends SimpleTextElement {
                 event.entity.setCustomNameVisible(false);
             }
             this.cache.add(event.entity);
-        }
-    }
-
-    public void onServerTick() {
-        if (this.isBobberActive()) {
-            this.timerTicks++;
-        } else if (this.timerTicks != 0) {
-            this.timerTicks = 0;
         }
     }
 }

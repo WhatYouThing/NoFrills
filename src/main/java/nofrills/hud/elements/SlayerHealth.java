@@ -5,9 +5,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import nofrills.config.Feature;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.misc.SlayerUtil;
 
-public final class SlayerHealth extends SimpleTextElement {
+public final class SlayerHealth extends SimpleTextElement implements TickableHudElement {
     private boolean visible = false;
 
     public SlayerHealth() {
@@ -27,7 +28,8 @@ public final class SlayerHealth extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void update() {
+    @Override
+    public void onClientTick() {
         ArmorStand entity = SlayerUtil.getNameEntity();
         if (entity == null || entity.getCustomName() == null) {
             if (this.visible) {

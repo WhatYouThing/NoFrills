@@ -7,6 +7,7 @@ import net.minecraft.world.entity.monster.MagmaCube;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.KuudraUtil;
@@ -14,7 +15,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
-public final class BossHealth extends SimpleTextElement {
+public final class BossHealth extends SimpleTextElement implements TickableHudElement {
     private final SettingBool dungeon = new SettingBool(true, "dungeon", this.instance);
     private final SettingBool kuudra = new SettingBool(true, "kuudra", this.instance);
     private boolean visible = false;
@@ -42,7 +43,8 @@ public final class BossHealth extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void update() {
+    @Override
+    public void onClientTick() {
         List<LerpingBossEvent> bossBars = Utils.getBossBars();
         if (bossBars.isEmpty()) {
             this.visible = false;
@@ -85,19 +87,20 @@ public final class BossHealth extends SimpleTextElement {
         this.visible = false;
     }
 
-    public void setHealth(String label, String health) {
-        this.setText(Utils.format("{}§r: {}", label, health));
-        this.visible = true;
-    }
-
-    public void setHealth(String label, float percent) {
-        this.setHealth(label, Utils.getPercentageColor(percent, true) + Utils.formatDecimal(percent * 100) + "%");
-    }
-
-    public void reset() {
+    @Override
+    public void onReset() {
         this.visible = false;
         this.kuudraTicks = 0;
         this.kuudraHealth = 0.0f;
         this.kuudraDPS = 0.0f;
+    }
+
+    private void setHealth(String label, String health) {
+        this.setText(Utils.format("{}§r: {}", label, health));
+        this.visible = true;
+    }
+
+    private void setHealth(String label, float percent) {
+        this.setHealth(label, Utils.getPercentageColor(percent, true) + Utils.formatDecimal(percent * 100) + "%");
     }
 }

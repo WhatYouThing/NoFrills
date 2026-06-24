@@ -14,8 +14,9 @@ import static nofrills.Main.LOGGER;
  */
 public class DataFile {
     private final Path path;
+    private final boolean loadFinished;
     private JsonObject data = new JsonObject();
-    private boolean readFailed = false;
+    private boolean loadFailed = false;
 
     public DataFile(String filename) {
         this.path = Config.getFolderPath().resolve(filename);
@@ -26,13 +27,14 @@ public class DataFile {
             }
         } catch (Exception exception) {
             LOGGER.error("Unable to load NoFrills data file!", exception);
-            this.readFailed = true;
+            this.loadFailed = true;
         }
+        this.loadFinished = true;
     }
 
     public void saveBlocking() {
-        if (this.readFailed) {
-            LOGGER.warn("Prevented save of NoFrills data file {}, the file contents could not be loaded.", this.path.getFileName());
+        if (this.loadFailed || !this.loadFinished) {
+            LOGGER.warn("Prevented save of NoFrills data file {} due to the file not being loaded.", this.path.getFileName());
             return;
         }
         try {

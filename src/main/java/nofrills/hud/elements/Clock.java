@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public final class Clock extends SimpleTextElement {
+public final class Clock extends SimpleTextElement implements TickableHudElement {
     public final SettingBool format24 = new SettingBool(false, "format24", instance.key());
 
     public Clock(String text) {
@@ -27,12 +28,12 @@ public final class Clock extends SimpleTextElement {
     @Override
     public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (this.shouldRender()) {
-            this.updateTime();
             super.draw(context, mouseX, mouseY, partialTicks, delta);
         }
     }
 
-    public void updateTime() {
+    @Override
+    public void onClientTick() {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = format24.value() ? DateTimeFormatter.ofPattern("HH:mm:ss") : DateTimeFormatter.ofPattern("hh:mm:ss a");
         this.setText(Utils.format("Time: §f{}", now.format(formatter)));

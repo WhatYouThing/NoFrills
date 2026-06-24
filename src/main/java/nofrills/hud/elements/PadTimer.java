@@ -21,6 +21,7 @@ public final class PadTimer extends TickTimerElement {
                 new Settings.Toggle("Total Time", this.totalTime, "Displays the total time spent in the Storm phase.")
         ));
         this.setDesc("Displays a tick timer for the pads in the F7/M7 Storm phase.");
+        this.setAutoPause();
         this.setCategory(Category.Dungeons);
     }
 

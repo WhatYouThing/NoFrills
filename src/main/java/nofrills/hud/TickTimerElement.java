@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.misc.Utils;
 
-public class TickTimerElement extends SimpleTextElement {
+public class TickTimerElement extends SimpleTextElement implements TickableHudElement {
     protected final String timerText;
     protected int ticks = -1;
     protected int startTicks = 0;
@@ -26,6 +26,18 @@ public class TickTimerElement extends SimpleTextElement {
         }
         this.updateTimer();
         super.draw(context, mouseX, mouseY, partialTicks, delta);
+    }
+
+    @Override
+    public void onServerTick() {
+        this.tick();
+    }
+
+    @Override
+    public void onReset() {
+        if (this.autoPause) {
+            this.pause();
+        }
     }
 
     public void setStartTicks(int ticks) {
@@ -50,12 +62,8 @@ public class TickTimerElement extends SimpleTextElement {
     public void tick() {
         if (this.ticks > 0) {
             this.ticks--;
-        }
-        if (this.ticks == 0) {
-            if (this.repeating) {
-                this.ticks = this.startTicks;
-            } else {
-                this.ticks = -1;
+            if (this.ticks == 0) {
+                this.ticks = this.repeating ? this.startTicks : -1;
             }
         }
     }
@@ -72,19 +80,11 @@ public class TickTimerElement extends SimpleTextElement {
         return this.ticks != -1;
     }
 
-    public boolean isRepeating() {
-        return this.repeating;
-    }
-
     public void setRepeating(boolean repeating) {
         this.repeating = repeating;
     }
 
     public void setAutoPause() {
         this.autoPause = true;
-    }
-
-    public boolean isAutoPause() {
-        return this.autoPause;
     }
 }

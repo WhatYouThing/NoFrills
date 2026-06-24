@@ -4,9 +4,11 @@ import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
-public final class Power extends SimpleTextElement {
+public final class Power extends SimpleTextElement implements TickableHudElement {
 
     public Power(String text) {
         super(Component.literal(text), new Feature("powerElement"), "Power Display");
@@ -25,7 +27,8 @@ public final class Power extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void setPower(double power) {
-        this.setText(Utils.format("Power: §f{}", power));
+    @Override
+    public void onClientTick() {
+        this.setText(Utils.format("Power: §f{}", DungeonUtil.getPower()));
     }
 }

@@ -13,6 +13,7 @@ import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Config;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.general.partycommands.PartyCommands;
+import nofrills.features.general.storageoverlay.StorageOverlayScreen;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.features.misc.AutoRequeue;
 import nofrills.features.misc.BlockList;
@@ -255,6 +256,9 @@ public class NoFrillsCommand {
             })).then(literal("toggleLogParticles").executes(context -> {
                 DebugStuff.toggleLogParticles();
                 return SINGLE_SUCCESS;
+            })).then(literal("storageOverlay").executes(context -> {
+                Utils.setScreen(new StorageOverlayScreen());
+                return SINGLE_SUCCESS;
             }))),
             new ModCommand("shardTracker", "Commands for managing the Shard Tracker feature.", literal("shardTracker").executes(context -> {
                 Utils.info("§f§lImporting shards§7: Click \"Copy Tree\" on the SkyShards calculator, choose the NoFrills format in the pop-up, and click the Import Shard List button on the Shard Tracker settings screen.\n\n§f§lTracking shards§7: Make sure to enable the Shard Tracker feature, and the Shard Tracker element in the NoFrills HUD editor. When enabled, the feature will track the obtained quantity of each shard that you are tracking.");
@@ -365,7 +369,7 @@ public class NoFrillsCommand {
                 AutoRequeue.paused = false;
                 Utils.info("§aAuto Requeue unpaused.");
                 return SINGLE_SUCCESS;
-            }))),
+            })))
     };
 
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {

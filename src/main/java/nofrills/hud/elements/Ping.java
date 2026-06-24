@@ -5,17 +5,18 @@ import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public final class Ping extends SimpleTextElement {
+public final class Ping extends SimpleTextElement implements TickableHudElement {
     public final SettingBool average = new SettingBool(false, "average", instance.key());
-    public int ticks = 20;
-    public long lastPing = 0;
-    public List<Long> pingList = new CopyOnWriteArrayList<>();
+    private final List<Long> pingList = new CopyOnWriteArrayList<>();
+    private int ticks = 20;
+    private long lastPing = 0;
 
     public Ping(String text) {
         super(Component.literal(text), new Feature("pingElement"), "Ping Display");
@@ -42,17 +43,29 @@ public final class Ping extends SimpleTextElement {
         }
     }
 
+    @Override
+    public void onClientTick() {
+        if (this.ticks > 0) {
+            this.ticks -= 1;
+            if (this.ticks == 0) {
+                Utils.sendPingPacket();
+            }
+        }
+    }
+
+    @Override
+    public void onReset() {
+        this.ticks = 20;
+        this.lastPing = 0;
+        this.pingList.clear();
+    }
+
     public void setPing(long ping) {
         if (this.pingList.size() > 30) {
             this.pingList.removeFirst();
         }
         this.lastPing = ping;
         this.pingList.add(ping);
-    }
-
-    public void reset() {
         this.ticks = 20;
-        this.lastPing = 0;
-        this.pingList.clear();
     }
 }

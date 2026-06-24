@@ -6,10 +6,11 @@ import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Feature;
 import nofrills.features.dungeons.ScoreCalculator;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
-public final class DungeonScore extends SimpleTextElement {
+public final class DungeonScore extends SimpleTextElement implements TickableHudElement {
 
     public DungeonScore() {
         super(Component.literal("Score: §fN/A"), new Feature("dungeonScoreElement"), "Dungeon Score");
@@ -28,7 +29,8 @@ public final class DungeonScore extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void tick() {
+    @Override
+    public void onClientTick() {
         int score = ScoreCalculator.getScore();
         if (score > 0) {
             int color = this.getScoreColor(score);

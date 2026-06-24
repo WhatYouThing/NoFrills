@@ -4,8 +4,9 @@ import io.wispforest.owo.ui.core.OwoUIGraphics;
 import nofrills.config.Feature;
 import nofrills.features.general.SkillTracker;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
 
-public final class SkillTrackerDisplay extends SimpleTextElement {
+public final class SkillTrackerDisplay extends SimpleTextElement implements TickableHudElement {
 
     public SkillTrackerDisplay() {
         super(SkillTracker.getText(), new Feature("skillTrackerElement"), "Skill Tracker Display");
@@ -24,7 +25,8 @@ public final class SkillTrackerDisplay extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void tick() {
+    @Override
+    public void onClientTick() {
         if (SkillTracker.instance.isActive()) {
             this.setText(SkillTracker.getText());
         }

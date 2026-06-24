@@ -5,16 +5,19 @@ import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class FPS extends SimpleTextElement {
+import static nofrills.Main.mc;
+
+public final class FPS extends SimpleTextElement implements TickableHudElement {
     public final SettingBool average = new SettingBool(false, "average", instance.key());
-    public int ticks = 20;
-    public List<Integer> fpsList = new ArrayList<>();
+    private final List<Integer> fpsList = new ArrayList<>();
+    private int ticks = 20;
 
     public FPS(String text) {
         super(Component.literal(text), new Feature("fpsElement"), "FPS Display");
@@ -32,6 +35,24 @@ public final class FPS extends SimpleTextElement {
         }
     }
 
+    @Override
+    public void onClientTick() {
+        if (this.ticks > 0) {
+            this.ticks -= 1;
+            if (this.ticks == 0) {
+                this.setFps(mc.getFps());
+                this.ticks = 20;
+            }
+        }
+    }
+
+    @Override
+    public void onReset() {
+        this.ticks = 20;
+        this.fpsList.clear();
+        this.setText("FPS: §f0");
+    }
+
     public void setFps(int fps) {
         if (average.value()) {
             if (this.fpsList.size() > 30) {
@@ -46,11 +67,5 @@ public final class FPS extends SimpleTextElement {
         } else {
             this.setText(Utils.format("FPS: §f{}", fps));
         }
-    }
-
-    public void reset() {
-        this.ticks = 20;
-        this.fpsList.clear();
-        this.setText("FPS: §f0");
     }
 }

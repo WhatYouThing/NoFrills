@@ -13,13 +13,14 @@ import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingEnum;
 import nofrills.hud.HudElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 
 import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class InventoryOverlay extends HudElement {
+public final class InventoryOverlay extends HudElement implements TickableHudElement {
     public final SettingEnum<HideMode> hideMode;
     private final FlowLayout content;
 
@@ -54,7 +55,8 @@ public final class InventoryOverlay extends HudElement {
         }
     }
 
-    public void updateInventory() {
+    @Override
+    public void onClientTick() {
         if (mc.player != null) {
             Inventory inv = mc.player.getInventory();
             for (int i = 0; i <= 2; i++) {

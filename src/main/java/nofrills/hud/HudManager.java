@@ -13,7 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import nofrills.events.*;
 import nofrills.hud.elements.*;
-import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -105,30 +104,22 @@ public class HudManager {
 
     @EventHandler
     private static void onJoinServer(ServerJoinEvent event) {
-        ping.reset();
-        tps.reset();
-        fps.reset();
-        lagMeter.setTickTime(0);
-        bossHealth.reset();
-        dungeonMap.reset();
         for (HudElement element : elements) {
-            if (element instanceof TickTimerElement tickTimer && tickTimer.isAutoPause()) {
-                tickTimer.pause();
+            if (element instanceof TickableHudElement tickableElement) {
+                tickableElement.onReset();
             }
             if (element instanceof TimerElement timer && timer.isAutoPause()) {
                 timer.pause();
             }
         }
+        dungeonMap.reset();
         currentTitle.reset();
     }
 
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
-        if (event.packet instanceof ClientboundPongResponsePacket(long time)) {
-            if (ping.isActive()) {
-                ping.setPing(Util.getMillis() - time);
-                ping.ticks = 20;
-            }
+        if (ping.isActive() && event.packet instanceof ClientboundPongResponsePacket(long time)) {
+            ping.setPing(Util.getMillis() - time);
         }
         if (day.isActive() && event.packet instanceof ClientboundSetTimePacket timePacket && mc.level != null) {
             mc.level.dimensionType().defaultClock().ifPresent(clock -> {
@@ -141,56 +132,10 @@ public class HudManager {
 
     @EventHandler
     private static void onWorldTick(WorldTickEvent event) {
-        if (power.isActive()) {
-            power.setPower(DungeonUtil.getPower());
-        }
-        if (ping.isActive()) { // pings every second when element is enabled, waits until ping result is received
-            if (ping.ticks > 0) {
-                ping.ticks -= 1;
-                if (ping.ticks == 0) {
-                    Utils.sendPingPacket();
-                }
+        for (HudElement element : elements) {
+            if (element instanceof TickableHudElement tickableElement && element.isActive()) {
+                tickableElement.onClientTick();
             }
-        }
-        if (tps.isActive()) {
-            if (tps.clientTicks > 0) {
-                tps.clientTicks -= 1;
-                if (tps.clientTicks == 0) {
-                    tps.setTps(tps.serverTicks);
-                    tps.clientTicks = 20;
-                    tps.serverTicks = 0;
-                }
-            }
-        }
-        if (fps.isActive()) {
-            if (fps.ticks > 0) {
-                fps.ticks -= 1;
-                if (fps.ticks == 0) {
-                    fps.setFps(mc.getFps());
-                    fps.ticks = 20;
-                }
-            }
-        }
-        if (armor.isActive()) {
-            armor.updateArmor();
-        }
-        if (inventory.isActive()) {
-            inventory.updateInventory();
-        }
-        if (slayerHealth.isActive()) {
-            slayerHealth.update();
-        }
-        if (slayerTimer.isActive()) {
-            slayerTimer.update();
-        }
-        if (bossHealth.isActive()) {
-            bossHealth.update();
-        }
-        if (dungeonScore.isActive()) {
-            dungeonScore.tick();
-        }
-        if (skillTracker.isActive()) {
-            skillTracker.tick();
         }
         if (currentTitle.isActive()) {
             currentTitle.tick();
@@ -199,34 +144,10 @@ public class HudManager {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (lagMeter.isActive()) {
-            lagMeter.setTickTime(Util.getMillis());
-        }
-        if (tps.isActive()) {
-            tps.serverTicks += 1;
-        }
-        if (bobber.isActive()) {
-            bobber.onServerTick();
-        }
-        if (spiritBearTimer.isActive() && Utils.isOnDungeonFloor("4")) {
-            spiritBearTimer.tick();
-        }
-        if (terraGyroTimer.isActive() && Utils.isOnDungeonFloor("6")) {
-            terraGyroTimer.tick();
-        }
-        if (Utils.isOnDungeonFloor("7")) {
-            if (padTimer.isActive()) {
-                padTimer.tick();
+        for (HudElement element : elements) {
+            if (element instanceof TickableHudElement tickableElement && element.isActive()) {
+                tickableElement.onServerTick();
             }
-            if (terminalStartTimer.isActive()) {
-                terminalStartTimer.tick();
-            }
-            if (goldorTickTimer.isActive()) {
-                goldorTickTimer.tick();
-            }
-        }
-        if (freshToolsTimer.isActive() && Utils.isInKuudra()) {
-            freshToolsTimer.tick();
         }
     }
 

@@ -6,14 +6,15 @@ import net.minecraft.util.Util;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.hud.SimpleTextElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
 import java.util.List;
 
-public final class LagMeter extends SimpleTextElement {
+public final class LagMeter extends SimpleTextElement implements TickableHudElement {
     public final SettingInt min = new SettingInt(500, "min", instance.key());
-    public long lastTick = 0;
+    private long lastTick = 0;
 
     public LagMeter(String text) {
         super(Component.literal(text), new Feature("lagMeterElement"), "Lag Meter");
@@ -29,9 +30,9 @@ public final class LagMeter extends SimpleTextElement {
         if (!this.shouldRender()) {
             return;
         } else if (!this.isEditingHud()) {
-            if (lastTick != 0) {
-                long sinceTick = Util.getMillis() - lastTick;
-                if (sinceTick >= min.value()) {
+            if (this.lastTick != 0) {
+                long sinceTick = Util.getMillis() - this.lastTick;
+                if (sinceTick >= this.min.value()) {
                     this.setText(Utils.format("Last server tick was {}s ago", Utils.formatDecimal(sinceTick * 0.001)));
                 } else {
                     return;
@@ -43,7 +44,13 @@ public final class LagMeter extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void setTickTime(long time) {
-        this.lastTick = time;
+    @Override
+    public void onServerTick() {
+        this.lastTick = Util.getMillis();
+    }
+
+    @Override
+    public void onReset() {
+        this.lastTick = 0;
     }
 }

@@ -2,6 +2,7 @@ package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.PartyChatMsgEvent;
 import nofrills.hud.HudManager;
 import nofrills.misc.KuudraUtil;
@@ -9,6 +10,7 @@ import nofrills.misc.Utils;
 
 import static nofrills.misc.KuudraUtil.PickupSpot.*;
 
+@EventListener
 public class CratePriority {
     public static final Feature instance = new Feature("cratePriority");
 

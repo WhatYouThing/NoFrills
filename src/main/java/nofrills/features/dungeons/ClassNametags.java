@@ -8,6 +8,7 @@ import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class ClassNametags {
     public static final Feature instance = new Feature("classNametags");
 

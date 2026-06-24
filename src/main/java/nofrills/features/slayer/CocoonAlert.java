@@ -4,9 +4,11 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
 import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
 
+@EventListener
 public class CocoonAlert {
     public static final Feature instance = new Feature("cocoonAlert");
 

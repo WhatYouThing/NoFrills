@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.Utils;
 
@@ -11,6 +12,7 @@ import java.util.Calendar;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class CalendarDate {
     public static final Feature instance = new Feature("calendarDate");
 

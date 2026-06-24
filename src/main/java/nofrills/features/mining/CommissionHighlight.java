@@ -6,10 +6,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+@EventListener
 public class CommissionHighlight {
     public static final Feature instance = new Feature("commissionHighlight");
 

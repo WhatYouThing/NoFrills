@@ -8,6 +8,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
@@ -16,6 +17,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
+@EventListener
 public class StarredMobHighlight {
     public static final Feature instance = new Feature("starredMobHighlight");
 

@@ -3,9 +3,11 @@ package nofrills.features.misc;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.util.Util;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.Utils;
 
+@EventListener
 public class AutoTip {
     public static final Feature instance = new Feature("autoTip");
 

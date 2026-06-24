@@ -7,10 +7,12 @@ import nofrills.config.Feature;
 import nofrills.config.SettingString;
 import nofrills.events.EntityRemovedEvent;
 import nofrills.events.EntityUpdatedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
 
+@EventListener
 public class MimicMessage {
     public static final Feature instance = new Feature("mimicMessage");
 

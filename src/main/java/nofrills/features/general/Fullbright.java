@@ -6,10 +6,12 @@ import net.minecraft.world.effect.MobEffects;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
+import nofrills.events.EventListener;
 import nofrills.events.WorldTickEvent;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class Fullbright {
     public static final Feature instance = new Feature("fullbright");
 

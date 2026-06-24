@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingEnum;
 import nofrills.config.SettingKeybind;
+import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class RecipeLookup {
     public static final Feature instance = new Feature("recipeLookup");
 

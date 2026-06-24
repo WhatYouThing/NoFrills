@@ -8,9 +8,11 @@ import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.*;
 
+@EventListener
 public class RareHighlight {
     public static final Feature instance = new Feature("rareGlow");
 

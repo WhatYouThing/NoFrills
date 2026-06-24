@@ -9,10 +9,7 @@ import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
-import nofrills.events.AttackEntityEvent;
-import nofrills.events.EntityNamedEvent;
-import nofrills.events.InteractEntityEvent;
-import nofrills.events.WorldRenderEvent;
+import nofrills.events.*;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SkyblockData;
@@ -22,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@EventListener
 public class SpookyChests {
     public static final Feature instance = new Feature("spookyChests");
 

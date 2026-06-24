@@ -9,6 +9,7 @@ import nofrills.events.*;
 import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
 
+@EventListener
 public class PhantomleafSolver {
     public static final Feature instance = new Feature("phantomleafSolver");
 

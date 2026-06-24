@@ -4,8 +4,10 @@ import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
 import nofrills.misc.Utils;
 
+@EventListener
 public class PrinceMessage {
     public static final Feature instance = new Feature("princeMessage");
 

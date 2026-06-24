@@ -9,6 +9,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingInt;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotUpdateEvent;
@@ -22,6 +23,7 @@ import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
+@EventListener
 public class KuudraChestValue {
     public static final Feature instance = new Feature("kuudraChestValue", Feature.Flags.UsePricingAPI);
 

@@ -5,10 +5,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
 import nofrills.hud.HudManager;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
+@EventListener
 public class SlayerMinibossAlert {
     public static final Feature instance = new Feature("slayerMinibossAlert");
 

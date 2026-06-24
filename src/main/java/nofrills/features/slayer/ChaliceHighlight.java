@@ -8,6 +8,7 @@ import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
@@ -16,6 +17,7 @@ import nofrills.misc.Utils;
 
 import java.util.regex.Pattern;
 
+@EventListener
 public class ChaliceHighlight {
     public static final Feature instance = new Feature("chaliceHighlight");
 

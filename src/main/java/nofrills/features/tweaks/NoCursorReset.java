@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenCloseEvent;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.WorldTickEvent;
@@ -14,6 +15,7 @@ import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class NoCursorReset {
     public static final Feature instance = new Feature("noCursorReset");
 

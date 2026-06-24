@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class SecretChime {
     public static final Feature instance = new Feature("secretChime");
 

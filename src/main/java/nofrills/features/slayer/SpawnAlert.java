@@ -3,11 +3,13 @@ package nofrills.features.slayer;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
+@EventListener
 public class SpawnAlert {
     public static final Feature instance = new Feature("spawnAlert");
 

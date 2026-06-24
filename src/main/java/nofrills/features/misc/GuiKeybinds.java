@@ -10,12 +10,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingKeybind;
+import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class GuiKeybinds {
     public static final Feature instance = new Feature("guiKeybinds");
 

@@ -5,8 +5,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
 import nofrills.misc.Utils;
 
+@EventListener
 public class LassoAlert {
     public static final Feature instance = new Feature("lassoAlert");
 

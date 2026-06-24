@@ -52,6 +52,8 @@ dependencies {
     include "de.topobyte:jama:${project.jama_version}"
 
     runtimeOnly "net.litetex.mcm:dev-auth-neo:${project.devauth_version}"
+
+    annotationProcessor project(":annotationprocessor")
 }
 
 loom {

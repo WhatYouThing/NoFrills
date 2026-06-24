@@ -4,12 +4,10 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
-import nofrills.events.InteractBlockEvent;
-import nofrills.events.InteractItemEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.misc.Utils;
 
+@EventListener
 public class HuntaxeLock {
     public static final Feature instance = new Feature("huntaxeLock");
 

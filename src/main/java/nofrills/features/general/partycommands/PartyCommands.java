@@ -6,6 +6,7 @@ import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sounds.SoundEvents;
 import nofrills.config.*;
+import nofrills.events.EventListener;
 import nofrills.events.PartyChatMsgEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.hud.HudManager;
@@ -14,6 +15,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
+@EventListener
 public class PartyCommands {
     public static final Feature instance = new Feature("partyCommands");
 

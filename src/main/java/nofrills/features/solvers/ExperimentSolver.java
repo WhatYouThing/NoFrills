@@ -10,6 +10,7 @@ import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.events.SlotUpdateEvent;
@@ -22,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class ExperimentSolver {
     public static final Feature instance = new Feature("experimentSolver");
 

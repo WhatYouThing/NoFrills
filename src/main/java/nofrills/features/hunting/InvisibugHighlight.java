@@ -10,10 +10,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.ServerTickEvent;
-import nofrills.events.SpawnParticleEvent;
-import nofrills.events.WorldRenderEvent;
+import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -22,6 +19,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class InvisibugHighlight {
     public static final Feature instance = new Feature("invisibugHighlight");
 

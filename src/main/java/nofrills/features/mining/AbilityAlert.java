@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
 import nofrills.events.InventoryUpdateEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.Utils;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import static nofrills.hud.HudManager.pickAbilityTimer;
 
+@EventListener
 public class AbilityAlert {
     public static final Feature instance = new Feature("abilityAlert");
 

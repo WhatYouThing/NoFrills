@@ -25,6 +25,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
+@EventListener
 public class WitherDragons {
     public static final Feature instance = new Feature("witherDragons");
 

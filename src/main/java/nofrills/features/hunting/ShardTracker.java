@@ -39,6 +39,7 @@ import java.util.zip.GZIPInputStream;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public final class ShardTracker {
     public static final Feature instance = new Feature("shardTracker");
 

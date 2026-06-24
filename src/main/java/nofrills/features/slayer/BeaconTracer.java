@@ -11,16 +11,14 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
-import nofrills.events.BlockUpdateEvent;
-import nofrills.events.EntityUpdatedEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.WorldRenderEvent;
+import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class BeaconTracer {
     public static final Feature instance = new Feature("beaconTracer");
 

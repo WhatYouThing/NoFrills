@@ -5,10 +5,8 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.entity.player.PlayerSkin;
 import nofrills.config.Feature;
 import nofrills.config.SettingString;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.PlayerJoinedEvent;
-import nofrills.events.PlayerLeftEvent;
-import nofrills.events.ServerJoinEvent;
+import nofrills.events.*;
+import nofrills.events.EventListener;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -20,6 +18,7 @@ import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class StreamerMode {
     public static final Feature instance = new Feature("streamerMode");
 

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.WorldTickEvent;
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ import java.util.Map;
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
+@EventListener
 public class NoFrillsAPI {
     public static HashMap<String, Long> auctionPricing = new HashMap<>();
     public static HashMap<String, BazaarPrice> bazaarPricing = new HashMap<>();

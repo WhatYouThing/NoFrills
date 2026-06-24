@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenCloseEvent;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenRenderEvent;
@@ -16,6 +17,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
+@EventListener
 public class AnvilHelper {
     public static final Feature instance = new Feature("anvilHelper");
 

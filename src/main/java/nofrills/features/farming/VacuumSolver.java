@@ -17,6 +17,7 @@ import java.util.HashSet;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class VacuumSolver {
     public static final Feature instance = new Feature("vacuumSolver");
 

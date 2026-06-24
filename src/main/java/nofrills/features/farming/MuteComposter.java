@@ -2,9 +2,11 @@ package nofrills.features.farming;
 
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.PlaySoundEvent;
 import nofrills.misc.Utils;
 
+@EventListener
 public class MuteComposter {
     public static final Feature instance = new Feature("muteComposter");
 

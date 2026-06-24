@@ -11,6 +11,7 @@ import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
+import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.events.WorldRenderEvent;
@@ -23,6 +24,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class EndNodeHighlight {
     public static final Feature instance = new Feature("endNodeHighlight");
 

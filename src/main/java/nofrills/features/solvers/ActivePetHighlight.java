@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
@@ -11,6 +12,7 @@ import nofrills.misc.Utils;
 
 import java.util.regex.Pattern;
 
+@EventListener
 public class ActivePetHighlight {
     public static final Feature instance = new Feature("activePetHighlight");
 

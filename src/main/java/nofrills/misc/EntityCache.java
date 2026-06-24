@@ -5,6 +5,7 @@ import meteordevelopment.orbit.EventPriority;
 import net.minecraft.world.entity.Entity;
 import nofrills.events.EntityRemovedEvent;
 import nofrills.events.EntityUpdatedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.function.Predicate;
 /**
  * An object for temporarily storing any relevant entity handles, such as armor stands with custom names.
  */
+@EventListener
 public class EntityCache {
     private static final List<EntityCache> instances = new ArrayList<>();
 

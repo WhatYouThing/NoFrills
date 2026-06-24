@@ -2,11 +2,13 @@ package nofrills.features.slayer;
 
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
+@EventListener
 public class KillTimer {
     public static final Feature instance = new Feature("killTimer");
 

@@ -14,10 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemLore;
 import nofrills.config.Feature;
-import nofrills.events.PlaySoundEvent;
-import nofrills.events.ScreenOpenEvent;
-import nofrills.events.ServerTickEvent;
-import nofrills.events.SlotUpdateEvent;
+import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.SoundPitch;
@@ -31,6 +28,7 @@ import java.util.stream.StreamSupport;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class BeaconTuningSolver {
     public static final Feature instance = new Feature("beaconTuningSolver");
 

@@ -6,6 +6,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 
@@ -16,6 +17,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class DungeonUtil {
     private static final HashMap<String, String> classCache = new HashMap<>();
     private static final MapId mapId = new MapId(1024);

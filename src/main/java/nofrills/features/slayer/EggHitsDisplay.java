@@ -7,6 +7,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
@@ -15,6 +16,7 @@ import nofrills.misc.Utils;
 
 import java.util.regex.Pattern;
 
+@EventListener
 public class EggHitsDisplay {
     public static final Feature instance = new Feature("eggHitsDisplay");
 

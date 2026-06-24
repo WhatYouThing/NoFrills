@@ -12,10 +12,7 @@ import net.minecraft.network.chat.Style;
 import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.GameShutdownEvent;
-import nofrills.events.PlayerJoinedEvent;
-import nofrills.events.ServerJoinEvent;
+import nofrills.events.*;
 import nofrills.misc.Utils;
 
 import java.io.InputStream;
@@ -31,6 +28,7 @@ import java.util.stream.Collectors;
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
+@EventListener
 public class BlockList {
     public static final Feature instance = new Feature("blockList");
 

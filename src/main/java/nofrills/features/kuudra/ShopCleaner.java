@@ -4,12 +4,14 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 
 import java.util.List;
 
+@EventListener
 public class ShopCleaner {
     public static final Feature instance = new Feature("shopCleaner");
 

@@ -6,12 +6,14 @@ import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
+import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class HotbarSwap {
     public static final Feature instance = new Feature("hotbarSwap");
 

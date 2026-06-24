@@ -6,10 +6,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
 import nofrills.config.SettingString;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.PartyChatMsgEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.SkyblockData;
@@ -18,6 +15,7 @@ import nofrills.misc.Utils;
 import java.util.List;
 import java.util.Optional;
 
+@EventListener
 public class ScoreCalculator {
     public static final Feature instance = new Feature("scoreCalculator", Feature.Flags.UseElectionAPI);
 

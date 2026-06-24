@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class HudManager {
     public static final List<HudElement> elements = new ArrayList<>();
 

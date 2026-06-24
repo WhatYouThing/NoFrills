@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotUpdateEvent;
@@ -19,6 +20,7 @@ import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
+@EventListener
 public class DungeonChestValue {
     public static final Feature instance = new Feature("dungeonChestValue", Feature.Flags.UsePricingAPI);
 

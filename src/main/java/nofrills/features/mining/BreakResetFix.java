@@ -2,12 +2,14 @@ package nofrills.features.mining;
 
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.InventoryUpdateEvent;
 import nofrills.mixin.ItemInHandRendererAccessor;
 import nofrills.mixin.MultiPlayerGameModeAccessor;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class BreakResetFix {
     public static final Feature instance = new Feature("breakResetFix");
 

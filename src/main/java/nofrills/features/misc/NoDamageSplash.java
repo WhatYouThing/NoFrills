@@ -4,11 +4,13 @@ import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 
 import java.util.regex.Pattern;
 
+@EventListener
 public class NoDamageSplash {
     public static final Feature instance = new Feature("noDamageSplash");
 

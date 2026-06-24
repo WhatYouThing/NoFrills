@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class DeviceSolvers {
     public static final Feature instance = new Feature("deviceSolvers");
 

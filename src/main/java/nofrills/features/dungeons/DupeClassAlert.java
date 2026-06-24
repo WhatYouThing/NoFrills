@@ -2,6 +2,7 @@ package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.WorldTickEvent;
 import nofrills.hud.HudManager;
 import nofrills.misc.DungeonUtil;
@@ -11,6 +12,7 @@ import nofrills.misc.Utils;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
+@EventListener
 public class DupeClassAlert {
     public static final Feature instance = new Feature("dupeClassAlert");
 

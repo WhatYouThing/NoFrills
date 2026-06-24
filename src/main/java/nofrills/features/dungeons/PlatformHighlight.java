@@ -4,10 +4,12 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 
+@EventListener
 public class PlatformHighlight {
     public static final Feature instance = new Feature("platformHighlight");
 

@@ -11,6 +11,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nofrills.config.*;
+import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenCloseEvent;
 import nofrills.events.ScreenOpenEvent;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class LeapOverlay {
     public static final Feature instance = new Feature("leapOverlay");
 

@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class QuickClose {
     public static final Feature instance = new Feature("quickClose");
 

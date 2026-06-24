@@ -9,6 +9,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityUpdatedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
@@ -17,6 +18,7 @@ import nofrills.misc.Utils;
 
 import java.util.HashSet;
 
+@EventListener
 public class MinibossHighlight {
     public static final Feature instance = new Feature("minibossHighlight");
 

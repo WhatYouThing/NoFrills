@@ -23,6 +23,7 @@ import nofrills.misc.Utils;
 import java.util.HashSet;
 import java.util.List;
 
+@EventListener
 public class HoppitySolver {
     public static final Feature instance = new Feature("hoppitySolver");
 

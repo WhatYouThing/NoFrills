@@ -12,6 +12,7 @@ import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingKeybind;
 import nofrills.events.*;
+import nofrills.events.EventListener;
 import nofrills.misc.CurveSolver;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -22,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class DianaSolver {
     public static final Feature instance = new Feature("dianaSolver");
 

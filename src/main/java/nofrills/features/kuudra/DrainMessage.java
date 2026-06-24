@@ -7,10 +7,12 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
 import nofrills.misc.Utils;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class DrainMessage {
     public static final Feature instance = new Feature("drainMessage");
 

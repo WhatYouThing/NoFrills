@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class EtherwarpOverlay {
     public static final Feature instance = new Feature("etherwarpOverlay");
 

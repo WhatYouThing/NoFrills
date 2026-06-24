@@ -7,6 +7,7 @@ import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
@@ -18,6 +19,7 @@ import java.util.Map;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class PlotBorders {
     public static final Feature instance = new Feature("plotBorders");
 

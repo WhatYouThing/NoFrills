@@ -28,6 +28,7 @@ import java.util.Optional;
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
+@EventListener
 public class DebugStuff {
     private static long tickCounter = 0;
     private static boolean logSounds = false;

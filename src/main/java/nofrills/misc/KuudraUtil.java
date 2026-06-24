@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.phys.Vec3;
+import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class KuudraUtil {
     public static final List<PickupSpot> pickupSpots = List.of( // data borrowed from odin
             PickupSpot.X,

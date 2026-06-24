@@ -6,12 +6,14 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.util.HashSet;
 
+@EventListener
 public class EquipmentHighlight {
     public static final Feature instance = new Feature("equipmentHighlight");
 

@@ -3,9 +3,11 @@ package nofrills.features.fishing;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.PlaySoundEvent;
 import nofrills.misc.Utils;
 
+@EventListener
 public class MuteDrake {
     public static final Feature instance = new Feature("muteDrake");
 

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+@EventListener
 public class TerminalSolvers {
     public static final Feature instance = new Feature("terminalSolvers");
 

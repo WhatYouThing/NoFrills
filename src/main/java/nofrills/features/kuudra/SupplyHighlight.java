@@ -6,6 +6,7 @@ import net.minecraft.world.entity.monster.Giant;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.EntityCache;
@@ -13,6 +14,7 @@ import nofrills.misc.KuudraUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+@EventListener
 public class SupplyHighlight {
     public static final Feature instance = new Feature("supplyHighlight");
 

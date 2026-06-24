@@ -2,11 +2,13 @@ package nofrills.features.misc;
 
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.Utils;
 
 import static nofrills.Main.eventBus;
 
+@EventListener
 public class UpdateChecker {
     public static final Feature instance = new Feature("updateChecker");
 

@@ -7,10 +7,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
 import net.minecraft.util.Util;
 import net.minecraft.world.scores.*;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.ReceivePacketEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +15,7 @@ import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class SkyblockData {
     public static final List<InstanceType> instances = List.of(
             new InstanceType("f0", "CATACOMBS_ENTRANCE"),

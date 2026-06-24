@@ -14,10 +14,7 @@ import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.GameShutdownEvent;
-import nofrills.events.OverlayMsgEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.components.ToggleButton;
@@ -30,6 +27,7 @@ import java.util.Optional;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class SkillTracker {
     public static final Feature instance = new Feature("skillTracker");
 

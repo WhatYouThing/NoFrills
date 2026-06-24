@@ -25,6 +25,7 @@ import java.util.List;
 import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.*;
 
+@EventListener
 public class ItemProtection {
     public static final Feature instance = new Feature("itemProtection", Feature.Flags.UsePricingAPI);
 

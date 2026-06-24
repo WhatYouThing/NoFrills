@@ -17,6 +17,7 @@ import nofrills.config.Config;
 import nofrills.config.Feature;
 import nofrills.config.SettingJson;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.*;
@@ -30,6 +31,7 @@ import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public final class ChatRules {
     public static final Feature instance = new Feature("chatRules");
 

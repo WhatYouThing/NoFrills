@@ -4,11 +4,13 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.entity.monster.MagmaCube;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.KuudraUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+@EventListener
 public class KuudraHitbox {
     public static final Feature instance = new Feature("kuudraHitbox");
 

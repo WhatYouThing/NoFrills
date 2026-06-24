@@ -7,6 +7,7 @@ import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.SlotUpdateEvent;
@@ -14,6 +15,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
+@EventListener
 public class MelodyMessage {
     public static final Feature instance = new Feature("melodyMessage");
 

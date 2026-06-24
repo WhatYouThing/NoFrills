@@ -11,6 +11,7 @@ import nofrills.misc.CurveSolver;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+@EventListener
 public class RadarSolver {
     public static final Feature instance = new Feature("radarSolver");
 

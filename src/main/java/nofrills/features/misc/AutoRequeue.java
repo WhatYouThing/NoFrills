@@ -3,15 +3,13 @@ package nofrills.features.misc;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.PartyChatMsgEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class AutoRequeue {
     public static final Feature instance = new Feature("autoRequeue");
 

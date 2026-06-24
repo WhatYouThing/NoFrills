@@ -8,12 +8,14 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingString;
 import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
 import nofrills.misc.SeaCreatureData;
 import nofrills.misc.Utils;
 
 import static nofrills.Main.mc;
 import static nofrills.misc.Utils.noFrillsIndicator;
 
+@EventListener
 public class RareAnnounce {
     public static final Feature instance = new Feature("rareAnnounce");
 

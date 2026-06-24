@@ -7,6 +7,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.*;
@@ -14,6 +15,7 @@ import nofrills.misc.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+@EventListener
 public class BossHighlight {
     public static final Feature instance = new Feature("bossHighlight");
 

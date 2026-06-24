@@ -3,10 +3,12 @@ package nofrills.features.general;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.events.EventListener;
 import nofrills.events.WorldTickEvent;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class AutoSprint {
     public static final Feature instance = new Feature("autoSprint");
 

@@ -17,6 +17,7 @@ import nofrills.misc.Utils;
 import static nofrills.Main.mc;
 import static nofrills.hud.HudManager.terraGyroTimer;
 
+@EventListener
 public class TerracottaTimer {
     public static final Feature instance = new Feature("terracottaTimer");
 

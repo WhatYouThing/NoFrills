@@ -4,6 +4,8 @@ import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.events.ChatMsgEvent;
 
+import nofrills.events.EventListener;
+@EventListener
 public class NoAttunementSpam {
     public static final Feature instance = new Feature("noAttunementSpam");
 

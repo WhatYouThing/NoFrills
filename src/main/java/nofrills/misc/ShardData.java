@@ -4,11 +4,13 @@ import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.item.ItemStack;
 import nofrills.config.DataFile;
+import nofrills.events.EventListener;
 import nofrills.events.GameShutdownEvent;
 import nofrills.events.SlotUpdateEvent;
 
 import java.util.List;
 
+@EventListener
 public class ShardData {
     private static final DataFile data = new DataFile("ShardData.json");
 

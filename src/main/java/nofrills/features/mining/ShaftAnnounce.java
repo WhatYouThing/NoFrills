@@ -3,16 +3,14 @@ package nofrills.features.mining;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingString;
-import nofrills.events.ChatMsgEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.ServerTickEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@EventListener
 public class ShaftAnnounce {
     public static final Feature instance = new Feature("shaftAnnounce");
 

@@ -6,11 +6,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@EventListener
 public class SlotOptions {
     public static final ItemStack BACKGROUND = stackWithName(Items.BLACK_STAINED_GLASS_PANE.getDefaultInstance(), " ");
     public static final ItemStack SOLID_BACKGROUND = stackWithName(Items.GRAY_CONCRETE.getDefaultInstance(), " ");

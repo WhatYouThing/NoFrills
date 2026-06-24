@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.StainedGlassPaneBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import nofrills.config.Feature;
 import nofrills.events.BlockUpdateEvent;
+import nofrills.events.EventListener;
 import nofrills.misc.SkyblockData;
 
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.HashSet;
 import static net.minecraft.world.level.block.CrossCollisionBlock.*;
 import static nofrills.Main.mc;
 
+@EventListener
 public class GemstoneDesyncFix {
     public static final Feature instance = new Feature("gemstoneDesyncFix");
 

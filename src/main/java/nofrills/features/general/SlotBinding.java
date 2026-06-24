@@ -18,6 +18,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import nofrills.config.*;
+import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.events.TooltipRenderEvent;
@@ -33,6 +34,7 @@ import java.util.Optional;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public final class SlotBinding {
     public static final Feature instance = new Feature("slotBinding");
 

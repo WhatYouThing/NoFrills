@@ -5,10 +5,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
-import nofrills.events.EntityNamedEvent;
-import nofrills.events.PlaySoundEvent;
-import nofrills.events.ServerTickEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.hud.HudManager;
 import nofrills.misc.EntityCache;
 import nofrills.misc.SlayerUtil;
@@ -17,6 +14,7 @@ import nofrills.misc.Utils;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Pattern;
 
+@EventListener
 public class PillarAlert {
     public static final Feature instance = new Feature("pillarAlert");
 

@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.events.TooltipRenderEvent;
@@ -22,6 +23,7 @@ import java.util.*;
 import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
+@EventListener
 public class CroesusSolver {
     public static final Feature instance = new Feature("croesusSolver", Feature.Flags.UsePricingAPI);
 

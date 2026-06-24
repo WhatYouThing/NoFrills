@@ -11,10 +11,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
-import nofrills.events.InteractEntityEvent;
-import nofrills.events.ServerJoinEvent;
-import nofrills.events.WorldRenderEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.RenderStyle;
@@ -24,6 +21,7 @@ import java.util.HashSet;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class CorpseHighlight {
     public static final Feature instance = new Feature("corpseHighlight");
 

@@ -5,11 +5,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Giant;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.ServerTickEvent;
 import nofrills.misc.KuudraUtil;
 import nofrills.misc.Utils;
 
+@EventListener
 public class PreMessage {
     public static final Feature instance = new Feature("preMessage");
 

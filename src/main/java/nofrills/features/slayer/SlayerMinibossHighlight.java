@@ -7,11 +7,13 @@ import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.*;
 
 import java.util.List;
 
+@EventListener
 public class SlayerMinibossHighlight {
     public static final Feature instance = new Feature("slayerMinibossHighlight");
 

@@ -6,11 +6,13 @@ import net.minecraft.world.entity.ambient.Bat;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EntityUpdatedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+@EventListener
 public class CinderbatHighlight {
     public static final Feature instance = new Feature("cinderbatHighlight");
 

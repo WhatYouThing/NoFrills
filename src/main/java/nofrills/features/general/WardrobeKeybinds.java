@@ -13,6 +13,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
 import nofrills.config.SettingKeybind;
+import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -21,6 +22,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class WardrobeKeybinds {
     public static final Feature instance = new Feature("wardrobeKeybinds");
 

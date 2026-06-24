@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
+import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.*;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public final class CommandKeybinds {
     public static final Feature instance = new Feature("customKeybinds");
 

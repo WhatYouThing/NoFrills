@@ -6,6 +6,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
+import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
@@ -13,6 +14,7 @@ import nofrills.misc.Utils;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class RelicHighlight {
     public static final Feature instance = new Feature("relicHighlight");
 

@@ -5,6 +5,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.DyedItemColor;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.events.EventListener;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.Utils;
@@ -14,6 +15,7 @@ import java.util.Locale;
 
 import static nofrills.misc.NoFrillsAPI.museumData;
 
+@EventListener
 public class InfoTooltips {
     public static final Feature instance = new Feature("infoTooltips", Feature.Flags.UseMuseumAPI);
 

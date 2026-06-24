@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.events.EventListener;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
+@EventListener
 public class GlowingMushroom {
     public static final Feature instance = new Feature("shroomHighlight");
 

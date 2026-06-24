@@ -7,12 +7,14 @@ import net.minecraft.world.entity.Entity;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
 import nofrills.events.SpawnParticleEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+@EventListener
 public class WateringHelper {
     public static final Feature instance = new Feature("wateringHelper");
 

@@ -11,6 +11,7 @@ import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
+import nofrills.events.EventListener;
 import nofrills.events.GameShutdownEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.events.TooltipRenderEvent;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 import static nofrills.misc.NoFrillsAPI.*;
 
+@EventListener
 public class PriceTooltips {
     public static final Feature instance = new Feature("priceTooltips", Feature.Flags.UsePricingAPI);
 

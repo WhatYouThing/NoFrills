@@ -102,7 +102,7 @@ public class WitherDragons {
                     float seconds = drag.spawnTicks / 20.0f;
                     String timerText = Utils.format("{}{}s",
                             Utils.getPercentageColor(seconds / 5.0, true),
-                            Utils.formatDecimal(seconds / 20.0f, 3)
+                            Utils.formatDecimal(seconds, 3)
                     );
                     event.drawText(drag.pos.getCenter().add(0.0, 4.0, 0.0), Component.literal(timerText), 0.3f, true, RenderColor.white);
                 }

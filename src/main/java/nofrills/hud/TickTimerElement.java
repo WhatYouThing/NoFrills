@@ -52,7 +52,7 @@ public class TickTimerElement extends SimpleTextElement implements TickableHudEl
     }
 
     public String getTimeColor() {
-        return Utils.getPercentageColor((double) this.ticks / this.startTicks);
+        return Utils.getPercentageColor((double) this.ticks / this.startTicks, true);
     }
 
     public void updateTimer() {

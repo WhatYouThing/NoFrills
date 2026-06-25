@@ -7,9 +7,11 @@ import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.commands.data.EntityDataAccessor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,6 +36,7 @@ public class DebugStuff {
     private static boolean logSounds = false;
     private static boolean logNametags = false;
     private static boolean logParticles = false;
+    private static boolean logEntityUpdates = false;
 
     private static void print(MutableComponent text) {
         Utils.infoRaw(text.setStyle(text.getStyle().withHoverEvent(new HoverEvent.ShowText(Component.literal("at tick: " + tickCounter)))));
@@ -41,6 +44,13 @@ public class DebugStuff {
 
     private static void print(String message, Object... values) {
         print(Component.literal(Utils.format(message, values)));
+    }
+
+    private static void logNbt(String message, Entity entity) {
+        Thread.startVirtualThread(() -> {
+            EntityDataAccessor accessor = new EntityDataAccessor(entity);
+            LOGGER.info(Utils.format(message, NbtUtils.prettyPrint(accessor.getData(), true)));
+        });
     }
 
     public static void dumpHeadTextures() {
@@ -154,6 +164,15 @@ public class DebugStuff {
         }
     }
 
+    public static void toggleLogEntityUpdates() {
+        logEntityUpdates = !logEntityUpdates;
+        if (logEntityUpdates) {
+            Utils.info("Entity logging enabled.");
+        } else {
+            Utils.info("Entity logging disabled.");
+        }
+    }
+
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
         if (logSounds) {
@@ -197,6 +216,20 @@ public class DebugStuff {
                 msg = Utils.format("{}, color: {} {} {}", msg, color.x, color.y, color.z);
             }
             print(msg);
+        }
+    }
+
+    @EventHandler
+    private static void onEntity(EntityUpdatedEvent event) {
+        if (logEntityUpdates) {
+            logNbt("entity update (tick " + tickCounter + "): {}", event.entity);
+        }
+    }
+
+    @EventHandler
+    private static void onRemoved(EntityRemovedEvent event) {
+        if (logEntityUpdates) {
+            logNbt("entity remove (tick " + tickCounter + "): {}", event.entity);
         }
     }
 

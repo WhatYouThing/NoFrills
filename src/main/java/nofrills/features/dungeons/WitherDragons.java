@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
@@ -33,9 +34,9 @@ public class WitherDragons {
     public static final SettingDouble power = new SettingDouble(0.0, "power", instance);
     public static final SettingDouble powerEasy = new SettingDouble(0.0, "powerEasy", instance);
     public static final SettingBool boxes = new SettingBool(false, "boxes", instance);
+    public static final SettingBool hitboxes = new SettingBool(false, "hitboxes", instance);
     public static final SettingBool tracers = new SettingBool(false, "tracers", instance);
-    public static final SettingBool stack = new SettingBool(false, "stack", instance);
-    public static final SettingEnum<stackTypes> stackType = new SettingEnum<>(stackTypes.Simple, stackTypes.class, "stackType", instance);
+    public static final SettingEnum<WaypointTypes> waypoints = new SettingEnum<>(WaypointTypes.Disabled, WaypointTypes.class, "stackType", instance);
     public static final SettingBool timer = new SettingBool(false, "timer", instance);
     public static final SettingBool health = new SettingBool(false, "health", instance);
 
@@ -92,22 +93,31 @@ public class WitherDragons {
                 if (boxes.value() && (drag.isSpawning() || drag.hasEntity())) {
                     event.drawOutline(drag.area, true, drag.color);
                 }
-                if (stack.value() && drag.isSpawning()) {
-                    if (stackType.value().equals(stackTypes.Advanced)) {
-                        for (AABB part : drag.parts) {
-                            event.drawOutline(part, true, drag.color);
-                        }
-                    } else {
-                        event.drawFilled(drag.pos, true, RenderColor.fromHex(drag.color.hex, 0.67f));
+                if (hitboxes.value() && drag.hasEntity()) {
+                    for (EnderDragonPart part : drag.getEntity().getSubEntities()) {
+                        event.drawOutline(Utils.getLerpedBox(part, event.delta()), false, drag.color);
                     }
                 }
                 if (timer.value() && drag.isSpawning()) {
-                    MutableComponent timerText = Component.literal(Utils.formatDecimal(drag.spawnTicks / 20.0f, 3) + "s");
-                    event.drawText(drag.pos.getCenter().add(0, 4, 0), timerText, 0.3f, true, drag.color);
+                    float seconds = drag.spawnTicks / 20.0f;
+                    String timerText = Utils.format("{}{}s",
+                            Utils.getPercentageColor(seconds / 5.0, true),
+                            Utils.formatDecimal(seconds / 20.0f, 3)
+                    );
+                    event.drawText(drag.pos.getCenter().add(0.0, 4.0, 0.0), Component.literal(timerText), 0.3f, true, RenderColor.white);
+                }
+                if (!waypoints.value().equals(WaypointTypes.Disabled) && drag.isSpawning()) {
+                    if (waypoints.value().equals(WaypointTypes.Advanced)) {
+                        for (AABB part : drag.parts) {
+                            event.drawOutline(part, false, drag.color);
+                        }
+                    } else {
+                        event.drawFilled(drag.pos, false, drag.color.withAlpha(0.5f));
+                    }
                 }
                 if (health.value() && drag.hasEntity()) {
                     MutableComponent healthText = Component.literal(Utils.formatDecimal(drag.health * 0.000001) + "M");
-                    Vec3 pos = drag.getEntity().getPosition(event.tickCounter.getGameTimeDeltaPartialTick(true)); // should make the text move smoothly with the dragons
+                    Vec3 pos = drag.getEntity().getPosition(event.delta());
                     event.drawText(pos, healthText, 0.2f, true, drag.color);
                 }
             }
@@ -204,7 +214,8 @@ public class WitherDragons {
         }
     }
 
-    public enum stackTypes {
+    public enum WaypointTypes {
+        Disabled,
         Simple,
         Advanced
     }

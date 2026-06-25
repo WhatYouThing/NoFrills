@@ -256,6 +256,9 @@ public class NoFrillsCommand {
             })).then(literal("toggleLogParticles").executes(context -> {
                 DebugStuff.toggleLogParticles();
                 return SINGLE_SUCCESS;
+            })).then(literal("toggleLogEntityUpdates").executes(context -> {
+                DebugStuff.toggleLogEntityUpdates();
+                return SINGLE_SUCCESS;
             })).then(literal("storageOverlay").executes(context -> {
                 Utils.setScreen(new StorageOverlayScreen());
                 return SINGLE_SUCCESS;

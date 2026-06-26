@@ -20,9 +20,11 @@ public class NoGhostPlace {
             "INFINITE_SUPERBOOM_TNT",
             "ARROW_SWAPPER",
             "PUMPKIN_LAUNCHER",
-            "SNOW_CANNON",
-            "SNOW_BLASTER",
-            "SNOW_HOWITZER"
+            "RED_KING_RELIC",
+            "ORANGE_KING_RELIC",
+            "BLUE_KING_RELIC",
+            "PURPLE_KING_RELIC",
+            "GREEN_KING_RELIC"
     );
 
     public static boolean isNonPlaceable(BlockPlaceContext context) {

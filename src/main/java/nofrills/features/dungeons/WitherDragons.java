@@ -90,14 +90,6 @@ public class WitherDragons {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && DungeonUtil.isInDragonPhase()) {
             for (Dragon drag : dragons) {
-                if (boxes.value() && (drag.isSpawning() || drag.hasEntity())) {
-                    event.drawOutline(drag.area, true, drag.color);
-                }
-                if (hitboxes.value() && drag.hasEntity()) {
-                    for (EnderDragonPart part : drag.getEntity().getSubEntities()) {
-                        event.drawOutline(Utils.getLerpedBox(part, event.delta()), false, drag.color);
-                    }
-                }
                 if (timer.value() && drag.isSpawning()) {
                     float seconds = drag.spawnTicks / 20.0f;
                     String timerText = Utils.format("{}{}s",
@@ -105,6 +97,14 @@ public class WitherDragons {
                             Utils.formatDecimal(seconds, 3)
                     );
                     event.drawText(drag.pos.getCenter().add(0.0, 4.0, 0.0), Component.literal(timerText), 0.3f, true, RenderColor.white);
+                }
+                if (boxes.value() && (drag.isSpawning() || drag.hasEntity())) {
+                    event.drawOutline(drag.area, true, drag.color);
+                }
+                if (hitboxes.value() && drag.hasEntity()) {
+                    for (EnderDragonPart part : drag.getEntity().getSubEntities()) {
+                        event.drawOutline(Utils.getLerpedBox(part, event.delta()), false, drag.color);
+                    }
                 }
                 if (!waypoints.value().equals(WaypointTypes.Disabled) && drag.isSpawning()) {
                     if (waypoints.value().equals(WaypointTypes.Advanced)) {

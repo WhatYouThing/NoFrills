@@ -55,6 +55,7 @@ public class HudManager {
     public static final SeaCreatures seaCreatures = register(new SeaCreatures("Sea Creatures: §70"));
     public static final FishingBobber bobber = register(new FishingBobber("Bobber: §7Inactive"));
     public static final FishingBag fishingBag = register(new FishingBag("Bait: §fN/A"));
+    public static final BeaconPower beaconPower = register(new BeaconPower());
     public static final ShardTrackerDisplay shardTracker = register(new ShardTrackerDisplay());
     public static final SkillTrackerDisplay skillTracker = register(new SkillTrackerDisplay());
 
@@ -223,6 +224,13 @@ public class HudManager {
     }
 
     @EventHandler
+    private static void onSlotUpdate(SlotUpdateEvent event) {
+        if (beaconPower.isActive()) {
+            beaconPower.update(event);
+        }
+    }
+
+    @EventHandler
     private static void onInventory(InventoryUpdateEvent event) {
         if (event.slotId == 44 || event.slotId == 9) { // 44 - 9th hotbar slot, 9 - top left inventory slot
             if (quiver.isActive()) {
@@ -231,6 +239,13 @@ public class HudManager {
             if (fishingBag.isActive()) {
                 fishingBag.update(event.stack);
             }
+        }
+    }
+
+    @EventHandler
+    private static void onShutdown(GameShutdownEvent event) {
+        if (beaconPower.isActive()) {
+            beaconPower.save();
         }
     }
 

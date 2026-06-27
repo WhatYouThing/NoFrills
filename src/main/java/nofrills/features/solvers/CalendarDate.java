@@ -16,14 +16,6 @@ import static nofrills.Main.mc;
 public class CalendarDate {
     public static final Feature instance = new Feature("calendarDate");
 
-    private static int parseTime(String time, String unit) {
-        int index = time.indexOf(unit);
-        if (index != -1) {
-            return Utils.parseInt(time.substring(Math.max(0, time.lastIndexOf(" ", index)), index).trim()).orElse(0);
-        }
-        return 0;
-    }
-
     private static Component buildLine(String prefix, Calendar calendar) {
         return Component.literal(Utils.format("{}: §b{}", prefix, Utils.parseDate(calendar)));
     }
@@ -34,12 +26,8 @@ public class CalendarDate {
             for (Component line : event.lines) {
                 String l = Utils.toPlain(line);
                 if (l.startsWith("Starts in: ")) {
-                    String time = l.substring(l.indexOf(":")).trim();
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.add(Calendar.DAY_OF_MONTH, parseTime(time, "d"));
-                    calendar.add(Calendar.HOUR, parseTime(time, "h"));
-                    calendar.add(Calendar.MINUTE, parseTime(time, "m"));
-                    calendar.add(Calendar.SECOND, parseTime(time, "s"));
+                    String time = l.substring(l.indexOf(":") + 2).trim();
+                    Calendar calendar = Utils.parseTime(time);
                     int second = calendar.get(Calendar.SECOND);
                     if (second % 5 != 0) { // scuffed patch for when the second is slightly off in the GUI
                         calendar.add(Calendar.SECOND, 5 - (second % 5));

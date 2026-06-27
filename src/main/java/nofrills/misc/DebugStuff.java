@@ -49,7 +49,7 @@ public class DebugStuff {
     private static void logNbt(String message, Entity entity) {
         Thread.startVirtualThread(() -> {
             EntityDataAccessor accessor = new EntityDataAccessor(entity);
-            LOGGER.info(Utils.format(message, NbtUtils.prettyPrint(accessor.getData(), true)));
+            LOGGER.info(Utils.format(message, entity + "\n" + NbtUtils.prettyPrint(accessor.getData(), true)));
         });
     }
 

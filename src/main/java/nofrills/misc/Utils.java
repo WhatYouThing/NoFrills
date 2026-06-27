@@ -896,6 +896,28 @@ public class Utils {
         return result;
     }
 
+    /**
+     * Parses a unit of time from a time duration string.
+     * <p>
+     * <code>parseTimeUnit("4d 2h 6m 9s", "h") == 2</code>
+     */
+    public static int parseTimeUnit(String time, String unit) {
+        int index = time.indexOf(unit);
+        if (index != -1) {
+            return parseInt(time.substring(Math.max(0, time.lastIndexOf(" ", index)), index).trim()).orElse(0);
+        }
+        return 0;
+    }
+
+    public static Calendar parseTime(String time) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_MONTH, parseTimeUnit(time, "d"));
+        calendar.add(Calendar.HOUR, parseTimeUnit(time, "h"));
+        calendar.add(Calendar.MINUTE, parseTimeUnit(time, "m"));
+        calendar.add(Calendar.SECOND, parseTimeUnit(time, "s"));
+        return calendar;
+    }
+
     public static String toLower(String string) {
         return string.toLowerCase(Locale.ROOT);
     }

@@ -97,7 +97,6 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "destroy", at = @At("HEAD"))
     private void beforeStop(CallbackInfo ci) {
-        eventBus.post(new GameShutdownEvent());
         Config.saveBlocking();
     }
 

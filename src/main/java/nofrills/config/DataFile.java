@@ -18,7 +18,7 @@ public class DataFile {
     private JsonObject data = new JsonObject();
     private boolean loadFailed = false;
 
-    public DataFile(String filename) {
+    protected DataFile(String filename) {
         this.path = Config.getFolderPath().resolve(filename);
         try {
             if (Files.isReadable(this.path)) {
@@ -34,7 +34,7 @@ public class DataFile {
 
     public void saveBlocking() {
         if (this.loadFailed || !this.loadFinished) {
-            LOGGER.warn("Prevented save of NoFrills data file {} due to the file not being loaded.", this.path.getFileName());
+            LOGGER.warn("Prevented save of NoFrills data file {} due to the file not being loaded correctly.", this.path.getFileName());
             return;
         }
         try {

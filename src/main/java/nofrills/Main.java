@@ -65,7 +65,7 @@ public class Main implements ModInitializer {
 
         Config.load();
 
-        ConfigScreenProviders.register(MOD_ID, screen -> new ClickGui());
+        ConfigScreenProviders.register(MOD_ID, _ -> new ClickGui());
 
         ClientCommandRegistrationCallback.EVENT.register(Main::registerCommands);
 

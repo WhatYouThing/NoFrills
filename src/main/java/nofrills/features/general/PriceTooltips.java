@@ -7,12 +7,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import nofrills.config.DataFile;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingInt;
+import nofrills.config.*;
 import nofrills.events.EventListener;
-import nofrills.events.GameShutdownEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.SkyblockData;
@@ -33,7 +29,7 @@ public class PriceTooltips {
     public static final SettingInt burgers = new SettingInt(0, "burgers", instance.key());
     public static final SettingBool pricePaid = new SettingBool(false, "pricePaid", instance);
 
-    private static final DataFile data = new DataFile("PricePaid.json");
+    private static final DataFile data = Config.getDataFile("PricePaid.json");
 
     public static int getStackQuantity(ItemStack stack) {
         for (String line : Utils.getLoreLines(stack)) {
@@ -158,13 +154,6 @@ public class PriceTooltips {
                 data.get().addProperty(uuid, cost);
                 data.save();
             }
-        }
-    }
-
-    @EventHandler
-    private static void onShutdown(GameShutdownEvent event) {
-        if (instance.isActive()) {
-            data.saveBlocking();
         }
     }
 }

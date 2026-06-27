@@ -2,8 +2,10 @@ package nofrills.hud.elements;
 
 import com.google.gson.JsonObject;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import nofrills.config.Config;
 import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -19,7 +21,7 @@ import java.util.Calendar;
 import java.util.List;
 
 public final class BeaconPower extends SimpleTextElement implements TickableHudElement {
-    public final DataFile data = new DataFile("BeaconPowerData.json");
+    public final DataFile data = Config.getDataFile("BeaconPowerData.json");
     public final SettingBool hideIfInactive = new SettingBool(false, "hideIfInactive", this.instance);
     private boolean active = false;
 
@@ -77,6 +79,11 @@ public final class BeaconPower extends SimpleTextElement implements TickableHudE
         if (!name.equals("Beacon Power") && !name.equals("Profile Stat Upgrades")) return;
         for (Component line : Utils.getLoreText(event.stack)) {
             String string = Utils.toPlain(line);
+            if (string.equals("No active profile stat bonus set!")) {
+                this.data.get().addProperty("statColor", ChatFormatting.RED.getColor());
+                this.data.get().addProperty("statText", "No stat!");
+                break;
+            }
             if (string.startsWith("Current Stat: ") || string.startsWith("Power Remaining: ")) {
                 String value = string.substring(string.indexOf(":") + 2).trim();
                 if (string.startsWith("Current Stat: ")) {
@@ -89,11 +96,8 @@ public final class BeaconPower extends SimpleTextElement implements TickableHudE
                     Calendar calendar = Utils.parseTime(value);
                     this.data.get().addProperty("statDuration", calendar.getTimeInMillis());
                 }
+                break;
             }
         }
-    }
-
-    public void save() {
-        this.data.saveBlocking();
     }
 }

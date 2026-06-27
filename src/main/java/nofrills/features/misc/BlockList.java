@@ -9,10 +9,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import nofrills.config.Config;
 import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
-import nofrills.events.*;
+import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
+import nofrills.events.PlayerJoinedEvent;
+import nofrills.events.ServerJoinEvent;
 import nofrills.misc.Utils;
 
 import java.io.InputStream;
@@ -35,7 +39,7 @@ public class BlockList {
     public static final SettingBool autoKick = new SettingBool(true, "autoKick", instance);
     public static final SettingBool joinAlert = new SettingBool(false, "joinAlert", instance);
 
-    private static final DataFile data = new DataFile("BlockList.json");
+    private static final DataFile data = Config.getDataFile("BlockList.json");
     private static final ConcurrentHashMap<String, CachedResult> resultCache = new ConcurrentHashMap<>();
 
     public static List<JsonObject> getEntries() {
@@ -186,13 +190,6 @@ public class BlockList {
                         Component.literal(Utils.format("§c§lDetected a blocked player in this lobby: §r§c{}§r§c§l.", event.entry.getProfile().name())))
                 );
             }
-        }
-    }
-
-    @EventHandler
-    private static void onShutdown(GameShutdownEvent event) {
-        if (instance.isActive()) {
-            data.saveBlocking();
         }
     }
 

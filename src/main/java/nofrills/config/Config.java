@@ -7,17 +7,28 @@ import nofrills.misc.Utils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static nofrills.Main.LOGGER;
 
 public class Config {
     private static final Path folderPath = FabricLoader.getInstance().getConfigDir().resolve("NoFrills");
     private static final Path filePath = folderPath.resolve("Configuration.json");
+    private static final CopyOnWriteArrayList<DataFile> dataFiles = new CopyOnWriteArrayList<>();
     private static JsonObject data = new JsonObject();
     private static int hash = 0;
 
     public static Path getFolderPath() {
         return folderPath;
+    }
+
+    public static DataFile getDataFile(String filename) {
+        if (filename.equals(filePath.getFileName().toString())) {
+            throw new IllegalStateException("Registered data file cannot share name with the main config file!");
+        }
+        DataFile file = new DataFile(filename);
+        dataFiles.add(file);
+        return file;
     }
 
     public static void load() {
@@ -38,6 +49,9 @@ public class Config {
             Utils.atomicWrite(filePath, data);
         } catch (Exception exception) {
             LOGGER.error("Unable to save NoFrills config file!", exception);
+        }
+        for (DataFile file : dataFiles) {
+            file.saveBlocking();
         }
     }
 

@@ -242,13 +242,6 @@ public class HudManager {
         }
     }
 
-    @EventHandler
-    private static void onShutdown(GameShutdownEvent event) {
-        if (beaconPower.isActive()) {
-            beaconPower.save();
-        }
-    }
-
     public static class CustomTitle {
         public MutableComponent text;
         public int ticks;

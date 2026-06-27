@@ -3,16 +3,16 @@ package nofrills.misc;
 import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.item.ItemStack;
+import nofrills.config.Config;
 import nofrills.config.DataFile;
 import nofrills.events.EventListener;
-import nofrills.events.GameShutdownEvent;
 import nofrills.events.SlotUpdateEvent;
 
 import java.util.List;
 
 @EventListener
 public class ShardData {
-    private static final DataFile data = new DataFile("ShardData.json");
+    private static final DataFile data = Config.getDataFile("ShardData.json");
 
     public static String getId(ItemStack stack) {
         if (isShard(stack)) {
@@ -142,10 +142,5 @@ public class ShardData {
                 }
             }
         }
-    }
-
-    @EventHandler
-    private static void onShutdown(GameShutdownEvent event) {
-        data.saveBlocking();
     }
 }

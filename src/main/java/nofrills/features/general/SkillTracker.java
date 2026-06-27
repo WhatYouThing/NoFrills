@@ -11,10 +11,14 @@ import io.wispforest.owo.ui.core.VerticalAlignment;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import nofrills.config.Config;
 import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
-import nofrills.events.*;
+import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
+import nofrills.events.OverlayMsgEvent;
+import nofrills.events.WorldTickEvent;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.components.ToggleButton;
@@ -42,7 +46,7 @@ public class SkillTracker {
     public static final SettingColor huntingColor = new SettingColor(RenderColor.fromHex(0x00aaaa), "huntingColor", instance);
     public static final SettingColor catacombsColor = new SettingColor(RenderColor.fromHex(0xff5555), "catacombsColor", instance);
 
-    private static final DataFile data = new DataFile("SkillTracker.json");
+    private static final DataFile data = Config.getDataFile("SkillTracker.json");
     private static final List<String> skills = List.of(
             "Combat",
             "Farming",
@@ -249,13 +253,6 @@ public class SkillTracker {
                 }
                 saveTicks = 0;
             }
-        }
-    }
-
-    @EventHandler
-    private static void onShutdown(GameShutdownEvent event) {
-        if (instance.isActive()) {
-            data.saveBlocking();
         }
     }
 }

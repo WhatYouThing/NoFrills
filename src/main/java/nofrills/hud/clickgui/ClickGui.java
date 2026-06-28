@@ -190,6 +190,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Description("Usage", "Run the \"/nf partyCommands\" command to see more information."),
                                 new Settings.TextInput("Prefixes", PartyCommands.prefixes, "List of valid prefixes for these commands, separated by space."),
                                 new Settings.Toggle("Self Commands", PartyCommands.self, "Allows you to trigger your own party commands and grants you whitelisted status, not recommended."),
+                                new Settings.SliderInt("Grace Period", 0, 60, 1, PartyCommands.gracePeriod, "Prevents recent Party Finder joins from running commands for a specific amount of time, in seconds.\nSet to 0 to disable."),
+                                new Settings.Toggle("Grace Auto Kick", PartyCommands.graceAutoKick, "Automatically kicks a player from the party if they attempt to run a command during the grace period."),
                                 new Settings.EnumToggle<>("Warp", PartyCommands.warp, "Allows party members to warp themselves into your lobby on demand.\n\nCommands: !warp | !w"),
                                 new Settings.EnumToggle<>("Party Transfer", PartyCommands.transfer, "Allows party members to promote themselves (or another player) to party leader on demand.\n\nCommands: !ptme | !pt"),
                                 new Settings.EnumToggle<>("All Invite", PartyCommands.allinv, "Allows party members to toggle the All Invite party setting on demand.\n\nCommand: !allinv"),

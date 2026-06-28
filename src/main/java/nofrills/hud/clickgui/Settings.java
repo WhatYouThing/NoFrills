@@ -23,6 +23,7 @@ import org.lwjgl.glfw.GLFW;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -288,6 +289,8 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             label.tooltip(Component.literal(tooltip));
             button.setMessage(Component.literal(this.setting.value().name()));
             button.onChanged().subscribe(value -> this.setting.set(this.setting.toConstant(value)));
+            int maxWidth = Arrays.stream(this.setting.constants).mapToInt(constant -> mc.font.width(constant.name())).max().orElse(0);
+            button.horizontalSizing(Sizing.fixed(maxWidth + 10));
             this.child(label);
             this.child(button);
             this.child(buildResetButton(btn -> {

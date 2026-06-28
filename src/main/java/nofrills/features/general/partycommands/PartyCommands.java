@@ -6,14 +6,15 @@ import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.sounds.SoundEvents;
 import nofrills.config.*;
-import nofrills.events.EventListener;
-import nofrills.events.PartyChatMsgEvent;
-import nofrills.events.WorldTickEvent;
+import nofrills.events.*;
 import nofrills.hud.HudManager;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static nofrills.Main.mc;
 
 @EventListener
 public class PartyCommands {
@@ -22,6 +23,8 @@ public class PartyCommands {
     public static final SettingString prefixes = new SettingString("! ?", "prefixes", instance.key());
     public static final SettingBool self = new SettingBool(false, "self", instance.key());
     public static final SettingJson lists = new SettingJson(new JsonObject(), "lists", instance.key());
+    public static final SettingInt gracePeriod = new SettingInt(10, "gracePeriod", instance);
+    public static final SettingBool graceAutoKick = new SettingBool(false, "graceAutoKick", instance);
     public static final SettingEnum<Behavior> warp = new SettingEnum<>(Behavior.Disabled, Behavior.class, "warp", instance.key());
     public static final SettingEnum<Behavior> transfer = new SettingEnum<>(Behavior.Disabled, Behavior.class, "transfer", instance.key());
     public static final SettingEnum<Behavior> allinv = new SettingEnum<>(Behavior.Disabled, Behavior.class, "allinv", instance.key());
@@ -39,6 +42,7 @@ public class PartyCommands {
             new CoordsCommand(),
             new KickCommand()
     );
+    private static final ConcurrentHashMap<String, Long> recentJoins = new ConcurrentHashMap<>();
     private static boolean downtimeNeeded = false;
 
     public static void setDowntimeNeeded() {
@@ -92,18 +96,41 @@ public class PartyCommands {
             if ((!self.value() && event.self) || isOnList(author, "blacklist")) {
                 return;
             }
+            if (gracePeriod.value() > 0 && recentJoins.containsKey(author)) {
+                long period = gracePeriod.value() * 1000L;
+                if (recentJoins.get(author) + period > Utils.getMeasuringTime()) {
+                    if (graceAutoKick.value()) {
+                        Utils.sendMessage(Utils.format("/party kick {}", author));
+                        Utils.info("§7Command ignored due to grace period. Kicking " + author + ".");
+                    } else {
+                        Utils.infoButton("§7Command ignored due to grace period. Click here to kick " + author + ".",
+                                Utils.format("/party kick {}", author)
+                        );
+                    }
+                    return;
+                }
+            }
             for (String prefix : Utils.toLower(prefixes.value()).split(" ")) {
-                if (msg.startsWith(prefix)) {
-                    String content = msg.replace(prefix, "");
-                    String name = content.split(" ")[0];
-                    for (Command command : commands) {
-                        if (command.isActive() && command.names.contains(name)) {
-                            if (command.process(author, content, event.self || isOnList(author, "whitelist"))) {
-                                return;
-                            }
+                if (!msg.startsWith(prefix)) continue;
+                String content = msg.replace(prefix, "");
+                String name = content.split(" ")[0];
+                for (Command command : commands) {
+                    if (command.isActive() && command.names.contains(name)) {
+                        if (command.process(author, content, event.self || isOnList(author, "whitelist"))) {
+                            return;
                         }
                     }
                 }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onMessage(ChatMsgEvent event) {
+        if (instance.isActive() && gracePeriod.value() > 0 && event.msg().startsWith("Party Finder >") && event.msg().contains("joined")) {
+            String name = event.msg().replace("Party Finder >", "").trim().split(" ", 2)[0];
+            if (!name.equalsIgnoreCase(mc.player.getName().getString())) {
+                recentJoins.put(Utils.toLower(name), Utils.getMeasuringTime());
             }
         }
     }
@@ -114,6 +141,15 @@ public class PartyCommands {
             HudManager.setCustomTitle("§6Downtime", 60);
             Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
             downtimeNeeded = false;
+        }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        if (instance.isActive() && gracePeriod.value() > 0) {
+            long period = gracePeriod.value() * 1000L;
+            long time = Utils.getMeasuringTime();
+            recentJoins.entrySet().removeIf(entry -> entry.getValue() + period < time);
         }
     }
 

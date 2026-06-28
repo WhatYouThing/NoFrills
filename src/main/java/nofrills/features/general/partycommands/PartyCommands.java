@@ -96,26 +96,26 @@ public class PartyCommands {
             if ((!self.value() && event.self) || isOnList(author, "blacklist")) {
                 return;
             }
-            if (gracePeriod.value() > 0 && recentJoins.containsKey(author)) {
-                long period = gracePeriod.value() * 1000L;
-                if (recentJoins.get(author) + period > Utils.getMeasuringTime()) {
-                    if (graceAutoKick.value()) {
-                        Utils.sendMessage(Utils.format("/party kick {}", author));
-                        Utils.info("§7Command ignored due to grace period. Kicking " + author + ".");
-                    } else {
-                        Utils.infoButton("§7Command ignored due to grace period. Click here to kick " + author + ".",
-                                Utils.format("/party kick {}", author)
-                        );
-                    }
-                    return;
-                }
-            }
             for (String prefix : Utils.toLower(prefixes.value()).split(" ")) {
                 if (!msg.startsWith(prefix)) continue;
                 String content = msg.replace(prefix, "");
                 String name = content.split(" ")[0];
                 for (Command command : commands) {
                     if (command.isActive() && command.names.contains(name)) {
+                        if (gracePeriod.value() > 0 && recentJoins.containsKey(author)) {
+                            long period = gracePeriod.value() * 1000L;
+                            if (recentJoins.get(author) + period > Utils.getMeasuringTime()) {
+                                if (graceAutoKick.value()) {
+                                    Utils.sendMessage(Utils.format("/party kick {}", author));
+                                    Utils.info("§7Command ignored due to grace period. Kicking " + author + ".");
+                                } else {
+                                    Utils.infoButton("§7Command ignored due to grace period. Click here to kick " + author + ".",
+                                            Utils.format("/party kick {}", author)
+                                    );
+                                }
+                                return;
+                            }
+                        }
                         if (command.process(author, content, event.self || isOnList(author, "whitelist"))) {
                             return;
                         }

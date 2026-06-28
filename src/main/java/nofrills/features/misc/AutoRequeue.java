@@ -1,11 +1,14 @@
 package nofrills.features.misc;
 
+import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.*;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
+
+import java.util.HashSet;
 
 import static nofrills.Main.mc;
 
@@ -15,6 +18,12 @@ public class AutoRequeue {
 
     public static final SettingInt delay = new SettingInt(100, "delay", instance.key());
 
+    private static final HashSet<String> autoPauseKeywords = Sets.newHashSet(
+            "!dt",
+            "dt",
+            "tyfr",
+            "tyfrs"
+    );
     public static boolean paused = false;
     public static int ticks = 0;
 
@@ -65,8 +74,10 @@ public class AutoRequeue {
     private static void onPartyMsg(PartyChatMsgEvent event) {
         if (instance.isActive() && !paused && SkyblockData.isInInstance()) {
             String msg = Utils.toLower(event.message).trim();
-            if (msg.equals("!dt") || msg.startsWith("!dt ")) {
-                setPaused();
+            for (String keyword : autoPauseKeywords) {
+                if (msg.equals(keyword) || msg.startsWith(keyword + " ")) {
+                    setPaused();
+                }
             }
         }
     }

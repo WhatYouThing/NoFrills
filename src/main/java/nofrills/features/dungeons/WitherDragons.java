@@ -106,19 +106,25 @@ public class WitherDragons {
                         event.drawOutline(Utils.getLerpedBox(part, event.delta()), false, drag.color);
                     }
                 }
-                if (!waypoints.value().equals(WaypointTypes.Disabled) && drag.isSpawning()) {
-                    if (waypoints.value().equals(WaypointTypes.Advanced)) {
-                        for (AABB part : drag.parts) {
-                            event.drawOutline(part, false, drag.color);
+                WaypointTypes waypointType = waypoints.value();
+                if (!waypointType.equals(WaypointTypes.Disabled) && drag.isSpawning()) {
+                    switch (waypointType) {
+                        case Simple -> event.drawFilled(drag.pos, false, drag.color.withAlpha(0.5f));
+                        case Advanced -> {
+                            for (AABB part : drag.parts) {
+                                event.drawFilled(part, false, drag.color.withAlpha(0.5f));
+                            }
                         }
-                    } else {
-                        event.drawFilled(drag.pos, false, drag.color.withAlpha(0.5f));
                     }
                 }
                 if (health.value() && drag.hasEntity()) {
-                    MutableComponent healthText = Component.literal(Utils.formatDecimal(drag.health * 0.000001) + "M");
+                    float maxHealth = drag.maxHealth > 0.0f ? drag.maxHealth : 200.0f;
+                    String healthText = Utils.format("{}{}M",
+                            Utils.getPercentageColor(drag.health / maxHealth),
+                            Utils.formatDecimal(drag.health * 0.000001)
+                    );
                     Vec3 pos = drag.getEntity().getPosition(event.delta());
-                    event.drawText(pos, healthText, 0.2f, true, drag.color);
+                    event.drawText(pos, Component.literal(healthText), 0.2f, true, RenderColor.white);
                 }
             }
             if (tracers.value()) {
@@ -229,12 +235,9 @@ public class WitherDragons {
                 RenderColor.fromHex(0xff0000),
                 AABB.ofSize(new Vec3(27.0, 14.0, 59.0), 1, 1, 1),
                 List.of(
-                        new AABB(26.5, 14.0, 52.0, 27.5, 15.0, 53.0),
                         new AABB(25.5, 14.0, 52.0, 28.5, 17.0, 55.0),
                         new AABB(24.5, 14.0, 56.0, 29.5, 17.0, 61.0),
-                        new AABB(26.0, 15.5, 61.5, 28.0, 17.5, 63.5),
-                        new AABB(26.0, 15.5, 63.5, 28.0, 17.5, 65.5),
-                        new AABB(26.0, 15.5, 65.5, 28.0, 17.5, 67.5),
+                        new AABB(26.0, 15.5, 61.5, 28.0, 17.5, 67.5),
                         new AABB(29.5, 16.0, 57.0, 33.5, 18.0, 61.0),
                         new AABB(20.5, 16.0, 57.0, 24.5, 18.0, 61.0)
                 ),
@@ -248,12 +251,9 @@ public class WitherDragons {
                 RenderColor.fromHex(0xffaa00),
                 AABB.ofSize(new Vec3(85.0, 14.0, 56.0), 1, 1, 1),
                 List.of(
-                        new AABB(84.5, 14.0, 49.0, 85.5, 15.0, 50.0),
                         new AABB(83.5, 14.0, 49.0, 86.5, 17.0, 52.0),
                         new AABB(82.5, 14.0, 53.0, 87.5, 17.0, 58.0),
-                        new AABB(84.0, 15.5, 58.5, 86.0, 17.5, 60.5),
-                        new AABB(84.0, 15.5, 60.5, 86.0, 17.5, 62.5),
-                        new AABB(84.0, 15.5, 62.5, 86.0, 17.5, 64.5),
+                        new AABB(84.0, 15.5, 58.5, 86.0, 17.5, 64.5),
                         new AABB(87.5, 16.0, 54.0, 91.5, 18.0, 58.0),
                         new AABB(78.5, 16.0, 54.0, 82.5, 18.0, 58.0)
                 ),
@@ -267,12 +267,9 @@ public class WitherDragons {
                 RenderColor.fromHex(0x55ffff),
                 AABB.ofSize(new Vec3(84.0, 14.0, 94.0), 1, 1, 1),
                 List.of(
-                        new AABB(83.5, 14.0, 87.0, 84.5, 15.0, 88.0),
                         new AABB(82.5, 14.0, 87.0, 85.5, 17.0, 90.0),
                         new AABB(81.5, 14.0, 91.0, 86.5, 17.0, 96.0),
-                        new AABB(83.0, 15.5, 96.5, 85.0, 17.5, 98.5),
-                        new AABB(83.0, 15.5, 98.5, 85.0, 17.5, 100.5),
-                        new AABB(83.0, 15.5, 100.5, 85.0, 17.5, 102.5),
+                        new AABB(83.0, 15.5, 96.5, 85.0, 17.5, 102.5),
                         new AABB(86.5, 16.0, 92.0, 90.5, 18.0, 96.0),
                         new AABB(77.5, 16.0, 92.0, 81.5, 18.0, 96.0)
                 ),
@@ -286,12 +283,9 @@ public class WitherDragons {
                 RenderColor.fromHex(0xaa00aa),
                 AABB.ofSize(new Vec3(56.0, 14.0, 125.0), 1, 1, 1),
                 List.of(
-                        new AABB(55.5, 14.0, 118.0, 56.5, 15.0, 119.0),
                         new AABB(54.5, 14.0, 118.0, 57.5, 17.0, 121.0),
                         new AABB(53.5, 14.0, 122.0, 58.5, 17.0, 127.0),
-                        new AABB(55.0, 15.5, 127.5, 57.0, 17.5, 129.5),
-                        new AABB(55.0, 15.5, 129.5, 57.0, 17.5, 131.5),
-                        new AABB(55.0, 15.5, 131.5, 57.0, 17.5, 133.5),
+                        new AABB(55.0, 15.5, 127.5, 57.0, 17.5, 133.5),
                         new AABB(58.5, 16.0, 123.0, 62.5, 18.0, 127.0),
                         new AABB(49.5, 16.0, 123.0, 53.5, 18.0, 127.0)
                 ),
@@ -305,12 +299,9 @@ public class WitherDragons {
                 RenderColor.fromHex(0x00ff00),
                 AABB.ofSize(new Vec3(27.0, 14.0, 94.0), 1, 1, 1),
                 List.of(
-                        new AABB(26.5, 14.0, 87.0, 27.5, 15.0, 88.0),
                         new AABB(25.5, 14.0, 87.0, 28.5, 17.0, 90.0),
                         new AABB(24.5, 14.0, 91.0, 29.5, 17.0, 96.0),
-                        new AABB(26.0, 15.5, 96.5, 28.0, 17.5, 98.5),
-                        new AABB(26.0, 15.5, 98.5, 28.0, 17.5, 100.5),
-                        new AABB(26.0, 15.5, 100.5, 28.0, 17.5, 102.5),
+                        new AABB(26.0, 15.5, 96.5, 28.0, 17.5, 102.5),
                         new AABB(29.5, 16.0, 92.0, 33.5, 18.0, 96.0),
                         new AABB(20.5, 16.0, 92.0, 24.5, 18.0, 96.0)
                 ),
@@ -327,6 +318,7 @@ public class WitherDragons {
         public List<AABB> parts;
         public AABB area;
         public float health = 0.0f;
+        public float maxHealth = 200.0f;
         public int spawnTicks = 0;
 
         public Dragon(String name, int archPriority, int bersPriority, String texture, RenderColor color, AABB pos, List<AABB> parts, AABB area) {
@@ -356,6 +348,7 @@ public class WitherDragons {
 
         public void reset() {
             this.health = 0.0f;
+            this.maxHealth = 200.0f;
             this.spawnTicks = 0;
         }
 
@@ -370,6 +363,7 @@ public class WitherDragons {
         public void setEntity(EnderDragon ent) {
             this.dragonCache.add(ent);
             this.health = ent.getHealth(); // store the health value on update, required as the client appears to reset it on the next tick
+            this.maxHealth = ent.getMaxHealth();
         }
 
         public boolean isCollar(ArmorStand entity) {

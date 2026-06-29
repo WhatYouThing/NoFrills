@@ -180,6 +180,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Soulweaver Skulls", NoRender.soulweaverSkulls, "Hides the floating skulls that appear while wearing the Soulweaver Gloves in Dungeons."),
                                 new Settings.Toggle("Guided Sheep", NoRender.guidedSheep, "Hides the Guided Sheep Mage ability in Dungeons."),
                                 new Settings.Toggle("Bone Plating", NoRender.bonePlating, "Hides the Bone Plating Archer ability (floating bone meal item) in Dungeons."),
+                                new Settings.Toggle("Healer Fairy", NoRender.healerFairy, "Hides the Healer flying Fairy in Dungeons."),
                                 new Settings.Toggle("Tree Bits", NoRender.treeBits, "Hides the flying wood and leaves blocks that appear when chopping trees on the Galatea."),
                                 new Settings.Toggle("Nausea", NoRender.nausea, "Prevents the nausea screen wobble and/or green overlay from rendering."),
                                 new Settings.EnumToggle<>("Vignette", NoRender.vignette, "The type of vignette overlay to hide.\n\nNone: Don't hide the vignette.\nAmbient: Hides the dark vignette that appears when in darkness.\nDanger: Hides the red (world border) vignette.\nBoth: Always hides the vignette."),

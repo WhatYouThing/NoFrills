@@ -19,9 +19,7 @@ import net.minecraft.world.level.block.Blocks;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
-import nofrills.events.EntityNamedEvent;
-import nofrills.events.EventListener;
-import nofrills.events.SpawnParticleEvent;
+import nofrills.events.*;
 import nofrills.misc.Utils;
 import org.joml.Vector3f;
 
@@ -56,6 +54,7 @@ public class NoRender {
     public static final SettingBool soulweaverSkulls = new SettingBool(false, "soulweaverSkulls", instance.key());
     public static final SettingBool guidedSheep = new SettingBool(false, "guidedSheep", instance.key());
     public static final SettingBool bonePlating = new SettingBool(false, "bonePlating", instance.key());
+    public static final SettingBool healerFairy = new SettingBool(false, "healerFairy", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
     public static final SettingEnum<VignetteMode> vignette = new SettingEnum<>(VignetteMode.None, VignetteMode.class, "vignetteMode", instance.key());
@@ -73,6 +72,7 @@ public class NoRender {
             ParticleTypes.GUST_EMITTER_LARGE
     );
     private static final EntityPredicates entityPredicates = new EntityPredicates();
+    private static boolean inDungeons = false;
 
     public static FogData getFogAsEmpty(FogData data) {
         data.renderDistanceStart = Float.MAX_VALUE;
@@ -147,7 +147,7 @@ public class NoRender {
                 event.cancel();
                 return;
             }
-            if (mageBeam.value() && event.type.equals(ParticleTypes.FIREWORK) && Utils.isInDungeons()) {
+            if (mageBeam.value() && event.type.equals(ParticleTypes.FIREWORK) && inDungeons) {
                 event.cancel();
                 return;
             }
@@ -159,6 +159,18 @@ public class NoRender {
                 event.cancel();
             }
         }
+    }
+
+    @EventHandler
+    private static void onTick(WorldTickEvent event) {
+        if (instance.isActive()) {
+            inDungeons = Utils.isInDungeons();
+        }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        inDungeons = false;
     }
 
     public enum VignetteMode {
@@ -190,7 +202,7 @@ public class NoRender {
                     (entity -> lightning.value() && entity instanceof LightningBolt),
                     (entity -> expOrbs.value() && entity instanceof ExperienceOrb),
                     (entity -> {
-                        if (soulweaverSkulls.value() && entity instanceof ArmorStand stand && Utils.isInDungeons()) {
+                        if (soulweaverSkulls.value() && entity instanceof ArmorStand stand && inDungeons) {
                             ItemStack helmet = Utils.getEntityHelmet(stand);
                             if (helmet.getItem().equals(Items.PLAYER_HEAD)) {
                                 return Utils.hasTexturePayload(helmet, -1020507406);
@@ -198,11 +210,20 @@ public class NoRender {
                         }
                         return false;
                     }),
-                    (entity -> guidedSheep.value() && entity instanceof Sheep sheep && sheep.getHealth() == 8.0f && Utils.isInDungeons()),
+                    (entity -> guidedSheep.value() && entity instanceof Sheep sheep && sheep.getHealth() == 8.0f && inDungeons),
                     (entity -> {
                         if (bonePlating.value() && entity instanceof ItemEntity item) {
                             ItemStack stack = item.getItem();
-                            return stack.getItem().equals(Items.BONE_MEAL) && stack.getHoverName().getString().equals("Bone Meal") && Utils.isInDungeons();
+                            return stack.getItem().equals(Items.BONE_MEAL) && stack.getHoverName().getString().equals("Bone Meal") && inDungeons;
+                        }
+                        return false;
+                    }),
+                    (entity -> {
+                        if (healerFairy.value() && entity instanceof ArmorStand stand && inDungeons && stand.isMarker()) {
+                            ItemStack item = stand.getItemBySlot(EquipmentSlot.MAINHAND);
+                            if (item.getItem().equals(Items.PLAYER_HEAD)) {
+                                return Utils.hasTexturePayload(item, 758129854);
+                            }
                         }
                         return false;
                     })

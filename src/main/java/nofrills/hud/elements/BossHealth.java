@@ -53,7 +53,7 @@ public final class BossHealth extends SimpleTextElement implements TickableHudEl
         LerpingBossEvent bar = bossBars.getFirst();
         if (dungeon.value() && Utils.isInDungeons() && !Utils.isInstanceOver()) {
             String name = Utils.toPlain(bar.getName());
-            if ((DungeonUtil.isInBossRoom() && !DungeonUtil.isInDragonPhase()) || name.equals("The Watcher")) {
+            if (DungeonUtil.isInBossRoom() || name.equals("The Watcher")) {
                 this.setHealth("§l" + name, bar.getProgress());
                 return;
             }

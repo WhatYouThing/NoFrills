@@ -113,7 +113,6 @@ public class HudManager {
                 timer.pause();
             }
         }
-        dungeonMap.reset();
         currentTitle.reset();
     }
 

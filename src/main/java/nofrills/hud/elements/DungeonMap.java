@@ -23,6 +23,7 @@ import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.*;
 import nofrills.hud.HudElement;
+import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
@@ -34,13 +35,14 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class DungeonMap extends HudElement {
+public final class DungeonMap extends HudElement implements TickableHudElement {
     public static DynamicTexture mapTexture;
     private final TextureAtlas atlasTexture = mc.getAtlasManager().getAtlasOrThrow(AtlasIds.MAP_DECORATIONS);
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
     private final SettingDouble playerMarkerScale = new SettingDouble(1.5, "playerMarkerScale", this.instance);
     private final SettingDouble playerNameScale = new SettingDouble(0.8, "playerNameScale", this.instance);
     private final SettingEnum<NameMode> playerNameMode = new SettingEnum<>(NameMode.Normal, NameMode.class, "playerNameMode", this.instance);
+    private final SettingEnum<NameDisplayMode> playerNameDisplayMode = new SettingEnum<>(NameDisplayMode.Disabled, NameDisplayMode.class, "playerNameDisplayMode", this.instance);
     private final SettingColor healColor = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", this.instance);
     private final SettingColor mageColor = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", this.instance);
     private final SettingColor bersColor = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", this.instance);
@@ -49,6 +51,7 @@ public final class DungeonMap extends HudElement {
     private final SettingBool debug = new SettingBool(false, "debug", this.instance);
     private List<DungeonUtil.Teammate> teammates = List.of();
     private MapParameters parameters = null;
+    private boolean holdingLeap = false;
 
     public DungeonMap() {
         super(new Feature("dungeonMapElement"), "Dungeon Map");
@@ -57,7 +60,8 @@ public final class DungeonMap extends HudElement {
                 new Settings.SliderDouble("Self Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),
                 new Settings.SliderDouble("Player Scale", 0.0, 2.0, 0.01, this.playerMarkerScale, "The scale of the markers of your teammates."),
                 new Settings.SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.playerNameScale, "The scale of the name displayed below teammate markers."),
-                new Settings.EnumToggle<>("Name Mode", this.playerNameMode, "The mode of how the player names are displayed.\n\nNormal: The full name of the player is displayed.\nClass: A short player class label is displayed (\"Arch\", \"Bers\" etc.).\nDisabled: No names displayed."),
+                new Settings.EnumToggle<>("Name Mode", this.playerNameMode, "The mode of how the player names are displayed.\n\nNormal: The full name of the player is displayed.\nClass: A short player class label is displayed (\"Arch\", \"Bers\" etc.)."),
+                new Settings.EnumToggle<>("Name Display Mode", this.playerNameDisplayMode, "The mode of when the player names are displayed.\n\nAlways: The names are always displayed.\nLeapOnly: The names are displayed only while holding a leap.\nDisabled: No names displayed."),
                 new Settings.ColorPicker("Healer Color", this.healColor, "The color used for the Healer marker name text."),
                 new Settings.ColorPicker("Mage Color", this.mageColor, "The color used for the Mage marker name text."),
                 new Settings.ColorPicker("Bers Color", this.bersColor, "The color used for the Berserk marker name text."),
@@ -115,6 +119,18 @@ public final class DungeonMap extends HudElement {
         matrices.popMatrix();
     }
 
+    @Override
+    public void onClientTick() {
+        if (!Utils.isInDungeons()) return;
+        this.holdingLeap = Utils.getRightClickAbility(Utils.getHeldItem()).contains("Ability: Spirit Leap");
+    }
+
+    @Override
+    public void onReset() {
+        this.teammates = List.of();
+        this.parameters = null;
+    }
+
     private MapParameters getMapParameters() {
         return switch (DungeonUtil.getCurrentFloor()) {
             case "E", "F1", "M1" -> new MapParameters(1.5f, 1.5f, -136);
@@ -153,11 +169,11 @@ public final class DungeonMap extends HudElement {
     }
 
     private void drawMarkerLabel(OwoUIGraphics context, DungeonUtil.Teammate teammate, byte x, byte z, float scale) {
-        NameMode mode = this.playerNameMode.value();
-        if (mode.equals(NameMode.Disabled)) {
+        NameDisplayMode displayMode = this.playerNameDisplayMode.value();
+        if (displayMode.equals(NameDisplayMode.Disabled) || (displayMode.equals(NameDisplayMode.LeapOnly) && !this.holdingLeap)) {
             return;
         }
-        String text = mode.equals(NameMode.Normal) ? teammate.name() : switch (teammate.selectedClass()) {
+        String text = this.playerNameMode.value().equals(NameMode.Normal) ? teammate.name() : switch (teammate.selectedClass()) {
             case "Healer" -> "Heal";
             case "Berserk" -> "Bers";
             case "Archer" -> "Arch";
@@ -195,12 +211,10 @@ public final class DungeonMap extends HudElement {
             packet.colorPatch().ifPresent(data -> {
                 byte[] colors = data.mapColors();
                 NativeImage nativeImage = mapTexture.getPixels();
-                if (nativeImage != null) {
-                    for (int i = 0; i < 128; i++) {
-                        for (int j = 0; j < 128; j++) {
-                            int k = j + i * 128;
-                            nativeImage.setPixel(j, i, MapColor.getColorFromPackedId(colors[k]));
-                        }
+                for (int i = 0; i < 128; i++) {
+                    for (int j = 0; j < 128; j++) {
+                        int k = j + i * 128;
+                        nativeImage.setPixel(j, i, MapColor.getColorFromPackedId(colors[k]));
                     }
                 }
                 mapTexture.upload();
@@ -208,14 +222,14 @@ public final class DungeonMap extends HudElement {
         }
     }
 
-    public void reset() {
-        this.teammates = List.of();
-        this.parameters = null;
-    }
-
     public enum NameMode {
         Normal,
-        Class,
+        Class
+    }
+
+    public enum NameDisplayMode {
+        Always,
+        LeapOnly,
         Disabled
     }
 

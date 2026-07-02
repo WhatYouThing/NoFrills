@@ -18,7 +18,9 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
 import nofrills.events.*;
+import nofrills.features.dungeons.WitherDragons;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.AnimationFix;
 import nofrills.features.tweaks.DisconnectFix;
@@ -159,6 +161,13 @@ public class ClientPacketListenerMixin {
     private void onAfterMapUpdate(ClientboundMapItemDataPacket packet, CallbackInfo ci) {
         if (HudManager.dungeonMap.isActive()) {
             HudManager.dungeonMap.onMapUpdate(packet);
+        }
+    }
+
+    @Inject(method = "handleSetEntityMotion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;lerpMotion(Lnet/minecraft/world/phys/Vec3;)V"))
+    private void onSetMotion(ClientboundSetEntityMotionPacket packet, CallbackInfo ci, @Local Entity entity) {
+        if (entity instanceof Arrow arrow && WitherDragons.instance.isActive() && WitherDragons.trackArrowHits.value()) {
+            WitherDragons.onArrowMotion(arrow, packet.movement());
         }
     }
 }

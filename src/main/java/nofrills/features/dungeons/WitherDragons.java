@@ -1,18 +1,26 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -24,7 +32,15 @@ import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
+
+import static nofrills.Main.mc;
 
 @EventListener
 public class WitherDragons {
@@ -39,6 +55,8 @@ public class WitherDragons {
     public static final SettingEnum<WaypointTypes> waypoints = new SettingEnum<>(WaypointTypes.Disabled, WaypointTypes.class, "stackType", instance);
     public static final SettingBool timer = new SettingBool(false, "timer", instance);
     public static final SettingBool health = new SettingBool(false, "health", instance);
+    public static final SettingBool trackIceSpray = new SettingBool(false, "trackIceSpray", instance);
+    public static final SettingBool trackArrowHits = new SettingBool(false, "trackArrowHits", instance);
 
     private static final List<Dragon> dragons = List.of(
             Dragon.RED,
@@ -47,7 +65,10 @@ public class WitherDragons {
             Dragon.PURPLE,
             Dragon.GREEN
     );
+    private static final HashMap<String, EntityCache> teammateArrows = new HashMap<>();
+    private static final CopyOnWriteArrayList<FireBowPoint> firePoints = new CopyOnWriteArrayList<>();
     private static boolean splitDone = false;
+    private static int tickCounter = 0;
 
     private static boolean isArcherTeam() {
         return DungeonUtil.isClass("Archer") || DungeonUtil.isClass("Tank");
@@ -68,6 +89,14 @@ public class WitherDragons {
         return first == Dragon.PURPLE || second == Dragon.PURPLE;
     }
 
+    private static boolean isIceSprayEntity(ArmorStand stand) {
+        if (stand.isMarker()) {
+            ItemStack item = stand.getItemBySlot(EquipmentSlot.MAINHAND);
+            return item.getItem().equals(Items.PACKED_ICE) && item.count() == 1 && Utils.getCustomData(item) == null;
+        }
+        return false;
+    }
+
     private static Dragon getHigherPriority(Dragon first, Dragon second, boolean archerTeam) {
         if (archerTeam) {
             return first.archPriority > second.archPriority ? first : second;
@@ -79,10 +108,87 @@ public class WitherDragons {
         MutableComponent title = Component.literal(Utils.toUpper(drag.name) + " IS SPAWNING").setStyle(Style.EMPTY.withBold(true).withColor(drag.color.hex));
         Utils.showTitle(title, Component.empty(), 0, 30, 10);
         Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
-        if (split) {
-            Utils.infoRaw(Component.literal(drag.name + " is your priority dragon.").withColor(drag.color.hex));
-        } else if (splitDone) {
-            Utils.infoRaw(Component.literal(drag.name + " is spawning.").withColor(drag.color.hex));
+        Utils.infoRaw(Component.literal(drag.name).withColor(drag.color.hex).append(
+                Component.literal(split ? " is your priority dragon." : " is spawning.").withStyle(ChatFormatting.GRAY)
+        ));
+    }
+
+    private static void updateDragonEntities(Entity entity) {
+        for (Dragon drag : dragons) {
+            if (entity instanceof EnderDragon dragon) {
+                if (!drag.hasEntity()) {
+                    for (Entity collar : drag.collarCache.get()) {
+                        if (Utils.horizontalDistance(dragon, collar) <= 10.0) {
+                            drag.setEntity(dragon);
+                            break;
+                        }
+                    }
+                } else if (drag.getEntity().equals(dragon)) {
+                    drag.setEntity(dragon);
+                }
+            } else if (entity instanceof ArmorStand stand) {
+                if (drag.isCollar(stand)) {
+                    drag.collarCache.add(stand);
+                    for (Entity dragon : drag.dragonCache.get()) {
+                        if (Utils.horizontalDistance(dragon, stand) <= 10.0) {
+                            drag.setEntity((EnderDragon) dragon);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void onArrowMotion(Arrow arrow, Vec3 motion) {
+        Vec2 rot = motion.rotation();
+        if (Float.isNaN(rot.x) || Float.isNaN(rot.y) || mc.level == null) {
+            return;
+        }
+        float rotPitch = Mth.wrapDegrees(rot.x);
+        float rotYaw = Mth.wrapDegrees(rot.y);
+        double pitchDiff = Math.clamp(10.0 / (Math.abs(motion.x) + Math.abs(motion.z)), 2.5, 20.0);
+        for (AbstractClientPlayer player : new ArrayList<>(mc.level.players())) {
+            if (!Utils.isPlayer(player)) continue;
+            String name = player.getName().getString();
+            List<FireBowPoint> points = player.equals(mc.player) ? firePoints : List.of(new FireBowPoint(
+                    player.position(),
+                    Mth.wrapDegrees(player.getXRot()),
+                    Mth.wrapDegrees(player.getYRot()),
+                    0
+            ));
+            for (FireBowPoint point : points) {
+                if (Utils.difference(point.pitch + 90.0f, rotPitch + 90.0f) > pitchDiff) continue;
+                if (point.pitch < -85.0 || point.pitch > 85.0) {
+                    if (Utils.horizontalDistance(arrow.position(), point.pos) > 1.0) continue;
+                } else {
+                    if (Utils.difference(point.yaw + 180.0f, rotYaw + 180.0f) > 15.0f) continue;
+                    if (Utils.horizontalDistance(arrow.position(), point.pos) > 4.0) continue;
+                }
+                if (!teammateArrows.containsKey(name)) {
+                    teammateArrows.put(name, new EntityCache());
+                }
+                teammateArrows.get(name).add(arrow);
+                return;
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onEntityRemoved(EntityRemovedEvent event) {
+        if (instance.isActive() && trackArrowHits.value() && event.entity instanceof Arrow arrow && DungeonUtil.isInDragonPhase()) {
+            for (Map.Entry<String, EntityCache> entry : teammateArrows.entrySet()) {
+                if (!entry.getValue().has(arrow)) continue;
+                for (Dragon dragon : dragons) {
+                    if (!dragon.hasEntity()) continue;
+                    for (EnderDragonPart part : dragon.getEntity().getSubEntities()) {
+                        if (part.getBoundingBox().intersects(arrow.getBoundingBox())) {
+                            String name = entry.getKey();
+                            dragon.arrowHits.put(name, dragon.arrowHits.getOrDefault(name, 0) + 1);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -112,15 +218,15 @@ public class WitherDragons {
                         case Simple -> event.drawFilled(drag.pos, false, drag.color.withAlpha(0.5f));
                         case Advanced -> {
                             for (AABB part : drag.parts) {
-                                event.drawFilled(part, false, drag.color.withAlpha(0.5f));
+                                event.drawFilled(part, false, drag.color.withAlpha(0.33f));
                             }
                         }
                     }
                 }
                 if (health.value() && drag.hasEntity()) {
-                    float maxHealth = drag.maxHealth > 0.0f ? drag.maxHealth : 200.0f;
+                    double maxHealth = drag.maxHealth > 0.0 ? drag.maxHealth : 200.0;
                     String healthText = Utils.format("{}{}M",
-                            Utils.getPercentageColor(drag.health / maxHealth),
+                            Utils.getPercentageColor(drag.health / maxHealth, true),
                             Utils.formatDecimal(drag.health * 0.000001)
                     );
                     Vec3 pos = drag.getEntity().getPosition(event.delta());
@@ -166,39 +272,23 @@ public class WitherDragons {
         }
     }
 
-    // the dragons can be outside of render distance when spawned, so instead of trying to rely on the statue area
-    // we can use their "collar" entities to accurately find each dragon regardless of where they are
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
         if (instance.isActive() && DungeonUtil.isInDragonPhase()) {
-            if (event.entity instanceof EnderDragon dragon) {
-                for (Dragon drag : dragons) {
-                    if (!drag.hasEntity()) {
-                        for (Entity collar : drag.collarCache.get()) {
-                            if (Utils.horizontalDistance(dragon, collar) <= 10.0) {
-                                drag.setEntity(dragon);
-                                break;
-                            }
-                        }
-                    } else if (drag.getEntity().equals(dragon)) {
-                        drag.setEntity(dragon);
-                        break;
+            if (event.entity instanceof ArmorStand stand && isIceSprayEntity(stand)) {
+                if (!trackIceSpray.value()) return;
+                for (Dragon dragon : dragons) {
+                    if (!dragon.hasEntity()) continue;
+                    EnderDragon entity = dragon.getEntity();
+                    if (!dragon.iceSprayed && Utils.horizontalDistance(entity, stand) < 2.0 && stand.getY() > entity.getY()) {
+                        Utils.infoRaw(Component.literal(dragon.name).withColor(dragon.color.hex).append(
+                                Component.literal(Utils.format(" Ice Sprayed in {} ticks.", tickCounter - dragon.spawnedAt)).withStyle(ChatFormatting.GRAY)
+                        ));
+                        dragon.iceSprayed = true;
                     }
                 }
-            }
-            if (event.entity instanceof ArmorStand stand) {
-                for (Dragon drag : dragons) {
-                    if (drag.isCollar(stand)) {
-                        drag.collarCache.add(stand);
-                        for (Entity dragon : drag.dragonCache.get()) {
-                            if (Utils.horizontalDistance(dragon, stand) <= 10.0) {
-                                drag.setEntity((EnderDragon) dragon);
-                                break;
-                            }
-                        }
-                        break;
-                    }
-                }
+            } else {
+                updateDragonEntities(event.entity);
             }
         }
     }
@@ -209,12 +299,30 @@ public class WitherDragons {
             for (Dragon drag : dragons) {
                 drag.tick();
             }
+            firePoints.removeIf(point -> point.tick + 60 < tickCounter);
+            tickCounter++;
+        }
+    }
+
+    @EventHandler
+    private static void onWorldTick(WorldTickEvent event) {
+        if (instance.isActive() && (mc.options.keyAttack.isDown() || mc.options.keyUse.isDown()) && mc.player.isHolding(Items.BOW)) {
+            Vec3 pos = mc.player.position();
+            firePoints.add(new FireBowPoint(
+                    new Vec3(pos.x, pos.y, pos.z),
+                    Mth.wrapDegrees(mc.player.getXRot()),
+                    Mth.wrapDegrees(mc.player.getYRot()),
+                    tickCounter
+            ));
         }
     }
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
+        teammateArrows.clear();
+        firePoints.clear();
         splitDone = false;
+        tickCounter = 0;
         for (Dragon drag : dragons) {
             drag.reset();
         }
@@ -226,12 +334,15 @@ public class WitherDragons {
         Advanced
     }
 
+    private record FireBowPoint(Vec3 pos, float pitch, float yaw, int tick) {
+    }
+
     private static class Dragon { // box coordinates taken from odin's WitherDragonEnum xqcL
         public static final Dragon RED = new Dragon(
                 "Red",
                 3,
                 3,
-                "c20ef06dd60499766ac8ce15d2bea41d2813fe55718864b52dc41cbaae1ea913",
+                "RED_KING_RELIC",
                 RenderColor.fromHex(0xff0000),
                 AABB.ofSize(new Vec3(27.0, 14.0, 59.0), 1, 1, 1),
                 List.of(
@@ -247,7 +358,7 @@ public class WitherDragons {
                 "Orange",
                 1,
                 5,
-                "aace6bb3aa4ccac031168202f6d4532597bcac6351059abd9d10b28610493aeb",
+                "ORANGE_KING_RELIC",
                 RenderColor.fromHex(0xffaa00),
                 AABB.ofSize(new Vec3(85.0, 14.0, 56.0), 1, 1, 1),
                 List.of(
@@ -263,7 +374,7 @@ public class WitherDragons {
                 "Blue",
                 4,
                 2,
-                "e4e71671db5f69d2c46a0d72766b249c1236d726782c00a0e22668df5772d4b9",
+                "BLUE_KING_RELIC",
                 RenderColor.fromHex(0x55ffff),
                 AABB.ofSize(new Vec3(84.0, 14.0, 94.0), 1, 1, 1),
                 List.of(
@@ -279,7 +390,7 @@ public class WitherDragons {
                 "Purple",
                 5,
                 1,
-                "cad8cc982786fb4d40b0b6e64a41f0d9736f9c26affb898f4a7faea88ccf8997",
+                "PURPLE_KING_RELIC",
                 RenderColor.fromHex(0xaa00aa),
                 AABB.ofSize(new Vec3(56.0, 14.0, 125.0), 1, 1, 1),
                 List.of(
@@ -295,7 +406,7 @@ public class WitherDragons {
                 "Green",
                 2,
                 4,
-                "816f0073c58703d8d41e55e0a3abb042b73f8c105bc41c2f02ffe33f0383cf0a",
+                "GREEN_KING_RELIC",
                 RenderColor.fromHex(0x00ff00),
                 AABB.ofSize(new Vec3(27.0, 14.0, 94.0), 1, 1, 1),
                 List.of(
@@ -307,25 +418,29 @@ public class WitherDragons {
                 ),
                 new AABB(7, 5, 80, 37, 28, 110)
         );
+
         public final EntityCache dragonCache = EntityCache.create();
         public final EntityCache collarCache = EntityCache.create();
-        public String name;
-        public int archPriority;
-        public int bersPriority;
-        public String texture;
-        public RenderColor color;
-        public AABB pos;
-        public List<AABB> parts;
-        public AABB area;
+        public final ConcurrentHashMap<String, Integer> arrowHits = new ConcurrentHashMap<>();
+        public final String name;
+        public final int archPriority;
+        public final int bersPriority;
+        public final String relicID;
+        public final RenderColor color;
+        public final AABB pos;
+        public final List<AABB> parts;
+        public final AABB area;
         public float health = 0.0f;
-        public float maxHealth = 200.0f;
+        public double maxHealth = 200.0f;
         public int spawnTicks = 0;
+        public int spawnedAt = 0;
+        public boolean iceSprayed = false;
 
-        public Dragon(String name, int archPriority, int bersPriority, String texture, RenderColor color, AABB pos, List<AABB> parts, AABB area) {
+        public Dragon(String name, int archPriority, int bersPriority, String relicID, RenderColor color, AABB pos, List<AABB> parts, AABB area) {
             this.name = name;
             this.archPriority = archPriority;
             this.bersPriority = bersPriority;
-            this.texture = texture;
+            this.relicID = relicID;
             this.color = color;
             this.pos = pos;
             this.parts = parts;
@@ -344,12 +459,27 @@ public class WitherDragons {
             if (this.spawnTicks > 0) {
                 this.spawnTicks--;
             }
+            if (!this.hasEntity()) {
+                if (!this.arrowHits.isEmpty()) {
+                    String hitsText = this.arrowHits.entrySet().stream().map(e -> e.getKey() + " - " + e.getValue()).collect(Collectors.joining(", "));
+                    Utils.infoRaw(Component.literal("Arrows hit on ").withStyle(ChatFormatting.GRAY)
+                            .append(Component.literal(this.name).withColor(this.color.hex))
+                            .append(Component.literal(": " + hitsText).withStyle(ChatFormatting.GRAY))
+                    );
+                    this.arrowHits.clear();
+                }
+                if (this.iceSprayed) this.iceSprayed = false;
+                if (this.spawnedAt != 0) this.spawnedAt = 0;
+            }
         }
 
         public void reset() {
+            this.iceSprayed = false;
+            this.arrowHits.clear();
             this.health = 0.0f;
             this.maxHealth = 200.0f;
             this.spawnTicks = 0;
+            this.spawnedAt = 0;
         }
 
         public boolean hasEntity() {
@@ -363,12 +493,15 @@ public class WitherDragons {
         public void setEntity(EnderDragon ent) {
             this.dragonCache.add(ent);
             this.health = ent.getHealth(); // store the health value on update, required as the client appears to reset it on the next tick
-            this.maxHealth = ent.getMaxHealth();
+            this.maxHealth = ent.getAttributeBaseValue(Attributes.MAX_HEALTH);
+            if (this.spawnedAt == 0) {
+                this.spawnedAt = tickCounter;
+            }
         }
 
         public boolean isCollar(ArmorStand entity) {
-            ItemStack helmet = Utils.getEntityArmor(entity).getFirst();
-            return Utils.isTextureEqual(Utils.getTextures(helmet), this.texture);
+            ItemStack helmet = Utils.getEntityHelmet(entity);
+            return !helmet.isEmpty() && Utils.getSkyblockId(helmet).equals(this.relicID);
         }
     }
 }

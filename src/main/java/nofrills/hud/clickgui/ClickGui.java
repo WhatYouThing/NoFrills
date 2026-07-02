@@ -500,7 +500,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Tracers", WitherDragons.tracers, "Draws tracer lines to spawning dragons."),
                                 new Settings.EnumToggle<>("Spawn Waypoints", WitherDragons.waypoints, "Renders waypoints for the dragon spawn positions.\n\nSimple: Highlights the exact spawn position of a spawning dragon.\nAdvanced: Highlights each individual hitbox of a spawning dragon."),
                                 new Settings.Toggle("Spawn Timer", WitherDragons.timer, "Renders timers for when a dragon should finish spawning."),
-                                new Settings.Toggle("Dragon Health", WitherDragons.health, "Renders the exact health of the dragons.")
+                                new Settings.Toggle("Dragon Health", WitherDragons.health, "Renders the exact health of the dragons."),
+                                new Settings.Toggle("Track Ice Spray", WitherDragons.trackIceSpray, "Tracks how many ticks it takes for a dragon to get ice sprayed."),
+                                new Settings.Toggle("Track Arrow Hits", WitherDragons.trackArrowHits, "Tracks how many arrows each player hits on a dragon. This option is experimental.")
                         ))),
                         new Module("Secret Bat Highlight", SecretBatHighlight.instance, "Highlights secret bats.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Highlight Style", SecretBatHighlight.style, "The style of the highlight."),

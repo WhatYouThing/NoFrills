@@ -8,26 +8,24 @@ import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Predicate;
 
 /**
  * An object for temporarily storing any relevant entity handles, such as armor stands with custom names.
  */
 @EventListener
-public class EntityCache {
-    private static final List<EntityCache> instances = new ArrayList<>();
+public final class EntityCache {
+    private static final CopyOnWriteArrayList<EntityCache> instances = new CopyOnWriteArrayList<>();
 
     private final ConcurrentHashSet<Entity> entities = new ConcurrentHashSet<>();
 
-    private EntityCache() {
+    public EntityCache() {
+        instances.add(this);
     }
 
     public static EntityCache create() {
-        EntityCache cache = new EntityCache();
-        instances.add(cache);
-        return cache;
+        return new EntityCache();
     }
 
     @EventHandler(priority = EventPriority.LOW)

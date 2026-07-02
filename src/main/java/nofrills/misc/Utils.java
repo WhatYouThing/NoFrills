@@ -1038,6 +1038,10 @@ public class Utils {
         return Math.abs(Math.abs(first) - Math.abs(second));
     }
 
+    public static float difference(float first, float second) {
+        return Math.abs(Math.abs(first) - Math.abs(second));
+    }
+
     /**
      * Formats the string by replacing each set of curly brackets "{}" with one of the values in order, similarly to Rust's format macro.
      */
@@ -1158,5 +1162,6 @@ public class Utils {
         public static String bingo = "Ⓑ";
         public static String aquatic = "⚓";
         public static String magmatic = "♆";
+        public static String twilightPoison = "ᛤ";
     }
 }

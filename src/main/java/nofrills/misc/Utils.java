@@ -478,6 +478,7 @@ public class Utils {
             case "Spirit Shortbow" -> "ITEM_SPIRIT_BOW";
             case "Spirit Stone" -> "SPIRIT_DECOY";
             case "Adaptive Blade" -> "STONE_BLADE";
+            case "Wither Cloak Sword" -> "WITHER_CLOAK";
             default -> toID(name);
         };
     }

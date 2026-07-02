@@ -29,6 +29,7 @@ public class ShardData {
     public static String parseId(String name) {
         String shard = Utils.toLower(name);
         return switch (shard.contains(" shard") ? shard.substring(0, shard.indexOf(" shard")).trim() : shard.trim()) {
+            case "prismarine", "enchanted prismarine" -> "";
             case "cinderbat" -> "SHARD_CINDER_BAT";
             case "abyssal lanternfish" -> "SHARD_ABYSSAL_LANTERN";
             case "stridersurfer" -> "SHARD_STRIDER_SURFER";

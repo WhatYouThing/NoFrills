@@ -185,6 +185,7 @@ public class WitherDragons {
                         if (part.getBoundingBox().intersects(arrow.getBoundingBox())) {
                             String name = entry.getKey();
                             dragon.arrowHits.put(name, dragon.arrowHits.getOrDefault(name, 0) + 1);
+                            return;
                         }
                     }
                 }
@@ -285,6 +286,7 @@ public class WitherDragons {
                                 Component.literal(Utils.format(" Ice Sprayed in {} ticks.", tickCounter - dragon.spawnedAt)).withStyle(ChatFormatting.GRAY)
                         ));
                         dragon.iceSprayed = true;
+                        break;
                     }
                 }
             } else {

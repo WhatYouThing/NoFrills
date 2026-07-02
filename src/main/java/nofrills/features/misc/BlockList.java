@@ -121,7 +121,7 @@ public class BlockList {
                 Utils.parseDate(entry.get("timestamp").getAsLong()),
                 entry.get("name").getAsString()
         ));
-        return text.setStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(tooltip)));
+        return text.setStyle(text.getStyle().withHoverEvent(new HoverEvent.ShowText(tooltip)));
     }
 
     public static void printEntries(int page) {
@@ -146,36 +146,33 @@ public class BlockList {
         }
     }
 
-    public static void forEntry(String name, Consumer<Optional<JsonObject>> callback) {
-        fetchUuid(name, (res) -> {
-            if (res.isPresent()) {
-                FetchResult result = res.get();
-                if (data.get().has(result.uuid())) {
-                    callback.accept(Optional.of(data.get().get(result.uuid()).getAsJsonObject()));
-                } else {
-                    callback.accept(Optional.empty());
-                }
-            } else {
-                callback.accept(Optional.empty());
-            }
-        });
-    }
-
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
-        if (instance.isActive() && autoKick.value() && event.msg().startsWith("Party Finder >") && event.msg().contains("joined")) {
+        if (instance.isActive() && event.msg().startsWith("Party Finder >") && event.msg().contains("joined")) {
             String name = event.msg().replace("Party Finder >", "").trim().split(" ", 2)[0];
             if (name.equalsIgnoreCase(mc.player.getName().getString())) {
                 return;
             }
-            forEntry(name, (obj) -> {
-                Optional<Style> style = Utils.getStyle(event.message, (string) -> string.trim().startsWith(name));
-                if (obj.isPresent()) {
-                    Style nameColor = style.orElse(Style.EMPTY.applyFormat(ChatFormatting.GRAY));
-                    Utils.infoRaw(buildEntryLine(obj.get(), Component.literal("§c§lAutomatically kicking blocked player §r")
-                            .append(Component.literal(name).setStyle(nameColor)).append("§c§l."))
-                    );
-                    Utils.sendMessage("/party kick " + name);
+            Optional<Style> style = Utils.getStyle(event.message, (string) -> string.trim().startsWith(name));
+            Style nameColor = style.orElse(Style.EMPTY.applyFormat(ChatFormatting.GRAY));
+            fetchUuid(name, (res) -> {
+                if (res.isPresent()) {
+                    FetchResult result = res.get();
+                    if (data.get().has(result.uuid())) {
+                        JsonObject obj = data.get().get(result.uuid()).getAsJsonObject();
+                        MutableComponent msg = Component.literal(name).setStyle(nameColor)
+                                .append(Component.literal(" is a blocked player.").withStyle(ChatFormatting.RED));
+                        if (autoKick.value()) {
+                            msg.append(Component.literal(" Kicking automatically.").withStyle(ChatFormatting.GRAY));
+                            Utils.sendMessage("/party kick " + name);
+                        }
+                        mc.schedule(() -> Utils.infoRaw(buildEntryLine(obj, msg)));
+                    }
+                } else {
+                    mc.schedule(() -> Utils.infoRaw(Component.literal("Failed to fetch UUID for ").withStyle(ChatFormatting.GRAY)
+                            .append(Component.literal(name).setStyle(nameColor))
+                            .append(Component.literal(", unable to check blocklist status.").withStyle(ChatFormatting.GRAY))
+                    ));
                 }
             });
         }

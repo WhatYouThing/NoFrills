@@ -14,8 +14,6 @@ import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
-import java.util.ArrayList;
-
 import static nofrills.Main.mc;
 
 @EventListener
@@ -32,7 +30,7 @@ public class ClassNametags {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && mc.level != null && Utils.isInDungeons() && DungeonUtil.isDungeonStarted()) {
-            for (AbstractClientPlayer player : new ArrayList<>(mc.level.players())) {
+            for (AbstractClientPlayer player : DungeonUtil.getTeammateEntities()) {
                 if (player.equals(mc.player)) {
                     continue;
                 }

@@ -18,6 +18,7 @@
     "CreeperMixin",
     "EffectsInInventoryMixin",
     "EnderManMixin",
+    "EntityMixin",
     "EntityRendererMixin",
     "FogRendererMixin",
     "GameRendererMixin",
@@ -44,12 +45,10 @@
     "PlayerTabOverlayAccessor",
     "ScreenEffectRendererMixin",
     "SoundEngineMixin",
+    "StringDecomposerMixin",
     "StuckInBodyLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "mixins": [
-    "StringDecomposerMixin"
-  ]
+  }
 }

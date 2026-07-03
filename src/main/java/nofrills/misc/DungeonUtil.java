@@ -2,6 +2,7 @@ package nofrills.misc;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.level.saveddata.maps.MapId;
@@ -36,6 +37,7 @@ public class DungeonUtil {
             "Obsidian",
             "Bedrock"
     );
+    private static List<AbstractClientPlayer> teammateEntities = List.of();
     private static String currentFloor = "";
     private static int partyCount = 0;
     private static double powerLevel = 0;
@@ -124,9 +126,13 @@ public class DungeonUtil {
         return mapId;
     }
 
+    public static List<AbstractClientPlayer> getTeammateEntities() {
+        return teammateEntities;
+    }
+
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (Utils.isInDungeons()) {
+        if (mc.level != null && Utils.isInDungeons()) {
             if (currentFloor.isEmpty()) {
                 String location = SkyblockData.getLocation();
                 if (location.contains("The Catacombs (")) {
@@ -155,12 +161,20 @@ public class DungeonUtil {
                 }
             }
             powerLevel = power;
+            List<AbstractClientPlayer> teammates = new ArrayList<>();
+            for (AbstractClientPlayer player : mc.level.players()) {
+                if (Utils.isPlayer(player) && !getPlayerClass(player.getName().getString()).isEmpty()) {
+                    teammates.add(player);
+                }
+            }
+            teammateEntities = teammates;
         }
     }
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         classCache.clear();
+        teammateEntities = new ArrayList<>();
         currentFloor = "";
         partyCount = 0;
         powerLevel = 0.0;

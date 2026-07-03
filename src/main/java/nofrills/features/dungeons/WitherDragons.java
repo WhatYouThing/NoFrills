@@ -176,13 +176,14 @@ public class WitherDragons {
 
     @EventHandler
     private static void onEntityRemoved(EntityRemovedEvent event) {
-        if (instance.isActive() && trackArrowHits.value() && event.entity instanceof Arrow arrow && DungeonUtil.isInDragonPhase()) {
+        if (instance.isActive() && trackArrowHits.value() && event.entity instanceof Arrow arrow && !arrow.isRemoved() && DungeonUtil.isInDragonPhase()) {
+            AABB arrowHitbox = arrow.getBoundingBox().inflate(0.25);
             for (Map.Entry<String, EntityCache> entry : teammateArrows.entrySet()) {
                 if (!entry.getValue().has(arrow)) continue;
                 for (Dragon dragon : dragons) {
                     if (!dragon.hasEntity()) continue;
                     for (EnderDragonPart part : dragon.getEntity().getSubEntities()) {
-                        if (part.getBoundingBox().intersects(arrow.getBoundingBox())) {
+                        if (arrowHitbox.intersects(part.getBoundingBox())) {
                             String name = entry.getKey();
                             dragon.arrowHits.put(name, dragon.arrowHits.getOrDefault(name, 0) + 1);
                             return;

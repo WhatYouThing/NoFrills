@@ -26,11 +26,16 @@ public abstract class ItemModelResolverMixin {
     @ModifyExpressionValue(method = "appendItemLayers", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemModelResolver;getItemModel(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/renderer/item/ItemModel;"))
     private ItemModel getItemModel(ItemModel original, @Local(argsOnly = true, name = "item") LocalRef<ItemStack> item) {
         if (LegacyTextures.instance.isActive() && LegacyTextures.texturesLoaded) {
-            String id = Utils.getSkyblockId(item.get());
-            if (LegacyTextures.textures.containsKey(id)) {
+            ItemStack stack = item.get();
+            Identifier model = stack.get(DataComponents.ITEM_MODEL);
+            if (model != null && model.getNamespace().equals("hypixel_skyblock")) {
+                String id = Utils.getSkyblockId(stack);
+                if (!LegacyTextures.textures.containsKey(id)) {
+                    return original;
+                }
                 LegacyTextures.Textures textures = LegacyTextures.textures.get(id);
                 if (!textures.textures().isEmpty()) {
-                    ItemStack clone = item.get().copy();
+                    ItemStack clone = stack.copy();
                     clone.set(DataComponents.PROFILE, LegacyTextures.getOrInitProfile(id, textures.textures()));
                     item.set(clone);
                 }

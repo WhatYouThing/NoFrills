@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import nofrills.features.tweaks.LegacyTextures;
@@ -15,6 +16,8 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+
+import static nofrills.Main.mc;
 
 @Mixin(ItemModelResolver.class)
 public abstract class ItemModelResolverMixin {
@@ -29,9 +32,25 @@ public abstract class ItemModelResolverMixin {
             ItemStack stack = item.get();
             Identifier model = stack.get(DataComponents.ITEM_MODEL);
             if (model != null && model.getNamespace().equals("hypixel_skyblock")) {
-                String id = Utils.getSkyblockId(stack);
-                if (!LegacyTextures.textures.containsKey(id)) {
+                CompoundTag data = Utils.getCustomData(stack);
+                String id = Utils.getSkyblockId(data);
+                if (id.isEmpty() || !LegacyTextures.textures.containsKey(id)) {
                     return original;
+                }
+                if (id.equals("VOIDEDGE_KATANA") || id.equals("VORPAL_KATANA") || id.equals("ATOMSPLIT_KATANA")) {
+                    return this.modelManager.getItemModel(Identifier.withDefaultNamespace(
+                            mc.player.getCooldowns().isOnCooldown(stack) ? "golden_sword" : "diamond_sword"
+                    ));
+                }
+                if (data.contains("td_attune_mode")) {
+                    String path = switch (data.getIntOr("td_attune_mode", -1)) {
+                        case 0 -> "stone_sword";
+                        case 1 -> "golden_sword";
+                        case 2 -> "iron_sword";
+                        case 3 -> "diamond_sword";
+                        default -> "";
+                    };
+                    if (!path.isEmpty()) return this.modelManager.getItemModel(Identifier.withDefaultNamespace(path));
                 }
                 LegacyTextures.Textures textures = LegacyTextures.textures.get(id);
                 if (!textures.textures().isEmpty()) {

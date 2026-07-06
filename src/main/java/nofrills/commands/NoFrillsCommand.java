@@ -262,6 +262,9 @@ public class NoFrillsCommand {
             })).then(literal("storageOverlay").executes(context -> {
                 Utils.setScreen(new StorageOverlayScreen());
                 return SINGLE_SUCCESS;
+            })).then(literal("dumpScoreboard").executes(context -> {
+                DebugStuff.dumpScoreboard();
+                return SINGLE_SUCCESS;
             }))),
             new ModCommand("shardTracker", "Commands for managing the Shard Tracker feature.", literal("shardTracker").executes(context -> {
                 Utils.info("§f§lImporting shards§7: Click \"Copy Tree\" on the SkyShards calculator, choose the NoFrills format in the pop-up, and click the Import Shard List button on the Shard Tracker settings screen.\n\n§f§lTracking shards§7: Make sure to enable the Shard Tracker feature, and the Shard Tracker element in the NoFrills HUD editor. When enabled, the feature will track the obtained quantity of each shard that you are tracking.");

@@ -286,7 +286,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Eye Height Fix", EyeHeightFix.instance, "Visually reverts the sneaking eye height on islands without modern version support.", new Settings(
                                 new Settings.Toggle("Skyblock Only", EyeHeightFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock.")
                         )),
-                        new Module("No Ghost Place", NoGhostPlace.instance, "Prevents ghost blocks from appearing when placing non-placeable Skyblock block items.")
+                        new Module("No Ghost Place", NoGhostPlace.instance, "Prevents ghost blocks from appearing when placing non-placeable Skyblock block items."),
+                        new Module("Legacy Textures", LegacyTextures.instance, "Replaces the models of most items added before Skyblock 0.26 with their old models.")
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(

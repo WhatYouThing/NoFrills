@@ -69,7 +69,7 @@ public class StreamerMode {
 
     public static boolean isActive() {
         if (instance.isActive()) {
-            return !playerName.isEmpty() && !sessionName.equals(playerName) && !instancedIslands.contains(SkyblockData.getArea());
+            return !playerName.isEmpty() && !sessionName.equals(playerName) && Utils.isInSkyblock() && !instancedIslands.contains(SkyblockData.getArea());
         }
         return false;
     }

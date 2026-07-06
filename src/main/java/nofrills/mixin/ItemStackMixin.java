@@ -17,7 +17,7 @@ import static nofrills.Main.mc;
 public class ItemStackMixin {
 
     @Inject(method = "limitSize", at = @At("HEAD"), cancellable = true)
-    private void onCapCount(int maxCount, CallbackInfo ci) {
+    private void onCapCount(int maxStackSize, CallbackInfo ci) {
         if (ItemCountFix.active()) {
             ci.cancel();
         }

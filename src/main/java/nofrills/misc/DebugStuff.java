@@ -137,6 +137,12 @@ public class DebugStuff {
         }
     }
 
+    public static void dumpScoreboard() {
+        for (String line : SkyblockData.getLines()) {
+            Utils.info(line);
+        }
+    }
+
     public static void toggleLogSounds() {
         logSounds = !logSounds;
         if (logSounds) {

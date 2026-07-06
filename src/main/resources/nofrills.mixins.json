@@ -28,6 +28,7 @@
     "ItemEntityRendererMixin",
     "ItemInHandRendererAccessor",
     "ItemInHandRendererMixin",
+    "ItemModelResolverMixin",
     "ItemStackMixin",
     "KeyboardHandlerMixin",
     "LevelMixin",

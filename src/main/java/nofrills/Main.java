@@ -21,6 +21,7 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.events.OverlayMsgEvent;
 import nofrills.events.PartyChatMsgEvent;
 import nofrills.features.general.CommandShortcuts;
+import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.hud.elements.DungeonMap;
 import nofrills.misc.Utils;
@@ -72,6 +73,8 @@ public class Main implements ModInitializer {
         ClientLifecycleEvents.CLIENT_STARTED.register(client -> {
             DungeonMap.mapTexture = new DynamicTexture("NoFrills Dungeon Map", 128, 128, true);
             client.getTextureManager().register(Identifier.fromNamespaceAndPath("nofrills", "dungeon_map_texture"), DungeonMap.mapTexture);
+
+            HudManager.registerElements();
         });
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {

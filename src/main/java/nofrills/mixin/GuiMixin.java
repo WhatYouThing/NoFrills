@@ -5,7 +5,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -20,7 +19,6 @@ import nofrills.events.HudRenderEvent;
 import nofrills.features.general.ChatTweaks;
 import nofrills.features.general.NoRender;
 import nofrills.features.misc.StreamerMode;
-import nofrills.hud.HudManager;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -98,11 +96,6 @@ public abstract class GuiMixin {
                 case Both -> ci.cancel();
             }
         }
-    }
-
-    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;<init>(Lnet/minecraft/client/Minecraft;)V"))
-    private void onInit(Minecraft minecraft, CallbackInfo ci) {
-        HudManager.registerElements();
     }
 
     @WrapOperation(method = "onDisconnected", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;clearMessages(Z)V"))

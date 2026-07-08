@@ -46,6 +46,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
@@ -1148,6 +1149,12 @@ public class Utils {
 
     public static void setScreen(Screen screen) {
         mc.schedule(() -> mc.setScreen(screen));
+    }
+
+    public static void click(int containerId, int slotId, int button, ContainerInput containerInput) {
+        if (mc.gameMode != null && mc.player != null) {
+            mc.gameMode.handleContainerInput(containerId, slotId, button, containerInput, mc.player);
+        }
     }
 
     public static class Symbols {

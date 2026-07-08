@@ -119,13 +119,7 @@ public class WardrobeKeybinds {
                 for (Slot slot : Utils.getContainerSlots(container.getMenu())) {
                     if (isEquipButton(slot, target)) {
                         if (event.action == GLFW.GLFW_PRESS) {
-                            mc.gameMode.handleContainerInput(
-                                    container.getMenu().containerId,
-                                    slot.index,
-                                    GLFW.GLFW_MOUSE_BUTTON_MIDDLE,
-                                    ContainerInput.CLONE,
-                                    mc.player
-                            );
+                            Utils.click(container.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
                             if (sound.value()) {
                                 Utils.playSound(SoundEvents.HORSE_ARMOR, 0.69f, 1.0f);
                             }

@@ -253,7 +253,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Item ID", InfoTooltips.skyblockId, "Displays the Skyblock ID of an item.\nNote: Items with generic IDs (pets, potions etc.) will display a dynamically generated ID.")
                         ))),
                         new Module("Skill Tracker", SkillTracker.instance, "Tracks the experience you gain for specific skills, similarly to SBE on 1.8.9.\nThis feature will be inaccurate if your tracked skills are not maxed (Catacombs excluded).", SkillTracker.buildSettings()),
-                        new Module("Command Shortcuts", CommandShortcuts.instance, "Create shortcuts which send a specific message/command when ran.\nNote: A lobby change is required to fully apply the changes made to the shortcuts.", CommandShortcuts.buildSettings())
+                        new Module("Command Shortcuts", CommandShortcuts.instance, "Create shortcuts which send a specific message/command when ran.\nNote: A lobby change is required to fully apply the changes made to the shortcuts.", CommandShortcuts.buildSettings()),
+                        new Module("Loadout Keybinds", LoadoutKeybinds.instance, "Allows you to set custom keybinds for loadouts.", new Settings(List.of(
+                                new Settings.Keybind("Edit Bind Key", LoadoutKeybinds.editBindKey, "The key to edit your keybinds. Press while hovering over a loadout slot to use.")
+                        )))
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands.", new Settings(List.of(

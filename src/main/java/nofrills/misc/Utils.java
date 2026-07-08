@@ -1151,15 +1151,15 @@ public class Utils {
     }
 
     public static class Symbols {
-        public static String zone = "⏣"; // "\uE067"
-        public static String zoneRift = "ф"; // "\uE020"
+        public static String zone = "\uE067";
+        public static String zoneRift = "\uE020";
         public static String star = "✯";
         public static String heart = "❤";
         public static String format = "§";
         public static String vampLow = "҉";
         public static String bingo = "Ⓑ";
-        public static String aquatic = "⚓"; // "\uE072"
-        public static String magmatic = "♆"; // "\uE07D"
+        public static String aquatic = "\uE072";
+        public static String magmatic = "\uE07D";
         public static String twilightPoison = "ᛤ";
     }
 }

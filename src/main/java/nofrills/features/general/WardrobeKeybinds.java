@@ -2,7 +2,7 @@ package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
@@ -19,6 +19,7 @@ import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
 
@@ -55,10 +56,13 @@ public class WardrobeKeybinds {
             Items.PINK_DYE,
             Items.GRAY_DYE
     );
+    private static final Pattern armorPattern = Pattern.compile("\\([0-9]*/[0-9]*\\) Armor Sets");
+    private static final Pattern equipmentPattern = Pattern.compile("\\([0-9]*/[0-9]*\\) Equipment Sets");
 
     private static int getWardrobePage(String title) {
-        if (title.startsWith("Wardrobe (") && title.endsWith(")")) {
-            return Utils.parseInt(title.replace("Wardrobe (", "").split("/")[0]).orElse(-1);
+        if (armorPattern.matcher(title).matches() || equipmentPattern.matcher(title).matches()) {
+            String page = title.substring(title.indexOf("(") + 1, title.indexOf("/"));
+            return Utils.parseInt(page).orElse(-1);
         }
         return -1;
     }
@@ -107,15 +111,21 @@ public class WardrobeKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
-            int page = getWardrobePage(container.getTitle().getString());
+        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container) {
+            int page = getWardrobePage(Utils.toPlain(container.getTitle()).trim());
             if (page == -1) return;
             int target = getTargetSlot(event, page);
             if (target != -1) {
                 for (Slot slot : Utils.getContainerSlots(container.getMenu())) {
                     if (isEquipButton(slot, target)) {
                         if (event.action == GLFW.GLFW_PRESS) {
-                            mc.gameMode.handleContainerInput(container.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_LEFT, ContainerInput.PICKUP, mc.player);
+                            mc.gameMode.handleContainerInput(
+                                    container.getMenu().containerId,
+                                    slot.index,
+                                    GLFW.GLFW_MOUSE_BUTTON_MIDDLE,
+                                    ContainerInput.CLONE,
+                                    mc.player
+                            );
                             if (sound.value()) {
                                 Utils.playSound(SoundEvents.HORSE_ARMOR, 0.69f, 1.0f);
                             }

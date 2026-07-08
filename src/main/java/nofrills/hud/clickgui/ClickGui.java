@@ -112,7 +112,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Burger Count", 0, 5, 1, PriceTooltips.burgers, "The amount of McGrubber's Burgers you've eaten, used to calculate the bonus Motes value."),
                                 new Settings.Toggle("Price Paid", PriceTooltips.pricePaid, "Tracks and displays the amount you've paid for a specific item in a BIN auction.")
                         ))),
-                        new Module("Wardrobe Keybinds", WardrobeKeybinds.instance, "Adds hotkeys to the Skyblock Wardrobe.", new Settings(List.of(
+                        new Module("Wardrobe Keybinds", WardrobeKeybinds.instance, "Adds hotkeys to the Armor and the Equipment wardrobes.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),
                                 new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with a keybind."),
                                 new Settings.Toggle("Sound Effect", WardrobeKeybinds.sound, "Plays a sound effect upon using a keybind."),

@@ -89,11 +89,24 @@ public class MiddleClickOverride {
         return Utils.getLoreLines(stack).stream().anyMatch(line -> line.equals("Cost") || line.equals("Sell Price") || line.equals("Bazaar Price"));
     }
 
+    private static boolean isInLoadoutEdit(ContainerScreen screen) {
+        return screen.getMenu().slots.stream()
+                .map(Slot::getItem)
+                .filter(stack -> !stack.isEmpty())
+                .anyMatch(stack -> {
+                    String name = stack.getHoverName().getString();
+                    if (name.equals("Rename Loadout")) {
+                        return true;
+                    }
+                    return false;
+                });
+    }
+
     public static boolean shouldOverride(Slot slot, int button, ContainerInput actionType) {
         if (instance.isActive() && mc.screen instanceof ContainerScreen container && slot != null && isLeftClick(button, actionType)) {
             String title = container.getTitle().getString();
             ItemStack stack = slot.getItem();
-            if (stack.isEmpty() || isBlacklisted(title) || !Utils.isInSkyblock()) {
+            if (stack.isEmpty() || isBlacklisted(title) || !Utils.isInSkyblock() || isInLoadoutEdit(container)) {
                 return false;
             }
             for (Slot s : Utils.getContainerSlots(container.getMenu())) {

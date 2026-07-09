@@ -5,6 +5,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +30,6 @@ public class LoadoutKeybinds {
     public static final SettingKeybind editBindKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "editBindKey", instance);
 
     private static final Pattern loadoutsPattern = Pattern.compile("\\([0-9]*/[0-9]*\\) Loadouts");
-    private static final Pattern loadoutButtonPattern = Pattern.compile("Loadout [0-9]*");
     private static String binding = "";
 
     private static boolean isLoadoutsMenu(String title) {
@@ -46,7 +46,8 @@ public class LoadoutKeybinds {
                         obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(binding));
                         obj.addProperty(key, binding);
                     });
-                    Utils.infoRaw(Component.literal("Successfully bound key to " + binding + ".").withStyle(ChatFormatting.GREEN));
+                    Utils.infoRaw(Component.literal("Successfully bound key to loadout slot: " + binding + ".").withStyle(ChatFormatting.GREEN));
+                    Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
                     binding = "";
                 }
                 event.cancel();
@@ -55,13 +56,15 @@ public class LoadoutKeybinds {
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
                 String name = Utils.toPlain(stack.getHoverName());
-                if (loadoutButtonPattern.matcher(name).matches()) {
+                if (Utils.getLoreLines(stack).contains("Left-click to equip!")) {
                     if (event.action == GLFW.GLFW_PRESS) {
                         if (data.value().entrySet().stream().anyMatch(entry -> entry.getValue().getAsString().equals(name))) {
                             data.edit(obj -> obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(name)));
-                            Utils.infoRaw(Component.literal("Cleared bound key from " + name + ".").withStyle(ChatFormatting.GREEN));
+                            Utils.infoRaw(Component.literal("Cleared bound key from loadout slot: " + name + ".").withStyle(ChatFormatting.GREEN));
+                            Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
                         } else {
-                            Utils.infoRaw(Component.literal("Press any key to bind to " + name + ".").withStyle(ChatFormatting.GRAY));
+                            Utils.infoRaw(Component.literal("Press any key to bind to loadout slot: " + name + ".").withStyle(ChatFormatting.GRAY));
+                            Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                             binding = name;
                         }
                     }

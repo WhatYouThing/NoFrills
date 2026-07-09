@@ -91,10 +91,7 @@ public class MiddleClickOverride {
                 .filter(stack -> !stack.isEmpty())
                 .anyMatch(stack -> {
                     String name = stack.getHoverName().getString();
-                    if (name.equals("Rename Loadout")) {
-                        return true;
-                    }
-                    return false;
+                    return name.equals("Rename Loadout");
                 });
     }
 

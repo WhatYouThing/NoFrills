@@ -44,11 +44,12 @@ public class MiddleClickOverride {
             "Attribute Transfer",
             "Hunting Box",
             "Composter",
-            "Midas Anvil"
+            "Midas Anvil",
+            "Accessory Bag Thaumaturgy",
+            "Select Power Stone"
     );
     private static final HashSet<String> matchWhitelist = Sets.newHashSet(
             "Your Equipment and Stats",
-            "Accessory Bag Thaumaturgy",
             "Community Shop"
     );
     private static final HashSet<String> containBlacklist = Sets.newHashSet(
@@ -67,6 +68,9 @@ public class MiddleClickOverride {
     private static final HashSet<String> containWhitelist = Sets.newHashSet(
             "Pets",
             "Bits Shop"
+    );
+    private static final HashSet<String> containsButtonBlacklist = Sets.newHashSet(
+            "Rename Loadout"
     );
 
     private static boolean isLeftClick(int button, ContainerInput actionType) {
@@ -91,6 +95,11 @@ public class MiddleClickOverride {
             ItemStack stack = slot.getItem();
             if (stack.isEmpty() || isBlacklisted(title) || !Utils.isInSkyblock()) {
                 return false;
+            }
+            for (Slot s : Utils.getContainerSlots(container.getMenu())) {
+                if (containsButtonBlacklist.contains(s.getItem().getCustomName().getString())) {
+                    return false;
+                }
             }
             if (Utils.getSkyblockId(stack).isEmpty() || isWhitelisted(title) || isTransaction(stack)) {
                 if (debug.value()) {

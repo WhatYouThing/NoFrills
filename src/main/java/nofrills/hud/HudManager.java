@@ -177,7 +177,7 @@ public class HudManager {
         if (phoenixPetTimer.isActive() && event.msg().equals("Your Phoenix Pet saved you from certain death!")) {
             phoenixPetTimer.start(60000);
         }
-        if (bonzoMaskTimer.isActive() && event.msg().replace("⚚ ", "").equals("Your Bonzo's Mask saved your life!")) {
+        if (bonzoMaskTimer.isActive() && event.msg().replace(Utils.Symbols.starredItem + " ", "").equals("Your Bonzo's Mask saved your life!")) {
             ItemStack helmet = Utils.getEntityHelmet(mc.player);
             Optional<String> line = Utils.getLoreLines(helmet).stream().filter(l -> l.startsWith("Cooldown: ")).findFirst();
             if (line.isPresent()) {

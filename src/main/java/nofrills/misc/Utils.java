@@ -1168,5 +1168,6 @@ public class Utils {
         public static String aquatic = "\uE072";
         public static String magmatic = "\uE07D";
         public static String twilightPoison = "ᛤ";
+        public static String starredItem = "\uE068";
     }
 }

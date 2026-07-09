@@ -14,10 +14,12 @@ import nofrills.config.SettingJson;
 import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
+import nofrills.events.ScreenOpenEvent;
 import nofrills.misc.Utils;
 import nofrills.mixin.AbstractContainerScreenAccessor;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
@@ -42,12 +44,16 @@ public class LoadoutKeybinds {
             String key = String.valueOf(event.key);
             if (!binding.isEmpty()) {
                 if (event.action == GLFW.GLFW_PRESS) {
-                    data.edit(obj -> {
-                        obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(binding));
-                        obj.addProperty(key, binding);
-                    });
-                    Utils.infoRaw(Component.literal("Successfully bound key to loadout slot: " + binding + ".").withStyle(ChatFormatting.GREEN));
-                    Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
+                    if (editBindKey.isKey(event.key) || event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT || event.key == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+                        Utils.infoRaw(Component.literal("Invalid key, not binding to loadout slot.").withStyle(ChatFormatting.RED));
+                    } else {
+                        data.edit(obj -> {
+                            obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(binding));
+                            obj.addProperty(key, binding);
+                        });
+                        Utils.infoRaw(Component.literal("Successfully bound key to loadout slot: " + binding + ".").withStyle(ChatFormatting.GREEN));
+                        Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
+                    }
                     binding = "";
                 }
                 event.cancel();
@@ -56,7 +62,8 @@ public class LoadoutKeybinds {
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
                 String name = Utils.toPlain(stack.getHoverName());
-                if (Utils.getLoreLines(stack).contains("Left-click to equip!")) {
+                List<String> lines = Utils.getLoreLines(stack);
+                if (lines.contains("Left-click to equip!") || lines.contains("Right-click to edit")) {
                     if (event.action == GLFW.GLFW_PRESS) {
                         if (data.value().entrySet().stream().anyMatch(entry -> entry.getValue().getAsString().equals(name))) {
                             data.edit(obj -> obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(name)));
@@ -85,5 +92,10 @@ public class LoadoutKeybinds {
                 }
             }
         }
+    }
+
+    @EventHandler
+    private static void onScreen(ScreenOpenEvent event) {
+        binding = "";
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import nofrills.features.tweaks.LegacyTextures;
+import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.Utils;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,13 +29,13 @@ public abstract class ItemModelResolverMixin {
 
     @ModifyExpressionValue(method = "appendItemLayers", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemModelResolver;getItemModel(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/renderer/item/ItemModel;"))
     private ItemModel getItemModel(ItemModel original, @Local(argsOnly = true, name = "item") LocalRef<ItemStack> item) {
-        if (LegacyTextures.instance.isActive() && LegacyTextures.texturesLoaded) {
+        if (LegacyTextures.instance.isActive()) {
             ItemStack stack = item.get();
             Identifier model = stack.get(DataComponents.ITEM_MODEL);
             if (model != null && model.getNamespace().equals("hypixel_skyblock")) {
                 CompoundTag data = Utils.getCustomData(stack);
                 String id = Utils.getSkyblockId(data);
-                if (id.isEmpty() || !LegacyTextures.textures.containsKey(id)) {
+                if (id.isEmpty() || !NoFrillsAPI.itemTextures.containsKey(id)) {
                     return original;
                 }
                 if (id.equals("VOIDEDGE_KATANA") || id.equals("VORPAL_KATANA") || id.equals("ATOMSPLIT_KATANA")) {
@@ -52,7 +53,7 @@ public abstract class ItemModelResolverMixin {
                     };
                     if (!path.isEmpty()) return this.modelManager.getItemModel(Identifier.withDefaultNamespace(path));
                 }
-                LegacyTextures.Textures textures = LegacyTextures.textures.get(id);
+                NoFrillsAPI.ItemTexture textures = NoFrillsAPI.itemTextures.get(id);
                 if (!textures.textures().isEmpty()) {
                     ItemStack clone = stack.copy();
                     clone.set(DataComponents.PROFILE, LegacyTextures.getOrInitProfile(id, textures.textures()));

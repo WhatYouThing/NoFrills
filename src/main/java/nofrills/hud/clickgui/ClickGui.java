@@ -290,7 +290,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skyblock Only", EyeHeightFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock.")
                         )),
                         new Module("No Ghost Place", NoGhostPlace.instance, "Prevents ghost blocks from appearing when placing non-placeable Skyblock block items."),
-                        new Module("Legacy Textures", LegacyTextures.instance, "Replaces the models of most items added before Skyblock 0.26 with their old models.")
+                        new Module("Legacy Textures", LegacyTextures.instance, "Replaces the models of most items added before Skyblock 0.26 with their old models.", new Settings(
+                                new Settings.Toggle("Unlock Pack Position", LegacyTextures.unlockPackPos, "Allows you to move the official resource pack up and down on the list."),
+                                new Settings.Toggle("Force Pack Position", LegacyTextures.forcePackPos, "Forces the official resource pack to be at the bottom by default.\nMay require a game restart to apply."),
+                                new Settings.Toggle("No Tooltip Styling", LegacyTextures.noTooltipStyle, "Disables custom styling of tooltips. Reverts item tooltips if the official pack is below the vanilla pack.")
+                        ))
                 )),
                 new Category("Misc", List.of(
                         new Module("Tooltip Scale", TooltipScale.instance, "Customize the scale of tooltips.", new Settings(List.of(
@@ -506,7 +510,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Spawn Timer", WitherDragons.timer, "Renders timers for when a dragon should finish spawning."),
                                 new Settings.Toggle("Dragon Health", WitherDragons.health, "Renders the exact health of the dragons."),
                                 new Settings.Toggle("Track Ice Spray", WitherDragons.trackIceSpray, "Tracks how many ticks it takes for a dragon to get ice sprayed."),
-                                new Settings.Toggle("Track Arrow Hits", WitherDragons.trackArrowHits, "Tracks how many arrows each player hits on a dragon. This option is experimental.")
+                                new Settings.Toggle("Track Arrow Hits", WitherDragons.trackArrowHits, "Tracks how many arrows each player hits on a dragon.\nWarning: Experimental option, likely will produce inaccurate results.")
                         ))),
                         new Module("Secret Bat Highlight", SecretBatHighlight.instance, "Highlights secret bats.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Highlight Style", SecretBatHighlight.style, "The style of the highlight."),

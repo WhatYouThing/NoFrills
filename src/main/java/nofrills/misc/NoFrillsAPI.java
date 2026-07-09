@@ -29,6 +29,7 @@ public class NoFrillsAPI {
     public static HashSet<String> electionPerks = new HashSet<>();
     public static HashSet<String> nonPlaceableItems = new HashSet<>();
     public static HashMap<String, MuseumData> museumData = new HashMap<>();
+    public static HashMap<String, ItemTexture> itemTextures = new HashMap<>();
     private static final List<RefreshTask> tasks = List.of(
             new RefreshTask(1200, Feature.Flags.UsePricingAPI, () -> Thread.startVirtualThread(() -> {
                 try {
@@ -98,6 +99,23 @@ public class NoFrillsAPI {
                 } catch (Exception exception) {
                     LOGGER.error("Failed to refresh museum data from NoFrills API.", exception);
                 }
+            })),
+            new RefreshTask(12000, Feature.Flags.UseItemTexturesAPI, () -> Thread.startVirtualThread(() -> {
+                try {
+                    InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v1/items/get-item-textures/").toURL().openStream();
+                    JsonObject json = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonObject();
+                    HashMap<String, ItemTexture> textures = new HashMap<>();
+                    for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
+                        JsonObject object = entry.getValue().getAsJsonObject();
+                        textures.put(entry.getKey(), new ItemTexture(
+                                object.get("model").getAsString(),
+                                object.has("textures") ? object.get("textures").getAsString() : ""
+                        ));
+                    }
+                    itemTextures = textures;
+                } catch (Exception exception) {
+                    LOGGER.error("Failed to refresh item texture data from NoFrills API.", exception);
+                }
             }))
     );
 
@@ -117,6 +135,9 @@ public class NoFrillsAPI {
                 task.tick();
             }
         }
+    }
+
+    public record ItemTexture(String model, String textures) {
     }
 
     private static class RefreshTask {

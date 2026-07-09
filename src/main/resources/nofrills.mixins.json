@@ -42,6 +42,7 @@
     "MultiPlayerGameModeAccessor",
     "MultiPlayerGameModeMixin",
     "OptionsMixin",
+    "PackMixin",
     "PlayerInfoMixin",
     "PlayerTabOverlayAccessor",
     "ScreenEffectRendererMixin",

@@ -1,6 +1,8 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -12,6 +14,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
 import nofrills.features.misc.CommandTooltip;
 import nofrills.features.misc.TooltipScale;
+import nofrills.features.tweaks.LegacyTextures;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2fStack;
@@ -64,6 +67,15 @@ public abstract class GuiGraphicsExtractorMixin {
                 this.pose.translate(x - x * scale, y - y * scale);
                 this.pose.scale(scale, scale);
             }
+        }
+    }
+
+    @WrapOperation(method = "tooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil;extractTooltipBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIIILnet/minecraft/resources/Identifier;)V"))
+    private void onExtractBackground(GuiGraphicsExtractor graphics, int x, int y, int w, int h, Identifier style, Operation<Void> original) {
+        if (LegacyTextures.instance.isActive() && LegacyTextures.noTooltipStyle.value()) {
+            original.call(graphics, x, y, w, h, null);
+        } else {
+            original.call(graphics, x, y, w, h, style);
         }
     }
 }

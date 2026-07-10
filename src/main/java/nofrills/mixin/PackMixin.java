@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class PackMixin {
 
     @Unique
-    private boolean nofrills$isHypixelPack() {
+    private boolean nofrills_mod$isHypixelPack() {
         return this.isRequired() && this.getDescription().getString().equals("Hypixel SkyBlock");
     }
 
@@ -25,7 +25,7 @@ public abstract class PackMixin {
 
     @ModifyReturnValue(method = "getDefaultPosition", at = @At("RETURN"))
     private Pack.Position getDefaultPackPos(Pack.Position original) {
-        if (LegacyTextures.instance.isActive() && LegacyTextures.forcePackPos.value() && this.nofrills$isHypixelPack()) {
+        if (LegacyTextures.instance.isActive() && LegacyTextures.forcePackPos.value() && this.nofrills_mod$isHypixelPack()) {
             return Pack.Position.BOTTOM;
         }
         return original;
@@ -33,7 +33,7 @@ public abstract class PackMixin {
 
     @ModifyReturnValue(method = "isFixedPosition", at = @At("RETURN"))
     private boolean isPackFixed(boolean original) {
-        if (LegacyTextures.instance.isActive() && LegacyTextures.unlockPackPos.value() && this.nofrills$isHypixelPack()) {
+        if (LegacyTextures.instance.isActive() && LegacyTextures.unlockPackPos.value() && this.nofrills_mod$isHypixelPack()) {
             return false;
         }
         return original;

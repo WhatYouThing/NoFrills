@@ -1,11 +1,13 @@
 package nofrills.features.general;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -15,12 +17,17 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenOpenEvent;
+import nofrills.events.SlotUpdateEvent;
+import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 import nofrills.mixin.AbstractContainerScreenAccessor;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static nofrills.Main.mc;
 
@@ -38,6 +45,38 @@ public class LoadoutKeybinds {
         return loadoutsPattern.matcher(title).matches();
     }
 
+    private static boolean isLoadoutButton(ItemStack stack) {
+        List<String> lines = Utils.getLoreLines(stack);
+        return lines.contains("Left-click to equip!") || lines.contains("Right-click to edit");
+    }
+
+    private static void updateBindText(Slot slot) {
+        ItemStack stack = slot.getItem();
+        String name = Utils.toPlain(stack.getHoverName());
+        if (isLoadoutButton(stack)) {
+            for (Map.Entry<String, JsonElement> entry : data.value().entrySet()) {
+                if (entry.getValue().getAsString().equals(name)) {
+                    int key = Utils.parseInt(entry.getKey()).orElse(-1);
+                    if (key != -1) {
+                        String keyName = SettingKeybind.asInputConstant(key).getDisplayName().getString();
+                        SlotOptions.setCount(slot, keyName.contains(" ")
+                                ? Arrays.stream(keyName.split(" ")).map(part -> part.substring(0, 1)).collect(Collectors.joining())
+                                : keyName.substring(0, Math.min(keyName.length(), 2))
+                        );
+                        return;
+                    }
+                }
+            }
+        }
+        SlotOptions.clearCount(slot);
+    }
+
+    private static void updateBindTextAll(AbstractContainerMenu menu) {
+        for (Slot slot : Utils.getContainerSlots(menu)) {
+            updateBindText(slot);
+        }
+    }
+
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
@@ -53,6 +92,7 @@ public class LoadoutKeybinds {
                         });
                         Utils.infoRaw(Component.literal("Successfully bound key to loadout slot: " + binding + ".").withStyle(ChatFormatting.GREEN));
                         Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
+                        updateBindTextAll(screen.getMenu());
                     }
                     binding = "";
                 }
@@ -61,14 +101,14 @@ public class LoadoutKeybinds {
                 Slot focused = ((AbstractContainerScreenAccessor) mc.screen).getHoveredSlot();
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
-                String name = Utils.toPlain(stack.getHoverName());
-                List<String> lines = Utils.getLoreLines(stack);
-                if (lines.contains("Left-click to equip!") || lines.contains("Right-click to edit")) {
+                if (isLoadoutButton(stack)) {
                     if (event.action == GLFW.GLFW_PRESS) {
+                        String name = Utils.toPlain(stack.getHoverName());
                         if (data.value().entrySet().stream().anyMatch(entry -> entry.getValue().getAsString().equals(name))) {
                             data.edit(obj -> obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(name)));
                             Utils.infoRaw(Component.literal("Cleared bound key from loadout slot: " + name + ".").withStyle(ChatFormatting.GREEN));
                             Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
+                            updateBindTextAll(screen.getMenu());
                         } else {
                             Utils.infoRaw(Component.literal("Press any key to bind to loadout slot: " + name + ".").withStyle(ChatFormatting.GRAY));
                             Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
@@ -91,6 +131,13 @@ public class LoadoutKeybinds {
                     }
                 }
             }
+        }
+    }
+
+    @EventHandler
+    private static void onSlot(SlotUpdateEvent event) {
+        if (instance.isActive() && event.slot != null && isLoadoutsMenu(event.title)) {
+            updateBindText(event.slot);
         }
     }
 

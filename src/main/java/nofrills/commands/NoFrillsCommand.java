@@ -13,7 +13,6 @@ import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Config;
 import nofrills.features.general.SlotBinding;
 import nofrills.features.general.partycommands.PartyCommands;
-import nofrills.features.general.storageoverlay.StorageOverlayScreen;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.features.misc.AutoRequeue;
 import nofrills.features.misc.BlockList;
@@ -258,9 +257,6 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             })).then(literal("toggleLogEntityUpdates").executes(context -> {
                 DebugStuff.toggleLogEntityUpdates();
-                return SINGLE_SUCCESS;
-            })).then(literal("storageOverlay").executes(context -> {
-                Utils.setScreen(new StorageOverlayScreen());
                 return SINGLE_SUCCESS;
             })).then(literal("dumpScoreboard").executes(context -> {
                 DebugStuff.dumpScoreboard();

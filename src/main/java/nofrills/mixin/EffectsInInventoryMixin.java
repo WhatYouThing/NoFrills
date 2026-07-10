@@ -1,5 +1,6 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -19,5 +20,13 @@ public abstract class EffectsInInventoryMixin {
         if (NoRender.instance.isActive() && NoRender.effectDisplay.value()) {
             ci.cancel();
         }
+    }
+
+    @ModifyReturnValue(method = "canSeeEffects", at = @At("RETURN"))
+    private boolean shouldDrawEffects(boolean original) {
+        if (NoRender.instance.isActive() && NoRender.effectDisplay.value()) {
+            return false;
+        }
+        return original;
     }
 }

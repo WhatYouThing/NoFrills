@@ -294,6 +294,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Unlock Pack Position", LegacyTextures.unlockPackPos, "Allows you to move the official resource pack up and down on the list."),
                                 new Settings.Toggle("Force Pack Position", LegacyTextures.forcePackPos, "Forces the official resource pack to be at the bottom by default.\nMay require a game restart to apply."),
                                 new Settings.Toggle("No Tooltip Styling", LegacyTextures.noTooltipStyle, "Disables custom styling of tooltips. Reverts item tooltips if the official pack is below the vanilla pack."),
+                                new Settings.Toggle("No Bow Cooldown", LegacyTextures.noBowCooldown, "Prevents the cooldown overlay from rendering on bows/shortbows."),
                                 new Settings.Toggle("More Legacy", LegacyTextures.moreLegacy, "Reverts several items which used to be axes (before the Foraging Update) into axes.")
                         ))
                 )),

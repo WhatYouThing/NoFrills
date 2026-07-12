@@ -31,6 +31,7 @@ public class LegacyTextures {
     public static final SettingBool unlockPackPos = new SettingBool(false, "unlockPackPos", instance);
     public static final SettingBool forcePackPos = new SettingBool(false, "forcePackPos", instance);
     public static final SettingBool noTooltipStyle = new SettingBool(false, "noTooltipStyle", instance);
+    public static final SettingBool noBowCooldown = new SettingBool(false, "noBowCooldown", instance);
     public static final SettingBool moreLegacy = new SettingBool(false, "moreLegacy", instance);
 
     private static final ConcurrentHashMap<String, ResolvableProfile> cache = new ConcurrentHashMap<>();

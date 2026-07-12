@@ -2,19 +2,24 @@ package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
+import nofrills.config.SettingEnum;
 import nofrills.events.*;
+import nofrills.hud.HudManager;
+import nofrills.misc.ConcurrentHashSet;
 import nofrills.misc.RenderColor;
+import nofrills.misc.RenderStyle;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -29,8 +34,12 @@ public class DeviceSolvers {
     public static final Feature instance = new Feature("deviceSolvers");
 
     public static final SettingBool sharpshooter = new SettingBool(false, "sharpshooter", instance.key());
-    public static final SettingColor sharpTargetColor = new SettingColor(RenderColor.green, "sharpTargetColor", instance.key());
-    public static final SettingColor sharpHitColor = new SettingColor(RenderColor.red, "sharpHitColor", instance.key());
+    public static final SettingBool sharpDoneAlert = new SettingBool(false, "sharpDoneAlert", instance.key());
+    public static final SettingEnum<RenderStyle> sharpStyle = new SettingEnum<>(RenderStyle.Filled, RenderStyle.class, "sharpStyle", instance);
+    public static final SettingColor sharpTargetColorFill = new SettingColor(RenderColor.green, "sharpTargetColor", instance.key());
+    public static final SettingColor sharpTargetColorOutline = new SettingColor(RenderColor.green, "sharpTargetColorOutline", instance.key());
+    public static final SettingColor sharpHitColorFill = new SettingColor(RenderColor.red, "sharpHitColor", instance.key());
+    public static final SettingColor sharpHitColorOutline = new SettingColor(RenderColor.red, "sharpHitColorOutline", instance.key());
     public static final SettingBool arrowAlign = new SettingBool(false, "arrowAlign", instance.key());
     public static final SettingBool alignBlockWrong = new SettingBool(false, "alignBlockWrong", instance.key());
     public static final SettingBool alignBlockInvert = new SettingBool(false, "alignBlockInvert", instance);
@@ -49,9 +58,13 @@ public class DeviceSolvers {
 
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("7")) {
-            if (sharpshooter.value()) {
-                Sharpshooter.blockUpdate(event);
+        if (instance.isActive() && sharpshooter.value() && Utils.isInDungeonBoss("7")) {
+            if (Sharpshooter.target.contains(event.pos.getCenter()) && Sharpshooter.isActive()) {
+                if (event.oldState.getBlock().equals(Blocks.EMERALD_BLOCK) && event.newState.getBlock().equals(Blocks.BLUE_TERRACOTTA)) {
+                    Sharpshooter.list.add(event.pos);
+                } else if (event.oldState.getBlock().equals(Blocks.BLUE_TERRACOTTA) && event.newState.getBlock().equals(Blocks.EMERALD_BLOCK)) {
+                    Sharpshooter.next = event.pos;
+                }
             }
         }
     }
@@ -86,62 +99,53 @@ public class DeviceSolvers {
         }
     }
 
+    @EventHandler
+    private static void onEntityNamed(EntityNamedEvent event) {
+        if (instance.isActive() && sharpshooter.value() && Utils.isInDungeonBoss("7")) {
+            if (!Sharpshooter.done && event.namePlain.equals("Active") && Sharpshooter.area.getCenter().distanceTo(event.entity.position()) < 3.0) {
+                if (sharpDoneAlert.value()) {
+                    HudManager.setCustomTitle("§aSharpshooter Done", 40);
+                    Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
+                }
+                Sharpshooter.done = true;
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        Sharpshooter.done = false;
+    }
+
     public static final class Sharpshooter {
-        public static final List<BlockPos> list = new ArrayList<>();
+        public static final ConcurrentHashSet<BlockPos> list = new ConcurrentHashSet<>();
         public static final AABB target = AABB.encapsulatingFullBlocks(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
-        public static final AABB area = new AABB(63.2, 127, 35.8, 63.8, 128, 35.2);
-        public static final BlockState terracotta = Blocks.BLUE_TERRACOTTA.defaultBlockState();
-        public static final BlockState emerald = Blocks.EMERALD_BLOCK.defaultBlockState();
+        public static final BlockPos area = new BlockPos(63, 126, 35);
         public static BlockPos next = null;
+        public static boolean done = false;
 
         private static boolean isActive() {
-            return mc.player != null && area.intersects(mc.player.getBoundingBox());
-        }
-
-        private static BlockPos findTarget() {
-            for (double x = target.minX; x <= target.maxX; x++) {
-                for (double y = target.minY; y <= target.maxY; y++) {
-                    for (double z = target.minZ; z <= target.maxZ; z++) {
-                        BlockPos pos = new BlockPos((int) x, (int) y, (int) z);
-                        if (mc.level.getBlockState(pos).equals(emerald)) {
-                            return pos;
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-
-        public static void blockUpdate(BlockUpdateEvent event) {
-            if (target.contains(event.pos.getCenter()) && isActive()) {
-                if (event.oldState.equals(emerald) && event.newState.equals(terracotta) && next != null) {
-                    list.add(next);
-                }
-                if (event.oldState.equals(terracotta) && event.newState.equals(emerald)) {
-                    next = findTarget();
-                }
-            }
+            return mc.level != null && mc.level.hasSignal(area, Direction.DOWN);
         }
 
         public static void tick() {
-            if (!isActive()) {
-                if (!list.isEmpty() || next != null) {
-                    next = null;
-                    list.clear();
-                }
-                return;
+            if (!isActive() && (!list.isEmpty() || next != null)) {
+                next = null;
+                list.clear();
             }
-            next = findTarget();
         }
 
         public static void render(WorldRenderEvent event) {
             if (!list.isEmpty()) {
                 for (BlockPos pos : list) {
-                    event.drawFilled(AABB.encapsulatingFullBlocks(pos, pos), true, sharpHitColor.value());
+                    if (pos.equals(next)) continue;
+                    AABB box = AABB.encapsulatingFullBlocks(pos, pos);
+                    event.drawStyled(box, sharpStyle.value(), false, sharpHitColorOutline.value(), sharpHitColorFill.value());
                 }
             }
             if (next != null) {
-                event.drawFilled(AABB.encapsulatingFullBlocks(next, next), true, sharpTargetColor.value());
+                AABB box = AABB.encapsulatingFullBlocks(next, next);
+                event.drawStyled(box, sharpStyle.value(), false, sharpTargetColorOutline.value(), sharpTargetColorFill.value());
             }
         }
     }

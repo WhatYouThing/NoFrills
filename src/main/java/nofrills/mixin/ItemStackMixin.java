@@ -24,10 +24,10 @@ public class ItemStackMixin {
     }
 
     @Inject(method = "applyAfterUseComponentSideEffects", at = @At("HEAD"), cancellable = true)
-    private void onApplyCooldown(LivingEntity user, ItemStack stack, CallbackInfoReturnable<ItemStack> cir) {
+    private void onApplyCooldown(LivingEntity user, ItemStack stackBeforeUsing, CallbackInfoReturnable<ItemStack> cir) {
         if (user.equals(mc.player) && NoPearlCooldown.active()) {
-            if (stack.getItem().equals(Items.ENDER_PEARL)) {
-                cir.setReturnValue(stack);
+            if (stackBeforeUsing.getItem().equals(Items.ENDER_PEARL)) {
+                cir.setReturnValue(stackBeforeUsing);
             }
         }
     }

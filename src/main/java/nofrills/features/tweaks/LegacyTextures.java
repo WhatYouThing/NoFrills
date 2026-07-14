@@ -6,10 +6,12 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ResolvableProfile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -46,7 +48,7 @@ public class LegacyTextures {
         return cache.get(id);
     }
 
-    public static Optional<Replacement> replaceIfNeeded(ItemStack stack) {
+    public static Optional<Identifier> replaceIfNeeded(ItemStack stack) {
         Identifier model = stack.get(DataComponents.ITEM_MODEL);
         if (model != null && model.getNamespace().equals("hypixel_skyblock")) {
             CompoundTag data = Utils.getCustomData(stack);
@@ -55,21 +57,21 @@ public class LegacyTextures {
             switch (id) {
                 case "VOIDEDGE_KATANA", "VORPAL_KATANA", "ATOMSPLIT_KATANA" -> {
                     String path = mc.player.getCooldowns().isOnCooldown(stack) ? "golden_sword" : "diamond_sword";
-                    return Optional.of(new Replacement(Identifier.withDefaultNamespace(path), null));
+                    return Optional.of(Identifier.withDefaultNamespace(path));
                 }
                 case "RAGNAROCK_AXE", "DAEDALUS_AXE", "STARRED_DAEDALUS_AXE" -> {
                     if (moreLegacy.value()) {
-                        return Optional.of(new Replacement(Identifier.withDefaultNamespace("golden_axe"), null));
+                        return Optional.of(Identifier.withDefaultNamespace("golden_axe"));
                     }
                 }
                 case "AXE_OF_THE_SHREDDED" -> {
                     if (moreLegacy.value()) {
-                        return Optional.of(new Replacement(Identifier.withDefaultNamespace("diamond_axe"), null));
+                        return Optional.of(Identifier.withDefaultNamespace("diamond_axe"));
                     }
                 }
                 case "RAIDER_AXE" -> {
                     if (moreLegacy.value()) {
-                        return Optional.of(new Replacement(Identifier.withDefaultNamespace("iron_axe"), null));
+                        return Optional.of(Identifier.withDefaultNamespace("iron_axe"));
                     }
                 }
             }
@@ -81,16 +83,25 @@ public class LegacyTextures {
                     case 3 -> "diamond_sword";
                     default -> "";
                 };
-                if (!path.isEmpty()) return Optional.of(new Replacement(Identifier.withDefaultNamespace(path), null));
+                if (!path.isEmpty()) return Optional.of(Identifier.withDefaultNamespace(path));
             }
             if (NoFrillsAPI.itemTextures.containsKey(id)) {
+                return Optional.of(Identifier.parse(NoFrillsAPI.itemTextures.get(id).model()));
+            }
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<ResolvableProfile> replaceProfileIfNeeded(DataComponentMap components) {
+        Identifier model = components.get(DataComponents.ITEM_MODEL);
+        CustomData data = components.get(DataComponents.CUSTOM_DATA);
+        if (data != null && model != null && model.getNamespace().equals("hypixel_skyblock")) {
+            String id = data.tag.getStringOr("id", "");
+            if (!id.isEmpty() && NoFrillsAPI.itemTextures.containsKey(id)) {
                 NoFrillsAPI.ItemTexture textures = NoFrillsAPI.itemTextures.get(id);
                 if (!textures.textures().isEmpty()) {
-                    ItemStack clone = stack.copy();
-                    clone.set(DataComponents.PROFILE, LegacyTextures.getOrInitProfile(id, textures.textures()));
-                    return Optional.of(new Replacement(Identifier.parse(textures.model()), clone));
+                    return Optional.of(LegacyTextures.getOrInitProfile(id, textures.textures()));
                 }
-                return Optional.of(new Replacement(Identifier.parse(textures.model()), null));
             }
         }
         return Optional.empty();
@@ -101,9 +112,5 @@ public class LegacyTextures {
         if (!instance.isActive()) {
             cache.clear();
         }
-    }
-
-    public record Replacement(Identifier identifier, ItemStack stack) {
-
     }
 }

@@ -32,7 +32,7 @@
         "ItemModelResolverMixin",
         "ItemStackMixin",
         "KeyboardHandlerMixin",
-        "LevelMixin",
+        "LevelChunkMixin",
         "LevelRendererMixin",
         "LightmapRenderStateExtractorMixin",
         "LivingEntityMixin",

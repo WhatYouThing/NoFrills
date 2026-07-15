@@ -119,11 +119,14 @@ public abstract class MinecraftMixin {
         return original;
     }
 
-    @Inject(method = "pauseIfInactive", at = @At("HEAD"))
+    @Inject(method = "pauseIfInactive", at = @At("TAIL"))
     private void onAfterFocusChanged(CallbackInfo ci) {
-        if (this.soundManager != null && UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.muteSounds.value()) {
+        if (UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.muteSounds.value() && this.soundManager != null) {
             for (SoundSource category : SoundSource.values()) {
-                this.soundManager.refreshCategoryVolume(category);
+                try {
+                    this.soundManager.refreshCategoryVolume(category);
+                } catch (Exception _) {
+                }
             }
         }
     }

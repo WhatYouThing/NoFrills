@@ -22,11 +22,10 @@ import nofrills.misc.Utils;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static nofrills.Main.LOGGER;
@@ -41,6 +40,7 @@ public class BlockList {
 
     private static final DataFile data = Config.getDataFile("BlockList.json");
     private static final ConcurrentHashMap<String, CachedResult> resultCache = new ConcurrentHashMap<>();
+    private static final Pattern validNameRegex = Pattern.compile("^[a-zA-Z0-9_]{3,16}$");
 
     public static List<JsonObject> getEntries() {
         return data.get().asMap().values().stream()
@@ -115,6 +115,48 @@ public class BlockList {
         return getEntries().stream().filter(object -> Utils.toLower(object.get("name").getAsString()).contains(Utils.toLower(name))).toList();
     }
 
+    public static void importFromClipboard(String defaultReason) {
+        String clipboard = mc.keyboardHandler.getClipboard();
+        try {
+            List<String> addedPlayers = new ArrayList<>();
+            JsonObject json = JsonParser.parseString(clipboard).getAsJsonObject();
+            for (Map.Entry<String, JsonElement> e : json.entrySet()) {
+                String uuid = e.getKey().replaceAll("-", "");
+                JsonObject entry = e.getValue().getAsJsonObject();
+                if (data.get().has(uuid)) {
+                    continue;
+                }
+                String entryName = entry.has("name") ? entry.get("name").getAsString() : "";
+                JsonObject object = new JsonObject();
+                object.addProperty("name", !entryName.isEmpty() && validNameRegex.matcher(entryName).matches() ? entryName : "N/A");
+                object.addProperty("reason", entry.has("reason") ? entry.get("reason").getAsString() : defaultReason);
+                object.addProperty("timestamp", Utils.getTimestamp());
+                data.get().add(uuid, object);
+                addedPlayers.add(uuid);
+            }
+            Utils.infoRaw(Component.literal(Utils.format("Block list import successful. Added {} new entries out of {} imported. Entries with missing names will be filled in over time.", addedPlayers.size(), json.size())).withStyle(ChatFormatting.GREEN));
+            Thread.startVirtualThread(() -> {
+                for (String uuid : addedPlayers) {
+                    if (data.get().get(uuid).getAsJsonObject().get("name").getAsString().equals("N/A")) {
+                        try {
+                            String url = Utils.format("https://api.minecraftservices.com/minecraft/profile/lookup/{}", uuid);
+                            InputStream connection = URI.create(url).toURL().openStream();
+                            JsonObject obj = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonObject();
+                            if (obj.has("id") && obj.has("name")) {
+                                data.get().get(uuid).getAsJsonObject().addProperty("name", obj.get("name").getAsString());
+                            }
+                            Thread.sleep(1000); // need small delay between requests to not get rate limited
+                        } catch (Exception exception) {
+                            LOGGER.error("Failed to fetch player name for NoFrills Block List import.", exception);
+                        }
+                    }
+                }
+            });
+        } catch (Exception exception) {
+            Utils.infoRaw(Component.literal("Unable to parse JSON data from clipboard, not importing players.").withStyle(ChatFormatting.RED));
+        }
+    }
+
     public static MutableComponent buildEntryLine(JsonObject entry, MutableComponent text) {
         MutableComponent tooltip = Component.literal(Utils.format("§7Block reason: {}\n§7Blocked date: {}\n§7Last known username: {}",
                 entry.get("reason").getAsString(),
@@ -163,7 +205,7 @@ public class BlockList {
                         MutableComponent msg = Component.literal(name).setStyle(nameColor)
                                 .append(Component.literal(" is a blocked player.").withStyle(ChatFormatting.RED));
                         if (autoKick.value()) {
-                            msg.append(Component.literal(" Kicking automatically.").withStyle(ChatFormatting.GRAY));
+                            msg.append(Component.literal(" Kicking automatically.").withStyle(ChatFormatting.RED));
                             Utils.sendMessage("/party kick " + name);
                         }
                         mc.schedule(() -> Utils.infoRaw(buildEntryLine(obj, msg)));

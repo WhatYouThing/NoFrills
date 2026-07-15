@@ -442,16 +442,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(
                                 new Settings.Separator("Sharpshooter"),
                                 new Settings.Toggle("Solve Sharpshooter", DeviceSolvers.sharpshooter, "Highlights the active and the hit targets while doing the 4th device."),
-                                new Settings.Toggle("Done Alert", DeviceSolvers.sharpDoneAlert, "Displays a title on screen once the device is completed. Useful for Pre4."),
-                                new Settings.EnumToggle<>("Render Style", DeviceSolvers.sharpStyle, "The style of the target highlights."),
-                                new Settings.ColorPicker("Target Fill Color", DeviceSolvers.sharpTargetColorFill, "The fill color of the active target block."),
-                                new Settings.ColorPicker("Target Outline Color", DeviceSolvers.sharpTargetColorOutline, "The outline color of the active target block."),
-                                new Settings.ColorPicker("Hit Fill Color", DeviceSolvers.sharpHitColorFill, "The fill color of the hit target blocks."),
-                                new Settings.ColorPicker("Hit Outline Color", DeviceSolvers.sharpHitColorOutline, "The outline color of the hit target blocks."),
+                                new Settings.Toggle("Done Alert", DeviceSolvers.Sharpshooter.doneAlert, "Displays a title on screen once the device is completed. Useful for Pre4."),
+                                new Settings.EnumToggle<>("Render Style", DeviceSolvers.Sharpshooter.style, "The style of the target highlights."),
+                                new Settings.ColorPicker("Target Fill Color", DeviceSolvers.Sharpshooter.targetColorFill, "The fill color of the active target block."),
+                                new Settings.ColorPicker("Target Outline Color", DeviceSolvers.Sharpshooter.targetColorOutline, "The outline color of the active target block."),
+                                new Settings.ColorPicker("Hit Fill Color", DeviceSolvers.Sharpshooter.hitColorFill, "The fill color of the hit target blocks."),
+                                new Settings.ColorPicker("Hit Outline Color", DeviceSolvers.Sharpshooter.hitColorOutline, "The outline color of the hit target blocks."),
                                 new Settings.Separator("Arrow Align"),
                                 new Settings.Toggle("Solve Arrow Align", DeviceSolvers.arrowAlign, "Shows the amount of needed clicks while doing the 3rd device."),
-                                new Settings.Toggle("Block Wrong Clicks", DeviceSolvers.alignBlockWrong, "Prevents you from rotating the arrows that already have the correct rotation."),
-                                new Settings.Toggle("Inverted Block", DeviceSolvers.alignBlockInvert, "Prevents wrong rotations only while sneaking instead of only while not sneaking.")
+                                new Settings.Toggle("Block Wrong Clicks", DeviceSolvers.ArrowAlign.blockWrong, "Prevents you from rotating the arrows that already have the correct rotation."),
+                                new Settings.Toggle("Inverted Block", DeviceSolvers.ArrowAlign.blockInvert, "Prevents wrong rotations while sneaking instead of while standing up.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Highlight Style", StarredMobHighlight.style, "The style of the starred mob highlight."),

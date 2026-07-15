@@ -33,38 +33,47 @@ import static nofrills.Main.mc;
 public class DeviceSolvers {
     public static final Feature instance = new Feature("deviceSolvers");
 
-    public static final SettingBool sharpshooter = new SettingBool(false, "sharpshooter", instance.key());
-    public static final SettingBool sharpDoneAlert = new SettingBool(false, "sharpDoneAlert", instance.key());
-    public static final SettingEnum<RenderStyle> sharpStyle = new SettingEnum<>(RenderStyle.Filled, RenderStyle.class, "sharpStyle", instance);
-    public static final SettingColor sharpTargetColorFill = new SettingColor(RenderColor.green, "sharpTargetColor", instance.key());
-    public static final SettingColor sharpTargetColorOutline = new SettingColor(RenderColor.green, "sharpTargetColorOutline", instance.key());
-    public static final SettingColor sharpHitColorFill = new SettingColor(RenderColor.red, "sharpHitColor", instance.key());
-    public static final SettingColor sharpHitColorOutline = new SettingColor(RenderColor.red, "sharpHitColorOutline", instance.key());
-    public static final SettingBool arrowAlign = new SettingBool(false, "arrowAlign", instance.key());
-    public static final SettingBool alignBlockWrong = new SettingBool(false, "alignBlockWrong", instance.key());
-    public static final SettingBool alignBlockInvert = new SettingBool(false, "alignBlockInvert", instance);
+    public static final SettingBool sharpshooter = new SettingBool(false, "sharpshooter", instance);
+    public static final SettingBool arrowAlign = new SettingBool(false, "arrowAlign", instance);
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInDungeonBoss("7")) {
             if (arrowAlign.value()) {
-                ArrowAlign.tick();
+                if (ArrowAlign.isActive()) {
+                    if (ArrowAlign.solutionMap.isEmpty()) {
+                        List<ItemFrame> frames = ArrowAlign.getFrames();
+                        int[] solution = ArrowAlign.findSolution(frames);
+                        if (frames.isEmpty() || solution.length == 0) return;
+                        for (ItemFrame frame : frames) {
+                            ArrowAlign.solutionMap.put(frame, solution[ArrowAlign.toIndex(frame)]);
+                        }
+                    }
+                } else {
+                    if (!ArrowAlign.solutionMap.isEmpty()) {
+                        ArrowAlign.solutionMap.clear();
+                        ArrowAlign.clicksMap.clear();
+                    }
+                }
             }
-            if (sharpshooter.value()) {
-                Sharpshooter.tick();
+            if (sharpshooter.value() && !Sharpshooter.isActive() && (!Sharpshooter.list.isEmpty() || Sharpshooter.next != null)) {
+                Sharpshooter.next = null;
+                Sharpshooter.list.clear();
             }
         }
     }
 
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
-        if (instance.isActive() && sharpshooter.value() && Utils.isInDungeonBoss("7")) {
-            if (Sharpshooter.target.contains(event.pos.getCenter()) && Sharpshooter.isActive()) {
-                if (event.oldState.getBlock().equals(Blocks.EMERALD_BLOCK) && event.newState.getBlock().equals(Blocks.BLUE_TERRACOTTA)) {
-                    Sharpshooter.list.add(event.pos);
-                } else if (event.oldState.getBlock().equals(Blocks.BLUE_TERRACOTTA) && event.newState.getBlock().equals(Blocks.EMERALD_BLOCK)) {
-                    Sharpshooter.next = event.pos;
+        if (instance.isActive() && Sharpshooter.isTargetBlock(event.pos) && Utils.isInDungeonBoss("7") && Sharpshooter.isActive()) {
+            if (event.oldBlock.equals(Blocks.EMERALD_BLOCK) && event.newBlock.equals(Blocks.BLUE_TERRACOTTA)) {
+                Sharpshooter.list.add(event.pos);
+                if (Sharpshooter.next != null && Sharpshooter.next.equals(event.pos)) {
+                    Sharpshooter.next = null;
                 }
+            } else if (event.oldBlock.equals(Blocks.BLUE_TERRACOTTA) && event.newBlock.equals(Blocks.EMERALD_BLOCK)) {
+                Sharpshooter.list.remove(event.pos);
+                Sharpshooter.next = event.pos;
             }
         }
     }
@@ -72,11 +81,29 @@ public class DeviceSolvers {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInDungeonBoss("7")) {
-            if (arrowAlign.value()) {
-                ArrowAlign.render(event);
+            if (arrowAlign.value() && ArrowAlign.isActive()) {
+                for (Map.Entry<ItemFrame, Integer> entry : ArrowAlign.solutionMap.entrySet()) {
+                    ItemFrame frame = entry.getKey();
+                    Vec3 pos = frame.getEyePosition().add(0.0, 0.2, 0.0);
+                    int rotation = ArrowAlign.clicksMap.containsKey(frame) ? ArrowAlign.clicksMap.get(frame) : frame.getRotation();
+                    int clicks = ArrowAlign.getNeededClicks(rotation, entry.getValue());
+                    if (clicks > 0) {
+                        event.drawText(pos, Component.literal(String.valueOf(clicks)), 0.04f, true, RenderColor.white);
+                    }
+                }
             }
             if (sharpshooter.value()) {
-                Sharpshooter.render(event);
+                if (!Sharpshooter.list.isEmpty()) {
+                    for (BlockPos pos : Sharpshooter.list) {
+                        if (pos.equals(Sharpshooter.next)) continue;
+                        AABB box = AABB.encapsulatingFullBlocks(pos, pos);
+                        event.drawStyled(box, Sharpshooter.style.value(), false, Sharpshooter.hitColorOutline.value(), Sharpshooter.hitColorFill.value());
+                    }
+                }
+                if (Sharpshooter.next != null) {
+                    AABB box = AABB.encapsulatingFullBlocks(Sharpshooter.next, Sharpshooter.next);
+                    event.drawStyled(box, Sharpshooter.style.value(), false, Sharpshooter.targetColorOutline.value(), Sharpshooter.targetColorFill.value());
+                }
             }
         }
     }
@@ -85,7 +112,14 @@ public class DeviceSolvers {
     private static void onEntityInteract(InteractEntityEvent event) {
         if (instance.isActive() && Utils.isInDungeonBoss("7")) {
             if (arrowAlign.value()) {
-                ArrowAlign.interactEntity(event);
+                if (event.entity instanceof ItemFrame frame && ArrowAlign.solutionMap.containsKey(frame)) {
+                    int rotation = ArrowAlign.clicksMap.containsKey(frame) ? ArrowAlign.clicksMap.get(frame) : frame.getRotation();
+                    if (ArrowAlign.shouldBlock() && ArrowAlign.getNeededClicks(rotation, ArrowAlign.solutionMap.get(frame)) == 0) {
+                        event.cancel();
+                        return;
+                    }
+                    ArrowAlign.clicksMap.put(frame, (rotation + 1) % 8);
+                }
             }
         }
     }
@@ -94,7 +128,11 @@ public class DeviceSolvers {
     private static void onEntityUpdated(EntityUpdatedEvent event) {
         if (instance.isActive() && Utils.isInDungeonBoss("7")) {
             if (arrowAlign.value()) {
-                ArrowAlign.updateEntity(event);
+                if (event.entity instanceof ItemFrame frame && ArrowAlign.solutionMap.containsKey(frame)) {
+                    if (ArrowAlign.clicksMap.containsKey(frame) && frame.getRotation() == ArrowAlign.clicksMap.get(frame)) {
+                        ArrowAlign.clicksMap.remove(frame);
+                    }
+                }
             }
         }
     }
@@ -103,7 +141,7 @@ public class DeviceSolvers {
     private static void onEntityNamed(EntityNamedEvent event) {
         if (instance.isActive() && sharpshooter.value() && Utils.isInDungeonBoss("7")) {
             if (!Sharpshooter.done && event.namePlain.equals("Active") && Sharpshooter.area.getCenter().distanceTo(event.entity.position()) < 3.0) {
-                if (sharpDoneAlert.value()) {
+                if (Sharpshooter.doneAlert.value()) {
                     HudManager.setCustomTitle("§aSharpshooter Done", 40);
                     Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 }
@@ -115,42 +153,39 @@ public class DeviceSolvers {
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         Sharpshooter.done = false;
+        Sharpshooter.next = null;
+        Sharpshooter.list.clear();
+        ArrowAlign.solutionMap.clear();
+        ArrowAlign.clicksMap.clear();
     }
 
     public static final class Sharpshooter {
+        public static final SettingBool doneAlert = new SettingBool(false, "sharpDoneAlert", instance);
+        public static final SettingEnum<RenderStyle> style = new SettingEnum<>(RenderStyle.Filled, RenderStyle.class, "sharpStyle", instance);
+        public static final SettingColor targetColorFill = new SettingColor(RenderColor.green, "sharpTargetColor", instance);
+        public static final SettingColor targetColorOutline = new SettingColor(RenderColor.green, "sharpTargetColorOutline", instance);
+        public static final SettingColor hitColorFill = new SettingColor(RenderColor.red, "sharpHitColor", instance);
+        public static final SettingColor hitColorOutline = new SettingColor(RenderColor.red, "sharpHitColorOutline", instance);
+
         public static final ConcurrentHashSet<BlockPos> list = new ConcurrentHashSet<>();
         public static final AABB target = AABB.encapsulatingFullBlocks(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));
         public static final BlockPos area = new BlockPos(63, 126, 35);
         public static BlockPos next = null;
         public static boolean done = false;
 
-        private static boolean isActive() {
-            return mc.level != null && mc.level.hasSignal(area, Direction.DOWN);
+        public static boolean isActive() {
+            return sharpshooter.value() && mc.level != null && mc.level.hasSignal(area, Direction.DOWN);
         }
 
-        public static void tick() {
-            if (!isActive() && (!list.isEmpty() || next != null)) {
-                next = null;
-                list.clear();
-            }
-        }
-
-        public static void render(WorldRenderEvent event) {
-            if (!list.isEmpty()) {
-                for (BlockPos pos : list) {
-                    if (pos.equals(next)) continue;
-                    AABB box = AABB.encapsulatingFullBlocks(pos, pos);
-                    event.drawStyled(box, sharpStyle.value(), false, sharpHitColorOutline.value(), sharpHitColorFill.value());
-                }
-            }
-            if (next != null) {
-                AABB box = AABB.encapsulatingFullBlocks(next, next);
-                event.drawStyled(box, sharpStyle.value(), false, sharpTargetColorOutline.value(), sharpTargetColorFill.value());
-            }
+        public static boolean isTargetBlock(BlockPos pos) {
+            return target.contains(pos.getCenter()) && pos.getX() % 2 == 0 && pos.getY() % 2 == 0;
         }
     }
 
     public static final class ArrowAlign {
+        public static final SettingBool blockWrong = new SettingBool(false, "alignBlockWrong", instance);
+        public static final SettingBool blockInvert = new SettingBool(false, "alignBlockInvert", instance);
+
         public static final AABB area = new AABB(-2, 125, 81, 4, 120, 74);
         public static final BlockPos corner = new BlockPos(-2, 124, 79);
         public static final int[][] solutions = new int[][]{
@@ -218,63 +253,14 @@ public class DeviceSolvers {
             return new int[]{}; // should never occur unless they add new patterns to the device
         }
 
-        public static void tick() {
-            if (!isActive()) {
-                if (!solutionMap.isEmpty()) {
-                    solutionMap.clear();
-                    clicksMap.clear();
-                }
-                return;
-            }
-            if (solutionMap.isEmpty()) {
-                List<ItemFrame> frames = getFrames();
-                int[] solution = findSolution(frames);
-                if (frames.isEmpty() || solution.length == 0) return;
-                for (ItemFrame frame : frames) {
-                    solutionMap.put(frame, solution[ArrowAlign.toIndex(frame)]);
-                }
-            }
-        }
-
-        public static void render(WorldRenderEvent event) {
-            for (Map.Entry<ItemFrame, Integer> entry : solutionMap.entrySet()) {
-                ItemFrame frame = entry.getKey();
-                Vec3 pos = frame.getEyePosition().add(0.0, 0.2, 0.0);
-                int rotation = clicksMap.containsKey(frame) ? clicksMap.get(frame) : frame.getRotation();
-                int clicks = getNeededClicks(rotation, entry.getValue());
-                if (clicks > 0) {
-                    event.drawText(pos, Component.literal(String.valueOf(clicks)), 0.04f, true, RenderColor.white);
-                }
-            }
-        }
-
         public static boolean shouldBlock() {
-            if (alignBlockWrong.value()) {
-                if (alignBlockInvert.value()) {
+            if (blockWrong.value()) {
+                if (blockInvert.value()) {
                     return mc.options.keyShift.isDown();
                 }
                 return !mc.options.keyShift.isDown();
             }
             return false;
-        }
-
-        public static void interactEntity(InteractEntityEvent event) {
-            if (event.entity instanceof ItemFrame frame && solutionMap.containsKey(frame)) {
-                int rotation = clicksMap.containsKey(frame) ? clicksMap.get(frame) : frame.getRotation();
-                if (shouldBlock() && getNeededClicks(rotation, solutionMap.get(frame)) == 0) {
-                    event.cancel();
-                    return;
-                }
-                clicksMap.put(frame, (rotation + 1) % 8);
-            }
-        }
-
-        public static void updateEntity(EntityUpdatedEvent event) {
-            if (event.entity instanceof ItemFrame frame && solutionMap.containsKey(frame)) {
-                if (clicksMap.containsKey(frame) && frame.getRotation() == clicksMap.get(frame)) {
-                    clicksMap.remove(frame);
-                }
-            }
         }
     }
 }

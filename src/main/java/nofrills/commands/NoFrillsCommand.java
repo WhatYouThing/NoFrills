@@ -361,6 +361,13 @@ public class NoFrillsCommand {
                     Utils.infoFormat("§7Found 0 results in the Block List.");
                 }
                 return SINGLE_SUCCESS;
+            }))).then(literal("import").executes(context -> {
+                BlockList.importFromClipboard("Unspecified");
+                return SINGLE_SUCCESS;
+            }).then(argument("defaultReason", StringArgumentType.greedyString()).executes(context -> {
+                String reason = StringArgumentType.getString(context, "defaultReason");
+                BlockList.importFromClipboard(reason);
+                return SINGLE_SUCCESS;
             })))),
             new ModCommand("autoRequeue", "Commands for managing the Auto Requeue feature.", literal("autoRequeue").executes(context -> {
                 return SINGLE_SUCCESS;

@@ -145,7 +145,7 @@ public class SkyblockData {
                     if (team != null) {
                         String line = ChatFormatting.stripFormatting(team.getPlayerPrefix().getString() + team.getPlayerSuffix().getString()).trim();
                         if (!line.isEmpty()) {
-                            if (line.startsWith(Utils.Symbols.zone) || line.startsWith(Utils.Symbols.zoneRift)) {
+                            if (line.startsWith(Utils.Symbols.zone) || line.startsWith(Utils.Symbols.zoneRift) || line.startsWith("⏣")) {
                                 location = line;
                             }
                             if (Utils.isInKuudra() && !instanceOver) {

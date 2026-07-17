@@ -67,13 +67,13 @@ public class DeviceSolvers {
     public static void onBlockUpdate(BlockUpdateEvent event) {
         if (instance.isActive() && Sharpshooter.isTargetBlock(event.pos) && Utils.isInDungeonBoss("7") && Sharpshooter.isActive()) {
             if (event.oldBlock.equals(Blocks.EMERALD_BLOCK) && event.newBlock.equals(Blocks.BLUE_TERRACOTTA)) {
-                Sharpshooter.list.add(event.pos);
+                Sharpshooter.list.add(event.pos.immutable());
                 if (Sharpshooter.next != null && Sharpshooter.next.equals(event.pos)) {
                     Sharpshooter.next = null;
                 }
             } else if (event.oldBlock.equals(Blocks.BLUE_TERRACOTTA) && event.newBlock.equals(Blocks.EMERALD_BLOCK)) {
                 Sharpshooter.list.remove(event.pos);
-                Sharpshooter.next = event.pos;
+                Sharpshooter.next = event.pos.immutable();
             }
         }
     }

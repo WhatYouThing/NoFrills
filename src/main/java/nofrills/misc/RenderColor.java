@@ -1,5 +1,6 @@
 package nofrills.misc;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.util.ARGB;
 
 public class RenderColor {
@@ -46,6 +47,15 @@ public class RenderColor {
 
     public static RenderColor fromFloat(float r, float g, float b, float a) {
         return new RenderColor(r, g, b, a);
+    }
+
+    @SuppressWarnings("DataFlowIssue")
+    public static RenderColor fromFormatting(ChatFormatting formatting) {
+        if (formatting.isColor()) {
+            return RenderColor.fromHex(formatting.getColor());
+        } else {
+            throw new IllegalStateException(Utils.format("RenderColor cannot be created from non-color ChatFormatting ({})", formatting));
+        }
     }
 
     public RenderColor withRed(float red) {

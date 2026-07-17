@@ -490,6 +490,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Solve Panes", TerminalSolvers.panes, "Solves the \"Correct all panes\" terminal."),
                                 new Settings.ColorPicker("Panes Color", TerminalSolvers.panesColor, "The button color used in the Panes terminal."),
                                 new Settings.Toggle("Solve In Order", TerminalSolvers.inOrder, "Solves the \"Click in order\" Among Us task."),
+                                new Settings.Toggle("In Order Numbers", TerminalSolvers.inOrderDrawNumbers, "Draws the 1-14 numbers on top of the In Order solution."),
                                 new Settings.ColorPicker("In Order First Color", TerminalSolvers.inOrderColorFirst, "The first button color used in the In Order terminal."),
                                 new Settings.ColorPicker("In Order Second Color", TerminalSolvers.inOrderColorSecond, "The second button color used in the In Order terminal."),
                                 new Settings.ColorPicker("In Order Third Color", TerminalSolvers.inOrderColorThird, "The third button color used in the In Order terminal."),
@@ -499,7 +500,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Select Color", TerminalSolvers.selectColor, "The button color used in the Select terminal."),
                                 new Settings.Toggle("Solve Colors", TerminalSolvers.colors, "Solves the \"Change all to same color\" terminal."),
                                 new Settings.ColorPicker("Colors First Color", TerminalSolvers.colorsColorFirst, "The left click button color used in the Colors terminal."),
-                                new Settings.ColorPicker("Colors Second Color", TerminalSolvers.colorsColorSecond, "The right click button color used in the Colors terminal.")
+                                new Settings.ColorPicker("Colors Second Color", TerminalSolvers.colorsColorSecond, "The right click button color used in the Colors terminal."),
+                                new Settings.SliderInt("First Click Ticks", 0, 20, 1, TerminalSolvers.firstClickTicks, "Blocks the first click in a terminal for the specified amount of server ticks.\nHelps prevent false flagging Watchdog if the server is lagging."),
+                                new Settings.Toggle("Sound On Click", TerminalSolvers.soundOnClick, "Plays a sound effect upon clicking a terminal slot."),
+                                new Settings.TextInput("Click Sound", TerminalSolvers.clickSound, "The identifier of the sound to play."),
+                                new Settings.SliderDouble("Sound Volume", 0.0, 5.0, 0.1, TerminalSolvers.clickSoundVolume, "The volume of the sound."),
+                                new Settings.SliderDouble("Sound Pitch", 0.0, 2.0, 0.05, TerminalSolvers.clickSoundPitch, "The pitch of the sound."),
+                                new Settings.ColorPicker("Background Color", TerminalSolvers.backgroundColor, "The color used to depict already clicked/solved terminal slots.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.", new Settings(List.of(
                                 new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text."),

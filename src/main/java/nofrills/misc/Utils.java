@@ -792,14 +792,6 @@ public class Utils {
         return entity;
     }
 
-    /**
-     * Checks if the provided ItemStack has a glint override flag. Ignores the default flag to work correctly with items such as Nether Stars.
-     */
-    public static boolean hasGlint(ItemStack stack) {
-        Boolean component = stack.get(DataComponents.ENCHANTMENT_GLINT_OVERRIDE);
-        return component != null && component;
-    }
-
     public static List<String> getTabListLines() {
         return SkyblockData.getTabListLines();
     }

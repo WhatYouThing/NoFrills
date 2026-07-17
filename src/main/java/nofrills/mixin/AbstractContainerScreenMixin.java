@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -17,6 +18,7 @@ import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.features.dungeons.LeapOverlay;
+import nofrills.features.dungeons.TerminalSolvers;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.MiddleClickFix;
 import nofrills.features.tweaks.MiddleClickOverride;
@@ -29,7 +31,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -71,9 +72,19 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     }
 
     @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("TAIL"))
-    private void onClickSlotTail(Slot slot, int slotId, int button, ContainerInput actionType, CallbackInfo ci) {
+    private void onClickSlotTail(Slot slot, int slotId, int buttonNum, ContainerInput containerInput, CallbackInfo ci) {
         if (SlotOptions.isSpoofed(slot)) {
             this.menu.setCarried(ItemStack.EMPTY); // prevents the real item from showing at the cursor
+        }
+    }
+
+    @Inject(method = "extractCarriedItem", at = @At("HEAD"), cancellable = true)
+    private void onBeforeDrawHeldItem(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
+        if (TerminalSolvers.instance.isActive()) {
+            TerminalSolvers.TerminalSolution solution = TerminalSolvers.getCurrentSolution();
+            if (solution != null && TerminalSolvers.isTypeEnabled(solution.type)) {
+                ci.cancel();
+            }
         }
     }
 
@@ -117,12 +128,20 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
         return original;
     }
 
-    @ModifyArg(method = "extractSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;itemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V"), index = 4)
-    private @Nullable String onDrawStackCount(@Nullable String stackCountText, @Local(argsOnly = true) Slot slot) {
-        if (SlotOptions.hasCount(slot)) {
-            return SlotOptions.getCount(slot);
+    @WrapOperation(method = "extractSlot", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;itemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V"))
+    private void onDrawDecorations(GuiGraphicsExtractor instance, Font font, ItemStack itemStack, int x, int y, String countText, Operation<Void> original, @Local(argsOnly = true, name = "slot") Slot slot) {
+        if (TerminalSolvers.instance.isActive() && TerminalSolvers.isTypeEnabled(TerminalSolvers.TerminalType.InOrder)) {
+            TerminalSolvers.TerminalSolution solution = TerminalSolvers.getCurrentSolution();
+            if (solution != null && solution.type.equals(TerminalSolvers.TerminalType.InOrder) && solution.solutionMap.containsKey(slot.index)) {
+                original.call(instance, font, itemStack, x, y, "");
+                return;
+            }
         }
-        return stackCountText;
+        if (SlotOptions.hasCount(slot)) {
+            original.call(instance, font, itemStack, x, y, SlotOptions.getCount(slot));
+            return;
+        }
+        original.call(instance, font, itemStack, x, y, countText);
     }
 
     @ModifyExpressionValue(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;getItem()Lnet/minecraft/world/item/ItemStack;"))

@@ -11,6 +11,7 @@ import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.SlotUpdateEvent;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class MelodyMessage {
 
     @EventHandler
     private static void onScreenOpen(ScreenOpenEvent event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("7") && isMelody(event.screen.getTitle().getString())) {
+        if (instance.isActive() && DungeonUtil.isOnFloor("7") && isMelody(event.screen.getTitle().getString())) {
             Utils.sendMessage(msg.value());
             resetCount();
         }
@@ -43,7 +44,7 @@ public class MelodyMessage {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("7") && !event.isInventory && isMelody(event.title) && progress.value()) {
+        if (instance.isActive() && !event.isInventory && isMelody(event.title) && progress.value() && DungeonUtil.isOnFloor("7")) {
             List<Slot> slots = Utils.getContainerSlots(event.handler).reversed();
             if (slots.stream().filter(slot -> !slot.getItem().isEmpty()).toList().size() != 54) {
                 return; // quick and dirty check for if the screen is built

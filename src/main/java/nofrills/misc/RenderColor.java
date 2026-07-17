@@ -50,7 +50,7 @@ public class RenderColor {
     }
 
     @SuppressWarnings("DataFlowIssue")
-    public static RenderColor fromFormatting(ChatFormatting formatting) {
+    public static RenderColor fromFormat(ChatFormatting formatting) {
         if (formatting.isColor()) {
             return RenderColor.fromHex(formatting.getColor());
         } else {

@@ -11,6 +11,7 @@ import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
 import nofrills.events.*;
 import nofrills.misc.ConcurrentHashSet;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -28,7 +29,7 @@ public class TerracottaTimer {
 
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("6")) {
+        if (instance.isActive() && DungeonUtil.isOnFloor("6")) {
             if (event.messagePlain.equals("[BOSS] Sadan: So you made it all the way here... Now you wish to defy me? Sadan?!")) {
                 terraGyroTimer.setStartTicks(267);
                 terraGyroTimer.start();
@@ -38,9 +39,9 @@ public class TerracottaTimer {
 
     @EventHandler
     private static void onBlockUpdate(BlockUpdateEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("6") && event.oldState.isAir()) {
+        if (instance.isActive() && DungeonUtil.isInBossRoom("6") && event.oldState.isAir()) {
             if (event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
-                terracottas.add(new Terracotta(event.pos, Utils.isOnDungeonFloor("M6") ? 240 : 300));
+                terracottas.add(new Terracotta(event.pos, DungeonUtil.isOnFloor("M6") ? 240 : 300));
             }
             if (!terraGyroTimer.isTicking() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
                 terraGyroTimer.setStartTicks(235);
@@ -51,7 +52,7 @@ public class TerracottaTimer {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("6")) {
+        if (instance.isActive() && DungeonUtil.isInBossRoom("6")) {
             for (Terracotta terra : terracottas) {
                 if (terra.ticks == 0 || mc.level.getBlockState(terra.pos).isAir()) {
                     terracottas.remove(terra);
@@ -70,7 +71,7 @@ public class TerracottaTimer {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("6")) {
+        if (instance.isActive() && DungeonUtil.isInBossRoom("6")) {
             for (Terracotta terra : terracottas) {
                 terra.tick();
             }

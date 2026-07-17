@@ -596,7 +596,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 (S+) score."),
                                 new Settings.TextInput("300 Title", ScoreCalculator.title300, "The title to show when 300 (S+) score is reached.")
                         ))),
-                        new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 platform area which you mine as Healer in F7/M7 after terminal phase."),
+                        new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 area which you mine in Necron phase to stop the platform from breaking.", new Settings(
+                                new Settings.Toggle("Healer Only", PlatformHighlight.healerOnly, "Whether to only draw the highlight while playing as Healer."),
+                                new Settings.EnumToggle<>("Highlight Style", PlatformHighlight.style, "The style of the highlight"),
+                                new Settings.ColorPicker("Outline Color", PlatformHighlight.outlineColor, "The color of the outline highlight."),
+                                new Settings.ColorPicker("Fill Color", PlatformHighlight.fillColor, "The color of the filled highlight.")
+                        )),
                         new Module("Croesus Solver", CroesusSolver.instance, "Highlights unopened loot and the most profitable chests in the Croesus.\nRequires connectivity to the NoFrills API.", new Settings(
                                 new Settings.ColorPicker("Profit Color", CroesusSolver.profitColor, "The highlight color for the most profitable chest."),
                                 new Settings.ColorPicker("Secondary Profit Color", CroesusSolver.profitSecondaryColor, "The highlight color for the 2nd most profitable chest."),

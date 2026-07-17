@@ -12,6 +12,7 @@ import net.minecraft.world.item.Items;
 import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.misc.ConcurrentHashSet;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -46,7 +47,7 @@ public class TerminalSolvers {
     public static final SettingString clickSound = new SettingString("minecraft:entity.blaze.hurt", "clickSound", instance);
     public static final SettingDouble clickSoundVolume = new SettingDouble(2.0, "clickSoundVolume", instance);
     public static final SettingDouble clickSoundPitch = new SettingDouble(2.0, "clickSoundPitch", instance);
-    public static final SettingColor backgroundColor = new SettingColor(RenderColor.fromFormatting(ChatFormatting.DARK_GRAY), "backgroundColor", instance);
+    public static final SettingColor backgroundColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.DARK_GRAY), "backgroundColor", instance);
 
     private static final List<Item> colorsOrder = List.of(
             Items.GREEN_STAINED_GLASS_PANE,
@@ -102,7 +103,7 @@ public class TerminalSolvers {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && !event.isInventory && event.slot != null && Utils.isOnDungeonFloor("7")) {
+        if (instance.isActive() && !event.isInventory && event.slot != null && DungeonUtil.isOnFloor("7")) {
             TerminalType type = getTerminalType(event.title);
             if (currentSolution == null && !type.equals(TerminalType.None)) {
                 currentSolution = new TerminalSolution(type); // create dummy solution even if melody to block first clicks correctly
@@ -172,7 +173,7 @@ public class TerminalSolvers {
 
     @EventHandler
     private static void onSlotClick(SlotClickEvent event) {
-        if (instance.isActive() && event.slot != null && !event.isInventory && Utils.isOnDungeonFloor("7")) {
+        if (instance.isActive() && event.slot != null && !event.isInventory && DungeonUtil.isOnFloor("7")) {
             TerminalType type = getTerminalType(event.title);
             if (isTypeEnabled(type) || type.equals(TerminalType.Melody)) {
                 if (currentSolution == null || (currentSolution.openedAtTick + firstClickTicks.value() >= tickCounter)) {
@@ -226,7 +227,7 @@ public class TerminalSolvers {
 
     @EventHandler
     private static void onScreenRender(ScreenRenderEvent.After event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("7")) {
+        if (instance.isActive() && DungeonUtil.isOnFloor("7")) {
             TerminalType type = getTerminalType(event.title);
             if (currentSolution == null || !isTypeEnabled(type)) return;
             switch (type) {
@@ -290,7 +291,7 @@ public class TerminalSolvers {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (instance.isActive() && Utils.isOnDungeonFloor("7")) {
+        if (instance.isActive() && DungeonUtil.isOnFloor("7")) {
             tickCounter++;
         }
     }

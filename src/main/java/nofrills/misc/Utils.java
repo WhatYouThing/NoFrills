@@ -211,33 +211,10 @@ public class Utils {
     }
 
     /**
-     * Checks if the player is currently on the specific Dungeon floor. For example, "F7" checks for F7 only, "M7" checks for M7 only, and "7" checks for both of them.
-     */
-    public static boolean isOnDungeonFloor(String floor) {
-        return DungeonUtil.getCurrentFloor().endsWith(floor);
-    }
-
-    /**
      * Returns true if the current island has either loot chests or the Croesus NPC.
      */
     public static boolean isInLootArea() {
         return lootIslands.contains(SkyblockData.getArea());
-    }
-
-    /**
-     * Checks if the player is currently inside the boss room on the specific floor.
-     */
-    public static boolean isInDungeonBoss(String floor) {
-        return isOnDungeonFloor(floor) && switch (floor) {
-            case "1", "F1", "M1" -> isInZone(-72, 146, -40, -14, 55, 49);
-            case "2", "F2", "M2" -> isInZone(-40, 99, -40, 24, 54, 54);
-            case "3", "F3", "M3" -> isInZone(-40, 118, -40, 42, 64, 73);
-            case "4", "F4", "M4" -> isInZone(50, 112, 81, -40, 53, -40);
-            case "5", "F5", "M5" -> isInZone(50, 112, 118, -40, 53, -8);
-            case "6", "F6", "M6" -> isInZone(22, 110, 134, -40, 51, -8);
-            case "7", "F7", "M7" -> isInZone(134, 254, 147, -8, 0, -8);
-            default -> false;
-        };
     }
 
     public static boolean isInKuudra() {

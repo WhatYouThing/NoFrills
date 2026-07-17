@@ -11,10 +11,7 @@ import nofrills.config.SettingEnum;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
-import nofrills.misc.EntityCache;
-import nofrills.misc.RenderColor;
-import nofrills.misc.RenderStyle;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
 import java.util.HashSet;
 
@@ -42,7 +39,7 @@ public class MinibossHighlight {
             if (!minibossList.contains(name)) {
                 return false;
             }
-            if (Utils.isInDungeonBoss("4")) {
+            if (DungeonUtil.isInBossRoom("4")) {
                 return player.position().y() < 76.0; // prevents the Floor 4 "crowd" NPC's from getting highlighted
             } else {
                 return !name.equals("Spirit Bear"); // prevents the Spirit Bear spawned by the Watcher from getting highlighted

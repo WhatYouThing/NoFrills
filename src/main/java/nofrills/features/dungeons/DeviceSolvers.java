@@ -17,10 +17,7 @@ import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.*;
 import nofrills.hud.HudManager;
-import nofrills.misc.ConcurrentHashSet;
-import nofrills.misc.RenderColor;
-import nofrills.misc.RenderStyle;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +35,7 @@ public class DeviceSolvers {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("7")) {
+        if (instance.isActive() && DungeonUtil.isInBossRoom("7")) {
             if (arrowAlign.value()) {
                 if (ArrowAlign.isActive()) {
                     if (ArrowAlign.solutionMap.isEmpty()) {
@@ -65,7 +62,7 @@ public class DeviceSolvers {
 
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
-        if (instance.isActive() && Sharpshooter.isTargetBlock(event.pos) && Utils.isInDungeonBoss("7") && Sharpshooter.isActive()) {
+        if (instance.isActive() && Sharpshooter.isTargetBlock(event.pos) && DungeonUtil.isInBossRoom("7") && Sharpshooter.isActive()) {
             if (event.oldBlock.equals(Blocks.EMERALD_BLOCK) && event.newBlock.equals(Blocks.BLUE_TERRACOTTA)) {
                 Sharpshooter.list.add(event.pos.immutable());
                 if (Sharpshooter.next != null && Sharpshooter.next.equals(event.pos)) {
@@ -80,7 +77,7 @@ public class DeviceSolvers {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("7")) {
+        if (instance.isActive() && DungeonUtil.isInBossRoom("7")) {
             if (arrowAlign.value() && ArrowAlign.isActive()) {
                 for (Map.Entry<ItemFrame, Integer> entry : ArrowAlign.solutionMap.entrySet()) {
                     ItemFrame frame = entry.getKey();
@@ -110,7 +107,7 @@ public class DeviceSolvers {
 
     @EventHandler
     private static void onEntityInteract(InteractEntityEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("7")) {
+        if (instance.isActive() && DungeonUtil.isInBossRoom("7")) {
             if (arrowAlign.value()) {
                 if (event.entity instanceof ItemFrame frame && ArrowAlign.solutionMap.containsKey(frame)) {
                     int rotation = ArrowAlign.clicksMap.containsKey(frame) ? ArrowAlign.clicksMap.get(frame) : frame.getRotation();
@@ -126,7 +123,7 @@ public class DeviceSolvers {
 
     @EventHandler
     private static void onEntityUpdated(EntityUpdatedEvent event) {
-        if (instance.isActive() && Utils.isInDungeonBoss("7")) {
+        if (instance.isActive() && DungeonUtil.isInBossRoom("7")) {
             if (arrowAlign.value()) {
                 if (event.entity instanceof ItemFrame frame && ArrowAlign.solutionMap.containsKey(frame)) {
                     if (ArrowAlign.clicksMap.containsKey(frame) && frame.getRotation() == ArrowAlign.clicksMap.get(frame)) {
@@ -139,7 +136,7 @@ public class DeviceSolvers {
 
     @EventHandler
     private static void onEntityNamed(EntityNamedEvent event) {
-        if (instance.isActive() && sharpshooter.value() && Utils.isInDungeonBoss("7")) {
+        if (instance.isActive() && sharpshooter.value() && DungeonUtil.isInBossRoom("7")) {
             if (!Sharpshooter.done && event.namePlain.equals("Active") && Sharpshooter.area.getCenter().distanceTo(event.entity.position()) < 3.0) {
                 if (Sharpshooter.doneAlert.value()) {
                     HudManager.setCustomTitle("§aSharpshooter Done", 40);

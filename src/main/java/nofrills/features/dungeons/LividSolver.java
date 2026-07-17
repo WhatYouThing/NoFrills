@@ -12,10 +12,7 @@ import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
 import nofrills.events.*;
-import nofrills.misc.EntityCache;
-import nofrills.misc.RenderColor;
-import nofrills.misc.RenderStyle;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +34,7 @@ public class LividSolver {
     private static String currentName = "";
 
     private static boolean isActive() {
-        return instance.isActive() && Utils.isInDungeonBoss("5");
+        return instance.isActive() && DungeonUtil.isInBossRoom("5");
     }
 
     private static HashMap<Block, Livid> buildLividData() {

@@ -7,6 +7,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.level.saveddata.maps.MapId;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
@@ -76,11 +78,26 @@ public class DungeonUtil {
     }
 
     public static boolean isInDragonPhase() {
-        return mc.player != null && mc.player.position().y() < 50 && Utils.isInDungeonBoss("7");
+        return mc.player != null && mc.player.position().y() < 50 && isOnFloor("7") && isInBossRoom();
+    }
+
+    public static boolean isInBossRoom(String floor) {
+        if (mc.player == null) return false;
+        Vec3 pos = mc.player.position();
+        return isOnFloor(floor) && switch (floor.length() == 2 ? floor.substring(1, 2) : floor) {
+            case "1" -> new AABB(-72, 146, -40, -14, 55, 49).contains(pos);
+            case "2" -> new AABB(-40, 99, -40, 24, 54, 54).contains(pos);
+            case "3" -> new AABB(-40, 118, -40, 42, 64, 73).contains(pos);
+            case "4" -> new AABB(50, 112, 81, -40, 53, -40).contains(pos);
+            case "5" -> new AABB(50, 112, 118, -40, 53, -8).contains(pos);
+            case "6" -> new AABB(22, 110, 134, -40, 51, -8).contains(pos);
+            case "7" -> new AABB(134, 254, 147, -8, 0, -8).contains(pos);
+            default -> false;
+        };
     }
 
     public static boolean isInBossRoom() {
-        return Utils.isInDungeonBoss(currentFloor);
+        return isInBossRoom(currentFloor);
     }
 
     public static String getCurrentFloor() {
@@ -105,7 +122,7 @@ public class DungeonUtil {
 
     public static boolean isSecretBat(Entity entity) {
         if (entity instanceof Bat bat) {
-            return Utils.isBaseHealth(bat, 100.0f) && !Utils.isInDungeonBoss("4");
+            return Utils.isBaseHealth(bat, 100.0f) && !isInBossRoom("4");
         }
         return false;
     }

@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import nofrills.events.*;
 import nofrills.hud.elements.*;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -188,7 +189,7 @@ public class HudManager {
                 bonzoMaskTimer.start(180000);
             }
         }
-        if (Utils.isOnDungeonFloor("7")) {
+        if (DungeonUtil.isOnFloor("7")) {
             switch (event.messagePlain) {
                 case "[BOSS] Storm: Pathetic Maxor, just like expected." -> {
                     if (padTimer.isActive()) {
@@ -215,7 +216,7 @@ public class HudManager {
 
     @EventHandler
     private static void onBlockUpdate(BlockUpdateEvent event) {
-        if (spiritBearTimer.isActive() && event.newState.getBlock().equals(Blocks.SEA_LANTERN) && Utils.isInDungeonBoss("4")) {
+        if (spiritBearTimer.isActive() && event.newState.getBlock().equals(Blocks.SEA_LANTERN) && DungeonUtil.isInBossRoom("4")) {
             if (event.pos.getX() == 7 && event.pos.getY() == 77 && event.pos.getZ() == 34) {
                 spiritBearTimer.start();
             }

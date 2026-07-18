@@ -185,7 +185,7 @@ public class TerminalSolvers {
                         if (currentSolution.isClicked(event.slot.index) || currentSolution.isDisabled(event.slot.index)) {
                             event.cancel();
                         } else {
-                            currentSolution.setClicked(event.slot, event.handler.containerId);
+                            currentSolution.setClicked(event.slot, event.button, event.handler.containerId);
                         }
                     }
                     case InOrder -> {
@@ -195,7 +195,7 @@ public class TerminalSolvers {
                         if (first.isEmpty() || first.get().getKey() != event.slotId) {
                             event.cancel();
                         } else {
-                            currentSolution.setClicked(event.slot, event.handler.containerId);
+                            currentSolution.setClicked(event.slot, event.button, event.handler.containerId);
                         }
                     }
                     case Colors -> {
@@ -203,21 +203,7 @@ public class TerminalSolvers {
                         if (solution.stream().anyMatch(entry -> entry.getKey() == event.slotId && entry.getValue() == 0)) {
                             event.cancel();
                         } else {
-                            int index = currentSolution.solutionMap.getOrDefault(event.slot.index, -1);
-                            if (index != -1) {
-                                int modifier = event.button == GLFW.GLFW_MOUSE_BUTTON_RIGHT ? -1 : 1;
-                                int newIndex = index - modifier;
-                                if (newIndex < 0) {
-                                    currentSolution.solutionMap.put(event.slot.index, 4);
-                                } else if (newIndex > 4) {
-                                    currentSolution.solutionMap.put(event.slot.index, 0);
-                                } else {
-                                    currentSolution.solutionMap.put(event.slot.index, newIndex);
-                                }
-                                if (soundOnClick.value()) {
-                                    Utils.playSound(clickSound.value(), clickSoundVolume.valueFloat(), clickSoundPitch.valueFloat());
-                                }
-                            }
+                            currentSolution.setClicked(event.slot, event.button, event.handler.containerId);
                         }
                     }
                 }
@@ -342,9 +328,24 @@ public class TerminalSolvers {
             this.solutionMap.put(slot.index, -1);
         }
 
-        public void setClicked(Slot slot, int containerId) {
+        public void setClicked(Slot slot, int button, int containerId) {
             if (this.containerId != containerId) {
-                this.clickedSet.add(slot.index);
+                if (this.type.equals(TerminalType.Colors)) {
+                    int index = this.solutionMap.getOrDefault(slot.index, -1);
+                    if (index != -1) {
+                        int modifier = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT ? -1 : 1;
+                        int newIndex = index - modifier;
+                        if (newIndex < 0) {
+                            this.solutionMap.put(slot.index, 4);
+                        } else if (newIndex > 4) {
+                            this.solutionMap.put(slot.index, 0);
+                        } else {
+                            this.solutionMap.put(slot.index, newIndex);
+                        }
+                    }
+                } else {
+                    this.clickedSet.add(slot.index);
+                }
                 this.containerId = containerId;
                 if (soundOnClick.value()) {
                     Utils.playSound(clickSound.value(), clickSoundVolume.valueFloat(), clickSoundPitch.valueFloat());

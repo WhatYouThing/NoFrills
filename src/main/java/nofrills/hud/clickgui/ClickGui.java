@@ -256,6 +256,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Command Shortcuts", CommandShortcuts.instance, "Create shortcuts which send a specific message/command when ran.\nNote: A lobby change is required to fully apply the changes made to the shortcuts.", CommandShortcuts.buildSettings()),
                         new Module("Loadout Keybinds", LoadoutKeybinds.instance, "Allows you to set custom keybinds for loadouts.", new Settings(List.of(
                                 new Settings.Keybind("Edit Bind Key", LoadoutKeybinds.editBindKey, "The key to edit your keybinds. Press while hovering over a loadout slot to use.")
+                        ))),
+                        new Module("Slot Locking", SlotLocking.instance, "Allows you to lock inventory slots to prevent accidental clicks.", new Settings(List.of(
+                                new Settings.Keybind("Lock Key", SlotLocking.keybind, "The key to lock/unlock a slot. Press while hovering over a slot to use."),
+                                new Settings.Toggle("Draw Overlay", SlotLocking.overlay, "Draw a colored overlay on top of slots that are locked."),
+                                new Settings.ColorPicker("Overlay Color", SlotLocking.color, "The color of the locked overlay")
                         )))
                 )),
                 new Category("Tweaks", List.of(

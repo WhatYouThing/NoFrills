@@ -1,6 +1,7 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.phys.Vec3;
@@ -99,7 +100,7 @@ public class KuudraUtil {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTick(WorldTickEvent event) {
         if (Utils.isInKuudra()) {
             updateCurrentPhase();

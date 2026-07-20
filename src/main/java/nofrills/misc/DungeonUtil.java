@@ -2,6 +2,7 @@ package nofrills.misc;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ambient.Bat;
@@ -147,7 +148,7 @@ public class DungeonUtil {
         return teammateEntities;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTick(WorldTickEvent event) {
         if (mc.level != null && Utils.isInDungeons()) {
             if (currentFloor.isEmpty()) {

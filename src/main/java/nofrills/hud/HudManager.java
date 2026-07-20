@@ -2,6 +2,7 @@ package nofrills.hud;
 
 import io.wispforest.owo.ui.hud.Hud;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -131,7 +132,7 @@ public class HudManager {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private static void onWorldTick(WorldTickEvent event) {
         for (HudElement element : elements) {
             if (element instanceof TickableHudElement tickableElement && element.isActive()) {

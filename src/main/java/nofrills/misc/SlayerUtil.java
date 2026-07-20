@@ -1,6 +1,7 @@
 package nofrills.misc;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.wolf.Wolf;
@@ -112,7 +113,7 @@ public class SlayerUtil {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTick(WorldTickEvent event) {
         if (currentBoss != null) {
             Entity spawner = getSpawnerEntity();

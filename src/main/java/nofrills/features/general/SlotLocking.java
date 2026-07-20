@@ -26,7 +26,7 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 @EventListener
-public final class SlotLocking {
+public class SlotLocking {
     public static final Feature instance = new Feature("slotLocking");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);

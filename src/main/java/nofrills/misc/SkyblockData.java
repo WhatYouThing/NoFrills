@@ -177,7 +177,7 @@ public class SkyblockData {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private static void onJoinServer(ServerJoinEvent event) {
         instanceOver = false;
         inSkyblock = false;

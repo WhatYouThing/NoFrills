@@ -11,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import nofrills.config.*;
 import nofrills.events.EventListener;
@@ -85,7 +86,7 @@ public class SlotLocking {
 
     @EventHandler(priority = EventPriority.LOW)
     private static void onClickSlot(SlotClickEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?>) {
+        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> && !event.actionType.equals(ContainerInput.CLONE)) {
             if (!data.value().has("slots")) return;
             List<Slot> inventorySlots = getInventorySlots(event.handler);
             if (event.slot == null || event.slot.getItem().isEmpty() || !inventorySlots.contains(event.slot)) return;

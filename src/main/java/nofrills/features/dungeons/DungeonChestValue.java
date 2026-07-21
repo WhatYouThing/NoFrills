@@ -1,5 +1,6 @@
 package nofrills.features.dungeons;
 
+import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -14,11 +15,11 @@ import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+import java.util.HashSet;
 import java.util.Optional;
 
 import static nofrills.Main.mc;
-import static nofrills.misc.NoFrillsAPI.auctionPricing;
-import static nofrills.misc.NoFrillsAPI.bazaarPricing;
+import static nofrills.misc.NoFrillsAPI.*;
 
 @EventListener
 public class DungeonChestValue {
@@ -26,6 +27,16 @@ public class DungeonChestValue {
 
     public static final SettingColor background = new SettingColor(RenderColor.fromHex(0x202020, 0.8f), "background", instance);
 
+    private static final HashSet<String> npcSellItems = Sets.newHashSet(
+            "STORM_THE_FISH",
+            "MAXOR_THE_FISH",
+            "GOLDOR_THE_FISH",
+            "DUNGEON_DISC_1",
+            "DUNGEON_DISC_2",
+            "DUNGEON_DISC_3",
+            "DUNGEON_DISC_4",
+            "DUNGEON_DISC_5"
+    );
     private static double currentValue = 0.0;
 
     public static boolean isChest(String title) {
@@ -35,6 +46,21 @@ public class DungeonChestValue {
             }
         }
         return false;
+    }
+
+    public static double getLootValue(String id) {
+        if (npcSellItems.contains(id)) {
+            if (npcPricing.containsKey(id)) {
+                return npcPricing.get(id).coin();
+            }
+        } else {
+            if (auctionPricing.containsKey(id)) {
+                return auctionPricing.get(id);
+            } else if (bazaarPricing.containsKey(id)) {
+                return bazaarPricing.get(id).sell();
+            }
+        }
+        return 0.0;
     }
 
     private static int getLootQuantity(ItemStack stack, String name) {
@@ -74,12 +100,7 @@ public class DungeonChestValue {
                 }
                 return;
             }
-            int quantity = getLootQuantity(event.stack, name);
-            if (auctionPricing.containsKey(id)) {
-                currentValue += auctionPricing.get(id) * quantity;
-            } else if (bazaarPricing.containsKey(id)) {
-                currentValue += bazaarPricing.get(id).sell() * quantity;
-            }
+            currentValue += getLootValue(id) * getLootQuantity(event.stack, name);
         }
     }
 

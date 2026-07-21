@@ -1,6 +1,7 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -9,6 +10,7 @@ import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
+import nofrills.config.SettingDouble;
 import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.SlotUpdateEvent;
@@ -20,20 +22,21 @@ import nofrills.misc.Utils;
 
 import java.util.*;
 
-import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
 @EventListener
 public class CroesusSolver {
     public static final Feature instance = new Feature("croesusSolver", Feature.Flags.UsePricingAPI);
 
-    public static final SettingColor profitColor = new SettingColor(RenderColor.fromHex(0x55FF55), "profitColor", instance);
-    public static final SettingColor profitSecondaryColor = new SettingColor(RenderColor.fromHex(0xFFFF55), "profitSecondaryColor", instance);
-    public static final SettingColor profitKeyColor = new SettingColor(RenderColor.fromHex(0x55FFFF), "profitKeyColor", instance);
-    public static final SettingColor unopenedColor = new SettingColor(RenderColor.fromHex(0x55FF55), "unopenedColor", instance);
-    public static final SettingColor rerolledColor = new SettingColor(RenderColor.fromHex(0x55FFFF), "rerolledColor", instance);
-    public static final SettingColor openedColor = new SettingColor(RenderColor.fromHex(0xFF5555), "openedColor", instance);
-    public static final SettingColor openedKeyColor = new SettingColor(RenderColor.fromHex(0x555555), "openedKeyColor", instance);
+    public static final SettingColor profitColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.GREEN), "profitColor", instance);
+    public static final SettingColor profitSecondaryColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.YELLOW), "profitSecondaryColor", instance);
+    public static final SettingColor profitKeyColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.AQUA), "profitKeyColor", instance);
+    public static final SettingColor profitHighColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.LIGHT_PURPLE), "profitHighColor", instance);
+    public static final SettingDouble profitHighThreshold = new SettingDouble(5_000_000.0, "profitHighThreshold", instance);
+    public static final SettingColor unopenedColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.GREEN), "unopenedColor", instance);
+    public static final SettingColor rerolledColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.AQUA), "rerolledColor", instance);
+    public static final SettingColor openedColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.RED), "openedColor", instance);
+    public static final SettingColor openedKeyColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.DARK_GRAY), "openedKeyColor", instance);
     public static final SettingBool valueTooltip = new SettingBool(true, "valueTooltip", instance);
     public static final SettingBool floorLabel = new SettingBool(true, "floorLabel", instance);
 
@@ -83,6 +86,7 @@ public class CroesusSolver {
         double value = 0;
         double cost = 0;
         int costIndex = -1;
+        boolean hasDye = false;
         for (int i = 0; i < lore.size(); i++) {
             Component text = lore.get(i);
             String line = Utils.toPlain(text);
@@ -93,12 +97,11 @@ public class CroesusSolver {
             }
             if (costIndex == -1) {
                 String id = Utils.getMarketId(text);
-                int quantity = Utils.hasItemQuantity(line) ? Utils.parseInt(line.substring(line.lastIndexOf("x") + 1)).orElse(0) : 1;
-                if (bazaarPricing.containsKey(id)) {
-                    value += bazaarPricing.get(id).sell() * quantity;
-                } else if (auctionPricing.containsKey(id)) {
-                    value += auctionPricing.get(id) * quantity;
+                if (id.startsWith("DYE_")) {
+                    hasDye = true;
                 }
+                int quantity = Utils.hasItemQuantity(line) ? Utils.parseInt(line.substring(line.lastIndexOf("x") + 1)).orElse(0) : 1;
+                value += DungeonChestValue.getLootValue(id) * quantity;
             } else {
                 if (line.endsWith(" Coins")) {
                     cost += Utils.parseInt(line.substring(0, line.indexOf(" ")).replaceAll(",", "")).orElse(0);
@@ -113,7 +116,9 @@ public class CroesusSolver {
             Map.Entry<Slot, Double> entry = chests.getFirst();
             if (entry.getValue() > 0) {
                 SlotOptions.clearBackground();
-                SlotOptions.setBackground(entry.getKey(), profitColor.value());
+                SlotOptions.setBackground(entry.getKey(), hasDye || entry.getValue() >= profitHighThreshold.value()
+                        ? profitHighColor.value()
+                        : profitColor.value());
             }
         }
         if (chests.size() >= 2) {
@@ -128,11 +133,10 @@ public class CroesusSolver {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && !event.stack.isEmpty() && Utils.isInLootArea()) {
+        if (instance.isActive() && !event.stack.isEmpty() && !event.isInventory && Utils.isInLootArea()) {
             if (event.title.equals("Croesus")) {
                 highlightLoot(event.stack, event.slot);
-            }
-            if (event.title.startsWith("Catacombs - Floor") || event.title.startsWith("Master Catacombs - Floor")) {
+            } else if (event.title.startsWith("Catacombs - Floor") || event.title.startsWith("Master Catacombs - Floor")) {
                 highlightChest(event.stack, event.slot);
             }
         }

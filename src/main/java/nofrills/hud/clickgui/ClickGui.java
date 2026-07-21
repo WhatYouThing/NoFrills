@@ -611,6 +611,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Profit Color", CroesusSolver.profitColor, "The highlight color for the most profitable chest."),
                                 new Settings.ColorPicker("Secondary Profit Color", CroesusSolver.profitSecondaryColor, "The highlight color for the 2nd most profitable chest."),
                                 new Settings.ColorPicker("Key Profit Color", CroesusSolver.profitKeyColor, "The highlight color for the 2nd most profitable chest if using a Dungeon Chest Key is worth it."),
+                                new Settings.ColorPicker("High Profit Color", CroesusSolver.profitHighColor, "The highlight color for the most profitable chest if it exceeds the profit threshold.\nThis color is also applied regardless of profit if a chest contains a dye."),
+                                new Settings.DoubleInput("Profit Threshold", CroesusSolver.profitHighThreshold, "The minimum profit for a chest to be considered as high value."),
                                 new Settings.ColorPicker("Unopened Color", CroesusSolver.unopenedColor, "The highlight color for unopened loot."),
                                 new Settings.ColorPicker("Rerolled Color", CroesusSolver.rerolledColor, "The highlight color for unopened loot that is already rerolled."),
                                 new Settings.ColorPicker("Opened Color", CroesusSolver.openedColor, "The highlight color for opened loot."),

@@ -457,6 +457,16 @@ public class Utils {
             case "Spirit Stone" -> "SPIRIT_DECOY";
             case "Adaptive Blade" -> "STONE_BLADE";
             case "Wither Cloak Sword" -> "WITHER_CLOAK";
+            case "Dungeon Disc" -> "DUNGEON_DISC_1";
+            case "Clown Disc" -> "DUNGEON_DISC_2";
+            case "Watcher Disc" -> "DUNGEON_DISC_3";
+            case "Old Disc" -> "DUNGEON_DISC_4";
+            case "Necron Disc" -> "DUNGEON_DISC_5";
+            case "Shiny Wither Helmet" -> "WITHER_HELMET";
+            case "Shiny Wither Chestplate" -> "WITHER_CHESTPLATE";
+            case "Shiny Wither Leggings" -> "WITHER_LEGGINGS";
+            case "Shiny Wither Boots" -> "WITHER_BOOTS";
+            case "Shiny Necron's Handle" -> "NECRON_HANDLE";
             default -> toID(name);
         };
     }

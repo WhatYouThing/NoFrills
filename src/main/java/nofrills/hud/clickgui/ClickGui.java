@@ -301,6 +301,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("No Tooltip Styling", LegacyTextures.noTooltipStyle, "Disables custom styling of tooltips. Reverts item tooltips if the official pack is below the vanilla pack."),
                                 new Settings.Toggle("No Bow Cooldown", LegacyTextures.noBowCooldown, "Prevents the cooldown overlay from rendering on bows/shortbows."),
                                 new Settings.Toggle("More Legacy", LegacyTextures.moreLegacy, "Reverts several items which used to be axes (before the Foraging Update) into axes.")
+                        )),
+                        new Module("Mute Explosion", MuteExplosion.instance, "Prevents the explosion sound from playing.", new Settings(
+                                new Settings.Toggle("Dungeons Only", MuteExplosion.dungeonsOnly, "Only mute the explosion sound while in Dungeons.")
                         ))
                 )),
                 new Category("Misc", List.of(

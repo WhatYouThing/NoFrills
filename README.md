@@ -45,6 +45,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Instant Sneak**: Removes the smooth sneaking/swimming animation.
     - **Eye Height Fix**: Visually reverts the sneaking eye height on islands without modern version support.
     - **No Ghost Place**: Prevents ghost blocks from appearing when placing non-placeable Skyblock block items.
+    - **Mute Explosion**: Prevents the explosion sound from playing (useful for Explosive Arrow).
 
 - **Misc**
 

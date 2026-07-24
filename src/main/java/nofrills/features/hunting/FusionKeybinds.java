@@ -29,7 +29,7 @@ public class FusionKeybinds {
     private static boolean isBindValid(ItemStack stack, String title, int key) {
         if (!stack.isEmpty()) {
             String name = Utils.toPlain(stack.getHoverName());
-            if (title.equals("Fusion Box")) {
+            if (title.contains("Fusion Box")) {
                 return name.equals("Repeat Previous Fusion") && key == repeat.value();
             }
             if (title.equals("Confirm Fusion")) {
@@ -44,7 +44,7 @@ public class FusionKeybinds {
     private static void onKey(InputEvent event) {
         if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
             String title = container.getTitle().getString();
-            if (!title.equals("Fusion Box") && !title.equals("Confirm Fusion")) {
+            if (!title.contains("Fusion Box") && !title.equals("Confirm Fusion")) {
                 return;
             }
             for (Slot slot : container.getMenu().slots) {

@@ -43,6 +43,13 @@ public abstract class GuiMixin {
         }
     }
 
+	@Inject(method = "extractHearts", at = @At("HEAD"), cancellable = true)
+	private void onRenderHealthBar(GuiGraphicsExtractor graphics, Player player, int xLeft, int yLineBase, int healthRowHeight, int heartOffsetIndex, float maxHealth, int currentHealth, int oldHealth, int absorption, boolean blink, CallbackInfo ci) {
+			if (NoRender.instance.isActive() && NoRender.healthBar.value()) {
+				ci.cancel();
+			}
+	}
+
     @Shadow
     public abstract Font getFont();
 

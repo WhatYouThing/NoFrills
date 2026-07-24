@@ -42,7 +42,6 @@ public class MiddleClickOverride {
             "Pet Sitter",
             "Transfer to Profile",
             "Attribute Transfer",
-            "Hunting Box",
             "Composter",
             "Midas Anvil"
     );
@@ -62,7 +61,8 @@ public class MiddleClickOverride {
             "Trap",
             "Gemstone",
             "Heart of the",
-            "Widgets"
+            "Widgets",
+            "Hunting Box"
     );
     private static final HashSet<String> containWhitelist = Sets.newHashSet(
             "Pets",

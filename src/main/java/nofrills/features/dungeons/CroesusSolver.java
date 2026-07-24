@@ -134,7 +134,7 @@ public class CroesusSolver {
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && !event.stack.isEmpty() && !event.isInventory && Utils.isInLootArea()) {
-            if (event.title.equals("Croesus")) {
+            if (event.title.contains("Croesus")) {
                 highlightLoot(event.stack, event.slot);
             } else if (event.title.startsWith("Catacombs - Floor") || event.title.startsWith("Master Catacombs - Floor")) {
                 highlightChest(event.stack, event.slot);

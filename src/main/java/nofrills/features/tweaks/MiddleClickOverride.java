@@ -47,7 +47,7 @@ public class MiddleClickOverride {
             "Midas Anvil"
     );
     private static final HashSet<String> matchWhitelist = Sets.newHashSet(
-            "Your Equipment and Stats",
+            "Stats & Equipment",
             "Accessory Bag Thaumaturgy",
             "Community Shop"
     );

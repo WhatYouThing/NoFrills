@@ -51,7 +51,7 @@ public class InventoryButtonSettings extends Settings {
         PlainLabel label = new PlainLabel(Component.literal("Scale").withColor(0xffffff));
         FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
         FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
-        slider.min(0.0).max(5.0).stepSize(0.01).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
+        slider.min(0.25).max(5.0).stepSize(0.01).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
         label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
         label.tooltip(Component.literal("The scale of this inventory button."));
         text.onChanged().subscribe(change -> Utils.parseDouble(change).ifPresent(value -> {

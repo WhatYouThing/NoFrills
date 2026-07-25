@@ -75,11 +75,22 @@ public class NoRender {
     private static final EntityPredicates entityPredicates = new EntityPredicates();
     private static boolean inDungeons = false;
 
-    public enum HealthBarMode {
-        Nowhere,
-        OutsideRift,
-        Everywhere
-    }
+	public enum HealthBarMode {
+		Nowhere("Nowhere"),
+		OutsideRift("Outside Rift"),
+		Everywhere("Everywhere");
+
+		private final String displayName;
+
+		HealthBarMode(String displayName) {
+			this.displayName = displayName;
+		}
+
+		@Override
+		public String toString() {
+			return displayName;
+		}
+	}
 
     public static FogData getFogAsEmpty(FogData data) {
         data.renderDistanceStart = Float.MAX_VALUE;

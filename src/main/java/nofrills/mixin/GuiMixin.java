@@ -51,7 +51,7 @@ public abstract class GuiMixin {
 			switch (mode) {
 				case Everywhere -> ci.cancel();
 				case OutsideRift -> {
-					if (!Utils.isInZone(Utils.Symbols.zoneRift, false)) {
+					if (!Utils.isInArea("The Rift")) {
 						ci.cancel();
 					}
 				}

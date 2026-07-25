@@ -631,10 +631,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Dupe Class Alert", DupeClassAlert.instance, "Shows text on screen if your party has multiple of the same class before the dungeon starts.")
                 )),
                 new Category("Kuudra", List.of(
-                        new Module("Drain Message", DrainMessage.instance, "Send a message when you drain your mana using an End Stone Sword.", new Settings(List.of(
-                                new Settings.TextInput("Message", DrainMessage.message, "The message to send.\nReplaces {mana} with the mana used, and {players} with the amount of affected players."),
-                                new Settings.Toggle("Hide Ability Messages", DrainMessage.hide, "Hides the chat messages that appear after using an End Stone Sword.")
-                        ))),
                         new Module("Fresh Timer", FreshTimer.instance, "Shows a timer on screen for the Fresh Tools essence shop ability.", new Settings(List.of(
                                 new Settings.Toggle("Send Message", FreshTimer.send, "Send a message once Fresh Tools activates."),
                                 new Settings.TextInput("Message", FreshTimer.message, "The message to send.")

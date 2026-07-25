@@ -23,7 +23,7 @@ public class GhostVision {
     public static final SettingColor fill = new SettingColor(RenderColor.fromHex(0x00c8c8, 0.5f), "fill", instance.key());
     public static final SettingColor outline = new SettingColor(RenderColor.fromHex(0x00c8c8, 1.0f), "outline", instance.key());
 
-    private static final EntityCache cache = EntityCache.create();
+    private static final EntityCache cache = new EntityCache();
 
     public static boolean isGhost(Creeper entity) {
         return instance.isActive() && cache.has(entity);

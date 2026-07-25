@@ -20,7 +20,7 @@ public class PillarAlert {
 
     private static final Pattern firePillarRegex = Pattern.compile("[0-9]s [0-9] hits");
     private static final CopyOnWriteArrayList<Vec3> pillarData = new CopyOnWriteArrayList<>();
-    private static final EntityCache pillarCache = EntityCache.create();
+    private static final EntityCache pillarCache = new EntityCache();
     private static int pillarClearTicks = 0;
 
     @EventHandler

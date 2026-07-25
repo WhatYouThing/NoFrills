@@ -21,7 +21,7 @@ public class SlayerMinibossHighlight {
     public static final SettingColor fillColor = new SettingColor(RenderColor.fromArgb(0x5500ffff), "fillColor", instance);
     public static final SettingColor outlineColor = new SettingColor(RenderColor.fromArgb(0xff00ffff), "outlineColor", instance);
 
-    private static final EntityCache cache = EntityCache.create();
+    private static final EntityCache cache = new EntityCache();
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {

@@ -21,7 +21,7 @@ public class WateringHelper {
     public static final SettingBool betterVisibility = new SettingBool(true, "betterVisibility", instance);
     public static final SettingBool hideParticles = new SettingBool(false, "hideParticles", instance);
 
-    private static final EntityCache waterLevels = EntityCache.create();
+    private static final EntityCache waterLevels = new EntityCache();
 
     private static boolean isActive() {
         return instance.isActive() && Utils.isInGarden();

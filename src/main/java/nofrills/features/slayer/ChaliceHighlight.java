@@ -24,7 +24,7 @@ public class ChaliceHighlight {
     public static final SettingColor color = new SettingColor(RenderColor.fromArgb(0xaaaf00ff), "color", instance.key());
 
     private static final Pattern chaliceRegex = Pattern.compile("[0-9]*\\.[0-9]*s");
-    private static final EntityCache chaliceData = EntityCache.create();
+    private static final EntityCache chaliceData = new EntityCache();
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {

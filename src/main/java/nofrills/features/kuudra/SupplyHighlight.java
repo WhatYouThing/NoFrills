@@ -2,13 +2,12 @@ package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.Giant;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
+import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
-import nofrills.events.WorldTickEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.KuudraUtil;
 import nofrills.misc.RenderColor;
@@ -20,22 +19,18 @@ public class SupplyHighlight {
 
     public static final SettingColor color = new SettingColor(new RenderColor(0, 255, 255, 170), "color", instance);
 
-    private static final EntityCache cache = EntityCache.create();
+    private static final EntityCache cache = new EntityCache();
 
     @EventHandler
-    private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && Utils.isInKuudra() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
-            for (Entity ent : Utils.getEntities()) {
-                if (ent instanceof Giant) {
-                    cache.add(ent);
-                }
-            }
+    private static void onEntity(EntityUpdatedEvent event) {
+        if (instance.isActive() && Utils.isInKuudra() && KuudraUtil.isSupplyCrateEntity(event.entity)) {
+            cache.add(event.entity);
         }
     }
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && Utils.isInKuudra() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect) && !cache.empty()) {
+        if (instance.isActive() && !cache.empty() && Utils.isInKuudra() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
             for (Entity supply : cache.get()) {
                 Vec3 pos = supply.getPosition(event.delta());
                 float yaw = supply.getViewXRot(event.delta());

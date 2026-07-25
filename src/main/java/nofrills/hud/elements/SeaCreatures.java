@@ -15,7 +15,7 @@ import java.util.List;
 
 public final class SeaCreatures extends SimpleTextElement {
     public final SettingBool zero = new SettingBool(false, "zero", instance);
-    private final EntityCache cache = EntityCache.create();
+    private final EntityCache cache = new EntityCache();
 
     public SeaCreatures(String text) {
         super(Component.literal(text), new Feature("seaCreaturesElement"), "Sea Creatures");

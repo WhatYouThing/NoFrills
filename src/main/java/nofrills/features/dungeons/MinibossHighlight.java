@@ -23,7 +23,7 @@ public class MinibossHighlight {
     public static final SettingColor outlineColor = new SettingColor(RenderColor.fromArgb(0xffffff00), "color", instance);
     public static final SettingColor fillColor = new SettingColor(RenderColor.fromHex(0xffff00, 0.5f), "fillColor", instance);
 
-    public static final EntityCache cache = EntityCache.create();
+    public static final EntityCache cache = new EntityCache();
 
     private static final HashSet<String> minibossList = Sets.newHashSet(
             "Lost Adventurer",

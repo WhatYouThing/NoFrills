@@ -422,8 +422,8 @@ public class WitherDragons {
                 new AABB(7, 5, 80, 37, 28, 110)
         );
 
-        public final EntityCache dragonCache = EntityCache.create();
-        public final EntityCache collarCache = EntityCache.create();
+        public final EntityCache dragonCache = new EntityCache();
+        public final EntityCache collarCache = new EntityCache();
         public final ConcurrentHashMap<String, Integer> arrowHits = new ConcurrentHashMap<>();
         public final String name;
         public final int archPriority;

@@ -3,6 +3,8 @@ package nofrills.misc;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.monster.Giant;
 import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.phys.Vec3;
 import nofrills.events.EventListener;
@@ -27,7 +29,7 @@ public class KuudraUtil {
             "Shoot Ballista at",
             "Mine Kuudra's pods"
     );
-    private static final EntityCache kuudraCache = EntityCache.create();
+    private static final EntityCache kuudraCache = new EntityCache();
     private static PickupSpot preSpot = null;
     private static Phase currentPhase = Phase.Starting;
 
@@ -41,6 +43,13 @@ public class KuudraUtil {
 
     public static PickupSpot getPreSpot() {
         return preSpot;
+    }
+
+    public static boolean isSupplyCrateEntity(Entity entity) {
+        if (entity instanceof Giant giant) {
+            return Utils.hasTexturePayload(giant.getItemBySlot(EquipmentSlot.MAINHAND), -292152149);
+        }
+        return false;
     }
 
     private static void updateKuudraEntity() {

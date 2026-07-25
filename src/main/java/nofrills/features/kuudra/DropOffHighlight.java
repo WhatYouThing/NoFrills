@@ -20,7 +20,7 @@ public class DropOffHighlight {
 
     public static final SettingColor color = new SettingColor(new RenderColor(255, 255, 0, 127), "color", instance);
 
-    private static final EntityCache cache = EntityCache.create();
+    private static final EntityCache cache = new EntityCache();
 
     private static Vec3 getGround(Vec3 pos) {
         BlockPos blockPos = BlockPos.containing(pos.x, Math.max(pos.y, 75), pos.z);

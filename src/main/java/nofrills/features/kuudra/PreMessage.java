@@ -2,7 +2,6 @@ package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.Giant;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.events.EventListener;
@@ -26,10 +25,9 @@ public class PreMessage {
                     KuudraUtil.PickupSpot preSpot = KuudraUtil.getPreSpot();
                     if (preSpot != null) {
                         KuudraUtil.PickupSpot secondary = KuudraUtil.PickupSpot.fromType(preSpot.secondary);
-                        Utils.infoFormat("§eYour Pre: {}", preSpot.name);
                         boolean preFound = false, secondaryFound = false;
                         for (Entity ent : Utils.getEntities()) {
-                            if (ent instanceof Giant) {
+                            if (KuudraUtil.isSupplyCrateEntity(ent)) {
                                 Vec3 entPos = ent.position();
                                 Vec3 supplyPos = new Vec3(entPos.x(), 76, entPos.z());
                                 if (preSpot.spot.distanceTo(supplyPos) < preSpot.supplyDist) {

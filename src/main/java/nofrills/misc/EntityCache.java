@@ -24,10 +24,6 @@ public final class EntityCache {
         instances.add(this);
     }
 
-    public static EntityCache create() {
-        return new EntityCache();
-    }
-
     @EventHandler(priority = EventPriority.LOW)
     private static void onRemoved(EntityRemovedEvent event) {
         for (EntityCache instance : instances) {

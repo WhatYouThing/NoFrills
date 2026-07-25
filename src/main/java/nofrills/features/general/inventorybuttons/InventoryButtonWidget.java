@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -16,6 +17,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ResolvableProfile;
@@ -33,19 +35,19 @@ public final class InventoryButtonWidget extends ImageButton {
             Identifier.withDefaultNamespace("widget/button_highlighted")
     );
     private final JsonObject buttonObject;
-    private final double buttonScale;
     private final ItemStack iconStack;
+    private double buttonScaleX;
+    private double buttonScaleY;
 
-    public InventoryButtonWidget(double x, double y, double scale, ItemStack stack, String command, String tooltip, JsonObject buttonObject) {
-        super((int) x, (int) y, (int) (20 * scale), (int) (20 * scale), inventoryButtonSprites, btn -> {
-            if (!buttonObject.get("dragAndDrop").getAsBoolean()) {
-                Utils.sendMessage(command);
-            }
+    public InventoryButtonWidget(double x, double y, double scaleX, double scaleY, ItemStack stack, String command, String tooltip, JsonObject buttonObject) {
+        super((int) x, (int) y, (int) (20 * scaleX), (int) (20 * scaleY), inventoryButtonSprites, btn -> {
+            Utils.sendMessage(command);
             btn.setFocused(false);
         });
         this.setTooltip(Tooltip.create(Component.literal(tooltip)));
         this.buttonObject = buttonObject;
-        this.buttonScale = scale;
+        this.buttonScaleX = scaleX;
+        this.buttonScaleY = scaleY;
         this.iconStack = stack;
     }
 
@@ -56,7 +58,8 @@ public final class InventoryButtonWidget extends ImageButton {
         String tooltip = buttonObject.get("tooltip").getAsString();
         double posX = buttonObject.get("x").getAsDouble() * mc.getWindow().getGuiScaledWidth();
         double posY = buttonObject.get("y").getAsDouble() * mc.getWindow().getGuiScaledHeight();
-        double scale = buttonObject.get("scale").getAsDouble();
+        double scaleX = buttonObject.get("scaleX").getAsDouble();
+        double scaleY = buttonObject.get("scaleY").getAsDouble();
         ItemStack stack = BuiltInRegistries.ITEM.getValue(Identifier.parse(model)).getDefaultInstance().copy();
         if (stack.is(Items.PLAYER_HEAD) && !textures.isEmpty()) {
             Multimap<String, Property> properties = ImmutableMultimap.of("textures", new Property("textures", textures));
@@ -65,15 +68,15 @@ public final class InventoryButtonWidget extends ImageButton {
             stack.set(DataComponents.PROFILE, profile);
         }
         stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, buttonObject.get("glint").getAsBoolean());
-        return new InventoryButtonWidget(posX, posY, scale, stack, command, tooltip, buttonObject);
+        return new InventoryButtonWidget(posX, posY, scaleX, scaleY, stack, command, tooltip, buttonObject);
     }
 
     @Override
     public void extractContents(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         super.extractContents(graphics, mouseX, mouseY, a);
         graphics.pose().pushMatrix();
-        graphics.pose().translate((float) (this.getX() + 2 * this.buttonScale), (float) (this.getY() + 2 * this.buttonScale));
-        graphics.pose().scale((float) this.buttonScale, (float) this.buttonScale);
+        graphics.pose().translate((float) (this.getX() + 2 * this.buttonScaleX), (float) (this.getY() + 2 * this.buttonScaleY));
+        graphics.pose().scale((float) this.buttonScaleX, (float) this.buttonScaleY);
         graphics.fakeItem(this.iconStack, 0, 0);
         graphics.pose().popMatrix();
     }
@@ -85,25 +88,45 @@ public final class InventoryButtonWidget extends ImageButton {
 
     @Override
     public void onClick(@NonNull MouseButtonEvent event, boolean doubleClick) {
-        if (event.buttonInfo().button() == 1) {
-            mc.setScreen(InventoryButtonSettings.of(this.buttonObject));
-        } else {
-            super.onClick(event, doubleClick);
+        if (!event.buttonInfo().hasControlDown() && !event.buttonInfo().hasAltDown()) {
+            if (event.buttonInfo().button() == 1) {
+                mc.setScreen(InventoryButtonSettings.of(this.buttonObject));
+            } else {
+                super.onClick(event, doubleClick);
+            }
         }
     }
 
     @Override
     protected void onDrag(final @NonNull MouseButtonEvent event, final double dx, final double dy) {
-        if (this.buttonObject.get("dragAndDrop").getAsBoolean()) {
+        if (event.buttonInfo().button() == 0) {
             double windowX = mc.getWindow().getGuiScaledWidth();
             double windowY = mc.getWindow().getGuiScaledHeight();
-            double buttonSize = 20 * this.buttonScale;
-            double newX = Math.clamp(event.x() - buttonSize * 0.5, 0, windowX - buttonSize);
-            double newY = Math.clamp(event.y() - buttonSize * 0.5, 0, windowY - buttonSize);
-            this.setX((int) newX);
-            this.setY((int) newY);
-            this.buttonObject.addProperty("x", newX / windowX);
-            this.buttonObject.addProperty("y", newY / windowY);
+            double buttonSizeX = 20 * this.buttonScaleX;
+            double buttonSizeY = 20 * this.buttonScaleY;
+            if (event.buttonInfo().hasControlDown()) {
+                double newX = Math.clamp(event.x() - buttonSizeX * 0.5, 0, windowX - buttonSizeX);
+                double newY = Math.clamp(event.y() - buttonSizeY * 0.5, 0, windowY - buttonSizeY);
+                this.setX((int) newX);
+                this.setY((int) newY);
+                this.buttonObject.addProperty("x", newX / windowX);
+                this.buttonObject.addProperty("y", newY / windowY);
+            } else if (event.buttonInfo().hasAltDown()) {
+                buttonSizeX = Math.clamp(event.x() - this.getX(), 0.25 * 20, windowX - buttonSizeX);
+                buttonSizeY = Math.clamp(event.y() - this.getY(), 0.25 * 20, windowY - buttonSizeY);
+                if (this.buttonObject.get("keepSquare").getAsBoolean()) {
+                    double finalSize = Math.min(buttonSizeX, buttonSizeY);
+                    this.setSize((int) finalSize, (int) finalSize);
+                    this.buttonScaleX = finalSize / 20.;
+                    this.buttonScaleY = finalSize / 20.;
+                } else {
+                    this.setSize((int) buttonSizeX, (int) buttonSizeY);
+                    this.buttonScaleX = buttonSizeX / 20.;
+                    this.buttonScaleY = buttonSizeY / 20.;
+                }
+                this.buttonObject.addProperty("scaleX", this.buttonScaleX);
+                this.buttonObject.addProperty("scaleY", this.buttonScaleY);
+            }
         }
     }
 }

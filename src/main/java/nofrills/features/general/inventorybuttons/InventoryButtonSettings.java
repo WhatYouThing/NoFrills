@@ -31,13 +31,14 @@ public class InventoryButtonSettings extends Settings {
 
     public static InventoryButtonSettings of(JsonObject buttonObject) {
         List<FlowLayout> list = new ArrayList<>();
-        list.add(buildScaleSetting(buttonObject));
+        FlowLayout keepSquareLayout = buildKeepSquareSetting(buttonObject);
+        list.add(keepSquareLayout);
+        list.addAll(buildScaleSettings(buttonObject, (ToggleButton) keepSquareLayout.children().get(1)));
         list.add(buildCommandSetting(buttonObject));
         list.add(buildTooltipSetting(buttonObject));
         list.add(buildModelSetting(buttonObject));
         list.add(buildTexturesSetting(buttonObject));
         list.add(buildGlintSetting(buttonObject));
-        list.add(buildDragAndDropSetting(buttonObject));
         list.add(buildManageSetting(buttonObject));
         InventoryButtonSettings buttonSettings = new InventoryButtonSettings(list);
         String command = buttonObject.get("command").getAsString();
@@ -45,33 +46,105 @@ public class InventoryButtonSettings extends Settings {
         return buttonSettings;
     }
 
-    protected static FlowLayout buildScaleSetting(JsonObject buttonObject) {
+    protected static FlowLayout buildKeepSquareSetting(JsonObject buttonObject) {
         FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
         layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-        PlainLabel label = new PlainLabel(Component.literal("Scale").withColor(0xffffff));
-        FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
-        FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
-        slider.min(0.25).max(5.0).stepSize(0.01).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
-        label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        label.tooltip(Component.literal("The scale of this inventory button."));
-        text.onChanged().subscribe(change -> Utils.parseDouble(change).ifPresent(value -> {
-            buttonObject.addProperty("scale", value);
-            slider.value(value);
-        }));
-        text.text(String.valueOf(buttonObject.get("scale").getAsDouble()));
-        slider.onChanged().subscribe(change -> {
-            double value = roundDouble(change);
-            buttonObject.addProperty("scale", value);
-            text.setValue(String.valueOf(value));
-        });
-        layout.child(label);
-        layout.child(text);
-        layout.child(slider);
-        layout.child(buildResetButton(_ -> {
-            buttonObject.addProperty("scale", 1.0);
-            text.setValue(String.valueOf(1.0));
-        }));
+
+        PlainLabel keepSquare = new PlainLabel(Component.literal("Keep Square"));
+        ToggleButton keepSquareButton = new ToggleButton(buttonObject.get("keepSquare").getAsBoolean());
+        keepSquare.tooltip(Component.literal("Keep aspect ratio locked to square."));
+        keepSquare.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+
+        keepSquareButton.onToggled().subscribe(change -> buttonObject.addProperty("keepSquare", change));
+        layout.child(keepSquare);
+        layout.child(keepSquareButton);
+
         return layout;
+    }
+
+    protected static List<FlowLayout> buildScaleSettings(JsonObject buttonObject, ToggleButton keepSquareButton) {
+        FlowLayout layoutX = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+        FlowLayout layoutY = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+        layoutX.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
+        layoutY.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
+
+        PlainLabel labelX = new PlainLabel(Component.literal("Scale X").withColor(0xffffff));
+        PlainLabel labelY = new PlainLabel(Component.literal("Scale Y").withColor(0xffffff));
+        FlatTextbox textX = new FlatTextbox(Sizing.fixed(50));
+        FlatTextbox textY = new FlatTextbox(Sizing.fixed(50));
+        FlatSlider sliderX = new FlatSlider(0xffdddddd, 0xff5ca0bf);
+        FlatSlider sliderY = new FlatSlider(0xffdddddd, 0xff5ca0bf);
+        sliderX.min(0.25).max(5.0).stepSize(0.01).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
+        sliderY.min(0.25).max(5.0).stepSize(0.01).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
+
+        labelX.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+        labelY.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+        labelX.tooltip(Component.literal("The horizontal scale of this inventory button."));
+        labelY.tooltip(Component.literal("The vertical scale of this inventory button."));
+
+        textX.onChanged().subscribe(change -> Utils.parseDouble(change).ifPresent(value -> {
+            buttonObject.addProperty("scaleX", value);
+            sliderX.value(value);
+            if (keepSquareButton.getToggle()) {
+                buttonObject.addProperty("scaleY", value);
+                sliderY.value(value);
+            }
+        }));
+        textY.onChanged().subscribe(change -> Utils.parseDouble(change).ifPresent(value -> {
+            buttonObject.addProperty("scaleY", value);
+            sliderY.value(value);
+            if (keepSquareButton.getToggle()) {
+                buttonObject.addProperty("scaleX", value);
+                sliderX.value(value);
+            }
+        }));
+
+        textX.text(String.valueOf(buttonObject.get("scaleX").getAsDouble()));
+        textY.text(String.valueOf(buttonObject.get("scaleY").getAsDouble()));
+
+        sliderX.onChanged().subscribe(change -> {
+            double value = roundDouble(change);
+            buttonObject.addProperty("scaleX", value);
+            textX.setValue(String.valueOf(value));
+            if (keepSquareButton.getToggle()) {
+                buttonObject.addProperty("scaleY", value);
+                textY.setValue(String.valueOf(value));
+            }
+        });
+        sliderY.onChanged().subscribe(change -> {
+            double value = roundDouble(change);
+            buttonObject.addProperty("scaleY", value);
+            textY.setValue(String.valueOf(value));
+            if (keepSquareButton.getToggle()) {
+                buttonObject.addProperty("scaleX", value);
+                textX.setValue(String.valueOf(value));
+            }
+        });
+
+        layoutX.child(labelX);
+        layoutX.child(textX);
+        layoutX.child(sliderX);
+        layoutX.child(buildResetButton(_ -> {
+            buttonObject.addProperty("scaleX", 1.0);
+            textX.setValue(String.valueOf(1.0));
+            if (keepSquareButton.getToggle()) {
+                buttonObject.addProperty("scaleY", 1.0);
+                textY.setValue(String.valueOf(1.0));
+            }
+        }));
+        layoutY.child(labelY);
+        layoutY.child(textY);
+        layoutY.child(sliderY);
+        layoutY.child(buildResetButton(_ -> {
+            buttonObject.addProperty("scaleY", 1.0);
+            textY.setValue(String.valueOf(1.0));
+            if (keepSquareButton.getToggle()) {
+                buttonObject.addProperty("scaleX", 1.0);
+                textX.setValue(String.valueOf(1.0));
+            }
+        }));
+
+        return List.of(layoutX, layoutY);
     }
 
     protected static FlowLayout buildCommandSetting(JsonObject buttonObject) {
@@ -159,24 +232,6 @@ public class InventoryButtonSettings extends Settings {
         layout.child(toggle);
         layout.child(buildResetButton(btn -> {
             buttonObject.addProperty("glint", false);
-            toggle.setToggle(false);
-        }));
-        return layout;
-    }
-
-    protected static FlowLayout buildDragAndDropSetting(JsonObject buttonObject) {
-        FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        layout.padding(Insets.of(5));
-        layout.horizontalAlignment(HorizontalAlignment.LEFT);
-        PlainLabel label = new PlainLabel(Component.literal("Drag And Drop").withColor(0xffffff));
-        label.tooltip(Component.literal("Allows you to edit the position of this inventory button by dragging and dropping."));
-        ToggleButton toggle = new ToggleButton(buttonObject.get("dragAndDrop").getAsBoolean());
-        toggle.onToggled().subscribe(value -> buttonObject.addProperty("dragAndDrop", value));
-        label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        layout.child(label);
-        layout.child(toggle);
-        layout.child(buildResetButton(btn -> {
-            buttonObject.addProperty("dragAndDrop", false);
             toggle.setToggle(false);
         }));
         return layout;

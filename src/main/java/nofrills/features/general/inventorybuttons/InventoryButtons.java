@@ -42,13 +42,14 @@ public class InventoryButtons {
                         JsonObject obj = new JsonObject();
                         obj.addProperty("x", (mc.mouseHandler.getScaledXPos(mc.getWindow()) - 10) / mc.getWindow().getGuiScaledWidth());
                         obj.addProperty("y", (mc.mouseHandler.getScaledYPos(mc.getWindow()) - 10) / mc.getWindow().getGuiScaledHeight());
-                        obj.addProperty("scale", 1.0);
+                        obj.addProperty("keepSquare", true);
+                        obj.addProperty("scaleX", 1.0);
+                        obj.addProperty("scaleY", 1.0);
                         obj.addProperty("command", "");
                         obj.addProperty("tooltip", "Inventory button");
                         obj.addProperty("model", "lime_concrete");
                         obj.addProperty("textures", "");
                         obj.addProperty("glint", false);
-                        obj.addProperty("dragAndDrop", false);
                         object.get("buttons").getAsJsonArray().add(obj);
                         container.addRenderableWidget(InventoryButtonWidget.of(obj));
                     });

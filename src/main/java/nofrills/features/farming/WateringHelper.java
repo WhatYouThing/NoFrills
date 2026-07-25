@@ -47,7 +47,7 @@ public class WateringHelper {
                 if (!ent.hasCustomName()) {
                     continue;
                 }
-                event.drawText(ent.position().add(0.0, 0.5, 0.0), ent.getName(), 0.025f, true, RenderColor.white);
+                event.drawText(ent.position().add(0.0, 0.5, 0.0), ent.getName(), 0.025f, true, RenderColor.WHITE);
             }
         }
     }

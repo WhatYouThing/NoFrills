@@ -56,18 +56,18 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         this(List.of(settings));
     }
 
-    private static ButtonComponent buildResetButton(Consumer<ButtonComponent> onPress) {
+    protected static ButtonComponent buildResetButton(Consumer<ButtonComponent> onPress) {
         ButtonComponent button = UIComponents.button(Component.literal("Reset").withColor(0xffffff), onPress);
         button.positioning(Positioning.relative(100, 0));
         button.renderer(buttonRendererWhite);
         return button;
     }
 
-    private static double roundDouble(double value) {
+    protected static double roundDouble(double value) {
         return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
-    private static int getSettingsHeight(List<UIComponent> children) {
+    protected static int getSettingsHeight(List<UIComponent> children) {
         int height = 0;
         for (UIComponent child : children) {
             int childHeight = switch (child) {
@@ -81,7 +81,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         return (int) Math.clamp(height, 30, mc.getWindow().getGuiScaledHeight() * 0.8);
     }
 
-    private static boolean isBinding(List<FlowLayout> settings, int button) {
+    protected static boolean isBinding(List<FlowLayout> settings, int button) {
         for (FlowLayout setting : settings) {
             for (UIComponent child : setting.children()) {
                 if (findKeybindButton(child, button)) {
@@ -92,7 +92,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         return false;
     }
 
-    private static boolean findKeybindButton(UIComponent child, int button) {
+    protected static boolean findKeybindButton(UIComponent child, int button) {
         if (child instanceof KeybindButton keybind) {
             if (keybind.isBinding) {
                 keybind.bind(button);

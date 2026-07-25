@@ -204,7 +204,7 @@ public class WitherDragons {
                             Utils.getPercentageColor(seconds / 5.0, true),
                             Utils.formatDecimal(seconds, 3)
                     );
-                    event.drawText(drag.pos.getCenter().add(0.0, 4.0, 0.0), Component.literal(timerText), 0.3f, true, RenderColor.white);
+                    event.drawText(drag.pos.getCenter().add(0.0, 4.0, 0.0), Component.literal(timerText), 0.3f, true, RenderColor.WHITE);
                 }
                 if (boxes.value() && (drag.isSpawning() || drag.hasEntity())) {
                     event.drawOutline(drag.area, true, drag.color);
@@ -232,7 +232,7 @@ public class WitherDragons {
                             Utils.formatDecimal(drag.health * 0.000001)
                     );
                     Vec3 pos = drag.getEntity().getPosition(event.delta());
-                    event.drawText(pos, Component.literal(healthText), 0.2f, true, RenderColor.white);
+                    event.drawText(pos, Component.literal(healthText), 0.2f, true, RenderColor.WHITE);
                 }
             }
             if (tracers.value()) {

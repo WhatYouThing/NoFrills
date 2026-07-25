@@ -135,14 +135,14 @@ public class BeaconTuningSolver {
         if (colorTarget1 < 0) {
             stack = Items.GREEN_WOOL.getDefaultInstance();
             stack.set(DataComponents.LORE, new ItemLore(List.of(
-                    Component.literal("Left clicks ").withStyle(style -> style.withColor(RenderColor.green.hex))
+                    Component.literal("Left clicks ").withStyle(style -> style.withColor(RenderColor.GREEN.hex))
                             .append(Component.literal(Utils.format("required: {}", Math.abs(colorTarget1)))
                                     .withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE)))
             )));
         } else if (colorTarget1 > 0) {
             stack = Items.ORANGE_WOOL.getDefaultInstance();
             stack.set(DataComponents.LORE, new ItemLore(List.of(
-                    Component.literal("Right clicks ").withStyle(style -> style.withColor(RenderColor.red.hex))
+                    Component.literal("Right clicks ").withStyle(style -> style.withColor(RenderColor.RED.hex))
                             .append(Component.literal(Utils.format("required: {}", Math.abs(colorTarget1)))
                                     .withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE)))
             )));

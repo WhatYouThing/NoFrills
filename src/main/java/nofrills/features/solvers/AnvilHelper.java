@@ -21,7 +21,7 @@ import java.util.List;
 public class AnvilHelper {
     public static final Feature instance = new Feature("anvilHelper");
 
-    public static final SettingColor color = new SettingColor(RenderColor.green, "color", instance);
+    public static final SettingColor color = new SettingColor(RenderColor.GREEN, "color", instance);
 
     private static boolean isInAnvil = false;
 

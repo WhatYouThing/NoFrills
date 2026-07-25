@@ -18,6 +18,7 @@ import nofrills.features.fishing.RadarSolver;
 import nofrills.features.fishing.RareAnnounce;
 import nofrills.features.fishing.RareHighlight;
 import nofrills.features.general.*;
+import nofrills.features.general.inventorybuttons.InventoryButtons;
 import nofrills.features.general.partycommands.PartyCommands;
 import nofrills.features.hunting.*;
 import nofrills.features.kuudra.*;
@@ -89,9 +90,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         int height = context.guiHeight();
-        context.text(this.font, "Left click a feature to toggle", 1, height - 30, RenderColor.white.argb);
-        context.text(this.font, "Right click a feature open its settings", 1, height - 20, RenderColor.white.argb);
-        context.text(this.font, "Scrolling supported in each category and the screen itself", 1, height - 10, RenderColor.white.argb);
+        context.text(this.font, "Left click a feature to toggle", 1, height - 30, RenderColor.WHITE.argb);
+        context.text(this.font, "Right click a feature open its settings", 1, height - 20, RenderColor.WHITE.argb);
+        context.text(this.font, "Scrolling supported in each category and the screen itself", 1, height - 10, RenderColor.WHITE.argb);
     }
 
     @Override
@@ -261,7 +262,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Keybind("Lock Key", SlotLocking.keybind, "The key to lock/unlock a slot. Press while hovering over a slot to use."),
                                 new Settings.Toggle("Draw Overlay", SlotLocking.overlay, "Draw a colored overlay on top of slots that are locked."),
                                 new Settings.ColorPicker("Overlay Color", SlotLocking.color, "The color of the locked overlay")
-                        )))
+                        ))),
+                        new Module("Inventory Buttons", InventoryButtons.instance, "Allows you to add custom command buttons to container screens.", new Settings(
+                                new Settings.Keybind("Add Button Key", InventoryButtons.addButtonKey, "The key to create a new button at the position of the cursor."),
+                                new Settings.Keybind("Copy Textures Key", InventoryButtons.copyTexturesKey, "The key to copy the head textures of an item. Press while hovering over a slot to use.\nThis can be used to apply custom player head textures to buttons.")
+                        ))
                 )),
                 new Category("Tweaks", List.of(
                         new Module("No Loading Screen", NoLoadingScreen.instance, "Fully removes the loading terrain screen that appears when switching islands.", new Settings(List.of(

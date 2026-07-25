@@ -51,10 +51,10 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
         }
         super.drawComponentTooltip(context, mouseX, mouseY, delta);
         int center = context.guiWidth() / 2;
-        context.centeredText(mc.font, "NoFrills HUD Editor", center, 10, RenderColor.white.argb);
-        context.centeredText(mc.font, "Left click element to hide", center, 20, RenderColor.white.argb);
-        context.centeredText(mc.font, "Right click element to view its settings", center, 30, RenderColor.white.argb);
-        context.centeredText(mc.font, "Right click screen to add/remove elements", center, 40, RenderColor.white.argb);
+        context.centeredText(mc.font, "NoFrills HUD Editor", center, 10, RenderColor.WHITE.argb);
+        context.centeredText(mc.font, "Left click element to hide", center, 20, RenderColor.WHITE.argb);
+        context.centeredText(mc.font, "Right click element to view its settings", center, 30, RenderColor.WHITE.argb);
+        context.centeredText(mc.font, "Right click screen to add/remove elements", center, 40, RenderColor.WHITE.argb);
     }
 
     @Override

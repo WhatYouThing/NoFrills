@@ -3,7 +3,7 @@ package nofrills.config;
 import nofrills.misc.RenderColor;
 
 public class SettingColor extends SettingGeneric {
-    private RenderColor color = RenderColor.white;
+    private RenderColor color = RenderColor.WHITE;
 
     public SettingColor(RenderColor defaultValue, String key, String parentKey) {
         super(defaultValue, key, parentKey);

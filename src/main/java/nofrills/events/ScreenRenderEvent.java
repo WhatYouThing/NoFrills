@@ -68,7 +68,7 @@ public class ScreenRenderEvent {
     }
 
     public void drawLabel(int slotId, Component text) {
-        this.getSlot(slotId).ifPresent(slot -> this.context.centeredText(mc.font, text, slot.x + 8, slot.y + 4, RenderColor.white.argb));
+        this.getSlot(slotId).ifPresent(slot -> this.context.centeredText(mc.font, text, slot.x + 8, slot.y + 4, RenderColor.WHITE.argb));
     }
 
     public void drawFill(int slotId, RenderColor color) {

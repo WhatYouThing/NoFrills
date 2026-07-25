@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 public class ActivePetHighlight {
     public static final Feature instance = new Feature("activePetHighlight");
 
-    public static final SettingColor color = new SettingColor(RenderColor.green, "color", instance);
+    public static final SettingColor color = new SettingColor(RenderColor.GREEN, "color", instance);
 
     private static final Pattern titlePattern = Pattern.compile("(.*/.*) Pets");
 

@@ -85,7 +85,7 @@ public class DeviceSolvers {
                     int rotation = ArrowAlign.clicksMap.containsKey(frame) ? ArrowAlign.clicksMap.get(frame) : frame.getRotation();
                     int clicks = ArrowAlign.getNeededClicks(rotation, entry.getValue());
                     if (clicks > 0) {
-                        event.drawText(pos, Component.literal(String.valueOf(clicks)), 0.04f, true, RenderColor.white);
+                        event.drawText(pos, Component.literal(String.valueOf(clicks)), 0.04f, true, RenderColor.WHITE);
                     }
                 }
             }
@@ -159,10 +159,10 @@ public class DeviceSolvers {
     public static final class Sharpshooter {
         public static final SettingBool doneAlert = new SettingBool(false, "sharpDoneAlert", instance);
         public static final SettingEnum<RenderStyle> style = new SettingEnum<>(RenderStyle.Filled, RenderStyle.class, "sharpStyle", instance);
-        public static final SettingColor targetColorFill = new SettingColor(RenderColor.green, "sharpTargetColor", instance);
-        public static final SettingColor targetColorOutline = new SettingColor(RenderColor.green, "sharpTargetColorOutline", instance);
-        public static final SettingColor hitColorFill = new SettingColor(RenderColor.red, "sharpHitColor", instance);
-        public static final SettingColor hitColorOutline = new SettingColor(RenderColor.red, "sharpHitColorOutline", instance);
+        public static final SettingColor targetColorFill = new SettingColor(RenderColor.GREEN, "sharpTargetColor", instance);
+        public static final SettingColor targetColorOutline = new SettingColor(RenderColor.GREEN, "sharpTargetColorOutline", instance);
+        public static final SettingColor hitColorFill = new SettingColor(RenderColor.RED, "sharpHitColor", instance);
+        public static final SettingColor hitColorOutline = new SettingColor(RenderColor.RED, "sharpHitColorOutline", instance);
 
         public static final ConcurrentHashSet<BlockPos> list = new ConcurrentHashSet<>();
         public static final AABB target = AABB.encapsulatingFullBlocks(new BlockPos(68, 130, 50), new BlockPos(64, 126, 50));

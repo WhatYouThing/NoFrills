@@ -4,9 +4,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.util.ARGB;
 
 public class RenderColor {
-    public static final RenderColor white = RenderColor.fromHex(0xffffff);
-    public static final RenderColor green = RenderColor.fromHex(0x55ff55);
-    public static final RenderColor red = RenderColor.fromHex(0xff5555);
+    public static final RenderColor WHITE = RenderColor.fromHex(0xffffff);
+    public static final RenderColor GREEN = RenderColor.fromFormat(ChatFormatting.GREEN);
+    public static final RenderColor RED = RenderColor.fromFormat(ChatFormatting.RED);
 
     public float r;
     public float g;

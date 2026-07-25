@@ -215,7 +215,7 @@ public class DianaSolver {
                         case Treasure -> treasureColor.value();
                         case Enemy -> enemyColor.value();
                         case Start -> startColor.value();
-                        default -> RenderColor.white;
+                        default -> RenderColor.WHITE;
                     };
                     event.drawBeam(pos, 256, true, color);
                     event.drawDistanceScaledText(textPos, label, 0.05f, true, RenderColor.fromHex(color.hex));

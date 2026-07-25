@@ -73,7 +73,7 @@ public class InvisibugHighlight {
         if (instance.isActive() && Utils.isInArea("Galatea")) {
             for (Invisibug bug : new ArrayList<>(invisibugList)) {
                 if (bug.positions.size() == 4) {
-                    event.drawText(bug.positions.getLast().add(0, 1, 0), Component.nullToEmpty("Invisibug"), 0.035f, false, RenderColor.white);
+                    event.drawText(bug.positions.getLast().add(0, 1, 0), Component.nullToEmpty("Invisibug"), 0.035f, false, RenderColor.WHITE);
                     event.drawFilled(AABB.ofSize(bug.positions.getLast(), 1, 1, 1), false, color.value());
                 }
             }

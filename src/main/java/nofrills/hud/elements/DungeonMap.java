@@ -114,7 +114,7 @@ public final class DungeonMap extends HudElement implements TickableHudElement {
                 }
             }
         } else if (this.isEditingHud()) {
-            context.centeredText(mc.font, "Dungeon Map", (int) (this.width * 0.5), (int) (this.height * 0.5) - 4, RenderColor.white.argb);
+            context.centeredText(mc.font, "Dungeon Map", (int) (this.width * 0.5), (int) (this.height * 0.5) - 4, RenderColor.WHITE.argb);
         }
         matrices.popMatrix();
     }

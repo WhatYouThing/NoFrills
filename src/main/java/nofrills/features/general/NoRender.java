@@ -39,7 +39,7 @@ public class NoRender {
     public static final SettingBool bossBar = new SettingBool(false, "bossBar", instance.key());
     public static final SettingBool armorBar = new SettingBool(false, "armorBar", instance.key());
     public static final SettingBool foodBar = new SettingBool(false, "foodBar", instance.key());
-    public static final SettingBool healthBar = new SettingBool(false, "healthBar", instance.key());
+    public static final SettingEnum<HealthBarMode> healthBar = new SettingEnum<>(HealthBarMode.Nowhere, HealthBarMode.class, "healthBarMode", instance.key());
     public static final SettingBool fog = new SettingBool(false, "fog", instance.key());
     public static final SettingBool effectDisplay = new SettingBool(false, "effectDisplay", instance.key());
     public static final SettingBool recipeBook = new SettingBool(false, "recipeBook", instance.key());
@@ -74,6 +74,12 @@ public class NoRender {
     );
     private static final EntityPredicates entityPredicates = new EntityPredicates();
     private static boolean inDungeons = false;
+
+    public enum HealthBarMode {
+        Nowhere,
+        OutsideRift,
+        Everywhere
+    }
 
     public static FogData getFogAsEmpty(FogData data) {
         data.renderDistanceStart = Float.MAX_VALUE;

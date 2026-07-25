@@ -44,7 +44,8 @@ public class SkyblockData {
             new InstanceType("t4", "KUUDRA_FIERY"),
             new InstanceType("t5", "KUUDRA_INFERNAL")
     );
-    private static final Pattern scoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
+    private static final Pattern dungeonScoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
+    private static final Pattern kuudraTokensRegex = Pattern.compile("Tokens Earned: [0-9]*");
     private static String location = "";
     private static String area = "";
     private static boolean inSkyblock = false;
@@ -145,11 +146,8 @@ public class SkyblockData {
                     if (team != null) {
                         String line = ChatFormatting.stripFormatting(team.getPlayerPrefix().getString() + team.getPlayerSuffix().getString()).trim();
                         if (!line.isEmpty()) {
-                            if (line.startsWith(Utils.Symbols.zone) || line.startsWith(Utils.Symbols.zoneRift) || line.startsWith("⏣")) {
+                            if (line.startsWith(Utils.Symbols.zone) || line.startsWith(Utils.Symbols.zoneRift)) {
                                 location = line;
-                            }
-                            if (Utils.isInKuudra() && !instanceOver) {
-                                instanceOver = line.startsWith("Instance Shutdown");
                             }
                             currentLines.add(line);
                         }
@@ -170,8 +168,10 @@ public class SkyblockData {
 
     @EventHandler
     private static void onChat(ChatMsgEvent event) {
-        if (Utils.isInDungeons()) {
-            if (!instanceOver && scoreRegex.matcher(event.messagePlain.trim()).matches()) {
+        if (!instanceOver) {
+            if (Utils.isInDungeons() && dungeonScoreRegex.matcher(event.messagePlain.trim()).matches()) {
+                instanceOver = true;
+            } else if (Utils.isInKuudra() && kuudraTokensRegex.matcher(event.messagePlain.trim()).matches()) {
                 instanceOver = true;
             }
         }

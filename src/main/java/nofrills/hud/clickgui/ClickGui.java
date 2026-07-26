@@ -653,7 +653,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Chest Value", KuudraChestValue.instance, "Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
                                 new Settings.SliderInt("Pet Bonus", 0, 20, 1, KuudraChestValue.petBonus, "The extra Crimson Essence percentage granted by your Kuudra pet.\nUsed to calculate the value of the essence with the extra perk included."),
                                 new Settings.EnumToggle<>("Faction", KuudraChestValue.faction, "Your selected Crimson Isle faction. Used to calculate the cost of the Kuudra key."),
-                                new Settings.EnumToggle<>("Reputation", KuudraChestValue.reputation, "Your faction reputation level, in thousands. Used to calculate the cost of the Kuudra key."),
+                                new Settings.EnumToggle<>("Reputation Range", KuudraChestValue.reputation, "Your faction reputation range. Used to calculate the cost of the Kuudra key."),
                                 new Settings.EnumToggle<>("Discount Item", KuudraChestValue.discountItem, "The tier of your Dark Auction accessory. Used to calculate the cost of the Kuudra key."),
                                 new Settings.Toggle("Use Salvage Value", KuudraChestValue.salvageValue, "Prices armor and equipment pieces based on the amount of essence gained from salvaging them.\nCan give a more accurate chest value compared to the default Lowest BIN value."),
                                 new Settings.ColorPicker("Background", KuudraChestValue.background, "The color of the background of the value text.")

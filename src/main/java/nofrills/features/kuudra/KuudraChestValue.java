@@ -201,17 +201,39 @@ public class KuudraChestValue {
     }
 
     public enum ReputationTiers {
-        Zero,
-        One,
-        Three,
-        Seven,
-        Twelve
+        Zero("0 - 1,000"),
+        One("1,000 - 3,000"),
+        Three("3,000 - 7,000"),
+        Seven("7,000 - 12,000"),
+        Twelve("12,000+");
+
+        private final String displayName;
+
+        ReputationTiers(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 
     public enum DiscountItems {
-        ShadyRing,
-        CrookedArtifact,
-        SealOfTheFamily,
-        None
+        ShadyRing("Shady Ring"),
+        CrookedArtifact("Crooked Artifact"),
+        SealOfTheFamily("Seal of the Family"),
+        None("None");
+
+        private final String displayName;
+
+        DiscountItems(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 }

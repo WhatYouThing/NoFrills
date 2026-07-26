@@ -26,7 +26,9 @@ public final class ToggleButton extends ButtonComponent {
         this.setToggle(!this.toggle);
     }
 
-    public boolean getToggle() { return this.toggle; }
+    public boolean getToggle() {
+        return this.toggle;
+    }
 
     public void setToggle(boolean toggle) {
         this.toggle = toggle;

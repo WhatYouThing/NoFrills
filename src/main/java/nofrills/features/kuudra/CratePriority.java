@@ -1,6 +1,7 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.events.EventListener;
 import nofrills.events.PartyChatMsgEvent;
@@ -15,7 +16,8 @@ public class CratePriority {
     public static final Feature instance = new Feature("cratePriority");
 
     private static void announce(String message) {
-        HudManager.setCustomTitle("§e" + message, 50);
+        HudManager.setCustomTitle("§e" + message, 100);
+        Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
         Utils.infoFormat("§eCrate Priority: {}.", message);
     }
 

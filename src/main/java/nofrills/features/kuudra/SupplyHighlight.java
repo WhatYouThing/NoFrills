@@ -30,14 +30,15 @@ public class SupplyHighlight {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && !cache.empty() && Utils.isInKuudra() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
+        if (instance.isActive() && !cache.empty() && KuudraUtil.getCurrentPhase().equals(KuudraUtil.Phase.Collect)) {
             for (Entity supply : cache.get()) {
-                Vec3 pos = supply.getPosition(event.delta());
-                float yaw = supply.getViewXRot(event.delta());
+                float delta = event.delta();
+                Vec3 pos = supply.getPosition(delta);
+                float yaw = supply.getViewXRot(delta);
                 Vec3 supplyPos = new Vec3(
                         pos.x + (3.7 * Math.cos((yaw + 130) * (Math.PI / 180))),
                         75,
-                        pos.y + (3.7 * Math.sin((yaw + 130) * (Math.PI / 180)))
+                        pos.z + (3.7 * Math.sin((yaw + 130) * (Math.PI / 180)))
                 );
                 event.drawBeam(supplyPos, 256, false, color.value());
             }

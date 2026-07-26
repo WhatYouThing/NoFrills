@@ -68,7 +68,7 @@ public class SecretChime {
             "REVIVE_STONE"
     );
     private static final EntityCache entityCache = new EntityCache();
-    private static final int[] essenceUUID = new int[]{-520885975, -2036449846, -1794878266, 1726902051};
+    private static final int[] essenceUUID = new int[]{677717835, 815216974, -2125861790, -1670195120};
     private static boolean clickedThisTick = false;
 
     private static void playSound(SettingString sound, SettingDouble volume, SettingDouble pitch) {
@@ -83,7 +83,7 @@ public class SecretChime {
                 Optional<CompoundTag> profile = nbt.getCompound("profile");
                 if (profile.isPresent()) {
                     Optional<int[]> id = profile.get().getIntArray("id");
-                    return id.isPresent() && Arrays.equals(id.get(), essenceUUID); // match the uuid, profile data is corrupted at the time of adding
+                    return id.isPresent() && Arrays.equals(id.get(), essenceUUID);
                 }
             }
         }

@@ -50,9 +50,9 @@ public class InventoryButtonSettings extends Settings {
         FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
         layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
 
-        PlainLabel keepSquare = new PlainLabel(Component.literal("Keep Square"));
+        PlainLabel keepSquare = new PlainLabel(Component.literal("Uniform Scale"));
         ToggleButton keepSquareButton = new ToggleButton(buttonObject.get("keepSquare").getAsBoolean());
-        keepSquare.tooltip(Component.literal("Keep aspect ratio locked to square."));
+        keepSquare.tooltip(Component.literal("Keep scale locked to 1:1."));
         keepSquare.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
 
         keepSquareButton.onToggled().subscribe(change -> buttonObject.addProperty("keepSquare", change));

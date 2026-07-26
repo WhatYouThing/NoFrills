@@ -56,8 +56,8 @@ public final class InventoryButtonWidget extends ImageButton {
         String tooltip = buttonObject.get("tooltip").getAsString();
         double posX = buttonObject.get("x").getAsDouble() * mc.getWindow().getGuiScaledWidth();
         double posY = buttonObject.get("y").getAsDouble() * mc.getWindow().getGuiScaledHeight();
-        double scaleX = buttonObject.get("scaleX").getAsDouble();
-        double scaleY = buttonObject.get("scaleY").getAsDouble();
+        double scaleX = buttonObject.has("scaleX") ? buttonObject.get("scaleX").getAsDouble() : 1.0;
+        double scaleY = buttonObject.has("scaleY") ? buttonObject.get("scaleY").getAsDouble() : 1.0;
         ItemStack stack = BuiltInRegistries.ITEM.getValue(Identifier.parse(model)).getDefaultInstance().copy();
         if (stack.is(Items.PLAYER_HEAD) && !textures.isEmpty()) {
             Multimap<String, Property> properties = ImmutableMultimap.of("textures", new Property("textures", textures));

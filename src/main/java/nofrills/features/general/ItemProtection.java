@@ -171,7 +171,7 @@ public class ItemProtection {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && !event.stack.isEmpty() && event.customData != null) {
             if (hideTooltip.value() && !revealingTooltip) {

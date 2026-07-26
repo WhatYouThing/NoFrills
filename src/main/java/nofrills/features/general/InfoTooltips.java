@@ -1,6 +1,7 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.DyedItemColor;
 import nofrills.config.Feature;
@@ -25,7 +26,7 @@ public class InfoTooltips {
     public static final SettingBool museum = new SettingBool(false, "museumDonated", instance);
     public static final SettingBool skyblockId = new SettingBool(false, "skyblockId", instance);
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && event.customData != null) {
             if (dungeonQuality.value()) {

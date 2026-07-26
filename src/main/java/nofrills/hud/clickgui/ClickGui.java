@@ -166,6 +166,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Boss Bar", NoRender.bossBar, "Hides the boss health bar that appears at the top of the screen."),
                                 new Settings.Toggle("Armor Bar", NoRender.armorBar, "Removes the armor bar from your hotbar."),
                                 new Settings.Toggle("Food Bar", NoRender.foodBar, "Removes the food bar from your hotbar."),
+                                new Settings.EnumToggle<>("Health Bar", NoRender.healthBar, "Where the health bar shouldn't be shown.\n\nNowhere: Don't hide the health bar.\nOutside rift: Hide the healthbar everywhere except the Rift.\nEverywhere: Hide the health bar in all areas."),
                                 new Settings.Toggle("Fog", NoRender.fog, "Hides terrain and ambient fog."),
                                 new Settings.Toggle("Effect Display", NoRender.effectDisplay, "Removes the potion effect display from the inventory and the top right of the screen."),
                                 new Settings.Toggle("Recipe Book", NoRender.recipeBook, "Removes the recipe book button from the inventory."),

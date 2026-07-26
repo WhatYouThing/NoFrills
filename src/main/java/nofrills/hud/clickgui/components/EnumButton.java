@@ -40,7 +40,7 @@ public final class EnumButton<T extends Enum<T>> extends ButtonComponent {
 
     public void setValue(T value) {
         this.value = value;
-        this.setMessage(Component.nullToEmpty(value.name()));
+        this.setMessage(Component.nullToEmpty(value.toString()));
         this.changedEvents.sink().onChanged(this.value.name());
     }
 

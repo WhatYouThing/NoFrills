@@ -287,7 +287,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             EnumButton<T> button = new EnumButton<>(this.setting.value().name(), this.setting.defaultValue(), this.setting.values);
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
-            button.setMessage(Component.literal(this.setting.value().name()));
+            button.setMessage(Component.literal(this.setting.value().toString()));
             button.onChanged().subscribe(value -> this.setting.set(this.setting.toConstant(value)));
             int maxWidth = Arrays.stream(this.setting.constants).mapToInt(constant -> mc.font.width(constant.name())).max().orElse(0);
             button.horizontalSizing(Sizing.fixed(maxWidth + 10));

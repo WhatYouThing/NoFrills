@@ -165,6 +165,8 @@ public class NoFrillsAPI {
     }
 
     public record BazaarPrice(double buy, double sell) {
+
+        public static final BazaarPrice ZERO = new BazaarPrice(0.0, 0.0);
     }
 
     public record NPCPrice(double coin, double mote) {

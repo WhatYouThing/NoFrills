@@ -412,7 +412,11 @@ public class Utils {
             name = name.substring(0, name.lastIndexOf(" ")).trim();
         }
         if (name.startsWith("Enchanted Book (") && name.endsWith(")")) {
-            String enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"));
+            String enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"))
+                    .replace("Hardened Vitality", "Hardened Mana")
+                    .replace("Strong Vitality", "Strong Mana")
+                    .replace("Vampiric Vitality", "Mana Vampire")
+                    .replace("Vivacious Vitality", "Ferocious Mana");
             String enchantName = toID(enchant.substring(0, enchant.lastIndexOf(" ")));
             int enchantLevel = parseRoman(enchant.substring(enchant.lastIndexOf(" ") + 1));
             Optional<Style> style = getStyle(text, enchant::equals);
@@ -467,7 +471,7 @@ public class Utils {
             case "Shiny Wither Leggings" -> "WITHER_LEGGINGS";
             case "Shiny Wither Boots" -> "WITHER_BOOTS";
             case "Shiny Necron's Handle" -> "NECRON_HANDLE";
-            default -> toID(name);
+            default -> toID(name.replaceAll(Symbols.dungeonStar, "").trim());
         };
     }
 
@@ -529,6 +533,10 @@ public class Utils {
 
     public static boolean hasItemQuantity(String name) {
         return Pattern.matches(".* x[0-9]*", name);
+    }
+
+    public static boolean isPaginatedMenu(String title, String match) {
+        return match.equals(title) || Pattern.matches("(.*/.*) " + match, title);
     }
 
     public static GameProfile getTextures(ItemStack stack) {
@@ -1141,6 +1149,7 @@ public class Utils {
         public static String zoneRift = "\uE020";
         public static String star = "✯";
         public static String heart = "❤";
+        public static String dungeonStar = "✪";
         public static String format = "§";
         public static String vampLow = "҉";
         public static String bingo = "Ⓑ";

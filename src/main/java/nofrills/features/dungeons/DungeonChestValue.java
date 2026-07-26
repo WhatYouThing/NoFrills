@@ -119,8 +119,6 @@ public class DungeonChestValue {
 
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
-        if (instance.isActive() && currentValue != 0.0) {
-            currentValue = 0.0;
-        }
+        currentValue = 0.0;
     }
 }

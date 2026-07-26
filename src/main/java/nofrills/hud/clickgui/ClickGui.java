@@ -615,7 +615,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Outline Color", PlatformHighlight.outlineColor, "The color of the outline highlight."),
                                 new Settings.ColorPicker("Fill Color", PlatformHighlight.fillColor, "The color of the filled highlight.")
                         )),
-                        new Module("Croesus Solver", CroesusSolver.instance, "Highlights unopened loot and the most profitable chests in the Croesus.\nRequires connectivity to the NoFrills API.", new Settings(
+                        new Module("Croesus Solver", CroesusSolver.instance, "Highlights Dungeons loot in the Croesus/Vesuvius menu.\nRequires connectivity to the NoFrills API.", new Settings(
                                 new Settings.ColorPicker("Profit Color", CroesusSolver.profitColor, "The highlight color for the most profitable chest."),
                                 new Settings.ColorPicker("Secondary Profit Color", CroesusSolver.profitSecondaryColor, "The highlight color for the 2nd most profitable chest."),
                                 new Settings.ColorPicker("Key Profit Color", CroesusSolver.profitKeyColor, "The highlight color for the 2nd most profitable chest if using a Dungeon Chest Key is worth it."),
@@ -651,10 +651,23 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Shop Cleaner", ShopCleaner.instance, "Removes useless things from the perk shop."),
                         new Module("Chest Value", KuudraChestValue.instance, "Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.", new Settings(List.of(
                                 new Settings.SliderInt("Pet Bonus", 0, 20, 1, KuudraChestValue.petBonus, "The extra Crimson Essence percentage granted by your Kuudra pet.\nUsed to calculate the value of the essence with the extra perk included."),
+                                new Settings.EnumToggle<>("Faction", KuudraChestValue.faction, "Your selected Crimson Isle faction. Used to calculate the cost of the Kuudra key."),
+                                new Settings.EnumToggle<>("Reputation", KuudraChestValue.reputation, "Your faction reputation level, in thousands. Used to calculate the cost of the Kuudra key."),
+                                new Settings.EnumToggle<>("Discount Item", KuudraChestValue.discountItem, "The tier of your Dark Auction accessory. Used to calculate the cost of the Kuudra key."),
                                 new Settings.Toggle("Use Salvage Value", KuudraChestValue.salvageValue, "Prices armor and equipment pieces based on the amount of essence gained from salvaging them.\nCan give a more accurate chest value compared to the default Lowest BIN value."),
                                 new Settings.ColorPicker("Background", KuudraChestValue.background, "The color of the background of the value text.")
                         ))),
-                        new Module("Crate Priority", CratePriority.instance, "Shows which crates to pull and/or grab after you collect your Pre.\nThis feature requires the full party to be using some kind of Pre message feature.")
+                        new Module("Crate Priority", CratePriority.instance, "Shows which crates to pull and/or grab after you collect your Pre.\nThis feature requires the full party to be using some kind of Pre message feature."),
+                        new Module("Vesuvius Solver", VesuviusSolver.instance, "Highlights Kuudra loot in the Croesus/Vesuvius menu.\nThis feature depends on the Kuudra Chest Value options to correctly calculate profits.\nRequires connectivity to the NoFrills API.", new Settings(
+                                new Settings.ColorPicker("Profit Color", VesuviusSolver.profitColor, "The highlight color for the most profitable chest."),
+                                new Settings.ColorPicker("High Profit Color", VesuviusSolver.profitHighColor, "The highlight color for the most profitable chest if it exceeds the profit threshold.\nThis color is also applied regardless of profit if a chest contains a dye."),
+                                new Settings.DoubleInput("Profit Threshold", VesuviusSolver.profitHighThreshold, "The minimum profit for a chest to be considered as high value."),
+                                new Settings.ColorPicker("Unopened Color", VesuviusSolver.unopenedColor, "The highlight color for unopened loot."),
+                                new Settings.ColorPicker("Rerolled Color", VesuviusSolver.rerolledColor, "The highlight color for unopened loot that is already rerolled."),
+                                new Settings.ColorPicker("Opened Color", VesuviusSolver.openedColor, "The highlight color for opened loot."),
+                                new Settings.Toggle("Value Tooltip", VesuviusSolver.valueTooltip, "Displays the value of individual chests in the tooltip."),
+                                new Settings.Toggle("Tier Label", VesuviusSolver.tierLabel, "Adds labels which indicate the tier the loot was obtained in.")
+                        ))
                 )),
                 new Category("Slayer", List.of(
                         new Module("Boss Highlight", BossHighlight.instance, "Highlights your slayer boss.", new Settings(List.of(

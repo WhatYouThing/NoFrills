@@ -5,14 +5,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingColor;
-import nofrills.config.SettingInt;
+import nofrills.config.*;
 import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotUpdateEvent;
+import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -28,11 +26,88 @@ public class KuudraChestValue {
     public static final Feature instance = new Feature("kuudraChestValue", Feature.Flags.UsePricingAPI);
 
     public static final SettingInt petBonus = new SettingInt(0, "petBonus", instance);
+    public static final SettingEnum<Factions> faction = new SettingEnum<>(Factions.Unknown, Factions.class, "faction", instance);
+    public static final SettingEnum<ReputationTiers> reputation = new SettingEnum<>(ReputationTiers.Zero, ReputationTiers.class, "reputation", instance);
+    public static final SettingEnum<DiscountItems> discountItem = new SettingEnum<>(DiscountItems.None, DiscountItems.class, "discountItem", instance);
     public static final SettingBool salvageValue = new SettingBool(false, "salvageValue", instance);
     public static final SettingColor background = new SettingColor(RenderColor.fromHex(0x202020, 0.8f), "background", instance);
 
-    private static final HashMap<String, Integer> salvageAmounts = buildSalvageAmounts();
+    public static final HashMap<String, Integer> salvageAmounts = buildSalvageAmounts();
     private static double currentValue = 0.0;
+
+    public static double getKeyPrice(String tier) {
+        String resource = switch (faction.value()) {
+            case Barbarian -> "ENCHANTED_RED_SAND";
+            case Mage -> "ENCHANTED_MYCELIUM";
+            default -> "";
+        };
+        double resourceCost = resource.isEmpty()
+                ? 0.0
+                : bazaarPricing.getOrDefault(resource, NoFrillsAPI.BazaarPrice.ZERO).buy() * getKeyResourceCost(tier);
+        double starCost = bazaarPricing.getOrDefault("CORRUPTED_NETHER_STAR", NoFrillsAPI.BazaarPrice.ZERO).buy() * 2.0;
+        return (getKeyBaseCost(tier) * getReputationDiscount() * getAccessoryDiscount()) + resourceCost + starCost;
+    }
+
+    public static boolean isLootChest(String title) {
+        return (title.startsWith("Free ") || title.startsWith("Paid ")) && title.endsWith(" Chest");
+    }
+
+    public static int getStarCost(int starCount) {
+        int cost = 0;
+        for (int i = 1; i <= starCount; i++) {
+            cost += i > 7 ? i * 10 - 10 : i * 5 + 25; // simple formula for the price of each star on a basic tier piece
+        }
+        return cost;
+    }
+
+    public static String getKeyTier(String keyName) {
+        return switch (keyName) {
+            case "Hot Kuudra Key" -> "T2";
+            case "Burning Kuudra Key" -> "T3";
+            case "Fiery Kuudra Key" -> "T4";
+            case "Infernal Kuudra Key" -> "T5";
+            default -> "T1";
+        };
+    }
+
+    private static int getKeyBaseCost(String tier) {
+        return switch (tier) {
+            case "T2" -> 400_000;
+            case "T3" -> 750_000;
+            case "T4" -> 1_500_000;
+            case "T5" -> 3_000_000;
+            default -> 200_000;
+        };
+    }
+
+    private static int getKeyResourceCost(String tier) {
+        return switch (tier) {
+            case "T2" -> 4;
+            case "T3" -> 16;
+            case "T4" -> 40;
+            case "T5" -> 80;
+            default -> 2;
+        };
+    }
+
+    private static double getReputationDiscount() {
+        return switch (reputation.value()) {
+            case One -> 0.95;
+            case Three -> 0.9;
+            case Seven -> 0.85;
+            case Twelve -> 0.8;
+            default -> 1.0;
+        };
+    }
+
+    private static double getAccessoryDiscount() {
+        return switch (discountItem.value()) {
+            case ShadyRing -> 0.99;
+            case CrookedArtifact -> 0.98;
+            case SealOfTheFamily -> 0.97;
+            default -> 1.0;
+        };
+    }
 
     private static HashMap<String, Integer> buildSalvageAmounts() {
         HashMap<String, Integer> map = new HashMap<>();
@@ -46,24 +121,15 @@ public class KuudraChestValue {
         }
         map.put("RUNIC_STAFF", 600);
         map.put("HOLLOW_WAND", 600);
+        map.put("KUUDRA_MANDIBLE", 600);
         return map;
-    }
-
-    private static boolean isLootChest(String title) {
-        return (title.startsWith("Free ") || title.startsWith("Paid ")) && title.endsWith(" Chest");
     }
 
     private static int getLootQuantity(ItemStack stack, String name, String id) {
         if (salvageValue.value() && salvageAmounts.containsKey(id)) {
-            int amount = salvageAmounts.get(id);
-            if (amount != 120) return amount;
             CompoundTag data = Utils.getCustomData(stack);
             int stars = data != null ? data.getIntOr("upgrade_level", 0) : 0;
-            int starCost = 0;
-            for (int i = 1; i <= stars; i++) {
-                starCost += i > 7 ? i * 10 - 10 : i * 5 + 25; // simple formula for the price of each star on a basic tier piece
-            }
-            return (int) Math.floor(amount + (starCost * 0.6));
+            return (int) Math.floor(salvageAmounts.get(id) + getStarCost(stars) * 0.6);
         }
         String[] parts = name.split(" ");
         String last = parts[parts.length - 1];
@@ -79,27 +145,29 @@ public class KuudraChestValue {
         return stack.getCount();
     }
 
-    private static String getLootID(ItemStack stack, String name) {
-        if (name.startsWith("Crimson Essence")) {
-            return "ESSENCE_CRIMSON";
-        }
-        String id = Utils.getMarketId(stack);
-        if (salvageValue.value() && salvageAmounts.containsKey(id)) {
-            return "ESSENCE_CRIMSON";
-        }
-        return id;
-    }
-
     @EventHandler
     private static void onSlot(SlotUpdateEvent event) {
-        if (instance.isActive() && isLootChest(event.title) && Utils.isInLootArea()) {
-            if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
+        if (instance.isActive() && !event.isInventory && isLootChest(event.title) && Utils.isInLootArea()) {
+            if (event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
                 return;
             }
             String name = Utils.toPlain(event.stack.getHoverName());
-            String id = getLootID(event.stack, name);
-            if (id.isEmpty()) return;
+            if (name.equals("Reroll Shard")) return;
+            String id = name.startsWith("Crimson Essence") ? Utils.getMarketId(event.stack.getHoverName()) : Utils.getMarketId(event.stack);
             int quantity = getLootQuantity(event.stack, name, id);
+            if (id.isEmpty()) {
+                if (name.equals("Open Reward Chest")) {
+                    for (String line : Utils.getLoreLines(event.stack)) {
+                        if (line.endsWith(" Kuudra Key")) {
+                            currentValue -= getKeyPrice(getKeyTier(line));
+                            break;
+                        }
+                    }
+                }
+                return;
+            } else if (salvageValue.value() && salvageAmounts.containsKey(id)) {
+                id = "ESSENCE_CRIMSON";
+            }
             if (auctionPricing.containsKey(id)) {
                 currentValue += auctionPricing.get(id) * quantity;
             } else if (bazaarPricing.containsKey(id)) {
@@ -110,21 +178,40 @@ public class KuudraChestValue {
 
     @EventHandler
     private static void onRender(ScreenRenderEvent.After event) {
-        if (instance.isActive() && currentValue > 0.0) {
+        if (instance.isActive() && currentValue != 0.0) {
             Slot targetSlot = event.handler.getSlot(4);
             String value = Utils.format("Chest Value: {}", Utils.formatSeparator(currentValue));
             int width = mc.font.width(value);
             int baseX = targetSlot.x + 8;
             int baseY = targetSlot.y + 8;
             event.context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, background.value().argb);
-            event.context.centeredText(mc.font, value, baseX, baseY - 4, RenderColor.GREEN.argb);
+            event.context.centeredText(mc.font, value, baseX, baseY - 4, currentValue > 0 ? RenderColor.GREEN.argb : RenderColor.RED.argb);
         }
     }
 
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
-        if (instance.isActive() && currentValue > 0.0) {
-            currentValue = 0.0;
-        }
+        currentValue = 0.0;
+    }
+
+    public enum Factions {
+        Barbarian,
+        Mage,
+        Unknown
+    }
+
+    public enum ReputationTiers {
+        Zero,
+        One,
+        Three,
+        Seven,
+        Twelve
+    }
+
+    public enum DiscountItems {
+        ShadyRing,
+        CrookedArtifact,
+        SealOfTheFamily,
+        None
     }
 }

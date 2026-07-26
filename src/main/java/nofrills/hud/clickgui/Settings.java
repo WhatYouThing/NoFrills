@@ -284,7 +284,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.setting = setting;
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
-            EnumButton<T> button = new EnumButton<>(this.setting.value().toString(), this.setting.defaultValue(), this.setting.values);
+            EnumButton<T> button = new EnumButton<>(this.setting.value().name(), this.setting.defaultValue(), this.setting.values);
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
             button.setMessage(Component.literal(this.setting.value().toString()));
@@ -295,7 +295,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.child(button);
             this.child(buildResetButton(btn -> {
                 this.setting.reset();
-                button.setMessage(Component.literal(this.setting.defaultValue().toString()));
+                button.setMessage(Component.literal(this.setting.defaultValue().name()));
             }));
         }
     }

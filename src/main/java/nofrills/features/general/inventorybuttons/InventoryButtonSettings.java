@@ -51,7 +51,7 @@ public class InventoryButtonSettings extends Settings {
         layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
 
         PlainLabel keepSquare = new PlainLabel(Component.literal("Uniform Scale"));
-        ToggleButton keepSquareButton = new ToggleButton(buttonObject.get("keepSquare").getAsBoolean());
+        ToggleButton keepSquareButton = new ToggleButton(buttonObject.has("keepSquare") && buttonObject.get("keepSquare").getAsBoolean());
         keepSquare.tooltip(Component.literal("Keep scale locked to 1:1."));
         keepSquare.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
 
@@ -99,8 +99,8 @@ public class InventoryButtonSettings extends Settings {
             }
         }));
 
-        textX.text(String.valueOf(buttonObject.get("scaleX").getAsDouble()));
-        textY.text(String.valueOf(buttonObject.get("scaleY").getAsDouble()));
+        textX.text(String.valueOf(buttonObject.has("scaleX") ? buttonObject.get("scaleX").getAsDouble() : 1.0));
+        textY.text(String.valueOf(buttonObject.has("scaleY") ? buttonObject.get("scaleY").getAsDouble() : 1.0));
 
         sliderX.onChanged().subscribe(change -> {
             double value = roundDouble(change);
@@ -205,17 +205,27 @@ public class InventoryButtonSettings extends Settings {
         FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
         layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
         PlainLabel label = new PlainLabel(Component.literal("Textures").withColor(0xffffff));
-        FlatTextbox text = new FlatTextbox(Sizing.fixed(150));
         label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        label.tooltip(Component.literal("The custom textures payload to display. Only works if the item model is a player head.\n\nUsage: You can copy the head textures of any item using the Inventory Buttons Copy Textures keybind.\nPaste the copied head textures into this input to apply them to the player head model."));
-        text.onChanged().subscribe(change -> buttonObject.addProperty("textures", change));
-        text.text(buttonObject.get("textures").getAsString());
+        label.tooltip(Component.literal("Allows you to apply custom head textures to this button. Only works if the item model is player_head.\n\nUsage: You can copy the head textures of any existing item using the Copy Textures keybind from Inventory Buttons."));
+        ButtonComponent copyButton = UIComponents.button(Component.literal("Copy").withColor(0xffffff), btn ->
+                mc.keyboardHandler.setClipboard(buttonObject.get("textures").getAsString())
+        );
+        copyButton.renderer(buttonRenderer);
+        copyButton.tooltip(Component.literal("Copies the current head textures payload.")).margins(Insets.of(0, 0, 0, 5));
+        ButtonComponent pasteButton = UIComponents.button(Component.literal("Paste").withColor(0xffffff), btn ->
+                buttonObject.addProperty("textures", mc.keyboardHandler.getClipboard())
+        );
+        pasteButton.renderer(buttonRenderer);
+        pasteButton.tooltip(Component.literal("Pastes the head textures payload.")).margins(Insets.of(0, 0, 0, 5));
+        ButtonComponent clearButton = UIComponents.button(Component.literal("Clear").withColor(0xffffff), btn ->
+                buttonObject.addProperty("textures", "")
+        );
+        clearButton.renderer(buttonRenderer);
+        clearButton.tooltip(Component.literal("Clears the head textures payload."));
         layout.child(label);
-        layout.child(text);
-        layout.child(buildResetButton(btn -> {
-            buttonObject.addProperty("textures", "");
-            text.setValue("");
-        }));
+        layout.child(copyButton);
+        layout.child(pasteButton);
+        layout.child(clearButton);
         return layout;
     }
 
@@ -243,12 +253,10 @@ public class InventoryButtonSettings extends Settings {
         PlainLabel label = new PlainLabel(Component.literal("Manage").withColor(0xffffff));
         label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
         ButtonComponent button = UIComponents.button(Component.literal("Delete").withColor(0xffffff), btn -> {
-            if (InventoryButtons.data.value().has("buttons")) {
-                InventoryButtons.data.value().get("buttons").getAsJsonArray().remove(buttonObject);
-                mc.setScreen(new InventoryScreen(mc.player));
-            }
+            InventoryButtons.data.value().get("buttons").getAsJsonArray().remove(buttonObject);
+            mc.setScreen(new InventoryScreen(mc.player));
         });
-        button.renderer(buttonRendererWhite);
+        button.renderer(buttonRenderer);
         button.tooltip(Component.literal("Deletes this inventory button."));
         layout.child(label);
         layout.child(button);

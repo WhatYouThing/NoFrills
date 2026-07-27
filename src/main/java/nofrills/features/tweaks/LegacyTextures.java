@@ -1,10 +1,5 @@
 package nofrills.features.tweaks;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
@@ -21,7 +16,6 @@ import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.Utils;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
@@ -40,10 +34,7 @@ public class LegacyTextures {
 
     public static ResolvableProfile getOrInitProfile(String id, String payload) {
         if (!cache.containsKey(id)) {
-            Multimap<String, Property> properties = ImmutableMultimap.of("textures", new Property("textures", payload));
-            GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "", new PropertyMap(properties));
-            ResolvableProfile profile = ResolvableProfile.createResolved(gameProfile);
-            cache.put(id, profile);
+            cache.put(id, Utils.toResolvableProfile(payload));
         }
         return cache.get(id);
     }

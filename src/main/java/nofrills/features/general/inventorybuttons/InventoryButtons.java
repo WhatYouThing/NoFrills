@@ -17,8 +17,11 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenOpenEvent;
+import nofrills.events.ServerJoinEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
 
@@ -29,6 +32,15 @@ public class InventoryButtons {
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingKeybind addButtonKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "addButtonKey", instance);
     public static final SettingKeybind copyTexturesKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "copyTexturesKey", instance);
+
+    private static final ConcurrentHashMap<String, ResolvableProfile> profileCache = new ConcurrentHashMap<>();
+
+    public static ResolvableProfile getOrInitTextures(String payload) {
+        if (!profileCache.containsKey(payload)) {
+            profileCache.put(payload, Utils.toResolvableProfile(payload));
+        }
+        return profileCache.get(payload);
+    }
 
     @EventHandler
     private static void onInput(InputEvent event) {
@@ -46,7 +58,7 @@ public class InventoryButtons {
                         obj.addProperty("scaleX", 1.0);
                         obj.addProperty("scaleY", 1.0);
                         obj.addProperty("command", "");
-                        obj.addProperty("tooltip", "Inventory button");
+                        obj.addProperty("tooltip", "Inventory Button");
                         obj.addProperty("model", "lime_concrete");
                         obj.addProperty("textures", "");
                         obj.addProperty("glint", false);
@@ -82,6 +94,21 @@ public class InventoryButtons {
             for (JsonElement element : data.value().get("buttons").getAsJsonArray()) {
                 container.addRenderableWidget(InventoryButtonWidget.of(element.getAsJsonObject()));
             }
+        }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        if (instance.isActive() && data.value().has("buttons")) {
+            JsonArray buttons = data.value().get("buttons").getAsJsonArray();
+            profileCache.entrySet().removeIf(entry -> {
+                for (JsonElement button : buttons) {
+                    if (button.getAsJsonObject().get("textures").getAsString().equals(entry.getKey())) {
+                        return false;
+                    }
+                }
+                return true;
+            });
         }
     }
 }

@@ -1,11 +1,6 @@
 package nofrills.features.general.inventorybuttons;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import com.google.gson.JsonObject;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -18,11 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.ResolvableProfile;
 import nofrills.misc.Utils;
 import org.jspecify.annotations.NonNull;
-
-import java.util.UUID;
 
 import static nofrills.Main.mc;
 
@@ -60,10 +52,7 @@ public final class InventoryButtonWidget extends ImageButton {
         double scaleY = buttonObject.has("scaleY") ? buttonObject.get("scaleY").getAsDouble() : 1.0;
         ItemStack stack = BuiltInRegistries.ITEM.getValue(Identifier.parse(model)).getDefaultInstance().copy();
         if (stack.is(Items.PLAYER_HEAD) && !textures.isEmpty()) {
-            Multimap<String, Property> properties = ImmutableMultimap.of("textures", new Property("textures", textures));
-            GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "", new PropertyMap(properties));
-            ResolvableProfile profile = ResolvableProfile.createResolved(gameProfile);
-            stack.set(DataComponents.PROFILE, profile);
+            stack.set(DataComponents.PROFILE, InventoryButtons.getOrInitTextures(textures));
         }
         stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, buttonObject.get("glint").getAsBoolean());
         return new InventoryButtonWidget(posX, posY, scaleX, scaleY, stack, command, tooltip, buttonObject);

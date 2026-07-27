@@ -1,6 +1,8 @@
 package nofrills.misc;
 
 import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,6 +12,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
@@ -591,6 +594,12 @@ public class Utils {
             return url.endsWith("texture/" + textureId);
         }
         return false;
+    }
+
+    public static ResolvableProfile toResolvableProfile(String texturePayload) {
+        Multimap<String, Property> properties = ImmutableMultimap.of("textures", new Property("textures", texturePayload));
+        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "", new PropertyMap(properties));
+        return ResolvableProfile.createResolved(gameProfile);
     }
 
     public static List<Component> getLoreText(ItemStack stack) {

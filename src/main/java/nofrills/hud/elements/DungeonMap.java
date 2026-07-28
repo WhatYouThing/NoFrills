@@ -211,10 +211,16 @@ public final class DungeonMap extends HudElement implements TickableHudElement {
             packet.colorPatch().ifPresent(data -> {
                 byte[] colors = data.mapColors();
                 NativeImage nativeImage = mapTexture.getPixels();
-                for (int i = 0; i < 128; i++) {
-                    for (int j = 0; j < 128; j++) {
-                        int k = j + i * 128;
-                        nativeImage.setPixel(j, i, MapColor.getColorFromPackedId(colors[k]));
+                int startX = data.startX();
+                int startY = data.startY();
+                int width = data.width();
+                int height = data.height();
+                for (int i = 0; i < height; i++) {
+                    for (int j = 0; j < width; j++) {
+                        int k = j + i * width;
+                        if (k < colors.length && startX + j < 128 && startY + i < 128) {
+                            nativeImage.setPixel(startX + j, startY + i, MapColor.getColorFromPackedId(colors[k]));
+                        }
                     }
                 }
                 mapTexture.upload();

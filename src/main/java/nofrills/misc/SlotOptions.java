@@ -22,12 +22,16 @@ public class SlotOptions {
     public static final ConcurrentHashMap<Slot, Flags> slotFlags = new ConcurrentHashMap<>();
 
     public static ItemStack stackWithName(ItemStack stack, String name) {
-        stack.set(DataComponents.CUSTOM_NAME, Component.nullToEmpty(name));
+        if (!stack.isEmpty()) {
+            stack.set(DataComponents.CUSTOM_NAME, Component.nullToEmpty(name));
+        }
         return stack;
     }
 
     public static ItemStack stackWithName(ItemStack stack, Component name) {
-        stack.set(DataComponents.CUSTOM_NAME, name);
+        if (!stack.isEmpty()) {
+            stack.set(DataComponents.CUSTOM_NAME, name);
+        }
         return stack;
     }
 

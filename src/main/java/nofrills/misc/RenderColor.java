@@ -29,7 +29,7 @@ public class RenderColor {
         this.g = Math.clamp(g, 0.0f, 1.0f);
         this.b = Math.clamp(b, 0.0f, 1.0f);
         this.a = Math.clamp(a, 0.0f, 1.0f);
-        this.hex = (((int) this.r * 255) << 16) + (((int) this.g * 255) << 8) + ((int) this.b * 255);
+        this.hex = ((int) (this.r * 255) << 16) + ((int) (this.g * 255) << 8) + (int) (this.b * 255);
         this.argb = ARGB.colorFromFloat(this.a, this.r, this.g, this.b);
     }
 

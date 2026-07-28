@@ -94,7 +94,7 @@ public class BeaconTuningSolver {
 
             )));
             SlotOptions.setSpoofed(handler.getSlot(speedSlot1Id), SlotOptions.stackWithName(
-                    SlotOptions.stackWithCount(stack, changeSpeed),
+                    SlotOptions.stackWithCount(stack, Math.max(1, changeSpeed)),
                     Component.literal("Speed").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.YELLOW))
             ));
         }
@@ -151,7 +151,7 @@ public class BeaconTuningSolver {
             stack = Items.WHITE_WOOL.getDefaultInstance();
         }
         SlotOptions.setSpoofed(handler.getSlot(colorSlot1Id), SlotOptions.stackWithName(
-                SlotOptions.stackWithCount(stack, Math.abs(colorTarget1)),
+                SlotOptions.stackWithCount(stack, Math.max(1, Math.abs(colorTarget1))),
                 Component.literal("Color").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.YELLOW))
         ));
     }

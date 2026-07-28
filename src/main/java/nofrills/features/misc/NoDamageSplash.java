@@ -16,7 +16,7 @@ public class NoDamageSplash {
 
     public static final SettingEnum<HideMode> mode = new SettingEnum<>(HideMode.Always, HideMode.class, "mode", instance);
 
-    private static final Pattern pattern = Pattern.compile("[0-9]*");
+    private static final Pattern pattern = Pattern.compile("[0-9]+");
 
     private static boolean isActive() {
         if (instance.isActive()) {

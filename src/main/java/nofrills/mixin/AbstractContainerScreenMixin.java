@@ -19,6 +19,7 @@ import nofrills.events.SlotClickEvent;
 import nofrills.events.TooltipRenderEvent;
 import nofrills.features.dungeons.LeapOverlay;
 import nofrills.features.dungeons.TerminalSolvers;
+import nofrills.features.general.ItemProtection;
 import nofrills.features.general.NoRender;
 import nofrills.features.tweaks.MiddleClickFix;
 import nofrills.features.tweaks.MiddleClickOverride;
@@ -140,6 +141,9 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
         if (SlotOptions.hasCount(slot)) {
             original.call(instance, font, itemStack, x, y, SlotOptions.getCount(slot));
             return;
+        }
+        if (ItemProtection.instance.isActive()) {
+            ItemProtection.drawOverlayIcon(instance, slot.x, slot.y, ItemProtection.getProtectType(slot.getItem()));
         }
         original.call(instance, font, itemStack, x, y, countText);
     }

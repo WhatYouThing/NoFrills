@@ -245,7 +245,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Protect Rarity Upgraded", ItemProtection.protectRarityUpgraded, "Protects any item that is Recombobulated."),
                                 new Settings.Toggle("Protect By Value", ItemProtection.protectValue, "Protects any item that has a high enough NPC/Auction/Bazaar value."),
                                 new Settings.DoubleInput("Minimum Value", ItemProtection.protectValueMin, "The minimum item value for an item to be protected by value."),
-                                new Settings.Toggle("Hide Tooltip", ItemProtection.hideTooltip, "Hides the tooltip line about items being protected. Hold Left Shift to reveal the line.")
+                                new Settings.Toggle("Hide Tooltip", ItemProtection.hideTooltip, "Hides the tooltip line about items being protected. Hold Left Shift to reveal the line."),
+                                new Settings.Toggle("Draw Overlay", ItemProtection.drawOverlay, "Draws a visual indicator for protected items."),
+                                new Settings.ColorPicker("Regular Tint", ItemProtection.regularOverlay, "Tint for regular protected items."),
+                                new Settings.ColorPicker("Manual Tint", ItemProtection.manualOverlay, "Tint for manually protected items.")
                         ))),
                         new Module("Info Tooltips", InfoTooltips.instance, "Adds various information about an item to its tooltip.", new Settings(List.of(
                                 new Settings.Toggle("Dungeon Quality", InfoTooltips.dungeonQuality, "Displays the quality and the floor tier on applicable dungeon items."),

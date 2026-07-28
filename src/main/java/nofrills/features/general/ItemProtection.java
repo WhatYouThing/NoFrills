@@ -5,11 +5,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
@@ -17,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nofrills.config.*;
 import nofrills.events.*;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
@@ -42,7 +46,11 @@ public class ItemProtection {
     public static final SettingBool protectValue = new SettingBool(false, "protectValue", instance);
     public static final SettingDouble protectValueMin = new SettingDouble(5000000.0, "protectValueMin", instance);
     public static final SettingBool hideTooltip = new SettingBool(false, "hideTooltip", instance);
+    public static final SettingBool drawOverlay = new SettingBool(false, "drawOverlay", instance);
+    public static final SettingColor regularOverlay = new SettingColor(RenderColor.GREEN, "regularOverlay", instance);
+    public static final SettingColor manualOverlay = new SettingColor(RenderColor.fromHex(0xffff7f), "manualOverlay", instance);
 
+    private static final Identifier overlaySprite = Identifier.fromNamespaceAndPath("nofrills", "item_protection");
     private static boolean isSellGUI = false;
     private static boolean isSalvageGUI = false;
     private static boolean overrideActive = false;
@@ -86,6 +94,17 @@ public class ItemProtection {
             }
         }
         return ProtectType.None;
+    }
+
+    public static void drawOverlayIcon(GuiGraphicsExtractor context, int slotX, int slotY, ProtectType type) {
+        int color = regularOverlay.value().argb;
+        if (!drawOverlay.value() || type == ProtectType.None) {
+            return;
+        }
+        if (type == ProtectType.UUID || type == ProtectType.SkyblockID) {
+            color = manualOverlay.value().argb;
+        }
+        context.blitSprite(RenderPipelines.GUI_TEXTURED, overlaySprite, slotX, slotY, 16, 16, color);
     }
 
     private static boolean isSellStack(ItemStack stack) {

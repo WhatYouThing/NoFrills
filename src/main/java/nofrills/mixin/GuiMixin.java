@@ -17,6 +17,7 @@ import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 import nofrills.events.HudRenderEvent;
 import nofrills.features.general.ChatTweaks;
+import nofrills.features.general.ItemProtection;
 import nofrills.features.general.NoRender;
 import nofrills.features.misc.StreamerMode;
 import nofrills.misc.Utils;
@@ -66,6 +67,13 @@ public abstract class GuiMixin {
     private void onRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (!mc.options.hideGui) {
             eventBus.post(new HudRenderEvent(graphics, this.getFont(), deltaTracker));
+        }
+    }
+
+    @Inject(method = "extractItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractSlot(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IILnet/minecraft/client/DeltaTracker;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;I)V", ordinal = 0, shift = At.Shift.AFTER))
+    private void onRenderItemHotbar(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci, @Local(name = "i") int slot_idx, @Local(name = "x") int x, @Local(name = "y") int y, @Local(name = "player") Player player) {
+        if (ItemProtection.instance.isActive()) {
+            ItemProtection.drawOverlayIcon(context, x, y, ItemProtection.getProtectType(player.getInventory().getNonEquipmentItems().get(slot_idx)));
         }
     }
 

@@ -100,7 +100,8 @@ public class WardrobeKeybinds {
         ItemStack stack = slot.getItem();
         Item item = stack.getItem();
         String name = Utils.toPlain(stack.getHoverName());
-        if (!stack.isEmpty() && target != -1 && name.startsWith(Utils.format("Slot {}:", target))) {
+        String prefix = Utils.format("Slot {}:", target);
+        if (!stack.isEmpty() && target != -1 && (name.equals(prefix) || name.startsWith(prefix + " "))) {
             if (noUnequip.value() && item.equals(Items.LIME_DYE)) {
                 return false;
             }

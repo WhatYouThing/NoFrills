@@ -72,10 +72,13 @@ public class CroesusSolver {
         if (color == null) return;
         SlotOptions.setBackground(slot, color);
         if (floorLabel.value()) {
-            String prefix = name.startsWith("Master Mode") ? "M" : "F";
-            String floorLine = Utils.getLoreLines(stack).getFirst();
-            int floor = Utils.parseRoman(floorLine.substring(floorLine.lastIndexOf(" ") + 1));
-            SlotOptions.setCount(slot, prefix + floor);
+            List<String> loreLines = Utils.getLoreLines(stack);
+            if (!loreLines.isEmpty()) {
+                String prefix = name.startsWith("Master Mode") ? "M" : "F";
+                String floorLine = loreLines.getFirst();
+                int floor = Utils.parseRoman(floorLine.substring(floorLine.lastIndexOf(" ") + 1));
+                SlotOptions.setCount(slot, prefix + floor);
+            }
         }
     }
 

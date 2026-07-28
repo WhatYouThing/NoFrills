@@ -137,7 +137,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Create Waypoints", ChatWaypoints.allWaypoints, "Enables creating waypoints for coordinates sent by players in the all chat."),
                                 new Settings.Toggle("Clear On Arrive", ChatWaypoints.allClear, "Automatically remove the all chat waypoint once you get close."),
                                 new Settings.SliderInt("Duration", 1, 600, 1, ChatWaypoints.allDuration, "The duration (in seconds) that all chat waypoints should be rendered for."),
-                                new Settings.ColorPicker("Color", ChatWaypoints.allColor, "The color used for the all chat waypoints.")
+                                new Settings.ColorPicker("Color", ChatWaypoints.allColor, "The color used for the all chat waypoints."),
+                                new Settings.Toggle("Show Distance", ChatWaypoints.showDistance, "Shows distance to all waypoints.")
                         ))),
                         new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(List.of(
                                 new Settings.Separator("Sound"),

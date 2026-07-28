@@ -31,6 +31,7 @@ public class ChatWaypoints {
     public static final SettingInt allDuration = new SettingInt(60, "allDuration", instance.key());
     public static final SettingBool allClear = new SettingBool(false, "allClearOnArrive", instance.key());
     public static final SettingColor allColor = new SettingColor(RenderColor.fromArgb(0xaa55ffff), "allColor", instance.key());
+    public static final SettingBool showDistance = new SettingBool(false, "showDistance", instance.key());
 
     private static final List<PlayerWaypoint> waypointList = new ArrayList<>();
 
@@ -127,6 +128,9 @@ public class ChatWaypoints {
                 RenderColor color = waypoint.party ? partyColor.value() : allColor.value();
                 event.drawFilledWithBeam(waypoint.box, 256, true, color);
                 event.drawDistanceScaledText(waypoint.box.getCenter().add(0, 1, 0), waypoint.name, 0.05f, true, RenderColor.WHITE);
+                if (showDistance.value()) {
+                    event.drawDistanceScaledText(waypoint.box.getCenter().add(0, -1, 0), Component.literal(String.format("%.1f m", waypoint.distance())), 0.05f, true, RenderColor.WHITE);
+                }
             }
         }
     }
@@ -149,6 +153,13 @@ public class ChatWaypoints {
             this.box = AABB.encapsulatingFullBlocks(pos, pos);
             this.duration = duration;
             this.party = party;
+        }
+
+        public double distance() {
+            if (mc.player != null) {
+                return mc.player.position().distanceTo(box.getCenter());
+            }
+            return 0;
         }
 
         public boolean shouldClear() {

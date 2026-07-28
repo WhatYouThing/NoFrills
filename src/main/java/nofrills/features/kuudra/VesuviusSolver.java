@@ -70,14 +70,17 @@ public class VesuviusSolver {
         if (color == null) return;
         SlotOptions.setBackground(slot, color);
         if (tierLabel.value()) {
-            String tierLine = Utils.getLoreLines(stack).getFirst();
-            SlotOptions.setCount(slot, switch (tierLine) {
-                case "Hot Tier" -> "T2";
-                case "Burning Tier" -> "T3";
-                case "Fiery Tier" -> "T4";
-                case "Infernal Tier" -> "T5";
-                default -> "T1";
-            });
+            List<String> loreLines = Utils.getLoreLines(stack);
+            if (!loreLines.isEmpty()) {
+                String tierLine = loreLines.getFirst();
+                SlotOptions.setCount(slot, switch (tierLine) {
+                    case "Hot Tier" -> "T2";
+                    case "Burning Tier" -> "T3";
+                    case "Fiery Tier" -> "T4";
+                    case "Infernal Tier" -> "T5";
+                    default -> "T1";
+                });
+            }
         }
     }
 

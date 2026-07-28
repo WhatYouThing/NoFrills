@@ -73,12 +73,15 @@ public class CurveSolver {
         this.activeTicks = this.activeDuration;
         this.clearTicks = this.clearDuration;
         if (this.particleList.size() > 3) {
-            this.solvedPos = solve();
+            Vec3 solution = solve();
+            if (solution != null) {
+                this.solvedPos = solution;
+            }
         }
     }
 
     public double getLastDist(Vec3 pos) {
-        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) : this.startPos.distanceTo(pos);
+        return !this.particleList.isEmpty() ? this.particleList.getLast().distanceTo(pos) : (this.startPos != null ? this.startPos.distanceTo(pos) : 0.0);
     }
 
     public Optional<Vec3> getSolvedPos() {
@@ -104,6 +107,7 @@ public class CurveSolver {
 
     private Vec3 solve() {
         double[][] res = fitter3D.fit();
+        if (res == null || res.length < 2) return null;
         double[] deriv_0 = new double[3];
         for (int i = 0; i < 3; i++) {
             deriv_0[i] = res[1][i] / 3;
@@ -140,14 +144,18 @@ public class CurveSolver {
         }
 
         public double[] fit() {
-            Matrix xMatrixTransposed = this.xMatrix.transpose();
-            Matrix result = xMatrixTransposed
-                    .times(this.xMatrix)
-                    .inverse()
-                    .times(xMatrixTransposed)
-                    .times(this.yMatrix)
-                    .transpose();
-            return result.getArray()[0];
+            try {
+                Matrix xMatrixTransposed = this.xMatrix.transpose();
+                Matrix result = xMatrixTransposed
+                        .times(this.xMatrix)
+                        .inverse()
+                        .times(xMatrixTransposed)
+                        .times(this.yMatrix)
+                        .transpose();
+                return result.getArray()[0];
+            } catch (RuntimeException ignored) {
+                return null;
+            }
         }
 
         public void clear() {
@@ -175,7 +183,9 @@ public class CurveSolver {
         public double[][] fit() {
             double[][] coefficients = new double[3][];
             for (int i = 0; i < 3; i++) {
-                coefficients[i] = this.fitters[i].fit();
+                double[] res = this.fitters[i].fit();
+                if (res == null) return null;
+                coefficients[i] = res;
             }
             return new Matrix(coefficients).transpose().getArray();
         }

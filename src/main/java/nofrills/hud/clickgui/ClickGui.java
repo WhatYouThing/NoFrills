@@ -13,7 +13,6 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import nofrills.features.dungeons.*;
 import nofrills.features.farming.*;
-import nofrills.features.fishing.MuteDrake;
 import nofrills.features.fishing.RadarSolver;
 import nofrills.features.fishing.RareAnnounce;
 import nofrills.features.fishing.RareHighlight;
@@ -311,9 +310,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("No Tooltip Styling", LegacyTextures.noTooltipStyle, "Disables custom styling of tooltips. Reverts item tooltips if the official pack is below the vanilla pack."),
                                 new Settings.Toggle("No Bow Cooldown", LegacyTextures.noBowCooldown, "Prevents the cooldown overlay from rendering on bows/shortbows."),
                                 new Settings.Toggle("More Legacy", LegacyTextures.moreLegacy, "Reverts several items which used to be axes (before the Foraging Update) into axes.")
-                        )),
-                        new Module("Mute Explosion", MuteExplosion.instance, "Prevents the explosion sound from playing.", new Settings(
-                                new Settings.Toggle("Dungeons Only", MuteExplosion.dungeonsOnly, "Only mute the explosion sound while in Dungeons.")
                         ))
                 )),
                 new Category("Misc", List.of(
@@ -371,6 +367,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         )),
                         new Module("Streamer Mode", StreamerMode.instance, "While nicked: replaces your nick with your real username, hides the lobby ID, and hides all player names.", new Settings(
                                 new Settings.TextInput("Base Name", StreamerMode.baseName, "The name to use to hide the names of other players. Replaces placeholders \"{}\" with random digits.")
+                        )),
+                        new Module("Sound Blocker", SoundBlocker.instance, "Prevents various sounds from playing.", new Settings(
+                                new Settings.EnumToggle<>("Explosions", SoundBlocker.explosions, "Cancels explosion sound effects."),
+                                new Settings.Toggle("Angry Enderman", SoundBlocker.angryEnderman, "Prevents the angry Enderman noises from being played by the client."),
+                                new Settings.Toggle("Vampire Abilities", SoundBlocker.vampireAbilities, "Cancels the Vampire Slayer Mania and Killer Springs sound effects."),
+                                new Settings.Toggle("Reindrake Gifts", SoundBlocker.reindrakeGifts, "Cancels the loud Totem of Undying sound effects that play when picking up Reindrake loot."),
+                                new Settings.Toggle("Composter", SoundBlocker.composter, "Cancels the sounds that the running composter makes.")
                         ))
                 )),
                 new Category("Solvers", List.of(
@@ -420,7 +423,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))
                 )),
                 new Category("Fishing", List.of(
-                        new Module("Mute Drake", MuteDrake.instance, "Prevents the Reindrake from blowing up your ears with gifts."),
                         new Module("Rare Highlight", RareHighlight.instance, "Highlights rare/profitable sea creatures.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Highlight Style", RareHighlight.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Outline Color", RareHighlight.outlineColor, "The color of the outline style highlight."),
@@ -695,7 +697,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Chalice Highlight", ChaliceHighlight.instance, "Highlights the Blood Ichor chalices spawned by the T5 Vampire.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", ChaliceHighlight.color, "The color of the chalice highlight.")
                         ))),
-                        new Module("Mute Vampire", MuteVampire.instance, "Prevents the Vampire Mania/Killer Springs sounds from playing."),
                         new Module("Egg Hits Display", EggHitsDisplay.instance, "Renders the needed hits for the Tarantula Broodfather egg sack phase.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", EggHitsDisplay.color, "The color of the text."),
                                 new Settings.SliderDouble("Scale", 0.0, 1.0, 0.01, EggHitsDisplay.scale, "The scale of the text.")
@@ -703,7 +704,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Beacon Tracer", BeaconTracer.instance, "Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", BeaconTracer.color, "The color of the tracer.")
                         ))),
-                        new Module("Mute Enderman", MuteEnderman.instance, "Prevents the angry Enderman sounds from playing."),
                         new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt."),
                         new Module("Spawn Alert", SpawnAlert.instance, "Alerts you when your slayer boss is spawned."),
                         new Module("Miniboss Highlight", SlayerMinibossHighlight.instance, "Highlights slayer minibosses.", new Settings(List.of(
@@ -785,8 +785,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Farm Color", EquipmentHighlight.farmColor, "The color of the farming equipment highlight."),
                                 new Settings.ColorPicker("Pest Color", EquipmentHighlight.pestColor, "The color of the pest spawning equipment highlight.")
                         )),
-                        new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation."),
-                        new Module("Mute Composter", MuteComposter.instance, "Prevents the composter sounds from playing.")
+                        new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.")
                 ))
         );
         this.categories.getLast().margins(Insets.of(5, 0, 3, 3));

@@ -210,7 +210,7 @@ public class NoRender {
             );
             this.predicates = List.of(
                     (entity -> deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()),
-                    (entity -> fallingBlocks.value() && entity instanceof FallingBlockEntity),
+                    (entity -> fallingBlocks.value() && entity instanceof FallingBlockEntity && !Utils.isInArea("The Rift")),
                     (entity -> {
                         if (treeBits.value() && entity instanceof Display.BlockDisplay blockDisplay) {
                             return treeBlocks.contains(blockDisplay.getBlockState().getBlock());

@@ -13,8 +13,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.jspecify.annotations.NonNull;
+
+import java.util.Arrays;
 
 import static nofrills.Main.mc;
 
@@ -24,10 +27,14 @@ public final class InventoryButtonWidget extends ImageButton {
             Identifier.withDefaultNamespace("widget/button"),
             Identifier.withDefaultNamespace("widget/button_highlighted")
     );
-    private final JsonObject buttonObject;
-    private final ItemStack iconStack;
-    private double buttonScaleX;
-    private double buttonScaleY;
+    final JsonObject buttonObject;
+    final ItemStack iconStack;
+    final InventoryButtonStyle buttonStyle;
+    final RenderColor buttonColorBackground;
+    final RenderColor buttonColorBorder;
+    final RenderColor buttonColorBorderHover;
+    double buttonScaleX;
+    double buttonScaleY;
 
     public InventoryButtonWidget(double x, double y, double scaleX, double scaleY, ItemStack stack, String command, String tooltip, JsonObject buttonObject) {
         super((int) x, (int) y, (int) (20 * scaleX), (int) (20 * scaleY), inventoryButtonSprites, btn -> {
@@ -36,9 +43,16 @@ public final class InventoryButtonWidget extends ImageButton {
         });
         this.setTooltip(Tooltip.create(Component.literal(tooltip)));
         this.buttonObject = buttonObject;
+        this.iconStack = stack;
+        this.buttonStyle = Arrays.stream(InventoryButtonStyle.values())
+                .filter(value -> value.name().equals(buttonObject.get("style").getAsString()))
+                .findFirst()
+                .orElse(InventoryButtonStyle.Vanilla);
+        this.buttonColorBackground = RenderColor.fromArgb(buttonObject.get("colorBackground").getAsInt());
+        this.buttonColorBorder = RenderColor.fromArgb(buttonObject.get("colorBorder").getAsInt());
+        this.buttonColorBorderHover = RenderColor.fromArgb(buttonObject.get("colorBorderHover").getAsInt());
         this.buttonScaleX = scaleX;
         this.buttonScaleY = scaleY;
-        this.iconStack = stack;
     }
 
     public static InventoryButtonWidget of(JsonObject buttonObject) {
@@ -48,8 +62,8 @@ public final class InventoryButtonWidget extends ImageButton {
         String tooltip = buttonObject.get("tooltip").getAsString();
         double posX = buttonObject.get("x").getAsDouble() * mc.getWindow().getGuiScaledWidth();
         double posY = buttonObject.get("y").getAsDouble() * mc.getWindow().getGuiScaledHeight();
-        double scaleX = buttonObject.has("scaleX") ? buttonObject.get("scaleX").getAsDouble() : 1.0;
-        double scaleY = buttonObject.has("scaleY") ? buttonObject.get("scaleY").getAsDouble() : 1.0;
+        double scaleX = buttonObject.get("scaleX").getAsDouble();
+        double scaleY = buttonObject.get("scaleY").getAsDouble();
         ItemStack stack = BuiltInRegistries.ITEM.getValue(Identifier.parse(model)).getDefaultInstance().copy();
         if (stack.is(Items.PLAYER_HEAD) && !textures.isEmpty()) {
             stack.set(DataComponents.PROFILE, InventoryButtons.getOrInitTextures(textures));
@@ -60,7 +74,15 @@ public final class InventoryButtonWidget extends ImageButton {
 
     @Override
     public void extractContents(@NonNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        super.extractContents(graphics, mouseX, mouseY, a);
+        if (this.buttonStyle.equals(InventoryButtonStyle.Vanilla)) {
+            super.extractContents(graphics, mouseX, mouseY, a);
+        } else if (this.buttonStyle.equals(InventoryButtonStyle.Color)) {
+            graphics.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), this.buttonColorBackground.getArgb());
+            graphics.outline(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.isHovered()
+                    ? this.buttonColorBorderHover.getArgb()
+                    : this.buttonColorBorder.getArgb()
+            );
+        }
         graphics.pose().pushMatrix();
         graphics.pose().translate((float) (this.getX() + 2 * this.buttonScaleX), (float) (this.getY() + 2 * this.buttonScaleY));
         graphics.pose().scale((float) this.buttonScaleX, (float) this.buttonScaleY);
@@ -77,7 +99,7 @@ public final class InventoryButtonWidget extends ImageButton {
     public void onClick(@NonNull MouseButtonEvent event, boolean doubleClick) {
         if (!event.buttonInfo().hasControlDown() && !event.buttonInfo().hasAltDown()) {
             if (event.buttonInfo().button() == 1) {
-                mc.setScreen(InventoryButtonSettings.of(this.buttonObject));
+                mc.setScreen(InventoryButtonSettings.of(this));
             } else {
                 super.onClick(event, doubleClick);
             }
@@ -101,15 +123,15 @@ public final class InventoryButtonWidget extends ImageButton {
             } else if (event.buttonInfo().hasAltDown()) {
                 buttonSizeX = Math.clamp(event.x() - this.getX(), 0.25 * 20, windowX - buttonSizeX);
                 buttonSizeY = Math.clamp(event.y() - this.getY(), 0.25 * 20, windowY - buttonSizeY);
-                if (this.buttonObject.get("keepSquare").getAsBoolean()) {
+                if (this.buttonObject.get("uniform").getAsBoolean()) {
                     double finalSize = Math.min(buttonSizeX, buttonSizeY);
                     this.setSize((int) finalSize, (int) finalSize);
-                    this.buttonScaleX = finalSize / 20.;
-                    this.buttonScaleY = finalSize / 20.;
+                    this.buttonScaleX = finalSize / 20.0;
+                    this.buttonScaleY = finalSize / 20.0;
                 } else {
                     this.setSize((int) buttonSizeX, (int) buttonSizeY);
-                    this.buttonScaleX = buttonSizeX / 20.;
-                    this.buttonScaleY = buttonSizeY / 20.;
+                    this.buttonScaleX = buttonSizeX / 20.0;
+                    this.buttonScaleY = buttonSizeY / 20.0;
                 }
                 this.buttonObject.addProperty("scaleX", this.buttonScaleX);
                 this.buttonObject.addProperty("scaleY", this.buttonScaleY);

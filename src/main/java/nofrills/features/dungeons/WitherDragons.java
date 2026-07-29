@@ -284,7 +284,7 @@ public class WitherDragons {
                     EnderDragon entity = dragon.getEntity();
                     if (!dragon.iceSprayed && Utils.horizontalDistance(entity, stand) < 2.0 && stand.getY() > entity.getY()) {
                         Utils.infoRaw(Component.literal(dragon.name).withColor(dragon.color.hex).append(
-                                Component.literal(Utils.format(" Ice Sprayed in {} ticks.", tickCounter - dragon.spawnedAt)).withStyle(ChatFormatting.GRAY)
+                                Component.literal(Utils.format(" Ice Sprayed in {} tick(s).", tickCounter - dragon.spawnedAt)).withStyle(ChatFormatting.GRAY)
                         ));
                         dragon.iceSprayed = true;
                         break;

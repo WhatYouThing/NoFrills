@@ -6,6 +6,7 @@ import io.wispforest.owo.util.EventSource;
 import io.wispforest.owo.util.EventStream;
 import net.minecraft.network.chat.Component;
 import nofrills.hud.clickgui.Settings;
+import nofrills.misc.Utils;
 
 public final class EnumButton<T extends Enum<T>> extends ButtonComponent {
     private final T[] values;
@@ -20,7 +21,7 @@ public final class EnumButton<T extends Enum<T>> extends ButtonComponent {
         this.defaultValue = defaultValue;
         this.renderer(Settings.buttonRenderer);
         this.setValue(value);
-        this.onPress(button -> {
+        this.onPress(_ -> {
             for (int i = 0; i < this.values.length; i++) {
                 if (this.values[i].equals(this.value)) {
                     T newValue = i == this.values.length - 1 ? this.values[0] : this.values[i + 1];
@@ -45,12 +46,7 @@ public final class EnumButton<T extends Enum<T>> extends ButtonComponent {
     }
 
     public T asValue(String name) {
-        for (T value : this.values) {
-            if (value.name().equals(name)) {
-                return value;
-            }
-        }
-        return this.defaultValue;
+        return Utils.toEnumConstant(name, this.values, this.defaultValue);
     }
 
     public EventSource<TextBoxComponent.OnChanged> onChanged() {

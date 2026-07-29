@@ -157,11 +157,11 @@ public class Utils {
     }
 
     public static MutableComponent getTag() {
-        return Component.literal("[NoFrills] ").withColor(0x5ca0bf);
+        return Component.literal("[NoFrills] ").withColor(RenderColor.NF_BLUE.getHex());
     }
 
     public static MutableComponent getShortTag() {
-        return Component.literal("[NF] ").withColor(0x5ca0bf);
+        return Component.literal("[NF] ").withColor(RenderColor.NF_BLUE.getHex());
     }
 
     public static void info(String message) {
@@ -474,6 +474,7 @@ public class Utils {
             case "Shiny Wither Leggings" -> "WITHER_LEGGINGS";
             case "Shiny Wither Boots" -> "WITHER_BOOTS";
             case "Shiny Necron's Handle" -> "NECRON_HANDLE";
+            case "Dusty Travel Scroll to the Kuudra Skull" -> "NETHER_FORTRESS_BOSS_TRAVEL_SCROLL";
             default -> toID(name.replaceAll(Symbols.dungeonStar, "").trim());
         };
     }
@@ -930,6 +931,15 @@ public class Utils {
 
     public static String toPlain(String string) {
         return string.replaceAll("(?i)§[0-9A-Z]", "");
+    }
+
+    public static <T extends Enum<?>> T toEnumConstant(String value, T[] constants, T fallback) {
+        for (T constant : constants) {
+            if (constant.name().equals(value)) {
+                return constant;
+            }
+        }
+        return fallback;
     }
 
     /**

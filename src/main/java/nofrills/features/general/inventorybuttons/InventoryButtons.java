@@ -3,6 +3,7 @@ package nofrills.features.general.inventorybuttons;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -18,9 +19,12 @@ import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ServerJoinEvent;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
@@ -42,6 +46,31 @@ public class InventoryButtons {
         return profileCache.get(payload);
     }
 
+    private static JsonObject fillDefaults(JsonObject object) {
+        List<Pair<String, JsonPrimitive>> values = List.of(
+                Pair.of("x", new JsonPrimitive((mc.mouseHandler.getScaledXPos(mc.getWindow()) - 10) / mc.getWindow().getGuiScaledWidth())),
+                Pair.of("y", new JsonPrimitive((mc.mouseHandler.getScaledYPos(mc.getWindow()) - 10) / mc.getWindow().getGuiScaledHeight())),
+                Pair.of("uniform", new JsonPrimitive(true)),
+                Pair.of("scaleX", new JsonPrimitive(1.0)),
+                Pair.of("scaleY", new JsonPrimitive(1.0)),
+                Pair.of("command", new JsonPrimitive("")),
+                Pair.of("tooltip", new JsonPrimitive("Inventory Button")),
+                Pair.of("model", new JsonPrimitive("")),
+                Pair.of("textures", new JsonPrimitive("")),
+                Pair.of("glint", new JsonPrimitive(false)),
+                Pair.of("style", new JsonPrimitive(InventoryButtonStyle.Vanilla.name())),
+                Pair.of("colorBackground", new JsonPrimitive(RenderColor.GRAY.withAlpha(0.33f).getArgb())),
+                Pair.of("colorBorder", new JsonPrimitive(RenderColor.NF_BLUE.getArgb())),
+                Pair.of("colorBorderHover", new JsonPrimitive(RenderColor.WHITE.getArgb()))
+        );
+        for (Pair<String, JsonPrimitive> value : values) {
+            if (!object.has(value.getKey())) {
+                object.add(value.getKey(), value.getValue());
+            }
+        }
+        return object;
+    }
+
     @EventHandler
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container) {
@@ -51,17 +80,7 @@ public class InventoryButtons {
                         if (!object.has("buttons")) {
                             object.add("buttons", new JsonArray());
                         }
-                        JsonObject obj = new JsonObject();
-                        obj.addProperty("x", (mc.mouseHandler.getScaledXPos(mc.getWindow()) - 10) / mc.getWindow().getGuiScaledWidth());
-                        obj.addProperty("y", (mc.mouseHandler.getScaledYPos(mc.getWindow()) - 10) / mc.getWindow().getGuiScaledHeight());
-                        obj.addProperty("keepSquare", true);
-                        obj.addProperty("scaleX", 1.0);
-                        obj.addProperty("scaleY", 1.0);
-                        obj.addProperty("command", "");
-                        obj.addProperty("tooltip", "Inventory Button");
-                        obj.addProperty("model", "lime_concrete");
-                        obj.addProperty("textures", "");
-                        obj.addProperty("glint", false);
+                        JsonObject obj = fillDefaults(new JsonObject());
                         object.get("buttons").getAsJsonArray().add(obj);
                         container.addRenderableWidget(InventoryButtonWidget.of(obj));
                     });
@@ -92,7 +111,7 @@ public class InventoryButtons {
     private static void onScreen(ScreenOpenEvent event) {
         if (instance.isActive() && event.screen instanceof AbstractContainerScreen<?> container && data.value().has("buttons")) {
             for (JsonElement element : data.value().get("buttons").getAsJsonArray()) {
-                container.addRenderableWidget(InventoryButtonWidget.of(element.getAsJsonObject()));
+                container.addRenderableWidget(InventoryButtonWidget.of(fillDefaults(element.getAsJsonObject())));
             }
         }
     }

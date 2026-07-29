@@ -13,10 +13,9 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatSlider;
-import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
-import nofrills.hud.clickgui.components.ToggleButton;
-import nofrills.misc.Utils;
+import nofrills.misc.MutableReference;
+import nofrills.misc.RenderColor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,16 +28,20 @@ public class InventoryButtonSettings extends Settings {
         super(settings);
     }
 
-    public static InventoryButtonSettings of(JsonObject buttonObject) {
+    public static InventoryButtonSettings of(InventoryButtonWidget widget) {
+        JsonObject buttonObject = widget.buttonObject;
         List<FlowLayout> list = new ArrayList<>();
-        FlowLayout keepSquareLayout = buildKeepSquareSetting(buttonObject);
-        list.add(keepSquareLayout);
-        list.addAll(buildScaleSettings(buttonObject, (ToggleButton) keepSquareLayout.children().get(1)));
+        list.add(buildUniformSetting(buttonObject));
+        list.addAll(buildScaleSettings(buttonObject));
         list.add(buildCommandSetting(buttonObject));
         list.add(buildTooltipSetting(buttonObject));
         list.add(buildModelSetting(buttonObject));
         list.add(buildTexturesSetting(buttonObject));
         list.add(buildGlintSetting(buttonObject));
+        list.add(buildStyleSetting(buttonObject, widget));
+        list.add(buildBackgroundColorSetting(buttonObject, widget));
+        list.add(buildBorderColorSetting(buttonObject, widget));
+        list.add(buildBorderHoverColorSetting(buttonObject, widget));
         list.add(buildManageSetting(buttonObject));
         InventoryButtonSettings buttonSettings = new InventoryButtonSettings(list);
         String command = buttonObject.get("command").getAsString();
@@ -46,159 +49,86 @@ public class InventoryButtonSettings extends Settings {
         return buttonSettings;
     }
 
-    protected static FlowLayout buildKeepSquareSetting(JsonObject buttonObject) {
-        FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-
-        PlainLabel keepSquare = new PlainLabel(Component.literal("Uniform Scale"));
-        ToggleButton keepSquareButton = new ToggleButton(buttonObject.has("keepSquare") && buttonObject.get("keepSquare").getAsBoolean());
-        keepSquare.tooltip(Component.literal("Keep scale locked to 1:1."));
-        keepSquare.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-
-        keepSquareButton.onToggled().subscribe(change -> buttonObject.addProperty("keepSquare", change));
-        layout.child(keepSquare);
-        layout.child(keepSquareButton);
-
-        return layout;
+    protected static FlowLayout buildUniformSetting(JsonObject buttonObject) {
+        return new Toggle(
+                "Uniform Scale",
+                buttonObject.get("uniform").getAsBoolean(),
+                false,
+                "Keeps the button scale locked to 1:1.",
+                b -> buttonObject.addProperty("uniform", b)
+        );
     }
 
-    protected static List<FlowLayout> buildScaleSettings(JsonObject buttonObject, ToggleButton keepSquareButton) {
-        FlowLayout layoutX = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        FlowLayout layoutY = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        layoutX.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-        layoutY.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-
-        PlainLabel labelX = new PlainLabel(Component.literal("Scale X").withColor(0xffffff));
-        PlainLabel labelY = new PlainLabel(Component.literal("Scale Y").withColor(0xffffff));
-        FlatTextbox textX = new FlatTextbox(Sizing.fixed(50));
-        FlatTextbox textY = new FlatTextbox(Sizing.fixed(50));
-        FlatSlider sliderX = new FlatSlider(0xffdddddd, 0xff5ca0bf);
-        FlatSlider sliderY = new FlatSlider(0xffdddddd, 0xff5ca0bf);
-        sliderX.min(0.25).max(5.0).stepSize(0.01).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
-        sliderY.min(0.25).max(5.0).stepSize(0.01).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
-
-        labelX.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        labelY.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        labelX.tooltip(Component.literal("The horizontal scale of this inventory button."));
-        labelY.tooltip(Component.literal("The vertical scale of this inventory button."));
-
-        textX.onChanged().subscribe(change -> Utils.parseDouble(change).ifPresent(value -> {
-            buttonObject.addProperty("scaleX", value);
-            sliderX.value(value);
-            if (keepSquareButton.getToggle()) {
-                buttonObject.addProperty("scaleY", value);
-                sliderY.value(value);
-            }
-        }));
-        textY.onChanged().subscribe(change -> Utils.parseDouble(change).ifPresent(value -> {
-            buttonObject.addProperty("scaleY", value);
-            sliderY.value(value);
-            if (keepSquareButton.getToggle()) {
-                buttonObject.addProperty("scaleX", value);
-                sliderX.value(value);
-            }
-        }));
-
-        textX.text(String.valueOf(buttonObject.has("scaleX") ? buttonObject.get("scaleX").getAsDouble() : 1.0));
-        textY.text(String.valueOf(buttonObject.has("scaleY") ? buttonObject.get("scaleY").getAsDouble() : 1.0));
-
-        sliderX.onChanged().subscribe(change -> {
-            double value = roundDouble(change);
-            buttonObject.addProperty("scaleX", value);
-            textX.setValue(String.valueOf(value));
-            if (keepSquareButton.getToggle()) {
-                buttonObject.addProperty("scaleY", value);
-                textY.setValue(String.valueOf(value));
-            }
-        });
-        sliderY.onChanged().subscribe(change -> {
-            double value = roundDouble(change);
-            buttonObject.addProperty("scaleY", value);
-            textY.setValue(String.valueOf(value));
-            if (keepSquareButton.getToggle()) {
-                buttonObject.addProperty("scaleX", value);
-                textX.setValue(String.valueOf(value));
-            }
-        });
-
-        layoutX.child(labelX);
-        layoutX.child(textX);
-        layoutX.child(sliderX);
-        layoutX.child(buildResetButton(_ -> {
-            buttonObject.addProperty("scaleX", 1.0);
-            textX.setValue(String.valueOf(1.0));
-            if (keepSquareButton.getToggle()) {
-                buttonObject.addProperty("scaleY", 1.0);
-                textY.setValue(String.valueOf(1.0));
-            }
-        }));
-        layoutY.child(labelY);
-        layoutY.child(textY);
-        layoutY.child(sliderY);
-        layoutY.child(buildResetButton(_ -> {
-            buttonObject.addProperty("scaleY", 1.0);
-            textY.setValue(String.valueOf(1.0));
-            if (keepSquareButton.getToggle()) {
-                buttonObject.addProperty("scaleX", 1.0);
-                textX.setValue(String.valueOf(1.0));
-            }
-        }));
-
-        return List.of(layoutX, layoutY);
+    protected static List<FlowLayout> buildScaleSettings(JsonObject buttonObject) {
+        MutableReference<FlowLayout> layoutX = new MutableReference<>(null);
+        MutableReference<FlowLayout> layoutY = new MutableReference<>(null);
+        layoutX.set(new SliderDouble(
+                "Scale X",
+                0.5,
+                5.0,
+                0.01,
+                buttonObject.get("scaleX").getAsDouble(),
+                1.0,
+                "The horizontal scale of this inventory button.",
+                d -> {
+                    buttonObject.addProperty("scaleX", d);
+                    if (buttonObject.get("uniform").getAsBoolean() && layoutY.get() != null) {
+                        layoutY.get().children().stream()
+                                .filter(child -> child instanceof FlatSlider)
+                                .findFirst()
+                                .ifPresent(slider -> ((FlatSlider) slider).value(d));
+                    }
+                })
+        );
+        layoutY.set(new SliderDouble(
+                "Scale Y",
+                0.5,
+                5.0,
+                0.01,
+                buttonObject.get("scaleY").getAsDouble(),
+                1.0,
+                "The vertical scale of this inventory button.",
+                d -> {
+                    buttonObject.addProperty("scaleY", d);
+                    if (buttonObject.get("uniform").getAsBoolean() && layoutX.get() != null) {
+                        layoutX.get().children().stream()
+                                .filter(child -> child instanceof FlatSlider)
+                                .findFirst()
+                                .ifPresent(slider -> ((FlatSlider) slider).value(d));
+                    }
+                })
+        );
+        return List.of(layoutX.get(), layoutY.get());
     }
 
     protected static FlowLayout buildCommandSetting(JsonObject buttonObject) {
-        FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-        PlainLabel label = new PlainLabel(Component.literal("Command").withColor(0xffffff));
-        FlatTextbox text = new FlatTextbox(Sizing.fixed(150));
-        label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        label.tooltip(Component.literal("The message/command to send when clicking this inventory button."));
-        text.onChanged().subscribe(change -> buttonObject.addProperty("command", change));
-        text.text(buttonObject.get("command").getAsString());
-        layout.child(label);
-        layout.child(text);
-        layout.child(buildResetButton(btn -> {
-            buttonObject.addProperty("command", "");
-            text.setValue("");
-        }));
-        return layout;
+        return new TextInput(
+                "Command",
+                buttonObject.get("command").getAsString(),
+                "",
+                "The message/command to send when clicking this inventory button.",
+                s -> buttonObject.addProperty("command", s)
+        );
     }
 
     protected static FlowLayout buildTooltipSetting(JsonObject buttonObject) {
-        FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-        PlainLabel label = new PlainLabel(Component.literal("Tooltip").withColor(0xffffff));
-        FlatTextbox text = new FlatTextbox(Sizing.fixed(150));
-        label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        label.tooltip(Component.literal("The tooltip to display when hovering over this inventory button."));
-        text.onChanged().subscribe(change -> buttonObject.addProperty("tooltip", change));
-        text.text(buttonObject.get("tooltip").getAsString());
-        layout.child(label);
-        layout.child(text);
-        layout.child(buildResetButton(btn -> {
-            buttonObject.addProperty("tooltip", "");
-            text.setValue("");
-        }));
-        return layout;
+        return new TextInput(
+                "Tooltip",
+                buttonObject.get("tooltip").getAsString(),
+                "",
+                "The tooltip to display when hovering over this inventory button.",
+                s -> buttonObject.addProperty("tooltip", s)
+        );
     }
 
     protected static FlowLayout buildModelSetting(JsonObject buttonObject) {
-        FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-        PlainLabel label = new PlainLabel(Component.literal("Item Model").withColor(0xffffff));
-        FlatTextbox text = new FlatTextbox(Sizing.fixed(150));
-        label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        label.tooltip(Component.literal("The identifier of the item to display on top of this inventory button.\nExamples: tnt, diamond_sword, purple_dye, ender_chest, bone."));
-        text.onChanged().subscribe(change -> buttonObject.addProperty("model", change));
-        text.text(buttonObject.get("model").getAsString());
-        layout.child(label);
-        layout.child(text);
-        layout.child(buildResetButton(btn -> {
-            buttonObject.addProperty("model", "");
-            text.setValue("");
-        }));
-        return layout;
+        return new TextInput(
+                "Item Model",
+                buttonObject.get("model").getAsString(),
+                "",
+                "The identifier of the item to display on top of this inventory button.\nExamples: tnt, diamond_sword, purple_dye, ender_chest, bone.",
+                s -> buttonObject.addProperty("model", s)
+        );
     }
 
     protected static FlowLayout buildTexturesSetting(JsonObject buttonObject) {
@@ -230,21 +160,54 @@ public class InventoryButtonSettings extends Settings {
     }
 
     protected static FlowLayout buildGlintSetting(JsonObject buttonObject) {
-        FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        layout.padding(Insets.of(5));
-        layout.horizontalAlignment(HorizontalAlignment.LEFT);
-        PlainLabel label = new PlainLabel(Component.literal("Glint").withColor(0xffffff));
-        label.tooltip(Component.literal("Applies the glint effect to the item model displayed on this inventory button."));
-        ToggleButton toggle = new ToggleButton(buttonObject.get("glint").getAsBoolean());
-        toggle.onToggled().subscribe(value -> buttonObject.addProperty("glint", value));
-        label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        layout.child(label);
-        layout.child(toggle);
-        layout.child(buildResetButton(btn -> {
-            buttonObject.addProperty("glint", false);
-            toggle.setToggle(false);
-        }));
-        return layout;
+        return new Toggle(
+                "Glint",
+                buttonObject.get("glint").getAsBoolean(),
+                false,
+                "Applies the glint effect to the item model displayed on this inventory button.",
+                b -> buttonObject.addProperty("glint", b)
+        );
+    }
+
+    protected static FlowLayout buildStyleSetting(JsonObject buttonObject, InventoryButtonWidget widget) {
+        return new EnumToggle<>(
+                "Style",
+                widget.buttonStyle,
+                InventoryButtonStyle.Vanilla,
+                InventoryButtonStyle.class,
+                "The rendering style of this inventory button.",
+                s -> buttonObject.addProperty("style", s.name())
+        );
+    }
+
+    protected static FlowLayout buildBackgroundColorSetting(JsonObject buttonObject, InventoryButtonWidget widget) {
+        return new ColorPicker(
+                "Background Color",
+                widget.buttonColorBackground,
+                RenderColor.GRAY.withAlpha(0.33f),
+                "The background color of this button. Only applies with the \"Color\" style.",
+                c -> buttonObject.addProperty("colorBackground", c.getArgb())
+        );
+    }
+
+    protected static FlowLayout buildBorderColorSetting(JsonObject buttonObject, InventoryButtonWidget widget) {
+        return new ColorPicker(
+                "Border Color",
+                widget.buttonColorBorder,
+                RenderColor.NF_BLUE,
+                "The border color of this button. Only applies with the \"Color\" style.",
+                c -> buttonObject.addProperty("colorBorder", c.getArgb())
+        );
+    }
+
+    protected static FlowLayout buildBorderHoverColorSetting(JsonObject buttonObject, InventoryButtonWidget widget) {
+        return new ColorPicker(
+                "Border Hover Color",
+                widget.buttonColorBorderHover,
+                RenderColor.WHITE,
+                "The border color of this button while hovered over. Only applies with the \"Color\" style.",
+                c -> buttonObject.addProperty("colorBorderHover", c.getArgb())
+        );
     }
 
     protected static FlowLayout buildManageSetting(JsonObject buttonObject) {

@@ -1,5 +1,7 @@
 package nofrills.config;
 
+import nofrills.misc.Utils;
+
 public final class SettingEnum<T extends Enum<T>> extends SettingGeneric {
     public final Class<T> values;
     public final T[] constants;
@@ -17,12 +19,7 @@ public final class SettingEnum<T extends Enum<T>> extends SettingGeneric {
     }
 
     public T toConstant(String value) {
-        for (T constant : this.constants) {
-            if (constant.name().equals(value)) {
-                return constant;
-            }
-        }
-        return this.constants[0];
+        return Utils.toEnumConstant(value, this.constants, Enum.valueOf(this.values, this.getDefault().getAsString()));
     }
 
     public T value() {

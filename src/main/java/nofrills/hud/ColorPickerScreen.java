@@ -9,16 +9,17 @@ import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import nofrills.config.SettingColor;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatSlider;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
+import nofrills.misc.MutableReference;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static nofrills.Main.mc;
 
@@ -30,38 +31,39 @@ public class ColorPickerScreen extends Settings {
         this.previous = previous;
     }
 
-    public static ColorPickerScreen build(SettingColor setting, Screen previous) {
+    public static ColorPickerScreen build(RenderColor currentColor, Screen previous, Consumer<RenderColor> updateCallback) {
         List<FlowLayout> list = new ArrayList<>();
+        MutableReference<RenderColor> reference = new MutableReference<>(currentColor);
 
         FlowLayout colorSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         colorSection.padding(Insets.of(5));
 
         BoxComponent colorDisplay = UIComponents.box(Sizing.fixed(290), Sizing.fixed(20));
-        colorDisplay.color(Color.ofArgb(setting.value().argb)).fill(true);
+        colorDisplay.color(Color.ofArgb(currentColor.getArgb())).fill(true);
         colorSection.child(colorDisplay);
 
         CustomHeight pickerSection = new Settings.CustomHeight(120);
         pickerSection.verticalSizing(Sizing.fixed(120));
         ColorPickerComponent colorPicker = new ColorPickerComponent();
         colorPicker.showAlpha(true).sizing(Sizing.fixed(110), Sizing.fixed(110));
-        colorPicker.selectedColor(Color.ofArgb(setting.value().argb));
+        colorPicker.selectedColor(Color.ofArgb(currentColor.getArgb()));
         pickerSection.child(addLabel("Picker"));
         pickerSection.child(colorPicker);
 
         FlowLayout argbSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         argbSection.horizontalAlignment(HorizontalAlignment.LEFT).padding(Insets.of(5));
         FlatTextbox argbInput = new FlatTextbox(Sizing.fixed(100));
-        argbInput.text("0x" + Integer.toHexString(setting.value().argb));
+        argbInput.text("0x" + Integer.toHexString(currentColor.getArgb()));
         argbSection.child(addLabel("ARGB"));
         argbSection.child(argbInput);
 
         FlowLayout redSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         redSection.horizontalAlignment(HorizontalAlignment.LEFT).padding(Insets.of(5));
         FlatTextbox redInput = new FlatTextbox(Sizing.fixed(40));
-        redInput.text(String.valueOf((int) (setting.value().r * 255)));
+        redInput.text(String.valueOf((int) (currentColor.getRed() * 255)));
         FlatSlider redSlider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
         redSlider.min(0).max(255).stepSize(1).horizontalSizing(Sizing.fixed(150)).verticalSizing(Sizing.fixed(20));
-        redSlider.value((int) (setting.value().r * 255));
+        redSlider.value((int) (currentColor.getRed() * 255));
         redSection.child(addLabel("Red"));
         redSection.child(redInput);
         redSection.child(redSlider);
@@ -69,10 +71,10 @@ public class ColorPickerScreen extends Settings {
         FlowLayout greenSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         greenSection.horizontalAlignment(HorizontalAlignment.LEFT).padding(Insets.of(5));
         FlatTextbox greenInput = new FlatTextbox(Sizing.fixed(40));
-        greenInput.text(String.valueOf((int) (setting.value().g * 255)));
+        greenInput.text(String.valueOf((int) (currentColor.getGreen() * 255)));
         FlatSlider greenSlider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
         greenSlider.min(0).max(255).stepSize(1).horizontalSizing(Sizing.fixed(150)).verticalSizing(Sizing.fixed(20));
-        greenSlider.value((int) (setting.value().g * 255));
+        greenSlider.value((int) (currentColor.getGreen() * 255));
         greenSection.child(addLabel("Green"));
         greenSection.child(greenInput);
         greenSection.child(greenSlider);
@@ -80,10 +82,10 @@ public class ColorPickerScreen extends Settings {
         FlowLayout blueSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         blueSection.horizontalAlignment(HorizontalAlignment.LEFT).padding(Insets.of(5));
         FlatTextbox blueInput = new FlatTextbox(Sizing.fixed(40));
-        blueInput.text(String.valueOf((int) (setting.value().b * 255)));
+        blueInput.text(String.valueOf((int) (currentColor.getBlue() * 255)));
         FlatSlider blueSlider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
         blueSlider.min(0).max(255).stepSize(1).horizontalSizing(Sizing.fixed(150)).verticalSizing(Sizing.fixed(20));
-        blueSlider.value((int) (setting.value().b * 255));
+        blueSlider.value((int) (currentColor.getBlue() * 255));
         blueSection.child(addLabel("Blue"));
         blueSection.child(blueInput);
         blueSection.child(blueSlider);
@@ -91,16 +93,16 @@ public class ColorPickerScreen extends Settings {
         FlowLayout alphaSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         alphaSection.horizontalAlignment(HorizontalAlignment.LEFT).padding(Insets.of(5));
         FlatTextbox alphaInput = new FlatTextbox(Sizing.fixed(40));
-        alphaInput.text(String.valueOf((int) (setting.value().a * 255)));
+        alphaInput.text(String.valueOf((int) (currentColor.getAlpha() * 255)));
         FlatSlider alphaSlider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
         alphaSlider.min(0).max(255).stepSize(1).horizontalSizing(Sizing.fixed(150)).verticalSizing(Sizing.fixed(20));
-        alphaSlider.value((int) (setting.value().a * 255));
+        alphaSlider.value((int) (currentColor.getAlpha() * 255));
         alphaSection.child(addLabel("Alpha"));
         alphaSection.child(alphaInput);
         alphaSection.child(alphaSlider);
 
         Runnable syncValues = () -> {
-            RenderColor color = setting.value();
+            RenderColor color = reference.get();
             int red = (int) (color.r * 255);
             int green = (int) (color.g * 255);
             int blue = (int) (color.b * 255);
@@ -125,12 +127,16 @@ public class ColorPickerScreen extends Settings {
         backButton.margins(Insets.right(5));
         backButton.renderer(Settings.buttonRenderer);
         ButtonComponent copyButton = UIComponents.button(Component.literal("Copy Color"), (btn) ->
-                mc.keyboardHandler.setClipboard("0x" + Integer.toHexString(setting.value().argb))
+                mc.keyboardHandler.setClipboard("0x" + Integer.toHexString(reference.get().argb))
         );
         copyButton.margins(Insets.right(5));
         copyButton.renderer(Settings.buttonRenderer);
         ButtonComponent pasteButton = UIComponents.button(Component.literal("Paste Color"), (btn) -> {
-            Utils.parseHex(mc.keyboardHandler.getClipboard()).ifPresent(integer -> setting.set(RenderColor.fromArgb(integer)));
+            Utils.parseHex(mc.keyboardHandler.getClipboard()).ifPresent(integer -> {
+                RenderColor color = RenderColor.fromArgb(integer);
+                updateCallback.accept(color);
+                reference.set(color);
+            });
             syncValues.run();
         });
         pasteButton.renderer(Settings.buttonRenderer);
@@ -138,49 +144,79 @@ public class ColorPickerScreen extends Settings {
         buttonSection.child(copyButton);
         buttonSection.child(pasteButton);
 
-        colorPicker.onChanged().subscribe(color -> {
-            setting.set(RenderColor.fromArgb(color.argb()));
+        colorPicker.onChanged().subscribe(owoColor -> {
+            RenderColor color = RenderColor.fromArgb(owoColor.argb());
+            updateCallback.accept(color);
+            reference.set(color);
             syncValues.run();
         });
 
         argbInput.onChanged().subscribe((value) -> {
-            Utils.parseHex(value).ifPresent(integer -> setting.set(RenderColor.fromArgb(integer)));
+            Utils.parseHex(value).ifPresent(integer -> {
+                RenderColor color = RenderColor.fromArgb(integer);
+                updateCallback.accept(color);
+                reference.set(color);
+            });
             syncValues.run();
         });
 
         redInput.onChanged().subscribe((value) -> {
-            Utils.parseInt(value).ifPresent(integer -> setting.set(setting.value().withRed(integer / 255.0f)));
+            Utils.parseInt(value).ifPresent(integer -> {
+                RenderColor color = reference.get().withRed(integer / 255.0f);
+                updateCallback.accept(color);
+                reference.set(color);
+            });
             syncValues.run();
         });
         redSlider.onChanged().subscribe((value) -> {
-            setting.set(setting.value().withRed((int) value / 255.0f));
+            RenderColor color = reference.get().withRed((int) value / 255.0f);
+            updateCallback.accept(color);
+            reference.set(color);
             syncValues.run();
         });
 
         greenInput.onChanged().subscribe((value) -> {
-            Utils.parseInt(value).ifPresent(integer -> setting.set(setting.value().withGreen(integer / 255.0f)));
+            Utils.parseInt(value).ifPresent(integer -> {
+                RenderColor color = reference.get().withGreen(integer / 255.0f);
+                updateCallback.accept(color);
+                reference.set(color);
+            });
             syncValues.run();
         });
         greenSlider.onChanged().subscribe((value) -> {
-            setting.set(setting.value().withGreen((int) value / 255.0f));
+            RenderColor color = reference.get().withGreen((int) value / 255.0f);
+            updateCallback.accept(color);
+            reference.set(color);
             syncValues.run();
         });
 
         blueInput.onChanged().subscribe((value) -> {
-            Utils.parseInt(value).ifPresent(integer -> setting.set(setting.value().withBlue(integer / 255.0f)));
+            Utils.parseInt(value).ifPresent(integer -> {
+                RenderColor color = reference.get().withBlue(integer / 255.0f);
+                updateCallback.accept(color);
+                reference.set(color);
+            });
             syncValues.run();
         });
         blueSlider.onChanged().subscribe((value) -> {
-            setting.set(setting.value().withBlue((int) value / 255.0f));
+            RenderColor color = reference.get().withBlue((int) value / 255.0f);
+            updateCallback.accept(color);
+            reference.set(color);
             syncValues.run();
         });
 
         alphaInput.onChanged().subscribe((value) -> {
-            Utils.parseInt(value).ifPresent(integer -> setting.set(setting.value().withAlpha(integer / 255.0f)));
+            Utils.parseInt(value).ifPresent(integer -> {
+                RenderColor color = reference.get().withAlpha(integer / 255.0f);
+                updateCallback.accept(color);
+                reference.set(color);
+            });
             syncValues.run();
         });
         alphaSlider.onChanged().subscribe((value) -> {
-            setting.set(setting.value().withAlpha((int) value / 255.0f));
+            RenderColor color = reference.get().withAlpha((int) value / 255.0f);
+            updateCallback.accept(color);
+            reference.set(color);
             syncValues.run();
         });
 

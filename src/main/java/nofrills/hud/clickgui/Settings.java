@@ -15,6 +15,8 @@ import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.*;
 import nofrills.hud.ColorPickerScreen;
 import nofrills.hud.clickgui.components.*;
+import nofrills.misc.MutableReference;
+import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +27,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import static nofrills.Main.mc;
@@ -179,145 +180,155 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     }
 
     public static final class Toggle extends FlowLayout {
-        public SettingBool setting;
-        public ToggleButton toggle;
 
-        public Toggle(String name, SettingBool setting, String tooltip) {
+        public Toggle(String name, boolean currentValue, boolean defaultValue, String tooltip, Consumer<Boolean> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
-            this.setting = setting;
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
             label.tooltip(Component.literal(tooltip));
-            this.toggle = new ToggleButton(this.setting.value());
-            this.toggle.onToggled().subscribe(value -> this.setting.set(value));
+            ToggleButton toggle = new ToggleButton(currentValue);
+            toggle.onToggled().subscribe(updateCallback::accept);
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             this.child(label);
-            this.child(this.toggle);
-            this.child(buildResetButton(btn -> {
-                this.setting.reset();
-                this.toggle.setToggle(this.setting.value());
+            this.child(toggle);
+            this.child(buildResetButton(_ -> {
+                updateCallback.accept(defaultValue);
+                toggle.setToggle(defaultValue);
             }));
+        }
+
+        public Toggle(String name, SettingBool setting, String tooltip) {
+            this(name, setting.value(), setting.getDefault().getAsBoolean(), tooltip, setting::set);
         }
     }
 
     public static final class SliderDouble extends FlowLayout {
-        public SettingDouble setting;
 
-        public SliderDouble(String name, double min, double max, double step, SettingDouble setting, String tooltip) {
+        public SliderDouble(String name, double min, double max, double step, double currentValue, double defaultValue, String tooltip, Consumer<Double> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
-            this.setting = setting;
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
             FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
-            slider.min(min).max(max).stepSize(step).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
+            slider.min(min).max(max).stepSize(step).value(currentValue).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
             text.onChanged().subscribe(change -> {
-                Optional<Double> value = Utils.parseDouble(text.getValue());
-                if (value.isPresent()) {
-                    this.setting.set(value.get());
-                    slider.value(value.get());
-                }
+                Utils.parseDouble(change).ifPresent(d -> {
+                    double value = roundDouble(d);
+                    updateCallback.accept(value);
+                    slider.value(value);
+                });
             });
-            text.text(String.valueOf(this.setting.value()));
+            text.text(String.valueOf(currentValue));
             slider.onChanged().subscribe(change -> {
-                double value = roundDouble(slider.value());
-                this.setting.set(value);
+                double value = roundDouble(change);
+                updateCallback.accept(value);
                 text.setValue(String.valueOf(value));
             });
             this.child(label);
             this.child(text);
             this.child(slider);
             this.child(buildResetButton(btn -> {
-                this.setting.reset();
-                text.setValue(String.valueOf(roundDouble(this.setting.value())));
+                updateCallback.accept(defaultValue);
+                text.setValue(String.valueOf(roundDouble(defaultValue)));
             }));
+        }
+
+        public SliderDouble(String name, double min, double max, double step, SettingDouble setting, String tooltip) {
+            this(name, min, max, step, setting.value(), setting.getDefault().getAsDouble(), tooltip, setting::set);
         }
     }
 
     public static final class SliderInt extends FlowLayout {
-        public SettingInt setting;
 
-        public SliderInt(String name, int min, int max, int step, SettingInt setting, String tooltip) {
+        public SliderInt(String name, int min, int max, int step, int currentValue, int defaultValue, String tooltip, Consumer<Integer> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
-            this.setting = setting;
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
             FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
-            slider.min(min).max(max).stepSize(step).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
+            slider.min(min).max(max).stepSize(step).value(currentValue).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
             text.onChanged().subscribe(change -> {
-                Optional<Integer> value = Utils.parseInt(text.getValue());
-                if (value.isPresent()) {
-                    this.setting.set(value.get());
-                    slider.value(value.get());
-                }
+                Utils.parseInt(change).ifPresent(i -> {
+                    updateCallback.accept(i);
+                    slider.value(i);
+                });
             });
-            text.text(String.valueOf(this.setting.value()));
+            text.text(String.valueOf(currentValue));
             slider.onChanged().subscribe(change -> {
-                int value = (int) slider.value();
-                this.setting.set(value);
+                int value = (int) change;
+                updateCallback.accept(value);
                 text.setValue(String.valueOf(value));
             });
             this.child(label);
             this.child(text);
             this.child(slider);
-            this.child(buildResetButton(btn -> {
-                this.setting.reset();
-                text.setValue(String.valueOf(this.setting.value()));
+            this.child(buildResetButton(_ -> {
+                updateCallback.accept(defaultValue);
+                text.setValue(String.valueOf(defaultValue));
             }));
+        }
+
+        public SliderInt(String name, int min, int max, int step, SettingInt setting, String tooltip) {
+            this(name, min, max, step, setting.value(), setting.getDefault().getAsInt(), tooltip, setting::set);
         }
     }
 
     public static final class EnumToggle<T extends Enum<T>> extends FlowLayout {
-        public SettingEnum<T> setting;
 
-        public EnumToggle(String name, SettingEnum<T> setting, String tooltip) {
+        public EnumToggle(String name, T currentValue, T defaultValue, Class<T> values, String tooltip, Consumer<T> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
-            this.setting = setting;
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
-            EnumButton<T> button = new EnumButton<>(this.setting.value().name(), this.setting.defaultValue(), this.setting.values);
+            EnumButton<T> button = new EnumButton<>(currentValue.name(), defaultValue, values);
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
-            button.setMessage(Component.literal(this.setting.value().toString()));
-            button.onChanged().subscribe(value -> this.setting.set(this.setting.toConstant(value)));
-            int maxWidth = Arrays.stream(this.setting.constants).mapToInt(constant -> mc.font.width(constant.toString())).max().orElse(0);
+            button.setMessage(Component.literal(currentValue.toString()));
+            T[] constants = values.getEnumConstants();
+            button.onChanged().subscribe(value -> updateCallback.accept(Utils.toEnumConstant(value, constants, defaultValue)));
+            int maxWidth = Arrays.stream(constants).mapToInt(constant -> mc.font.width(constant.toString())).max().orElse(0);
             button.horizontalSizing(Sizing.fixed(maxWidth + 10));
             this.child(label);
             this.child(button);
-            this.child(buildResetButton(btn -> {
-                this.setting.reset();
-                button.setMessage(Component.literal(this.setting.defaultValue().name()));
+            this.child(buildResetButton(_ -> {
+                updateCallback.accept(defaultValue);
+                button.setMessage(Component.literal(defaultValue.name()));
             }));
+        }
+
+        public EnumToggle(String name, SettingEnum<T> setting, String tooltip) {
+            this(name, setting.value(), setting.defaultValue(), setting.values, tooltip, setting::set);
         }
     }
 
     public static final class ColorPicker extends FlowLayout {
-        public SettingColor setting;
         public Screen previous;
 
-        public ColorPicker(String name, SettingColor setting, String tooltip) {
+        public ColorPicker(String name, RenderColor currentValue, RenderColor defaultValue, String tooltip, Consumer<RenderColor> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.verticalAlignment(VerticalAlignment.CENTER);
-            this.setting = setting;
+            MutableReference<RenderColor> reference = new MutableReference<>(currentValue);
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
             FlowLayout colorDisplay = UIContainers.verticalFlow(Sizing.fixed(20), Sizing.fixed(20));
-            colorDisplay.surface((context, component) -> context.fill(component.x(), component.y(), component.x() + component.width(), component.y() + component.height(), this.setting.value().argb)).margins(Insets.right(5));
-            this.child(buildResetButton(btn -> this.setting.reset()).positioning(Positioning.relative(100, 50)));
-            ButtonComponent editButton = UIComponents.button(Component.literal("Edit Color"), (btn) -> {
-                ColorPickerScreen pickerScreen = ColorPickerScreen.build(this.setting, this.previous);
+            colorDisplay.surface((context, component) ->
+                    context.fill(component.x(), component.y(), component.x() + component.width(), component.y() + component.height(), reference.get().getArgb())
+            ).margins(Insets.right(5));
+            ButtonComponent editButton = UIComponents.button(Component.literal("Edit Color"), _ -> {
+                ColorPickerScreen pickerScreen = ColorPickerScreen.build(reference.get(), this.previous, color -> {
+                    reference.set(color);
+                    updateCallback.accept(color);
+                });
                 pickerScreen.setTitle(Component.literal(!Utils.toLower(name).endsWith("color") ? name + " Color" : name));
                 mc.setScreen(pickerScreen);
             });
@@ -326,6 +337,14 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.child(label);
             this.child(colorDisplay);
             this.child(editButton);
+            this.child(buildResetButton(_ -> {
+                reference.set(defaultValue);
+                updateCallback.accept(defaultValue);
+            }).positioning(Positioning.relative(100, 50)));
+        }
+
+        public ColorPicker(String name, SettingColor setting, String tooltip) {
+            this(name, setting.value(), RenderColor.fromArgb(setting.getDefault().getAsInt()), tooltip, setting::set);
         }
     }
 
@@ -367,49 +386,51 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     }
 
     public static final class TextInput extends FlowLayout {
-        public SettingString setting;
 
-        public TextInput(String name, SettingString setting, String tooltip) {
+        public TextInput(String name, String currentValue, String defaultValue, String tooltip, Consumer<String> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
-            this.setting = setting;
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(150));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
-            text.onChanged().subscribe(change -> this.setting.set(text.getValue()));
-            text.text(String.valueOf(this.setting.value()));
+            text.onChanged().subscribe(updateCallback::accept);
+            text.text(currentValue);
             this.child(label);
             this.child(text);
-            this.child(buildResetButton(btn -> {
-                this.setting.reset();
-                text.setValue(String.valueOf(this.setting.value()));
+            this.child(buildResetButton(_ -> {
+                updateCallback.accept(defaultValue);
+                text.setValue(defaultValue);
             }));
+        }
+
+        public TextInput(String name, SettingString setting, String tooltip) {
+            this(name, setting.value(), setting.getDefault().getAsString(), tooltip, setting::set);
         }
     }
 
     public static final class Keybind extends FlowLayout {
-        public SettingKeybind setting;
-        public KeybindButton button;
 
-        public Keybind(String name, SettingKeybind setting, String tooltip) {
+        public Keybind(String name, int currentValue, int defaultValue, String tooltip, Consumer<Integer> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
-            this.padding(Insets.of(5));
-            this.horizontalAlignment(HorizontalAlignment.LEFT);
-            this.setting = setting;
+            this.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
             label.tooltip(Component.literal(tooltip));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            this.button = new KeybindButton();
-            this.button.bind(this.setting.value());
-            this.button.onBound().subscribe(keycode -> this.setting.set(keycode));
+            KeybindButton button = new KeybindButton();
+            button.bind(currentValue);
+            button.onBound().subscribe(updateCallback::accept);
             this.child(label);
-            this.child(this.button);
-            this.child(buildResetButton(btn -> {
-                this.setting.reset();
-                this.button.bind(this.setting.value());
+            this.child(button);
+            this.child(buildResetButton(_ -> {
+                updateCallback.accept(defaultValue);
+                button.bind(defaultValue);
             }));
+        }
+
+        public Keybind(String name, SettingKeybind setting, String tooltip) {
+            this(name, setting.key(), setting.getDefault().getAsInt(), tooltip, setting::set);
         }
     }
 
@@ -428,25 +449,27 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     }
 
     public static final class DoubleInput extends FlowLayout {
-        public SettingDouble setting;
 
-        public DoubleInput(String name, SettingDouble setting, String tooltip) {
+        public DoubleInput(String name, double currentValue, double defaultValue, String tooltip, Consumer<Double> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
-            this.setting = setting;
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(150));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
-            text.onChanged().subscribe(change -> Utils.parseDouble(change).ifPresent(value -> this.setting.set(value)));
-            text.text(String.valueOf(this.setting.value()));
+            text.onChanged().subscribe(change -> Utils.parseDouble(change).ifPresent(updateCallback));
+            text.text(String.valueOf(currentValue));
             this.child(label);
             this.child(text);
-            this.child(buildResetButton(btn -> {
-                this.setting.reset();
-                text.setValue(String.valueOf(this.setting.value()));
+            this.child(buildResetButton(_ -> {
+                updateCallback.accept(defaultValue);
+                text.setValue(String.valueOf(defaultValue));
             }));
+        }
+
+        public DoubleInput(String name, SettingDouble setting, String tooltip) {
+            this(name, setting.value(), setting.getDefault().getAsDouble(), tooltip, setting::set);
         }
     }
 

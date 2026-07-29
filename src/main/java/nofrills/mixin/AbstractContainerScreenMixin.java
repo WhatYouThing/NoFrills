@@ -48,6 +48,9 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     @Final
     protected T menu;
 
+    @Shadow
+    private boolean doubleclick;
+
     protected AbstractContainerScreenMixin(Component title) {
         super(title);
     }
@@ -56,6 +59,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     private void onClickSlotRedirect(AbstractContainerScreen<?> instance, Slot slot, int slotId, int button, ContainerInput actionType, Operation<Void> original) {
         if (MiddleClickOverride.shouldOverride(slot, button, actionType)) {
             instance.slotClicked(slot, slotId, GLFW.GLFW_MOUSE_BUTTON_3, ContainerInput.CLONE);
+            this.doubleclick = false;
         } else {
             original.call(instance, slot, slotId, button, actionType);
         }

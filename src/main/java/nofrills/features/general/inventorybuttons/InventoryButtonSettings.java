@@ -36,6 +36,8 @@ public class InventoryButtonSettings extends Settings {
         list.add(buildCommandSetting(buttonObject));
         list.add(buildTooltipSetting(buttonObject));
         list.add(buildModelSetting(buttonObject));
+        list.add(buildItemIdSetting(buttonObject));
+        list.add(buildCustomModelSetting(buttonObject));
         list.add(buildTexturesSetting(buttonObject));
         list.add(buildGlintSetting(buttonObject));
         list.add(buildStyleSetting(buttonObject, widget));
@@ -131,31 +133,46 @@ public class InventoryButtonSettings extends Settings {
         );
     }
 
+    protected static FlowLayout buildItemIdSetting(JsonObject buttonObject) {
+        return new TextInput(
+                "Item ID",
+                buttonObject.get("itemId").getAsString(),
+                "",
+                "The Skyblock ID of the item displayed on top of this inventory button.\nThis option has no effect on the item itself and it exists purely for resource pack compatibility.",
+                s -> buttonObject.addProperty("itemId", s)
+        );
+    }
+
+    protected static FlowLayout buildCustomModelSetting(JsonObject buttonObject) {
+        return new TextInput(
+                "Custom Model",
+                buttonObject.get("customModel").getAsString(),
+                "",
+                "The custom texture identifier to display. This option can be used to import textures from the official Skyblock resource pack.",
+                s -> buttonObject.addProperty("customModel", s)
+        );
+    }
+
     protected static FlowLayout buildTexturesSetting(JsonObject buttonObject) {
         FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
         layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-        PlainLabel label = new PlainLabel(Component.literal("Textures").withColor(0xffffff));
+        PlainLabel label = new PlainLabel(Component.literal("Head Textures").withColor(0xffffff));
         label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        label.tooltip(Component.literal("Allows you to apply custom head textures to this button. Only works if the item model is player_head.\n\nUsage: You can copy the head textures of any existing item using the Copy Textures keybind from Inventory Buttons."));
-        ButtonComponent copyButton = UIComponents.button(Component.literal("Copy").withColor(0xffffff), btn ->
+        label.tooltip(Component.literal("Allows you to apply custom head textures to this button. Only works if the item model is player_head."));
+        ButtonComponent copyButton = UIComponents.button(Component.literal("Copy").withColor(0xffffff), _ ->
                 mc.keyboardHandler.setClipboard(buttonObject.get("textures").getAsString())
         );
         copyButton.renderer(buttonRenderer);
         copyButton.tooltip(Component.literal("Copies the current head textures payload.")).margins(Insets.of(0, 0, 0, 5));
-        ButtonComponent pasteButton = UIComponents.button(Component.literal("Paste").withColor(0xffffff), btn ->
+        ButtonComponent pasteButton = UIComponents.button(Component.literal("Paste").withColor(0xffffff), _ ->
                 buttonObject.addProperty("textures", mc.keyboardHandler.getClipboard())
         );
         pasteButton.renderer(buttonRenderer);
         pasteButton.tooltip(Component.literal("Pastes the head textures payload.")).margins(Insets.of(0, 0, 0, 5));
-        ButtonComponent clearButton = UIComponents.button(Component.literal("Clear").withColor(0xffffff), btn ->
-                buttonObject.addProperty("textures", "")
-        );
-        clearButton.renderer(buttonRenderer);
-        clearButton.tooltip(Component.literal("Clears the head textures payload."));
         layout.child(label);
         layout.child(copyButton);
         layout.child(pasteButton);
-        layout.child(clearButton);
+        layout.child(buildResetButton(_ -> buttonObject.addProperty("textures", "")));
         return layout;
     }
 
@@ -211,19 +228,10 @@ public class InventoryButtonSettings extends Settings {
     }
 
     protected static FlowLayout buildManageSetting(JsonObject buttonObject) {
-        FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-        PlainLabel label = new PlainLabel(Component.literal("Manage").withColor(0xffffff));
-        label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-        ButtonComponent button = UIComponents.button(Component.literal("Delete").withColor(0xffffff), btn -> {
+        return new BigButton("Delete Button", _ -> {
             InventoryButtons.data.value().get("buttons").getAsJsonArray().remove(buttonObject);
             mc.setScreen(new InventoryScreen(mc.player));
         });
-        button.renderer(buttonRenderer);
-        button.tooltip(Component.literal("Deletes this inventory button."));
-        layout.child(label);
-        layout.child(button);
-        return layout;
     }
 
     @Override

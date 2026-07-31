@@ -475,6 +475,7 @@ public class Utils {
             case "Shiny Wither Boots" -> "WITHER_BOOTS";
             case "Shiny Necron's Handle" -> "NECRON_HANDLE";
             case "Dusty Travel Scroll to the Kuudra Skull" -> "NETHER_FORTRESS_BOSS_TRAVEL_SCROLL";
+            case "Hellstorm Wand" -> "HELLSTORM_STAFF";
             default -> toID(name.replaceAll(Symbols.dungeonStar, "").trim());
         };
     }
@@ -556,6 +557,14 @@ public class Utils {
             if (property.name().equals("textures")) {
                 return Optional.of(property.value());
             }
+        }
+        return Optional.empty();
+    }
+
+    public static Optional<String> getTexturePayload(ItemStack stack) {
+        GameProfile profile = getTextures(stack);
+        if (profile != null) {
+            return getTexturePayload(profile);
         }
         return Optional.empty();
     }

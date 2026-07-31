@@ -9,15 +9,16 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.CustomData;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.jspecify.annotations.NonNull;
-
-import java.util.Arrays;
 
 import static nofrills.Main.mc;
 
@@ -33,6 +34,7 @@ public final class InventoryButtonWidget extends ImageButton {
     final RenderColor buttonColorBackground;
     final RenderColor buttonColorBorder;
     final RenderColor buttonColorBorderHover;
+    boolean unlockPosition = false;
     double buttonScaleX;
     double buttonScaleY;
 
@@ -44,10 +46,7 @@ public final class InventoryButtonWidget extends ImageButton {
         this.setTooltip(Tooltip.create(Component.literal(tooltip)));
         this.buttonObject = buttonObject;
         this.iconStack = stack;
-        this.buttonStyle = Arrays.stream(InventoryButtonStyle.values())
-                .filter(value -> value.name().equals(buttonObject.get("style").getAsString()))
-                .findFirst()
-                .orElse(InventoryButtonStyle.Vanilla);
+        this.buttonStyle = Utils.toEnumConstant(buttonObject.get("style").getAsString(), InventoryButtonStyle.values(), InventoryButtonStyle.Vanilla);
         this.buttonColorBackground = RenderColor.fromArgb(buttonObject.get("colorBackground").getAsInt());
         this.buttonColorBorder = RenderColor.fromArgb(buttonObject.get("colorBorder").getAsInt());
         this.buttonColorBorderHover = RenderColor.fromArgb(buttonObject.get("colorBorderHover").getAsInt());
@@ -57,6 +56,8 @@ public final class InventoryButtonWidget extends ImageButton {
 
     public static InventoryButtonWidget of(JsonObject buttonObject) {
         String model = buttonObject.get("model").getAsString();
+        String itemId = buttonObject.get("itemId").getAsString();
+        String customModel = buttonObject.get("customModel").getAsString();
         String textures = buttonObject.get("textures").getAsString();
         String command = buttonObject.get("command").getAsString();
         String tooltip = buttonObject.get("tooltip").getAsString();
@@ -64,9 +65,17 @@ public final class InventoryButtonWidget extends ImageButton {
         double posY = buttonObject.get("y").getAsDouble() * mc.getWindow().getGuiScaledHeight();
         double scaleX = buttonObject.get("scaleX").getAsDouble();
         double scaleY = buttonObject.get("scaleY").getAsDouble();
-        ItemStack stack = BuiltInRegistries.ITEM.getValue(Identifier.parse(model)).getDefaultInstance().copy();
+        ItemStack stack = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(model)).getDefaultInstance().copy();
         if (stack.is(Items.PLAYER_HEAD) && !textures.isEmpty()) {
             stack.set(DataComponents.PROFILE, InventoryButtons.getOrInitTextures(textures));
+        }
+        if (!itemId.isEmpty()) {
+            CompoundTag tag = new CompoundTag();
+            tag.put("id", StringTag.valueOf(itemId));
+            stack.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+        }
+        if (!customModel.isEmpty()) {
+            stack.set(DataComponents.ITEM_MODEL, Identifier.tryParse(customModel));
         }
         stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, buttonObject.get("glint").getAsBoolean());
         return new InventoryButtonWidget(posX, posY, scaleX, scaleY, stack, command, tooltip, buttonObject);
@@ -78,9 +87,10 @@ public final class InventoryButtonWidget extends ImageButton {
             super.extractContents(graphics, mouseX, mouseY, a);
         } else if (this.buttonStyle.equals(InventoryButtonStyle.Color)) {
             graphics.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), this.buttonColorBackground.getArgb());
-            graphics.outline(this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.isHovered()
-                    ? this.buttonColorBorderHover.getArgb()
-                    : this.buttonColorBorder.getArgb()
+            graphics.outline(this.getX(), this.getY(), this.getWidth(), this.getHeight(),
+                    this.isHovered()
+                            ? this.buttonColorBorderHover.getArgb()
+                            : this.buttonColorBorder.getArgb()
             );
         }
         graphics.pose().pushMatrix();
@@ -97,30 +107,35 @@ public final class InventoryButtonWidget extends ImageButton {
 
     @Override
     public void onClick(@NonNull MouseButtonEvent event, boolean doubleClick) {
-        if (!event.buttonInfo().hasControlDown() && !event.buttonInfo().hasAltDown()) {
-            if (event.buttonInfo().button() == 1) {
-                mc.setScreen(InventoryButtonSettings.of(this));
-            } else {
-                super.onClick(event, doubleClick);
-            }
+        if (this.unlockPosition) return;
+        if (event.buttonInfo().button() == 1) {
+            mc.setScreen(InventoryButtonSettings.of(this));
+        } else {
+            super.onClick(event, doubleClick);
         }
     }
 
     @Override
     protected void onDrag(final @NonNull MouseButtonEvent event, final double dx, final double dy) {
+        if (!this.unlockPosition) return;
         if (event.buttonInfo().button() == 0) {
             double windowX = mc.getWindow().getGuiScaledWidth();
             double windowY = mc.getWindow().getGuiScaledHeight();
             double buttonSizeX = 20 * this.buttonScaleX;
             double buttonSizeY = 20 * this.buttonScaleY;
-            if (event.buttonInfo().hasControlDown()) {
+            if (!event.buttonInfo().hasAltDown()) {
                 double newX = Math.clamp(event.x() - buttonSizeX * 0.5, 0, windowX - buttonSizeX);
                 double newY = Math.clamp(event.y() - buttonSizeY * 0.5, 0, windowY - buttonSizeY);
+                if (event.buttonInfo().hasShiftDown()) {
+                    int precision = InventoryButtons.gridPrecision.value();
+                    newX = Math.min(newX - (newX % precision), newX);
+                    newY = Math.min(newY - (newY % precision), newY);
+                }
                 this.setX((int) newX);
                 this.setY((int) newY);
                 this.buttonObject.addProperty("x", newX / windowX);
                 this.buttonObject.addProperty("y", newY / windowY);
-            } else if (event.buttonInfo().hasAltDown()) {
+            } else {
                 buttonSizeX = Math.clamp(event.x() - this.getX(), 0.25 * 20, windowX - buttonSizeX);
                 buttonSizeY = Math.clamp(event.y() - this.getY(), 0.25 * 20, windowY - buttonSizeY);
                 if (this.buttonObject.get("uniform").getAsBoolean()) {

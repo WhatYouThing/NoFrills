@@ -6,13 +6,19 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ResolvableProfile;
 import nofrills.config.Feature;
+import nofrills.config.SettingInt;
 import nofrills.config.SettingJson;
 import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
@@ -24,7 +30,9 @@ import nofrills.misc.Utils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
@@ -34,10 +42,11 @@ public class InventoryButtons {
     public static final Feature instance = new Feature("inventoryButtons");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind addButtonKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "addButtonKey", instance);
-    public static final SettingKeybind copyTexturesKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "copyTexturesKey", instance);
+    public static final SettingKeybind manageKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "addButtonKey", instance);
+    public static final SettingInt gridPrecision = new SettingInt(5, "gridPrecision", instance);
 
     private static final ConcurrentHashMap<String, ResolvableProfile> profileCache = new ConcurrentHashMap<>();
+    private static List<InventoryButtonWidget> currentWidgets = new ArrayList<>();
 
     public static ResolvableProfile getOrInitTextures(String payload) {
         if (!profileCache.containsKey(payload)) {
@@ -56,10 +65,12 @@ public class InventoryButtons {
                 Pair.of("command", new JsonPrimitive("")),
                 Pair.of("tooltip", new JsonPrimitive("Inventory Button")),
                 Pair.of("model", new JsonPrimitive("")),
+                Pair.of("itemId", new JsonPrimitive("")),
+                Pair.of("customModel", new JsonPrimitive("")),
                 Pair.of("textures", new JsonPrimitive("")),
                 Pair.of("glint", new JsonPrimitive(false)),
                 Pair.of("style", new JsonPrimitive(InventoryButtonStyle.Vanilla.name())),
-                Pair.of("colorBackground", new JsonPrimitive(RenderColor.GRAY.withAlpha(0.33f).getArgb())),
+                Pair.of("colorBackground", new JsonPrimitive(RenderColor.NF_BLUE.withAlpha(0.25f).getArgb())),
                 Pair.of("colorBorder", new JsonPrimitive(RenderColor.NF_BLUE.getArgb())),
                 Pair.of("colorBorderHover", new JsonPrimitive(RenderColor.WHITE.getArgb()))
         );
@@ -73,46 +84,75 @@ public class InventoryButtons {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container) {
-            if (addButtonKey.isKey(event.key)) {
-                if (event.action == GLFW.GLFW_PRESS) {
+        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container && manageKey.isKey(event.key)) {
+            Optional<InventoryButtonWidget> hoveredWidget = currentWidgets.stream().filter(AbstractWidget::isHovered).findFirst();
+            Slot hoveredSlot = Utils.getFocusedSlot();
+            if (event.action == GLFW.GLFW_PRESS) {
+                if (hoveredWidget.isPresent()) {
+                    InventoryButtonWidget widget = hoveredWidget.get();
+                    if (widget.unlockPosition) {
+                        Utils.infoRaw(Component.literal("Button positioning locked.").withStyle(ChatFormatting.YELLOW));
+                    } else {
+                        Utils.infoRaw(Component.literal(
+                                "Button positioning unlocked. Left Click: Drag, Shift + Left Click: Drag and snap to grid, Alt + Left Click: Change scale."
+                        ).withStyle(ChatFormatting.GREEN));
+                    }
+                    widget.unlockPosition = !widget.unlockPosition;
+                } else if (hoveredSlot != null) {
+                    ItemStack stack = hoveredSlot.getItem();
+                    if (!stack.isEmpty()) {
+                        String id = Utils.getSkyblockId(stack);
+                        Identifier model = stack.get(DataComponents.ITEM_MODEL);
+                        Optional<String> payload = Utils.getTexturePayload(stack);
+                        List<Pair<String, String>> buttons = new ArrayList<>();
+                        if (!id.isEmpty()) buttons.add(Pair.of("[SKYBLOCK ID]", id));
+                        if (model != null) buttons.add(Pair.of("[ITEM MODEL]", model.toString()));
+                        payload.ifPresent(string -> buttons.add(Pair.of("[HEAD TEXTURES]", string)));
+                        MutableComponent msg = Component.literal("Copy options for ").withStyle(ChatFormatting.GREEN)
+                                .append(stack.getHoverName())
+                                .append(Component.literal(": ").withStyle(ChatFormatting.GREEN));
+                        if (buttons.isEmpty()) {
+                            msg.append(Component.literal("None").withStyle(ChatFormatting.GRAY));
+                        } else {
+                            for (Pair<String, String> button : buttons) {
+                                msg.append(Component.literal(" " + button.getKey()).withStyle(s -> s
+                                        .withClickEvent(new ClickEvent.CopyToClipboard(button.getValue()))
+                                        .applyFormats(ChatFormatting.YELLOW, ChatFormatting.BOLD)
+                                ));
+                            }
+                        }
+                        Utils.infoRaw(msg);
+                    }
+                } else {
                     data.edit(object -> {
                         if (!object.has("buttons")) {
                             object.add("buttons", new JsonArray());
                         }
                         JsonObject obj = fillDefaults(new JsonObject());
                         object.get("buttons").getAsJsonArray().add(obj);
-                        container.addRenderableWidget(InventoryButtonWidget.of(obj));
+                        InventoryButtonWidget widget = InventoryButtonWidget.of(obj);
+                        container.addRenderableWidget(widget);
+                        currentWidgets.add(widget);
                     });
+                    Utils.infoRaw(Component.literal("Created new inventory button.").withStyle(ChatFormatting.GREEN));
+                    Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 }
-                event.cancel();
-            } else if (copyTexturesKey.isKey(event.key)) {
-                Slot focused = Utils.getFocusedSlot();
-                if (focused == null) return;
-                if (event.action == GLFW.GLFW_PRESS) {
-                    ItemStack stack = focused.getItem();
-                    ResolvableProfile profile = stack.get(DataComponents.PROFILE);
-                    if (profile != null) {
-                        Utils.getTexturePayload(profile.partialProfile()).ifPresent(payload -> {
-                            mc.keyboardHandler.setClipboard(payload);
-                            Utils.infoRaw(Component.literal("Copied head textures payload from item: ")
-                                    .withStyle(ChatFormatting.GREEN)
-                                    .append(stack.getHoverName())
-                            );
-                        });
-                    }
-                }
-                event.cancel();
             }
+            event.cancel();
         }
     }
 
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
         if (instance.isActive() && event.screen instanceof AbstractContainerScreen<?> container && data.value().has("buttons")) {
+            List<InventoryButtonWidget> list = new ArrayList<>();
             for (JsonElement element : data.value().get("buttons").getAsJsonArray()) {
-                container.addRenderableWidget(InventoryButtonWidget.of(fillDefaults(element.getAsJsonObject())));
+                JsonObject button = fillDefaults(element.getAsJsonObject());
+                InventoryButtonWidget widget = InventoryButtonWidget.of(button);
+                container.addRenderableWidget(widget);
+                list.add(widget);
             }
+            currentWidgets = list;
         }
     }
 

@@ -268,8 +268,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Overlay Color", SlotLocking.color, "The color of the locked overlay")
                         ))),
                         new Module("Inventory Buttons", InventoryButtons.instance, "Allows you to add custom command buttons to container screens.", new Settings(
-                                new Settings.Keybind("Add Button Key", InventoryButtons.addButtonKey, "The key to create a new button at the position of the cursor."),
-                                new Settings.Keybind("Copy Textures Key", InventoryButtons.copyTexturesKey, "The key to copy the head textures of an item. Press while hovering over a slot to use.\nThis can be used to apply custom player head textures to buttons.")
+                                new Settings.Keybind("Manage Key", InventoryButtons.manageKey, "The key to manage your inventory buttons.\n\nWhen hovered over an existing inventory button: Locks/unlocks button position and scale.\nWhen hovered over a container slot: Sends button in chat to copy specific item properties.\nWhen not hovered over anything: Creates a new button at the cursor's position."),
+                                new Settings.SliderInt("Grid Precision", 1, 20, 1, InventoryButtons.gridPrecision, "The precision of the grid snapping calculation while dragging buttons around.")
                         ))
                 )),
                 new Category("Tweaks", List.of(

@@ -52,7 +52,7 @@ public class RecipeLookup {
                             Utils.sendMessage(command + itemId);
                         }
                         event.cancel();
-                    } else if (mc.screen.getTitle().getString().startsWith("Museum")) {
+                    } else if (mc.screen.getTitle().getString().contains("Museum")) {
                         String entryName = Utils.toPlain(stack.getHoverName());
                         if (entryName.endsWith("Armor") || entryName.endsWith("Set") || entryName.endsWith("Equipment")) {
                             String[] words = entryName.split(" ");

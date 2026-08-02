@@ -165,9 +165,9 @@ public class ClientPacketListenerMixin {
     }
 
     @Inject(method = "handleSetEntityMotion", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;lerpMotion(Lnet/minecraft/world/phys/Vec3;)V"))
-    private void onSetMotion(ClientboundSetEntityMotionPacket packet, CallbackInfo ci, @Local Entity entity) {
-        if (entity instanceof Arrow arrow && WitherDragons.instance.isActive() && WitherDragons.trackArrowHits.value()) {
-            WitherDragons.onArrowMotion(arrow, packet.movement());
+    private void onSetMotion(ClientboundSetEntityMotionPacket packet, CallbackInfo ci, @Local(name = "entity") Entity entity) {
+        if (entity instanceof Arrow arrow) {
+            eventBus.post(new WitherDragons.ArrowMotionEvent(arrow, packet.movement()));
         }
     }
 }

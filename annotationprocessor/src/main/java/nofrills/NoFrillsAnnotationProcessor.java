@@ -13,7 +13,7 @@ import java.util.Set;
 
 @SupportedAnnotationTypes({"nofrills.events.EventListener"})
 @SupportedSourceVersion(SourceVersion.RELEASE_25)
-public class NofrillsAnnotationProcessor extends AbstractProcessor {
+public class NoFrillsAnnotationProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (annotations.isEmpty()) {

@@ -46,6 +46,7 @@
         "PackMixin",
         "PlayerInfoMixin",
         "PlayerTabOverlayAccessor",
+        "ProjectileMixin",
         "ScreenEffectRendererMixin",
         "SoundEngineMixin",
         "StringDecomposerMixin",

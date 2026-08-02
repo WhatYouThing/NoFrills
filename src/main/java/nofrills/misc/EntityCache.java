@@ -1,91 +1,60 @@
 package nofrills.misc;
 
-import meteordevelopment.orbit.EventHandler;
-import meteordevelopment.orbit.EventPriority;
 import net.minecraft.world.entity.Entity;
-import nofrills.events.EntityRemovedEvent;
-import nofrills.events.EntityUpdatedEvent;
-import nofrills.events.EventListener;
-import nofrills.events.ServerJoinEvent;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
 import java.util.function.Predicate;
 
 /**
  * An object for temporarily storing any relevant entity handles, such as armor stands with custom names.
  */
-@EventListener
 public final class EntityCache {
-    private static final CopyOnWriteArrayList<EntityCache> instances = new CopyOnWriteArrayList<>();
 
-    private final ConcurrentHashSet<Entity> entities = new ConcurrentHashSet<>();
+    private static final Object present = new Object();
+    private final MappedEntityCache<Object> cache = new MappedEntityCache<>();
 
     public EntityCache() {
-        instances.add(this);
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    private static void onRemoved(EntityRemovedEvent event) {
-        for (EntityCache instance : instances) {
-            instance.remove(event.entity);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    private static void onUpdated(EntityUpdatedEvent event) {
-        if (event.entity.isRemoved()) {
-            for (EntityCache instance : instances) {
-                instance.remove(event.entity);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    private static void onJoin(ServerJoinEvent event) {
-        for (EntityCache instance : instances) {
-            instance.clear();
-        }
     }
 
     public boolean has(Entity ent) {
-        return this.entities.contains(ent);
+        return this.cache.has(ent);
     }
 
     public boolean empty() {
-        return this.entities.isEmpty();
+        return this.cache.empty();
     }
 
     public int size() {
-        return this.entities.size();
+        return this.cache.size();
     }
 
     /**
      * Adds an entity handle to the object. Does nothing if the entity is already on the list.
      */
     public void add(Entity ent) {
-        this.entities.add(ent);
+        this.cache.add(ent, present);
     }
 
     /**
      * Removes an entity handle from the object. Does nothing if the entity is not on the list.
      */
     public void remove(Entity ent) {
-        this.entities.remove(ent);
+        this.cache.remove(ent);
     }
 
     public void removeIf(Predicate<Entity> predicate) {
-        this.entities.removeIf(predicate);
+        this.cache.removeIf(entry -> predicate.test(entry.getKey()));
     }
 
     public void clear() {
-        this.entities.clear();
+        this.cache.clear();
     }
 
-    public ConcurrentHashSet<Entity> get() {
-        return this.entities;
+    public List<Entity> get() {
+        return this.cache.getEntities();
     }
 
     public Entity getFirst() {
-        return this.entities.stream().findFirst().orElse(null);
+        return this.cache.getFirst();
     }
 }

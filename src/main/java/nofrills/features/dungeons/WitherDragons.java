@@ -20,6 +20,7 @@ import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
@@ -27,15 +28,10 @@ import nofrills.config.SettingBool;
 import nofrills.config.SettingDouble;
 import nofrills.config.SettingEnum;
 import nofrills.events.*;
-import nofrills.misc.DungeonUtil;
-import nofrills.misc.EntityCache;
-import nofrills.misc.RenderColor;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -65,7 +61,7 @@ public class WitherDragons {
             Dragon.PURPLE,
             Dragon.GREEN
     );
-    private static final HashMap<String, EntityCache> teammateArrows = new HashMap<>();
+    private static final MappedEntityCache<String> teammateArrows = new MappedEntityCache<>();
     private static final CopyOnWriteArrayList<FireBowPoint> firePoints = new CopyOnWriteArrayList<>();
     private static boolean splitDone = false;
     private static int tickCounter = 0;
@@ -140,54 +136,67 @@ public class WitherDragons {
         }
     }
 
-    public static void onArrowMotion(Arrow arrow, Vec3 motion) {
-        Vec2 rot = motion.rotation();
-        if (Float.isNaN(rot.x) || Float.isNaN(rot.y) || mc.level == null) {
-            return;
-        }
-        float rotPitch = Mth.wrapDegrees(rot.x);
-        float rotYaw = Mth.wrapDegrees(rot.y);
-        double pitchDiff = Math.clamp(10.0 / (Math.abs(motion.x) + Math.abs(motion.z)), 2.5, 20.0);
-        for (AbstractClientPlayer player : new ArrayList<>(mc.level.players())) {
-            if (!Utils.isPlayer(player)) continue;
-            String name = player.getName().getString();
-            List<FireBowPoint> points = player.equals(mc.player) ? firePoints : List.of(new FireBowPoint(
-                    player.position(),
-                    Mth.wrapDegrees(player.getXRot()),
-                    Mth.wrapDegrees(player.getYRot()),
-                    0
-            ));
-            for (FireBowPoint point : points) {
-                if (Utils.difference(point.pitch + 90.0f, rotPitch + 90.0f) > pitchDiff) continue;
-                if (point.pitch < -85.0 || point.pitch > 85.0) {
-                    if (Utils.horizontalDistance(arrow.position(), point.pos) > 1.0) continue;
-                } else {
-                    if (Utils.difference(point.yaw + 180.0f, rotYaw + 180.0f) > 15.0f) continue;
-                    if (Utils.horizontalDistance(arrow.position(), point.pos) > 4.0) continue;
-                }
-                if (!teammateArrows.containsKey(name)) {
-                    teammateArrows.put(name, new EntityCache());
-                }
-                teammateArrows.get(name).add(arrow);
+    @EventHandler
+    private static void onArrowMotion(ArrowMotionEvent event) {
+        if (instance.isActive() && trackArrowHits.value() && DungeonUtil.isInDragonPhase()) {
+            Vec2 rot = event.motion().rotation();
+            if (Float.isNaN(rot.x) || Float.isNaN(rot.y) || mc.level == null) {
                 return;
+            }
+            float rotPitch = Mth.wrapDegrees(rot.x);
+            float rotYaw = Mth.wrapDegrees(rot.y);
+            double pitchDiff = Math.clamp(10.0 / (Math.abs(event.motion().x) + Math.abs(event.motion().z)), 2.5, 20.0);
+            for (AbstractClientPlayer player : new ArrayList<>(mc.level.players())) {
+                if (!Utils.isPlayer(player)) continue;
+                List<FireBowPoint> points = player.equals(mc.player) ? firePoints : List.of(new FireBowPoint(
+                        player.position(),
+                        Mth.wrapDegrees(player.getXRot()),
+                        Mth.wrapDegrees(player.getYRot()),
+                        0
+                ));
+                for (FireBowPoint point : points) {
+                    if (Utils.difference(point.pitch + 90.0f, rotPitch + 90.0f) > pitchDiff) continue;
+                    if (point.pitch < -85.0 || point.pitch > 85.0) {
+                        if (Utils.horizontalDistance(event.arrow().position(), point.pos) > 1.0) continue;
+                    } else {
+                        if (Utils.difference(point.yaw + 180.0f, rotYaw + 180.0f) > 15.0f) continue;
+                        if (Utils.horizontalDistance(event.arrow().position(), point.pos) > 4.0) continue;
+                    }
+                    teammateArrows.add(event.arrow(), player.getName().getString());
+                    return;
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onArrowHit(ArrowHitEvent event) {
+        if (instance.isActive() && trackArrowHits.value() && event.entity() instanceof EnderDragonPart && teammateArrows.has(event.arrow()) && DungeonUtil.isInDragonPhase()) {
+            for (Dragon dragon : dragons) {
+                if (!dragon.hasEntity()) continue;
+                for (EnderDragonPart part : dragon.getEntity().getSubEntities()) {
+                    if (event.entity().equals(part)) {
+                        String name = teammateArrows.getValue(event.arrow());
+                        dragon.arrowHits.put(name, dragon.arrowHits.getOrDefault(name, 0) + 1);
+                        teammateArrows.remove(event.arrow());
+                        break;
+                    }
+                }
             }
         }
     }
 
     @EventHandler
     private static void onEntityRemoved(EntityRemovedEvent event) {
-        if (instance.isActive() && trackArrowHits.value() && event.entity instanceof Arrow arrow && !arrow.isRemoved() && DungeonUtil.isInDragonPhase()) {
+        if (instance.isActive() && trackArrowHits.value() && event.entity instanceof Arrow arrow && teammateArrows.has(arrow) && DungeonUtil.isInDragonPhase()) {
             AABB arrowHitbox = arrow.getBoundingBox().inflate(0.25);
-            for (Map.Entry<String, EntityCache> entry : teammateArrows.entrySet()) {
-                if (!entry.getValue().has(arrow)) continue;
-                for (Dragon dragon : dragons) {
-                    if (!dragon.hasEntity()) continue;
-                    for (EnderDragonPart part : dragon.getEntity().getSubEntities()) {
-                        if (arrowHitbox.intersects(part.getBoundingBox())) {
-                            String name = entry.getKey();
-                            dragon.arrowHits.put(name, dragon.arrowHits.getOrDefault(name, 0) + 1);
-                            return;
-                        }
+            for (Dragon dragon : dragons) {
+                if (!dragon.hasEntity()) continue;
+                for (EnderDragonPart part : dragon.getEntity().getSubEntities()) {
+                    if (arrowHitbox.intersects(part.getBoundingBox())) {
+                        String name = teammateArrows.getValue(arrow);
+                        dragon.arrowHits.put(name, dragon.arrowHits.getOrDefault(name, 0) + 1);
+                        return;
                     }
                 }
             }
@@ -506,5 +515,11 @@ public class WitherDragons {
             ItemStack helmet = Utils.getEntityHelmet(entity);
             return !helmet.isEmpty() && Utils.getSkyblockId(helmet).equals(this.relicID);
         }
+    }
+
+    public record ArrowMotionEvent(Arrow arrow, Vec3 motion) {
+    }
+
+    public record ArrowHitEvent(Arrow arrow, HitResult hitResult, Entity entity) {
     }
 }

@@ -10,15 +10,11 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 
-import java.util.regex.Pattern;
-
 @EventListener
 public class ActivePetHighlight {
     public static final Feature instance = new Feature("activePetHighlight");
 
     public static final SettingColor color = new SettingColor(RenderColor.GREEN, "color", instance);
-
-    private static final Pattern titlePattern = Pattern.compile("(.*/.*) Pets");
 
     private static boolean isEquippedPet(ItemStack stack) {
         return Utils.getSkyblockId(stack).equals("PET") && Utils.getLoreLines(stack).contains("Click to despawn!");
@@ -26,7 +22,7 @@ public class ActivePetHighlight {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && event.slot != null && !event.isInventory && titlePattern.matcher(event.title).matches() && isEquippedPet(event.stack)) {
+        if (instance.isActive() && event.slot != null && !event.isInventory && Utils.isPaginatedMenu(event.title, "Pets") && isEquippedPet(event.stack)) {
             SlotOptions.setBackground(event.slot, color.value());
         }
     }

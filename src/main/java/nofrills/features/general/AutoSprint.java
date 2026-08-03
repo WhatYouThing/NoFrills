@@ -28,6 +28,10 @@ public class AutoSprint {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
+        if (mc.screen != null) {
+            // weird animated dyed armor tooltip workaround
+            return;
+        }
         if (instance.isActive() && mc.player != null) {
             if (waterCheck.value() && mc.player.isInWater()) {
                 if (wasSprinting) {

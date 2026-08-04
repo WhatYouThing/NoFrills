@@ -206,7 +206,10 @@ public class NoRender {
                     Blocks.MANGROVE_WOOD,
                     Blocks.MANGROVE_LEAVES,
                     Blocks.STRIPPED_SPRUCE_WOOD,
-                    Blocks.AZALEA_LEAVES
+                    Blocks.AZALEA_LEAVES,
+                    Blocks.STRIPPED_BIRCH_WOOD,
+                    Blocks.STRIPPED_MANGROVE_WOOD,
+                    Blocks.OAK_LEAVES
             );
             this.predicates = List.of(
                     (entity -> deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()),

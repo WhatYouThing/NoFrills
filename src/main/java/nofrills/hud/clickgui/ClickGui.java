@@ -414,7 +414,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", HoppitySolver.color, "The color of the guess highlight."),
                                 new Settings.ColorPicker("Tracer Color", HoppitySolver.tracerColor, "The color of the guess tracer.")
                         ))),
-                        new Module("Moonglade Beacon", BeaconTuningSolver.instance, "Solves the beacon tuning mini-game on Galatea."),
+                        new Module("Foraging Beacon", BeaconTuningSolver.instance, "Solves the beacon tuning mini-game on foraging islands."),
                         new Module("Anvil Helper", AnvilHelper.instance, "Highlights the enchanted books which you can safely combine while using the anvil.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", AnvilHelper.color, "The color of the highlight.")
                         ))),

@@ -158,14 +158,14 @@ public class BeaconTuningSolver {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (instance.isActive() && (Utils.isInArea("Galatea") || Utils.isInArea("Torrhus Canyon")) && !getTuningType().equals(TuningType.None)) {
+        if (instance.isActive() && Utils.isInGalatea() && !getTuningType().equals(TuningType.None)) {
             tickCounter++;
         }
     }
 
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
-        if (instance.isActive() && Utils.isInArea("Galatea")) {
+        if (instance.isActive()) {
             tickCounter = 0;
             lastMatchTick = 0;
             matchSpeed = 0;
@@ -184,7 +184,7 @@ public class BeaconTuningSolver {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && (Utils.isInArea("Galatea") || Utils.isInArea("Torrhus Canyon"))) {
+        if (instance.isActive() && Utils.isInGalatea()) {
             TuningType tuningType = getTuningType();
             if (tuningType.equals(TuningType.None)) return;
             if (event.isSound(SoundEvents.NOTE_BLOCK_BASS)) {
@@ -205,7 +205,7 @@ public class BeaconTuningSolver {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && (Utils.isInArea("Galatea") || Utils.isInArea("Torrhus Canyon")) && !event.isInventory) {
+        if (instance.isActive() && Utils.isInGalatea() && !event.isInventory) {
             TuningType tuningType = getTuningType();
             if (tuningType.equals(TuningType.None)) return;
             String name = Utils.toPlain(event.stack.getHoverName());

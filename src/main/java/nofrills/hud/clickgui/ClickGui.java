@@ -442,7 +442,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         )))
                 )),
                 new Category("Hunting", List.of(
-                        new Module("Invisibug Highlight", InvisibugHighlight.instance, "Highlights nearby Invisibugs on the Galatea.", new Settings(List.of(
+                        new Module("Invisibug Highlight", InvisibugHighlight.instance, "Highlights nearby Invisibugs on the Moonglade Marsh.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", InvisibugHighlight.color, "The color of the Invisibug highlight.")
                         ))),
                         new Module("Cinderbat Highlight", CinderbatHighlight.instance, "Highlights the annoying bats on the Crimson Isle.", new Settings(List.of(

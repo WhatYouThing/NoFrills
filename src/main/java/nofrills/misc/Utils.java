@@ -250,6 +250,10 @@ public class Utils {
         return isInArea("Hub");
     }
 
+    public static boolean isInGalatea() {
+        return isInArea("Moonglade Marsh") || isInArea("Torrhus Canyon");
+    }
+
     public static boolean isInstanceOver() {
         return SkyblockData.isInstanceOver();
     }

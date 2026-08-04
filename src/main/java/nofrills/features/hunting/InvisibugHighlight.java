@@ -16,6 +16,7 @@ import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static nofrills.Main.mc;
 
@@ -25,7 +26,7 @@ public class InvisibugHighlight {
 
     public static final SettingColor color = new SettingColor(RenderColor.fromHex(0xff0000, 0.5f), "color", instance.key());
 
-    private static final List<Invisibug> invisibugList = new ArrayList<>();
+    private static final CopyOnWriteArrayList<Invisibug> invisibugList = new CopyOnWriteArrayList<>();
 
     private static boolean isInvisibugParticle(ClientboundLevelParticlesPacket packet) {
         return packet.getCount() == 1 && packet.getMaxSpeed() == 0.0f && packet.getXDist() == 0.0f
@@ -43,9 +44,9 @@ public class InvisibugHighlight {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (instance.isActive() && Utils.isInArea("Galatea") && event.type.equals(ParticleTypes.CRIT) && isInvisibugParticle(event.packet)) {
+        if (instance.isActive() && Utils.isInArea("Moonglade Marsh") && event.type.equals(ParticleTypes.CRIT) && isInvisibugParticle(event.packet)) {
             if (hasInvisibugMarker(event.pos)) {
-                for (Invisibug bug : new ArrayList<>(invisibugList)) {
+                for (Invisibug bug : invisibugList) {
                     if (bug.isNear(event.pos)) {
                         bug.add(event.pos);
                         return;
@@ -58,8 +59,8 @@ public class InvisibugHighlight {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (instance.isActive() && Utils.isInArea("Galatea")) {
-            for (Invisibug bug : new ArrayList<>(invisibugList)) {
+        if (instance.isActive() && Utils.isInArea("Moonglade Marsh")) {
+            for (Invisibug bug : invisibugList) {
                 bug.tick();
                 if (bug.updateTicks == 0) {
                     invisibugList.remove(bug);
@@ -70,8 +71,8 @@ public class InvisibugHighlight {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && Utils.isInArea("Galatea")) {
-            for (Invisibug bug : new ArrayList<>(invisibugList)) {
+        if (instance.isActive() && Utils.isInArea("Moonglade Marsh")) {
+            for (Invisibug bug : invisibugList) {
                 if (bug.positions.size() == 4) {
                     event.drawText(bug.positions.getLast().add(0, 1, 0), Component.nullToEmpty("Invisibug"), 0.035f, false, RenderColor.WHITE);
                     event.drawFilled(AABB.ofSize(bug.positions.getLast(), 1, 1, 1), false, color.value());

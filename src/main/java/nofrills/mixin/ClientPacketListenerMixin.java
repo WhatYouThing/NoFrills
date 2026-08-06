@@ -69,23 +69,23 @@ public class ClientPacketListenerMixin {
 
     @SuppressWarnings("unchecked")
     @Inject(method = "handleSetEntityData", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/syncher/SynchedEntityData;assignValues(Ljava/util/List;)V", shift = At.Shift.AFTER))
-    private void onPostTrackerUpdate(ClientboundSetEntityDataPacket packet, CallbackInfo ci, @Local Entity ent) {
-        if (ent instanceof LivingEntity || ent instanceof ItemEntity) {
-            if (ent instanceof ArmorStand) {
+    private void onPostTrackerUpdate(ClientboundSetEntityDataPacket packet, CallbackInfo ci, @Local(name = "entity") Entity entity) {
+        if (entity instanceof LivingEntity || entity instanceof ItemEntity) {
+            if (entity instanceof ArmorStand) {
                 for (SynchedEntityData.DataValue<?> entry : packet.packedItems()) {
-                    if (entry.serializer().equals(EntityDataSerializers.OPTIONAL_COMPONENT) && entry.value() != null) {
-                        ((Optional<Component>) entry.value()).ifPresent(value -> eventBus.post(new EntityNamedEvent(ent, value)));
+                    if (entry.serializer().equals(EntityDataSerializers.OPTIONAL_COMPONENT)) {
+                        ((Optional<Component>) entry.value()).ifPresent(value -> eventBus.post(new EntityNamedEvent(entity, value)));
                         break;
                     }
                 }
             }
-            eventBus.post(new EntityUpdatedEvent(ent));
+            eventBus.post(new EntityUpdatedEvent(entity));
         }
     }
 
     @Inject(method = "handleAddEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;postAddEntitySoundInstance(Lnet/minecraft/world/entity/Entity;)V"))
-    private void onEntitySpawn(ClientboundAddEntityPacket packet, CallbackInfo ci, @Local Entity ent) {
-        eventBus.post(new EntityUpdatedEvent(ent));
+    private void onEntitySpawn(ClientboundAddEntityPacket packet, CallbackInfo ci, @Local(name = "entity") Entity entity) {
+        eventBus.post(new EntityUpdatedEvent(entity));
     }
 
     @Inject(method = "handleContainerSetSlot", at = @At("TAIL"))

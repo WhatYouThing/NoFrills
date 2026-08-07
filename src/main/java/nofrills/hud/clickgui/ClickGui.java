@@ -456,7 +456,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Lasso Alert", LassoAlert.instance, "Plays a sound effect once you can reel in with your lasso."),
                         new Module("Instant Fog", InstantFog.instance, "Makes the thick underwater fog disappear instantly."),
                         new Module("Shard Tracker", ShardTracker.instance, "Tracks obtained shards for you and displays information with a HUD element.", ShardTracker.buildSettings()),
-                        new Module("Huntaxe Lock", HuntaxeLock.instance, "Requires you to double right click with your Huntaxe to be able to open the GUI.")
+                        new Module("Huntaxe Lock", HuntaxeLock.instance, "Requires you to double right click with your Huntaxe to be able to open the GUI."),
+                        new Module("Honeycomb Timer", HoneycombTimer.instance, "Adds timers, beacons, and chat reminders for the Pots of Honeycomb you use on protected trees.", new Settings(List.of(
+                                new Settings.ColorPicker("Color", HoneycombTimer.color, "The color of the honeycomb beacon highlight."),
+                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, HoneycombTimer.scale, "The scale of the honeycomb timer text.")
+                        )))
                 )),
                 new Category("Dungeons", List.of(
                         new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(

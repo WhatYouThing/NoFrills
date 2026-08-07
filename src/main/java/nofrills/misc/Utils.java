@@ -1146,12 +1146,12 @@ public class Utils {
 
     public static String getPercentageColor(double percentage, boolean inverse) {
         if (percentage > 0.66) {
-            return inverse ? "§a" : "§c";
+            return inverse ? ChatFormatting.GREEN.toString() : ChatFormatting.RED.toString();
         }
         if (percentage > 0.33) {
-            return "§6";
+            return ChatFormatting.GOLD.toString();
         }
-        return inverse ? "§c" : "§a";
+        return inverse ? ChatFormatting.RED.toString() : ChatFormatting.GREEN.toString();
     }
 
     public static String getPercentageColor(float percentage, boolean inverse) {
@@ -1187,6 +1187,7 @@ public class Utils {
         public static String bingo = "Ⓑ";
         public static String aquatic = "\uE072";
         public static String magmatic = "\uE07D";
+        public static String critter = "\uE087";
         public static String twilightPoison = "ᛤ";
         public static String starredItem = "\uE068";
     }

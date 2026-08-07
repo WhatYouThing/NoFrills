@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -13,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
@@ -136,9 +138,11 @@ public class ItemProtection {
             JsonPrimitive primitive = new JsonPrimitive(uuid);
             if (array.remove(primitive)) {
                 Utils.infoRaw(Component.literal("§eItem ").append(stack.getHoverName()).append(" §eis no longer protected by UUID."));
+                Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
             } else {
                 Utils.infoRaw(Component.literal("§aItem ").append(stack.getHoverName()).append(" §ais now protected by UUID."));
                 array.add(primitive);
+                Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
             }
         });
     }
@@ -157,9 +161,11 @@ public class ItemProtection {
             JsonPrimitive primitive = new JsonPrimitive(id);
             if (array.remove(primitive)) {
                 Utils.infoRaw(Component.literal("§eItem ").append(stack.getHoverName()).append(" §eis no longer protected by Skyblock ID."));
+                Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
             } else {
                 Utils.infoRaw(Component.literal("§aItem ").append(stack.getHoverName()).append(" §ais now protected by Skyblock ID."));
                 array.add(primitive);
+                Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
             }
         });
     }
@@ -172,6 +178,13 @@ public class ItemProtection {
             }
             if (overrideKey.isKey(event.key)) {
                 overrideActive = event.action != GLFW.GLFW_RELEASE;
+                if (event.action == GLFW.GLFW_PRESS) {
+                    Utils.infoRaw(Component.literal("Item Protection override is now active.").withStyle(ChatFormatting.RED));
+                    Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
+                } else if (event.action == GLFW.GLFW_RELEASE) {
+                    Utils.infoRaw(Component.literal("Item Protection override deactivated.").withStyle(ChatFormatting.GREEN));
+                    Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
+                }
                 event.cancel();
                 return;
             }

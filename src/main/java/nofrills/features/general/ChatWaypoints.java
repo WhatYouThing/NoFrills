@@ -1,8 +1,10 @@
 package nofrills.features.general;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static nofrills.Main.mc;
 
@@ -23,6 +26,7 @@ import static nofrills.Main.mc;
 public class ChatWaypoints {
     public static final Feature instance = new Feature("chatWaypoints");
 
+    public static final SettingBool showDistance = new SettingBool(false, "showDistance", instance.key());
     public static final SettingBool partyWaypoints = new SettingBool(false, "partyEnabled", instance.key());
     public static final SettingInt partyDuration = new SettingInt(120, "partyDuration", instance.key());
     public static final SettingBool partyClear = new SettingBool(false, "partyClearOnArrive", instance.key());
@@ -31,9 +35,8 @@ public class ChatWaypoints {
     public static final SettingInt allDuration = new SettingInt(60, "allDuration", instance.key());
     public static final SettingBool allClear = new SettingBool(false, "allClearOnArrive", instance.key());
     public static final SettingColor allColor = new SettingColor(RenderColor.fromArgb(0xaa55ffff), "allColor", instance.key());
-    public static final SettingBool showDistance = new SettingBool(false, "showDistance", instance.key());
 
-    private static final List<PlayerWaypoint> waypointList = new ArrayList<>();
+    private static final CopyOnWriteArrayList<PlayerWaypoint> waypointList = new CopyOnWriteArrayList<>();
 
     private static boolean isPlayerValid(String name) {
         if (mc.player != null && mc.player.getName().getString().equals(name)) {
@@ -69,7 +72,7 @@ public class ChatWaypoints {
                     break;
                 }
                 int duration = party ? partyDuration.value() * 20 : allDuration.value() * 20;
-                waypointList.removeIf(waypoint -> waypoint.name.getString().equals(sender));
+                waypointList.removeIf(waypoint -> waypoint.name.equals(sender));
                 waypointList.add(new PlayerWaypoint(sender, pos, duration, party));
                 break;
             }
@@ -104,7 +107,7 @@ public class ChatWaypoints {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && !waypointList.isEmpty()) {
-            for (PlayerWaypoint waypoint : new ArrayList<>(waypointList)) {
+            for (PlayerWaypoint waypoint : waypointList) {
                 if (waypoint.duration > 0) {
                     waypoint.duration--;
                 }
@@ -114,42 +117,36 @@ public class ChatWaypoints {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && !waypointList.isEmpty()) {
-            List<PlayerWaypoint> waypoints = new ArrayList<>(waypointList);
-            for (PlayerWaypoint waypoint : waypoints) {
-                if (waypoint.duration == 0) {
-                    waypointList.remove(waypoint);
-                    continue;
-                }
-                if (waypoint.shouldClear() && waypoint.box.getCenter().distanceTo(mc.player.position()) <= 8.0) {
+        if (instance.isActive() && !waypointList.isEmpty() && mc.player != null) {
+            for (PlayerWaypoint waypoint : waypointList) {
+                if (waypoint.duration == 0 || (waypoint.shouldClear() && waypoint.box.getCenter().distanceTo(mc.player.position()) <= 8.0)) {
                     waypointList.remove(waypoint);
                     continue;
                 }
                 RenderColor color = waypoint.party ? partyColor.value() : allColor.value();
-                event.drawFilledWithBeam(waypoint.box, 256, true, color);
-                event.drawDistanceScaledText(waypoint.box.getCenter().add(0, 1, 0), waypoint.name, 0.05f, true, RenderColor.WHITE);
+                MutableComponent name = Component.literal(waypoint.name).withStyle(ChatFormatting.WHITE);
                 if (showDistance.value()) {
-                    event.drawDistanceScaledText(waypoint.box.getCenter().add(0, -1, 0), Component.literal(String.format("%.1f m", waypoint.distance())), 0.05f, true, RenderColor.WHITE);
+                    name.append(Component.literal(" " + Utils.formatDecimal(waypoint.distance(), 1) + "m").withColor(color.hex));
                 }
+                event.drawFilledWithBeam(waypoint.box, 256, true, color);
+                event.drawDistanceScaledText(waypoint.box.getCenter().add(0, 1, 0), name, 0.05f, true, RenderColor.WHITE);
             }
         }
     }
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
-        if (!waypointList.isEmpty()) {
-            waypointList.clear();
-        }
+        waypointList.clear();
     }
 
     private static class PlayerWaypoint {
-        public Component name;
+        public String name;
         public AABB box;
         public int duration;
         public boolean party;
 
         public PlayerWaypoint(String name, BlockPos pos, int duration, boolean party) {
-            this.name = Component.literal(name);
+            this.name = name;
             this.box = AABB.encapsulatingFullBlocks(pos, pos);
             this.duration = duration;
             this.party = party;

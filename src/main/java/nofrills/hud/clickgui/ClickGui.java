@@ -127,6 +127,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Keybind("Custom Slot 9", WardrobeKeybinds.custom9, "Your custom keybind for the 9th wardrobe slot.")
                         ))),
                         new Module("Chat Waypoints", ChatWaypoints.instance, "Automatically creates waypoints for coordinates sent in Party/Global chat.", new Settings(List.of(
+                                new Settings.Separator("Generic"),
+                                new Settings.Toggle("Show Distance", ChatWaypoints.showDistance, "Shows distance to all waypoints."),
                                 new Settings.Separator("Party Chat"),
                                 new Settings.Toggle("Create Waypoints", ChatWaypoints.partyWaypoints, "Enables creating waypoints for coordinates sent by party members."),
                                 new Settings.Toggle("Clear On Arrive", ChatWaypoints.partyClear, "Automatically removes the party waypoint once you get close."),
@@ -136,8 +138,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Create Waypoints", ChatWaypoints.allWaypoints, "Enables creating waypoints for coordinates sent by players in the all chat."),
                                 new Settings.Toggle("Clear On Arrive", ChatWaypoints.allClear, "Automatically remove the all chat waypoint once you get close."),
                                 new Settings.SliderInt("Duration", 1, 600, 1, ChatWaypoints.allDuration, "The duration (in seconds) that all chat waypoints should be rendered for."),
-                                new Settings.ColorPicker("Color", ChatWaypoints.allColor, "The color used for the all chat waypoints."),
-                                new Settings.Toggle("Show Distance", ChatWaypoints.showDistance, "Shows distance to all waypoints.")
+                                new Settings.ColorPicker("Color", ChatWaypoints.allColor, "The color used for the all chat waypoints.")
                         ))),
                         new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(List.of(
                                 new Settings.Separator("Sound"),

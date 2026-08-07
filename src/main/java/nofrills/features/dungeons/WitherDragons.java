@@ -171,12 +171,13 @@ public class WitherDragons {
 
     @EventHandler
     private static void onArrowHit(ArrowHitEvent event) {
-        if (instance.isActive() && trackArrowHits.value() && event.entity() instanceof EnderDragonPart && teammateArrows.has(event.arrow()) && DungeonUtil.isInDragonPhase()) {
+        if (instance.isActive() && trackArrowHits.value() && event.entity() instanceof EnderDragonPart && DungeonUtil.isInDragonPhase()) {
             for (Dragon dragon : dragons) {
                 if (!dragon.hasEntity()) continue;
                 for (EnderDragonPart part : dragon.getEntity().getSubEntities()) {
                     if (event.entity().equals(part)) {
                         String name = teammateArrows.getValue(event.arrow());
+                        if (name == null) continue;
                         dragon.arrowHits.put(name, dragon.arrowHits.getOrDefault(name, 0) + 1);
                         teammateArrows.remove(event.arrow());
                         break;
@@ -188,13 +189,14 @@ public class WitherDragons {
 
     @EventHandler
     private static void onEntityRemoved(EntityRemovedEvent event) {
-        if (instance.isActive() && trackArrowHits.value() && event.entity instanceof Arrow arrow && teammateArrows.has(arrow) && DungeonUtil.isInDragonPhase()) {
-            AABB arrowHitbox = arrow.getBoundingBox().inflate(0.25);
+        if (instance.isActive() && trackArrowHits.value() && event.entity instanceof Arrow arrow && DungeonUtil.isInDragonPhase()) {
+            AABB arrowHitbox = arrow.getBoundingBox().inflate(0.5);
             for (Dragon dragon : dragons) {
                 if (!dragon.hasEntity()) continue;
                 for (EnderDragonPart part : dragon.getEntity().getSubEntities()) {
                     if (arrowHitbox.intersects(part.getBoundingBox())) {
                         String name = teammateArrows.getValue(arrow);
+                        if (name == null) continue;
                         dragon.arrowHits.put(name, dragon.arrowHits.getOrDefault(name, 0) + 1);
                         return;
                     }

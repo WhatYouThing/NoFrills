@@ -17,6 +17,8 @@ public class SeaCreatureData {
             new SeaCreature("Loch Emperor", "The Loch Emperor arises from the depths.", "§4", true, true),
             new SeaCreature("Abyssal Miner", "An Abyssal Miner breaks out of the water!", "§2", true, true),
             new SeaCreature("Alligator", "A long snout breaks the surface of the water. It's an Alligator!", "§2", true, true),
+            new SeaCreature("Silkbreeze", "Something zips through the air - it's a Silkbreeze!", "§b", true, true),
+            new SeaCreature("Giant Isopod", "A Giant Isopod was dredged up from the depths!", "§5", true, true),
             new SeaCreature(
                     "Titanoboa",
                     "A massive Titanoboa surfaces. Its body stretches as far as the eye can see.",

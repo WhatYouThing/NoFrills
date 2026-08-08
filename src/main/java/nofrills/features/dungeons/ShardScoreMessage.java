@@ -11,8 +11,8 @@ import nofrills.misc.Utils;
 public class ShardScoreMessage {
     public static final Feature instance = new Feature("shardScoreMessage");
 
-    public static final SettingString msgPrince = new SettingString("/pc Prince Killed!", "msg", instance);
-    public static final SettingString msgBat = new SettingString("/pc Bat Killed!", "msg", instance);
+    public static final SettingString msgPrince = new SettingString("/pc Prince Killed!", "msgPrince", instance);
+    public static final SettingString msgBat = new SettingString("/pc Bat Killed!", "msgBat", instance);
 
     @EventHandler
     private static void onMsg(ChatMsgEvent event) {

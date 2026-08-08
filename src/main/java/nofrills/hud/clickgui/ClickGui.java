@@ -564,8 +564,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Fill Color", LividSolver.fillColor, "The color of the fill style highlight."),
                                 new Settings.ColorPicker("Tracer Color", LividSolver.tracerColor, "The color of the tracer.")
                         ))),
-                        new Module("Prince Message", PrinceMessage.instance, "Sends a message when you gain bonus score from the Prince Shard.", new Settings(List.of(
-                                new Settings.TextInput("Message", PrinceMessage.msg, "The message to send.")
+                        new Module("Shard Score Message", ShardScoreMessage.instance, "Sends a message when you gain bonus score from the Prince or Murkbat Shard.", new Settings(List.of(
+                                new Settings.TextInput("Prince Message", ShardScoreMessage.msgPrince, "The message to send when Prince is killed."),
+                                new Settings.TextInput("Bat Message", ShardScoreMessage.msgBat, "The message to send when Bat is killed.")
                         ))),
                         new Module("Mimic Message", MimicMessage.instance, "Sends a message once you kill the Mimic. Should work even if it's instantly killed.", new Settings(List.of(
                                 new Settings.TextInput("Message", MimicMessage.msg, "The message to send.")

@@ -39,6 +39,7 @@ public class ScoreCalculator {
     private static boolean bloodDone = false;
     private static boolean mimic = false;
     private static boolean prince = false;
+    private static boolean bat = false;
     private static boolean sent270 = false;
     private static boolean sent300 = false;
 
@@ -194,6 +195,7 @@ public class ScoreCalculator {
         int bonus = 0;
         if (mimic) bonus += 2;
         if (prince) bonus += 1;
+        if (bat) bonus += 1;
         if (isEZPZ()) bonus += 10;
         for (String line : SkyblockData.getTabListLines()) {
             if (line.startsWith("Crypts: ")) {
@@ -209,6 +211,10 @@ public class ScoreCalculator {
 
     public static void setPrinceKilled() {
         prince = true;
+    }
+
+    public static void setBatKilled() {
+        bat = true;
     }
 
     public static int getScore() {
@@ -271,6 +277,7 @@ public class ScoreCalculator {
         bloodDone = false;
         mimic = false;
         prince = false;
+        bat = false;
         sent270 = false;
         sent300 = false;
     }

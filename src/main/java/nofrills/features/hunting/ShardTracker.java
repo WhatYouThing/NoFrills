@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import static nofrills.Main.mc;
@@ -50,6 +52,24 @@ public final class ShardTracker {
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
 
     public static final MutableComponent displayNone = Component.literal("Shard Tracker\n§7None tracked.");
+    private static final Pattern sentToBoxPattern = Pattern.compile("You sent (?<quantity>a|an|[0-9]*) (?<name>.*) (?:Shard|Shards) to your Hunting Box.");
+    private static final Pattern boughtPattern = Pattern.compile("You bought (?<name>.*)!");
+    private static final List<Pattern> shardCaughtPatterns = List.of(
+            Pattern.compile("You caught (?<quantity>a|an|x[0-9]*) (?<name>.*) (?:Shard|Shards)!"),
+            Pattern.compile("CHARM You charmed (?:a|an) (?<name>.*) and captured (?<quantity>a|[0-9]*) (?:Shard|Shards) from it."),
+            Pattern.compile("LOOT SHARE You received (?<quantity>a|an|[0-9]*) (?<name>.*) (?:Shard|Shards) for assisting .*!"),
+            Pattern.compile("CAPTURE! You caught (?:a|an) .* and gained (?<quantity>a|an|x[0-9]*) (?<name>.*) (?:Shard|Shards)!"),
+            Pattern.compile("CAPTURE! You caught (?:a|an) SPARKLING .* and received a Rainbow Feather and (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard!"),
+            Pattern.compile("LOOT SHARE! You received (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard from .* catching .*!"),
+            Pattern.compile("LOOT SHARE! You received a Rainbow Feather and (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard from .* catching (?:a|an) SPARKLING .*!"),
+            Pattern.compile("FLOOR DROP! You found (?<name>.*) Shard on the ground!"),
+            Pattern.compile("You have been given a (?<name>.*)!"),
+            Pattern.compile("FUSION! You obtained (?:a |an |)(?<name>.*) Shard(?<quantity> x[0-9]*|)!(?:| NEW!)"),
+            Pattern.compile(Utils.Symbols.treasureCatch + " .* CATCH! You caught (?:a |an |)(?<name>.*) Shard(?<quantity> x[0-9]*|)!"),
+            Pattern.compile(" *(?<name>.*) Shard \\(.*%\\)"),
+            sentToBoxPattern,
+            boughtPattern
+    );
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
@@ -217,65 +237,6 @@ public final class ShardTracker {
         HudManager.shardTracker.setDefaultText();
     }
 
-    private static Shard getShardFromMsg(String msg) { // parses various messages about obtaining shards, do not touch
-        if (msg.startsWith("You caught ") && (msg.endsWith("Shards!") || msg.endsWith("Shard!"))) {
-            msg = msg.replace("You caught ", "").replace(" Shards!", "").replace(" Shard!", "").trim();
-            String quantity = msg.substring(0, msg.indexOf(" "));
-            String name = msg.substring(msg.indexOf(" ") + 1);
-            return Shard.of(name, quantity.replace("x", ""), ShardSource.Caught);
-        }
-        if (msg.startsWith("LOOT SHARE You received ") && (msg.contains(" Shard for assisting ") || msg.contains(" Shards for assisting "))) {
-            msg = msg.replace("LOOT SHARE You received ", "").trim();
-            msg = msg.substring(0, msg.indexOf(" Shard")).trim();
-            String quantity = msg.substring(0, msg.indexOf(" "));
-            String name = msg.substring(msg.indexOf(" ") + 1);
-            return Shard.of(name, quantity, ShardSource.Lootshare);
-        }
-        if (msg.startsWith("CHARM ") || msg.startsWith("NAGA ") || msg.startsWith("SALT ")) {
-            int index = msg.indexOf("You charmed a ");
-            if (index != -1) {
-                msg = msg.substring(index + "You charmed a ".length());
-                int quantityStart = msg.indexOf(" and captured") + " and captured".length() + 1;
-                String quantity = msg.substring(quantityStart, msg.indexOf(" ", quantityStart));
-                String name = msg.substring(0, msg.indexOf(" and captured"));
-                return Shard.of(name, quantity, ShardSource.Charmed);
-            }
-        }
-        if (msg.startsWith("FUSION! You obtained ") && msg.contains(" Shard")) {
-            msg = msg.replace("FUSION! You obtained ", "").replace(" NEW!", "").trim();
-            if (msg.startsWith("an ") || msg.startsWith("a ")) {
-                msg = msg.substring(msg.indexOf(" ") + 1);
-            }
-            String quantity = msg.substring(msg.indexOf(" Shard") + " Shard".length() + 1).trim();
-            String name = msg.substring(0, msg.indexOf(" Shard"));
-            return Shard.of(name, quantity.replace("x", "").replace("!", ""), ShardSource.Fused);
-        }
-        if (msg.startsWith("You sent ") && msg.endsWith(" to your Hunting Box.")) {
-            msg = msg.replace("You sent ", "").replace(" to your Hunting Box.", "").trim();
-            String quantity = msg.substring(0, msg.indexOf(" "));
-            String name = msg.substring(msg.indexOf(" ") + 1, msg.indexOf(" Shard"));
-            return Shard.of(name, quantity, ShardSource.Absorbed);
-        }
-        if (msg.startsWith("⛃ ") && msg.contains(" CATCH! You caught ") && msg.endsWith(" Shard!")) {
-            msg = msg.substring(msg.indexOf(" CATCH! You caught ") + 19).replace(" Shard!", "").trim();
-            if (msg.startsWith("an ") || msg.startsWith("a ")) {
-                msg = msg.substring(msg.indexOf(" ") + 1);
-            }
-            return new Shard(msg, 1, ShardSource.TreasureCatch);
-        }
-        if (msg.contains(" Shard (") && msg.endsWith(")")) {
-            msg = msg.substring(0, msg.indexOf(" Shard (")).trim();
-            return new Shard(msg, 1, ShardSource.TreeGift);
-        }
-        if (msg.startsWith("You bought ") && msg.endsWith("!")) {
-            msg = msg.replace("You bought ", "").replace("!", "").trim();
-            if (!ShardData.getShardSkill(msg).isEmpty()) {
-                return new Shard(msg, 1, ShardSource.Bought);
-            }
-        }
-        return null;
-    }
-
     public static String getSourceColor(String source) {
         return switch (Utils.toLower(source)) {
             case "direct", "bazaar" -> "§a";
@@ -296,27 +257,32 @@ public final class ShardTracker {
 
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
-        if (instance.isActive() && !event.messagePlain.isEmpty() && Utils.isInSkyblock()) {
-            Shard shard = getShardFromMsg(event.messagePlain.trim());
-            if (shard != null && data.value().has("shards")) {
-                if (shard.source.equals(ShardSource.Absorbed) && ShardData.getShardSkill(shard.name).equals("Fishing")) {
-                    return;
-                }
-                JsonObject tracked = getTrackedShard(shard.name);
+        if (instance.isActive() && !event.messagePlain.trim().isEmpty() && data.value().has("shards")) {
+            for (Pattern pattern : shardCaughtPatterns) {
+                Matcher matcher = pattern.matcher(event.messagePlain);
+                if (!matcher.matches()) continue;
+                String name = matcher.group("name");
+                if (name == null) continue;
+                if (pattern == sentToBoxPattern && ShardData.getShardSkill(name).equals("Fishing")) return;
+                if (pattern == boughtPattern && ShardData.getShardSkill(name).isEmpty()) return;
+                int quantity = matcher.namedGroups().containsKey("quantity")
+                        ? Utils.parseInt(matcher.group("quantity").replace("x", "")).orElse(1)
+                        : 1;
+                JsonObject tracked = getTrackedShard(Utils.toLower(name));
                 if (tracked != null) {
                     long needed = tracked.get("needed").getAsLong();
                     long obtained = tracked.get("obtained").getAsLong();
-                    long quantity = obtained + shard.quantity;
-                    if (doneMsg.value() && needed != 0 && obtained < needed && quantity >= needed) {
-                        String name = tracked.get("name").getAsString();
+                    long newQuantity = obtained + quantity;
+                    if (doneMsg.value() && needed != 0 && obtained < needed && newQuantity >= needed) {
+                        String shardName = tracked.get("name").getAsString();
                         Utils.infoFormat("{}§l{} §r§aShard done! {}/{}x obtained.",
-                                ShardData.getColorPrefix(name),
-                                Utils.uppercaseFirst(name, false),
-                                Utils.formatSeparator(quantity),
+                                ShardData.getColorPrefix(shardName),
+                                Utils.uppercaseFirst(shardName, false),
+                                Utils.formatSeparator(newQuantity),
                                 Utils.formatSeparator(needed)
                         );
                     }
-                    data.edit(object -> tracked.addProperty("obtained", obtained + shard.quantity));
+                    data.edit(_ -> tracked.addProperty("obtained", obtained + quantity));
                     refreshDisplay();
                 }
             }
@@ -364,38 +330,11 @@ public final class ShardTracker {
         }
     }
 
-    public enum ShardSource {
-        Caught,
-        Lootshare,
-        TreasureCatch,
-        Charmed,
-        Fused,
-        Absorbed,
-        TreeGift,
-        Bought
-    }
-
     public enum TrackerSource {
         Direct,
         Fuse,
         Cycle,
         Bazaar
-    }
-
-    public static final class Shard {
-        public String name;
-        public int quantity;
-        public ShardSource source;
-
-        public Shard(String name, int quantity, ShardSource source) {
-            this.name = Utils.toLower(name);
-            this.quantity = quantity;
-            this.source = source;
-        }
-
-        public static Shard of(String name, String quantity, ShardSource source) {
-            return new Shard(Utils.toLower(name), Utils.parseInt(quantity).orElse(1), source);
-        }
     }
 
     public static final class Setting extends FlowLayout {

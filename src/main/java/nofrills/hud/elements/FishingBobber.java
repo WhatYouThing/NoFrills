@@ -3,9 +3,11 @@ package nofrills.hud.elements;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.config.SettingInt;
 import nofrills.events.EntityNamedEvent;
 import nofrills.hud.SimpleTextElement;
 import nofrills.hud.TickableHudElement;
@@ -22,9 +24,11 @@ public final class FishingBobber extends SimpleTextElement implements TickableHu
     public final SettingBool timer = new SettingBool(false, "timer", instance.key());
     public final SettingBool hideHologram = new SettingBool(false, "hideHologram", instance.key());
     public final SettingBool compact = new SettingBool(false, "compact", instance.key());
+    public final SettingInt slugfishTimer = new SettingInt(0, "slugfishTimer", instance.key());
     public final EntityCache cache = new EntityCache();
 
     private int timerTicks = 0;
+    private boolean slugfishTrigger = false;
 
     public FishingBobber(String text) {
         super(Component.literal(text), new Feature("bobberElement"), "Fishing Bobber");
@@ -32,7 +36,8 @@ public final class FishingBobber extends SimpleTextElement implements TickableHu
                 new Settings.Toggle("Hide If Inactive", this.inactive, "Hides the element if your fishing bobber is inactive."),
                 new Settings.Toggle("Bobber Timer", this.timer, "Displays how long your fishing bobber has existed for, useful for Slugfish."),
                 new Settings.Toggle("Hide Hologram", this.hideHologram, "Hides the bobber timer hologram that appears above your bobber."),
-                new Settings.Toggle("Compact Mode", this.compact, "Makes the element more compact by removing the prefix.")
+                new Settings.Toggle("Compact Mode", this.compact, "Makes the element more compact by removing the prefix."),
+                new Settings.SliderInt("Slugfish Timer", 0, 20, 1, this.slugfishTimer, "Amount of seconds to wait for Slugfish alarm to be sent. Set to 0 to disable.")
         ));
         this.setDesc("Displays the fishing hologram timer, and optionally the existence time of your bobber.");
         this.setCategory(Category.Fishing);
@@ -66,9 +71,15 @@ public final class FishingBobber extends SimpleTextElement implements TickableHu
     @Override
     public void onServerTick() {
         if (this.isBobberActive()) {
+            if (Utils.isInArea("Crimson Isle") && !this.slugfishTrigger && this.slugfishTimer.value() != 0 && this.timerTicks > this.slugfishTimer.value() * 20) {
+                Utils.showTitle("§5§lSLUG", "Reel in your next catch!", 0, 30, 10);
+                Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
+                this.slugfishTrigger = true;
+            }
             this.timerTicks++;
         } else if (this.timerTicks != 0) {
             this.timerTicks = 0;
+            this.slugfishTrigger = false;
         }
     }
 

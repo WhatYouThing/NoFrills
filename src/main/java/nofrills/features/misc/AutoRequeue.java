@@ -5,6 +5,7 @@ import meteordevelopment.orbit.EventHandler;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.*;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -50,7 +51,7 @@ public class AutoRequeue {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive()) {
-            if (ticks != -1 && !paused && SkyblockData.isInstanceOver()) {
+            if (ticks != -1 && !paused && SkyblockData.isInstanceOver() && !DungeonUtil.isGhost()) {
                 if (ticks == 0) {
                     Utils.infoFormat("§aAutomatically requeuing in {} seconds.", Utils.formatDecimal(delay.value() / 20.0f));
                 }

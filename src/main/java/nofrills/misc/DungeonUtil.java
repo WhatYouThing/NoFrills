@@ -74,6 +74,10 @@ public class DungeonUtil {
         return getAliveTeammates(false);
     }
 
+    public static boolean isGhost() {
+        return mc.player != null && mc.player.isInvisible() && mc.player.getAbilities().mayfly;
+    }
+
     public static boolean isDungeonStarted() {
         return getMap() != null;
     }

@@ -58,9 +58,9 @@ public final class ShardTracker {
             Pattern.compile("CHARM You charmed (?:a|an) (?<name>.*) and captured (?<quantity>a|[0-9]*) (?:Shard|Shards) from it."),
             Pattern.compile("LOOT SHARE You received (?<quantity>a|an|[0-9]*) (?<name>.*) (?:Shard|Shards) for assisting .*!"),
             Pattern.compile("CAPTURE! You caught (?:a|an) .* and gained (?<quantity>a|an|x[0-9]*) (?<name>.*) (?:Shard|Shards)!"),
-            Pattern.compile("CAPTURE! You caught (?:a|an) SPARKLING .* and received a Rainbow Feather and (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard!"),
+            Pattern.compile("CAPTURE! You caught (?:a|an) SPARKLING .* and received .* and (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard!"),
             Pattern.compile("LOOT SHARE! You received (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard from .* catching .*!"),
-            Pattern.compile("LOOT SHARE! You received a Rainbow Feather and (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard from .* catching (?:a|an) SPARKLING .*!"),
+            Pattern.compile("LOOT SHARE! You received .* and (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard from .* catching (?:a|an) SPARKLING .*!"),
             Pattern.compile("FLOOR DROP! You found (?<name>.*) Shard on the ground!"),
             Pattern.compile("You have been given a (?<name>.*)!"),
             Pattern.compile("FUSION! You obtained (?:a |an |)(?<name>.*) Shard(?<quantity> x[0-9]*|)!(?:| NEW!)"),
@@ -249,6 +249,7 @@ public final class ShardTracker {
                         );
                     }
                     data.edit(_ -> tracked.addProperty("obtained", obtained + quantity));
+                    break;
                 }
             }
         }

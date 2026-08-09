@@ -4,6 +4,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
+import nofrills.misc.Utils;
 
 public final class SlotClickEvent extends Cancellable {
     public Slot slot;
@@ -23,5 +24,9 @@ public final class SlotClickEvent extends Cancellable {
         this.title = title;
         this.handler = handler;
         this.isInventory = slot != null && handler instanceof ChestMenu chestMenu && slot.index >= chestMenu.getRowCount() * 9;
+    }
+
+    public boolean isPaginatedMenu(String match) {
+        return Utils.isPaginatedMenu(this.title, match);
     }
 }

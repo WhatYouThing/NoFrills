@@ -115,7 +115,7 @@ public class ShardData {
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
         if (event.stack.isEmpty() || event.isInventory) return;
-        if (event.title.equals("Hunting Box")) {
+        if (event.isPaginatedMenu("Hunting Box")) {
             List<String> lines = Utils.getLoreLines(event.stack);
             if (lines.stream().noneMatch(line -> line.startsWith("Owned: ") && line.contains(" Shard"))) return;
             for (int i = 0; i < lines.size(); i++) {
@@ -129,7 +129,7 @@ public class ShardData {
                     break;
                 }
             }
-        } else if (event.title.equals("Attribute Menu")) {
+        } else if (event.isPaginatedMenu("Attribute Menu")) {
             List<String> lines = Utils.getLoreLines(event.stack);
             for (int i = 0; i < lines.size(); i++) {
                 String line = lines.get(i);

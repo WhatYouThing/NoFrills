@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
+import nofrills.misc.Utils;
 import org.joml.Matrix3x2f;
 
 import java.util.Optional;
@@ -40,6 +41,10 @@ public class ScreenRenderEvent {
             return Optional.empty();
         }
         return Optional.of(this.handler.getSlot(slotId));
+    }
+
+    public boolean isPaginatedMenu(String match) {
+        return Utils.isPaginatedMenu(this.title, match);
     }
 
     public void drawLine(int firstId, int secondId, double width, RenderColor color) {

@@ -6,6 +6,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import nofrills.misc.Utils;
 
 public class SlotUpdateEvent {
     public ClientboundContainerSetSlotPacket packet;
@@ -30,5 +31,9 @@ public class SlotUpdateEvent {
         this.title = screen.getTitle().getString();
         this.isFinal = packet.getSlot() == handler.slots.getLast().index;
         this.isInventory = this.stack.equals(ItemStack.EMPTY);
+    }
+
+    public boolean isPaginatedMenu(String match) {
+        return Utils.isPaginatedMenu(this.title, match);
     }
 }

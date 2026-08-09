@@ -18,9 +18,10 @@ import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
-import nofrills.events.*;
+import nofrills.events.ChatMsgEvent;
+import nofrills.events.EventListener;
+import nofrills.events.SlotUpdateEvent;
 import nofrills.features.general.PriceTooltips;
-import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
@@ -34,7 +35,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -51,7 +51,6 @@ public final class ShardTracker {
     public static final SettingBool filterDirect = new SettingBool(false, "filterDirect", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
 
-    public static final MutableComponent displayNone = Component.literal("Shard Tracker\n§7None tracked.");
     private static final Pattern sentToBoxPattern = Pattern.compile("You sent (?<quantity>a|an|[0-9]*) (?<name>.*) (?:Shard|Shards) to your Hunting Box.");
     private static final Pattern boughtPattern = Pattern.compile("You bought (?<name>.*)!");
     private static final List<Pattern> shardCaughtPatterns = List.of(
@@ -120,7 +119,6 @@ public final class ShardTracker {
     public static Settings buildSettings() {
         Settings settings = new Settings(getSettingsList());
         settings.setTitle(Component.literal("Shard Tracker"));
-        refreshDisplay();
         return settings;
     }
 
@@ -162,6 +160,31 @@ public final class ShardTracker {
         Utils.info("§aShard list imported successfully.");
     }
 
+    public static boolean shouldFilter(TrackerSource source) {
+        return switch (source) {
+            case Direct, Bazaar -> filterDirect.value() && isInFusion();
+            case Fuse, Cycle -> filterFuse.value() && !isInFusion();
+        };
+    }
+
+    public static String getSourceColor(String source) {
+        return switch (Utils.toLower(source)) {
+            case "direct", "bazaar" -> "§a";
+            case "fuse" -> "§d";
+            case "cycle" -> "§6";
+            default -> "§7";
+        };
+    }
+
+    public static TrackerSource getTrackedSource(String source) {
+        for (TrackerSource value : TrackerSource.values()) {
+            if (value.name().equals(source)) {
+                return value;
+            }
+        }
+        return TrackerSource.Direct;
+    }
+
     private static JsonArray parseTreeData(String payload) {
         try {
             String data = payload.substring(payload.indexOf(":") + 1);
@@ -198,63 +221,6 @@ public final class ShardTracker {
         return false;
     }
 
-    private static boolean shouldFilter(TrackerSource source) {
-        return switch (source) {
-            case Direct, Bazaar -> filterDirect.value() && isInFusion();
-            case Fuse, Cycle -> filterFuse.value() && !isInFusion();
-        };
-    }
-
-    public static void refreshDisplay() {
-        if (data.value().has("shards")) {
-            JsonArray shards = data.value().get("shards").getAsJsonArray();
-            List<String> lines = new ArrayList<>();
-            for (JsonElement shard : shards) {
-                JsonObject shardData = shard.getAsJsonObject();
-                String name = shardData.get("name").getAsString();
-                long needed = shardData.get("needed").getAsLong();
-                long obtained = shardData.get("obtained").getAsLong();
-                String source = shardData.get("source").getAsString();
-                if (name.isEmpty() || shouldFilter(getTrackedSource(source))) {
-                    continue;
-                }
-                String shardName = Utils.format("{}§l{}", ShardData.getColorPrefix(Utils.toLower(name)), Utils.uppercaseFirst(name, false));
-                String shardSource = Utils.format("{}[{}]", getSourceColor(source), source);
-                String quantityColor = needed > 0 & obtained >= needed ? "§a" : "§f";
-                String shardQuantity = needed <= 0 ? Utils.format("{}x", Utils.formatSeparator(obtained)) : Utils.format("{}/{}x", Utils.formatSeparator(obtained), Utils.formatSeparator(needed));
-                lines.add(Utils.format("{}{}§r {}§r {}", quantityColor, shardQuantity, shardName, shardSource));
-            }
-            if (!lines.isEmpty()) {
-                StringBuilder builder = new StringBuilder();
-                builder.append("Shard Tracker");
-                for (String line : lines) {
-                    builder.append("\n").append(line);
-                }
-                HudManager.shardTracker.setText(builder.toString());
-                return;
-            }
-        }
-        HudManager.shardTracker.setDefaultText();
-    }
-
-    public static String getSourceColor(String source) {
-        return switch (Utils.toLower(source)) {
-            case "direct", "bazaar" -> "§a";
-            case "fuse" -> "§d";
-            case "cycle" -> "§6";
-            default -> "§7";
-        };
-    }
-
-    private static TrackerSource getTrackedSource(String source) {
-        for (TrackerSource value : TrackerSource.values()) {
-            if (value.name().equals(source)) {
-                return value;
-            }
-        }
-        return TrackerSource.Direct;
-    }
-
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
         if (instance.isActive() && !event.messagePlain.trim().isEmpty() && data.value().has("shards")) {
@@ -283,7 +249,6 @@ public final class ShardTracker {
                         );
                     }
                     data.edit(_ -> tracked.addProperty("obtained", obtained + quantity));
-                    refreshDisplay();
                 }
             }
         }
@@ -291,7 +256,7 @@ public final class ShardTracker {
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (instance.isActive() && boxApply.value() && event.title.equals("Hunting Box") && !event.isInventory && data.value().has("shards")) {
+        if (instance.isActive() && boxApply.value() && event.isPaginatedMenu("Hunting Box") && !event.isInventory && data.value().has("shards")) {
             JsonArray shards = data.value().get("shards").getAsJsonArray();
             if (!shards.isEmpty()) {
                 for (String line : Utils.getLoreLines(event.stack)) {
@@ -299,34 +264,12 @@ public final class ShardTracker {
                         String name = Utils.toLower(Utils.toPlain(event.stack.getHoverName()));
                         JsonObject tracked = getTrackedShard(name);
                         if (tracked != null) {
-                            data.edit(object -> tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack)));
-                            refreshDisplay();
+                            data.edit(_ -> tracked.addProperty("obtained", PriceTooltips.getStackQuantity(event.stack)));
                         }
                         break;
                     }
                 }
             }
-        }
-    }
-
-    @EventHandler
-    private static void onScreen(ScreenOpenEvent event) {
-        if (instance.isActive()) {
-            refreshDisplay();
-        }
-    }
-
-    @EventHandler
-    private static void onScreenClose(ScreenCloseEvent event) {
-        if (instance.isActive()) {
-            refreshDisplay();
-        }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        if (instance.isActive()) {
-            refreshDisplay();
         }
     }
 
@@ -358,36 +301,22 @@ public final class ShardTracker {
             this.inputName.onChanged().subscribe(value -> {
                 data.edit(object -> getData(object).addProperty("name", Utils.toLower(value)));
                 this.inputName.borderColor = ShardData.getColorHex(Utils.toLower(value));
-                refreshDisplay();
             });
             this.inputObtained = new FlatTextbox(Sizing.fixed(50));
             this.inputObtained.margins(Insets.of(0, 0, 0, 5));
             this.inputObtained.tooltip(Component.literal("The amount of this shard that you currently have."));
             this.inputObtained.text(String.valueOf(getData().get("obtained").getAsLong()));
-            this.inputObtained.onChanged().subscribe(text -> {
-                Optional<Long> value = Utils.parseLong(text);
-                if (value.isPresent()) {
-                    data.edit(object -> getData(object).addProperty("obtained", value.get()));
-                    refreshDisplay();
-                }
-            });
+            this.inputObtained.onChanged().subscribe(text -> Utils.parseLong(text).ifPresent(value -> data.edit(object -> getData(object).addProperty("obtained", value))));
             this.inputNeeded = new FlatTextbox(Sizing.fixed(50));
             this.inputNeeded.margins(Insets.of(0, 0, 0, 5));
             this.inputNeeded.tooltip(Component.literal("The amount of this shard that you want to obtain. Set to 0 for no target amount."));
             this.inputNeeded.text(String.valueOf(getData().get("needed").getAsLong()));
-            this.inputNeeded.onChanged().subscribe(text -> {
-                Optional<Long> value = Utils.parseLong(text);
-                if (value.isPresent()) {
-                    data.edit(object -> getData(object).addProperty("needed", value.get()));
-                    refreshDisplay();
-                }
-            });
+            this.inputNeeded.onChanged().subscribe(text -> Utils.parseLong(text).ifPresent(value -> data.edit(object -> getData(object).addProperty("needed", value))));
             this.inputSource = new EnumButton<>(getData().get("source").getAsString(), TrackerSource.Direct, TrackerSource.class);
             this.inputSource.setMessage(this.getSourceInputLabel(getData().get("source").getAsString()));
             this.inputSource.onChanged().subscribe(value -> {
                 data.edit(object -> getData(object).addProperty("source", value));
                 this.inputSource.setMessage(this.getSourceInputLabel(value));
-                refreshDisplay();
             });
             this.inputSource.margins(Insets.of(1, 0, 0, 0));
             this.inputSource.sizing(Sizing.fixed(48), Sizing.fixed(18));

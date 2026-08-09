@@ -267,11 +267,9 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             }).then(literal("import").executes(context -> {
                 ShardTracker.importTreeData();
-                ShardTracker.refreshDisplay();
                 return SINGLE_SUCCESS;
             })).then(literal("clear").executes(context -> {
                 ShardTracker.data.value().add("shards", new JsonArray());
-                ShardTracker.refreshDisplay();
                 Utils.info("§aTracked shard list cleared successfully.");
                 return SINGLE_SUCCESS;
             })).then(literal("settings").executes(context -> {

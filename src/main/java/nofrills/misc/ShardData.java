@@ -36,6 +36,16 @@ public class ShardData {
             case "bogged" -> "SHARD_SEA_ARCHER";
             case "loch emperor" -> "SHARD_SEA_EMPEROR";
             case "end stone protector" -> "SHARD_ENDSTONE_PROTECTOR";
+            case "lotusfish" -> "SHARD_LOTUS_FISH";
+            case "inkling" -> "SHARD_NIGHT_SQUID";
+            case "field mouse" -> "SHARD_PEST";
+            case "flipflopper" -> "SHARD_FLIP_FLOPPER";
+            case "earthworm" -> "SHARD_TERMITE";
+            case "zealot bruiser" -> "SHARD_BRUISER";
+            case "seashine" -> "SHARD_SEA_SHINE";
+            case "beetle" -> "SHARD_CROPEETLE";
+            case "wither spectre" -> "SHARD_WITHER_SPECTER";
+            case "inferno demonlord" -> "SHARD_BURNINGSOUL";
             default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
         };
     }

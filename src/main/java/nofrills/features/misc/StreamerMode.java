@@ -24,7 +24,7 @@ public class StreamerMode {
 
     public static final SettingString baseName = new SettingString("nostrils-{}{}{}{}", "baseName", instance);
 
-    public static final Supplier<PlayerSkin> skinSupplier = mc.getSkinManager().createLookup(
+    public static final Supplier<Supplier<PlayerSkin>> skinSupplier = () -> mc.getSkinManager().createLookup(
             mc.getGameProfile(),
             false
     );

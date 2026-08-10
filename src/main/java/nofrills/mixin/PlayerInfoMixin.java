@@ -25,7 +25,7 @@ public abstract class PlayerInfoMixin {
     @ModifyReturnValue(method = "getSkin", at = @At("RETURN"))
     private PlayerSkin getSkinTextures(PlayerSkin original) {
         if (StreamerMode.isActive() && (this.profile.id().version() == 4 || this.tabListDisplayName != null)) {
-            return StreamerMode.skinSupplier.get();
+            return StreamerMode.skinSupplier.get().get();
         }
         return original;
     }

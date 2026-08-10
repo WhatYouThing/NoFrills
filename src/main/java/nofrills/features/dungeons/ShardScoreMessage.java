@@ -16,20 +16,22 @@ public class ShardScoreMessage {
 
     @EventHandler
     private static void onMsg(ChatMsgEvent event) {
-        if (event.messagePlain.equals("A Prince falls. +1 Bonus Score") && Utils.isInDungeons()) {
-            if (instance.isActive()) {
-                Utils.sendMessage(msgPrince.value());
+        if (Utils.isInDungeons()) {
+            if (event.messagePlain.equals("A Prince falls. +1 Bonus Score")) {
+                if (instance.isActive()) {
+                    Utils.sendMessage(msgPrince.value());
+                }
+                if (ScoreCalculator.instance.isActive()) {
+                    ScoreCalculator.setPrinceKilled();
+                }
             }
-            if (ScoreCalculator.instance.isActive()) {
-                ScoreCalculator.setPrinceKilled();
-            }
-        }
-        if (event.messagePlain.equals("A Bat has been slain. +1 Bonus Score") && Utils.isInDungeons()) {
-            if (instance.isActive()) {
-                Utils.sendMessage(msgBat.value());
-            }
-            if (ScoreCalculator.instance.isActive()) {
-                ScoreCalculator.setBatKilled();
+            if (event.messagePlain.equals("A Bat has been slain. +1 Bonus Score")) {
+                if (instance.isActive()) {
+                    Utils.sendMessage(msgBat.value());
+                }
+                if (ScoreCalculator.instance.isActive()) {
+                    ScoreCalculator.setBatKilled();
+                }
             }
         }
     }

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @EventListener
@@ -49,7 +50,7 @@ public class TerminalSolvers {
     public static final SettingDouble clickSoundPitch = new SettingDouble(2.0, "clickSoundPitch", instance);
     public static final SettingColor backgroundColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.DARK_GRAY), "backgroundColor", instance);
 
-    private static final List<Item> colorsOrder = List.of(
+    private static final Supplier<List<Item>> colorsOrder = () -> List.of(
             Items.GREEN_STAINED_GLASS_PANE,
             Items.YELLOW_STAINED_GLASS_PANE,
             Items.ORANGE_STAINED_GLASS_PANE,
@@ -160,7 +161,7 @@ public class TerminalSolvers {
                 }
                 case Colors -> {
                     Item item = event.stack.getItem();
-                    int index = colorsOrder.indexOf(item);
+                    int index = colorsOrder.get().indexOf(item);
                     if (index != -1) {
                         currentSolution.setEnabled(event.slot, index);
                     }

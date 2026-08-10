@@ -57,7 +57,7 @@ public final class ShardTracker {
             Pattern.compile("You caught (?<quantity>a|an|x[0-9]*) (?<name>.*) (?:Shard|Shards)!"),
             Pattern.compile("CHARM You charmed (?:a|an) (?<name>.*) and captured (?<quantity>a|[0-9]*) (?:Shard|Shards) from it."),
             Pattern.compile("LOOT SHARE You received (?<quantity>a|an|[0-9]*) (?<name>.*) (?:Shard|Shards) for assisting .*!"),
-            Pattern.compile("CAPTURE! You caught (?:a|an) .* and gained (?<quantity>a|an|x[0-9]*) (?<name>.*) (?:Shard|Shards)!"),
+            Pattern.compile("CAPTURE! You caught (?:a|an) .* and gained (?<quantity>a|an|[0-9]*x) (?<name>.*) (?:Shard|Shards)!"),
             Pattern.compile("CAPTURE! You caught (?:a|an) SPARKLING .* and received .* and (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard!"),
             Pattern.compile("LOOT SHARE! You received (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard from .* catching .*!"),
             Pattern.compile("LOOT SHARE! You received .* and (?<quantity>a|an|[0-9]*x) (?<name>.*) Shard from .* catching (?:a|an) SPARKLING .*!"),

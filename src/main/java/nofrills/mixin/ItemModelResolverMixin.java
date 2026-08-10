@@ -24,7 +24,7 @@ public abstract class ItemModelResolverMixin {
 
     @ModifyExpressionValue(method = "appendItemLayers", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemModelResolver;getItemModel(Lnet/minecraft/resources/Identifier;)Lnet/minecraft/client/renderer/item/ItemModel;"))
     private ItemModel getItemModel(ItemModel original, @Local(argsOnly = true, name = "item") ItemStack item) {
-        if (LegacyTextures.instance.isActive()) {
+        if (LegacyTextures.instance.isActive() && LegacyTextures.revertItems.value()) {
             Optional<Identifier> replacement = LegacyTextures.replaceIfNeeded(item);
             if (replacement.isPresent()) {
                 return this.modelManager.getItemModel(replacement.get());

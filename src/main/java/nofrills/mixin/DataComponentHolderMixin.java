@@ -24,7 +24,7 @@ public interface DataComponentHolderMixin {
     @SuppressWarnings("unchecked")
     @ModifyReturnValue(method = "get", at = @At("RETURN"))
     private <T> T onGetComponent(@Nullable T original, @Local(argsOnly = true, name = "type") DataComponentType<?> type) {
-        if (LegacyTextures.instance.isActive() && type == DataComponents.PROFILE) {
+        if (LegacyTextures.instance.isActive() && LegacyTextures.revertItems.value() && type == DataComponents.PROFILE) {
             Optional<ResolvableProfile> replacement = LegacyTextures.replaceProfileIfNeeded(this.getComponents());
             if (replacement.isPresent()) {
                 return (T) replacement.get();

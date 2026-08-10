@@ -306,6 +306,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         )),
                         new Module("No Ghost Place", NoGhostPlace.instance, "Prevents ghost blocks from appearing when placing non-placeable Skyblock block items."),
                         new Module("Legacy Textures", LegacyTextures.instance, "Replaces the models of most items added before Skyblock 0.26 with their old models.", new Settings(
+                                new Settings.Toggle("Revert Items", LegacyTextures.revertItems, "Allows you to disable the item model revert functionality of this feature."),
                                 new Settings.Toggle("Unlock Pack Position", LegacyTextures.unlockPackPos, "Allows you to move the official resource pack up and down on the list."),
                                 new Settings.Toggle("Force Pack Position", LegacyTextures.forcePackPos, "Forces the official resource pack to be at the bottom by default.\nMay require a game restart to apply."),
                                 new Settings.Toggle("No Tooltip Styling", LegacyTextures.noTooltipStyle, "Disables custom styling of tooltips. Reverts item tooltips if the official pack is below the vanilla pack."),

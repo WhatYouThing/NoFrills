@@ -16,6 +16,7 @@ import nofrills.features.general.partycommands.PartyCommands;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.features.misc.AutoRequeue;
 import nofrills.features.misc.BlockList;
+import nofrills.features.tweaks.LegacyTextures;
 import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.ClickGui;
 import nofrills.misc.DebugStuff;
@@ -375,6 +376,12 @@ public class NoFrillsCommand {
             })).then(literal("unpause").executes(context -> {
                 AutoRequeue.paused = false;
                 Utils.info("§aAuto Requeue unpaused.");
+                return SINGLE_SUCCESS;
+            }))),
+            new ModCommand("legacyTextures", "Commands for managing the Legacy Textures feature.", literal("legacyTextures").executes(context -> {
+                return SINGLE_SUCCESS;
+            }).then(literal("whitelistItem").executes(context -> {
+                LegacyTextures.whitelistHeldItem();
                 return SINGLE_SUCCESS;
             })))
     };

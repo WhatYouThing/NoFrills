@@ -36,6 +36,8 @@ public class EtherwarpRaycastContext extends ClipContext {
             case SnowLayerBlock ignored -> Shapes.block();
             case PressurePlateBlock ignored -> Shapes.block();
             case WeightedPressurePlateBlock ignored -> Shapes.block();
+            case WallBannerBlock ignored -> Shapes.block();
+            case BannerBlock ignored -> Shapes.block();
             default -> state.getCollisionShape(world, pos).isEmpty() ? Shapes.empty() : Shapes.block();
         };
     }

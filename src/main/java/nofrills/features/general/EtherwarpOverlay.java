@@ -69,6 +69,7 @@ public class EtherwarpOverlay {
             case SnowLayerBlock ignored -> !isAbove;
             case PressurePlateBlock ignored -> !isAbove;
             case WeightedPressurePlateBlock ignored -> !isAbove;
+            case HoneyBlock ignored -> !isAbove;
             default ->
                     isAbove ? !state.canOcclude() && !state.isCollisionShapeFullBlock(mc.level, pos) : state.canOcclude() || state.isCollisionShapeFullBlock(mc.level, pos);
         };

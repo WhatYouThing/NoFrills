@@ -41,7 +41,7 @@ public class PhantomleafSolver {
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
         if (instance.isActive() && event.isSound(SoundEvents.NOTE_BLOCK_BASEDRUM) && Utils.isInGarden()) {
-            if (event.volume() > 0.6 && event.volume() < 0.63) {
+            if (event.pitch() > 0.6 && event.pitch() < 0.62) {
                 Vec3 pos = mc.player.getPosition(0);
                 Vec3 playerPos = new Vec3(pos.x, 74, pos.z);
 

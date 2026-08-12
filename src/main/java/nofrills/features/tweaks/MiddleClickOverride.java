@@ -1,6 +1,5 @@
 package nofrills.features.tweaks;
 
-import com.google.common.collect.Sets;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
@@ -10,7 +9,7 @@ import nofrills.config.SettingBool;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import static nofrills.Main.mc;
 
@@ -19,7 +18,7 @@ public class MiddleClickOverride {
 
     public static final SettingBool debug = new SettingBool(false, "debug", instance);
 
-    private static final HashSet<String> matchBlacklist = Sets.newHashSet(
+    private static final Set<String> matchBlacklist = Set.of(
             "Attribute Fusion",
             "Beacon",
             "Chest",
@@ -36,36 +35,35 @@ public class MiddleClickOverride {
             "Convert to Dungeon Item",
             "Upgrade Item",
             "Salvage Items",
-            Utils.format("A{}iphone", Utils.Symbols.bingo),
             "Fishing Rod Parts",
             "Stats Tuning",
             "Pet Sitter",
             "Transfer to Profile",
-            "Attribute Transfer",
+            "Kuudra Armor Type Transfer",
             "Composter",
-            "Midas Anvil"
+            "Midas Anvil",
+            "Hunting Box"
     );
-    private static final HashSet<String> matchWhitelist = Sets.newHashSet(
+    private static final Set<String> matchWhitelist = Set.of(
             "Stats & Equipment",
             "Accessory Bag Thaumaturgy",
+            "Pets",
             "Community Shop"
     );
-    private static final HashSet<String> containBlacklist = Sets.newHashSet(
-            "Wardrobe",
-            "Minion",
+    private static final Set<String> containBlacklist = Set.of(
+            " Minion ",
             "Abiphone",
+            Utils.format("A{}iphone", Utils.Symbols.bingo),
             "The Hex",
             "Enchant Item",
             "Auction",
             "Cosmetic",
             "Trap",
-            "Gemstone",
-            "Heart of the",
-            "Widgets",
-            "Hunting Box"
+            "Gemstones",
+            "Heart of the ",
+            "Widgets"
     );
-    private static final HashSet<String> containWhitelist = Sets.newHashSet(
-            "Pets",
+    private static final Set<String> containWhitelist = Set.of(
             "Bits Shop"
     );
 
@@ -74,11 +72,11 @@ public class MiddleClickOverride {
     }
 
     private static boolean isBlacklisted(String title) {
-        return matchBlacklist.contains(title) || containBlacklist.stream().anyMatch(title::contains);
+        return matchBlacklist.stream().anyMatch(s -> Utils.isPaginatedMenu(title, s)) || containBlacklist.stream().anyMatch(title::contains);
     }
 
     private static boolean isWhitelisted(String title) {
-        return matchWhitelist.contains(title) || containWhitelist.stream().anyMatch(title::contains);
+        return matchWhitelist.stream().anyMatch(s -> Utils.isPaginatedMenu(title, s)) || containWhitelist.stream().anyMatch(title::contains);
     }
 
     private static boolean isTransaction(ItemStack stack) {

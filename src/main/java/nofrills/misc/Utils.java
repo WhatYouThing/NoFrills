@@ -78,6 +78,7 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -87,6 +88,7 @@ import static nofrills.Main.*;
 public class Utils {
     public static final GuiMessageTag noFrillsIndicator = new GuiMessageTag(0x5ca0bf, null, Component.nullToEmpty("Message from NoFrills mod."), "NoFrills Mod");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final ConcurrentHashMap<String, Pattern> paginationPatternCache = new ConcurrentHashMap<>();
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",
             "Kuudra",
@@ -545,7 +547,10 @@ public class Utils {
     }
 
     public static boolean isPaginatedMenu(String title, String match) {
-        return match.equals(title) || Pattern.matches("(.*/.*) " + match, title);
+        if (!paginationPatternCache.containsKey(match)) {
+            paginationPatternCache.put(match, Pattern.compile("(?:|\\([0-9]*/[0-9]*\\) )" + match));
+        }
+        return paginationPatternCache.get(match).matcher(title).matches();
     }
 
     public static GameProfile getTextures(ItemStack stack) {

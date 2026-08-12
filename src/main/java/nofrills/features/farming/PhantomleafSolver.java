@@ -5,7 +5,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.BlockBox;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
@@ -38,6 +37,7 @@ public class PhantomleafSolver {
     private static final ConcurrentHashMap<BlockPos, AtomicInteger> candidateScores = new ConcurrentHashMap<>();
     private static final List<BlockPos> bestCandidates = new ArrayList<>();
     private static final JsonArray debugOutput = new JsonArray();
+    private static BlockPos fallbackSolution;
     private static int ticks = 0;
 
     @EventHandler
@@ -78,6 +78,11 @@ public class PhantomleafSolver {
             obj.addProperty("tick", DebugStuff.getTickCounter());
             debugOutput.add(obj);
 
+            if (event.volume() >= 0.99) {
+                fallbackSolution = new BlockPos(mc.player.getBlockX(), 74, mc.player.getBlockZ());
+                Utils.infoFormat("got fallback solution: {}", fallbackSolution);
+            }
+
             if (event.pitch() > 0.6 && event.pitch() < 0.62) {
                 Vec3 playerPos = new Vec3(pos.x, 74, pos.z);
                 if (!events.isEmpty()) {
@@ -98,7 +103,7 @@ public class PhantomleafSolver {
         for (double z = 0; z < 10; z++) {
             for (double x = 0; x < 10; x++) {
                 Vec3 pos = new Vec3(planterArea.get().maxX, 74, planterArea.get().maxZ);
-                if (event.playerPos.distanceTo(pos) < 0.01) {
+                if (Utils.isNearlyEqual(event.playerPos.distanceTo(pos), calculated, 0.001)) {
                     int score = candidateScores.computeIfAbsent(new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), v -> new AtomicInteger(0)).incrementAndGet();
                     Utils.infoFormat("found candidate at {}, score = {}", pos, score);
                 }
@@ -123,6 +128,10 @@ public class PhantomleafSolver {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInGarden()) {
+            if (fallbackSolution != null) {
+                event.drawBeam(fallbackSolution.getCenter(), 5, true, RenderColor.fromHex(0x7f7fff));
+                event.drawFilled(AABB.encapsulatingFullBlocks(fallbackSolution, fallbackSolution), true, RenderColor.fromHex(0x7f7fff));
+            }
             if (bestCandidates.size() > 1) {
                 for (BlockPos pos : bestCandidates) {
                     event.drawBeam(pos.getCenter(), 5, true, RenderColor.fromHex(0xffff7f));
@@ -168,8 +177,22 @@ public class PhantomleafSolver {
     }
 
     @EventHandler
+    private static void onMessage(ChatMsgEvent event) {
+        if (instance.isActive() && Utils.isInGarden()) {
+            if (event.messagePlain.equals("[CROP] Phantomleaf: You found me!")) {
+                cleanUp();
+            }
+        }
+    }
+
+    @EventHandler
     private static void onJoin(ServerJoinEvent event) {
+        cleanUp();
+    }
+
+    private static void cleanUp() {
         events.clear();
+        fallbackSolution = null;
         candidateScores.clear();
         bestCandidates.clear();
         planterArea.set(null);

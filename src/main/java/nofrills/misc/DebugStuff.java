@@ -53,6 +53,10 @@ public class DebugStuff {
         });
     }
 
+    public static long getTickCounter() {
+        return tickCounter;
+    }
+
     public static void dumpHeadTextures() {
         List<EquipmentSlot> searchedSlots = List.of(
                 EquipmentSlot.HEAD,

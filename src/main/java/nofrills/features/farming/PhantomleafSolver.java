@@ -1,17 +1,26 @@
 package nofrills.features.farming;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockBox;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.events.*;
+import nofrills.misc.DebugStuff;
+import nofrills.misc.MutableReference;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,27 +33,53 @@ import static nofrills.Main.mc;
 public class PhantomleafSolver {
     public static final Feature instance = new Feature("phantomleafSolver");
 
-    private static final BlockBox barnArea =  new BlockBox(new BlockPos(48, 0, 48), new BlockPos(-48, 255, -48));
+    private static final MutableReference<AABB> planterArea = new MutableReference<>(null);
     private static final List<PhantomleafEvent> events = new ArrayList<>();
     private static final ConcurrentHashMap<BlockPos, AtomicInteger> candidateScores = new ConcurrentHashMap<>();
     private static final List<BlockPos> bestCandidates = new ArrayList<>();
-    private static BlockPos currentCarpenter = BlockPos.ZERO;
-
-    @EventHandler
-    private static void onNamed(EntityNamedEvent event) {
-        if (Utils.isInGarden() && event.namePlain.equals("Carpenter") && !barnArea.contains(event.entity.blockPosition())) {
-            currentCarpenter = event.entity.getOnPos();
-            Utils.infoFormat("found carpenter: {}", currentCarpenter);
-        }
-    }
+    private static final JsonArray debugOutput = new JsonArray();
+    private static int ticks = 0;
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && event.isSound(SoundEvents.NOTE_BLOCK_BASEDRUM) && Utils.isInGarden()) {
-            if (event.pitch() > 0.6 && event.pitch() < 0.62) {
-                Vec3 pos = mc.player.getPosition(0);
-                Vec3 playerPos = new Vec3(pos.x, 74, pos.z);
+        if (instance.isActive() && event.isSound(SoundEvents.NOTE_BLOCK_BASEDRUM) && ticks > 0 && Utils.isInGarden()) {
+            if (planterArea.get() == null) {
+                PlotBorders.getCurrentPlot().ifPresent(plot->{
+                    BlockPos center = plot.getValue().center;
+                    planterArea.set(AABB.encapsulatingFullBlocks(center.offset(4, 8, 4), center.offset(-5, 8, -5)));
+                });
+            }
 
+            Vec3 pos = mc.player.position();
+
+            JsonObject obj = new JsonObject();
+            JsonArray soundPosArray = new JsonArray();
+            soundPosArray.add(event.pos.x);
+            soundPosArray.add(event.pos.y);
+            soundPosArray.add(event.pos.z);
+            obj.add("soundPos", soundPosArray);
+            obj.addProperty("soundPitch", event.pitch());
+            obj.addProperty("soundVolume", event.volume());
+            JsonArray soundOffsetArray = new JsonArray();
+            soundOffsetArray.add(planterArea.get().maxX - event.pos.x);
+            soundOffsetArray.add(planterArea.get().maxY - event.pos.y);
+            soundOffsetArray.add(planterArea.get().maxZ - event.pos.z);
+            obj.add("soundOffset", soundOffsetArray);
+            JsonArray playerPosArray = new JsonArray();
+            playerPosArray.add(pos.x);
+            playerPosArray.add(pos.y);
+            playerPosArray.add(pos.z);
+            obj.add("playerPos", playerPosArray);
+            JsonArray planterTopCornerArray = new JsonArray();
+            planterTopCornerArray.add(planterArea.get().maxX);
+            planterTopCornerArray.add(planterArea.get().maxY);
+            planterTopCornerArray.add(planterArea.get().maxZ);
+            obj.add("planterTopCorner", planterTopCornerArray);
+            obj.addProperty("tick", DebugStuff.getTickCounter());
+            debugOutput.add(obj);
+
+            if (event.pitch() > 0.6 && event.pitch() < 0.62) {
+                Vec3 playerPos = new Vec3(pos.x, 74, pos.z);
                 if (!events.isEmpty()) {
                     if (events.getLast().playerPos.distanceTo(playerPos) < 1.) {
                         Utils.infoRaw(Component.literal("§aMove around to get more position data."));
@@ -62,7 +97,7 @@ public class PhantomleafSolver {
         double calculated = (1.0 - event.volume) * 30.0;
         for (double z = 0; z < 10; z++) {
             for (double x = 0; x < 10; x++) {
-                Vec3 pos = new Vec3(currentCarpenter.getX() + x - 5.5, 74, currentCarpenter.getZ() + z + 2.5);
+                Vec3 pos = new Vec3(planterArea.get().maxX, 74, planterArea.get().maxZ);
                 if (event.playerPos.distanceTo(pos) < 0.01) {
                     int score = candidateScores.computeIfAbsent(new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), v -> new AtomicInteger(0)).incrementAndGet();
                     Utils.infoFormat("found candidate at {}, score = {}", pos, score);
@@ -102,11 +137,42 @@ public class PhantomleafSolver {
     }
 
     @EventHandler
+    private static void onServerTick(ServerTickEvent event) {
+        if (instance.isActive() && ticks > 0) {
+            ticks--;
+            if (ticks == 0) {
+                Thread.startVirtualThread(()->{
+                    Path path = FabricLoader.getInstance().getConfigDir().resolve("NoFrills").resolve("PhantomleafDebug.json");
+                    try {
+                        Utils.atomicWrite(path, new GsonBuilder().setPrettyPrinting().create().toJson(debugOutput));
+                        debugOutput.asList().clear();
+                        mc.schedule(()->Utils.info("Phantomleaf solver debug data saved to config folder"));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onPacket(ReceivePacketEvent event) {
+        if (instance.isActive() && event.packet instanceof ClientboundSetSubtitleTextPacket(
+                Component text
+        ) && Utils.isInGarden()) {
+            String subtitle = Utils.toPlain(text).trim();
+            if (subtitle.startsWith("(") && subtitle.contains(Utils.Symbols.heart) && subtitle.endsWith(")")) {
+                ticks = 40;
+            }
+        }
+    }
+
+    @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         events.clear();
         candidateScores.clear();
         bestCandidates.clear();
-        currentCarpenter = BlockPos.ZERO;
+        planterArea.set(null);
     }
 
     private record PhantomleafEvent(

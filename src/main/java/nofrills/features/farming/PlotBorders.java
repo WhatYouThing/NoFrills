@@ -8,6 +8,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.events.EventListener;
+import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldRenderEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.misc.RenderColor;
@@ -16,6 +17,7 @@ import nofrills.misc.Utils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 
 import static nofrills.Main.mc;
 
@@ -32,6 +34,10 @@ public class PlotBorders {
 
     private static final HashMap<String, Plot> plotData = buildPlotList();
     private static HashSet<String> infestedPlots = new HashSet<>();
+
+    public static Optional<Map.Entry<String, Plot>> getCurrentPlot() {
+        return plotData.entrySet().stream().filter(entry->entry.getValue().isPlayerAbove()).findFirst();
+    }
 
     private static HashMap<String, Plot> buildPlotList() {
         HashMap<String, Plot> map = new HashMap<>();
@@ -63,20 +69,6 @@ public class PlotBorders {
         return map;
     }
 
-    private static HashSet<String> getInfestedPlots() {
-        for (String line : Utils.getTabListLines()) {
-            if (line.startsWith("Plots: ")) {
-                String[] plots = line.substring(line.indexOf(":") + 1).split(",");
-                HashSet<String> set = new HashSet<>();
-                for (String plot : plots) {
-                    set.add(plot.trim());
-                }
-                return set;
-            }
-        }
-        return new HashSet<>();
-    }
-
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && Utils.isInGarden()) {
@@ -88,12 +80,11 @@ public class PlotBorders {
                 }
             }
             if (current.value()) { // kinda scuffed but this ensures the rendering order is correct
-                for (Map.Entry<String, Plot> entry : plotData.entrySet()) {
-                    if (!infestedPlots.contains(entry.getKey()) && entry.getValue().isPlayerAbove()) {
+                getCurrentPlot().ifPresent(entry->{
+                    if (!infestedPlots.contains(entry.getKey())) {
                         event.drawOutline(entry.getValue().boundingBox, true, currentColor.value());
-                        break;
                     }
-                }
+                });
             }
             if (infested.value()) {
                 for (String plot : infestedPlots) {
@@ -108,8 +99,24 @@ public class PlotBorders {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && Utils.isInGarden() && infested.value()) {
-            infestedPlots = getInfestedPlots();
+            for (String line : Utils.getTabListLines()) {
+                if (line.startsWith("Plots: ")) {
+                    String[] plots = line.substring(line.indexOf(":") + 1).split(",");
+                    HashSet<String> set = new HashSet<>();
+                    for (String plot : plots) {
+                        set.add(plot.trim());
+                    }
+                    infestedPlots = set;
+                    return;
+                }
+            }
+            infestedPlots = new HashSet<>();
         }
+    }
+
+    @EventHandler
+    private static void onJoin(ServerJoinEvent event) {
+        infestedPlots = new HashSet<>();
     }
 
     public static class Plot {

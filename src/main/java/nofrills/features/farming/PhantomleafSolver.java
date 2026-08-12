@@ -88,6 +88,7 @@ public class PhantomleafSolver {
                 if (!events.isEmpty()) {
                     if (events.getLast().playerPos.distanceTo(playerPos) < 1.) {
                         Utils.infoRaw(Component.literal("§aMove around to get more position data."));
+                        return;
                     }
                 }
                 PhantomleafEvent phantomleafEvent = new PhantomleafEvent(event.volume(), playerPos);

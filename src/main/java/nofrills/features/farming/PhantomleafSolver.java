@@ -85,12 +85,12 @@ public class PhantomleafSolver {
 
             if (event.pitch() > 0.6 && event.pitch() < 0.62) {
                 Vec3 playerPos = new Vec3(pos.x, 74, pos.z);
-                if (!events.isEmpty()) {
-                    if (events.getLast().playerPos.distanceTo(playerPos) < 1.) {
-                        Utils.infoRaw(Component.literal("§aMove around to get more position data."));
-                        return;
-                    }
-                }
+//                if (!events.isEmpty()) {
+//                    if (events.getLast().playerPos.distanceTo(playerPos) < 1.) {
+//                        Utils.infoRaw(Component.literal("§aMove around to get more position data."));
+//                        return;
+//                    }
+//                }
                 PhantomleafEvent phantomleafEvent = new PhantomleafEvent(event.volume(), playerPos);
                 Utils.infoFormat("got new sound event: {}", phantomleafEvent);
                 events.add(phantomleafEvent);
@@ -104,7 +104,7 @@ public class PhantomleafSolver {
         for (double z = 0; z < 10; z++) {
             for (double x = 0; x < 10; x++) {
                 Vec3 pos = new Vec3(planterArea.get().maxX, 74, planterArea.get().maxZ);
-                if (Utils.isNearlyEqual(event.playerPos.distanceTo(pos), calculated, 0.001)) {
+                if (Utils.isNearlyEqual(event.playerPos.distanceTo(pos), calculated, 0.01)) {
                     int score = candidateScores.computeIfAbsent(new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), v -> new AtomicInteger(0)).incrementAndGet();
                     Utils.infoFormat("found candidate at {}, score = {}", pos, score);
                 }

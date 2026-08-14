@@ -19,6 +19,7 @@ public class SeaCreatureData {
             new SeaCreature("Alligator", "A long snout breaks the surface of the water. It's an Alligator!", "§2", true, true),
             new SeaCreature("Silkbreeze", "Something zips through the air - it's a Silkbreeze!", "§b", true, true),
             new SeaCreature("Giant Isopod", "A Giant Isopod was dredged up from the depths!", "§5", true, true),
+            new SeaCreature("Nessie", "You've caused a disturbance in the loch. Could it be... Nessie?", "§a", true, true),
             new SeaCreature(
                     "Titanoboa",
                     "A massive Titanoboa surfaces. Its body stretches as far as the eye can see.",

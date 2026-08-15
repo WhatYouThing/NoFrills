@@ -13,10 +13,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.events.*;
-import nofrills.misc.DebugStuff;
-import nofrills.misc.MutableReference;
-import nofrills.misc.RenderColor;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -35,9 +32,10 @@ public class PhantomleafSolver {
     private static final MutableReference<AABB> planterArea = new MutableReference<>(null);
     private static final List<PhantomleafEvent> events = new ArrayList<>();
     private static final ConcurrentHashMap<BlockPos, AtomicInteger> candidateScores = new ConcurrentHashMap<>();
-    private static final List<BlockPos> bestCandidates = new ArrayList<>();
+    private static final ConcurrentHashSet<BlockPos> bestCandidates = new ConcurrentHashSet<>();
     private static final JsonArray debugOutput = new JsonArray();
     private static BlockPos fallbackSolution;
+    private static float highestVolume = 0.0f;
     private static int ticks = 0;
 
     @EventHandler
@@ -78,19 +76,14 @@ public class PhantomleafSolver {
             obj.addProperty("tick", DebugStuff.getTickCounter());
             debugOutput.add(obj);
 
-            if (event.volume() >= 0.99) {
+            if (event.volume() >= 0.99 && event.volume() > highestVolume) {
                 fallbackSolution = new BlockPos(mc.player.getBlockX(), 74, mc.player.getBlockZ());
+                highestVolume =  event.volume();
                 Utils.infoFormat("got fallback solution: {}", fallbackSolution);
             }
 
             if (event.pitch() > 0.6 && event.pitch() < 0.62) {
                 Vec3 playerPos = new Vec3(pos.x, 74, pos.z);
-//                if (!events.isEmpty()) {
-//                    if (events.getLast().playerPos.distanceTo(playerPos) < 1.) {
-//                        Utils.infoRaw(Component.literal("§aMove around to get more position data."));
-//                        return;
-//                    }
-//                }
                 PhantomleafEvent phantomleafEvent = new PhantomleafEvent(event.volume(), playerPos);
                 Utils.infoFormat("got new sound event: {}", phantomleafEvent);
                 events.add(phantomleafEvent);
@@ -100,16 +93,21 @@ public class PhantomleafSolver {
     }
 
     private static void processCandidates(PhantomleafEvent event) {
+        double bestDiff = Double.MAX_VALUE;
+        BlockPos bestCandidate = null;
         double calculated = (1.0 - event.volume) * 30.0;
         for (double z = 0; z < 10; z++) {
             for (double x = 0; x < 10; x++) {
-                Vec3 pos = new Vec3(planterArea.get().maxX, 74, planterArea.get().maxZ);
-                if (Utils.isNearlyEqual(event.playerPos.distanceTo(pos), calculated, 0.01)) {
-                    int score = candidateScores.computeIfAbsent(new BlockPos((int) pos.x, (int) pos.y, (int) pos.z), v -> new AtomicInteger(0)).incrementAndGet();
-                    Utils.infoFormat("found candidate at {}, score = {}", pos, score);
+                Vec3 pos = new Vec3(planterArea.get().maxX - x - 0.5, 74, planterArea.get().maxZ - z - 0.5);
+                double diff = Math.abs(event.playerPos.distanceTo(pos) - calculated);
+                if (diff < bestDiff) {
+                    bestCandidate = new BlockPos((int) pos.x, (int) pos.y, (int) pos.z);
+                    bestDiff = diff;
                 }
             }
         }
+        int s = candidateScores.computeIfAbsent(bestCandidate, v -> new AtomicInteger(0)).incrementAndGet();
+        Utils.infoFormat("found candidate at {}, score = {}", bestCandidate, s);
         bestCandidates.clear();
         int bestScore = -1;
 
@@ -133,15 +131,17 @@ public class PhantomleafSolver {
                 event.drawBeam(fallbackSolution.getCenter(), 5, true, RenderColor.fromHex(0x7f7fff));
                 event.drawFilled(AABB.encapsulatingFullBlocks(fallbackSolution, fallbackSolution), true, RenderColor.fromHex(0x7f7fff));
             }
-            if (bestCandidates.size() > 1) {
-                for (BlockPos pos : bestCandidates) {
-                    event.drawBeam(pos.getCenter(), 5, true, RenderColor.fromHex(0xffff7f));
-                    event.drawFilled(AABB.encapsulatingFullBlocks(pos, pos), true, RenderColor.fromHex(0xffff7f));
+            if (!bestCandidates.isEmpty()) {
+                RenderColor color;
+                if (bestCandidates.size() == 1) {
+                    color = RenderColor.GREEN;
+                } else {
+                    color = RenderColor.fromArgb(0xffff7f7f);
                 }
-            } else if (bestCandidates.size() == 1) {
-                BlockPos pos = bestCandidates.getFirst();
-                event.drawBeam(pos.getCenter(), 5, true, RenderColor.GREEN);
-                event.drawFilled(AABB.encapsulatingFullBlocks(pos, pos), true, RenderColor.GREEN);
+                for (BlockPos pos : bestCandidates) {
+                    event.drawBeam(pos.getCenter(), 5, true, color);
+                    event.drawFilled(AABB.encapsulatingFullBlocks(pos, pos), true, color);
+                }
             }
         }
     }
@@ -194,6 +194,7 @@ public class PhantomleafSolver {
     private static void cleanUp() {
         events.clear();
         fallbackSolution = null;
+        highestVolume = 0.0f;
         candidateScores.clear();
         bestCandidates.clear();
         planterArea.set(null);

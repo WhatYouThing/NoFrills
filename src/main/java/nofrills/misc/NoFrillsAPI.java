@@ -107,8 +107,9 @@ public class NoFrillsAPI {
                     HashMap<String, ItemTexture> textures = new HashMap<>();
                     for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
                         JsonObject object = entry.getValue().getAsJsonObject();
+                        String model = object.get("model").getAsString();
                         textures.put(entry.getKey(), new ItemTexture(
-                                object.get("model").getAsString(),
+                                model.equals("skull") ? "player_head" : model,
                                 object.has("textures") ? object.get("textures").getAsString() : ""
                         ));
                     }

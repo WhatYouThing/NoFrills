@@ -791,7 +791,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Farm Color", EquipmentHighlight.farmColor, "The color of the farming equipment highlight."),
                                 new Settings.ColorPicker("Pest Color", EquipmentHighlight.pestColor, "The color of the pest spawning equipment highlight.")
                         )),
-                        new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.")
+                        new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.", new Settings(
+                                new Settings.ColorPicker("Correct Highlight", PhantomleafSolver.colorCorrect, "The color of highlight for confident solution."),
+                                new Settings.SliderInt("Correct Threshold", -1, 4, 1, PhantomleafSolver.correctThreshold, "Amount of solver hits to display solution. Lower to -1 to show all immediately (requires toggled uncertain solutions)."),
+                                new Settings.Toggle("Sound Match", PhantomleafSolver.showSoundMatch, "Whether to show highest volume match (likely the correct solution based on volume)."),
+                                new Settings.ColorPicker("Sound Match Highlight", PhantomleafSolver.colorSoundMatch, "The color of highlight for sound match."),
+                                new Settings.Toggle("Show Uncertain", PhantomleafSolver.showUncertain, "Whether to display uncertain solver hits (different coords with same score)."),
+                                new Settings.ColorPicker("Uncertain Highlight", PhantomleafSolver.colorUncertain, "The color of highlight for uncertain solver hits.")
+                        ))
                 ))
         );
         this.categories.getLast().margins(Insets.of(5, 0, 3, 3));

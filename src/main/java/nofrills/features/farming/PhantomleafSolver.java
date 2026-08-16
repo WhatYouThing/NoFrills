@@ -1,10 +1,6 @@
 package nofrills.features.farming;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
@@ -12,13 +8,12 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
+import nofrills.config.SettingBool;
+import nofrills.config.SettingColor;
+import nofrills.config.SettingInt;
 import nofrills.events.*;
 import nofrills.misc.*;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -29,14 +24,20 @@ import static nofrills.Main.mc;
 public class PhantomleafSolver {
     public static final Feature instance = new Feature("phantomleafSolver");
 
+    public static final SettingColor colorCorrect = new SettingColor(RenderColor.fromArgb(0xaa55ff55), "colorCorrect", instance);
+    public static final SettingInt correctThreshold = new SettingInt(2, "correctThreshold", instance);
+    public static final SettingBool showSoundMatch = new SettingBool(false, "showSoundMatch", instance);
+    public static final SettingColor colorSoundMatch = new SettingColor(RenderColor.fromArgb(0xaaafafff), "colorSoundMatch", instance);
+    public static final SettingBool showUncertain =  new SettingBool(false, "showUncertain", instance);
+    public static final SettingColor colorUncertain = new SettingColor(RenderColor.fromArgb(0xaaffff55), "colorUncertain", instance);
+
     private static final MutableReference<AABB> planterArea = new MutableReference<>(null);
-    private static final List<PhantomleafEvent> events = new ArrayList<>();
     private static final ConcurrentHashMap<BlockPos, AtomicInteger> candidateScores = new ConcurrentHashMap<>();
     private static final ConcurrentHashSet<BlockPos> bestCandidates = new ConcurrentHashSet<>();
-    private static final JsonArray debugOutput = new JsonArray();
     private static BlockPos fallbackSolution;
     private static float highestVolume = 0.0f;
     private static int ticks = 0;
+    private static boolean solverActive = false;
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
@@ -50,43 +51,14 @@ public class PhantomleafSolver {
 
             Vec3 pos = mc.player.position();
 
-            JsonObject obj = new JsonObject();
-            JsonArray soundPosArray = new JsonArray();
-            soundPosArray.add(event.pos.x);
-            soundPosArray.add(event.pos.y);
-            soundPosArray.add(event.pos.z);
-            obj.add("soundPos", soundPosArray);
-            obj.addProperty("soundPitch", event.pitch());
-            obj.addProperty("soundVolume", event.volume());
-            JsonArray soundOffsetArray = new JsonArray();
-            soundOffsetArray.add(planterArea.get().maxX - event.pos.x);
-            soundOffsetArray.add(planterArea.get().maxY - event.pos.y);
-            soundOffsetArray.add(planterArea.get().maxZ - event.pos.z);
-            obj.add("soundOffset", soundOffsetArray);
-            JsonArray playerPosArray = new JsonArray();
-            playerPosArray.add(pos.x);
-            playerPosArray.add(pos.y);
-            playerPosArray.add(pos.z);
-            obj.add("playerPos", playerPosArray);
-            JsonArray planterTopCornerArray = new JsonArray();
-            planterTopCornerArray.add(planterArea.get().maxX);
-            planterTopCornerArray.add(planterArea.get().maxY);
-            planterTopCornerArray.add(planterArea.get().maxZ);
-            obj.add("planterTopCorner", planterTopCornerArray);
-            obj.addProperty("tick", DebugStuff.getTickCounter());
-            debugOutput.add(obj);
-
             if (event.volume() >= 0.99 && event.volume() > highestVolume) {
                 fallbackSolution = new BlockPos(mc.player.getBlockX(), 74, mc.player.getBlockZ());
                 highestVolume =  event.volume();
-                Utils.infoFormat("got fallback solution: {}", fallbackSolution);
             }
 
             if (event.pitch() > 0.6 && event.pitch() < 0.62) {
                 Vec3 playerPos = new Vec3(pos.x, 74, pos.z);
                 PhantomleafEvent phantomleafEvent = new PhantomleafEvent(event.volume(), playerPos);
-                Utils.infoFormat("got new sound event: {}", phantomleafEvent);
-                events.add(phantomleafEvent);
                 processCandidates(phantomleafEvent);
             }
         }
@@ -106,10 +78,9 @@ public class PhantomleafSolver {
                 }
             }
         }
-        int s = candidateScores.computeIfAbsent(bestCandidate, v -> new AtomicInteger(0)).incrementAndGet();
-        Utils.infoFormat("found candidate at {}, score = {}", bestCandidate, s);
+        candidateScores.computeIfAbsent(bestCandidate, v -> new AtomicInteger(0)).incrementAndGet();
         bestCandidates.clear();
-        int bestScore = -1;
+        int bestScore = correctThreshold.value();
 
         for (Map.Entry<BlockPos, AtomicInteger> entry : candidateScores.entrySet()) {
             int score = entry.getValue().get();
@@ -126,17 +97,19 @@ public class PhantomleafSolver {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && Utils.isInGarden()) {
-            if (fallbackSolution != null) {
-                event.drawBeam(fallbackSolution.getCenter(), 5, true, RenderColor.fromHex(0x7f7fff));
-                event.drawFilled(AABB.encapsulatingFullBlocks(fallbackSolution, fallbackSolution), true, RenderColor.fromHex(0x7f7fff));
-            }
-            if (!bestCandidates.isEmpty()) {
+        if (instance.isActive() && Utils.isInGarden() && solverActive) {
+            if (showSoundMatch.value() && fallbackSolution != null) {
+                event.drawBeam(fallbackSolution.getCenter(), 5, true, colorSoundMatch.value());
+                event.drawFilled(AABB.encapsulatingFullBlocks(fallbackSolution, fallbackSolution), true, colorSoundMatch.value());
+            } else if (!bestCandidates.isEmpty()) {
                 RenderColor color;
                 if (bestCandidates.size() == 1) {
-                    color = RenderColor.GREEN;
+                    color = colorCorrect.value();
                 } else {
-                    color = RenderColor.fromArgb(0xffff7f7f);
+                    if (!showUncertain.value()) {
+                        return;
+                    }
+                    color = colorUncertain.value();
                 }
                 for (BlockPos pos : bestCandidates) {
                     event.drawBeam(pos.getCenter(), 5, true, color);
@@ -150,18 +123,6 @@ public class PhantomleafSolver {
     private static void onServerTick(ServerTickEvent event) {
         if (instance.isActive() && ticks > 0) {
             ticks--;
-            if (ticks == 0) {
-                Thread.startVirtualThread(()->{
-                    Path path = FabricLoader.getInstance().getConfigDir().resolve("NoFrills").resolve("PhantomleafDebug.json");
-                    try {
-                        Utils.atomicWrite(path, new GsonBuilder().setPrettyPrinting().create().toJson(debugOutput));
-                        debugOutput.asList().clear();
-                        mc.schedule(()->Utils.info("Phantomleaf solver debug data saved to config folder"));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-            }
         }
     }
 
@@ -180,7 +141,10 @@ public class PhantomleafSolver {
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
         if (instance.isActive() && Utils.isInGarden()) {
-            if (event.messagePlain.equals("[CROP] Phantomleaf: You found me!")) {
+            if (event.messagePlain.equals("[CROP] Phantomleaf: Poof! Try and find me!")) {
+                solverActive = true;
+                Utils.showTitle("§5§lPHANTOMLEAF", "Move around the planter to collect the sounds for solution.", 0, 30, 10);
+            } else if (event.messagePlain.equals("[CROP] Phantomleaf: You found me!")) {
                 cleanUp();
             }
         }
@@ -192,12 +156,13 @@ public class PhantomleafSolver {
     }
 
     private static void cleanUp() {
-        events.clear();
         fallbackSolution = null;
         highestVolume = 0.0f;
         candidateScores.clear();
         bestCandidates.clear();
         planterArea.set(null);
+        solverActive = false;
+        ticks = 0;
     }
 
     private record PhantomleafEvent(

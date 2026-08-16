@@ -78,6 +78,14 @@ public class DungeonUtil {
         return mc.player != null && mc.player.isInvisible() && mc.player.getAbilities().mayfly;
     }
 
+    public static boolean isPrinceScoreMessage(String msg) {
+        return msg.equals("A Prince falls. +1 Bonus Score");
+    }
+
+    public static boolean isBatScoreMessage(String msg) {
+        return msg.equals("A Bat has been slain. +1 Bonus Score");
+    }
+
     public static boolean isDungeonStarted() {
         return getMap() != null;
     }

@@ -33,11 +33,11 @@ public class ScoreCalculator {
             "kill",
             "dead",
             "score",
-            "smoke"
+            "bonus"
     );
+    public static boolean mimic = false;
     private static int score = 0;
     private static boolean bloodDone = false;
-    private static boolean mimic = false;
     private static boolean prince = false;
     private static boolean bat = false;
     private static boolean sent270 = false;
@@ -205,18 +205,6 @@ public class ScoreCalculator {
         return bonus;
     }
 
-    public static void setMimicKilled() {
-        mimic = true;
-    }
-
-    public static void setPrinceKilled() {
-        prince = true;
-    }
-
-    public static void setBatKilled() {
-        bat = true;
-    }
-
     public static int getScore() {
         return score;
     }
@@ -247,8 +235,16 @@ public class ScoreCalculator {
 
     @EventHandler
     private static void onMsg(ChatMsgEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && event.messagePlain.equals("[BOSS] The Watcher: You have proven yourself. You may pass.")) {
-            bloodDone = true;
+        if (instance.isActive() && Utils.isInDungeons()) {
+            if (event.msg().equals("[BOSS] The Watcher: You have proven yourself. You may pass.")) {
+                bloodDone = true;
+            }
+            if (DungeonUtil.isPrinceScoreMessage(event.msg())) {
+                prince = true;
+            }
+            if (DungeonUtil.isBatScoreMessage(event.msg())) {
+                bat = true;
+            }
         }
     }
 
@@ -256,16 +252,13 @@ public class ScoreCalculator {
     private static void onPartyMsg(PartyChatMsgEvent event) {
         if (instance.isActive() && Utils.isInDungeons()) {
             String msg = Utils.toLower(event.message);
-            for (String keyword : scoreKeywords) {
-                if (msg.contains(keyword)) {
-                    if (msg.contains("mimic")) {
-                        if (!DungeonUtil.isOnFloor("6") && !DungeonUtil.isOnFloor("7")) {
-                            continue;
-                        }
-                        setMimicKilled();
-                    } else if (msg.contains("prince")) {
-                        setPrinceKilled();
-                    }
+            if (scoreKeywords.stream().anyMatch(msg::contains)) {
+                if (msg.contains("mimic") && (DungeonUtil.isOnFloor("6") || DungeonUtil.isOnFloor("7"))) {
+                    mimic = true;
+                } else if (msg.contains("prince")) {
+                    prince = true;
+                } else if (msg.contains("bat")) {
+                    bat = true;
                 }
             }
         }

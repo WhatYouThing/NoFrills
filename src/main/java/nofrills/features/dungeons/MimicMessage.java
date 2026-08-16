@@ -8,9 +8,10 @@ import nofrills.config.SettingString;
 import nofrills.events.EntityRemovedEvent;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.EventListener;
-import nofrills.events.ServerJoinEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
+
+import static nofrills.features.dungeons.ScoreCalculator.mimic;
 
 @EventListener
 public class MimicMessage {
@@ -19,21 +20,17 @@ public class MimicMessage {
     public static final SettingString msg = new SettingString("/pc Mimic Killed!", "msg", instance);
 
     private static final EntityCache cache = new EntityCache();
-    private static boolean mimicKilled = false;
 
     private static void processDeath() {
         if (instance.isActive()) {
             Utils.sendMessage(msg.value());
         }
-        if (ScoreCalculator.instance.isActive()) {
-            ScoreCalculator.setMimicKilled();
-        }
-        mimicKilled = true;
+        mimic = true;
     }
 
     @EventHandler
     private static void onEntity(EntityUpdatedEvent event) {
-        if (!mimicKilled && event.entity instanceof Zombie zombie && zombie.isBaby() && Utils.isInDungeons()) {
+        if (!mimic && event.entity instanceof Zombie zombie && zombie.isBaby() && Utils.isInDungeons()) {
             GameProfile textures = Utils.getTextures(Utils.getEntityArmor(zombie).getFirst());
             if (Utils.isTextureEqual(textures, "e19c12543bc7792605ef68e1f8749ae8f2a381d9085d4d4b780ba1282d3597a0")) {
                 cache.add(zombie);
@@ -46,13 +43,8 @@ public class MimicMessage {
 
     @EventHandler
     private static void onRemoved(EntityRemovedEvent event) {
-        if (!mimicKilled && event.entity instanceof Zombie zombie && zombie.isDeadOrDying() && cache.has(event.entity)) {
+        if (!mimic && event.entity instanceof Zombie zombie && zombie.isDeadOrDying() && cache.has(event.entity)) {
             processDeath();
         }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        mimicKilled = false;
     }
 }

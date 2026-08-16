@@ -330,7 +330,7 @@ public class TerminalSolvers {
         }
 
         public void setClicked(Slot slot, int button, int containerId) {
-            if (this.containerId != containerId) {
+            if (this.containerId < containerId) {
                 if (this.type.equals(TerminalType.Colors)) {
                     int index = this.solutionMap.getOrDefault(slot.index, -1);
                     if (index != -1) {

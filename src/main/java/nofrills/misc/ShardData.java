@@ -8,11 +8,19 @@ import nofrills.config.DataFile;
 import nofrills.events.EventListener;
 import nofrills.events.SlotUpdateEvent;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @EventListener
 public class ShardData {
     private static final DataFile data = Config.getDataFile("ShardData.json");
+
+    private static final Pattern sourcePattern = Pattern.compile("Source: (?<name>.*) Shard \\(.*[0-9]*\\)");
+    private static final Pattern attributeLevelPattern = Pattern.compile("Attribute Level: (?<level>[0-9]*)(?:| \\(MAX!\\))");
+    private static final Pattern rarityPattern = Pattern.compile("Rarity: (?<rarity>[A-Z]*)");
+    private static final Pattern enabledPattern = Pattern.compile("Enabled: (?<value>Yes|No)");
+    private static final Pattern skillPattern = Pattern.compile("(?<skill>Combat|Fishing|Farming|Foraging|Mining|Taming|Enchanting|Hunting|Global|Alchemy)");
 
     public static String getId(ItemStack stack) {
         if (isShard(stack)) {
@@ -50,12 +58,43 @@ public class ShardData {
         };
     }
 
-    public static String getShardSkill(String name) {
-        return data.get().has(name) ? data.get().get(name).getAsJsonObject().get("skill").getAsString() : "";
+    public static Optional<CachedShard> getFromCache(String name) {
+        JsonObject object = data.get();
+        String shard = Utils.toLower(name);
+        if (object.has(shard)) {
+            JsonObject shardObject = object.get(shard).getAsJsonObject();
+            return Optional.of(new CachedShard(
+                    shardObject.has("level") ? shardObject.get("level").getAsInt() : 0,
+                    shardObject.has("rarity") ? shardObject.get("rarity").getAsString() : "",
+                    shardObject.has("enabled") && shardObject.get("enabled").getAsBoolean(),
+                    shardObject.has("skill") ? shardObject.get("skill").getAsString() : ""
+            ));
+        }
+        return Optional.empty();
     }
 
-    public static String getShardRarity(String name) {
-        return data.get().has(name) ? data.get().get(name).getAsJsonObject().get("rarity").getAsString() : "";
+    public static String getColorPrefix(String shard) {
+        String rarity = getFromCache(shard).map(cached -> cached.rarity).orElse("");
+        return switch (rarity) {
+            case "LEGENDARY" -> "§6";
+            case "EPIC" -> "§5";
+            case "RARE" -> "§9";
+            case "UNCOMMON" -> "§a";
+            case "COMMON" -> "§f";
+            default -> "§7";
+        };
+    }
+
+    public static int getColorHex(String shard) {
+        String rarity = getFromCache(shard).map(cached -> cached.rarity).orElse("");
+        return switch (rarity) {
+            case "LEGENDARY" -> 0xffffaa00;
+            case "EPIC" -> 0xffaa00aa;
+            case "RARE" -> 0xff5555ff;
+            case "UNCOMMON" -> 0xff55ff55;
+            case "COMMON" -> 0xffffffff;
+            default -> 0xffaaaaaa;
+        };
     }
 
     private static boolean isShard(ItemStack stack) {
@@ -84,74 +123,78 @@ public class ShardData {
 
     private static String getSource(ItemStack stack) {
         for (String line : Utils.getLoreLines(stack)) {
-            if (line.startsWith("Source: ") && line.contains(" Shard")) {
-                return line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1);
+            Matcher matcher = sourcePattern.matcher(line);
+            if (!matcher.matches()) continue;
+            String name = matcher.group("name");
+            if (name != null) {
+                return name;
             }
         }
         return "";
     }
 
-    private static void addToCache(String source, String skill, String rarity) {
-        JsonObject object = new JsonObject();
-        object.addProperty("skill", skill);
-        object.addProperty("rarity", rarity);
-        data.get().add(Utils.toLower(source), object);
+    private static int getLevel(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            Matcher matcher = attributeLevelPattern.matcher(line);
+            if (!matcher.matches()) continue;
+            String level = matcher.group("level");
+            if (level != null) {
+                return Utils.parseInt(level).orElse(0);
+            }
+        }
+        return 0;
     }
 
-    public static String getColorPrefix(String shard) {
-        String rarity = getShardRarity(shard);
-        return switch (rarity) {
-            case "LEGENDARY" -> "§6";
-            case "EPIC" -> "§5";
-            case "RARE" -> "§9";
-            case "UNCOMMON" -> "§a";
-            case "COMMON" -> "§f";
-            default -> "§7";
-        };
+    private static String getRarity(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            Matcher matcher = rarityPattern.matcher(line);
+            if (!matcher.matches()) continue;
+            String rarity = matcher.group("rarity");
+            if (rarity != null) {
+                return rarity;
+            }
+        }
+        return "";
     }
 
-    public static int getColorHex(String shard) {
-        String rarity = getShardRarity(shard);
-        return switch (rarity) {
-            case "LEGENDARY" -> 0xffffaa00;
-            case "EPIC" -> 0xffaa00aa;
-            case "RARE" -> 0xff5555ff;
-            case "UNCOMMON" -> 0xff55ff55;
-            case "COMMON" -> 0xffffffff;
-            default -> 0xffaaaaaa;
-        };
+    private static boolean getEnabled(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            Matcher matcher = enabledPattern.matcher(line);
+            if (!matcher.matches()) continue;
+            String value = matcher.group("value");
+            return value != null && value.equals("Yes");
+        }
+        return false;
+    }
+
+    private static String getSkill(ItemStack stack) {
+        for (String line : Utils.getLoreLines(stack)) {
+            Matcher matcher = skillPattern.matcher(line);
+            if (!matcher.matches()) continue;
+            String skill = matcher.group("skill");
+            if (skill != null) {
+                return skill;
+            }
+        }
+        return "";
     }
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (event.stack.isEmpty() || event.isInventory) return;
-        if (event.isPaginatedMenu("Hunting Box")) {
-            List<String> lines = Utils.getLoreLines(event.stack);
-            if (lines.stream().noneMatch(line -> line.startsWith("Owned: ") && line.contains(" Shard"))) return;
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.contains(" (") && !line.contains(" (ID ") && line.endsWith(")")) {
-                    addToCache(
-                            Utils.toPlain(event.stack.getHoverName()),
-                            line.substring(line.indexOf("(") + 1, line.indexOf(")")),
-                            lines.getLast().substring(0, lines.getLast().indexOf(" "))
-                    );
-                    break;
-                }
-            }
-        } else if (event.isPaginatedMenu("Attribute Menu")) {
-            List<String> lines = Utils.getLoreLines(event.stack);
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i);
-                if (line.startsWith("Source: ") && line.contains(" Shard") && line.endsWith(")")) {
-                    addToCache(
-                            line.substring(line.indexOf(":") + 2, line.indexOf("Shard") - 1),
-                            lines.getFirst(),
-                            lines.get(i + 1).substring(line.indexOf(":") + 2)
-                    );
-                    break;
-                }
-            }
+        if (!event.stack.isEmpty() && !event.isInventory && event.isPaginatedMenu("Attribute Menu")) {
+            String source = getSource(event.stack);
+            if (source.isEmpty()) return;
+            JsonObject object = new JsonObject();
+            object.addProperty("level", getLevel(event.stack));
+            object.addProperty("rarity", getRarity(event.stack));
+            object.addProperty("enabled", getEnabled(event.stack));
+            object.addProperty("skill", getSkill(event.stack));
+            data.get().add(Utils.toLower(source), object);
         }
+    }
+
+    public record CachedShard(int level, String rarity, boolean enabled, String skill) {
+
+        public static final CachedShard EMPTY = new CachedShard(0, "", false, "");
     }
 }

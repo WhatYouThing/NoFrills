@@ -12,6 +12,7 @@ import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.RenderColor;
+import nofrills.misc.ShardData;
 import nofrills.misc.Utils;
 
 import java.util.HashMap;
@@ -58,6 +59,16 @@ public class KuudraChestValue {
             cost += i > 7 ? i * 10 - 10 : i * 5 + 25; // simple formula for the price of each star on a basic tier piece
         }
         return cost;
+    }
+
+    public static double getEssenceMultiplier() {
+        ShardData.CachedShard lavaLeech = ShardData.getFromCache("Lava Leech").orElse(ShardData.CachedShard.EMPTY);
+        ShardData.CachedShard komodoDragon = ShardData.getFromCache("Komodo Dragon").orElse(ShardData.CachedShard.EMPTY);
+        ShardData.CachedShard tiamat = ShardData.getFromCache("Tiamat").orElse(ShardData.CachedShard.EMPTY);
+        int lavaLeechLevel = lavaLeech.enabled() ? lavaLeech.level() : 0;
+        int komodoDragonLevel = komodoDragon.enabled() ? komodoDragon.level() : 0;
+        int tiamatLevel = tiamat.enabled() ? tiamat.level() : 0;
+        return 1 + petBonus.value() * 0.01 + (lavaLeechLevel * 0.01) * (1 + (komodoDragonLevel * 0.02) * (1 + tiamatLevel * 0.05));
     }
 
     public static String getKeyTier(String keyName) {
@@ -137,7 +148,7 @@ public class KuudraChestValue {
             Optional<Integer> quantity = Utils.parseInt(last.replaceAll("x", "").replaceAll(",", ""));
             if (quantity.isPresent()) {
                 if (name.startsWith("Crimson Essence")) {
-                    return (int) Math.floor(quantity.get() * (1 + petBonus.value() * 0.01));
+                    return (int) Math.floor(quantity.get() * getEssenceMultiplier());
                 }
                 return quantity.get();
             }

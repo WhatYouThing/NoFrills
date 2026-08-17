@@ -229,8 +229,9 @@ public final class ShardTracker {
                 if (!matcher.matches()) continue;
                 String name = matcher.group("name");
                 if (name == null) continue;
-                if (pattern == sentToBoxPattern && ShardData.getShardSkill(name).equals("Fishing")) return;
-                if (pattern == boughtPattern && ShardData.getShardSkill(name).isEmpty()) return;
+                String skill = ShardData.getFromCache(name).map(ShardData.CachedShard::skill).orElse("");
+                if (pattern == sentToBoxPattern && skill.equals("Fishing")) return;
+                if (pattern == boughtPattern && skill.isEmpty()) return;
                 int quantity = matcher.namedGroups().containsKey("quantity")
                         ? Utils.parseInt(matcher.group("quantity").replace("x", "")).orElse(1)
                         : 1;

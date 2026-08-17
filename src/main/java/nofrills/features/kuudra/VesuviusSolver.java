@@ -104,7 +104,7 @@ public class VesuviusSolver {
                 }
                 int quantity = Utils.hasItemQuantity(line) ? Utils.parseInt(line.substring(line.lastIndexOf("x") + 1)).orElse(0) : 1;
                 if (id.equals("ESSENCE_CRIMSON")) {
-                    quantity = (int) Math.floor(quantity * (1 + KuudraChestValue.petBonus.value() * 0.01));
+                    quantity = (int) Math.floor(quantity * KuudraChestValue.getEssenceMultiplier());
                 }
                 if (KuudraChestValue.salvageValue.value() && KuudraChestValue.salvageAmounts.containsKey(id)) {
                     AtomicInteger stars = new AtomicInteger();

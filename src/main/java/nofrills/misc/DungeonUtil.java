@@ -141,7 +141,11 @@ public class DungeonUtil {
     }
 
     public static String getPlayerClass(String name) {
-        return classCache.getOrDefault(name, "");
+        return getPlayerClass(name, "");
+    }
+
+    public static String getPlayerClass(String name, String defaultValue) {
+        return classCache.getOrDefault(name, defaultValue);
     }
 
     public static String getPlayerClass() {

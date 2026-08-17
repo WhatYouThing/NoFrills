@@ -81,7 +81,11 @@ public final class MappedEntityCache<T> {
     }
 
     public T getValue(Entity entity) {
-        return this.entities.getOrDefault(entity, null);
+        return this.getOrDefault(entity, null);
+    }
+
+    public T getOrDefault(Entity entity, T defaultValue) {
+        return this.entities.getOrDefault(entity, defaultValue);
     }
 
     public List<Entity> getEntities() {

@@ -13,9 +13,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ResolvableProfile;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingJson;
+import nofrills.config.*;
 import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.NoFrillsAPI;
@@ -24,11 +22,12 @@ import nofrills.misc.Utils;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
 @EventListener
 public class LegacyTextures {
-    public static final Feature instance = new Feature("legacyTextures", Feature.Flags.UseItemTexturesAPI);
+    public static final Feature instance = new Feature("legacyTextures");
 
     public static final SettingBool revertItems = new SettingBool(true, "revertItems", instance);
     public static final SettingBool unlockPackPos = new SettingBool(false, "unlockPackPos", instance);
@@ -38,7 +37,9 @@ public class LegacyTextures {
     public static final SettingBool moreLegacy = new SettingBool(false, "moreLegacy", instance);
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
 
+    private static final DataFile textures = Config.getDataFile("LegacyTexturesCache.json");
     private static final ConcurrentHashMap<String, ResolvableProfile> cache = new ConcurrentHashMap<>();
+    private static boolean texturesLoaded = false;
 
     public static ResolvableProfile getOrInitProfile(String id, String payload) {
         if (!cache.containsKey(id)) {
@@ -84,8 +85,8 @@ public class LegacyTextures {
                 };
                 if (!path.isEmpty()) return Optional.of(Identifier.withDefaultNamespace(path));
             }
-            if (NoFrillsAPI.itemTextures.containsKey(id)) {
-                return Optional.of(Identifier.parse(NoFrillsAPI.itemTextures.get(id).model()));
+            if (textures.get().has(id)) {
+                return Optional.of(Identifier.parse(textures.get().get(id).getAsJsonObject().get("model").getAsString()));
             }
         }
         return Optional.empty();
@@ -97,10 +98,11 @@ public class LegacyTextures {
         if (data != null && model != null && model.getNamespace().equals("hypixel_skyblock")) {
             String id = data.tag.getStringOr("id", "");
             if (id.isEmpty() || isWhitelisted(id)) return Optional.empty();
-            if (NoFrillsAPI.itemTextures.containsKey(id)) {
-                NoFrillsAPI.ItemTexture textures = NoFrillsAPI.itemTextures.get(id);
-                if (!textures.textures().isEmpty()) {
-                    return Optional.of(LegacyTextures.getOrInitProfile(id, textures.textures()));
+            if (textures.get().has(id)) {
+                JsonObject object = textures.get().get(id).getAsJsonObject();
+                String payload = object.has("textures") ? object.get("textures").getAsString() : "";
+                if (!payload.isEmpty()) {
+                    return Optional.of(LegacyTextures.getOrInitProfile(id, payload));
                 }
             }
         }
@@ -133,7 +135,19 @@ public class LegacyTextures {
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
-        if (!instance.isActive()) {
+        if (instance.isActive()) {
+            if (!texturesLoaded) {
+                Thread.startVirtualThread(() -> {
+                    try {
+                        JsonObject json = NoFrillsAPI.makeRequestObject("v1/items/get-item-textures/");
+                        textures.set(json);
+                    } catch (Exception exception) {
+                        LOGGER.error("Failed to refresh item textures from NoFrills API.", exception);
+                    }
+                });
+            }
+            texturesLoaded = true;
+        } else {
             cache.clear();
         }
     }

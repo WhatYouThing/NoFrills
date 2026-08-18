@@ -5,14 +5,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
+import net.fabricmc.loader.api.ModContainer;
 import nofrills.config.Feature;
 import nofrills.events.EventListener;
 import nofrills.events.WorldTickEvent;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,18 +24,17 @@ import static nofrills.Main.mc;
 
 @EventListener
 public class NoFrillsAPI {
+    private static final HttpClient httpClient = HttpClient.newBuilder().build();
     public static HashMap<String, Long> auctionPricing = new HashMap<>();
     public static HashMap<String, BazaarPrice> bazaarPricing = new HashMap<>();
     public static HashMap<String, NPCPrice> npcPricing = new HashMap<>();
     public static HashSet<String> electionPerks = new HashSet<>();
     public static HashSet<String> nonPlaceableItems = new HashSet<>();
     public static HashMap<String, MuseumData> museumData = new HashMap<>();
-    public static HashMap<String, ItemTexture> itemTextures = new HashMap<>();
     private static final List<RefreshTask> tasks = List.of(
             new RefreshTask(1200, Feature.Flags.UsePricingAPI, () -> Thread.startVirtualThread(() -> {
                 try {
-                    InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v2/economy/get-item-pricing/").toURL().openStream();
-                    JsonObject json = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonObject();
+                    JsonObject json = makeRequestObject("v2/economy/get-item-pricing/");
                     HashMap<String, Long> auction = new HashMap<>();
                     for (Map.Entry<String, JsonElement> entry : json.getAsJsonObject("auction").asMap().entrySet()) {
                         auction.put(entry.getKey(), entry.getValue().getAsLong());
@@ -60,21 +60,19 @@ public class NoFrillsAPI {
             })),
             new RefreshTask(2400, Feature.Flags.UseElectionAPI, () -> Thread.startVirtualThread(() -> {
                 try {
-                    InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v1/election/get-active-perks").toURL().openStream();
-                    JsonObject json = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonObject();
+                    JsonObject json = makeRequestObject("v1/election/get-active-perks");
                     HashSet<String> perks = new HashSet<>();
                     for (JsonElement element : json.getAsJsonArray("perks")) {
                         perks.add(element.getAsString());
                     }
                     electionPerks = perks;
-                } catch (IOException exception) {
+                } catch (Exception exception) {
                     LOGGER.error("Failed to refresh election perks from NoFrills API.", exception);
                 }
             })),
             new RefreshTask(12000, Feature.Flags.UseNonPlaceableAPI, () -> Thread.startVirtualThread(() -> {
                 try {
-                    InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v1/items/get-non-placeable/").toURL().openStream();
-                    JsonArray json = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonArray();
+                    JsonArray json = makeRequestArray("v1/items/get-non-placeable/");
                     HashSet<String> items = new HashSet<>();
                     for (JsonElement element : json) {
                         items.add(element.getAsString());
@@ -86,8 +84,7 @@ public class NoFrillsAPI {
             })),
             new RefreshTask(12000, Feature.Flags.UseMuseumAPI, () -> Thread.startVirtualThread(() -> {
                 try {
-                    InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v1/items/get-museum-data/").toURL().openStream();
-                    JsonObject json = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonObject();
+                    JsonObject json = makeRequestObject("v1/items/get-museum-data/");
                     HashMap<String, MuseumData> data = new HashMap<>();
                     for (Map.Entry<String, JsonElement> entry : json.asMap().entrySet()) {
                         JsonObject object = entry.getValue().getAsJsonObject();
@@ -99,26 +96,30 @@ public class NoFrillsAPI {
                 } catch (Exception exception) {
                     LOGGER.error("Failed to refresh museum data from NoFrills API.", exception);
                 }
-            })),
-            new RefreshTask(12000, Feature.Flags.UseItemTexturesAPI, () -> Thread.startVirtualThread(() -> {
-                try {
-                    InputStream connection = URI.create("https://whatyouth.ing/api/nofrills/v1/items/get-item-textures/").toURL().openStream();
-                    JsonObject json = JsonParser.parseReader(new InputStreamReader(connection)).getAsJsonObject();
-                    HashMap<String, ItemTexture> textures = new HashMap<>();
-                    for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
-                        JsonObject object = entry.getValue().getAsJsonObject();
-                        String model = object.get("model").getAsString();
-                        textures.put(entry.getKey(), new ItemTexture(
-                                model.equals("skull") ? "player_head" : model,
-                                object.has("textures") ? object.get("textures").getAsString() : ""
-                        ));
-                    }
-                    itemTextures = textures;
-                } catch (Exception exception) {
-                    LOGGER.error("Failed to refresh item texture data from NoFrills API.", exception);
-                }
             }))
     );
+
+    public static String makeRequest(String endpoint) throws Exception {
+        ModContainer container = Utils.getModContainer();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://whatyouth.ing/api/nofrills/" + endpoint))
+                .header("X-NoFrills-ModVer", container.getMetadata().getVersion().getFriendlyString())
+                .header("X-NoFrills-GameVer", mc.getLaunchedVersion())
+                .GET()
+                .build();
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+
+    public static JsonObject makeRequestObject(String endpoint) throws Exception {
+        String response = makeRequest(endpoint);
+        return JsonParser.parseString(response).getAsJsonObject();
+    }
+
+    public static JsonArray makeRequestArray(String endpoint) throws Exception {
+        String response = makeRequest(endpoint);
+        return JsonParser.parseString(response).getAsJsonArray();
+    }
 
     public static boolean usingFlag(Feature.Flags flag) {
         for (Feature feature : Feature.withFlags) {
@@ -136,9 +137,6 @@ public class NoFrillsAPI {
                 task.tick();
             }
         }
-    }
-
-    public record ItemTexture(String model, String textures) {
     }
 
     private static class RefreshTask {

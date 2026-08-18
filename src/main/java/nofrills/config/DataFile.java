@@ -52,4 +52,8 @@ public class DataFile {
     public JsonObject get() {
         return this.data;
     }
+
+    public void set(JsonObject newData) {
+        this.data = newData;
+    }
 }

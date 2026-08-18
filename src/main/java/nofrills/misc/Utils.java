@@ -14,6 +14,7 @@ import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.components.LerpingBossEvent;
@@ -80,6 +81,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -89,6 +91,7 @@ public class Utils {
     public static final GuiMessageTag noFrillsIndicator = new GuiMessageTag(0x5ca0bf, null, Component.nullToEmpty("Message from NoFrills mod."), "NoFrills Mod");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final ConcurrentHashMap<String, Pattern> paginationPatternCache = new ConcurrentHashMap<>();
+    private static final Supplier<ModContainer> modContainer = () -> FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow();
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",
             "Kuudra",
@@ -721,6 +724,10 @@ public class Utils {
         atomicWrite(path, GSON.toJson(content));
     }
 
+    public static ModContainer getModContainer() {
+        return modContainer.get();
+    }
+
     private static int getVersionNumber(String version) {
         String[] numbers = version.split("\\.");
         if (numbers.length >= 3) {
@@ -732,7 +739,7 @@ public class Utils {
     public static void checkUpdate(boolean notifyIfMatch) {
         Thread.startVirtualThread(() -> {
             try {
-                String version = FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow().getMetadata().getVersion().getFriendlyString();
+                String version = modContainer.get().getMetadata().getVersion().getFriendlyString();
                 InputStream connection = URI.create("https://raw.githubusercontent.com/WhatYouThing/NoFrills/refs/heads/main/gradle.properties").toURL().openStream();
                 for (String line : IOUtils.toString(connection, StandardCharsets.UTF_8).split("\n")) {
                     if (line.startsWith("mod_version=")) {

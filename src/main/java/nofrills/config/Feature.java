@@ -66,7 +66,6 @@ public class Feature {
         UsePricingAPI,
         UseElectionAPI,
         UseNonPlaceableAPI,
-        UseMuseumAPI,
-        UseItemTexturesAPI
+        UseMuseumAPI
     }
 }

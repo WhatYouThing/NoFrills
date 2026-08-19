@@ -9,7 +9,7 @@ import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.VerticalAlignment;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatSlider;
@@ -23,12 +23,14 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class InventoryButtonSettings extends Settings {
+    private final Screen previous;
 
-    public InventoryButtonSettings(List<FlowLayout> settings) {
+    public InventoryButtonSettings(List<FlowLayout> settings, Screen previous) {
+        this.previous = previous;
         super(settings);
     }
 
-    public static InventoryButtonSettings of(InventoryButtonWidget widget) {
+    public static InventoryButtonSettings of(InventoryButtonWidget widget, Screen previous) {
         JsonObject buttonObject = widget.buttonObject;
         List<FlowLayout> list = new ArrayList<>();
         list.add(buildUniformSetting(buttonObject));
@@ -44,8 +46,8 @@ public class InventoryButtonSettings extends Settings {
         list.add(buildBackgroundColorSetting(buttonObject, widget));
         list.add(buildBorderColorSetting(buttonObject, widget));
         list.add(buildBorderHoverColorSetting(buttonObject, widget));
-        list.add(buildManageSetting(buttonObject));
-        InventoryButtonSettings buttonSettings = new InventoryButtonSettings(list);
+        list.add(buildManageSetting(buttonObject, previous));
+        InventoryButtonSettings buttonSettings = new InventoryButtonSettings(list, previous);
         String command = buttonObject.get("command").getAsString();
         buttonSettings.setTitle(Component.literal("Inventory Button: " + (command.isEmpty() ? "Blank" : command)));
         return buttonSettings;
@@ -227,15 +229,15 @@ public class InventoryButtonSettings extends Settings {
         );
     }
 
-    protected static FlowLayout buildManageSetting(JsonObject buttonObject) {
+    protected static FlowLayout buildManageSetting(JsonObject buttonObject, Screen previous) {
         return new BigButton("Delete Button", _ -> {
             InventoryButtons.data.value().get("buttons").getAsJsonArray().remove(buttonObject);
-            mc.setScreen(new InventoryScreen(mc.player));
+            mc.setScreen(previous);
         });
     }
 
     @Override
     public void onClose() {
-        mc.setScreen(new InventoryScreen(mc.player));
+        mc.setScreen(this.previous);
     }
 }

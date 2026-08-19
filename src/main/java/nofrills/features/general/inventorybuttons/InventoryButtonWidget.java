@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.core.component.DataComponents;
@@ -109,7 +110,8 @@ public final class InventoryButtonWidget extends ImageButton {
     public void onClick(@NonNull MouseButtonEvent event, boolean doubleClick) {
         if (this.unlockPosition) return;
         if (event.buttonInfo().button() == 1) {
-            mc.setScreen(InventoryButtonSettings.of(this));
+            Screen previous = mc.screen;
+            mc.setScreen(InventoryButtonSettings.of(this, previous));
         } else {
             super.onClick(event, doubleClick);
         }

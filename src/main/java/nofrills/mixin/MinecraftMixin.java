@@ -64,7 +64,7 @@ public abstract class MinecraftMixin {
         eventBus.post(new AttackBlockEvent(blockHitResult, blockPos));
     }
 
-    @Inject(method = "close", at = @At("HEAD"))
+    @Inject(method = "exitWorldAndClose", at = @At("HEAD"))
     private void beforeStop(CallbackInfo ci) {
         Config.saveBlocking();
     }

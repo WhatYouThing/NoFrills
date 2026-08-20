@@ -66,7 +66,7 @@ public class GuiKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
+        if (instance.isActive() && mc.gui.screen() instanceof ContainerScreen container) {
             ChestMenu handler = container.getMenu();
             for (Slot slot : Utils.getContainerSlots(handler)) {
                 ButtonType type = getButtonType(slot.getItem());

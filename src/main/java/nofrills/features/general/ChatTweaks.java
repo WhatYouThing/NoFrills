@@ -34,7 +34,7 @@ public class ChatTweaks {
     public static final SettingInt lines = new SettingInt(1000, "lines", instance);
 
     private static String getHoveredMsg(boolean singleLine) {
-        ChatComponent chatHud = mc.gui.getChat();
+        ChatComponent chatHud = mc.gui.hud.getChat();
         float mouseX = (float) mc.mouseHandler.getScaledXPos(mc.getWindow());
         float mouseY = (float) mc.mouseHandler.getScaledYPos(mc.getWindow());
         int chatBottom = Mth.floor((mc.getWindow().getGuiScaledHeight() - 40));
@@ -73,7 +73,7 @@ public class ChatTweaks {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof ChatScreen && (copyKey.isKey(event.key) || copyLineKey.isKey(event.key))) {
+        if (instance.isActive() && mc.gui.screen() instanceof ChatScreen && (copyKey.isKey(event.key) || copyLineKey.isKey(event.key))) {
             if (event.action == GLFW.GLFW_PRESS) {
                 String message = getHoveredMsg(copyLineKey.isKey(event.key));
                 if (message.isEmpty()) return;

@@ -52,9 +52,9 @@ public class WardrobeKeybinds {
             custom9
     );
     private static final List<Item> validButtons = List.of(
-            Items.LIME_DYE,
-            Items.PINK_DYE,
-            Items.GRAY_DYE
+            Items.DYE.lime(),
+            Items.DYE.pink(),
+            Items.DYE.gray()
     );
     private static final Pattern armorPattern = Pattern.compile("\\([0-9]*/[0-9]*\\) Armor Sets");
     private static final Pattern equipmentPattern = Pattern.compile("\\([0-9]*/[0-9]*\\) Equipment Sets");
@@ -101,7 +101,7 @@ public class WardrobeKeybinds {
         Item item = stack.getItem();
         String name = Utils.toPlain(stack.getHoverName());
         if (!stack.isEmpty() && target != -1 && name.startsWith(Utils.format("Slot {}:", target))) {
-            if (noUnequip.value() && item.equals(Items.LIME_DYE)) {
+            if (noUnequip.value() && item.equals(Items.DYE.lime())) {
                 return false;
             }
             return validButtons.stream().anyMatch(item::equals);
@@ -111,7 +111,7 @@ public class WardrobeKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container) {
             int page = getWardrobePage(Utils.toPlain(container.getTitle()).trim());
             if (page == -1) return;
             int target = getTargetSlot(event, page);

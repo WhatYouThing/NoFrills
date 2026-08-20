@@ -31,10 +31,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.ClickEvent;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.*;
 import net.minecraft.network.protocol.ping.ServerboundPingRequestPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
@@ -100,9 +97,9 @@ public class Utils {
     );
 
     public static void showTitle(MutableComponent title, MutableComponent subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        mc.gui.setTitle(title);
-        mc.gui.setSubtitle(subtitle);
-        mc.gui.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
+        mc.gui.hud.setTitle(title);
+        mc.gui.hud.setSubtitle(subtitle);
+        mc.gui.hud.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
     }
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
@@ -187,7 +184,7 @@ public class Utils {
         if (message.getStyle().getColor() == null) {
             message.withColor(0xffffff);
         }
-        mc.gui.getChat().addMessage(getTag().append(message), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator);
+        mc.gui.hud.getChat().addMessage(getTag().append(message), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator);
     }
 
     public static void infoFormat(String message, Object... values) {
@@ -831,7 +828,7 @@ public class Utils {
      */
     public static List<String> getFooterLines() {
         List<String> list = new ArrayList<>();
-        Component footer = ((PlayerTabOverlayAccessor) mc.gui.getTabList()).getFooter();
+        Component footer = ((PlayerTabOverlayAccessor) mc.gui.hud.getTabList()).getFooter();
         if (footer != null) {
             String[] lines = footer.getString().split("\n");
             for (String line : lines) {
@@ -845,7 +842,7 @@ public class Utils {
     }
 
     public static List<LerpingBossEvent> getBossBars() {
-        return ((BossHealthOverlayAccessor) mc.gui.getBossOverlay()).getEvents().values().stream().toList();
+        return ((BossHealthOverlayAccessor) mc.gui.hud.getBossOverlay()).getEvents().values().stream().toList();
     }
 
     /**
@@ -880,7 +877,7 @@ public class Utils {
     }
 
     public static Slot getFocusedSlot() {
-        return mc.screen != null ? ((AbstractContainerScreenAccessor) mc.screen).getHoveredSlot() : null;
+        return mc.gui.screen() != null ? ((AbstractContainerScreenAccessor) mc.gui.screen()).getHoveredSlot() : null;
     }
 
     private static int romanToInt(Character roman) {
@@ -1015,7 +1012,8 @@ public class Utils {
     }
 
     public static boolean hasColor(Style style, ChatFormatting color) {
-        return color.getColor() != null && hasColor(style, color.getColor());
+        TextColor textColor = TextColor.fromLegacyFormat(color);
+        return textColor != null && hasColor(style, textColor.getValue());
     }
 
     public static boolean hasColor(Style style, int hex) {
@@ -1179,7 +1177,7 @@ public class Utils {
     }
 
     public static void setScreen(Screen screen) {
-        mc.schedule(() -> mc.setScreen(screen));
+        mc.schedule(() -> mc.gui.setScreen(screen));
     }
 
     public static void click(int containerId, int slotId, int button, ContainerInput containerInput) {

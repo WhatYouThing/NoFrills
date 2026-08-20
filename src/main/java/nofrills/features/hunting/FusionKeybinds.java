@@ -34,7 +34,7 @@ public class FusionKeybinds {
             }
             if (title.equals("Confirm Fusion")) {
                 Item item = stack.getItem();
-                return (item.equals(Items.LIME_TERRACOTTA) && key == confirm.value()) || (item.equals(Items.RED_TERRACOTTA) && key == cancel.value());
+                return (item.equals(Items.DYED_TERRACOTTA.lime()) && key == confirm.value()) || (item.equals(Items.DYED_TERRACOTTA.red()) && key == cancel.value());
             }
         }
         return false;
@@ -42,7 +42,7 @@ public class FusionKeybinds {
 
     @EventHandler
     private static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
+        if (instance.isActive() && mc.gui.screen() instanceof ContainerScreen container) {
             String title = container.getTitle().getString();
             if (!title.contains("Fusion Box") && !title.equals("Confirm Fusion")) {
                 return;

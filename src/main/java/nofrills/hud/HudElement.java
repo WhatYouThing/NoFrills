@@ -119,7 +119,7 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
                 return true;
             }
             if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-                mc.setScreen(this.options);
+                mc.gui.setScreen(this.options);
                 return true;
             }
         }

@@ -30,7 +30,7 @@ public class QuickClose {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && event.isKeyboard && mc.screen instanceof ContainerScreen container) {
+        if (instance.isActive() && Utils.isInDungeons() && event.isKeyboard && mc.gui.screen() instanceof ContainerScreen container) {
             if (isChest(container.getTitle().getString()) && movementKeys.stream().anyMatch(key -> Utils.matchesKey(key, event.keyInput))) {
                 if (event.action == GLFW.GLFW_PRESS) {
                     container.onClose();

@@ -40,7 +40,7 @@ public class RareAnnounce {
                         Utils.sendMessage(msg.value().replace("{name}", creature.name).replace("{spawnmsg}", creature.spawnMsg));
                     }
                     if (replace.value()) {
-                        mc.gui.getChat().addMessage(Component.literal(creature.color + "§l" + creature.spawnMsg + "§r"), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator);
+                        mc.gui.hud.getChat().addMessage(Component.literal(creature.color + "§l" + creature.spawnMsg + "§r"), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator);
                         event.cancel();
                     }
                     return;

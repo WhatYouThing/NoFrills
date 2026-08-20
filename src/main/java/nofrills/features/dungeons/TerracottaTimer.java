@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FlowerPotBlock;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
@@ -59,7 +60,7 @@ public class TerracottaTimer {
                     continue;
                 }
                 MutableComponent text = Component.literal(Utils.formatDecimal(terra.ticks / 20.0f) + "s");
-                event.drawText(terra.pos.getCenter(), text, scale.valueFloat() * 0.1f, true, color.value());
+                event.drawText(Vec3.atCenterOf(terra.pos), text, scale.valueFloat() * 0.1f, true, color.value());
             }
         }
     }

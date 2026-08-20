@@ -30,7 +30,7 @@ public class RecipeLookup {
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && keybind.value() == event.key && event.action == GLFW.GLFW_PRESS) {
-            if (mc.screen instanceof InventoryScreen || mc.screen instanceof ContainerScreen) {
+            if (mc.gui.screen() instanceof InventoryScreen || mc.gui.screen() instanceof ContainerScreen) {
                 Slot focused = Utils.getFocusedSlot();
                 if (focused != null) {
                     ItemStack stack = focused.getItem();
@@ -52,7 +52,7 @@ public class RecipeLookup {
                             Utils.sendMessage(command + itemId);
                         }
                         event.cancel();
-                    } else if (mc.screen.getTitle().getString().contains("Museum")) {
+                    } else if (mc.gui.screen().getTitle().getString().contains("Museum")) {
                         String entryName = Utils.toPlain(stack.getHoverName());
                         if (entryName.endsWith("Armor") || entryName.endsWith("Set") || entryName.endsWith("Equipment")) {
                             String[] words = entryName.split(" ");

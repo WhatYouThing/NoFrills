@@ -6,6 +6,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
@@ -80,7 +81,7 @@ public class SpookyChests {
                 }
                 BlockPos pos = Utils.findGround(chest.blockPosition(), 4).above(1);
                 event.drawFilledWithBeam(AABB.encapsulatingFullBlocks(pos, pos), 256, true, color.value());
-                if (tracer.value()) event.drawTracer(pos.getCenter(), color.valueWithAlpha(1.0f));
+                if (tracer.value()) event.drawTracer(Vec3.atCenterOf(pos), color.valueWithAlpha(1.0f));
             }
         }
     }

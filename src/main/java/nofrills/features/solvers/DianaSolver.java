@@ -76,7 +76,7 @@ public class DianaSolver {
         double lowestDist = mc.player.position().distanceTo(pos);
         DianaWarp closestWarp = null;
         for (DianaWarp warp : warps) {
-            Vec3 warpPos = warp.pos.getCenter();
+            Vec3 warpPos = Vec3.atCenterOf(warp.pos);
             double warpDist = warpPos.distanceTo(pos);
             if (warp.toggle.value() && warpDist < lowestDist) {
                 lowestDist = warpDist;
@@ -120,7 +120,7 @@ public class DianaSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen == null && warpKey.key() == event.key && Utils.isInHub()) {
+        if (instance.isActive() && mc.gui.screen() == null && warpKey.key() == event.key && Utils.isInHub()) {
             if (event.action == GLFW.GLFW_PRESS) {
                 Optional<Burrow> burrow = burrowsList.stream().filter(Burrow::isGuess).findFirst();
                 if (burrow.isPresent()) {
@@ -271,7 +271,7 @@ public class DianaSolver {
         }
 
         public Vec3 getVec() {
-            return this.pos.getCenter().add(0, 0.5, 0);
+            return Vec3.atCenterOf(this.pos).add(0, 0.5, 0);
         }
 
         public double distanceTo() {

@@ -14,11 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @EventListener
 public class SlotOptions {
-    public static final ItemStack BACKGROUND = stackWithName(Items.BLACK_STAINED_GLASS_PANE.getDefaultInstance(), " ");
-    public static final ItemStack SOLID_BACKGROUND = stackWithName(Items.GRAY_CONCRETE.getDefaultInstance(), " ");
-    public static final ItemStack FIRST = stackWithName(Items.LIME_CONCRETE.getDefaultInstance(), Utils.Symbols.format + "aClick here!");
-    public static final ItemStack SECOND = stackWithName(Items.ORANGE_CONCRETE.getDefaultInstance(), Utils.Symbols.format + "9Click next.");
-    public static final ItemStack THIRD = stackWithName(Items.RED_CONCRETE.getDefaultInstance(), Utils.Symbols.format + "cClick after.");
+    public static final ItemStack BACKGROUND = stackWithName(Items.STAINED_GLASS_PANE.black().getDefaultInstance(), " ");
+    public static final ItemStack SOLID_BACKGROUND = stackWithName(Items.CONCRETE.gray().getDefaultInstance(), " ");
+    public static final ItemStack FIRST = stackWithName(Items.CONCRETE.lime().getDefaultInstance(), Utils.Symbols.format + "aClick here!");
+    public static final ItemStack SECOND = stackWithName(Items.CONCRETE.orange().getDefaultInstance(), Utils.Symbols.format + "9Click next.");
+    public static final ItemStack THIRD = stackWithName(Items.CONCRETE.red().getDefaultInstance(), Utils.Symbols.format + "cClick after.");
     public static final ConcurrentHashMap<Slot, Flags> slotFlags = new ConcurrentHashMap<>();
 
     public static ItemStack stackWithName(ItemStack stack, String name) {

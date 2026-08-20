@@ -1,5 +1,7 @@
 package nofrills.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -13,7 +15,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -31,60 +32,60 @@ public class ItemInHandRendererMixin {
     @Shadow
     private float oOffHandHeight;
 
-    @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER))
-    private void onBeforeRenderItem(AbstractClientPlayer player, float tickProgress, float pitch, InteractionHand hand, float swingProgress, ItemStack item, float equipProgress, PoseStack matrices, SubmitNodeCollector orderedRenderCommandQueue, int light, CallbackInfo ci) {
+    @Inject(method = "submitArmWithItem", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", shift = At.Shift.AFTER))
+    private void onBeforeRenderItem(AbstractClientPlayer player, float frameInterp, float xRot, InteractionHand hand, float attack, ItemStack itemStack, float inverseArmHeight, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, CallbackInfo ci) {
         if (Viewmodel.instance.isActive()) {
-            if (!Viewmodel.applyToHand.value() && item.isEmpty()) return;
+            if (!Viewmodel.applyToHand.value() && itemStack.isEmpty()) return;
             if (hand == InteractionHand.MAIN_HAND) {
-                matrices.translate(Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
+                poseStack.translate(Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             } else {
-                matrices.translate(-Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
+                poseStack.translate(-Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             }
         }
     }
 
-    @Inject(method = "renderArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V"))
-    private void onRenderItem(AbstractClientPlayer player, float tickProgress, float pitch, InteractionHand hand, float swingProgress, ItemStack item, float equipProgress, PoseStack matrices, SubmitNodeCollector orderedRenderCommandQueue, int light, CallbackInfo ci) {
+    @Inject(method = "submitArmWithItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemInHandRenderer;renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V"))
+    private void onRenderItem(AbstractClientPlayer player, float frameInterp, float xRot, InteractionHand hand, float attack, ItemStack itemStack, float inverseArmHeight, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, CallbackInfo ci) {
         if (Viewmodel.instance.isActive()) {
-            matrices.mulPose(Axis.XP.rotationDegrees((float) Viewmodel.rotX.value()));
-            matrices.mulPose(Axis.YP.rotationDegrees((float) Viewmodel.rotY.value()));
-            matrices.mulPose(Axis.ZP.rotationDegrees((float) Viewmodel.rotZ.value()));
-            matrices.scale((float) Viewmodel.scaleX.value(), (float) Viewmodel.scaleY.value(), (float) Viewmodel.scaleZ.value());
+            poseStack.mulPose(Axis.XP.rotationDegrees((float) Viewmodel.rotX.value()));
+            poseStack.mulPose(Axis.YP.rotationDegrees((float) Viewmodel.rotY.value()));
+            poseStack.mulPose(Axis.ZP.rotationDegrees((float) Viewmodel.rotZ.value()));
+            poseStack.scale((float) Viewmodel.scaleX.value(), (float) Viewmodel.scaleY.value(), (float) Viewmodel.scaleZ.value());
         }
     }
 
     @Inject(method = "renderPlayerArm", at = @At("HEAD"))
-    private void onBeforeRenderHand(PoseStack matrices, SubmitNodeCollector queue, int light, float equipProgress, float swingProgress, HumanoidArm arm, CallbackInfo ci) {
+    private void onBeforeRenderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, float inverseArmHeight, float attackValue, HumanoidArm arm, CallbackInfo ci) {
         if (Viewmodel.instance.isActive() && Viewmodel.applyToHand.value()) {
             if (arm == HumanoidArm.RIGHT) {
-                matrices.translate(Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
+                poseStack.translate(Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             } else {
-                matrices.translate(-Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
+                poseStack.translate(-Viewmodel.offsetX.value(), Viewmodel.offsetY.value(), Viewmodel.offsetZ.value());
             }
         }
     }
 
     @Inject(method = "renderPlayerArm", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;getPlayerRenderer(Lnet/minecraft/client/player/AbstractClientPlayer;)Lnet/minecraft/client/renderer/entity/player/AvatarRenderer;"))
-    private void onRenderHand(PoseStack matrices, SubmitNodeCollector queue, int light, float equipProgress, float swingProgress, HumanoidArm arm, CallbackInfo ci) {
+    private void onRenderHand(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, float inverseArmHeight, float attackValue, HumanoidArm arm, CallbackInfo ci) {
         if (Viewmodel.instance.isActive() && Viewmodel.applyToHand.value()) {
-            matrices.mulPose(Axis.XP.rotationDegrees((float) Viewmodel.rotX.value()));
-            matrices.mulPose(Axis.YP.rotationDegrees((float) Viewmodel.rotY.value()));
-            matrices.mulPose(Axis.ZP.rotationDegrees((float) Viewmodel.rotZ.value()));
-            matrices.scale((float) Viewmodel.scaleX.value(), (float) Viewmodel.scaleY.value(), (float) Viewmodel.scaleZ.value());
+            poseStack.mulPose(Axis.XP.rotationDegrees((float) Viewmodel.rotX.value()));
+            poseStack.mulPose(Axis.YP.rotationDegrees((float) Viewmodel.rotY.value()));
+            poseStack.mulPose(Axis.ZP.rotationDegrees((float) Viewmodel.rotZ.value()));
+            poseStack.scale((float) Viewmodel.scaleX.value(), (float) Viewmodel.scaleY.value(), (float) Viewmodel.scaleZ.value());
         }
     }
 
-    @Redirect(method = "swingArm", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V", ordinal = 0))
-    private void onSwingArmTranslate(PoseStack instance, float x, float y, float z) {
+    @WrapOperation(method = "swingArm", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;translate(FFF)V", ordinal = 0))
+    private void onSwingArmTranslate(PoseStack instance, float xo, float yo, float zo, Operation<Void> original) {
         if (Viewmodel.instance.isActive()) {
-            instance.translate(x * Viewmodel.swingX.value(), y * Viewmodel.swingY.value(), z * Viewmodel.swingZ.value());
+            original.call(instance, xo * Viewmodel.swingX.valueFloat(), yo * Viewmodel.swingY.valueFloat(), zo * Viewmodel.swingZ.valueFloat());
         } else {
-            instance.translate(x, y, z);
+            original.call(instance, xo, yo, zo);
         }
     }
 
     @Inject(method = "shouldInstantlyReplaceVisibleItem", at = @At("HEAD"), cancellable = true)
-    private void onShouldSkipAnimation(ItemStack from, ItemStack _to, CallbackInfoReturnable<Boolean> cir) {
+    private void onShouldSkipAnimation(ItemStack currentlyVisibleItem, ItemStack expectedItem, CallbackInfoReturnable<Boolean> cir) {
         if (Viewmodel.instance.isActive() && Viewmodel.noEquip.value()) {
             cir.setReturnValue(true);
         }

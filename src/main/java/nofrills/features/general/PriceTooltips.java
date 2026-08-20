@@ -145,7 +145,7 @@ public class PriceTooltips {
     private static void onSlotClick(SlotClickEvent event) {
         if (instance.isActive() && pricePaid.value() && event.slot != null && event.title.equals("Confirm Purchase")) {
             ItemStack stack = event.slot.getItem();
-            if (!stack.getItem().equals(Items.GREEN_TERRACOTTA)) {
+            if (!stack.getItem().equals(Items.DYED_TERRACOTTA.green())) {
                 return;
             }
             long cost = getPurchasedCost(stack);

@@ -22,7 +22,7 @@ public class CalendarDate {
 
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container && container.getTitle().getString().equals("Calendar and Events")) {
+        if (instance.isActive() && mc.gui.screen() instanceof ContainerScreen container && container.getTitle().getString().equals("Calendar and Events")) {
             for (Component line : event.lines) {
                 String l = Utils.toPlain(line);
                 if (l.startsWith("Starts in: ")) {

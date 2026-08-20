@@ -110,8 +110,8 @@ public final class InventoryButtonWidget extends ImageButton {
     public void onClick(@NonNull MouseButtonEvent event, boolean doubleClick) {
         if (this.unlockPosition) return;
         if (event.buttonInfo().button() == 1) {
-            Screen previous = mc.screen;
-            mc.setScreen(InventoryButtonSettings.of(this, previous));
+            Screen previous = mc.gui.screen();
+            mc.gui.setScreen(InventoryButtonSettings.of(this, previous));
         } else {
             super.onClick(event, doubleClick);
         }

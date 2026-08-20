@@ -22,7 +22,7 @@ public class HotbarSwap {
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.modifiers == 2) {
-            if (mc.screen instanceof InventoryScreen screen) {
+            if (mc.gui.screen() instanceof InventoryScreen screen) {
                 Slot focusedSlot = Utils.getFocusedSlot();
                 if (focusedSlot != null && !focusedSlot.getItem().isEmpty()) {
                     int focusedSlotId = focusedSlot.getContainerSlot();

@@ -45,7 +45,7 @@ public class SlotLocking {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container && keybind.isKey(event.key)) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && keybind.isKey(event.key)) {
             Slot focused = Utils.getFocusedSlot();
             List<Slot> inventorySlots = getInventorySlots(container.getMenu());
             if (focused == null || !inventorySlots.contains(focused)) return;
@@ -71,7 +71,7 @@ public class SlotLocking {
 
     @EventHandler
     private static void onRender(ScreenRenderEvent.After event) {
-        if (instance.isActive() && overlay.value() && mc.screen instanceof AbstractContainerScreen<?>) {
+        if (instance.isActive() && overlay.value() && mc.gui.screen() instanceof AbstractContainerScreen<?>) {
             if (!data.value().has("slots")) return;
             List<Slot> inventorySlots = getInventorySlots(event.handler);
             int offset = getFirstSlotOffset(inventorySlots);
@@ -86,7 +86,7 @@ public class SlotLocking {
 
     @EventHandler(priority = EventPriority.LOW)
     private static void onClickSlot(SlotClickEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> && !event.actionType.equals(ContainerInput.CLONE)) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> && !event.actionType.equals(ContainerInput.CLONE)) {
             if (!data.value().has("slots")) return;
             List<Slot> inventorySlots = getInventorySlots(event.handler);
             if (event.slot == null || event.slot.getItem().isEmpty() || !inventorySlots.contains(event.slot)) return;

@@ -99,7 +99,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
             }
             HudSettings settings = new HudSettings(list);
             settings.setTitle(Component.literal("HUD Elements"));
-            mc.setScreen(settings);
+            mc.gui.setScreen(settings);
             return true;
         }
         return clicked;

@@ -232,12 +232,12 @@ public class InventoryButtonSettings extends Settings {
     protected static FlowLayout buildManageSetting(JsonObject buttonObject, Screen previous) {
         return new BigButton("Delete Button", _ -> {
             InventoryButtons.data.value().get("buttons").getAsJsonArray().remove(buttonObject);
-            mc.setScreen(previous);
+            mc.gui.setScreen(previous);
         });
     }
 
     @Override
     public void onClose() {
-        mc.setScreen(this.previous);
+        mc.gui.setScreen(this.previous);
     }
 }

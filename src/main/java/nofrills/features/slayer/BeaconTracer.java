@@ -62,7 +62,7 @@ public class BeaconTracer {
                 return;
             }
             event.drawOutline(AABB.encapsulatingFullBlocks(beaconPos, beaconPos), false, color.value());
-            event.drawTracer(beaconPos.getCenter(), color.value());
+            event.drawTracer(Vec3.atCenterOf(beaconPos), color.value());
         }
     }
 

@@ -84,7 +84,7 @@ public class InventoryButtons {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container && manageKey.isKey(event.key)) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && manageKey.isKey(event.key)) {
             Optional<InventoryButtonWidget> hoveredWidget = currentWidgets.stream().filter(AbstractWidget::isHovered).findFirst();
             Slot hoveredSlot = Utils.getFocusedSlot();
             if (event.action == GLFW.GLFW_PRESS) {

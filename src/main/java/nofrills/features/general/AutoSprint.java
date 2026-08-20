@@ -28,7 +28,7 @@ public class AutoSprint {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (mc.screen != null) {
+        if (mc.gui.screen() != null) {
             // weird animated dyed armor tooltip workaround
             return;
         }

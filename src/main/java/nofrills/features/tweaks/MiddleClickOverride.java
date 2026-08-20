@@ -94,7 +94,7 @@ public class MiddleClickOverride {
     }
 
     public static boolean shouldOverride(Slot slot, int button, ContainerInput actionType) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container && slot != null && isLeftClick(button, actionType)) {
+        if (instance.isActive() && mc.gui.screen() instanceof ContainerScreen container && slot != null && isLeftClick(button, actionType)) {
             String title = container.getTitle().getString();
             ItemStack stack = slot.getItem();
             if (stack.isEmpty() || isBlacklisted(title) || !Utils.isInSkyblock() || isInLoadoutEdit(container)) {

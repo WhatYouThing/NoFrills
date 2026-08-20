@@ -118,7 +118,7 @@ public class PlotBorders {
 
         public Plot(int centerX, int centerZ) {
             this.center = new BlockPos(centerX, 66, centerZ);
-            this.boundingBox = AABB.ofSize(this.center.getCenter().add(-0.5, 0.5, -0.5), 96, 0, 96);
+            this.boundingBox = AABB.ofSize(Vec3.atCenterOf(this.center).add(-0.5, 0.5, -0.5), 96, 0, 96);
         }
 
         public boolean isPlayerAbove() {

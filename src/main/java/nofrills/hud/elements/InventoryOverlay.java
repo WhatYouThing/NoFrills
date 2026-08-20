@@ -72,8 +72,8 @@ public final class InventoryOverlay extends HudElement implements TickableHudEle
     public boolean shouldHideInScreen() {
         return switch (this.hideMode.value()) {
             case Disabled -> false;
-            case Inventory -> mc.screen instanceof AbstractContainerScreen<?>;
-            case Any -> mc.screen != null;
+            case Inventory -> mc.gui.screen() instanceof AbstractContainerScreen<?>;
+            case Any -> mc.gui.screen() != null;
         };
     }
 

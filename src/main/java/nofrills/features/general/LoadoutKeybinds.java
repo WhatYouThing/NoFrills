@@ -79,7 +79,7 @@ public class LoadoutKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
             String key = String.valueOf(event.key);
             if (!binding.isEmpty()) {
                 if (event.action == GLFW.GLFW_PRESS) {
@@ -98,7 +98,7 @@ public class LoadoutKeybinds {
                 }
                 event.cancel();
             } else if (editBindKey.isKey(event.key)) {
-                Slot focused = ((AbstractContainerScreenAccessor) mc.screen).getHoveredSlot();
+                Slot focused = ((AbstractContainerScreenAccessor) mc.gui.screen()).getHoveredSlot();
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
                 if (isLoadoutButton(stack)) {

@@ -159,7 +159,7 @@ public class KuudraChestValue {
     @EventHandler
     private static void onSlot(SlotUpdateEvent event) {
         if (instance.isActive() && !event.isInventory && isLootChest(event.title) && Utils.isInLootArea()) {
-            if (event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
+            if (event.stack.getItem().equals(Items.STAINED_GLASS_PANE.black())) {
                 return;
             }
             String name = Utils.toPlain(event.stack.getHoverName());

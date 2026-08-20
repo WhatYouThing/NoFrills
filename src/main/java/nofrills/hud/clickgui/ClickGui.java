@@ -804,7 +804,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.mainScroll = UIContainers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
         this.mainScroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
         root.child(this.mainScroll);
-        ButtonComponent hudEditorButton = UIComponents.button(Component.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
+        ButtonComponent hudEditorButton = UIComponents.button(Component.literal("Open HUD Editor"), button -> mc.gui.setScreen(new HudEditorScreen()));
         hudEditorButton.margins(Insets.of(0, 3, 0, 3));
         hudEditorButton.positioning(Positioning.relative(100, 100));
         hudEditorButton.renderer((context, button, delta) -> {

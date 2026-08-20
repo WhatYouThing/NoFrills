@@ -94,11 +94,11 @@ public class LeapOverlay {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (mc.screen != null && isLeapMenu(mc.screen.getTitle().getString())) {
+        if (mc.gui.screen() != null && isLeapMenu(mc.gui.screen().getTitle().getString())) {
             List<SettingKeybind> leapKeys = List.of(firstKey, secondKey, thirdKey, fourthKey);
             for (int i = 0; i < leapKeys.size(); i++) {
                 if (leapKeys.get(i).isKey(event.key) && leapButtons.size() >= i + 1) {
-                    leapButtons.get(i).click(((AbstractContainerScreen<?>) mc.screen).getMenu());
+                    leapButtons.get(i).click(((AbstractContainerScreen<?>) mc.gui.screen()).getMenu());
                     event.cancel();
                     return;
                 }

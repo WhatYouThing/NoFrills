@@ -30,7 +30,7 @@ public class NoCursorReset {
     }
 
     public static boolean isActive() {
-        return isActive(mc.screen);
+        return isActive(mc.gui.screen());
     }
 
     public static void startTicking() {
@@ -38,7 +38,7 @@ public class NoCursorReset {
     }
 
     public static void updateCursorPos(double x, double y) {
-        if (mc.screen instanceof ContainerScreen || mc.screen instanceof InventoryScreen) {
+        if (mc.gui.screen() instanceof ContainerScreen || mc.gui.screen() instanceof InventoryScreen) {
             cursorX = x;
             cursorY = y;
         }
@@ -61,7 +61,7 @@ public class NoCursorReset {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && ticks > 0 && mc.screen == null) {
+        if (instance.isActive() && ticks > 0 && mc.gui.screen() == null) {
             ticks--;
             if (ticks == 0) {
                 cursorX = -1.0;

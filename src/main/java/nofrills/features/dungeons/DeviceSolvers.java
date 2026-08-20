@@ -63,12 +63,12 @@ public class DeviceSolvers {
     @EventHandler
     public static void onBlockUpdate(BlockUpdateEvent event) {
         if (instance.isActive() && Sharpshooter.isTargetBlock(event.pos) && DungeonUtil.isInBossRoom("7") && Sharpshooter.isActive()) {
-            if (event.oldBlock.equals(Blocks.EMERALD_BLOCK) && event.newBlock.equals(Blocks.BLUE_TERRACOTTA)) {
+            if (event.oldBlock.equals(Blocks.EMERALD_BLOCK) && event.newBlock.equals(Blocks.DYED_TERRACOTTA.blue())) {
                 Sharpshooter.list.add(event.pos.immutable());
                 if (Sharpshooter.next != null && Sharpshooter.next.equals(event.pos)) {
                     Sharpshooter.next = null;
                 }
-            } else if (event.oldBlock.equals(Blocks.BLUE_TERRACOTTA) && event.newBlock.equals(Blocks.EMERALD_BLOCK)) {
+            } else if (event.oldBlock.equals(Blocks.DYED_TERRACOTTA.blue()) && event.newBlock.equals(Blocks.EMERALD_BLOCK)) {
                 Sharpshooter.list.remove(event.pos);
                 Sharpshooter.next = event.pos.immutable();
             }
@@ -137,7 +137,7 @@ public class DeviceSolvers {
     @EventHandler
     private static void onEntityNamed(EntityNamedEvent event) {
         if (instance.isActive() && sharpshooter.value() && DungeonUtil.isInBossRoom("7")) {
-            if (!Sharpshooter.done && event.namePlain.equals("Active") && Sharpshooter.area.getCenter().distanceTo(event.entity.position()) < 3.0) {
+            if (!Sharpshooter.done && event.namePlain.equals("Active") && Vec3.atCenterOf(Sharpshooter.area).distanceTo(event.entity.position()) < 3.0) {
                 if (Sharpshooter.doneAlert.value()) {
                     HudManager.setCustomTitle("§aSharpshooter Done", 40);
                     Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
@@ -175,7 +175,7 @@ public class DeviceSolvers {
         }
 
         public static boolean isTargetBlock(BlockPos pos) {
-            return target.contains(pos.getCenter()) && pos.getX() % 2 == 0 && pos.getY() % 2 == 0;
+            return target.contains(Vec3.atCenterOf(pos)) && pos.getX() % 2 == 0 && pos.getY() % 2 == 0;
         }
     }
 

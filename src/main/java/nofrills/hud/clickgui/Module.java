@@ -44,7 +44,7 @@ public final class Module extends FlowLayout {
             if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
                 this.active(!this.feature.isActive());
             } else if (click.button() == GLFW.GLFW_MOUSE_BUTTON_2 && this.options != null) {
-                mc.setScreen(this.options);
+                mc.gui.setScreen(this.options);
             }
             return true;
         }

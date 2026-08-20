@@ -172,7 +172,7 @@ public class ItemProtection {
 
     @EventHandler
     private static void onKey(InputEvent event) {
-        if (instance.isActive() && (mc.screen instanceof InventoryScreen || mc.screen instanceof ContainerScreen)) {
+        if (instance.isActive() && (mc.gui.screen() instanceof InventoryScreen || mc.gui.screen() instanceof ContainerScreen)) {
             if (hideTooltip.value() && event.key == GLFW.GLFW_KEY_LEFT_SHIFT) {
                 revealingTooltip = event.action != GLFW.GLFW_RELEASE;
             }

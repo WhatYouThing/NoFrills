@@ -65,7 +65,7 @@ public final class ChatRules {
                 object.get("rules").getAsJsonArray().add(obj);
             });
             Config.computeHash();
-            mc.setScreen(buildSettings());
+            mc.gui.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
         list.add(button);
@@ -186,12 +186,12 @@ public final class ChatRules {
             mainToggle.sizing(Sizing.fixed(50), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 3));
             mainToggle.tooltip(Component.literal("The main toggle for this chat rule."));
             mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));
-            ButtonComponent editButton = UIComponents.button(Component.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildRuleSettings()));
+            ButtonComponent editButton = UIComponents.button(Component.literal("Edit").withColor(0xffffff), button -> mc.gui.setScreen(this.buildRuleSettings()));
             editButton.sizing(Sizing.fixed(48), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             editButton.renderer(Settings.buttonRendererWhite);
             ButtonComponent delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("rules").getAsJsonArray().remove(this.index));
-                mc.setScreen(buildSettings());
+                mc.gui.setScreen(buildSettings());
             });
             delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18));
             delete.renderer(Settings.buttonRendererWhite);
@@ -412,7 +412,7 @@ public final class ChatRules {
 
         @Override
         public void onClose() {
-            mc.setScreen(buildSettings());
+            mc.gui.setScreen(buildSettings());
         }
     }
 }

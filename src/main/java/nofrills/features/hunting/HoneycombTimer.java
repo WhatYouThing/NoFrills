@@ -73,7 +73,7 @@ public class HoneycombTimer {
             Vec3 playerPos = mc.player.position();
             waypoints.removeIf(e -> {
                 JsonObject waypoint = e.getAsJsonObject();
-                return waypoint.get("done").getAsBoolean() && getHoneycombPos(waypoint).getCenter().distanceTo(playerPos) <= 8.0;
+                return waypoint.get("done").getAsBoolean() && Vec3.atCenterOf(getHoneycombPos(waypoint)).distanceTo(playerPos) <= 8.0;
             });
             Set<String> areas = waypoints.stream().map(e -> e.getAsJsonObject().get("area").getAsString()).collect(Collectors.toSet());
             List<Honeycomb> list = new ArrayList<>();
@@ -104,9 +104,9 @@ public class HoneycombTimer {
             for (Honeycomb honeycomb : activeHoneycombs) {
                 long timeLeft = honeycomb.timestamp() - timestamp;
                 String timeColor = Utils.getPercentageColor(timeLeft / 3600000.0);
-                event.drawBeam(honeycomb.pos().getCenter().add(0.0, 0.5, 0.0), 256, true, color.value());
+                event.drawBeam(Vec3.atCenterOf(honeycomb.pos()).add(0.0, 0.5, 0.0), 256, true, color.value());
                 event.drawDistanceScaledText(
-                        honeycomb.pos().getCenter(),
+                        Vec3.atCenterOf(honeycomb.pos()),
                         Component.literal(timeColor + (timeLeft <= 0 ? "Ready" : Utils.millisecondsToTime(timeLeft))),
                         scale.valueFloat() * 0.1f,
                         true,

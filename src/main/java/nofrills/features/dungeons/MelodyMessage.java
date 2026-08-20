@@ -52,10 +52,10 @@ public class MelodyMessage {
             int count = 0;
             for (Slot slot : slots) {
                 Item item = slot.getItem().getItem();
-                if (item.equals(Items.RED_TERRACOTTA) || item.equals(Items.LIME_TERRACOTTA)) {
+                if (item.equals(Items.DYED_TERRACOTTA.red()) || item.equals(Items.DYED_TERRACOTTA.lime())) {
                     count++;
                 } // go from last slot to first, count every terracotta item, find the terminal progress from the first lime terracotta
-                if (item.equals(Items.LIME_TERRACOTTA) && count < lastCount) {
+                if (item.equals(Items.DYED_TERRACOTTA.lime()) && count < lastCount) {
                     String percent = switch (count) {
                         case 1 -> "75%";
                         case 2 -> "50%";

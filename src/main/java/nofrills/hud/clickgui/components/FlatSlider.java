@@ -1,9 +1,9 @@
 package nofrills.hud.clickgui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.SlimSliderComponent;
 import io.wispforest.owo.ui.core.CursorStyle;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import org.lwjgl.glfw.GLFW;
 
 public final class FlatSlider extends SlimSliderComponent {
     public int trackColor;
@@ -15,11 +15,11 @@ public final class FlatSlider extends SlimSliderComponent {
         this.sliderColor = sliderColor;
         this.cursorStyle(CursorStyle.POINTER);
         this.keyPress().subscribe((click) -> {
-            if (click.key() == GLFW.GLFW_KEY_LEFT) {
+            if (click.key() == InputConstants.KEY_LEFT) {
                 this.value(this.value() - this.stepSize);
                 return true;
             }
-            if (click.key() == GLFW.GLFW_KEY_RIGHT) {
+            if (click.key() == InputConstants.KEY_RIGHT) {
                 this.value(this.value() + this.stepSize);
                 return true;
             }

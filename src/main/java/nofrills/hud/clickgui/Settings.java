@@ -1,5 +1,6 @@
 package nofrills.hud.clickgui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
@@ -20,7 +21,6 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -114,8 +114,8 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         if (isBinding(this.settings, input.key())) {
             return true;
         }
-        if (input.key() == GLFW.GLFW_KEY_PAGE_UP || input.key() == GLFW.GLFW_KEY_PAGE_DOWN) {
-            this.scroll.onMouseScroll(0, 0, input.key() == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+        if (input.key() == InputConstants.KEY_PAGEUP || input.key() == InputConstants.KEY_PAGEDOWN) {
+            this.scroll.onMouseScroll(0, 0, input.key() == InputConstants.KEY_PAGEUP ? 4 : -4);
             return true;
         }
         return super.keyPressed(input);

@@ -3,6 +3,7 @@ package nofrills.features.general;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.ChatFormatting;
@@ -20,7 +21,6 @@ import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ public class SlotLocking {
     public static final Feature instance = new Feature("slotLocking");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "keybind", instance);
+    public static final SettingKeybind keybind = new SettingKeybind(-1, "keybind", instance);
     public static final SettingBool overlay = new SettingBool(true, "overlay", instance);
     public static final SettingColor color = new SettingColor(RenderColor.fromFormat(ChatFormatting.YELLOW).withAlpha(0.33f), "color", instance);
 
@@ -50,7 +50,7 @@ public class SlotLocking {
             List<Slot> inventorySlots = getInventorySlots(container.getMenu());
             if (focused == null || !inventorySlots.contains(focused)) return;
             int slotIndex = inventorySlots.indexOf(focused) + getFirstSlotOffset(inventorySlots);
-            if (event.action == GLFW.GLFW_PRESS) {
+            if (event.action == InputConstants.PRESS) {
                 data.edit(obj -> {
                     if (!obj.has("slots")) {
                         obj.add("slots", new JsonArray());

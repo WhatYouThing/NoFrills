@@ -1,5 +1,6 @@
 package nofrills.features.tweaks;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
@@ -11,7 +12,6 @@ import nofrills.events.ScreenCloseEvent;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.dungeons.LeapOverlay;
-import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
@@ -47,7 +47,8 @@ public class NoCursorReset {
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
         if (isActive(event.screen)) {
-            if (cursorX >= 0.0 && cursorY >= 0.0) GLFW.glfwSetCursorPos(mc.getWindow().handle(), cursorX, cursorY);
+            if (cursorX >= 0.0 && cursorY >= 0.0)
+                InputConstants.grabOrReleaseMouse(mc.getWindow(), InputConstants.CURSOR_NORMAL, cursorX, cursorY);
             startTicking();
         }
     }

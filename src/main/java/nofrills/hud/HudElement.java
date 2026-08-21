@@ -1,5 +1,6 @@
 package nofrills.hud;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import io.wispforest.owo.ui.base.BaseParentUIComponent;
 import io.wispforest.owo.ui.container.DraggableContainer;
@@ -18,7 +19,6 @@ import nofrills.config.SettingDouble;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,11 +114,11 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
     @Override
     public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
         if (this.isAdded()) {
-            if (click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            if (click.button() == InputConstants.MOUSE_BUTTON_LEFT) {
                 this.toggling = true;
                 return true;
             }
-            if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+            if (click.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
                 mc.gui.setScreen(this.options);
                 return true;
             }

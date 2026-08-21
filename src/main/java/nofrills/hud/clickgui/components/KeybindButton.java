@@ -1,5 +1,6 @@
 package nofrills.hud.clickgui.components;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.util.EventSource;
@@ -7,15 +8,14 @@ import io.wispforest.owo.util.EventStream;
 import net.minecraft.network.chat.Component;
 import nofrills.config.SettingKeybind;
 import nofrills.misc.Rendering;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
 public final class KeybindButton extends ButtonComponent {
     private final EventStream<KeybindChanged> changedEvents = KeybindChanged.newStream();
     private final List<Integer> keybindBlacklist = List.of(
-            GLFW.GLFW_KEY_UNKNOWN,
-            GLFW.GLFW_KEY_ESCAPE
+            -1,
+            InputConstants.KEY_ESCAPE
     );
     public Component unbound = Component.literal("Not Bound").withColor(0xffffff);
     public Component binding = Component.literal("Press Key...").withColor(0xffffff);
@@ -26,7 +26,7 @@ public final class KeybindButton extends ButtonComponent {
         });
         this.onPress(button -> {
             if (this.isBinding) {
-                this.bind(GLFW.GLFW_KEY_UNKNOWN);
+                this.bind(-1);
             } else {
                 this.setMessage(this.binding);
                 this.isBinding = true;
@@ -47,7 +47,7 @@ public final class KeybindButton extends ButtonComponent {
     public void bind(int key) {
         if (!this.valid(key)) {
             this.setMessage(this.unbound);
-            changedEvents.sink().onBind(GLFW.GLFW_KEY_UNKNOWN);
+            changedEvents.sink().onBind(-1);
         } else {
             this.setMessage(getKeyLabel(key));
             changedEvents.sink().onBind(key);

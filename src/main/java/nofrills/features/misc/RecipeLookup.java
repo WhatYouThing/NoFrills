@@ -2,6 +2,7 @@ package nofrills.features.misc;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -14,7 +15,6 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Arrays;
 
@@ -25,11 +25,11 @@ public class RecipeLookup {
     public static final Feature instance = new Feature("recipeLookup");
 
     public static final SettingEnum<Mode> mode = new SettingEnum<>(Mode.Recipe, Mode.class, "mode", instance);
-    public static final SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "bind", instance.key());
+    public static final SettingKeybind keybind = new SettingKeybind(-1, "bind", instance.key());
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && keybind.value() == event.key && event.action == GLFW.GLFW_PRESS) {
+        if (instance.isActive() && keybind.value() == event.key && event.action == InputConstants.PRESS) {
             if (mc.gui.screen() instanceof InventoryScreen || mc.gui.screen() instanceof ContainerScreen) {
                 Slot focused = Utils.getFocusedSlot();
                 if (focused != null) {

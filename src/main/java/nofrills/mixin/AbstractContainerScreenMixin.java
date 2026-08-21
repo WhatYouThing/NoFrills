@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
@@ -26,7 +27,6 @@ import nofrills.features.tweaks.MiddleClickOverride;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -58,7 +58,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     @WrapOperation(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", ordinal = 1))
     private void onClickSlotRedirect(AbstractContainerScreen<?> instance, Slot slot, int slotId, int button, ContainerInput actionType, Operation<Void> original) {
         if (MiddleClickOverride.shouldOverride(slot, button, actionType)) {
-            instance.slotClicked(slot, slotId, GLFW.GLFW_MOUSE_BUTTON_3, ContainerInput.CLONE);
+            instance.slotClicked(slot, slotId, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
             this.doubleclick = false;
         } else {
             original.call(instance, slot, slotId, button, actionType);
@@ -190,7 +190,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(MouseButtonEvent click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
-        if (LeapOverlay.isLeapMenu(this.title.getString()) && click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
+        if (LeapOverlay.isLeapMenu(this.title.getString()) && click.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             for (LeapOverlay.LeapButton leapButton : LeapOverlay.getLeapButtons()) {
                 if (leapButton.isHovered(click.x(), click.y())) {
                     leapButton.click(this.menu);

@@ -1,18 +1,10 @@
 package nofrills.events;
 
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.CompareOp;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.gizmos.DrawableGizmoPrimitives;
-import net.minecraft.client.renderer.rendertype.LayeringTransform;
-import net.minecraft.client.renderer.rendertype.OutputTarget;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.network.chat.Component;
@@ -25,34 +17,6 @@ import static net.minecraft.util.LightCoordsUtil.FULL_BRIGHT;
 import static nofrills.Main.mc;
 
 public class WorldRenderEvent {
-
-    private static final RenderPipeline DEBUG_FILLED_BOX_NO_CULL_PIPELINE = RenderPipelines.register(
-            RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
-                    .withLocation("pipeline/nofrills_debug_filled_box_no_cull")
-                    .withDepthStencilState(new DepthStencilState(CompareOp.NOT_EQUAL, false))
-                    .build()
-    );
-    private static final RenderPipeline LINES_TRANSLUCENT_NO_CULL_PIPELINE = RenderPipelines.register(
-            RenderPipeline.builder(RenderPipelines.LINES_SNIPPET)
-                    .withDepthStencilState(new DepthStencilState(CompareOp.NOT_EQUAL, false))
-                    .withLocation("pipeline/nofrills_lines_translucent_no_cull")
-                    .build()
-    );
-    private static final RenderType DEBUG_FILLED_BOX_NO_CULL = RenderType.create(
-            "nofrills_debug_filled_box_no_cull",
-            RenderSetup.builder(DEBUG_FILLED_BOX_NO_CULL_PIPELINE)
-                    .sortOnUpload()
-                    .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-                    .createRenderSetup()
-    );
-    private static final RenderType LINES_TRANSLUCENT_NO_CULL = RenderType.create(
-            "nofrills_lines_translucent_no_cull",
-            RenderSetup.builder(LINES_TRANSLUCENT_NO_CULL_PIPELINE)
-                    .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-                    .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
-                    .createRenderSetup()
-    );
-
     public final DeltaTracker tickCounter = mc.getDeltaTracker();
     public final CameraRenderState camera;
     public final PoseStack matrices;

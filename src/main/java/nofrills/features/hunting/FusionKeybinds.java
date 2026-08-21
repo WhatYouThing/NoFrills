@@ -1,5 +1,6 @@
 package nofrills.features.hunting;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.world.inventory.ContainerInput;
@@ -12,7 +13,6 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
@@ -22,9 +22,9 @@ public class FusionKeybinds {
 
     // ta? https://github.com/hannibal002/SkyHanni/commit/571f3976570092cc054f201a8fd71c7d672393f2
 
-    public static final SettingKeybind repeat = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "repeat", instance.key());
-    public static final SettingKeybind confirm = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "confirm", instance.key());
-    public static final SettingKeybind cancel = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "cancel", instance.key());
+    public static final SettingKeybind repeat = new SettingKeybind(-1, "repeat", instance.key());
+    public static final SettingKeybind confirm = new SettingKeybind(-1, "confirm", instance.key());
+    public static final SettingKeybind cancel = new SettingKeybind(-1, "cancel", instance.key());
 
     private static boolean isBindValid(ItemStack stack, String title, int key) {
         if (!stack.isEmpty()) {
@@ -49,8 +49,8 @@ public class FusionKeybinds {
             }
             for (Slot slot : container.getMenu().slots) {
                 if (isBindValid(slot.getItem(), title, event.key)) {
-                    if (event.action == GLFW.GLFW_PRESS) {
-                        mc.gameMode.handleContainerInput(container.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_3, ContainerInput.CLONE, mc.player);
+                    if (event.action == InputConstants.PRESS) {
+                        Utils.click(container.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
                     }
                     event.cancel();
                     return;

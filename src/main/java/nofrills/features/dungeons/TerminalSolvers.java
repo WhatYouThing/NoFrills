@@ -1,6 +1,7 @@
 package nofrills.features.dungeons;
 
 import com.google.common.collect.Maps;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -15,7 +16,6 @@ import nofrills.misc.ConcurrentHashSet;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Comparator;
 import java.util.List;
@@ -334,7 +334,7 @@ public class TerminalSolvers {
                 if (this.type.equals(TerminalType.Colors)) {
                     int index = this.solutionMap.getOrDefault(slot.index, -1);
                     if (index != -1) {
-                        int modifier = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT ? -1 : 1;
+                        int modifier = button == InputConstants.MOUSE_BUTTON_RIGHT ? -1 : 1;
                         int newIndex = index - modifier;
                         if (newIndex < 0) {
                             this.solutionMap.put(slot.index, 4);

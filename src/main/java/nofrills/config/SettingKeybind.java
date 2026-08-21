@@ -1,7 +1,7 @@
 package nofrills.config;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import org.lwjgl.glfw.GLFW;
+
 
 public class SettingKeybind extends SettingInt {
     public SettingKeybind(int defaultValue, String key, String parentKey) {
@@ -26,11 +26,11 @@ public class SettingKeybind extends SettingInt {
     }
 
     public boolean bound() {
-        return this.value() != GLFW.GLFW_KEY_UNKNOWN;
+        return this.value() != -1;
     }
 
     public boolean isKey(int key) {
-        return key != GLFW.GLFW_KEY_UNKNOWN && key == this.value();
+        return key != -1 && key == this.value();
     }
 
     public InputConstants.Key asInputConstant() {

@@ -1,5 +1,6 @@
 package nofrills.features.tweaks;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
@@ -7,7 +8,6 @@ import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public class MiddleClickOverride {
     );
 
     private static boolean isLeftClick(int button, ContainerInput actionType) {
-        return button == GLFW.GLFW_MOUSE_BUTTON_LEFT && actionType.equals(ContainerInput.PICKUP);
+        return button == InputConstants.MOUSE_BUTTON_LEFT && actionType.equals(ContainerInput.PICKUP);
     }
 
     private static boolean isBlacklisted(String title) {

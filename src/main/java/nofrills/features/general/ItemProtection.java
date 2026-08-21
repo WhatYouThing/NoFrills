@@ -3,6 +3,7 @@ package nofrills.features.general;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.ChatFormatting;
@@ -24,7 +25,6 @@ import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,15 +173,15 @@ public class ItemProtection {
     @EventHandler
     private static void onKey(InputEvent event) {
         if (instance.isActive() && (mc.gui.screen() instanceof InventoryScreen || mc.gui.screen() instanceof ContainerScreen)) {
-            if (hideTooltip.value() && event.key == GLFW.GLFW_KEY_LEFT_SHIFT) {
-                revealingTooltip = event.action != GLFW.GLFW_RELEASE;
+            if (hideTooltip.value() && event.key == InputConstants.KEY_LSHIFT) {
+                revealingTooltip = event.action != InputConstants.RELEASE;
             }
             if (overrideKey.isKey(event.key)) {
-                overrideActive = event.action != GLFW.GLFW_RELEASE;
-                if (event.action == GLFW.GLFW_PRESS) {
+                overrideActive = event.action != InputConstants.RELEASE;
+                if (event.action == InputConstants.PRESS) {
                     Utils.infoRaw(Component.literal("Item Protection override is now active.").withStyle(ChatFormatting.RED));
                     Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
-                } else if (event.action == GLFW.GLFW_RELEASE) {
+                } else if (event.action == InputConstants.RELEASE) {
                     Utils.infoRaw(Component.literal("Item Protection override deactivated.").withStyle(ChatFormatting.GREEN));
                     Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 }
@@ -193,7 +193,7 @@ public class ItemProtection {
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
                 if (!stack.isEmpty()) {
-                    if (event.action == GLFW.GLFW_PRESS) {
+                    if (event.action == InputConstants.PRESS) {
                         if (uuidKey.isKey(event.key)) addUUID(stack);
                         if (skyblockIdKey.isKey(event.key)) addSkyblockID(stack);
                     }

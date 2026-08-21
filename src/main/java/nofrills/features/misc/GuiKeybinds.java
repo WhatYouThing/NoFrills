@@ -1,5 +1,6 @@
 package nofrills.features.misc;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.world.inventory.ChestMenu;
@@ -13,7 +14,6 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
@@ -21,11 +21,11 @@ import static nofrills.Main.mc;
 public class GuiKeybinds {
     public static final Feature instance = new Feature("guiKeybinds");
 
-    public static final SettingKeybind next = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "next", instance.key());
-    public static final SettingKeybind previous = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "previous", instance.key());
-    public static final SettingKeybind up = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "up", instance.key());
-    public static final SettingKeybind down = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "down", instance.key());
-    public static final SettingKeybind back = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "back", instance.key());
+    public static final SettingKeybind next = new SettingKeybind(-1, "next", instance.key());
+    public static final SettingKeybind previous = new SettingKeybind(-1, "previous", instance.key());
+    public static final SettingKeybind up = new SettingKeybind(-1, "up", instance.key());
+    public static final SettingKeybind down = new SettingKeybind(-1, "down", instance.key());
+    public static final SettingKeybind back = new SettingKeybind(-1, "back", instance.key());
 
     private static ButtonType getButtonType(ItemStack stack) {
         if (!stack.isEmpty() && Utils.getSkyblockId(stack).isEmpty()) {
@@ -55,12 +55,11 @@ public class GuiKeybinds {
 
     private static void click(int syncId, Slot slot) {
         boolean extraLines = Utils.getLoreLines(slot.getItem()).size() > 1;
-        mc.gameMode.handleContainerInput(
+        Utils.click(
                 syncId,
                 slot.index,
-                extraLines ? GLFW.GLFW_MOUSE_BUTTON_LEFT : GLFW.GLFW_MOUSE_BUTTON_3,
-                extraLines ? ContainerInput.PICKUP : ContainerInput.CLONE,
-                mc.player
+                extraLines ? InputConstants.MOUSE_BUTTON_LEFT : InputConstants.MOUSE_BUTTON_MIDDLE,
+                extraLines ? ContainerInput.PICKUP : ContainerInput.CLONE
         );
     }
 
@@ -71,7 +70,7 @@ public class GuiKeybinds {
             for (Slot slot : Utils.getContainerSlots(handler)) {
                 ButtonType type = getButtonType(slot.getItem());
                 if (!type.equals(ButtonType.None) && getBoundKey(type).key() == event.key) {
-                    if (event.action == GLFW.GLFW_PRESS) click(handler.containerId, slot);
+                    if (event.action == InputConstants.PRESS) click(handler.containerId, slot);
                     event.cancel();
                     break;
                 }

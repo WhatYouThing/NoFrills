@@ -1,5 +1,6 @@
 package nofrills.features.general;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -16,7 +17,6 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -30,15 +30,15 @@ public class WardrobeKeybinds {
     public static final SettingEnum<KeybindStyle> style = new SettingEnum<>(KeybindStyle.Simple, KeybindStyle.class, "style", instance.key());
     public static final SettingBool noUnequip = new SettingBool(false, "noUnequip", instance.key());
     public static final SettingBool sound = new SettingBool(false, "sound", instance.key());
-    public static final SettingKeybind custom1 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom1", instance.key());
-    public static final SettingKeybind custom2 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom2", instance.key());
-    public static final SettingKeybind custom3 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom3", instance.key());
-    public static final SettingKeybind custom4 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom4", instance.key());
-    public static final SettingKeybind custom5 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom5", instance.key());
-    public static final SettingKeybind custom6 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom6", instance.key());
-    public static final SettingKeybind custom7 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom7", instance.key());
-    public static final SettingKeybind custom8 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom8", instance.key());
-    public static final SettingKeybind custom9 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom9", instance.key());
+    public static final SettingKeybind custom1 = new SettingKeybind(-1, "custom1", instance.key());
+    public static final SettingKeybind custom2 = new SettingKeybind(-1, "custom2", instance.key());
+    public static final SettingKeybind custom3 = new SettingKeybind(-1, "custom3", instance.key());
+    public static final SettingKeybind custom4 = new SettingKeybind(-1, "custom4", instance.key());
+    public static final SettingKeybind custom5 = new SettingKeybind(-1, "custom5", instance.key());
+    public static final SettingKeybind custom6 = new SettingKeybind(-1, "custom6", instance.key());
+    public static final SettingKeybind custom7 = new SettingKeybind(-1, "custom7", instance.key());
+    public static final SettingKeybind custom8 = new SettingKeybind(-1, "custom8", instance.key());
+    public static final SettingKeybind custom9 = new SettingKeybind(-1, "custom9", instance.key());
 
     private static final List<SettingKeybind> customKeys = List.of(
             custom1,
@@ -70,7 +70,7 @@ public class WardrobeKeybinds {
     private static int getTargetSlot(InputEvent event, int page) {
         return switch (style.value()) {
             case Simple -> {
-                if (event.key >= GLFW.GLFW_KEY_1 && event.key <= GLFW.GLFW_KEY_9) {
+                if (event.key >= InputConstants.KEY_1 && event.key <= InputConstants.KEY_9) {
                     yield event.key - 48 + (page - 1) * 9;
                 }
                 yield -1;
@@ -118,8 +118,8 @@ public class WardrobeKeybinds {
             if (target != -1) {
                 for (Slot slot : Utils.getContainerSlots(container.getMenu())) {
                     if (isEquipButton(slot, target)) {
-                        if (event.action == GLFW.GLFW_PRESS) {
-                            Utils.click(container.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
+                        if (event.action == InputConstants.PRESS) {
+                            Utils.click(container.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
                             if (sound.value()) {
                                 Utils.playSound(SoundEvents.HORSE_ARMOR, 0.69f, 1.0f);
                             }

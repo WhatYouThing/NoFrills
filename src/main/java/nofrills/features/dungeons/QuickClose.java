@@ -1,5 +1,6 @@
 package nofrills.features.dungeons;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
@@ -7,7 +8,6 @@ import nofrills.config.Feature;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class QuickClose {
     private static void onInput(InputEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && event.isKeyboard && mc.gui.screen() instanceof ContainerScreen container) {
             if (isChest(container.getTitle().getString()) && movementKeys.stream().anyMatch(key -> Utils.matchesKey(key, event.keyInput))) {
-                if (event.action == GLFW.GLFW_PRESS) {
+                if (event.action == InputConstants.PRESS) {
                     container.onClose();
                 }
                 event.cancel();

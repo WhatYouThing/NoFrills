@@ -19,7 +19,6 @@ import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,10 +34,10 @@ public class LeapOverlay {
     public static final SettingBool send = new SettingBool(false, "send", instance.key());
     public static final SettingString message = new SettingString("/pc Leaped to {name}!", "message", instance.key());
     public static final SettingDouble scale = new SettingDouble(3.0, "scale", instance.key());
-    public static final SettingKeybind firstKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "firstKey", instance);
-    public static final SettingKeybind secondKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "secondKey", instance);
-    public static final SettingKeybind thirdKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "thirdKey", instance);
-    public static final SettingKeybind fourthKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "fourthKey", instance);
+    public static final SettingKeybind firstKey = new SettingKeybind(-1, "firstKey", instance);
+    public static final SettingKeybind secondKey = new SettingKeybind(-1, "secondKey", instance);
+    public static final SettingKeybind thirdKey = new SettingKeybind(-1, "thirdKey", instance);
+    public static final SettingKeybind fourthKey = new SettingKeybind(-1, "fourthKey", instance);
     public static final SettingColor healer = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", instance.key());
     public static final SettingColor mage = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", instance.key());
     public static final SettingColor bers = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", instance.key());

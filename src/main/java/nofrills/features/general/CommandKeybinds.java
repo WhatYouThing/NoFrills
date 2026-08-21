@@ -3,6 +3,7 @@ package nofrills.features.general;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -21,7 +22,6 @@ import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.*;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +46,7 @@ public final class CommandKeybinds {
                 }
                 JsonObject obj = new JsonObject();
                 obj.addProperty("name", "New Keybind");
-                obj.addProperty("key", GLFW.GLFW_KEY_UNKNOWN);
+                obj.addProperty("key", -1);
                 obj.addProperty("command", "");
                 obj.addProperty("enabled", true);
                 obj.addProperty("allowInGui", false);
@@ -93,9 +93,9 @@ public final class CommandKeybinds {
         return switch (modifier) {
             case Any -> -1;
             case None -> 0;
-            case Shift -> GLFW.GLFW_MOD_SHIFT;
-            case Alt -> GLFW.GLFW_MOD_ALT;
-            case Ctrl -> GLFW.GLFW_MOD_CONTROL;
+            case Shift -> InputConstants.MOD_SHIFT;
+            case Alt -> InputConstants.MOD_ALT;
+            case Ctrl -> InputConstants.MOD_CONTROL;
         };
     }
 
@@ -130,7 +130,7 @@ public final class CommandKeybinds {
                     }
                     String command = bind.get("command").getAsString();
                     if (!command.isEmpty()) {
-                        if (event.action == GLFW.GLFW_PRESS) {
+                        if (event.action == InputConstants.PRESS) {
                             Utils.sendMessage(command);
                         }
                         event.cancel();

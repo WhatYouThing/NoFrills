@@ -1,5 +1,6 @@
 package nofrills.features.general;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.components.ChatComponent;
@@ -13,7 +14,6 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +24,8 @@ import static nofrills.Main.mc;
 public class ChatTweaks {
     public static final Feature instance = new Feature("chatTweaks");
 
-    public static final SettingKeybind copyKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "copyKey", instance);
-    public static final SettingKeybind copyLineKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "copyLineKey", instance);
+    public static final SettingKeybind copyKey = new SettingKeybind(-1, "copyKey", instance);
+    public static final SettingKeybind copyLineKey = new SettingKeybind(-1, "copyLineKey", instance);
     public static final SettingBool trimOnCopy = new SettingBool(false, "trimOnCopy", instance);
     public static final SettingBool msgOnCopy = new SettingBool(false, "msgOnCopy", instance);
     public static final SettingInt copyMsgLength = new SettingInt(50, "copyMsgLength", instance);
@@ -74,7 +74,7 @@ public class ChatTweaks {
     @EventHandler
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() instanceof ChatScreen && (copyKey.isKey(event.key) || copyLineKey.isKey(event.key))) {
-            if (event.action == GLFW.GLFW_PRESS) {
+            if (event.action == InputConstants.PRESS) {
                 String message = getHoveredMsg(copyLineKey.isKey(event.key));
                 if (message.isEmpty()) return;
                 mc.keyboardHandler.setClipboard(trimOnCopy.value() ? message.trim() : message);

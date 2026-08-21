@@ -1,5 +1,6 @@
 package nofrills.features.farming;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.KeyMapping;
 import nofrills.config.Feature;
@@ -9,7 +10,6 @@ import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
@@ -17,12 +17,12 @@ import static nofrills.Main.mc;
 public class MouseLock {
     public static final Feature instance = new Feature("mouseLock");
 
-    public static SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "keybind", instance);
+    public static SettingKeybind keybind = new SettingKeybind(-1, "keybind", instance);
     public static SettingBool rebind = new SettingBool(false, "rebind", instance);
-    public static SettingKeybind breakKeyActive = new SettingKeybind(GLFW.GLFW_KEY_SPACE, "breakKeyActive", instance);
-    public static SettingKeybind jumpKeyActive = new SettingKeybind(GLFW.GLFW_MOUSE_BUTTON_1, "jumpKeyActive", instance);
-    public static SettingKeybind breakKeyInactive = new SettingKeybind(GLFW.GLFW_MOUSE_BUTTON_1, "breakKeyInactive", instance);
-    public static SettingKeybind jumpKeyInactive = new SettingKeybind(GLFW.GLFW_KEY_SPACE, "jumpKeyInactive", instance);
+    public static SettingKeybind breakKeyActive = new SettingKeybind(InputConstants.KEY_SPACE, "breakKeyActive", instance);
+    public static SettingKeybind jumpKeyActive = new SettingKeybind(InputConstants.MOUSE_BUTTON_LEFT, "jumpKeyActive", instance);
+    public static SettingKeybind breakKeyInactive = new SettingKeybind(InputConstants.MOUSE_BUTTON_LEFT, "breakKeyInactive", instance);
+    public static SettingKeybind jumpKeyInactive = new SettingKeybind(InputConstants.KEY_SPACE, "jumpKeyInactive", instance);
 
     public static boolean locked = false;
 
@@ -35,7 +35,7 @@ public class MouseLock {
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && keybind.isKey(event.key) && mc.gui.screen() == null && Utils.isInGarden()) {
-            if (event.action == GLFW.GLFW_PRESS) {
+            if (event.action == InputConstants.PRESS) {
                 locked = !locked;
                 Utils.info(locked ? "§aMouse lock activated." : "§cMouse lock deactivated.");
                 if (rebind.value()) {

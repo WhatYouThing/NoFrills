@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -28,7 +29,6 @@ import nofrills.events.ServerJoinEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class InventoryButtons {
     public static final Feature instance = new Feature("inventoryButtons");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind manageKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "addButtonKey", instance);
+    public static final SettingKeybind manageKey = new SettingKeybind(-1, "addButtonKey", instance);
     public static final SettingInt gridPrecision = new SettingInt(5, "gridPrecision", instance);
 
     private static final ConcurrentHashMap<String, ResolvableProfile> profileCache = new ConcurrentHashMap<>();
@@ -87,7 +87,7 @@ public class InventoryButtons {
         if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && manageKey.isKey(event.key)) {
             Optional<InventoryButtonWidget> hoveredWidget = currentWidgets.stream().filter(AbstractWidget::isHovered).findFirst();
             Slot hoveredSlot = Utils.getFocusedSlot();
-            if (event.action == GLFW.GLFW_PRESS) {
+            if (event.action == InputConstants.PRESS) {
                 if (hoveredWidget.isPresent()) {
                     InventoryButtonWidget widget = hoveredWidget.get();
                     if (widget.unlockPosition) {

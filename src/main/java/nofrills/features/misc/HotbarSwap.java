@@ -1,5 +1,6 @@
 package nofrills.features.misc;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.world.inventory.ContainerInput;
@@ -9,7 +10,6 @@ import nofrills.config.SettingInt;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
@@ -21,13 +21,13 @@ public class HotbarSwap {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.modifiers == 2) {
+        if (instance.isActive() && event.key == InputConstants.MOUSE_BUTTON_LEFT && event.modifiers == 2) {
             if (mc.gui.screen() instanceof InventoryScreen screen) {
                 Slot focusedSlot = Utils.getFocusedSlot();
                 if (focusedSlot != null && !focusedSlot.getItem().isEmpty()) {
                     int focusedSlotId = focusedSlot.getContainerSlot();
                     if (focusedSlotId >= 9 && focusedSlotId <= 35) {
-                        if (event.action == GLFW.GLFW_PRESS) {
+                        if (event.action == InputConstants.PRESS) {
                             int button = focusedSlotId % 9;
                             if (button == 8) {
                                 button = override.value() - 1;

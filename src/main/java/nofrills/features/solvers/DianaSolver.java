@@ -1,6 +1,7 @@
 package nofrills.features.solvers;
 
 import com.google.common.collect.Sets;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -16,7 +17,6 @@ import nofrills.events.EventListener;
 import nofrills.misc.CurveSolver;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -33,7 +33,7 @@ public class DianaSolver {
     public static final SettingColor treasureColor = new SettingColor(RenderColor.fromArgb(0xaaffaa00), "treasureColor", instance);
     public static final SettingColor enemyColor = new SettingColor(RenderColor.fromArgb(0xaaff5555), "enemyColor", instance);
     public static final SettingColor startColor = new SettingColor(RenderColor.fromArgb(0xaa55ff55), "startColor", instance);
-    public static final SettingKeybind warpKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "warpKey", instance);
+    public static final SettingKeybind warpKey = new SettingKeybind(-1, "warpKey", instance);
     public static final SettingBool warpMsg = new SettingBool(false, "warpMsg", instance);
     public static final SettingBool hubToggle = new SettingBool(true, "hubToggle", instance);
     public static final SettingBool stonksToggle = new SettingBool(true, "stonksToggle", instance);
@@ -121,7 +121,7 @@ public class DianaSolver {
     @EventHandler
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() == null && warpKey.key() == event.key && Utils.isInHub()) {
-            if (event.action == GLFW.GLFW_PRESS) {
+            if (event.action == InputConstants.PRESS) {
                 Optional<Burrow> burrow = burrowsList.stream().filter(Burrow::isGuess).findFirst();
                 if (burrow.isPresent()) {
                     DianaWarp warp = findWarp(burrow.get().getVec());

@@ -7,6 +7,7 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
@@ -86,7 +87,8 @@ public class SlotLocking {
 
     @EventHandler(priority = EventPriority.LOW)
     private static void onClickSlot(SlotClickEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> && !event.actionType.equals(ContainerInput.CLONE)) {
+        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?>) {
+            if (event.actionType.equals(ContainerInput.CLONE) && mc.screen instanceof InventoryScreen) return;
             if (!data.value().has("slots")) return;
             List<Slot> inventorySlots = getInventorySlots(event.handler);
             if (event.slot == null || event.slot.getItem().isEmpty() || !inventorySlots.contains(event.slot)) return;

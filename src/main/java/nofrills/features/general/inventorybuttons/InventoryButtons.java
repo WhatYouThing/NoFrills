@@ -92,10 +92,14 @@ public class InventoryButtons {
                     InventoryButtonWidget widget = hoveredWidget.get();
                     if (widget.unlockPosition) {
                         Utils.infoRaw(Component.literal("Button positioning locked.").withStyle(ChatFormatting.YELLOW));
+                        Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
                     } else {
-                        Utils.infoRaw(Component.literal(
-                                "Button positioning unlocked. Left Click: Drag, Shift + Left Click: Drag and snap to grid, Alt + Left Click: Change scale."
-                        ).withStyle(ChatFormatting.GREEN));
+                        Utils.infoRaw(Component.literal("Button positioning unlocked.").withStyle(ChatFormatting.GREEN)
+                                .append(Component.literal("\n- Left Click: Drag button.").withStyle(ChatFormatting.GRAY))
+                                .append(Component.literal("\n- Shift + Left Click: Drag button and snap to grid.").withStyle(ChatFormatting.GRAY))
+                                .append(Component.literal("\n- Alt + Left Click: Resize button.").withStyle(ChatFormatting.GRAY))
+                        );
+                        Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                     }
                     widget.unlockPosition = !widget.unlockPosition;
                 } else if (hoveredSlot != null) {

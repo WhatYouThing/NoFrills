@@ -10,8 +10,10 @@ import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
 import nofrills.config.*;
 import nofrills.hud.ColorPickerScreen;
 import nofrills.hud.clickgui.components.*;
@@ -470,6 +472,73 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
         public DoubleInput(String name, SettingDouble setting, String tooltip) {
             this(name, setting.value(), setting.getDefault().getAsDouble(), tooltip, setting::set);
+        }
+    }
+
+    public static final class SoundInput extends FlowLayout {
+
+        public SoundInput(String name, String currentSound, String defaultSound, double currentVolume, double defaultVolume, double currentPitch, double defaultPitch, String tooltip, Consumer<String> soundCallback, Consumer<Double> volumeCallback, Consumer<Double> pitchCallback) {
+            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            this.padding(Insets.of(5));
+            this.horizontalAlignment(HorizontalAlignment.LEFT);
+            PlainLabel label = new PlainLabel(Component.literal(name));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            label.tooltip(Component.literal(tooltip));
+            ValidatorFlatTextbox inputSound = new ValidatorFlatTextbox(Sizing.fixed(100));
+            inputSound.setValidator(obj -> {
+                String text = obj.getValue();
+                Identifier identifier = Identifier.tryParse(text);
+                SoundManager soundManager = mc.getSoundManager();
+                if (text.isEmpty() || identifier == null) {
+                    obj.borderColor = RenderColor.NF_BLUE.getArgb();
+                    return true;
+                } else if (soundManager.getSoundEvent(identifier) == null) {
+                    obj.borderColor = RenderColor.RED.getArgb();
+                    return false;
+                } else {
+                    obj.borderColor = RenderColor.GREEN.getArgb();
+                    return true;
+                }
+            });
+            inputSound.text(currentSound);
+            inputSound.tooltip(Component.literal("The identifier of the sound."));
+            inputSound.onChanged().subscribe(soundCallback::accept);
+            FlatTextbox inputVolume = new FlatTextbox(Sizing.fixed(30));
+            inputVolume.text(String.valueOf(currentVolume));
+            inputVolume.tooltip(Component.literal("The volume of the sound."));
+            inputVolume.onChanged().subscribe(value -> Utils.parseDouble(value).ifPresent(volumeCallback));
+            FlatTextbox inputPitch = new FlatTextbox(Sizing.fixed(30));
+            inputPitch.text(String.valueOf(currentPitch));
+            inputPitch.tooltip(Component.literal("The pitch of the sound."));
+            inputPitch.onChanged().subscribe(value -> Utils.parseDouble(value).ifPresent(pitchCallback));
+            this.child(label);
+            this.child(inputSound);
+            this.child(inputVolume);
+            this.child(inputPitch);
+            this.child(buildResetButton(_ -> {
+                soundCallback.accept(defaultSound);
+                volumeCallback.accept(defaultVolume);
+                pitchCallback.accept(defaultPitch);
+                inputSound.setValue(defaultSound);
+                inputVolume.setValue(String.valueOf(defaultVolume));
+                inputPitch.setValue(String.valueOf(defaultPitch));
+            }));
+        }
+
+        public SoundInput(String name, SettingString soundSetting, SettingDouble volumeSetting, SettingDouble pitchSetting, String tooltip) {
+            this(
+                    name,
+                    soundSetting.value(),
+                    soundSetting.getDefault().getAsString(),
+                    volumeSetting.value(),
+                    volumeSetting.getDefault().getAsDouble(),
+                    pitchSetting.value(),
+                    pitchSetting.getDefault().getAsDouble(),
+                    tooltip,
+                    soundSetting::set,
+                    volumeSetting::set,
+                    pitchSetting::set
+            );
         }
     }
 

@@ -11,9 +11,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import nofrills.config.Feature;
-import nofrills.config.SettingJson;
-import nofrills.config.SettingKeybind;
+import nofrills.config.*;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenOpenEvent;
@@ -37,6 +35,10 @@ public class LoadoutKeybinds {
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingKeybind editBindKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "editBindKey", instance);
+    public static final SettingBool playSound = new SettingBool(false, "playSound", instance);
+    public static final SettingString sound = new SettingString("block.note_block.cow_bell", "sound", instance);
+    public static final SettingDouble volume = new SettingDouble(2.0, "volume", instance);
+    public static final SettingDouble pitch = new SettingDouble(1.0, "pitch", instance);
 
     private static final Pattern loadoutsPattern = Pattern.compile("\\([0-9]*/[0-9]*\\) Loadouts");
     private static String binding = "";
@@ -125,6 +127,9 @@ public class LoadoutKeybinds {
                     if (name.equals(Utils.toPlain(stack.getHoverName()))) {
                         if (event.action == GLFW.GLFW_PRESS) {
                             Utils.click(screen.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_LEFT, ContainerInput.PICKUP);
+                            if (playSound.value()) {
+                                Utils.playSound(sound.value(), volume.valueFloat(), pitch.valueFloat());
+                            }
                         }
                         event.cancel();
                         break;

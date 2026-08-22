@@ -3,16 +3,12 @@ package nofrills.features.general;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingEnum;
-import nofrills.config.SettingKeybind;
+import nofrills.config.*;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
@@ -29,7 +25,10 @@ public class WardrobeKeybinds {
 
     public static final SettingEnum<KeybindStyle> style = new SettingEnum<>(KeybindStyle.Simple, KeybindStyle.class, "style", instance.key());
     public static final SettingBool noUnequip = new SettingBool(false, "noUnequip", instance.key());
-    public static final SettingBool sound = new SettingBool(false, "sound", instance.key());
+    public static final SettingBool playSound = new SettingBool(false, "sound", instance.key());
+    public static final SettingString sound = new SettingString("entity.horse.armor", "soundIdentifier", instance);
+    public static final SettingDouble volume = new SettingDouble(0.7, "volume", instance);
+    public static final SettingDouble pitch = new SettingDouble(1.0, "pitch", instance);
     public static final SettingKeybind custom1 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom1", instance.key());
     public static final SettingKeybind custom2 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom2", instance.key());
     public static final SettingKeybind custom3 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom3", instance.key());
@@ -120,8 +119,8 @@ public class WardrobeKeybinds {
                     if (isEquipButton(slot, target)) {
                         if (event.action == GLFW.GLFW_PRESS) {
                             Utils.click(container.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
-                            if (sound.value()) {
-                                Utils.playSound(SoundEvents.HORSE_ARMOR, 0.69f, 1.0f);
+                            if (playSound.value()) {
+                                Utils.playSound(sound.value(), volume.valueFloat(), pitch.valueFloat());
                             }
                         }
                         break;

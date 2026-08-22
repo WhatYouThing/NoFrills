@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ScreenMixin {
 
     @Shadow
-    protected abstract <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget);
+    public abstract <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(T widget);
 
     @SuppressWarnings("ConstantValue")
     @Inject(method = "init(II)V", at = @At("TAIL"))

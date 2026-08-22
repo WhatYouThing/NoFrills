@@ -12,7 +12,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Auto Sprint**: Essentially Toggle Sprint, but always active.
     - **Slot Binding**: Bind your hotbar slots to your inventory slots, similarly to NEU's slot binding.
     - **Price Tooltips**: Adds pricing information to item tooltips. Requires connectivity to the NoFrills API.
-    - **Wardrobe Keybinds**: Adds hotkeys to the Skyblock Wardrobe.
+    - **Wardrobe Keybinds**: Adds hotkeys to the Armor and the Equipment wardrobes.
     - **Chat Waypoints**: Automatically creates waypoints for coordinates sent in Party/Global chat.
     - **Etherwarp Overlay**: Highlights the block you are targeting with the Ether Transmission ability.
     - **Fullbright**: You know him, you love him.
@@ -26,6 +26,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Info Tooltips**: Adds various information about an item to its tooltip.
     - **Skill Tracker**: Tracks the experience you gain for specific skills, similarly to SBE on 1.8.9.
     - **Command Shortcuts**: Create shortcuts which send a specific message/command when ran.
+    - **Loadout Keybinds**: Allows you to set custom keybinds for loadouts.
+    - **Slot Locking**: Allows you to lock inventory slots to prevent accidental clicks.
+    - **Inventory Buttons**: Allows you to add custom command buttons to container screens.
 
 - **Tweaks**
 
@@ -45,7 +48,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Instant Sneak**: Removes the smooth sneaking/swimming animation.
     - **Eye Height Fix**: Visually reverts the sneaking eye height on islands without modern version support.
     - **No Ghost Place**: Prevents ghost blocks from appearing when placing non-placeable Skyblock block items.
-    - **Mute Explosion**: Prevents the explosion sound from playing (useful for Explosive Arrow).
+    - **Legacy Textures**: Replaces the models of most items added before Skyblock 0.26 with their old models.
 
 - **Misc**
 
@@ -65,6 +68,9 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Item Scale**: Changes the scale of items laying on the ground.
     - **No Damage Splash**: Hides damage splash nametags.
     - **Block List**: Allows you to keep a client side player block list.
+    - **Streamer Mode**: While nicked: replaces your nick with your real username, hides the lobby ID, and hides all
+      player names.
+    - **Sound Blocker**: Prevents various sounds from playing.
 
 - **Solvers**
 
@@ -73,26 +79,27 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Spooky Chests**: Highlights nearby trick or treat chests during the Spooky Festival.
     - **Diana Solver**: Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.
     - **Hoppity Solver**: Guesses Hoppity egg positions when using your Egglocator.
-    - **Moonglade Beacon**: Solves the beacon tuning mini-game on Galatea.
+    - **Foraging Beacon**: Solves the beacon tuning mini-game on foraging islands.
     - **Anvil Helper**: Highlights the enchanted books which you can safely combine while using the anvil.
+    - **Active Pet Highlight**: Highlights your selected pet while in the pets menu.
 
 - **Fishing**
 
-    - **Cap Tracker**: Tracks the sea creature cap. Mostly for barn fishing.
-    - **Mute Drake**: Prevents the Reindrake from blowing up your ears with gifts.
     - **Rare Highlight**: Highlights rare/profitable sea creatures.
     - **Rare Alert**: Alerts you, and/or your party when you catch a rare sea creature.
     - **Radar Solver**: Guesses Fishing Hotspot positions when using your Hotspot Radar.
 
 - **Hunting**
 
-    - **Invisibug Highlight**: Highlights nearby Invisibugs on the Galatea.
+    - **Invisibug Highlight**: Highlights nearby Invisibugs on the Moonglade Marsh.
     - **Cinderbat Highlight**: Highlights the annoying bats on the Crimson Isle.
     - **Fusion Keybinds**: Adds handy keybinds to the Fusion Machine.
     - **Lasso Alert**: Plays a sound effect once you can reel in with your lasso.
     - **Instant Fog**: Makes the thick underwater fog disappear instantly.
     - **Shard Tracker**: Tracks obtained shards for you and displays information with a HUD element.
     - **Huntaxe Lock**: Requires you to double right click with your Huntaxe to be able to open the GUI.
+    - **Honeycomb Timer**: Adds timers, beacons, and chat reminders for the Pots of Honeycomb you use on protected
+      trees.
 
 - **Dungeons**
 
@@ -108,7 +115,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Wither Dragons**: Features for the last phase of M7.
     - **Secret Bat Highlight**: Highlights secret bats.
     - **Livid Solver**: Finds and highlights the correct Livid in F5/M5.
-    - **Prince Message**: Sends a message when you gain bonus score from the Prince Shard.
+    - **Shard Score Message**: Sends a message when you gain bonus score from an attribute.
     - **Mimic Message**: Sends a message once you kill the Mimic. Should work even if it's instantly killed.
     - **Secret Chime**: Plays sounds upon collecting specific secrets.
     - **Melody Message**: Send start and progress messages when you get the Melody terminal in F7/M7.
@@ -117,12 +124,12 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Relic Highlight**: Highlights the correct placement position of your M7 king relic.
     - **Class Nametags**: Renders large nametags for your teammates, indicating their selected class and position.
     - **Score Calculator**: Calculates the score in your dungeon runs.
-    - **Platform Highlight**: Highlights the 3x3 platform area which you mine as Healer in F7/M7 after terminal phase.
-    - **Croesus Solver**: Highlights unopened loot and the most profitable chests in the Croesus.
+    - **Platform Highlight**: Highlights the 3x3 area which you mine in Necron phase to stop the platform from breaking.
+    - **Croesus Solver**: Highlights Dungeons loot in the Croesus/Vesuvius menu.
+    - **Dupe Class Alert**: Shows text on screen if your party has multiple of the same class before the dungeon starts.
 
 - **Kuudra**
 
-    - **Drain Message**: Send a message when you drain your mana using an End Stone Sword.
     - **Fresh Timer**: Shows a timer on screen for the Fresh Tools essence shop ability.
     - **Kuudra Hitbox**: Renders a hitbox for Kuudra.
     - **Build Pile Highlight**: Renders beacons for the supply build piles in Kuudra.
@@ -132,6 +139,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Shop Cleaner**: Removes useless things from the perk shop.
     - **Chest Value**: Calculates the value of your Kuudra loot. Requires connectivity to the NoFrills API.
     - **Crate Priority**: Shows which crates to pull and/or grab after you collect your Pre.
+    - **Vesuvius Solver**: Highlights Kuudra loot in the Croesus/Vesuvius menu.
 
 - **Slayer**
 
@@ -140,12 +148,12 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **No Attunement Spam**: Filters the chat messages about using the wrong attunement on the Blaze boss.
     - **Kill Timer**: Tracks how long your slayer boss took to kill.
     - **Chalice Highlight**: Highlights the Blood Ichor chalices spawned by the T5 Vampire.
-    - **Mute Vampire**: Prevents the Vampire Mania/Killer Springs sounds from playing.
     - **Egg Hits Display**: Renders the needed hits for the Tarantula Broodfather egg sack phase.
     - **Beacon Tracer**: Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.
-    - **Mute Enderman**: Prevents the angry Enderman sounds from playing.
     - **Cocoon Alert**: Alerts you when your slayer boss is cocooned by your Primordial belt.
     - **Spawn Alert**: Alerts you when your slayer boss is spawned.
+    - **Miniboss Highlight**: Highlights slayer minibosses.
+    - **Miniboss Alert**: Alerts you when a slayer miniboss is spawned.
 
 - **Mining**
 
@@ -154,7 +162,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Ghost Vision**: Makes Ghosts easier to see in the Dwarven Mines.
     - **Scatha Mining**: Scatha mining features.
     - **End Node Highlight**: Highlights End Nodes.
-    - **Temple Skip**: Highlights a pearl skip spot for the Jungle Temple once you approach the entrance.
     - **Gemstone Desync Fix**: Fixes adjacent gemstone blocks not correctly updating when mining.
     - **Break Reset Fix**: Fixes item updates resetting your block breaking progress, also known as HSM.
     - **Shaft Announce**: Sends a message with the mineshaft ID and the list of corpses upon entering a Glacite
@@ -163,7 +170,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Farming**
 
-    - **Space Farmer**: Allows you to farm by holding space bar, sneak and press space to activate.
+    - **Mouse Lock**: Locks your player view with a keybind. Toggleable while on the Garden.
     - **Glowing Mushrooms**: Highlights Glowing Mushrooms.
     - **Plot Borders**: Renders borders for plots.
     - **Vacuum Solver**: Guesses Pest positions when using the Pest Tracker ability on your vacuum.
@@ -199,6 +206,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **slotBinding**: Commands for managing the Slot Binding feature.
     - **blockList**: Commands for managing the Block List feature.
     - **autoRequeue**: Commands for managing the Auto Requeue feature.
+    - **legacyTextures**: Commands for managing the Legacy Textures feature.
 - **Other Commands** (not under `/nofrills`)
     - **/yeet**: Instantly closes Minecraft.
 
@@ -209,10 +217,11 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **FPS**: Displays your FPS.
 - **TPS**: Displays the real time TPS of the server, and optionally the average TPS.
+- **Clock**: Displays system clock.
 - **Ping**: Displays your ping.
 - **Day**: Displays the day that the server world is on.
 - **Armor**: Displays your current armor set.
-- **Inventory**: Displays the contents of your inventory.
+- **InventoryOverlay**: Displays the contents of your inventory.
 - **Quiver**: Displays the type and the amount of arrows in your quiver.
 - **LagMeter**: Displays the time since the last received server tick.
 - **PickaxeAbilityTimer**: Displays the duration of your pickaxe ability cooldown.
@@ -232,8 +241,10 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **GoldorTickTimer**: Displays a tick timer for the death tick in the F7/M7 Goldor phase.
 - **Power**: Displays the power blessing level while in Dungeons.
 - **FreshToolsTimer**: Displays a timer for the Fresh Tools perk shop ability in Kuudra.
-- **SeaCreatures**: Displays the amount of nearby sea creatures. Used by the Cap Tracker feature.
+- **SeaCreatures**: Displays the amount of nearby sea creatures.
 - **FishingBobber**: Displays the fishing hologram timer, and optionally the existence time of your bobber.
+- **FishingBag**: Displays the type and the amount of bait in your fishing bag.
+- **BeaconPower**: Displays the duration and the stat upgrade granted by your Beacon.
 - **ShardTrackerDisplay**: Displays information about tracked attribute shards. Used by the Shard Tracker feature.
 - **SkillTrackerDisplay**: Displays information about your skill EXP gain. Used by the Skill Tracker feature.
 

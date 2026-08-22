@@ -121,6 +121,19 @@ public class Utils {
         return isNearlyEqual(a, b, 1e-5);
     }
 
+    /**
+     * @return the number closest to the provided value.
+     */
+    public static double getClosest(double value, double a, double b) {
+        double diffA = difference(value, a);
+        double diffB = difference(value, b);
+        if (diffA <= diffB) {
+            return a;
+        } else {
+            return b;
+        }
+    }
+
     public static void playSound(SoundEvent event, float volume, float pitch) {
         mc.getSoundManager().play(SimpleSoundInstance.forUI(event, pitch, volume));
     }
@@ -1072,6 +1085,10 @@ public class Utils {
     }
 
     public static float difference(float first, float second) {
+        return Math.abs(Math.abs(first) - Math.abs(second));
+    }
+
+    public static double difference(double first, double second) {
         return Math.abs(Math.abs(first) - Math.abs(second));
     }
 

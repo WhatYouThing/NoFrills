@@ -8,6 +8,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -69,6 +70,8 @@ public class InventoryButtons {
                 Pair.of("customModel", new JsonPrimitive("")),
                 Pair.of("textures", new JsonPrimitive("")),
                 Pair.of("glint", new JsonPrimitive(false)),
+                Pair.of("inventoryOnly", new JsonPrimitive(false)),
+                Pair.of("snapPosition", new JsonPrimitive(true)),
                 Pair.of("style", new JsonPrimitive(InventoryButtonStyle.Vanilla.name())),
                 Pair.of("colorBackground", new JsonPrimitive(RenderColor.NF_BLUE.withAlpha(0.25f).getArgb())),
                 Pair.of("colorBorder", new JsonPrimitive(RenderColor.NF_BLUE.getArgb())),
@@ -134,7 +137,7 @@ public class InventoryButtons {
                         }
                         JsonObject obj = fillDefaults(new JsonObject());
                         object.get("buttons").getAsJsonArray().add(obj);
-                        InventoryButtonWidget widget = InventoryButtonWidget.of(obj);
+                        InventoryButtonWidget widget = InventoryButtonWidget.of(obj, container);
                         container.addRenderableWidget(widget);
                         currentWidgets.add(widget);
                     });
@@ -152,7 +155,10 @@ public class InventoryButtons {
             List<InventoryButtonWidget> list = new ArrayList<>();
             for (JsonElement element : data.value().get("buttons").getAsJsonArray()) {
                 JsonObject button = fillDefaults(element.getAsJsonObject());
-                InventoryButtonWidget widget = InventoryButtonWidget.of(button);
+                if (button.get("inventoryOnly").getAsBoolean() && !(event.screen instanceof InventoryScreen)) {
+                    continue;
+                }
+                InventoryButtonWidget widget = InventoryButtonWidget.of(button, container);
                 container.addRenderableWidget(widget);
                 list.add(widget);
             }

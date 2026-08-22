@@ -1,11 +1,13 @@
 package nofrills.features.general.inventorybuttons;
 
 import com.google.gson.JsonObject;
+import io.wispforest.owo.ui.core.PositionedRectangle;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.core.component.DataComponents;
@@ -29,6 +31,7 @@ public final class InventoryButtonWidget extends ImageButton {
             Identifier.withDefaultNamespace("widget/button"),
             Identifier.withDefaultNamespace("widget/button_highlighted")
     );
+    private static final int containerDefaultHeight = 166; // AbstractContainerScreen <init>
     final JsonObject buttonObject;
     final ItemStack iconStack;
     final InventoryButtonStyle buttonStyle;
@@ -55,7 +58,7 @@ public final class InventoryButtonWidget extends ImageButton {
         this.buttonScaleY = scaleY;
     }
 
-    public static InventoryButtonWidget of(JsonObject buttonObject) {
+    public static InventoryButtonWidget of(JsonObject buttonObject, AbstractContainerScreen<?> container) {
         String model = buttonObject.get("model").getAsString();
         String itemId = buttonObject.get("itemId").getAsString();
         String customModel = buttonObject.get("customModel").getAsString();
@@ -79,7 +82,16 @@ public final class InventoryButtonWidget extends ImageButton {
             stack.set(DataComponents.ITEM_MODEL, Identifier.tryParse(customModel));
         }
         stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, buttonObject.get("glint").getAsBoolean());
-        return new InventoryButtonWidget(posX, posY, scaleX, scaleY, stack, command, tooltip, buttonObject);
+        double finalY = buttonObject.get("snapPosition").getAsBoolean() && intersectsGui(posX, posY, scaleX, scaleY, container)
+                ? Utils.getClosest(posY, container.topPos - 20 * scaleX, container.topPos + container.imageHeight)
+                : posY;
+        return new InventoryButtonWidget(posX, finalY, scaleX, scaleY, stack, command, tooltip, buttonObject);
+    }
+
+    private static boolean intersectsGui(double posX, double posY, double scaleX, double scaleY, AbstractContainerScreen<?> container) {
+        PositionedRectangle buttonRect = PositionedRectangle.of((int) posX, (int) posY, (int) (scaleX * 20), (int) (scaleY * 20));
+        PositionedRectangle screenRect = PositionedRectangle.of(container.leftPos, container.topPos, container.imageWidth, container.imageHeight);
+        return buttonRect.intersects(screenRect);
     }
 
     @Override

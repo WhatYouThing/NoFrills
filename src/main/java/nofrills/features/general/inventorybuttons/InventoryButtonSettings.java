@@ -42,6 +42,8 @@ public class InventoryButtonSettings extends Settings {
         list.add(buildCustomModelSetting(buttonObject));
         list.add(buildTexturesSetting(buttonObject));
         list.add(buildGlintSetting(buttonObject));
+        list.add(buildInventoryOnlySetting(buttonObject));
+        list.add(buildSnapPositionSetting(buttonObject));
         list.add(buildStyleSetting(buttonObject, widget));
         list.add(buildBackgroundColorSetting(buttonObject, widget));
         list.add(buildBorderColorSetting(buttonObject, widget));
@@ -185,6 +187,26 @@ public class InventoryButtonSettings extends Settings {
                 false,
                 "Applies the glint effect to the item model displayed on this inventory button.",
                 b -> buttonObject.addProperty("glint", b)
+        );
+    }
+
+    protected static FlowLayout buildInventoryOnlySetting(JsonObject buttonObject) {
+        return new Toggle(
+                "Inventory Only",
+                buttonObject.get("inventoryOnly").getAsBoolean(),
+                false,
+                "Hides this inventory button outside of the player inventory screen.",
+                b -> buttonObject.addProperty("inventoryOnly", b)
+        );
+    }
+
+    protected static FlowLayout buildSnapPositionSetting(JsonObject buttonObject) {
+        return new Toggle(
+                "Snap Position",
+                buttonObject.get("snapPosition").getAsBoolean(),
+                true,
+                "Prevents this button from appearing on top of GUIs by snapping it to the top/bottom of the GUI when needed.",
+                b -> buttonObject.addProperty("snapPosition", b)
         );
     }
 

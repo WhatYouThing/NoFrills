@@ -9,6 +9,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
@@ -69,6 +70,8 @@ public class InventoryButtons {
                 Pair.of("customModel", new JsonPrimitive("")),
                 Pair.of("textures", new JsonPrimitive("")),
                 Pair.of("glint", new JsonPrimitive(false)),
+                Pair.of("inventoryOnly", new JsonPrimitive(false)),
+                Pair.of("snapPosition", new JsonPrimitive(true)),
                 Pair.of("style", new JsonPrimitive(InventoryButtonStyle.Vanilla.name())),
                 Pair.of("colorBackground", new JsonPrimitive(RenderColor.NF_BLUE.withAlpha(0.25f).getArgb())),
                 Pair.of("colorBorder", new JsonPrimitive(RenderColor.NF_BLUE.getArgb())),
@@ -92,10 +95,14 @@ public class InventoryButtons {
                     InventoryButtonWidget widget = hoveredWidget.get();
                     if (widget.unlockPosition) {
                         Utils.infoRaw(Component.literal("Button positioning locked.").withStyle(ChatFormatting.YELLOW));
+                        Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
                     } else {
-                        Utils.infoRaw(Component.literal(
-                                "Button positioning unlocked. Left Click: Drag, Shift + Left Click: Drag and snap to grid, Alt + Left Click: Change scale."
-                        ).withStyle(ChatFormatting.GREEN));
+                        Utils.infoRaw(Component.literal("Button positioning unlocked.").withStyle(ChatFormatting.GREEN)
+                                .append(Component.literal("\n- Left Click: Drag button.").withStyle(ChatFormatting.GRAY))
+                                .append(Component.literal("\n- Shift + Left Click: Drag button and snap to grid.").withStyle(ChatFormatting.GRAY))
+                                .append(Component.literal("\n- Alt + Left Click: Resize button.").withStyle(ChatFormatting.GRAY))
+                        );
+                        Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                     }
                     widget.unlockPosition = !widget.unlockPosition;
                 } else if (hoveredSlot != null) {
@@ -130,7 +137,7 @@ public class InventoryButtons {
                         }
                         JsonObject obj = fillDefaults(new JsonObject());
                         object.get("buttons").getAsJsonArray().add(obj);
-                        InventoryButtonWidget widget = InventoryButtonWidget.of(obj);
+                        InventoryButtonWidget widget = InventoryButtonWidget.of(obj, container);
                         container.addRenderableWidget(widget);
                         currentWidgets.add(widget);
                     });
@@ -148,7 +155,10 @@ public class InventoryButtons {
             List<InventoryButtonWidget> list = new ArrayList<>();
             for (JsonElement element : data.value().get("buttons").getAsJsonArray()) {
                 JsonObject button = fillDefaults(element.getAsJsonObject());
-                InventoryButtonWidget widget = InventoryButtonWidget.of(button);
+                if (button.get("inventoryOnly").getAsBoolean() && !(event.screen instanceof InventoryScreen)) {
+                    continue;
+                }
+                InventoryButtonWidget widget = InventoryButtonWidget.of(button, container);
                 container.addRenderableWidget(widget);
                 list.add(widget);
             }

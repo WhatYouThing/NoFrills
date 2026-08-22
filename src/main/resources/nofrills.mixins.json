@@ -48,6 +48,7 @@
         "PlayerTabOverlayAccessor",
         "ProjectileMixin",
         "ScreenEffectRendererMixin",
+        "ScreenMixin",
         "SoundEngineMixin",
         "StringDecomposerMixin",
         "StuckInBodyLayerMixin"

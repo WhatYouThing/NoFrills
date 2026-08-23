@@ -225,7 +225,7 @@ public class InventoryButtonSettings extends Settings {
         return new ColorPicker(
                 "Background Color",
                 widget.buttonColorBackground,
-                RenderColor.GRAY.withAlpha(0.33f),
+                RenderColor.NF_BLUE.withAlpha(0.25f),
                 "The background color of this button. Only applies with the \"Color\" style.",
                 c -> buttonObject.addProperty("colorBackground", c.getArgb())
         );

@@ -115,7 +115,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Wardrobe Keybinds", WardrobeKeybinds.instance, "Adds hotkeys to the Armor and the Equipment wardrobes.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),
                                 new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with a keybind."),
-                                new Settings.Toggle("Sound Effect", WardrobeKeybinds.sound, "Plays a sound effect upon using a keybind."),
+                                new Settings.Toggle("Sound Effect", WardrobeKeybinds.playSound, "Plays a sound effect upon using a keybind."),
+                                new Settings.SoundInput("Sound", WardrobeKeybinds.sound, WardrobeKeybinds.volume, WardrobeKeybinds.pitch, "The sound to play on set switch."),
                                 new Settings.Keybind("Custom Slot 1", WardrobeKeybinds.custom1, "Your custom keybind for the 1st wardrobe slot."),
                                 new Settings.Keybind("Custom Slot 2", WardrobeKeybinds.custom2, "Your custom keybind for the 2nd wardrobe slot."),
                                 new Settings.Keybind("Custom Slot 3", WardrobeKeybinds.custom3, "Your custom keybind for the 3rd wardrobe slot."),
@@ -261,10 +262,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Skill Tracker", SkillTracker.instance, "Tracks the experience you gain for specific skills, similarly to SBE on 1.8.9.\nThis feature will be inaccurate if your tracked skills are not maxed (Catacombs excluded).", SkillTracker.buildSettings()),
                         new Module("Command Shortcuts", CommandShortcuts.instance, "Create shortcuts which send a specific message/command when ran.\nNote: A lobby change is required to fully apply the changes made to the shortcuts.", CommandShortcuts.buildSettings()),
                         new Module("Loadout Keybinds", LoadoutKeybinds.instance, "Allows you to set custom keybinds for loadouts.", new Settings(List.of(
-                                new Settings.Keybind("Edit Bind Key", LoadoutKeybinds.editBindKey, "The key to edit your keybinds. Press while hovering over a loadout slot to use.")
+                                new Settings.Description("Usage", "Press the Edit Bind key while hovering over a loadout in the Loadouts menu."),
+                                new Settings.Keybind("Edit Bind Key", LoadoutKeybinds.editBindKey, "The key to edit your keybinds. Press while hovering over a loadout slot to use."),
+                                new Settings.Toggle("Play Sound", LoadoutKeybinds.playSound, "Plays a sound effect upon successfully switching loadout."),
+                                new Settings.SoundInput("Sound", LoadoutKeybinds.sound, LoadoutKeybinds.volume, LoadoutKeybinds.pitch, "The sound to play on loadout switch.")
                         ))),
                         new Module("Slot Locking", SlotLocking.instance, "Allows you to lock inventory slots to prevent accidental clicks.", new Settings(List.of(
-                                new Settings.Keybind("Lock Key", SlotLocking.keybind, "The key to lock/unlock a slot. Press while hovering over a slot to use."),
+                                new Settings.Keybind("Lock Key", SlotLocking.keybind, "The key to lock/unlock a slot."),
                                 new Settings.Toggle("Draw Overlay", SlotLocking.overlay, "Draw a colored overlay on top of slots that are locked."),
                                 new Settings.ColorPicker("Overlay Color", SlotLocking.color, "The color of the locked overlay")
                         ))),

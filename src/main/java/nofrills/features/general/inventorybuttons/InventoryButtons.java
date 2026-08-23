@@ -25,7 +25,6 @@ import nofrills.config.SettingJson;
 import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
-import nofrills.events.ScreenOpenEvent;
 import nofrills.events.ServerJoinEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -54,6 +53,20 @@ public class InventoryButtons {
             profileCache.put(payload, Utils.toResolvableProfile(payload));
         }
         return profileCache.get(payload);
+    }
+
+    public static Optional<List<InventoryButtonWidget>> addWidgets(AbstractContainerScreen<?> container) {
+        if (!data.value().has("buttons")) return Optional.empty();
+        List<InventoryButtonWidget> list = new ArrayList<>();
+        for (JsonElement element : data.value().get("buttons").getAsJsonArray()) {
+            JsonObject button = fillDefaults(element.getAsJsonObject());
+            if (button.get("inventoryOnly").getAsBoolean() && !(container instanceof InventoryScreen)) {
+                continue;
+            }
+            list.add(InventoryButtonWidget.of(button, container));
+        }
+        currentWidgets = list;
+        return Optional.of(list);
     }
 
     private static JsonObject fillDefaults(JsonObject object) {
@@ -146,23 +159,6 @@ public class InventoryButtons {
                 }
             }
             event.cancel();
-        }
-    }
-
-    @EventHandler
-    private static void onScreen(ScreenOpenEvent event) {
-        if (instance.isActive() && event.screen instanceof AbstractContainerScreen<?> container && data.value().has("buttons")) {
-            List<InventoryButtonWidget> list = new ArrayList<>();
-            for (JsonElement element : data.value().get("buttons").getAsJsonArray()) {
-                JsonObject button = fillDefaults(element.getAsJsonObject());
-                if (button.get("inventoryOnly").getAsBoolean() && !(event.screen instanceof InventoryScreen)) {
-                    continue;
-                }
-                InventoryButtonWidget widget = InventoryButtonWidget.of(button, container);
-                container.addRenderableWidget(widget);
-                list.add(widget);
-            }
-            currentWidgets = list;
         }
     }
 

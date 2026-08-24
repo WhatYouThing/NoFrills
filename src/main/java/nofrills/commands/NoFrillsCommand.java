@@ -44,7 +44,7 @@ public class NoFrillsCommand {
                 Utils.info("§aLoaded latest settings from the configuration file.");
                 return SINGLE_SUCCESS;
             })).then(literal("save").executes(context -> {
-                Config.saveBlocking();
+                Config.save();
                 Utils.info("§aSaved your current settings to the configuration file.");
                 return SINGLE_SUCCESS;
             }))),

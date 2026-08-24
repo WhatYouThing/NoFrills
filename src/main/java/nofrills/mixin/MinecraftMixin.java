@@ -11,7 +11,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import nofrills.config.Config;
 import nofrills.events.AttackBlockEvent;
 import nofrills.events.InteractBlockEvent;
 import nofrills.events.InteractEntityEvent;
@@ -59,14 +58,9 @@ public abstract class MinecraftMixin {
         }
     }
 
-    @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"), cancellable = true)
-    private void onAttackBlock(CallbackInfoReturnable<Boolean> cir, @Local BlockHitResult blockHitResult, @Local BlockPos blockPos) {
-        eventBus.post(new AttackBlockEvent(blockHitResult, blockPos));
-    }
-
-    @Inject(method = "exitWorldAndClose", at = @At("HEAD"))
-    private void beforeStop(CallbackInfo ci) {
-        Config.saveBlocking();
+    @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"))
+    private void onAttackBlock(CallbackInfoReturnable<Boolean> cir, @Local(name = "blockHit") BlockHitResult blockHit, @Local(name = "pos") BlockPos pos) {
+        eventBus.post(new AttackBlockEvent(blockHit, pos));
     }
 
     @ModifyReturnValue(method = "isGameLoadFinished", at = @At("RETURN"))

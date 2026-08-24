@@ -10,7 +10,7 @@ import static nofrills.Main.mc;
 public class YeetCommand {
     public static void init(CommandDispatcher<FabricClientCommandSource> dispatcher) {
         dispatcher.register(literal("yeet").executes(context -> {
-            mc.exitWorldAndClose();
+            mc.stop();
             return SINGLE_SUCCESS;
         }));
     }

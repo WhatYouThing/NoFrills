@@ -6,8 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.ClickEvent;
@@ -46,7 +46,6 @@ public class InventoryButtons {
     public static final SettingInt gridPrecision = new SettingInt(5, "gridPrecision", instance);
 
     private static final ConcurrentHashMap<String, ResolvableProfile> profileCache = new ConcurrentHashMap<>();
-    private static List<InventoryButtonWidget> currentWidgets = new ArrayList<>();
 
     public static ResolvableProfile getOrInitTextures(String payload) {
         if (!profileCache.containsKey(payload)) {
@@ -55,18 +54,17 @@ public class InventoryButtons {
         return profileCache.get(payload);
     }
 
-    public static Optional<List<InventoryButtonWidget>> addWidgets(AbstractContainerScreen<?> container) {
-        if (!data.value().has("buttons")) return Optional.empty();
-        List<InventoryButtonWidget> list = new ArrayList<>();
+    public static void addWidgets(AbstractContainerScreen<?> container) {
+        if (!data.value().has("buttons") || container instanceof CreativeModeInventoryScreen) {
+            return;
+        }
         for (JsonElement element : data.value().get("buttons").getAsJsonArray()) {
             JsonObject button = fillDefaults(element.getAsJsonObject());
             if (button.get("inventoryOnly").getAsBoolean() && !(container instanceof InventoryScreen)) {
                 continue;
             }
-            list.add(InventoryButtonWidget.of(button, container));
+            container.addRenderableWidget(InventoryButtonWidget.of(button, container));
         }
-        currentWidgets = list;
-        return Optional.of(list);
     }
 
     private static JsonObject fillDefaults(JsonObject object) {
@@ -101,7 +99,11 @@ public class InventoryButtons {
     @EventHandler
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container && manageKey.isKey(event.key)) {
-            Optional<InventoryButtonWidget> hoveredWidget = currentWidgets.stream().filter(AbstractWidget::isHovered).findFirst();
+            Optional<InventoryButtonWidget> hoveredWidget = container.renderables
+                    .stream()
+                    .filter(renderable -> renderable instanceof InventoryButtonWidget button && button.isHovered())
+                    .map(renderable -> (InventoryButtonWidget) renderable)
+                    .findFirst();
             Slot hoveredSlot = Utils.getFocusedSlot();
             if (event.action == GLFW.GLFW_PRESS) {
                 if (hoveredWidget.isPresent()) {
@@ -150,9 +152,7 @@ public class InventoryButtons {
                         }
                         JsonObject obj = fillDefaults(new JsonObject());
                         object.get("buttons").getAsJsonArray().add(obj);
-                        InventoryButtonWidget widget = InventoryButtonWidget.of(obj, container);
-                        container.addRenderableWidget(widget);
-                        currentWidgets.add(widget);
+                        container.addRenderableWidget(InventoryButtonWidget.of(obj, container));
                     });
                     Utils.infoRaw(Component.literal("Created new inventory button.").withStyle(ChatFormatting.GREEN));
                     Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);

@@ -56,6 +56,14 @@ public abstract class LivingEntityMixin extends Entity {
         return original;
     }
 
+    @ModifyExpressionValue(method = "swing(Lnet/minecraft/world/InteractionHand;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getCurrentSwingDuration()I"))
+    private int onGetSwingDuration(int original) {
+        if (Viewmodel.instance.isActive() && Viewmodel.noSwingReset.value() && Utils.isSelf(this)) {
+            return original * 2; // force the check to require 100% swing progress instead of 50%
+        }
+        return original;
+    }
+
     @ModifyReturnValue(method = "hasEffect", at = @At("RETURN"))
     private boolean hasNightVision(boolean original, Holder<MobEffect> effect) {
         if (Fullbright.instance.isActive() && Utils.isSelf(this) && effect == MobEffects.NIGHT_VISION) {

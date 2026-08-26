@@ -143,6 +143,14 @@ public class HoppitySolver {
     }
 
     @EventHandler
+    private static void onMessage(ChatMsgEvent event) {
+        if (instance.isActive() && isSlopSeason() && event.messagePlain.equals("There are no hidden Chocolate Rabbit Eggs nearby! Try again later!")) {
+            currentEgg = null;
+            solver.clear();
+        }
+    }
+
+    @EventHandler
     private static void onJoin(ServerJoinEvent event) {
         currentEgg = null;
         solver.clear();

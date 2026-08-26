@@ -67,6 +67,13 @@ public class VacuumSolver {
     }
 
     @EventHandler
+    private static void onMessage(ChatMsgEvent event) {
+        if (instance.isActive() && event.messagePlain.equals("There are not any Pests on your Garden right now! Keep farming!")) {
+            solver.clear();
+        }
+    }
+
+    @EventHandler
     private static void onServerTick(ServerTickEvent event) {
         if (instance.isActive()) {
             solver.tick();

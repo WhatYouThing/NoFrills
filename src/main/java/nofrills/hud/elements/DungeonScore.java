@@ -5,12 +5,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Feature;
 import nofrills.features.dungeons.ScoreCalculator;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
-public final class DungeonScore extends SimpleTextElement implements TickableHudElement {
+public final class DungeonScore extends SimpleTextElement implements ListeningHudElement {
 
     public DungeonScore() {
         super(Component.literal("Score: §fN/A"), new Feature("dungeonScoreElement"), "Dungeon Score");

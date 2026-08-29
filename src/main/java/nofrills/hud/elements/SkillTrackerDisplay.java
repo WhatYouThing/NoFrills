@@ -3,10 +3,10 @@ package nofrills.hud.elements;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import nofrills.config.Feature;
 import nofrills.features.general.SkillTracker;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 
-public final class SkillTrackerDisplay extends SimpleTextElement implements TickableHudElement {
+public final class SkillTrackerDisplay extends SimpleTextElement implements ListeningHudElement {
 
     public SkillTrackerDisplay() {
         super(SkillTracker.getText(), new Feature("skillTrackerElement"), "Skill Tracker Display");

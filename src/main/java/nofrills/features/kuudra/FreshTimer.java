@@ -8,8 +8,6 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.events.EventListener;
 import nofrills.misc.Utils;
 
-import static nofrills.hud.HudManager.freshToolsTimer;
-
 @EventListener
 public class FreshTimer {
     public static final Feature instance = new Feature("freshTimer");
@@ -19,10 +17,7 @@ public class FreshTimer {
 
     @EventHandler
     private static void onChatMsg(ChatMsgEvent event) {
-        if (instance.isActive() && event.messagePlain.equals("Your Fresh Tools Perk bonus doubles your building speed for the next 10 seconds!") && Utils.isInKuudra()) {
-            if (freshToolsTimer.isActive()) {
-                freshToolsTimer.start();
-            }
+        if (instance.isActive() && event.msg().equals("Your Fresh Tools Perk bonus doubles your building speed for the next 10 seconds!") && Utils.isInKuudra()) {
             if (send.value() && !message.value().isEmpty()) {
                 Utils.sendMessage(message.value());
             }

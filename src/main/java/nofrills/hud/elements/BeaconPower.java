@@ -10,8 +10,8 @@ import nofrills.config.DataFile;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.SlotUpdateEvent;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
@@ -20,7 +20,7 @@ import java.time.Instant;
 import java.util.Calendar;
 import java.util.List;
 
-public final class BeaconPower extends SimpleTextElement implements TickableHudElement {
+public final class BeaconPower extends SimpleTextElement implements ListeningHudElement {
     public final DataFile data = Config.getDataFile("BeaconPowerData.json");
     public final SettingBool hideIfInactive = new SettingBool(false, "hideIfInactive", this.instance);
     private boolean active = false;
@@ -73,7 +73,8 @@ public final class BeaconPower extends SimpleTextElement implements TickableHudE
         }
     }
 
-    public void update(SlotUpdateEvent event) {
+    @Override
+    public void onSlotUpdate(SlotUpdateEvent event) {
         if (!event.title.equals("Beacon")) return;
         String name = Utils.toPlain(event.stack.getHoverName());
         if (!name.equals("Beacon Power") && !name.equals("Profile Stat Upgrades")) return;

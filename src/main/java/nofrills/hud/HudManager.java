@@ -6,62 +6,63 @@ import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
-import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
 import nofrills.events.*;
 import nofrills.hud.elements.*;
-import nofrills.misc.DungeonUtil;
-import nofrills.misc.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
+import java.util.function.Consumer;
 
 import static nofrills.Main.mc;
 
 @EventListener
 public class HudManager {
-    public static final List<HudElement> elements = new ArrayList<>();
-
-    public static final FPS fps = register(new FPS("FPS: §f0"));
-    public static final TPS tps = register(new TPS("TPS: §f20.00"));
-    public static final Clock clock = register(new Clock("Time: §f00:00:00"));
-    public static final Ping ping = register(new Ping("Ping: §f0ms"));
-    public static final Day day = register(new Day("Day: §f0"));
-    public static final Armor armor = register(new Armor());
-    public static final InventoryOverlay inventory = register(new InventoryOverlay());
-    public static final Quiver quiver = register(new Quiver("Quiver: §fN/A"));
-    public static final LagMeter lagMeter = register(new LagMeter("Last server tick was 0.00s ago"));
-    public static final PickaxeAbilityTimer pickAbilityTimer = register(new PickaxeAbilityTimer());
-    public static final QueueCooldownTimer queueCooldownTimer = register(new QueueCooldownTimer());
-    public static final SlayerHealth slayerHealth = register(new SlayerHealth());
-    public static final SlayerTimer slayerTimer = register(new SlayerTimer());
-    public static final BossHealth bossHealth = register(new BossHealth());
-    public static final DungeonMap dungeonMap = register(new DungeonMap());
-    public static final DungeonScore dungeonScore = register(new DungeonScore());
-    public static final SpiritMaskTimer spiritMaskTimer = register(new SpiritMaskTimer());
-    public static final PhoenixPetTimer phoenixPetTimer = register(new PhoenixPetTimer());
-    public static final BonzoMaskTimer bonzoMaskTimer = register(new BonzoMaskTimer());
-    public static final SpiritBearTimer spiritBearTimer = register(new SpiritBearTimer());
-    public static final TerracottaGyroTimer terraGyroTimer = register(new TerracottaGyroTimer());
-    public static final PadTimer padTimer = register(new PadTimer());
-    public static final TerminalStartTimer terminalStartTimer = register(new TerminalStartTimer());
-    public static final GoldorTickTimer goldorTickTimer = register(new GoldorTickTimer());
-    public static final Power power = register(new Power("Power: §f0"));
-    public static final FreshToolsTimer freshToolsTimer = register(new FreshToolsTimer());
-    public static final SeaCreatures seaCreatures = register(new SeaCreatures("Sea Creatures: §70"));
-    public static final FishingBobber bobber = register(new FishingBobber("Bobber: §7Inactive"));
-    public static final FishingBag fishingBag = register(new FishingBag("Bait: §fN/A"));
-    public static final BeaconPower beaconPower = register(new BeaconPower());
-    public static final ShardTrackerDisplay shardTracker = register(new ShardTrackerDisplay());
-    public static final SkillTrackerDisplay skillTracker = register(new SkillTrackerDisplay());
+    public static final DungeonMap dungeonMap = new DungeonMap();
+    public static final PickaxeAbilityTimer pickAbilityTimer = new PickaxeAbilityTimer();
+    public static final List<HudElement> elements = List.of(
+            new FPS(),
+            new TPS(),
+            new Clock(),
+            new Ping(),
+            new Day(),
+            new Armor(),
+            new InventoryOverlay(),
+            new Quiver(),
+            new LagMeter(),
+            new QueueCooldownTimer(),
+            new SlayerHealth(),
+            new SlayerTimer(),
+            new BossHealth(),
+            new DungeonScore(),
+            new SpiritMaskTimer(),
+            new PhoenixPetTimer(),
+            new BonzoMaskTimer(),
+            new SpiritBearTimer(),
+            new TerracottaGyroTimer(),
+            new PadTimer(),
+            new TerminalStartTimer(),
+            new GoldorTickTimer(),
+            new Power(),
+            new FreshToolsTimer(),
+            new SeaCreatures(),
+            new FishingBobber(),
+            new FishingBag(),
+            new BeaconPower(),
+            new ShardTrackerDisplay(),
+            new SkillTrackerDisplay(),
+            new KickCooldownTimer(),
+            dungeonMap,
+            pickAbilityTimer
+    );
 
     private static CustomTitle currentTitle = new CustomTitle(Component.empty(), 0);
+
+    private static void forEachListening(Consumer<ListeningHudElement> consumer) {
+        elements.stream()
+                .filter(e -> e instanceof ListeningHudElement && e.isActive())
+                .map(e -> (ListeningHudElement) e)
+                .forEach(consumer);
+    }
 
     public static boolean isEditingHud() {
         return mc.screen instanceof HudEditorScreen;
@@ -69,11 +70,6 @@ public class HudManager {
 
     public static List<HudElement> getElements() {
         return elements;
-    }
-
-    public static <T extends HudElement> T register(T element) {
-        elements.add(element);
-        return element;
     }
 
     public static void registerElements() {
@@ -108,8 +104,8 @@ public class HudManager {
     @EventHandler
     private static void onJoinServer(ServerJoinEvent event) {
         for (HudElement element : elements) {
-            if (element instanceof TickableHudElement tickableElement) {
-                tickableElement.onReset();
+            if (element instanceof ListeningHudElement tickableElement) {
+                tickableElement.onServerJoin();
             }
             if (element instanceof TimerElement timer && timer.isAutoPause()) {
                 timer.pause();
@@ -120,25 +116,12 @@ public class HudManager {
 
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
-        if (ping.isActive() && event.packet instanceof ClientboundPongResponsePacket(long time)) {
-            ping.setPing(Util.getMillis() - time);
-        }
-        if (day.isActive() && event.packet instanceof ClientboundSetTimePacket timePacket && mc.level != null) {
-            mc.level.dimensionType().defaultClock().ifPresent(clock -> {
-                if (timePacket.clockUpdates().containsKey(clock)) {
-                    day.setDay(timePacket.clockUpdates().get(clock).totalTicks() / 24000L);
-                }
-            });
-        }
+        forEachListening(element -> element.onReceivePacket(event));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onWorldTick(WorldTickEvent event) {
-        for (HudElement element : elements) {
-            if (element instanceof TickableHudElement tickableElement && element.isActive()) {
-                tickableElement.onClientTick();
-            }
-        }
+        forEachListening(ListeningHudElement::onClientTick);
         if (currentTitle.isActive()) {
             currentTitle.tick();
         }
@@ -146,101 +129,32 @@ public class HudManager {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        for (HudElement element : elements) {
-            if (element instanceof TickableHudElement tickableElement && element.isActive()) {
-                tickableElement.onServerTick();
-            }
-        }
+        forEachListening(ListeningHudElement::onServerTick);
     }
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (seaCreatures.isActive()) {
-            seaCreatures.onNamed(event);
-        }
-        if (bobber.isActive()) {
-            bobber.onNamed(event);
-        }
+        forEachListening(element -> element.onEntityNamed(event));
     }
 
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
-        if (queueCooldownTimer.isActive()) {
-            for (Pattern pattern : queueCooldownTimer.patterns) {
-                if (pattern.matcher(event.msg()).matches()) {
-                    queueCooldownTimer.start(30000);
-                    break;
-                }
-            }
-        }
-        if (spiritMaskTimer.isActive() && event.msg().equals("Second Wind Activated! Your Spirit Mask saved your life!")) {
-            spiritMaskTimer.start(30000);
-        }
-        if (phoenixPetTimer.isActive() && event.msg().equals("Your Phoenix Pet saved you from certain death!")) {
-            phoenixPetTimer.start(60000);
-        }
-        if (bonzoMaskTimer.isActive() && event.msg().replace(Utils.Symbols.starredItem + " ", "").equals("Your Bonzo's Mask saved your life!")) {
-            ItemStack helmet = Utils.getEntityHelmet(mc.player);
-            Optional<String> line = Utils.getLoreLines(helmet).stream().filter(l -> l.startsWith("Cooldown: ")).findFirst();
-            if (line.isPresent()) {
-                String cooldown = line.get();
-                String duration = cooldown.substring(cooldown.indexOf(":") + 2).replace("s", "");
-                bonzoMaskTimer.start((long) Math.ceil(Utils.parseDouble(duration).orElse(180.0) * 1000));
-            } else {
-                bonzoMaskTimer.start(180000);
-            }
-        }
-        if (DungeonUtil.isOnFloor("7")) {
-            switch (event.messagePlain) {
-                case "[BOSS] Storm: Pathetic Maxor, just like expected." -> {
-                    if (padTimer.isActive()) {
-                        padTimer.start();
-                    }
-                }
-                case "[BOSS] Storm: I should have known that I stood no chance." -> {
-                    padTimer.pause();
-                    if (terminalStartTimer.isActive()) {
-                        terminalStartTimer.start();
-                    }
-                }
-                case "[BOSS] Goldor: Who dares trespass into my domain?" -> {
-                    if (goldorTickTimer.isActive()) {
-                        goldorTickTimer.start();
-                    }
-                }
-                case "The Core entrance is opening!" -> goldorTickTimer.pause();
-                default -> {
-                }
-            }
-        }
+        forEachListening(element -> element.onChatMessage(event));
     }
 
     @EventHandler
     private static void onBlockUpdate(BlockUpdateEvent event) {
-        if (spiritBearTimer.isActive() && event.newState.getBlock().equals(Blocks.SEA_LANTERN) && DungeonUtil.isInBossRoom("4")) {
-            if (event.pos.getX() == 7 && event.pos.getY() == 77 && event.pos.getZ() == 34) {
-                spiritBearTimer.start();
-            }
-        }
+        forEachListening(element -> element.onBlockUpdate(event));
     }
 
     @EventHandler
     private static void onSlotUpdate(SlotUpdateEvent event) {
-        if (beaconPower.isActive()) {
-            beaconPower.update(event);
-        }
+        forEachListening(element -> element.onSlotUpdate(event));
     }
 
     @EventHandler
     private static void onInventory(InventoryUpdateEvent event) {
-        if (event.slotId == 44 || event.slotId == 9) { // 44 - 9th hotbar slot, 9 - top left inventory slot
-            if (quiver.isActive()) {
-                quiver.update(event.stack);
-            }
-            if (fishingBag.isActive()) {
-                fishingBag.update(event.stack);
-            }
-        }
+        forEachListening(element -> element.onInventoryUpdate(event));
     }
 
     public static class CustomTitle {

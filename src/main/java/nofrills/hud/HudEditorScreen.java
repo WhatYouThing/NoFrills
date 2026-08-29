@@ -11,6 +11,7 @@ import nofrills.features.misc.AutoSave;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.hud.elements.Armor;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
@@ -40,8 +41,10 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
             if (element.isAdded()) {
                 root.child(element);
             }
+            if (element instanceof Armor armorElement) {
+                armorElement.updateArmor();
+            }
         }
-        HudManager.armor.updateArmor();
     }
 
     @Override

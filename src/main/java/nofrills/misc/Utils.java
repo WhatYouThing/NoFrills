@@ -147,7 +147,7 @@ public class Utils {
     }
 
     public static void sendMessage(String message) {
-        if (mc.player != null && !message.isEmpty()) {
+        if (mc.player != null && !message.trim().isEmpty()) {
             if (message.startsWith("/")) {
                 mc.player.connection.sendCommand(message.substring(1));
             } else {

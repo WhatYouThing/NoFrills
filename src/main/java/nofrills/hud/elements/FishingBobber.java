@@ -9,8 +9,8 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingInt;
 import nofrills.events.EntityNamedEvent;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
@@ -19,7 +19,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class FishingBobber extends SimpleTextElement implements TickableHudElement {
+public final class FishingBobber extends SimpleTextElement implements ListeningHudElement {
     public final SettingBool inactive = new SettingBool(false, "inactive", instance.key());
     public final SettingBool timer = new SettingBool(false, "timer", instance.key());
     public final SettingBool hideHologram = new SettingBool(false, "hideHologram", instance.key());
@@ -30,8 +30,8 @@ public final class FishingBobber extends SimpleTextElement implements TickableHu
     private int timerTicks = 0;
     private boolean slugfishTrigger = false;
 
-    public FishingBobber(String text) {
-        super(Component.literal(text), new Feature("bobberElement"), "Fishing Bobber");
+    public FishingBobber() {
+        super(Component.literal("Bobber: §7Inactive"), new Feature("bobberElement"), "Fishing Bobber");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Inactive", this.inactive, "Hides the element if your fishing bobber is inactive."),
                 new Settings.Toggle("Bobber Timer", this.timer, "Displays how long your fishing bobber has existed for, useful for Slugfish."),
@@ -87,7 +87,8 @@ public final class FishingBobber extends SimpleTextElement implements TickableHu
         return mc.player != null && (mc.player.fishing != null || this.cache.getFirst() != null);
     }
 
-    public void onNamed(EntityNamedEvent event) {
+    @Override
+    public void onEntityNamed(EntityNamedEvent event) {
         if (event.namePlain.equals("!!!") || event.namePlain.equals("?") || (event.namePlain.indexOf(".") == 1 && event.namePlain.length() == 3)) {
             if (this.hideHologram.value()) {
                 event.entity.setCustomNameVisible(false);

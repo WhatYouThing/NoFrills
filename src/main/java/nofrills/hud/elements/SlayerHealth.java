@@ -4,11 +4,11 @@ import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import nofrills.config.Feature;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.misc.SlayerUtil;
 
-public final class SlayerHealth extends SimpleTextElement implements TickableHudElement {
+public final class SlayerHealth extends SimpleTextElement implements ListeningHudElement {
     private boolean visible = false;
 
     public SlayerHealth() {

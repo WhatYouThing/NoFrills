@@ -5,19 +5,19 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
 import java.util.List;
 
-public final class LagMeter extends SimpleTextElement implements TickableHudElement {
+public final class LagMeter extends SimpleTextElement implements ListeningHudElement {
     public final SettingInt min = new SettingInt(500, "min", instance.key());
     private long lastTick = 0;
 
-    public LagMeter(String text) {
-        super(Component.literal(text), new Feature("lagMeterElement"), "Lag Meter");
+    public LagMeter() {
+        super(Component.literal("Last server tick was 0.00s ago"), new Feature("lagMeterElement"), "Lag Meter");
         this.options = this.getBaseSettings(List.of(
                 new Settings.SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
         ));
@@ -50,7 +50,7 @@ public final class LagMeter extends SimpleTextElement implements TickableHudElem
     }
 
     @Override
-    public void onReset() {
+    public void onServerJoin() {
         this.lastTick = 0;
     }
 }

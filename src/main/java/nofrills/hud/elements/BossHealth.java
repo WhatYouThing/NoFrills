@@ -6,8 +6,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.monster.MagmaCube;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.KuudraUtil;
@@ -15,7 +15,7 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
-public final class BossHealth extends SimpleTextElement implements TickableHudElement {
+public final class BossHealth extends SimpleTextElement implements ListeningHudElement {
     private final SettingBool dungeon = new SettingBool(true, "dungeon", this.instance);
     private final SettingBool kuudra = new SettingBool(true, "kuudra", this.instance);
     private boolean visible = false;
@@ -88,7 +88,7 @@ public final class BossHealth extends SimpleTextElement implements TickableHudEl
     }
 
     @Override
-    public void onReset() {
+    public void onServerJoin() {
         this.visible = false;
         this.kuudraTicks = 0;
         this.kuudraHealth = 0.0f;

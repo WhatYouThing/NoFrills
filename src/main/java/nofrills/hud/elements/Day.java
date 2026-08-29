@@ -2,16 +2,21 @@ package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
 import nofrills.config.Feature;
+import nofrills.events.ReceivePacketEvent;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
 import nofrills.misc.Utils;
 
-public final class Day extends SimpleTextElement {
+import static nofrills.Main.mc;
+
+public final class Day extends SimpleTextElement implements ListeningHudElement {
     private long day = 0;
     private boolean dirty = false;
 
-    public Day(String text) {
-        super(Component.literal(text), new Feature("dayElement"), "Day Display");
+    public Day() {
+        super(Component.literal("Day: §f0"), new Feature("dayElement"), "Day Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the day that the server world is on.");
         this.setCategory(Category.Info);
@@ -28,8 +33,15 @@ public final class Day extends SimpleTextElement {
         }
     }
 
-    public void setDay(long day) {
-        this.day = day;
-        this.dirty = true;
+    @Override
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (event.packet instanceof ClientboundSetTimePacket timePacket && mc.level != null) {
+            mc.level.dimensionType().defaultClock().ifPresent(clock -> {
+                if (timePacket.clockUpdates().containsKey(clock)) {
+                    this.day = timePacket.clockUpdates().get(clock).totalTicks() / 24000L;
+                    this.dirty = true;
+                }
+            });
+        }
     }
 }

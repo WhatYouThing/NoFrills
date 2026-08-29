@@ -2,13 +2,15 @@ package nofrills.hud.elements;
 
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.events.ChatMsgEvent;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.TickTimerElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
 import java.util.List;
 
-public final class PadTimer extends TickTimerElement {
+public final class PadTimer extends TickTimerElement implements ListeningHudElement {
     public SettingBool totalTime;
     private int totalTicks = 0;
 
@@ -46,5 +48,14 @@ public final class PadTimer extends TickTimerElement {
     public void pause() {
         super.pause();
         this.totalTicks = 0;
+    }
+
+    @Override
+    public void onChatMessage(ChatMsgEvent event) {
+        if (event.msg().equals("[BOSS] Storm: Pathetic Maxor, just like expected.")) {
+            this.start();
+        } else if (event.msg().equals("[BOSS] Storm: I should have known that I stood no chance.")) {
+            this.pause();
+        }
     }
 }

@@ -4,22 +4,22 @@ import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public final class TPS extends SimpleTextElement implements TickableHudElement {
+public final class TPS extends SimpleTextElement implements ListeningHudElement {
     public final SettingBool average = new SettingBool(false, "average", instance.key());
     private final List<Integer> tpsList = new ArrayList<>();
     private int clientTicks = 20;
     private int serverTicks = 0;
 
-    public TPS(String text) {
-        super(Component.literal(text), new Feature("tpsElement"), "TPS Display");
+    public TPS() {
+        super(Component.literal("TPS: §f20.00"), new Feature("tpsElement"), "TPS Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
@@ -52,7 +52,7 @@ public final class TPS extends SimpleTextElement implements TickableHudElement {
     }
 
     @Override
-    public void onReset() {
+    public void onServerJoin() {
         this.clientTicks = 20;
         this.serverTicks = 0;
         this.tpsList.clear();

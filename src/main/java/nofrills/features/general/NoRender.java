@@ -15,7 +15,10 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
@@ -25,7 +28,6 @@ import org.joml.Vector3f;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 @EventListener
@@ -72,8 +74,22 @@ public class NoRender {
             ParticleTypes.GUST,
             ParticleTypes.GUST_EMITTER_LARGE
     );
-    private static final EntityPredicates entityPredicates = new EntityPredicates();
     private static boolean inDungeons = false;
+
+    private static boolean isWoodOrLeavesBlock(BlockState state) {
+        Block block = state.getBlock();
+        if (block instanceof LeavesBlock) {
+            return true;
+        }
+        if (block instanceof RotatedPillarBlock) {
+            SoundType sound = state.getSoundType();
+            return sound.equals(SoundType.WOOD)
+                    || sound.equals(SoundType.CHERRY_WOOD)
+                    || sound.equals(SoundType.BAMBOO_WOOD)
+                    || sound.equals(SoundType.NETHER_WOOD);
+        }
+        return false;
+    }
 
     public static FogData getFogAsEmpty(FogData data) {
         data.renderDistanceStart = Float.MAX_VALUE;
@@ -91,9 +107,29 @@ public class NoRender {
     }
 
     public static boolean shouldCancelRender(Entity entity) {
-        for (Predicate<Entity> predicate : entityPredicates.get()) {
-            if (predicate.test(entity)) {
-                return true;
+        if (deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()) return true;
+        if (fallingBlocks.value() && entity instanceof FallingBlockEntity && !Utils.isInArea("The Rift")) return true;
+        if (treeBits.value() && entity instanceof Display.BlockDisplay blockDisplay && isWoodOrLeavesBlock(blockDisplay.getBlockState())) {
+            return Utils.isInGalatea() || Utils.isInHub() || Utils.isInArea("The Park");
+        }
+        if (lightning.value() && entity instanceof LightningBolt) return true;
+        if (expOrbs.value() && entity instanceof ExperienceOrb) return true;
+        if (soulweaverSkulls.value() && entity instanceof ArmorStand stand && Utils.isInDungeons()) {
+            ItemStack helmet = Utils.getEntityHelmet(stand);
+            if (helmet.getItem().equals(Items.PLAYER_HEAD)) {
+                return Utils.hasTexturePayload(helmet, -1020507406);
+            }
+        }
+        if (guidedSheep.value() && entity instanceof Sheep sheep && sheep.getHealth() == 8.0f && Utils.isInDungeons())
+            return true;
+        if (bonePlating.value() && entity instanceof ItemEntity item) {
+            ItemStack stack = item.getItem();
+            return stack.getItem().equals(Items.BONE_MEAL) && stack.getHoverName().getString().equals("Bone Meal") && Utils.isInDungeons();
+        }
+        if (healerFairy.value() && entity instanceof ArmorStand stand && stand.isMarker() && Utils.isInDungeons()) {
+            ItemStack item = stand.getItemBySlot(EquipmentSlot.MAINHAND);
+            if (item.getItem().equals(Items.PLAYER_HEAD)) {
+                return Utils.hasTexturePayload(item, 758129854);
             }
         }
         return false;
@@ -196,63 +232,5 @@ public class NoRender {
         Ambient,
         Danger,
         Both
-    }
-
-    public static class EntityPredicates {
-        private final List<Predicate<Entity>> predicates;
-
-        public EntityPredicates() {
-            HashSet<Block> treeBlocks = Sets.newHashSet(
-                    Blocks.MANGROVE_WOOD,
-                    Blocks.MANGROVE_LEAVES,
-                    Blocks.STRIPPED_SPRUCE_WOOD,
-                    Blocks.AZALEA_LEAVES,
-                    Blocks.STRIPPED_BIRCH_WOOD,
-                    Blocks.STRIPPED_MANGROVE_WOOD,
-                    Blocks.OAK_LEAVES
-            );
-            this.predicates = List.of(
-                    (entity -> deadEntities.value() && entity instanceof LivingEntity && !entity.isAlive()),
-                    (entity -> fallingBlocks.value() && entity instanceof FallingBlockEntity && !Utils.isInArea("The Rift")),
-                    (entity -> {
-                        if (treeBits.value() && entity instanceof Display.BlockDisplay blockDisplay) {
-                            return treeBlocks.contains(blockDisplay.getBlockState().getBlock());
-                        }
-                        return false;
-                    }),
-                    (entity -> lightning.value() && entity instanceof LightningBolt),
-                    (entity -> expOrbs.value() && entity instanceof ExperienceOrb),
-                    (entity -> {
-                        if (soulweaverSkulls.value() && entity instanceof ArmorStand stand && inDungeons) {
-                            ItemStack helmet = Utils.getEntityHelmet(stand);
-                            if (helmet.getItem().equals(Items.PLAYER_HEAD)) {
-                                return Utils.hasTexturePayload(helmet, -1020507406);
-                            }
-                        }
-                        return false;
-                    }),
-                    (entity -> guidedSheep.value() && entity instanceof Sheep sheep && sheep.getHealth() == 8.0f && inDungeons),
-                    (entity -> {
-                        if (bonePlating.value() && entity instanceof ItemEntity item) {
-                            ItemStack stack = item.getItem();
-                            return stack.getItem().equals(Items.BONE_MEAL) && stack.getHoverName().getString().equals("Bone Meal") && inDungeons;
-                        }
-                        return false;
-                    }),
-                    (entity -> {
-                        if (healerFairy.value() && entity instanceof ArmorStand stand && inDungeons && stand.isMarker()) {
-                            ItemStack item = stand.getItemBySlot(EquipmentSlot.MAINHAND);
-                            if (item.getItem().equals(Items.PLAYER_HEAD)) {
-                                return Utils.hasTexturePayload(item, 758129854);
-                            }
-                        }
-                        return false;
-                    })
-            );
-        }
-
-        public List<Predicate<Entity>> get() {
-            return this.predicates;
-        }
     }
 }

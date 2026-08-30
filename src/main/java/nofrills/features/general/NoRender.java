@@ -22,7 +22,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
-import nofrills.events.*;
+import nofrills.events.EntityNamedEvent;
+import nofrills.events.EventListener;
+import nofrills.events.SpawnParticleEvent;
 import nofrills.misc.Utils;
 import org.joml.Vector3f;
 
@@ -74,7 +76,6 @@ public class NoRender {
             ParticleTypes.GUST,
             ParticleTypes.GUST_EMITTER_LARGE
     );
-    private static boolean inDungeons = false;
 
     private static boolean isWoodOrLeavesBlock(BlockState state) {
         Block block = state.getBlock();
@@ -184,7 +185,7 @@ public class NoRender {
                 event.cancel();
                 return;
             }
-            if (mageBeam.value() && event.type.equals(ParticleTypes.FIREWORK) && inDungeons) {
+            if (mageBeam.value() && event.type.equals(ParticleTypes.FIREWORK) && Utils.isInDungeons()) {
                 event.cancel();
                 return;
             }
@@ -196,18 +197,6 @@ public class NoRender {
                 event.cancel();
             }
         }
-    }
-
-    @EventHandler
-    private static void onTick(WorldTickEvent event) {
-        if (instance.isActive()) {
-            inDungeons = Utils.isInDungeons();
-        }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        inDungeons = false;
     }
 
     public enum HealthBarMode {

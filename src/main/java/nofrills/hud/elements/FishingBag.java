@@ -8,6 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.events.InventoryUpdateEvent;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
@@ -16,11 +18,11 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class FishingBag extends SimpleTextElement {
+public final class FishingBag extends SimpleTextElement implements ListeningHudElement {
     public final SettingBool onlyRod = new SettingBool(true, "onlyRod", this.instance);
 
-    public FishingBag(String text) {
-        super(Component.literal(text), new Feature("fishingBagElement"), "Fishing Bag Display");
+    public FishingBag() {
+        super(Component.literal("Bait: §fN/A"), new Feature("fishingBagElement"), "Fishing Bag Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Only If Rod", this.onlyRod, "Automatically hides the element if you are not holding a fishing rod.")
         ));
@@ -38,7 +40,10 @@ public final class FishingBag extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void update(ItemStack stack) {
+    @Override
+    public void onInventoryUpdate(InventoryUpdateEvent event) {
+        if (event.slotId != 44 && event.slotId != 9) return;
+        ItemStack stack = event.stack;
         String name = Utils.toPlain(stack.getHoverName());
         if (name.endsWith(" Bait")) {
             for (Component text : Utils.getLoreText(stack)) {

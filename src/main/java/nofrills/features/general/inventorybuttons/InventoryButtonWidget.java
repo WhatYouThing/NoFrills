@@ -82,7 +82,7 @@ public final class InventoryButtonWidget extends ImageButton {
         }
         stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, buttonObject.get("glint").getAsBoolean());
         double finalY = buttonObject.get("snapPosition").getAsBoolean() && intersectsGui(posX, posY, scaleX, scaleY, container)
-                ? Utils.getClosest(posY, Math.floor(container.topPos - 20 * scaleX), container.topPos + container.imageHeight)
+                ? Utils.getClosest(posY, Math.floor(container.topPos - 20 * scaleX) - 1, container.topPos + container.imageHeight)
                 : posY;
         return new InventoryButtonWidget(posX, finalY, scaleX, scaleY, stack, command, tooltip, buttonObject);
     }

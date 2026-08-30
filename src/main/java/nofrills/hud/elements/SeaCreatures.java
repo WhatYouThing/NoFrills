@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.EntityCache;
@@ -13,12 +14,12 @@ import nofrills.misc.Utils;
 
 import java.util.List;
 
-public final class SeaCreatures extends SimpleTextElement {
+public final class SeaCreatures extends SimpleTextElement implements ListeningHudElement {
     public final SettingBool zero = new SettingBool(false, "zero", instance);
     private final EntityCache cache = new EntityCache();
 
-    public SeaCreatures(String text) {
-        super(Component.literal(text), new Feature("seaCreaturesElement"), "Sea Creatures");
+    public SeaCreatures() {
+        super(Component.literal("Sea Creatures: §70"), new Feature("seaCreaturesElement"), "Sea Creatures");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
         ));
@@ -41,7 +42,8 @@ public final class SeaCreatures extends SimpleTextElement {
         super.draw(context, mouseX, mouseY, partialTicks, delta);
     }
 
-    public void onNamed(EntityNamedEvent event) {
+    @Override
+    public void onEntityNamed(EntityNamedEvent event) {
         if (SeaCreatureData.isSeaCreature(event.namePlain) && !Utils.isInDungeons()) {
             this.cache.add(event.entity);
         }

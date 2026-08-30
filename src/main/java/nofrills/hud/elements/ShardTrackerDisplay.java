@@ -8,8 +8,8 @@ import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.features.hunting.ShardTracker;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.MutableReference;
 import nofrills.misc.ShardData;
@@ -18,7 +18,7 @@ import nofrills.misc.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ShardTrackerDisplay extends SimpleTextElement implements TickableHudElement {
+public final class ShardTrackerDisplay extends SimpleTextElement implements ListeningHudElement {
     private static final String displayNone = "Shard Tracker\n§7None tracked.";
     public final SettingBool hideIfNone = new SettingBool(false, "hideIfNone", instance);
     private final MutableReference<String> display = new MutableReference<>(displayNone);

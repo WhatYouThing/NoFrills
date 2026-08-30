@@ -57,6 +57,10 @@ public class TimerElement extends SimpleTextElement {
         this.time = duration + Util.getMillis();
     }
 
+    public boolean started() {
+        return this.time > 0;
+    }
+
     public void pause() {
         this.duration = 0;
         this.time = 0;

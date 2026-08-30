@@ -13,14 +13,14 @@ import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingEnum;
 import nofrills.hud.HudElement;
-import nofrills.hud.TickableHudElement;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.clickgui.Settings;
 
 import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class InventoryOverlay extends HudElement implements TickableHudElement {
+public final class InventoryOverlay extends HudElement implements ListeningHudElement {
     public final SettingEnum<HideMode> hideMode;
     private final FlowLayout content;
 

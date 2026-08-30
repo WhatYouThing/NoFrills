@@ -2,24 +2,27 @@ package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
+import net.minecraft.util.Util;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.events.ReceivePacketEvent;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public final class Ping extends SimpleTextElement implements TickableHudElement {
+public final class Ping extends SimpleTextElement implements ListeningHudElement {
     public final SettingBool average = new SettingBool(false, "average", instance.key());
     private final List<Long> pingList = new CopyOnWriteArrayList<>();
     private int ticks = 20;
     private long lastPing = 0;
 
-    public Ping(String text) {
-        super(Component.literal(text), new Feature("pingElement"), "Ping Display");
+    public Ping() {
+        super(Component.literal("Ping: §f0ms"), new Feature("pingElement"), "Ping Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds your average ping to the element.")
         ));
@@ -54,13 +57,20 @@ public final class Ping extends SimpleTextElement implements TickableHudElement 
     }
 
     @Override
-    public void onReset() {
+    public void onServerJoin() {
         this.ticks = 20;
         this.lastPing = 0;
         this.pingList.clear();
     }
 
-    public void setPing(long ping) {
+    @Override
+    public void onReceivePacket(ReceivePacketEvent event) {
+        if (event.packet instanceof ClientboundPongResponsePacket(long time)) {
+            this.setPing(Util.getMillis() - time);
+        }
+    }
+
+    private void setPing(long ping) {
         if (this.pingList.size() > 30) {
             this.pingList.removeFirst();
         }

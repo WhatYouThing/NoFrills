@@ -23,7 +23,7 @@ import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.*;
 import nofrills.hud.HudElement;
-import nofrills.hud.TickableHudElement;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
@@ -35,7 +35,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class DungeonMap extends HudElement implements TickableHudElement {
+public final class DungeonMap extends HudElement implements ListeningHudElement {
     public static DynamicTexture mapTexture;
     private final TextureAtlas atlasTexture = mc.getAtlasManager().getAtlasOrThrow(AtlasIds.MAP_DECORATIONS);
     private final SettingDouble selfMarkerScale = new SettingDouble(7.0, "selfMarkerScale", this.instance);
@@ -126,7 +126,7 @@ public final class DungeonMap extends HudElement implements TickableHudElement {
     }
 
     @Override
-    public void onReset() {
+    public void onServerJoin() {
         this.teammates = List.of();
         this.parameters = null;
     }

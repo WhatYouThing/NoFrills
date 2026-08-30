@@ -10,7 +10,7 @@ import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
 import nofrills.config.SettingEnum;
 import nofrills.hud.HudElement;
-import nofrills.hud.TickableHudElement;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
@@ -18,7 +18,7 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class Armor extends HudElement implements TickableHudElement {
+public final class Armor extends HudElement implements ListeningHudElement {
     public final SettingEnum<Alignment> align = new SettingEnum<>(Alignment.Horizontal, Alignment.class, "align", instance.key());
     private FlowLayout content;
     private Alignment lastAlign;

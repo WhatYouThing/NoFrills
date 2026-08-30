@@ -4,8 +4,8 @@ import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
@@ -14,13 +14,13 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class FPS extends SimpleTextElement implements TickableHudElement {
+public final class FPS extends SimpleTextElement implements ListeningHudElement {
     public final SettingBool average = new SettingBool(false, "average", instance.key());
     private final List<Integer> fpsList = new ArrayList<>();
     private int ticks = 20;
 
-    public FPS(String text) {
-        super(Component.literal(text), new Feature("fpsElement"), "FPS Display");
+    public FPS() {
+        super(Component.literal("FPS: §f0"), new Feature("fpsElement"), "FPS Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Average", average, "Tracks and adds the average FPS to the element.")
         ));
@@ -47,7 +47,7 @@ public final class FPS extends SimpleTextElement implements TickableHudElement {
     }
 
     @Override
-    public void onReset() {
+    public void onServerJoin() {
         this.ticks = 20;
         this.fpsList.clear();
         this.setText("FPS: §f0");

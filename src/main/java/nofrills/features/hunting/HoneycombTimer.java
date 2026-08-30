@@ -70,16 +70,16 @@ public class HoneycombTimer {
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive() && mc.player != null && Utils.isInSkyblock() && data.get().has("waypoints")) {
             List<JsonElement> waypoints = data.get().get("waypoints").getAsJsonArray().asList();
-            Vec3 playerPos = mc.player.position();
             waypoints.removeIf(e -> {
                 JsonObject waypoint = e.getAsJsonObject();
-                return waypoint.get("done").getAsBoolean() && Vec3.atCenterOf(getHoneycombPos(waypoint)).distanceTo(playerPos) <= 8.0;
+                return waypoint.get("done").getAsBoolean() && Vec3.atCenterOf(getHoneycombPos(waypoint)).distanceTo(mc.player.position()) <= 10.0;
             });
             Set<String> areas = waypoints.stream().map(e -> e.getAsJsonObject().get("area").getAsString()).collect(Collectors.toSet());
             List<Honeycomb> list = new ArrayList<>();
             long now = Instant.now().toEpochMilli();
             for (String area : areas) {
-                List<JsonElement> areaWaypoints = waypoints.stream().filter(e -> e.getAsJsonObject().get("area").getAsString().equals(area)).toList();
+                List<JsonElement> areaWaypoints = waypoints.stream()
+                        .filter(e -> e.getAsJsonObject().get("area").getAsString().equals(area)).toList();
                 for (int i = 0; i < areaWaypoints.size(); i++) {
                     JsonObject waypoint = areaWaypoints.get(i).getAsJsonObject();
                     long timestamp = waypoint.get("timestamp").getAsLong();
@@ -100,14 +100,19 @@ public class HoneycombTimer {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && !activeHoneycombs.isEmpty()) {
+            List<Honeycomb> honeycombs = activeHoneycombs;
             long timestamp = Instant.now().toEpochMilli();
-            for (Honeycomb honeycomb : activeHoneycombs) {
+            for (Honeycomb honeycomb : honeycombs) {
                 long timeLeft = honeycomb.timestamp() - timestamp;
-                String timeColor = Utils.getPercentageColor(timeLeft / 3600000.0);
+                String text = Utils.format("{}#{}: {}",
+                        Utils.getPercentageColor(timeLeft / 3600000.0),
+                        honeycombs.indexOf(honeycomb) + 1,
+                        timeLeft <= 0 ? "Ready" : Utils.millisecondsToTime(timeLeft)
+                );
                 event.drawBeam(Vec3.atCenterOf(honeycomb.pos()).add(0.0, 0.5, 0.0), 256, true, color.value());
                 event.drawDistanceScaledText(
                         Vec3.atCenterOf(honeycomb.pos()),
-                        Component.literal(timeColor + (timeLeft <= 0 ? "Ready" : Utils.millisecondsToTime(timeLeft))),
+                        Component.literal(text),
                         scale.valueFloat() * 0.1f,
                         true,
                         RenderColor.WHITE

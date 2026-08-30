@@ -4,7 +4,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
@@ -17,7 +16,6 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import static nofrills.Main.mc;
-import static nofrills.hud.HudManager.terraGyroTimer;
 
 @EventListener
 public class TerracottaTimer {
@@ -29,25 +27,9 @@ public class TerracottaTimer {
     private static final ConcurrentHashSet<Terracotta> terracottas = new ConcurrentHashSet<>();
 
     @EventHandler
-    private static void onChat(ChatMsgEvent event) {
-        if (instance.isActive() && DungeonUtil.isOnFloor("6")) {
-            if (event.messagePlain.equals("[BOSS] Sadan: So you made it all the way here... Now you wish to defy me? Sadan?!")) {
-                terraGyroTimer.setStartTicks(267);
-                terraGyroTimer.start();
-            }
-        }
-    }
-
-    @EventHandler
     private static void onBlockUpdate(BlockUpdateEvent event) {
-        if (instance.isActive() && DungeonUtil.isInBossRoom("6") && event.oldState.isAir()) {
-            if (event.newState.getBlock() instanceof FlowerPotBlock) { // EVERY POTTED FLOWER HAS ITS OWN BLOCK ID AAAAAAAAHHH
-                terracottas.add(new Terracotta(event.pos, DungeonUtil.isOnFloor("M6") ? 240 : 300));
-            }
-            if (!terraGyroTimer.isTicking() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
-                terraGyroTimer.setStartTicks(235);
-                terraGyroTimer.start();
-            }
+        if (instance.isActive() && event.oldState.isAir() && event.newState.getBlock() instanceof FlowerPotBlock && DungeonUtil.isInBossRoom("6")) {
+            terracottas.add(new Terracotta(event.pos.immutable(), DungeonUtil.isOnFloor("M6") ? 240 : 300));
         }
     }
 

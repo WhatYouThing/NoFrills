@@ -4,8 +4,8 @@ import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-public final class Clock extends SimpleTextElement implements TickableHudElement {
+public final class Clock extends SimpleTextElement implements ListeningHudElement {
     public final SettingBool format24 = new SettingBool(false, "format24", instance.key());
 
-    public Clock(String text) {
-        super(Component.literal(text), new Feature("clockElement"), "Clock Display");
+    public Clock() {
+        super(Component.literal("Time: §f00:00:00"), new Feature("clockElement"), "Clock Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("24H Format", this.format24, "Use 24H format instead of 12H.")
         ));

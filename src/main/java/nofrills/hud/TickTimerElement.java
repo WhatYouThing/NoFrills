@@ -5,7 +5,7 @@ import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.misc.Utils;
 
-public class TickTimerElement extends SimpleTextElement implements TickableHudElement {
+public class TickTimerElement extends SimpleTextElement implements ListeningHudElement {
     protected final String timerText;
     protected int ticks = -1;
     protected int startTicks = 0;
@@ -34,7 +34,7 @@ public class TickTimerElement extends SimpleTextElement implements TickableHudEl
     }
 
     @Override
-    public void onReset() {
+    public void onServerJoin() {
         if (this.autoPause) {
             this.pause();
         }

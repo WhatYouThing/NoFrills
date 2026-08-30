@@ -3,15 +3,15 @@ package nofrills.hud.elements;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
+import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.TickableHudElement;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.Utils;
 
-public final class Power extends SimpleTextElement implements TickableHudElement {
+public final class Power extends SimpleTextElement implements ListeningHudElement {
 
-    public Power(String text) {
-        super(Component.literal(text), new Feature("powerElement"), "Power Display");
+    public Power() {
+        super(Component.literal("Power: §f0"), new Feature("powerElement"), "Power Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the power blessing level while in Dungeons.");
         this.setCategory(Category.Dungeons);

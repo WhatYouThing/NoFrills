@@ -46,7 +46,6 @@ dependencies {
     include "meteordevelopment:orbit:${project.orbit_version}"
 
     implementation("io.wispforest:owo-lib:${project.owolib_version}")
-    include "io.wispforest:owo-sentinel:${project.owolib_version}"
 
     implementation("de.topobyte:jama:${project.jama_version}")
     include "de.topobyte:jama:${project.jama_version}"

@@ -8,8 +8,7 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -28,6 +27,7 @@ import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.WeakHashMap;
 
 import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.*;
@@ -53,60 +53,64 @@ public class ItemProtection {
     public static final SettingColor manualOverlay = new SettingColor(RenderColor.fromHex(0xffff7f), "manualOverlay", instance);
 
     private static final Identifier overlaySprite = Identifier.fromNamespaceAndPath("nofrills", "item_protection");
+    private static final WeakHashMap<ItemStack, ProtectType> stackCache = new WeakHashMap<>();
     private static boolean isSellGUI = false;
     private static boolean isSalvageGUI = false;
-    private static boolean overrideActive = false;
-    private static boolean revealingTooltip = false;
 
-    public static ProtectType getProtectType(ItemStack stack) {
-        if (overrideActive || stack.isEmpty()) return ProtectType.None;
-        CompoundTag customData = Utils.getCustomData(stack);
-        if (customData == null) return ProtectType.None;
-        String id = Utils.getMarketId(stack);
-        if (protectUUID.value() && data.value().has("uuids")) {
-            String uuid = customData.getStringOr("uuid", "");
-            if (data.value().getAsJsonArray("uuids").contains(new JsonPrimitive(uuid))) {
-                return ProtectType.UUID;
-            }
+    public static ProtectType getProtectType(ItemStack item) {
+        if (mc.gui.screen() != null && overrideKey.isDown()) {
+            return ProtectType.None;
         }
-        if (protectSkyblockId.value() && data.value().has("ids")) {
-            if (data.value().getAsJsonArray("ids").contains(new JsonPrimitive(id))) {
-                return ProtectType.SkyblockID;
-            }
-        }
-        if (protectMaxQuality.value() && customData.getIntOr("baseStatBoostPercentage", 0) == 50) {
-            return ProtectType.MaxQuality;
-        }
-        if (protectStarred.value() && customData.getIntOr("upgrade_level", 0) > 0 && !customData.contains("boss_tier")) {
-            return ProtectType.Starred;
-        }
-        if (protectRarityUpgraded.value() && customData.getIntOr("rarity_upgrades", 0) > 0) {
-            return ProtectType.RarityUpgraded;
-        }
-        if (protectValue.value()) {
-            double min = protectValueMin.value();
-            List<Double> prices = new ArrayList<>();
-            if (bazaarPricing.containsKey(id)) prices.add(bazaarPricing.get(id).buy());
-            if (auctionPricing.containsKey(id)) prices.add(Double.valueOf(auctionPricing.get(id)));
-            if (npcPricing.containsKey(id)) prices.add(npcPricing.get(id).coin());
-            for (double price : prices) {
-                if (price >= min) {
-                    return ProtectType.Value;
+        return stackCache.computeIfAbsent(item, (stack) -> {
+            if (stack.isEmpty()) return ProtectType.None;
+            CompoundTag customData = Utils.getCustomData(stack);
+            if (customData == null) return ProtectType.None;
+            String id = Utils.getMarketId(stack);
+            if (protectUUID.value() && data.value().has("uuids")) {
+                String uuid = customData.getStringOr("uuid", "");
+                if (data.value().getAsJsonArray("uuids").contains(new JsonPrimitive(uuid))) {
+                    return ProtectType.UUID;
                 }
             }
-        }
-        return ProtectType.None;
+            if (protectSkyblockId.value() && data.value().has("ids")) {
+                if (data.value().getAsJsonArray("ids").contains(new JsonPrimitive(id))) {
+                    return ProtectType.SkyblockID;
+                }
+            }
+            if (protectMaxQuality.value() && customData.getIntOr("baseStatBoostPercentage", 0) == 50) {
+                return ProtectType.MaxQuality;
+            }
+            if (protectStarred.value() && customData.getIntOr("upgrade_level", 0) > 0 && !customData.contains("boss_tier")) {
+                return ProtectType.Starred;
+            }
+            if (protectRarityUpgraded.value() && customData.getIntOr("rarity_upgrades", 0) > 0) {
+                return ProtectType.RarityUpgraded;
+            }
+            if (protectValue.value()) {
+                double min = protectValueMin.value();
+                List<Double> prices = new ArrayList<>();
+                if (bazaarPricing.containsKey(id)) prices.add(bazaarPricing.get(id).buy());
+                if (auctionPricing.containsKey(id)) prices.add(Double.valueOf(auctionPricing.get(id)));
+                if (npcPricing.containsKey(id)) prices.add(npcPricing.get(id).coin());
+                for (double price : prices) {
+                    if (price >= min) {
+                        return ProtectType.Value;
+                    }
+                }
+            }
+            return ProtectType.None;
+        });
     }
 
     public static void drawOverlayIcon(GuiGraphicsExtractor context, int slotX, int slotY, ProtectType type) {
-        int color = regularOverlay.value().argb;
-        if (!drawOverlay.value() || type == ProtectType.None) {
+        if (!drawOverlay.value() || type.equals(ProtectType.None)) {
             return;
         }
-        if (type == ProtectType.UUID || type == ProtectType.SkyblockID) {
-            color = manualOverlay.value().argb;
-        }
-        context.blitSprite(RenderPipelines.GUI_TEXTURED, overlaySprite, slotX, slotY, 16, 16, color);
+        RenderColor color = switch (type) {
+            case UUID, SkyblockID -> manualOverlay.value();
+            default -> regularOverlay.value();
+        };
+        context.blitSprite(RenderPipelines.GUI_TEXTURED, overlaySprite, slotX, slotY, 16, 16, color.getArgb());
     }
 
     private static boolean isSellStack(ItemStack stack) {
@@ -141,9 +145,10 @@ public class ItemProtection {
                 Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
             } else {
                 Utils.infoRaw(Component.literal("§aItem ").append(stack.getHoverName()).append(" §ais now protected by UUID."));
-                array.add(primitive);
                 Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
+                array.add(primitive);
             }
+            stackCache.remove(stack);
         });
     }
 
@@ -164,20 +169,17 @@ public class ItemProtection {
                 Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
             } else {
                 Utils.infoRaw(Component.literal("§aItem ").append(stack.getHoverName()).append(" §ais now protected by Skyblock ID."));
-                array.add(primitive);
                 Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
+                array.add(primitive);
             }
+            stackCache.remove(stack);
         });
     }
 
     @EventHandler
     private static void onKey(InputEvent event) {
-        if (instance.isActive() && (mc.gui.screen() instanceof InventoryScreen || mc.gui.screen() instanceof ContainerScreen)) {
-            if (hideTooltip.value() && event.key == InputConstants.KEY_LSHIFT) {
-                revealingTooltip = event.action != InputConstants.RELEASE;
-            }
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?>) {
             if (overrideKey.isKey(event.key)) {
-                overrideActive = event.action != InputConstants.RELEASE;
                 if (event.action == InputConstants.PRESS) {
                     Utils.infoRaw(Component.literal("Item Protection override is now active.").withStyle(ChatFormatting.RED));
                     Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
@@ -206,7 +208,7 @@ public class ItemProtection {
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && !event.stack.isEmpty() && event.customData != null) {
-            if (hideTooltip.value() && !revealingTooltip) {
+            if (hideTooltip.value() && !InputConstants.isKeyDown(mc.getWindow(), InputConstants.KEY_LSHIFT)) {
                 return;
             }
             ProtectType type = getProtectType(event.stack);
@@ -254,16 +256,9 @@ public class ItemProtection {
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
         if (instance.isActive()) {
+            String title = event.screen.getTitle().getString();
             isSellGUI = false;
-            isSalvageGUI = event.screen.getTitle().getString().equals("Salvage Items") || event.screen.getTitle().getString().equals("Draconic Sacrifice");
-        }
-    }
-
-    @EventHandler
-    private static void onScreenClose(ScreenCloseEvent event) {
-        if (instance.isActive()) {
-            overrideActive = false;
-            revealingTooltip = false;
+            isSalvageGUI = title.equals("Salvage Items") || title.equals("Draconic Sacrifice");
         }
     }
 

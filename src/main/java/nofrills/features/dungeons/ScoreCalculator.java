@@ -7,13 +7,12 @@ import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
 import nofrills.config.SettingString;
 import nofrills.events.*;
-import nofrills.misc.DungeonUtil;
-import nofrills.misc.NoFrillsAPI;
-import nofrills.misc.SkyblockData;
-import nofrills.misc.Utils;
+import nofrills.misc.*;
 
 import java.util.List;
 import java.util.Optional;
+
+import static nofrills.Main.mc;
 
 @EventListener
 public class ScoreCalculator {
@@ -35,11 +34,11 @@ public class ScoreCalculator {
             "score",
             "bonus"
     );
+    private static final ConcurrentHashSet<String> batKills = new ConcurrentHashSet<>();
     public static boolean mimic = false;
     private static int score = 0;
     private static boolean bloodDone = false;
     private static boolean prince = false;
-    private static boolean bat = false;
     private static boolean sent270 = false;
     private static boolean sent300 = false;
 
@@ -195,8 +194,8 @@ public class ScoreCalculator {
         int bonus = 0;
         if (mimic) bonus += 2;
         if (prince) bonus += 1;
-        if (bat) bonus += 1;
         if (isEZPZ()) bonus += 10;
+        bonus += batKills.size();
         for (String line : SkyblockData.getTabListLines()) {
             if (line.startsWith("Crypts: ")) {
                 bonus += Math.clamp(Utils.parseInt(getLineValue(line)).orElse(0), 0, 5);
@@ -243,7 +242,7 @@ public class ScoreCalculator {
                 prince = true;
             }
             if (DungeonUtil.isBatScoreMessage(event.msg())) {
-                bat = true;
+                batKills.add(mc.player.getName().getString());
             }
         }
     }
@@ -258,7 +257,7 @@ public class ScoreCalculator {
                 } else if (msg.contains("prince")) {
                     prince = true;
                 } else if (msg.contains("bat")) {
-                    bat = true;
+                    batKills.add(event.sender);
                 }
             }
         }
@@ -270,7 +269,7 @@ public class ScoreCalculator {
         bloodDone = false;
         mimic = false;
         prince = false;
-        bat = false;
+        batKills.clear();
         sent270 = false;
         sent300 = false;
     }

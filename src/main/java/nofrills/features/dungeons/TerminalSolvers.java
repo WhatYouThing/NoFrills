@@ -44,6 +44,7 @@ public class TerminalSolvers {
     public static final SettingColor colorsColorFirst = new SettingColor(RenderColor.fromArgb(0xff5ca0bf), "colorsColorFirst", instance);
     public static final SettingColor colorsColorSecond = new SettingColor(RenderColor.fromArgb(0xff45788f), "colorsColorSecond", instance);
     public static final SettingInt firstClickTicks = new SettingInt(10, "firstClickTicks", instance);
+    public static final SettingInt throttleTicks = new SettingInt(1, "throttleTicks", instance);
     public static final SettingBool soundOnClick = new SettingBool(false, "soundOnClick", instance);
     public static final SettingString clickSound = new SettingString("minecraft:entity.blaze.hurt", "clickSound", instance);
     public static final SettingDouble clickSoundVolume = new SettingDouble(2.0, "clickSoundVolume", instance);
@@ -100,6 +101,12 @@ public class TerminalSolvers {
             case WHITE -> item.equals(Items.BONE_MEAL);
             default -> false;
         };
+    }
+
+    private static boolean shouldCancelClick() {
+        return currentSolution == null
+                || currentSolution.openedAtTick + firstClickTicks.value() >= tickCounter
+                || currentSolution.clickedAtTick + throttleTicks.value() >= tickCounter;
     }
 
     @EventHandler
@@ -177,7 +184,7 @@ public class TerminalSolvers {
         if (instance.isActive() && event.slot != null && !event.isInventory && DungeonUtil.isOnFloor("7")) {
             TerminalType type = getTerminalType(event.title);
             if (isTypeEnabled(type) || type.equals(TerminalType.Melody)) {
-                if (currentSolution == null || (currentSolution.openedAtTick + firstClickTicks.value() >= tickCounter)) {
+                if (shouldCancelClick()) {
                     event.cancel();
                     return;
                 }
@@ -310,10 +317,12 @@ public class TerminalSolvers {
         public final ConcurrentHashMap<Integer, Item> contents = new ConcurrentHashMap<>();
         public final TerminalType type;
         public int openedAtTick;
+        public int clickedAtTick;
 
         public TerminalSolution(TerminalType type) {
             this.type = type;
             this.openedAtTick = tickCounter;
+            this.clickedAtTick = 0;
         }
 
         public void setEnabled(Slot slot, int count) {
@@ -345,6 +354,7 @@ public class TerminalSolvers {
             } else {
                 this.clickedSet.add(slot.index);
             }
+            this.clickedAtTick = tickCounter;
             if (soundOnClick.value()) {
                 Utils.playSound(clickSound.value(), clickSoundVolume.valueFloat(), clickSoundPitch.valueFloat());
             }

@@ -1,6 +1,7 @@
 package nofrills.config;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import org.lwjgl.glfw.GLFW;
 
 import static nofrills.Main.mc;
 
@@ -40,7 +41,14 @@ public class SettingKeybind extends SettingInt {
         return asInputConstant(this.key());
     }
 
+    public boolean isMouse() {
+        return this.asInputConstant().getType().equals(InputConstants.Type.MOUSE);
+    }
+
     public boolean isDown() {
+        if (this.isMouse()) {
+            return this.bound() && GLFW.glfwGetMouseButton(mc.getWindow().handle(), this.key()) == 1;
+        }
         return this.bound() && InputConstants.isKeyDown(mc.getWindow(), this.key());
     }
 }

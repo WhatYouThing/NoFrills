@@ -255,10 +255,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 **There are fake NoFrills websites and Discord servers floating around.** Here are some general rules of thumb to help
 you stay safe:
 
-- The official Discord server link is https://discord.com/invite/NENuTFvS7X.
-- The official Discord server does not require any form of verification.
-- The official Discord server does not have a vanity link, it is currently taken by a phishing server which tries to
-  steal your Microsoft account.
+- The official Discord server link can be found on the Modrinth project page, under the Links section. **The official
+  server will not ask for any kind of account verification upon joining.**
 - There is no official website where you can download the mod from. The Modrinth and the GitHub are the only safe
   sources of the mod.
 - Microsoft does not care about your account safety. Never share your email address with anyone.
@@ -269,16 +267,14 @@ you stay safe:
   your Minecraft version, and add it to your "mods" folder.
 - Additional dependencies needed to launch the mod:
     - [Fabric API](https://modrinth.com/mod/fabric-api)
-    - [owo-lib](https://modrinth.com/mod/owo-lib) (Prompts you to install if not present)
+    - [owo-lib](https://modrinth.com/mod/owo-lib)
     - [Mod Menu](https://modrinth.com/mod/modmenu) (Optional, settings can be accessed with `/nofrills`, or `/nf`)
 - To finish off, open the mod's settings screen, and configure it to your liking. **Every feature is off by default**.
 
 ## Incompatibilities
 
 - Some highlight features might not render correctly with Iris shaders active.
-- Input boxes in the mod's GUI won't detect any changes with the Caxton mod installed.
-    - The popular Skyblock Enhanced modpack comes with this mod included. Due to the presence of AI generated mods
-      within the pack, it is recommended that you either use different modpack, or create your own mod folder.
+- Input boxes in the config GUI won't save any changes with the Caxton mod installed.
 - The mod may not work with third party loaders such as Lunar or Feather, only Fabric is supported.
     - If you aren't using Fabric already, it is recommended you upgrade to either
       the [Modrinth App](https://modrinth.com/app) or the [Prism Launcher](https://prismlauncher.org/). Automatic mod
@@ -288,12 +284,10 @@ you stay safe:
 ## Credits
 
 - [Orbit](https://github.com/MeteorDevelopment/orbit): Event system which keeps the mod blazing fast.
-- [Skyblocker](https://github.com/SkyblockerMod/Skyblocker): Has more info on how YACL works than its own wiki, also a
-  source for the odd function such as reading scoreboard lines.
-- [clientcommands](https://github.com/Earthcomputer/clientcommands): Taught me rendering magic with mixins.
-- [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus): Source for the base mixin targets for Anti Swim and Old
-  Sneak.
+- [Skyblocker](https://github.com/SkyblockerMod/Skyblocker): Source for the original YACL config implementation and
+  random code snippets.
 
-## Sponsored by: [Wrath.TV](https://wrath.tv/)
+## Sponsors/Other projects
 
-- A *no frills* (figuratively and literally) game live-streaming platform.
+- [wrath.tv](https://wrath.tv/) - A *no frills* live-streaming platform, coming soon:tm:
+- [NoProxy](https://whatyouth.ing/noproxy/) - Minecraft proxy service which helps avoid Hypixel's proxy hell.

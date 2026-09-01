@@ -1,10 +1,7 @@
 package nofrills.features.tweaks;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.EventListener;
@@ -26,11 +23,15 @@ public class NoCursorReset {
     public static double cursorY = -1.0;
 
     public static boolean isActive(Screen screen) {
-        return instance.isActive() && screen instanceof ContainerScreen && !LeapOverlay.isLeapMenu(screen.getTitle().getString());
+        return instance.isActive() && !LeapOverlay.isLeapMenu(screen.getTitle().getString());
     }
 
     public static boolean isActive() {
         return isActive(mc.gui.screen());
+    }
+
+    public static boolean isPosStored() {
+        return cursorX >= 0.0 && cursorY >= 0.0;
     }
 
     public static void startTicking() {
@@ -38,17 +39,13 @@ public class NoCursorReset {
     }
 
     public static void updateCursorPos(double x, double y) {
-        if (mc.gui.screen() instanceof ContainerScreen || mc.gui.screen() instanceof InventoryScreen) {
-            cursorX = x;
-            cursorY = y;
-        }
+        cursorX = x;
+        cursorY = y;
     }
 
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
         if (isActive(event.screen)) {
-            if (cursorX >= 0.0 && cursorY >= 0.0)
-                InputConstants.grabOrReleaseMouse(mc.getWindow(), InputConstants.CURSOR_NORMAL, cursorX, cursorY);
             startTicking();
         }
     }

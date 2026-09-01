@@ -186,7 +186,7 @@ public class TerminalSolvers {
                         if (currentSolution.isClicked(event.slot.index) || currentSolution.isDisabled(event.slot.index)) {
                             event.cancel();
                         } else {
-                            currentSolution.setClicked(event.slot, event.button, event.handler.containerId);
+                            currentSolution.setClicked(event.slot, event.button);
                         }
                     }
                     case InOrder -> {
@@ -196,7 +196,7 @@ public class TerminalSolvers {
                         if (first.isEmpty() || first.get().getKey() != event.slotId) {
                             event.cancel();
                         } else {
-                            currentSolution.setClicked(event.slot, event.button, event.handler.containerId);
+                            currentSolution.setClicked(event.slot, event.button);
                         }
                     }
                     case Colors -> {
@@ -204,7 +204,7 @@ public class TerminalSolvers {
                         if (solution.stream().anyMatch(entry -> entry.getKey() == event.slotId && entry.getValue() == 0)) {
                             event.cancel();
                         } else {
-                            currentSolution.setClicked(event.slot, event.button, event.handler.containerId);
+                            currentSolution.setClicked(event.slot, event.button);
                         }
                     }
                 }
@@ -310,7 +310,6 @@ public class TerminalSolvers {
         public final ConcurrentHashMap<Integer, Item> contents = new ConcurrentHashMap<>();
         public final TerminalType type;
         public int openedAtTick;
-        public int containerId = -1;
 
         public TerminalSolution(TerminalType type) {
             this.type = type;
@@ -329,28 +328,25 @@ public class TerminalSolvers {
             this.solutionMap.put(slot.index, -1);
         }
 
-        public void setClicked(Slot slot, int button, int containerId) {
-            if (this.containerId < containerId) {
-                if (this.type.equals(TerminalType.Colors)) {
-                    int index = this.solutionMap.getOrDefault(slot.index, -1);
-                    if (index != -1) {
-                        int modifier = button == InputConstants.MOUSE_BUTTON_RIGHT ? -1 : 1;
-                        int newIndex = index - modifier;
-                        if (newIndex < 0) {
-                            this.solutionMap.put(slot.index, 4);
-                        } else if (newIndex > 4) {
-                            this.solutionMap.put(slot.index, 0);
-                        } else {
-                            this.solutionMap.put(slot.index, newIndex);
-                        }
+        public void setClicked(Slot slot, int button) {
+            if (this.type.equals(TerminalType.Colors)) {
+                int index = this.solutionMap.getOrDefault(slot.index, -1);
+                if (index != -1) {
+                    int modifier = button == InputConstants.MOUSE_BUTTON_RIGHT ? -1 : 1;
+                    int newIndex = index - modifier;
+                    if (newIndex < 0) {
+                        this.solutionMap.put(slot.index, 4);
+                    } else if (newIndex > 4) {
+                        this.solutionMap.put(slot.index, 0);
+                    } else {
+                        this.solutionMap.put(slot.index, newIndex);
                     }
-                } else {
-                    this.clickedSet.add(slot.index);
                 }
-                this.containerId = containerId;
-                if (soundOnClick.value()) {
-                    Utils.playSound(clickSound.value(), clickSoundVolume.valueFloat(), clickSoundPitch.valueFloat());
-                }
+            } else {
+                this.clickedSet.add(slot.index);
+            }
+            if (soundOnClick.value()) {
+                Utils.playSound(clickSound.value(), clickSoundVolume.valueFloat(), clickSoundPitch.valueFloat());
             }
         }
 
@@ -368,7 +364,6 @@ public class TerminalSolvers {
                 this.clickedSet.clear();
                 this.contents.clear();
                 this.openedAtTick = tickCounter;
-                this.containerId = -1;
             }
             this.contents.put(slotId, stack.getItem());
         }

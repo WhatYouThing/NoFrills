@@ -24,21 +24,18 @@ public class MelodyMessage {
     public static final SettingBool progress = new SettingBool(false, "progress", instance.key());
     public static final SettingString progressMsg = new SettingString("/pc Melody {percent}", "progressMsg", instance.key());
 
-    private static int lastCount = 4;
+    private static final int rows = 4;
+    private static int lastCount = rows;
 
     private static boolean isMelody(String title) {
         return TerminalSolvers.getTerminalType(title).equals(TerminalSolvers.TerminalType.Melody);
-    }
-
-    private static void resetCount() {
-        lastCount = 4;
     }
 
     @EventHandler
     private static void onScreenOpen(ScreenOpenEvent event) {
         if (instance.isActive() && DungeonUtil.isOnFloor("7") && isMelody(event.screen.getTitle().getString())) {
             Utils.sendMessage(msg.value());
-            resetCount();
+            lastCount = rows;
         }
     }
 
@@ -46,7 +43,7 @@ public class MelodyMessage {
     private static void onSlotUpdate(SlotUpdateEvent event) {
         if (instance.isActive() && !event.isInventory && isMelody(event.title) && progress.value() && DungeonUtil.isOnFloor("7")) {
             List<Slot> slots = Utils.getContainerSlots(event.handler).reversed();
-            if (slots.stream().filter(slot -> !slot.getItem().isEmpty()).toList().size() != 54) {
+            if (slots.stream().anyMatch(slot -> slot.getItem().isEmpty())) {
                 return; // quick and dirty check for if the screen is built
             }
             int count = 0;
@@ -74,6 +71,6 @@ public class MelodyMessage {
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
-        resetCount();
+        lastCount = rows;
     }
 }

@@ -116,7 +116,7 @@ public class ItemProtection {
 
     private static boolean isSalvageButton(ItemStack stack) {
         String name = Utils.toPlain(stack.getHoverName());
-        return name.equals("Salvage Items") || name.equals("Confirm Salvage");
+        return name.equals("Salvage Items") || name.equals("Confirm Salvage") || name.equals("Draconic Altar");
     }
 
     private static void addUUID(ItemStack stack) {
@@ -255,7 +255,7 @@ public class ItemProtection {
     private static void onScreen(ScreenOpenEvent event) {
         if (instance.isActive()) {
             isSellGUI = false;
-            isSalvageGUI = event.screen.getTitle().getString().equals("Salvage Items");
+            isSalvageGUI = event.screen.getTitle().getString().equals("Salvage Items") || event.screen.getTitle().getString().equals("Draconic Sacrifice");
         }
     }
 

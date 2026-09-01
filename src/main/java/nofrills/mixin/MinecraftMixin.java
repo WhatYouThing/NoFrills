@@ -33,6 +33,7 @@ public abstract class MinecraftMixin {
     @Shadow
     @Nullable
     public ClientLevel level;
+
     @Shadow
     @Final
     private SoundManager soundManager;

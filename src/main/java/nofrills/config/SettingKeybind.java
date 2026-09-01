@@ -3,7 +3,11 @@ package nofrills.config;
 import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 
+import static nofrills.Main.mc;
+
 public class SettingKeybind extends SettingInt {
+    public static final int UNKNOWN_KEY = InputConstants.UNKNOWN.getValue();
+
     public SettingKeybind(int defaultValue, String key, String parentKey) {
         super(defaultValue, key, parentKey);
     }
@@ -35,5 +39,9 @@ public class SettingKeybind extends SettingInt {
 
     public InputConstants.Key asInputConstant() {
         return asInputConstant(this.key());
+    }
+
+    public boolean isDown() {
+        return this.bound() && InputConstants.isKeyDown(mc.getWindow(), this.key());
     }
 }

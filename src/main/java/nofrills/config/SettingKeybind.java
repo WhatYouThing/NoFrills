@@ -30,18 +30,25 @@ public class SettingKeybind extends SettingInt {
     }
 
     public boolean bound() {
-        return this.value() != GLFW.GLFW_KEY_UNKNOWN;
+        return this.value() != -1;
     }
 
     public boolean isKey(int key) {
-        return key != GLFW.GLFW_KEY_UNKNOWN && key == this.value();
+        return key != -1 && key == this.value();
     }
 
     public InputConstants.Key asInputConstant() {
         return asInputConstant(this.key());
     }
 
+    public boolean isMouse() {
+        return this.asInputConstant().getType().equals(InputConstants.Type.MOUSE);
+    }
+
     public boolean isDown() {
+        if (this.isMouse()) {
+            return this.bound() && GLFW.glfwGetMouseButton(mc.getWindow().handle(), this.key()) == 1;
+        }
         return this.bound() && InputConstants.isKeyDown(mc.getWindow(), this.key());
     }
 }

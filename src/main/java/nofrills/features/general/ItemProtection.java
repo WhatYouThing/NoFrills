@@ -41,6 +41,7 @@ public class ItemProtection {
     public static final SettingKeybind uuidKey = new SettingKeybind(-1, "uuidKey", instance);
     public static final SettingKeybind skyblockIdKey = new SettingKeybind(-1, "skyblockIdKey", instance);
     public static final SettingKeybind overrideKey = new SettingKeybind(-1, "overrideKey", instance);
+    public static final SettingBool playOverrideSound = new SettingBool(false, "playOverrideSound", instance);
     public static final SettingBool protectUUID = new SettingBool(false, "protectUUID", instance);
     public static final SettingBool protectSkyblockId = new SettingBool(false, "protectSkyblockId", instance);
     public static final SettingBool protectMaxQuality = new SettingBool(false, "protectMaxQuality", instance);
@@ -183,10 +184,10 @@ public class ItemProtection {
             if (overrideKey.isKey(event.key)) {
                 if (event.action == GLFW.GLFW_PRESS) {
                     Utils.infoRaw(Component.literal("Item Protection override is now active.").withStyle(ChatFormatting.RED));
-                    Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
+                    if (playOverrideSound.value()) Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
                 } else if (event.action == GLFW.GLFW_RELEASE) {
                     Utils.infoRaw(Component.literal("Item Protection override deactivated.").withStyle(ChatFormatting.GREEN));
-                    Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
+                    if (playOverrideSound.value()) Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 }
                 event.cancel();
                 return;

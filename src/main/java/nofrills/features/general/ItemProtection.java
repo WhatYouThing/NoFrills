@@ -60,7 +60,7 @@ public class ItemProtection {
     private static boolean isSalvageGUI = false;
 
     public static ProtectType getProtectType(ItemStack item) {
-        if (mc.screen != null && overrideKey.isDown()) {
+        if (mc.screen instanceof AbstractContainerScreen<?> && overrideKey.isDown()) {
             return ProtectType.None;
         }
         return stackCache.computeIfAbsent(item, (stack) -> {
@@ -258,8 +258,8 @@ public class ItemProtection {
     @EventHandler
     private static void onScreen(ScreenOpenEvent event) {
         if (instance.isActive()) {
-            String title = event.screen.getTitle().getString();
             isSellGUI = false;
+            String title = event.screen.getTitle().getString();
             isSalvageGUI = title.equals("Salvage Items") || title.equals("Draconic Sacrifice");
         }
     }

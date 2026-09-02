@@ -633,7 +633,7 @@ public class Utils {
 
     public static ResolvableProfile toResolvableProfile(String texturePayload) {
         Multimap<String, Property> properties = ImmutableMultimap.of("textures", new Property("textures", texturePayload));
-        GameProfile gameProfile = new GameProfile(UUID.randomUUID(), "", new PropertyMap(properties));
+        GameProfile gameProfile = new GameProfile(UUID.nameUUIDFromBytes(texturePayload.getBytes()), "", new PropertyMap(properties));
         return ResolvableProfile.createResolved(gameProfile);
     }
 

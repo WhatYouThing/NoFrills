@@ -70,7 +70,7 @@ public final class InventoryButtonWidget extends ImageButton {
         double scaleY = buttonObject.get("scaleY").getAsDouble();
         ItemStack stack = BuiltInRegistries.ITEM.getValue(Identifier.tryParse(model)).getDefaultInstance().copy();
         if (stack.is(Items.PLAYER_HEAD) && !textures.isEmpty()) {
-            stack.set(DataComponents.PROFILE, InventoryButtons.getOrInitTextures(textures));
+            stack.set(DataComponents.PROFILE, Utils.toResolvableProfile(textures));
         }
         if (!itemId.isEmpty()) {
             CompoundTag tag = new CompoundTag();

@@ -18,14 +18,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ResolvableProfile;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.config.SettingJson;
 import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
-import nofrills.events.ServerJoinEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,7 +31,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
 
@@ -44,15 +41,6 @@ public class InventoryButtons {
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingKeybind manageKey = new SettingKeybind(-1, "addButtonKey", instance);
     public static final SettingInt gridPrecision = new SettingInt(5, "gridPrecision", instance);
-
-    private static final ConcurrentHashMap<String, ResolvableProfile> profileCache = new ConcurrentHashMap<>();
-
-    public static ResolvableProfile getOrInitTextures(String payload) {
-        if (!profileCache.containsKey(payload)) {
-            profileCache.put(payload, Utils.toResolvableProfile(payload));
-        }
-        return profileCache.get(payload);
-    }
 
     public static void addWidgets(AbstractContainerScreen<?> container) {
         if (!data.value().has("buttons") || container instanceof CreativeModeInventoryScreen) {
@@ -159,21 +147,6 @@ public class InventoryButtons {
                 }
             }
             event.cancel();
-        }
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        if (instance.isActive() && data.value().has("buttons")) {
-            JsonArray buttons = data.value().get("buttons").getAsJsonArray();
-            profileCache.entrySet().removeIf(entry -> {
-                for (JsonElement button : buttons) {
-                    if (button.getAsJsonObject().get("textures").getAsString().equals(entry.getKey())) {
-                        return false;
-                    }
-                }
-                return true;
-            });
         }
     }
 }

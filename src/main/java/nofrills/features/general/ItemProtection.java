@@ -37,9 +37,9 @@ public class ItemProtection {
     public static final Feature instance = new Feature("itemProtection", Feature.Flags.UsePricingAPI);
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind uuidKey = new SettingKeybind(-1, "uuidKey", instance);
-    public static final SettingKeybind skyblockIdKey = new SettingKeybind(-1, "skyblockIdKey", instance);
-    public static final SettingKeybind overrideKey = new SettingKeybind(-1, "overrideKey", instance);
+    public static final SettingKeybind uuidKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "uuidKey", instance);
+    public static final SettingKeybind skyblockIdKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "skyblockIdKey", instance);
+    public static final SettingKeybind overrideKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "overrideKey", instance);
     public static final SettingBool playOverrideSound = new SettingBool(false, "playOverrideSound", instance);
     public static final SettingBool protectUUID = new SettingBool(false, "protectUUID", instance);
     public static final SettingBool protectSkyblockId = new SettingBool(false, "protectSkyblockId", instance);

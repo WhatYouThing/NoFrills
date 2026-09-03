@@ -34,7 +34,7 @@ public class LoadoutKeybinds {
     public static final Feature instance = new Feature("loadoutKeybinds");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind editBindKey = new SettingKeybind(-1, "editBindKey", instance);
+    public static final SettingKeybind editBindKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "editBindKey", instance);
     public static final SettingBool playSound = new SettingBool(false, "playSound", instance);
     public static final SettingString sound = new SettingString("block.note_block.cow_bell", "sound", instance);
     public static final SettingDouble volume = new SettingDouble(2.0, "volume", instance);

@@ -29,15 +29,15 @@ public class WardrobeKeybinds {
     public static final SettingString sound = new SettingString("entity.horse.armor", "soundIdentifier", instance);
     public static final SettingDouble volume = new SettingDouble(0.7, "volume", instance);
     public static final SettingDouble pitch = new SettingDouble(1.0, "pitch", instance);
-    public static final SettingKeybind custom1 = new SettingKeybind(-1, "custom1", instance.key());
-    public static final SettingKeybind custom2 = new SettingKeybind(-1, "custom2", instance.key());
-    public static final SettingKeybind custom3 = new SettingKeybind(-1, "custom3", instance.key());
-    public static final SettingKeybind custom4 = new SettingKeybind(-1, "custom4", instance.key());
-    public static final SettingKeybind custom5 = new SettingKeybind(-1, "custom5", instance.key());
-    public static final SettingKeybind custom6 = new SettingKeybind(-1, "custom6", instance.key());
-    public static final SettingKeybind custom7 = new SettingKeybind(-1, "custom7", instance.key());
-    public static final SettingKeybind custom8 = new SettingKeybind(-1, "custom8", instance.key());
-    public static final SettingKeybind custom9 = new SettingKeybind(-1, "custom9", instance.key());
+    public static final SettingKeybind custom1 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom1", instance.key());
+    public static final SettingKeybind custom2 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom2", instance.key());
+    public static final SettingKeybind custom3 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom3", instance.key());
+    public static final SettingKeybind custom4 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom4", instance.key());
+    public static final SettingKeybind custom5 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom5", instance.key());
+    public static final SettingKeybind custom6 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom6", instance.key());
+    public static final SettingKeybind custom7 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom7", instance.key());
+    public static final SettingKeybind custom8 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom8", instance.key());
+    public static final SettingKeybind custom9 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom9", instance.key());
 
     private static final List<SettingKeybind> customKeys = List.of(
             custom1,

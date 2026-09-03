@@ -38,7 +38,7 @@ import static nofrills.Main.mc;
 public final class SlotBinding {
     public static final Feature instance = new Feature("slotBinding");
 
-    public static final SettingKeybind keybind = new SettingKeybind(-1, "keybind", instance.key());
+    public static final SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "keybind", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
     public static final SettingBool lines = new SettingBool(false, "lines", instance.key());
     public static final SettingDouble lineWidth = new SettingDouble(2.0, "lineWidth", instance.key());

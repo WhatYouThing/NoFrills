@@ -32,7 +32,7 @@ public class SlotLocking {
     public static final Feature instance = new Feature("slotLocking");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind keybind = new SettingKeybind(-1, "keybind", instance);
+    public static final SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "keybind", instance);
     public static final SettingBool overlay = new SettingBool(true, "overlay", instance);
     public static final SettingColor color = new SettingColor(RenderColor.fromFormat(ChatFormatting.YELLOW).withAlpha(0.33f), "color", instance);
 

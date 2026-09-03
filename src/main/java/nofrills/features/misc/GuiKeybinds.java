@@ -21,11 +21,11 @@ import static nofrills.Main.mc;
 public class GuiKeybinds {
     public static final Feature instance = new Feature("guiKeybinds");
 
-    public static final SettingKeybind next = new SettingKeybind(-1, "next", instance.key());
-    public static final SettingKeybind previous = new SettingKeybind(-1, "previous", instance.key());
-    public static final SettingKeybind up = new SettingKeybind(-1, "up", instance.key());
-    public static final SettingKeybind down = new SettingKeybind(-1, "down", instance.key());
-    public static final SettingKeybind back = new SettingKeybind(-1, "back", instance.key());
+    public static final SettingKeybind next = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "next", instance.key());
+    public static final SettingKeybind previous = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "previous", instance.key());
+    public static final SettingKeybind up = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "up", instance.key());
+    public static final SettingKeybind down = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "down", instance.key());
+    public static final SettingKeybind back = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "back", instance.key());
 
     private static ButtonType getButtonType(ItemStack stack) {
         if (!stack.isEmpty() && Utils.getSkyblockId(stack).isEmpty()) {

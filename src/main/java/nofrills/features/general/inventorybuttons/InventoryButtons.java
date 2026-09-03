@@ -39,7 +39,7 @@ public class InventoryButtons {
     public static final Feature instance = new Feature("inventoryButtons");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind manageKey = new SettingKeybind(-1, "addButtonKey", instance);
+    public static final SettingKeybind manageKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "addButtonKey", instance);
     public static final SettingInt gridPrecision = new SettingInt(5, "gridPrecision", instance);
 
     public static void addWidgets(AbstractContainerScreen<?> container) {

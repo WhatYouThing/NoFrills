@@ -25,7 +25,7 @@ public class RecipeLookup {
     public static final Feature instance = new Feature("recipeLookup");
 
     public static final SettingEnum<Mode> mode = new SettingEnum<>(Mode.Recipe, Mode.class, "mode", instance);
-    public static final SettingKeybind keybind = new SettingKeybind(-1, "bind", instance.key());
+    public static final SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "bind", instance.key());
 
     @EventHandler
     public static void onKey(InputEvent event) {

@@ -33,7 +33,7 @@ public class DianaSolver {
     public static final SettingColor treasureColor = new SettingColor(RenderColor.fromArgb(0xaaffaa00), "treasureColor", instance);
     public static final SettingColor enemyColor = new SettingColor(RenderColor.fromArgb(0xaaff5555), "enemyColor", instance);
     public static final SettingColor startColor = new SettingColor(RenderColor.fromArgb(0xaa55ff55), "startColor", instance);
-    public static final SettingKeybind warpKey = new SettingKeybind(-1, "warpKey", instance);
+    public static final SettingKeybind warpKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "warpKey", instance);
     public static final SettingBool warpMsg = new SettingBool(false, "warpMsg", instance);
     public static final SettingBool hubToggle = new SettingBool(true, "hubToggle", instance);
     public static final SettingBool stonksToggle = new SettingBool(true, "stonksToggle", instance);

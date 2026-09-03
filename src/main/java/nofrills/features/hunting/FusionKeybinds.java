@@ -22,9 +22,9 @@ public class FusionKeybinds {
 
     // ta? https://github.com/hannibal002/SkyHanni/commit/571f3976570092cc054f201a8fd71c7d672393f2
 
-    public static final SettingKeybind repeat = new SettingKeybind(-1, "repeat", instance.key());
-    public static final SettingKeybind confirm = new SettingKeybind(-1, "confirm", instance.key());
-    public static final SettingKeybind cancel = new SettingKeybind(-1, "cancel", instance.key());
+    public static final SettingKeybind repeat = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "repeat", instance.key());
+    public static final SettingKeybind confirm = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "confirm", instance.key());
+    public static final SettingKeybind cancel = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "cancel", instance.key());
 
     private static boolean isBindValid(ItemStack stack, String title, int key) {
         if (!stack.isEmpty()) {

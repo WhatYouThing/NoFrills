@@ -221,6 +221,7 @@ public final class SlotBinding {
                     }
                     lastSlot = emptySlot;
                 }
+                event.cancel();
             }
         }
     }
@@ -261,7 +262,7 @@ public final class SlotBinding {
     }
 
     @EventHandler
-    private static void onBeforeTooltip(TooltipRenderEvent.Before event) {
+    private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && lastSlot.isValid()) {
             event.cancel();
         }

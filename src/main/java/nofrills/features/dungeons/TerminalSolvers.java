@@ -277,7 +277,7 @@ public class TerminalSolvers {
     }
 
     @EventHandler
-    private static void onBeforeTooltip(TooltipRenderEvent.Before event) {
+    private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && !getTerminalType(event.title).equals(TerminalType.None)) {
             event.cancel();
         }

@@ -23,7 +23,7 @@ public class TooltipRenderEvent extends Cancellable {
         this.replacement = null;
         this.stack = stack;
         this.customData = Utils.getCustomData(stack);
-        this.title = mc.screen != null ? mc.screen.getTitle().getString() : "";
+        this.title = mc.gui.screen() != null ? mc.gui.screen().getTitle().getString() : "";
     }
 
     public void addLine(Component line) {

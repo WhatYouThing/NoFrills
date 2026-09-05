@@ -51,6 +51,7 @@ public class HudManager {
             new ShardTrackerDisplay(),
             new SkillTrackerDisplay(),
             new KickCooldownTimer(),
+            new CalendarEvents(),
             dungeonMap,
             pickAbilityTimer
     );
@@ -155,6 +156,11 @@ public class HudManager {
     @EventHandler
     private static void onInventory(InventoryUpdateEvent event) {
         forEachListening(element -> element.onInventoryUpdate(event));
+    }
+
+    @EventHandler
+    private static void onSlotClick(SlotClickEvent event) {
+        forEachListening(element -> element.onSlotClick(event));
     }
 
     public static class CustomTitle {

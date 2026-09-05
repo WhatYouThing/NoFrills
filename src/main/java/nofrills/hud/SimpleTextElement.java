@@ -70,15 +70,17 @@ public abstract class SimpleTextElement extends HudElement {
     }
 
     public void setText(String text) {
-        this.label.text(Component.literal(text).withColor(this.getTextColor()));
+        this.setText(Component.literal(text));
     }
 
     public void setText(MutableComponent text) {
-        this.label.text(text.withColor(this.getTextColor()));
+        MutableComponent withColor = text.withColor(this.getTextColor());
+        this.label.text(withColor);
+        this.text = withColor;
     }
 
     public void setDefaultText() {
-        this.label.text(this.defaultText);
+        this.setText(this.defaultText);
     }
 
     public final int getTextColor() {

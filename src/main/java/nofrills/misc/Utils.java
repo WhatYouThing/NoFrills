@@ -13,7 +13,6 @@ import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.ChatFormatting;
@@ -201,12 +200,7 @@ public class Utils {
         if (message.getStyle().getColor() == null) {
             message.withColor(0xffffff);
         }
-        Runnable runnable = () -> mc.gui.getChat().addMessage(getTag().append(message), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator);
-        if (RenderSystem.isOnRenderThread()) {
-            runnable.run();
-        } else {
-            mc.schedule(runnable);
-        }
+        mc.execute(() -> mc.gui.getChat().addMessage(getTag().append(message), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator));
     }
 
     public static void infoFormat(String message, Object... values) {
@@ -1159,9 +1153,9 @@ public class Utils {
         }
         StringBuilder builder = new StringBuilder();
         long current = ticks;
-        String[] units = new String[]{"h", "m", "s"};
-        int[] durations = new int[]{72000, 1200, 20};
-        for (int i = 0; i <= 2; i++) {
+        String[] units = new String[]{"d", "h", "m", "s"};
+        int[] durations = new int[]{1728000, 72000, 1200, 20};
+        for (int i = 0; i < units.length; i++) {
             int amount = 0;
             while (current >= durations[i]) {
                 amount++;

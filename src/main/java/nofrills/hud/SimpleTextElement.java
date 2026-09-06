@@ -23,8 +23,8 @@ public abstract class SimpleTextElement extends HudElement {
     public final SettingEnum<TextAlignment> textAlignment;
     public final SettingBool textShadow;
     public final SettingColor textColor;
+    public final MutableComponent defaultText;
     public MutableComponent text;
-    public MutableComponent defaultText;
     public LabelComponent label;
 
     protected SimpleTextElement(MutableComponent text, Feature instance, String label) {
@@ -41,8 +41,7 @@ public abstract class SimpleTextElement extends HudElement {
 
     @Override
     public boolean shouldRender() {
-        boolean shouldRender = super.shouldRender();
-        if (shouldRender) {
+        if (super.shouldRender()) {
             HorizontalAlignment alignment = switch (this.textAlignment.value()) {
                 case Left -> HorizontalAlignment.LEFT;
                 case Center -> HorizontalAlignment.CENTER;
@@ -51,8 +50,9 @@ public abstract class SimpleTextElement extends HudElement {
             this.label.shadow(this.textShadow.value());
             this.label.horizontalTextAlignment(alignment);
             this.layout.horizontalAlignment(alignment);
+            return true;
         }
-        return shouldRender;
+        return false;
     }
 
     @Override
@@ -70,15 +70,17 @@ public abstract class SimpleTextElement extends HudElement {
     }
 
     public void setText(String text) {
-        this.label.text(Component.literal(text).withColor(this.getTextColor()));
+        this.setText(Component.literal(text));
     }
 
     public void setText(MutableComponent text) {
-        this.label.text(text.withColor(this.getTextColor()));
+        MutableComponent withColor = text.withColor(this.getTextColor());
+        this.label.text(withColor);
+        this.text = withColor;
     }
 
     public void setDefaultText() {
-        this.label.text(this.defaultText);
+        this.setText(this.defaultText);
     }
 
     public final int getTextColor() {

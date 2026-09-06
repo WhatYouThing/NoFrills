@@ -161,9 +161,8 @@ public class VesuviusSolver {
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && valueTooltip.value() && Utils.isInLootArea()) {
-            Slot slot = Utils.getFocusedSlot();
-            if (slot != null && chestValues.containsKey(slot)) {
-                double value = chestValues.get(slot);
+            if (event.slot != null && chestValues.containsKey(event.slot)) {
+                double value = chestValues.get(event.slot);
                 MutableComponent valueText = Component.literal(Utils.formatSeparator(value)).withColor(value > 0 ? RenderColor.GREEN.argb : RenderColor.RED.argb);
                 event.addLine(Utils.getShortTag().append("§bChest Value: §r").append(valueText));
             }

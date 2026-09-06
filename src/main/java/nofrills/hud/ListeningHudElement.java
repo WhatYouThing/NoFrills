@@ -30,4 +30,7 @@ public interface ListeningHudElement {
 
     default void onInventoryUpdate(InventoryUpdateEvent event) {
     }
+
+    default void onSlotClick(SlotClickEvent event) {
+    }
 }

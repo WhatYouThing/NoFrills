@@ -2,6 +2,7 @@ package nofrills.hud.elements;
 
 import com.google.gson.JsonObject;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextColor;
@@ -15,7 +16,6 @@ import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.Utils;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.List;
@@ -23,7 +23,6 @@ import java.util.List;
 public final class BeaconPower extends SimpleTextElement implements ListeningHudElement {
     public final DataFile data = Config.getDataFile("BeaconPowerData.json");
     public final SettingBool hideIfInactive = new SettingBool(false, "hideIfInactive", this.instance);
-    private boolean active = false;
 
     public BeaconPower() {
         super(Component.literal("Beacon: §7Inactive"), new Feature("beaconPowerElement"), "Beacon Power");
@@ -38,7 +37,7 @@ public final class BeaconPower extends SimpleTextElement implements ListeningHud
     public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
-        } else if (this.hideIfInactive.value() && !this.active) {
+        } else if (!this.isEditingHud() && this.hideIfInactive.value() && this.text == this.defaultText) {
             return;
         }
         super.draw(context, mouseX, mouseY, partialTicks, delta);
@@ -48,29 +47,18 @@ public final class BeaconPower extends SimpleTextElement implements ListeningHud
     public void onClientTick() {
         JsonObject object = this.data.get();
         if (object.has("statDuration")) {
-            Instant instant = Instant.now();
+            long now = Instant.now().toEpochMilli();
             long statDuration = object.get("statDuration").getAsLong();
-            if (instant.toEpochMilli() <= statDuration) {
+            if (now <= statDuration) {
                 if (!object.has("statColor") || !object.has("statText")) return;
                 MutableComponent stat = Component.literal(object.get("statText").getAsString()).withColor(object.get("statColor").getAsInt());
-                Duration duration = Duration.between(instant, Instant.ofEpochMilli(statDuration));
-                StringBuilder time = new StringBuilder();
-                int[] parts = new int[]{(int) duration.toDaysPart(), duration.toHoursPart(), duration.toMinutesPart(), duration.toSecondsPart()};
-                String[] units = new String[]{"d", "h", "m", "s"};
-                for (int i = 0; i < units.length; i++) {
-                    if (parts[i] != 0) {
-                        time.append(parts[i]).append(units[i]).append(" ");
-                    }
-                }
-                this.setText(Component.literal("Beacon: ").append(stat).append(" §7" + time.toString().trim()));
-                this.active = true;
+                this.setText(Component.literal("Beacon: ")
+                        .append(stat)
+                        .append(Component.literal(" " + Utils.millisecondsToTime(statDuration - now)).withStyle(ChatFormatting.GRAY)));
                 return;
             }
         }
-        if (this.active) {
-            this.setText("Beacon: §7Inactive");
-            this.active = false;
-        }
+        this.setDefaultText();
     }
 
     @Override

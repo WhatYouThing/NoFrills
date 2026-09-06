@@ -1,7 +1,6 @@
 package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.events.EventListener;
@@ -9,8 +8,6 @@ import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.Utils;
 
 import java.util.Calendar;
-
-import static nofrills.Main.mc;
 
 @EventListener
 public class CalendarDate {
@@ -22,7 +19,7 @@ public class CalendarDate {
 
     @EventHandler
     private static void onTooltip(TooltipRenderEvent event) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container && container.getTitle().getString().equals("Calendar and Events")) {
+        if (instance.isActive() && event.title.equals("Calendar and Events")) {
             for (Component line : event.lines) {
                 String l = Utils.toPlain(line);
                 if (l.startsWith("Starts in: ")) {

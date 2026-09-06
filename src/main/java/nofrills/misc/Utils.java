@@ -19,6 +19,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -892,7 +893,7 @@ public class Utils {
     }
 
     public static Slot getFocusedSlot() {
-        return mc.screen != null ? ((AbstractContainerScreenAccessor) mc.screen).getHoveredSlot() : null;
+        return mc.screen instanceof AbstractContainerScreen<?> container ? ((AbstractContainerScreenAccessor) container).getHoveredSlot() : null;
     }
 
     private static int romanToInt(Character roman) {

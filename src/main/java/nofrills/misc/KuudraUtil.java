@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Giant;
 import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.phys.Vec3;
@@ -12,6 +13,7 @@ import nofrills.events.ServerJoinEvent;
 import nofrills.events.WorldTickEvent;
 
 import java.util.List;
+import java.util.Optional;
 
 import static nofrills.Main.mc;
 
@@ -41,6 +43,19 @@ public class KuudraUtil {
         return (MagmaCube) kuudraCache.getFirst();
     }
 
+    public static Optional<Float> getKuudraHealth() {
+        MagmaCube kuudra = getKuudraEntity();
+        if (kuudra == null) return Optional.empty();
+        float health = kuudra.getHealth();
+        if (getCurrentPhase().equals(Phase.Lair)) {
+            return Optional.of(240000000.0f * (health / 25000.f));
+        }
+        if (health == 1024.0f) {
+            return Optional.of(100000.0f);
+        }
+        return Optional.of(health);
+    }
+
     public static PickupSpot getPreSpot() {
         return preSpot;
     }
@@ -53,22 +68,10 @@ public class KuudraUtil {
     }
 
     private static void updateKuudraEntity() {
-        if (kuudraCache.empty()) {
-            MagmaCube kuudra = null;
-            double maxY = 0;
-            int cubesFound = 0;
-            for (Entity ent : Utils.getEntities()) {
-                if (ent instanceof MagmaCube cube && cube.getSize() == 30) {
-                    double y = ent.position().y();
-                    cubesFound++;
-                    if (y > maxY) {
-                        kuudra = cube;
-                        maxY = y;
-                    }
-                }
-            }
-            if (kuudra != null && (cubesFound == 2 || currentPhase.equals(Phase.Lair))) {
-                kuudraCache.add(kuudra);
+        if (!kuudraCache.empty()) return;
+        for (Entity ent : Utils.getEntities()) {
+            if (ent instanceof MagmaCube cube && cube.getSize() == 30 && cube.getAttributeBaseValue(Attributes.MAX_HEALTH) == 100000.0f) {
+                kuudraCache.add(cube);
             }
         }
     }

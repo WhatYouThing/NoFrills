@@ -211,11 +211,9 @@ public class WitherDragons {
             for (Dragon drag : dragons) {
                 if (timer.value() && drag.isSpawning()) {
                     float seconds = drag.spawnTicks / 20.0f;
-                    String timerText = Utils.format("{}{}s",
-                            Utils.getPercentageColor(seconds / 5.0, true),
-                            Utils.formatDecimal(seconds, 3)
-                    );
-                    event.drawText(drag.pos.getCenter().add(0.0, 4.0, 0.0), Component.literal(timerText), 0.3f, true, RenderColor.WHITE);
+                    MutableComponent timerText = Component.literal(Utils.formatDecimal(seconds, 3) + "s")
+                            .withColor(Utils.getPercentageColor(seconds / 5.0, true).getHex());
+                    event.drawText(drag.pos.getCenter().add(0.0, 4.0, 0.0), timerText, 0.3f, true, RenderColor.WHITE);
                 }
                 if (boxes.value() && (drag.isSpawning() || drag.hasEntity())) {
                     event.drawOutline(drag.area, true, drag.color);
@@ -238,12 +236,10 @@ public class WitherDragons {
                 }
                 if (health.value() && drag.hasEntity()) {
                     double maxHealth = drag.maxHealth > 0.0 ? drag.maxHealth : 200.0;
-                    String healthText = Utils.format("{}{}M",
-                            Utils.getPercentageColor(drag.health / maxHealth, true),
-                            Utils.formatDecimal(drag.health * 0.000001)
-                    );
+                    MutableComponent healthText = Component.literal(Utils.formatDecimal(drag.health * 0.000001) + "M")
+                            .withColor(Utils.getPercentageColor(drag.health / maxHealth, true).getHex());
                     Vec3 pos = drag.getEntity().getPosition(event.delta());
-                    event.drawText(pos, Component.literal(healthText), 0.2f, true, RenderColor.WHITE);
+                    event.drawText(pos, healthText, 0.2f, true, RenderColor.WHITE);
                 }
             }
             if (tracers.value()) {

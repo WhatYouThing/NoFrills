@@ -7,6 +7,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.events.EventListener;
@@ -103,19 +104,11 @@ public class HoneycombTimer {
             long timestamp = Instant.now().toEpochMilli();
             for (Honeycomb honeycomb : honeycombs) {
                 long timeLeft = honeycomb.timestamp() - timestamp;
-                String text = Utils.format("{}#{}: {}",
-                        Utils.getPercentageColor(timeLeft / 3600000.0),
-                        honeycombs.indexOf(honeycomb) + 1,
-                        timeLeft <= 0 ? "Ready" : Utils.millisecondsToTime(timeLeft)
-                );
+                String time = timeLeft <= 0 ? "Ready" : Utils.millisecondsToTime(timeLeft);
+                MutableComponent text = Component.literal("#" + (honeycombs.indexOf(honeycomb) + 1) + ": " + time)
+                        .withColor(Utils.getPercentageColor(timeLeft / 3600000.0).getHex());
                 event.drawBeam(honeycomb.pos().getCenter().add(0.0, 0.5, 0.0), 256, true, color.value());
-                event.drawDistanceScaledText(
-                        honeycomb.pos().getCenter(),
-                        Component.literal(text),
-                        scale.valueFloat() * 0.1f,
-                        true,
-                        RenderColor.WHITE
-                );
+                event.drawDistanceScaledText(honeycomb.pos().getCenter(), text, scale.valueFloat() * 0.1f, true, RenderColor.WHITE);
             }
         }
     }

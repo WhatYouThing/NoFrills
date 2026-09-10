@@ -8,6 +8,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Config;
@@ -261,6 +262,9 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             })).then(literal("dumpScoreboard").executes(context -> {
                 DebugStuff.dumpScoreboard();
+                return SINGLE_SUCCESS;
+            })).then(literal("printVersion").executes(context -> {
+                Utils.infoFormat("mc: {}, mod: {}", SharedConstants.getCurrentVersion().name(), Utils.getModContainer().getMetadata().getVersion().getFriendlyString());
                 return SINGLE_SUCCESS;
             }))),
             new ModCommand("shardTracker", "Commands for managing the Shard Tracker feature.", literal("shardTracker").executes(context -> {

@@ -1207,7 +1207,7 @@ public class Utils {
     }
 
     public static void setScreen(Screen screen) {
-        mc.schedule(() -> mc.setScreen(screen));
+        mc.execute(() -> mc.setScreen(screen));
     }
 
     public static void click(int containerId, int slotId, int button, ContainerInput containerInput) {

@@ -35,8 +35,8 @@ public class TimerElement extends SimpleTextElement {
         return Utils.formatDecimal(time * 0.001) + "s";
     }
 
-    public String getTimeColor(long timeLeft) {
-        return Utils.getPercentageColor((double) timeLeft / this.duration);
+    public int getTimeColor(long timeLeft) {
+        return Utils.getPercentageColor((double) timeLeft / this.duration).getHex();
     }
 
     public String getTimerText() {
@@ -46,7 +46,7 @@ public class TimerElement extends SimpleTextElement {
     public void updateTimer() {
         long timeLeft = this.time - Util.getMillis();
         if (timeLeft > 0) {
-            this.setText(Utils.format(this.getTimerText(), this.getTimeColor(timeLeft) + this.millisecondsAsTime(timeLeft)));
+            this.setText(Utils.formatText(this.getTimerText(), Component.literal(this.millisecondsAsTime(timeLeft)).withColor(this.getTimeColor(timeLeft))));
         } else if (this.time != 0) {
             this.pause();
         }

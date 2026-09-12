@@ -15,6 +15,7 @@ import nofrills.hud.clickgui.components.ToggleButton;
 import nofrills.hud.elements.Armor;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -55,13 +56,13 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
         super.drawComponentTooltip(context, mouseX, mouseY, delta);
         int center = context.guiWidth() / 2;
         context.centeredText(mc.font, "NoFrills HUD Editor", center, 10, RenderColor.WHITE.argb);
-        context.centeredText(mc.font, "Left click element to hide", center, 20, RenderColor.WHITE.argb);
+        context.centeredText(mc.font, "Left click element to toggle visibility", center, 20, RenderColor.WHITE.argb);
         context.centeredText(mc.font, "Right click element to view its settings", center, 30, RenderColor.WHITE.argb);
         context.centeredText(mc.font, "Right click screen to add/remove elements", center, 40, RenderColor.WHITE.argb);
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
+    public boolean mouseClicked(@NonNull MouseButtonEvent click, boolean doubled) {
         if (this.uiAdapter == null) {
             return false;
         }

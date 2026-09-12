@@ -1,9 +1,9 @@
 package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.monster.cubemob.MagmaCube;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.ListeningHudElement;
@@ -14,17 +14,17 @@ import nofrills.misc.KuudraUtil;
 import nofrills.misc.Utils;
 
 import java.util.List;
+import java.util.Optional;
 
 public final class BossHealth extends SimpleTextElement implements ListeningHudElement {
     private final SettingBool dungeon = new SettingBool(true, "dungeon", this.instance);
     private final SettingBool kuudra = new SettingBool(true, "kuudra", this.instance);
-    private boolean visible = false;
     private int kuudraTicks = 0;
     private float kuudraHealth = 0.0f;
     private float kuudraDPS = 0.0f;
 
     public BossHealth() {
-        super(Component.literal("Boss Health"), new Feature("bossHealthElement"), "Boss Health");
+        super(Component.literal("Boss Health: N/A"), new Feature("bossHealthElement"), "Boss Health");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Dungeon", this.dungeon, "If enabled, the health of the dungeon bosses is displayed."),
                 new Settings.Toggle("Kuudra", this.kuudra, "If enabled, the health of Kuudra is displayed.")
@@ -37,7 +37,7 @@ public final class BossHealth extends SimpleTextElement implements ListeningHudE
     public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
-        } else if (!this.isEditingHud() && !this.visible) {
+        } else if (!this.isEditingHud() && this.text == this.defaultText) {
             return;
         }
         super.draw(context, mouseX, mouseY, partialTicks, delta);
@@ -47,60 +47,62 @@ public final class BossHealth extends SimpleTextElement implements ListeningHudE
     public void onClientTick() {
         List<LerpingBossEvent> bossBars = Utils.getBossBars();
         if (bossBars.isEmpty()) {
-            this.visible = false;
+            this.setDefaultText();
             return;
         }
         LerpingBossEvent bar = bossBars.getFirst();
         if (dungeon.value() && Utils.isInDungeons() && !Utils.isInstanceOver()) {
             String name = Utils.toPlain(bar.getName());
-            if (DungeonUtil.isInBossRoom() || name.equals("The Watcher")) {
-                this.setHealth("§l" + name, bar.getProgress());
+            if (DungeonUtil.isInBossRoom() || name.contains("The Watcher")) {
+                this.setText(Component.literal(name)
+                        .append(": ")
+                        .append(Component.literal(Utils.formatDecimal(bar.getProgress() * 100.0) + "%")
+                                .withColor(Utils.getPercentageColor(bar.getProgress()).getHex())
+                        ));
                 return;
             }
         }
         if (kuudra.value() && Utils.isInKuudra() && !Utils.isInstanceOver()) {
-            MagmaCube kuudra = KuudraUtil.getKuudraEntity();
+            Optional<Float> health = KuudraUtil.getKuudraHealth();
             KuudraUtil.Phase phase = KuudraUtil.getCurrentPhase();
             if (phase.equals(KuudraUtil.Phase.DPS)) {
-                if (kuudra == null) {
-                    this.setHealth("§lKuudra", bar.getProgress());
-                } else {
-                    this.setHealth("§lKuudra", kuudra.getHealth() / 100000);
-                }
+                float percent = health.map(value -> value / 100000.0f).orElseGet(bar::getProgress);
+                this.setText(Component.literal("Kuudra")
+                        .append(": ")
+                        .append(Component.literal(Utils.formatDecimal(percent * 100.0) + "%")
+                                .withColor(Utils.getPercentageColor(percent).getHex())
+                        ));
                 return;
             }
-            if (phase.equals(KuudraUtil.Phase.Lair)) {
-                float currentHealth = kuudra == null ? 0.0f : (kuudra.getHealth() - 1024.0f) * 10000.0f;
+            if (phase.equals(KuudraUtil.Phase.Lair) && health.isPresent()) {
+                float currentHealth = health.get();
                 this.kuudraTicks++;
                 if (this.kuudraTicks >= 20) {
                     this.kuudraDPS = Math.max(0, this.kuudraHealth - currentHealth);
                     this.kuudraHealth = currentHealth;
                     this.kuudraTicks = 0;
                 }
-                this.setHealth("§lKuudra", Utils.format("§e{}M §7({}M DPS)",
-                        Utils.formatDecimal(currentHealth * 0.000001),
-                        Utils.formatDecimal(this.kuudraDPS * 0.000001)
-                ));
+                this.setText(Component.literal("Kuudra")
+                        .append(": ")
+                        .append(Component.literal(Utils.formatDecimal(currentHealth * 0.000001) + "M")
+                                .withColor(Utils.getPercentageColor(currentHealth / 240_000_000.0f).getHex())
+                        )
+                        .append(" ")
+                        .append(Component.literal("(" + Utils.formatDecimal(this.kuudraDPS * 0.000001) + "M DPS)")
+                                .withStyle(ChatFormatting.GRAY)
+                        )
+                );
                 return;
             }
         }
-        this.visible = false;
+        this.setDefaultText();
     }
 
     @Override
     public void onServerJoin() {
-        this.visible = false;
+        this.setDefaultText();
         this.kuudraTicks = 0;
         this.kuudraHealth = 0.0f;
         this.kuudraDPS = 0.0f;
-    }
-
-    private void setHealth(String label, String health) {
-        this.setText(Utils.format("{}§r: {}", label, health));
-        this.visible = true;
-    }
-
-    private void setHealth(String label, float percent) {
-        this.setHealth(label, Utils.getPercentageColor(percent, true) + Utils.formatDecimal(percent * 100) + "%");
     }
 }

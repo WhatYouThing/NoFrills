@@ -5,11 +5,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
-import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.SharedConstants;
 import nofrills.config.Feature;
 import nofrills.events.EventListener;
 import nofrills.events.WorldTickEvent;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -100,14 +101,16 @@ public class NoFrillsAPI {
     );
 
     public static String makeRequest(String endpoint) throws Exception {
-        ModContainer container = Utils.getModContainer();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://whatyouth.ing/api/nofrills/" + endpoint))
-                .header("X-NoFrills-ModVer", container.getMetadata().getVersion().getFriendlyString())
-                .header("X-NoFrills-GameVer", mc.getLaunchedVersion())
+                .header("X-NoFrills-ModVer", Utils.getModContainer().getMetadata().getVersion().getFriendlyString())
+                .header("X-NoFrills-GameVer", SharedConstants.getCurrentVersion().name())
                 .GET()
                 .build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() != 200) {
+            throw new IOException(Utils.format("API request to {} failed with status code: {}", response.uri().toString(), response.statusCode()));
+        }
         return response.body();
     }
 

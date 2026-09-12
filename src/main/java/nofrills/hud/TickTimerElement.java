@@ -51,12 +51,12 @@ public class TickTimerElement extends SimpleTextElement implements ListeningHudE
         return Utils.formatDecimal(ticks / 20.0) + "s";
     }
 
-    public String getTimeColor() {
-        return Utils.getPercentageColor((double) this.ticks / this.startTicks, true);
+    public int getTimeColor() {
+        return Utils.getPercentageColor((double) this.ticks / this.startTicks, true).getHex();
     }
 
     public void updateTimer() {
-        this.setText(Utils.format(this.timerText, this.getTimeColor() + this.ticksAsTime(this.ticks)));
+        this.setText(Utils.formatText(this.timerText, Component.literal(this.ticksAsTime(this.ticks)).withColor(this.getTimeColor())));
     }
 
     public void tick() {

@@ -1106,6 +1106,19 @@ public class Utils {
         return builder.toString();
     }
 
+    public static MutableComponent formatText(String string, Component... values) {
+        MutableComponent text = Component.empty();
+        int index = 0;
+        for (String section : Splitter.on("{}").split(string)) {
+            text.append(section);
+            if (index < values.length) {
+                text.append(values[index]);
+            }
+            index++;
+        }
+        return text;
+    }
+
     public static String formatDecimal(double number) {
         return formatDecimal(number, 2);
     }
@@ -1171,30 +1184,28 @@ public class Utils {
         return ticksToTime(ms / 50);
     }
 
-    public static String getPercentageColor(double percentage, boolean inverse) {
-        if (percentage > 0.66) {
-            return inverse ? ChatFormatting.GREEN.toString() : ChatFormatting.RED.toString();
+    public static RenderColor getPercentageColor(double percentage, boolean inverse) {
+        float value = (float) Math.clamp(percentage, 0.0, 1.0);
+        if (inverse) {
+            return RenderColor.WHITE.scaled(2.0f - value * 2.0f, value * 2.0f, 0.0f);
         }
-        if (percentage > 0.33) {
-            return ChatFormatting.GOLD.toString();
-        }
-        return inverse ? ChatFormatting.RED.toString() : ChatFormatting.GREEN.toString();
+        return RenderColor.WHITE.scaled(value * 2.0f, 2.0f - value * 2.0f, 0.0f);
     }
 
-    public static String getPercentageColor(float percentage, boolean inverse) {
+    public static RenderColor getPercentageColor(float percentage, boolean inverse) {
         return getPercentageColor((double) percentage, inverse);
     }
 
-    public static String getPercentageColor(double percentage) {
+    public static RenderColor getPercentageColor(double percentage) {
         return getPercentageColor(percentage, false);
     }
 
-    public static String getPercentageColor(float percentage) {
+    public static RenderColor getPercentageColor(float percentage) {
         return getPercentageColor((double) percentage, false);
     }
 
     public static void setScreen(Screen screen) {
-        mc.schedule(() -> mc.gui.setScreen(screen));
+        mc.execute(() -> mc.gui.setScreen(screen));
     }
 
     public static void click(int containerId, int slotId, int button, ContainerInput containerInput) {

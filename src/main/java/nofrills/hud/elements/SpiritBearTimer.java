@@ -1,5 +1,6 @@
 package nofrills.hud.elements;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Blocks;
 import nofrills.config.Feature;
 import nofrills.events.BlockUpdateEvent;
@@ -43,8 +44,8 @@ public final class SpiritBearTimer extends TickTimerElement implements Listening
         } else {
             int needed = DungeonUtil.isOnFloor("M4") ? 30 : 25;
             int kills = (int) Math.floor(needed * (this.count / 165.0));
-            this.setText(Utils.format(this.timerText,
-                    Utils.getPercentageColor(kills / (double) needed, true) + kills + "/" + needed)
+            this.setText(Utils.formatText(this.timerText,
+                    Component.literal(kills + "/" + needed).withColor(Utils.getPercentageColor(kills / (double) needed, true).getHex()))
             );
         }
     }

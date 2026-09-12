@@ -1,8 +1,13 @@
 package nofrills.features.general;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -11,10 +16,15 @@ import nofrills.config.*;
 import nofrills.events.EventListener;
 import nofrills.events.SlotClickEvent;
 import nofrills.events.TooltipRenderEvent;
+import nofrills.misc.RecipeData;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.DoubleStream;
 
 import static nofrills.misc.NoFrillsAPI.*;
 
@@ -28,6 +38,7 @@ public class PriceTooltips {
     public static final SettingBool mote = new SettingBool(false, "mote", instance.key());
     public static final SettingInt burgers = new SettingInt(0, "burgers", instance.key());
     public static final SettingBool pricePaid = new SettingBool(false, "pricePaid", instance);
+    public static final SettingBool craftCost = new SettingBool(false, "craftCost", instance);
 
     private static final DataFile data = Config.getDataFile("PricePaid.json");
 
@@ -85,6 +96,38 @@ public class PriceTooltips {
         return "";
     }
 
+    private static double getCraftCost(String id) {
+        Optional<JsonArray> recipe = RecipeData.getFromCache(id);
+        if (recipe.isEmpty()) {
+            return Math.max(bazaarPricing.getOrDefault(id, BazaarPrice.ZERO).buy(), auctionPricing.getOrDefault(id, 0L));
+        } else {
+            List<List<Double>> costs = new ArrayList<>();
+            for (JsonElement element : recipe.get()) {
+                List<Double> total = new ArrayList<>();
+                JsonObject object = element.getAsJsonObject();
+                for (Map.Entry<String, JsonElement> entry : object.get("items").getAsJsonObject().entrySet()) {
+                    String itemID = entry.getKey();
+                    int itemCount = entry.getValue().getAsInt();
+                    if (itemID.equalsIgnoreCase(id))
+                        continue; // prevent explosion if the item itself is part of the recipe
+                    int quantity = object.get("quantity").getAsInt();
+                    double cost = getCraftCost(itemID);
+                    DoubleStream stream = DoubleStream.of(
+                            bazaarPricing.getOrDefault(itemID, BazaarPrice.ZERO).buy(),
+                            auctionPricing.getOrDefault(itemID, 0L),
+                            cost
+                    ); // provide insta-buy price if raw craft price is higher, often the case for compacted resources
+                    total.add((stream.filter(d -> d > 0.0).min().orElse(0.0) * itemCount) / quantity);
+                }
+                costs.add(total);
+            }
+            return costs.stream()
+                    .mapToDouble(l -> l.stream().mapToDouble(d -> d).sum())
+                    .min()
+                    .orElse(0.0);
+        }
+    }
+
     private static Component buildLine(String name, double price, int quantity) {
         String line = Utils.format(
                 "{}: §6{} {}",
@@ -136,6 +179,18 @@ public class PriceTooltips {
                 String uuid = event.customData.getStringOr("uuid", "");
                 if (!uuid.isEmpty() && data.get().has(uuid)) {
                     event.addLine(buildLine("§ePrice Paid", data.get().get(uuid).getAsLong(), 1));
+                }
+            }
+            if (craftCost.value() && RecipeData.getFromCache(itemId).isPresent()) {
+                double cost = getCraftCost(itemId);
+                if (cost > 0.0) {
+                    MutableComponent text = Utils.getShortTag()
+                            .append(Component.literal("Craft Cost: ").withStyle(ChatFormatting.YELLOW))
+                            .append(Component.literal("~" + Utils.formatSeparator(cost * quantity)).withStyle(ChatFormatting.GOLD));
+                    if (quantity > 1) {
+                        text.append(Component.literal(" (" + quantity + "x " + Utils.formatSeparator(cost) + ")").withStyle(ChatFormatting.DARK_GRAY));
+                    }
+                    event.addLine(text);
                 }
             }
         }

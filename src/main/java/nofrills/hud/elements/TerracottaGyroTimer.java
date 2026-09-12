@@ -28,7 +28,7 @@ public final class TerracottaGyroTimer extends TickTimerElement implements Liste
 
     @Override
     public void onBlockUpdate(BlockUpdateEvent event) {
-        if (!this.isTicking() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE)) {
+        if (!this.isTicking() && event.newState.getBlock().equals(Blocks.NETHER_BRICK_FENCE) && DungeonUtil.isOnFloor("6")) {
             this.setStartTicks(235);
             this.start();
         }

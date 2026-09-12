@@ -1,5 +1,7 @@
 package nofrills.features.general;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -28,7 +30,6 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.WeakHashMap;
 
 import static nofrills.Main.mc;
 import static nofrills.misc.NoFrillsAPI.*;
@@ -55,53 +56,57 @@ public class ItemProtection {
     public static final SettingColor manualOverlay = new SettingColor(RenderColor.fromHex(0xffff7f), "manualOverlay", instance);
 
     private static final Identifier overlaySprite = Identifier.fromNamespaceAndPath("nofrills", "item_protection");
-    private static final WeakHashMap<ItemStack, ProtectType> stackCache = new WeakHashMap<>();
+    private static final Cache<ItemStack, ProtectType> stackCache = CacheBuilder.newBuilder().weakKeys().maximumSize(5000L).build();
     private static boolean isSellGUI = false;
     private static boolean isSalvageGUI = false;
 
-    public static ProtectType getProtectType(ItemStack item) {
+    public static ProtectType getProtectType(ItemStack stack) {
         if (mc.screen instanceof AbstractContainerScreen<?> && overrideKey.isDown()) {
             return ProtectType.None;
         }
-        return stackCache.computeIfAbsent(item, (stack) -> {
-            if (stack.isEmpty()) return ProtectType.None;
-            CompoundTag customData = Utils.getCustomData(stack);
-            if (customData == null) return ProtectType.None;
-            String id = Utils.getMarketId(stack);
-            if (protectUUID.value() && data.value().has("uuids")) {
-                String uuid = customData.getStringOr("uuid", "");
-                if (data.value().getAsJsonArray("uuids").contains(new JsonPrimitive(uuid))) {
-                    return ProtectType.UUID;
-                }
-            }
-            if (protectSkyblockId.value() && data.value().has("ids")) {
-                if (data.value().getAsJsonArray("ids").contains(new JsonPrimitive(id))) {
-                    return ProtectType.SkyblockID;
-                }
-            }
-            if (protectMaxQuality.value() && customData.getIntOr("baseStatBoostPercentage", 0) == 50) {
-                return ProtectType.MaxQuality;
-            }
-            if (protectStarred.value() && customData.getIntOr("upgrade_level", 0) > 0 && !customData.contains("boss_tier")) {
-                return ProtectType.Starred;
-            }
-            if (protectRarityUpgraded.value() && customData.getIntOr("rarity_upgrades", 0) > 0) {
-                return ProtectType.RarityUpgraded;
-            }
-            if (protectValue.value()) {
-                double min = protectValueMin.value();
-                List<Double> prices = new ArrayList<>();
-                if (bazaarPricing.containsKey(id)) prices.add(bazaarPricing.get(id).buy());
-                if (auctionPricing.containsKey(id)) prices.add(Double.valueOf(auctionPricing.get(id)));
-                if (npcPricing.containsKey(id)) prices.add(npcPricing.get(id).coin());
-                for (double price : prices) {
-                    if (price >= min) {
-                        return ProtectType.Value;
+        try {
+            return stackCache.get(stack, () -> {
+                if (stack.isEmpty()) return ProtectType.None;
+                CompoundTag customData = Utils.getCustomData(stack);
+                if (customData == null) return ProtectType.None;
+                String id = Utils.getMarketId(stack);
+                if (protectUUID.value() && data.value().has("uuids")) {
+                    String uuid = customData.getStringOr("uuid", "");
+                    if (data.value().getAsJsonArray("uuids").contains(new JsonPrimitive(uuid))) {
+                        return ProtectType.UUID;
                     }
                 }
-            }
+                if (protectSkyblockId.value() && data.value().has("ids")) {
+                    if (data.value().getAsJsonArray("ids").contains(new JsonPrimitive(id))) {
+                        return ProtectType.SkyblockID;
+                    }
+                }
+                if (protectMaxQuality.value() && customData.getIntOr("baseStatBoostPercentage", 0) == 50) {
+                    return ProtectType.MaxQuality;
+                }
+                if (protectStarred.value() && customData.getIntOr("upgrade_level", 0) > 0 && !customData.contains("boss_tier")) {
+                    return ProtectType.Starred;
+                }
+                if (protectRarityUpgraded.value() && customData.getIntOr("rarity_upgrades", 0) > 0) {
+                    return ProtectType.RarityUpgraded;
+                }
+                if (protectValue.value()) {
+                    double min = protectValueMin.value();
+                    List<Double> prices = new ArrayList<>();
+                    if (bazaarPricing.containsKey(id)) prices.add(bazaarPricing.get(id).buy());
+                    if (auctionPricing.containsKey(id)) prices.add(Double.valueOf(auctionPricing.get(id)));
+                    if (npcPricing.containsKey(id)) prices.add(npcPricing.get(id).coin());
+                    for (double price : prices) {
+                        if (price >= min) {
+                            return ProtectType.Value;
+                        }
+                    }
+                }
+                return ProtectType.None;
+            });
+        } catch (Exception _) {
             return ProtectType.None;
-        });
+        }
     }
 
     public static void drawOverlayIcon(GuiGraphicsExtractor context, int slotX, int slotY, ProtectType type) {
@@ -150,7 +155,7 @@ public class ItemProtection {
                 Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 array.add(primitive);
             }
-            stackCache.remove(stack);
+            stackCache.invalidate(stack);
         });
     }
 
@@ -174,7 +179,7 @@ public class ItemProtection {
                 Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 array.add(primitive);
             }
-            stackCache.remove(stack);
+            stackCache.invalidate(stack);
         });
     }
 

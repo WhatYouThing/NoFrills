@@ -2,7 +2,6 @@ package nofrills.features.solvers;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.phys.AABB;
@@ -15,12 +14,8 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
 @EventListener
-public class SpookyChests {
+public class SpookyChestHighlight {
     public static final Feature instance = new Feature("spookyChests");
 
     public static final SettingBool tracer = new SettingBool(false, "tracer", instance);
@@ -28,6 +23,10 @@ public class SpookyChests {
 
     private static final EntityCache chestList = new EntityCache();
     private static final EntityCache clickedList = new EntityCache();
+
+    private static boolean isSpookyChest(String name) {
+        return name.equalsIgnoreCase("Trick or Treat?") || name.equalsIgnoreCase("Party Chest");
+    }
 
     private static boolean isSpooky() {
         for (String line : SkyblockData.getLines()) {
@@ -40,35 +39,29 @@ public class SpookyChests {
 
     private static void clickChest(Entity ent) {
         if (ent instanceof ArmorStand) {
-            List<Entity> chests = new ArrayList<>(chestList.get());
-            chests.removeIf(clickedList::has);
-            chests.sort(Comparator.comparingDouble(chest -> Utils.horizontalDistance(ent, chest)));
-            if (!chests.isEmpty() && Utils.horizontalDistance(ent, chests.getFirst()) <= 1.5) {
-                clickedList.add(chests.getFirst());
-            }
+            BlockPos pos = ent.blockPosition();
+            chestList.get().stream()
+                    .filter(e -> e.getBlockX() == pos.getX() && e.getBlockZ() == pos.getZ())
+                    .findFirst()
+                    .ifPresent(clickedList::add);
         }
     }
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && isSpooky() && event.entity.isCustomNameVisible() && !chestList.has(event.entity)) {
-            String name = Utils.toLower(event.namePlain);
-            if (name.equals("trick or treat?") || name.equals("party chest")) {
-                Utils.showTitle("§6§lCHEST SPAWNED!", "", 5, 20, 5);
-                Utils.playSound(SoundEvents.VAULT_ACTIVATE, 1.0f, 1.0f);
-                chestList.add(event.entity);
-            }
+        if (instance.isActive() && isSpookyChest(event.namePlain) && isSpooky() && !chestList.has(event.entity)) {
+            chestList.add(event.entity);
         }
     }
 
     @EventHandler
     private static void onInteractEntity(InteractEntityEvent event) {
-        if (instance.isActive() && isSpooky()) clickChest(event.entity);
+        if (instance.isActive() && !chestList.empty() && isSpooky()) clickChest(event.entity);
     }
 
     @EventHandler
     private static void onAttackEntity(AttackEntityEvent event) {
-        if (instance.isActive() && isSpooky()) clickChest(event.entity);
+        if (instance.isActive() && !chestList.empty() && isSpooky()) clickChest(event.entity);
     }
 
     @EventHandler

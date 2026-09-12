@@ -395,9 +395,9 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Superpairs Powerup", ExperimentSolver.superColorPowerup, "The color of the powerup highlight in Superpairs.")
                         ))),
                         new Module("Calendar Date", CalendarDate.instance, "Calculates the exact starting dates of events in the calendar."),
-                        new Module("Spooky Chests", SpookyChests.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(
-                                new Settings.Toggle("Chest Tracer", SpookyChests.tracer, "Draws tracers towards unopened trick or treat chests."),
-                                new Settings.ColorPicker("Color", SpookyChests.color, "The color of the spooky chest highlight.")
+                        new Module("Spooky Chest Highlight", SpookyChestHighlight.instance, "Highlights nearby trick or treat chests during the Spooky Festival.", new Settings(List.of(
+                                new Settings.Toggle("Tracer", SpookyChestHighlight.tracer, "Draws tracers towards unopened trick or treat chests."),
+                                new Settings.ColorPicker("Color", SpookyChestHighlight.color, "The color of the spooky chest highlight.")
                         ))),
                         new Module("Diana Solver", DianaSolver.instance, "Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.", new Settings(List.of(
                                 new Settings.Separator("Burrows"),

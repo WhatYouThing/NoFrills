@@ -28,7 +28,7 @@ public class BeaconTracer {
     private static BlockPos beaconPos = null;
 
     private static boolean isActive() {
-        return instance.isActive() && Utils.isInArea("The End") && SlayerUtil.isFightingBoss(SlayerUtil.voidgloom);
+        return instance.isActive() && Utils.isInArea("The End") && SlayerUtil.isFightingBoss(SlayerUtil.VOIDGLOOM);
     }
 
     @EventHandler

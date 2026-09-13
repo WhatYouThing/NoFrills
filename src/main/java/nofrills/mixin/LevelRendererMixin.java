@@ -46,7 +46,7 @@ public abstract class LevelRendererMixin {
     }
 
     @ModifyExpressionValue(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;shouldRender(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/culling/Frustum;DDD)Z"))
-    private boolean onBeforeRenderEntity(boolean original, @Local Entity entity) {
+    private boolean onBeforeRenderEntity(boolean original, @Local(name = "entity") Entity entity) {
         if (NoRender.instance.isActive() && NoRender.shouldCancelRender(entity)) {
             return false;
         }

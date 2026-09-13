@@ -36,7 +36,7 @@ public class PillarAlert {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive()) {
-            if (SlayerUtil.isFightingBoss(SlayerUtil.blaze)) {
+            if (SlayerUtil.isFightingBoss(SlayerUtil.BLAZE)) {
                 Entity nametag = pillarCache.getFirst();
                 if (nametag != null && nametag.getCustomName() != null) {
                     HudManager.setCustomTitle(nametag.getCustomName().copy(), 1);
@@ -50,7 +50,7 @@ public class PillarAlert {
 
     @EventHandler
     private static void onServerTick(ServerTickEvent event) {
-        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.BLAZE)) {
             if (pillarClearTicks > 0) {
                 pillarClearTicks--;
                 if (pillarClearTicks == 0) {
@@ -62,7 +62,7 @@ public class PillarAlert {
 
     @EventHandler
     private static void onSound(PlaySoundEvent event) {
-        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze) && event.isSound(SoundEvents.CHICKEN_EGG)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.BLAZE) && event.isSound(SoundEvents.CHICKEN_EGG)) {
             Entity spawner = SlayerUtil.getSpawnerEntity();
             if (spawner == null) return;
             if (pillarData.isEmpty()) {

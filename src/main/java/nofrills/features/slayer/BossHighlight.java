@@ -36,9 +36,9 @@ public class BossHighlight {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.blaze) && SlayerUtil.isTimer(event.namePlain)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.BLAZE) && SlayerUtil.isTimer(event.namePlain)) {
             String attunement = event.namePlain.contains(" ") ? event.namePlain.substring(0, event.namePlain.indexOf(" ")) : "";
-            List<Entity> other = Utils.getOtherEntities(event.entity, 1.0, 3.0, 1.0, SlayerUtil.blaze.predicate);
+            List<Entity> other = Utils.getOtherEntities(event.entity, 1.0, 3.0, 1.0, SlayerUtil.BLAZE.predicate);
             Entity owner = Utils.findNametagOwner(event.entity, other);
             if (owner != null) {
                 attunementMap.put(owner.getId(), attunement);
@@ -50,7 +50,7 @@ public class BossHighlight {
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && SlayerUtil.bossAlive) {
-            if (SlayerUtil.isFightingBoss(SlayerUtil.blaze)) {
+            if (SlayerUtil.isFightingBoss(SlayerUtil.BLAZE)) {
                 for (Entity ent : blazeCache.get()) {
                     if (!ent.isAlive()) return;
                     AABB box = Utils.getLerpedBox(ent, event.tickCounter.getGameTimeDeltaPartialTick(true));

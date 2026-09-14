@@ -1,6 +1,7 @@
 package nofrills.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
@@ -11,6 +12,8 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.world.entity.Entity;
@@ -45,11 +48,11 @@ public abstract class LevelRendererMixin {
         pass.executes(() -> eventBus.post(new WorldRenderEvent(cameraState, new PoseStack(), this.levelRenderState)).draw());
     }
 
-    @ModifyExpressionValue(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;shouldRender(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/culling/Frustum;DDD)Z"))
-    private boolean onBeforeRenderEntity(boolean original, @Local(name = "entity") Entity entity) {
+    @WrapOperation(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;shouldRender(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/culling/Frustum;DDD)Z"))
+    private <E extends Entity> boolean onBeforeRenderEntity(EntityRenderDispatcher instance, E entity, Frustum culler, double camX, double camY, double camZ, Operation<Boolean> original) {
         if (NoRender.instance.isActive() && NoRender.shouldCancelRender(entity)) {
             return false;
         }
-        return original;
+        return original.call(instance, entity, culler, camX, camY, camZ);
     }
 }

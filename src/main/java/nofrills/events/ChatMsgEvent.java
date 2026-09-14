@@ -19,4 +19,12 @@ public class ChatMsgEvent extends Cancellable {
     public String msg() {
         return this.messagePlain;
     }
+
+    public boolean isPartyFinderJoin() {
+        return this.messagePlain.startsWith("Party Finder >") && this.messagePlain.contains("joined");
+    }
+
+    public String getPartyFinderJoinName() {
+        return this.messagePlain.replace("Party Finder >", "").trim().split(" ", 2)[0];
+    }
 }

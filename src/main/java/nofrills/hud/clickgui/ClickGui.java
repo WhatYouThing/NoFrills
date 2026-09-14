@@ -373,6 +373,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Block List", BlockList.instance, "Allows you to keep a client side player block list.", new Settings(
                                 new Settings.Description("Usage", "You can manage this feature with /nf blockList."),
                                 new Settings.Toggle("Auto Kick", BlockList.autoKick, "Automatically kicks blocked players if they join your party through party finder."),
+                                new Settings.Toggle("Send Kick", BlockList.sendKick, "Sends a chat message when the auto kick fires to inform the party of the kick reason."),
+                                new Settings.TextInput("Kick Message", BlockList.kickMsg, "The message to send.\n\nReplaces {name} with the blocked player's name.\nReplaces {reason} with the player's block reason."),
                                 new Settings.Toggle("Join Alert", BlockList.joinAlert, "Notifies you when a blocked player is detected in your lobby.")
                         )),
                         new Module("Streamer Mode", StreamerMode.instance, "While nicked: replaces your nick with your real username, hides the lobby ID, and hides all player names.", new Settings(

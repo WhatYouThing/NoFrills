@@ -1108,13 +1108,18 @@ public class Utils {
         return builder.toString();
     }
 
-    public static MutableComponent formatText(String string, Component... values) {
+    public static MutableComponent formatText(String string, Object... values) {
         MutableComponent text = Component.empty();
         int index = 0;
         for (String section : Splitter.on("{}").split(string)) {
             text.append(section);
             if (index < values.length) {
-                text.append(values[index]);
+                Object value = values[index];
+                if (value instanceof Component component) {
+                    text.append(component);
+                } else {
+                    text.append(Component.literal(value.toString()));
+                }
             }
             index++;
         }

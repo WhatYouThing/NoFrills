@@ -53,7 +53,7 @@ public class Config {
         for (DataFile file : dataFiles) {
             file.saveBlocking();
         }
-        LOGGER.error("NoFrills configuration files saved.");
+        LOGGER.info("NoFrills configuration files saved.");
     }
 
     public static void save() {

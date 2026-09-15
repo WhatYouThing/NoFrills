@@ -51,7 +51,6 @@ public class HudManager {
             new ShardTrackerDisplay(),
             new SkillTrackerDisplay(),
             new KickCooldownTimer(),
-            new CalendarEvents(),
             dungeonMap,
             pickAbilityTimer
     );

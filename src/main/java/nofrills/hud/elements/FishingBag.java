@@ -50,11 +50,11 @@ public final class FishingBag extends SimpleTextElement implements ListeningHudE
                 String line = Utils.toPlain(text);
                 if (line.startsWith("Bait Remaining: ")) {
                     String quantity = line.substring(line.indexOf(":") + 2);
-                    Style nameStyle = Utils.getStyle(stack.getHoverName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
-                    Style quantityStyle = Utils.getStyle(text, s -> s.trim().startsWith(quantity)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
+                    Style color = Utils.getStyle(stack.getHoverName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
+                    double percentage = Utils.parseInt(quantity.replaceAll(",", "")).orElse(0) / 2880.0; // max capacity, 5 * 9 * 64
                     this.setText(Component.literal("Bait: ")
-                            .append(Component.literal(name.replace(" Bait", "")).setStyle(nameStyle))
-                            .append(Component.literal(" x" + quantity).setStyle(quantityStyle))
+                            .append(Component.literal(name.replace(" Bait", "")).setStyle(color))
+                            .append(Component.literal(" x" + quantity).withColor(Utils.getPercentageColor(percentage, true).getHex()))
                     );
                     break;
                 }

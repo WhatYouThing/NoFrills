@@ -1191,16 +1191,16 @@ public class Utils {
         return ticksToTime(ms / 50);
     }
 
-    public static RenderColor getPercentageColor(double percentage, boolean inverse) {
+    public static RenderColor getPercentageColor(double percentage, boolean greenToRed) {
         float value = (float) Math.clamp(percentage, 0.0, 1.0);
-        if (inverse) {
+        if (greenToRed) {
             return RenderColor.WHITE.scaled(2.0f - value * 2.0f, value * 2.0f, 0.0f);
         }
         return RenderColor.WHITE.scaled(value * 2.0f, 2.0f - value * 2.0f, 0.0f);
     }
 
-    public static RenderColor getPercentageColor(float percentage, boolean inverse) {
-        return getPercentageColor((double) percentage, inverse);
+    public static RenderColor getPercentageColor(float percentage, boolean greenToRed) {
+        return getPercentageColor((double) percentage, greenToRed);
     }
 
     public static RenderColor getPercentageColor(double percentage) {

@@ -28,7 +28,7 @@ public class ChaliceHighlight {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.vampire) && Utils.isInChateau()) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.VAMPIRE) && Utils.isInChateau()) {
             if (!chaliceData.has(event.entity) && chaliceRegex.matcher(event.namePlain).matches()) {
                 chaliceData.add(event.entity);
             }
@@ -37,7 +37,7 @@ public class ChaliceHighlight {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.vampire)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.VAMPIRE)) {
             for (Entity ent : chaliceData.get()) {
                 BlockPos blockPos = Utils.findGround(ent.blockPosition(), 4);
                 Vec3 pos = ent.position();

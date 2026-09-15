@@ -28,7 +28,7 @@ public class EggHitsDisplay {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.tarantula)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.TARANTULA)) {
             if (!cache.has(event.entity) && eggRegex.matcher(event.namePlain).matches()) {
                 cache.add(event.entity);
             }
@@ -37,7 +37,7 @@ public class EggHitsDisplay {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.tarantula)) {
+        if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.TARANTULA)) {
             for (Entity ent : cache.get()) {
                 String name = Utils.toPlain(ent.getName());
                 event.drawText(ent.position(), Component.literal(name.substring(name.indexOf(" ") + 1)), scale.valueFloat(), true, color.value());

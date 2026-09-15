@@ -25,12 +25,15 @@ import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.EventListener;
 import nofrills.events.SpawnParticleEvent;
+import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 import org.joml.Vector3f;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import static nofrills.misc.SlayerUtil.TARANTULA;
 
 @EventListener
 public class NoRender {
@@ -61,6 +64,7 @@ public class NoRender {
     public static final SettingBool bonePlating = new SettingBool(false, "bonePlating", instance.key());
     public static final SettingBool healerFairy = new SettingBool(false, "healerFairy", instance.key());
     public static final SettingBool treeBits = new SettingBool(false, "treeBits", instance.key());
+    public static final SettingBool cocoonAnimation = new SettingBool(false, "cocoonAnimation", instance.key());
     public static final SettingBool nausea = new SettingBool(false, "nausea", instance.key());
     public static final SettingEnum<VignetteMode> vignette = new SettingEnum<>(VignetteMode.None, VignetteMode.class, "vignetteMode", instance.key());
     public static final SettingBool expOrbs = new SettingBool(false, "expOrbs", instance.key());
@@ -117,8 +121,8 @@ public class NoRender {
         if (expOrbs.value() && entity instanceof ExperienceOrb) return true;
         if (soulweaverSkulls.value() && entity instanceof ArmorStand stand && Utils.isInDungeons()) {
             ItemStack helmet = Utils.getEntityHelmet(stand);
-            if (helmet.getItem().equals(Items.PLAYER_HEAD)) {
-                return Utils.hasTexturePayload(helmet, -1020507406);
+            if (helmet.getItem().equals(Items.PLAYER_HEAD) && Utils.hasTexturePayload(helmet, -1020507406)) {
+                return true;
             }
         }
         if (guidedSheep.value() && entity instanceof Sheep sheep && sheep.getHealth() == 8.0f && Utils.isInDungeons())
@@ -129,9 +133,13 @@ public class NoRender {
         }
         if (healerFairy.value() && entity instanceof ArmorStand stand && stand.isMarker() && Utils.isInDungeons()) {
             ItemStack item = stand.getItemBySlot(EquipmentSlot.MAINHAND);
-            if (item.getItem().equals(Items.PLAYER_HEAD)) {
-                return Utils.hasTexturePayload(item, 758129854);
+            if (item.getItem().equals(Items.PLAYER_HEAD) && Utils.hasTexturePayload(item, 758129854)) {
+                return true;
             }
+        }
+        if (cocoonAnimation.value() && entity instanceof ArmorStand stand && stand.isMarker() && !SlayerUtil.isFightingBoss(TARANTULA)) {
+            ItemStack item = stand.getItemBySlot(EquipmentSlot.HEAD);
+            return item.getItem().equals(Items.PLAYER_HEAD) && Utils.hasTexturePayload(item, 1843970301);
         }
         return false;
     }

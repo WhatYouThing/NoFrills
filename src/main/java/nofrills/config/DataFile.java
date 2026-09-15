@@ -16,6 +16,7 @@ public class DataFile {
     private final Path path;
     private final boolean loadFinished;
     private JsonObject data = new JsonObject();
+    private int hash = 0;
     private boolean loadFailed = false;
 
     protected DataFile(String filename) {
@@ -23,7 +24,7 @@ public class DataFile {
         try {
             if (Files.isReadable(this.path)) {
                 this.data = JsonParser.parseString(Files.readString(this.path)).getAsJsonObject();
-                LOGGER.info("NoFrills data file loaded: {}", this.path.getFileName());
+                this.hash = this.data.hashCode();
             }
         } catch (Exception exception) {
             LOGGER.error("Unable to load NoFrills data file!", exception);
@@ -34,12 +35,15 @@ public class DataFile {
 
     public void saveBlocking() {
         if (this.loadFailed || !this.loadFinished) {
-            LOGGER.warn("Prevented save of NoFrills data file {} due to the file not being loaded correctly.", this.path.getFileName());
+            LOGGER.warn("Prevented save of NoFrills data file {} due to file load failure.", this.path.getFileName());
             return;
         }
         try {
-            Utils.atomicWrite(this.path, this.data);
-            LOGGER.info("NoFrills data file saved: {}", this.path.getFileName());
+            int hash = this.data.hashCode();
+            if (hash != this.hash) {
+                Utils.atomicWrite(this.path, this.data);
+                this.hash = hash;
+            }
         } catch (Exception exception) {
             LOGGER.error("Unable to save NoFrills data file!", exception);
         }

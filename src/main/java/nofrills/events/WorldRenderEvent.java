@@ -4,9 +4,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.gizmos.DrawableGizmoPrimitives;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
+import net.minecraft.gizmos.CuboidGizmo;
+import net.minecraft.gizmos.GizmoStyle;
+import net.minecraft.gizmos.LineGizmo;
+import net.minecraft.gizmos.SimpleGizmoCollector;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -18,56 +21,36 @@ import static nofrills.Main.mc;
 
 public class WorldRenderEvent {
     public final DeltaTracker tickCounter = mc.getDeltaTracker();
+    public final SimpleGizmoCollector gizmos;
     public final CameraRenderState camera;
     public final PoseStack matrices;
     public final LevelRenderState state;
     public final SubmitNodeStorage storage;
 
-    public WorldRenderEvent(CameraRenderState camera, PoseStack matrices, LevelRenderState state, SubmitNodeStorage storage) {
-        this.camera = camera;
+    public WorldRenderEvent(LevelRenderState state, PoseStack matrices, SubmitNodeStorage storage, SimpleGizmoCollector gizmos) {
+        this.camera = state.cameraRenderState;
         this.matrices = matrices;
         this.state = state;
         this.storage = storage;
+        this.gizmos = gizmos;
     }
 
     public void drawFilled(AABB box, boolean throughWalls, RenderColor color) {
-        DrawableGizmoPrimitives primitives = new DrawableGizmoPrimitives();
-        double d = box.minX;
-        double e = box.minY;
-        double f = box.minZ;
-        double g = box.maxX;
-        double h = box.maxY;
-        double i = box.maxZ;
-        primitives.addQuad(new Vec3(g, e, f), new Vec3(g, h, f), new Vec3(g, h, i), new Vec3(g, e, i), color.argb);
-        primitives.addQuad(new Vec3(d, e, f), new Vec3(d, e, i), new Vec3(d, h, i), new Vec3(d, h, f), color.argb);
-        primitives.addQuad(new Vec3(d, e, f), new Vec3(d, h, f), new Vec3(g, h, f), new Vec3(g, e, f), color.argb);
-        primitives.addQuad(new Vec3(d, e, i), new Vec3(g, e, i), new Vec3(g, h, i), new Vec3(d, h, i), color.argb);
-        primitives.addQuad(new Vec3(d, h, f), new Vec3(d, h, i), new Vec3(g, h, i), new Vec3(g, h, f), color.argb);
-        primitives.addQuad(new Vec3(d, e, f), new Vec3(g, e, f), new Vec3(g, e, i), new Vec3(d, e, i), color.argb);
-        primitives.submit(this.storage, this.camera, throughWalls);
+        CuboidGizmo gizmo = new CuboidGizmo(box, GizmoStyle.fill(color.getArgb()), false);
+        if (throughWalls) {
+            gizmos.add(gizmo).setAlwaysOnTop();
+        } else {
+            gizmos.add(gizmo);
+        }
     }
 
     public void drawOutline(AABB box, boolean throughWalls, RenderColor color) {
-        DrawableGizmoPrimitives primitives = new DrawableGizmoPrimitives();
-        double d = box.minX;
-        double e = box.minY;
-        double f = box.minZ;
-        double g = box.maxX;
-        double h = box.maxY;
-        double i = box.maxZ;
-        primitives.addLine(new Vec3(d, e, f), new Vec3(g, e, f), color.argb, 3.0f);
-        primitives.addLine(new Vec3(d, e, f), new Vec3(d, h, f), color.argb, 3.0f);
-        primitives.addLine(new Vec3(d, e, f), new Vec3(d, e, i), color.argb, 3.0f);
-        primitives.addLine(new Vec3(g, e, f), new Vec3(g, h, f), color.argb, 3.0f);
-        primitives.addLine(new Vec3(g, h, f), new Vec3(d, h, f), color.argb, 3.0f);
-        primitives.addLine(new Vec3(d, h, f), new Vec3(d, h, i), color.argb, 3.0f);
-        primitives.addLine(new Vec3(d, h, i), new Vec3(d, e, i), color.argb, 3.0f);
-        primitives.addLine(new Vec3(d, e, i), new Vec3(g, e, i), color.argb, 3.0f);
-        primitives.addLine(new Vec3(g, e, i), new Vec3(g, e, f), color.argb, 3.0f);
-        primitives.addLine(new Vec3(d, h, i), new Vec3(g, h, i), color.argb, 3.0f);
-        primitives.addLine(new Vec3(g, e, i), new Vec3(g, h, i), color.argb, 3.0f);
-        primitives.addLine(new Vec3(g, h, f), new Vec3(g, h, i), color.argb, 3.0f);
-        primitives.submit(this.storage, this.camera, throughWalls);
+        CuboidGizmo gizmo = new CuboidGizmo(box, GizmoStyle.stroke(color.getArgb()), false);
+        if (throughWalls) {
+            gizmos.add(gizmo).setAlwaysOnTop();
+        } else {
+            gizmos.add(gizmo);
+        }
     }
 
     public void drawStyled(AABB box, RenderStyle style, boolean throughWalls, RenderColor outlineColor, RenderColor filledColor) {
@@ -113,10 +96,8 @@ public class WorldRenderEvent {
     }
 
     public void drawTracer(Vec3 pos, float width, RenderColor color) {
-        DrawableGizmoPrimitives primitives = new DrawableGizmoPrimitives();
         Vec3 point = this.camera.pos.add(Vec3.directionFromRotation(this.camera.xRot, this.camera.yRot));
-        primitives.addLine(point, pos, color.argb, width);
-        primitives.submit(this.storage, this.camera, true);
+        gizmos.add(new LineGizmo(point, pos, color.argb, width)).setAlwaysOnTop();
     }
 
     public void drawTracer(Vec3 pos, RenderColor color) {

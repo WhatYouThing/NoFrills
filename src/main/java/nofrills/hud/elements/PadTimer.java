@@ -1,5 +1,8 @@
 package nofrills.hud.elements;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.ChatMsgEvent;
@@ -29,9 +32,9 @@ public final class PadTimer extends TickTimerElement implements ListeningHudElem
 
     @Override
     public void updateTimer() {
-        String timer = Utils.format(this.timerText, this.getTimeColor() + this.ticksAsTime(this.ticks));
+        MutableComponent timer = Utils.formatText(this.timerText, Component.literal(this.ticksAsTime(this.ticks)).withColor(this.getTimeColor()));
         if (this.totalTime.value()) {
-            timer += " §7(" + this.ticksAsTime(this.totalTicks) + ")";
+            timer.append(Component.literal(" (" + this.ticksAsTime(this.totalTicks) + ")").withStyle(ChatFormatting.GRAY));
         }
         this.setText(timer);
     }

@@ -2,6 +2,7 @@ package nofrills.features.tweaks;
 
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.events.EventListener;
@@ -23,7 +24,7 @@ public class NoCursorReset {
     public static double cursorY = -1.0;
 
     public static boolean isActive(Screen screen) {
-        return instance.isActive() && !LeapOverlay.isLeapMenu(screen.getTitle().getString());
+        return instance.isActive() && !LeapOverlay.isLeapMenu(screen instanceof AbstractContainerScreen<?> ? screen.getTitle().getString() : "");
     }
 
     public static boolean isActive() {

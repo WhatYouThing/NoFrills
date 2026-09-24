@@ -33,10 +33,22 @@ public class TooltipRenderEvent extends Cancellable {
         }
     }
 
-    public void addLine(Component line) {
+    public List<Component> getReplacement() {
         if (this.replacement == null) {
             this.replacement = new ArrayList<>(this.lines);
         }
-        replacement.add(line);
+        return this.replacement;
+    }
+
+    public void addLine(Component line) {
+        this.getReplacement().add(line);
+    }
+
+    public void addLine(int index, Component line) {
+        this.getReplacement().add(index, line);
+    }
+
+    public void removeLine(int index) {
+        this.getReplacement().remove(index);
     }
 }

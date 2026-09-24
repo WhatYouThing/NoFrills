@@ -136,7 +136,7 @@ public abstract class GuiMixin {
             return original.stream().filter(score -> {
                 PlayerTeam team = scoreboard.getPlayersTeam(score.owner());
                 Component name = PlayerTeam.formatNameForTeam(team, score.ownerName());
-                return StreamerMode.replaceIfNeeded(Utils.toPlain(name).trim()).isEmpty();
+                return StreamerMode.replaceIfNeeded(Utils.toPlain(name)).isEmpty();
             }).collect(Collectors.toCollection(ArrayList::new));
         }
         return original;

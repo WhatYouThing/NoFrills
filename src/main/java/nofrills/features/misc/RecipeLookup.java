@@ -3,8 +3,7 @@ package nofrills.features.misc;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -29,52 +28,47 @@ public class RecipeLookup {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && keybind.value() == event.key && event.action == GLFW.GLFW_PRESS) {
-            if (mc.screen instanceof InventoryScreen || mc.screen instanceof ContainerScreen) {
-                Slot focused = Utils.getFocusedSlot();
-                if (focused != null) {
-                    ItemStack stack = focused.getItem();
-                    if (stack.isEmpty()) return;
-                    String itemId = Utils.getSkyblockId(stack);
-                    if (!itemId.isEmpty()) {
-                        if (itemId.equals("PET")) {
-                            CompoundTag data = Utils.getCustomData(stack);
-                            if (!data.contains("petInfo")) return;
-                            JsonObject petData = JsonParser.parseString(data.getString("petInfo").orElse("")).getAsJsonObject();
-                            Utils.sendMessage("/recipe " + Utils.uppercaseFirst(Utils.toLower(petData.get("type").getAsString()), true));
-                        } else {
-                            String command;
-                            if (mode.value() == Mode.Viewrecipe) {
-                                command = "/viewrecipe ";
-                            } else {
-                                command = "/recipe ";
-                            }
-                            Utils.sendMessage(command + itemId);
-                        }
-                        event.cancel();
-                    } else if (mc.screen.getTitle().getString().contains("Museum")) {
-                        String entryName = Utils.toPlain(stack.getHoverName());
-                        if (entryName.endsWith("Armor") || entryName.endsWith("Set") || entryName.endsWith("Equipment")) {
-                            String[] words = entryName.split(" ");
-                            entryName = String.join(" ", Arrays.copyOf(words, words.length - 1));
-                        }
-                        Utils.sendMessage("/recipe " + entryName);
-                        event.cancel();
-                    } else if (stack.getCustomName().getString().equals("Accept Offer")) {
-                        // will only give recipe of the first item (in case of multi-item requests like Bartender)
-                        // might be worth revisiting later with a stateful approach
-                        String target = Utils.getLoreLines(stack).stream()
-                                .dropWhile(s -> !s.contains("Items Required:"))
-                                .skip(1)
-                                .findFirst()
-                                .orElse("");
-                        if (!target.isEmpty()) {
-                            int index = target.lastIndexOf(" x");
-                            target = index > 0 ? target.substring(0, index) : target;
-                            Utils.sendMessage("/recipe " + target);
-                        }
+        if (instance.isActive() && event.isKey(keybind) && mc.screen instanceof AbstractContainerScreen<?> container) {
+            Slot focused = Utils.getFocusedSlot();
+            if (focused == null) return;
+            ItemStack stack = focused.getItem();
+            String itemId = Utils.getSkyblockId(stack);
+            if (!itemId.isEmpty()) {
+                event.consume(() -> {
+                    if (itemId.equals("PET")) {
+                        CompoundTag data = Utils.getCustomData(stack);
+                        if (!data.contains("petInfo")) return;
+                        JsonObject petData = JsonParser.parseString(data.getString("petInfo").orElse("")).getAsJsonObject();
+                        Utils.sendMessage("/recipe " + Utils.uppercaseFirst(Utils.toLower(petData.get("type").getAsString()), true));
+                    } else {
+                        String command = mode.value().equals(Mode.Viewrecipe) ? "/viewrecipe" : "/recipe";
+                        Utils.sendMessage(command + " " + itemId);
                     }
-                }
+                });
+            } else if (container.getTitle().getString().contains("Museum")) {
+                event.consume(() -> {
+                    String entryName = Utils.toPlain(stack.getHoverName());
+                    if (entryName.endsWith("Armor") || entryName.endsWith("Set") || entryName.endsWith("Equipment")) {
+                        String[] words = entryName.split(" ");
+                        entryName = String.join(" ", Arrays.copyOf(words, words.length - 1));
+                    }
+                    Utils.sendMessage("/recipe " + entryName);
+                });
+            } else if (stack.getHoverName().getString().equals("Accept Offer")) {
+                // will only give recipe of the first item (in case of multi-item requests like Bartender)
+                // might be worth revisiting later with a stateful approach
+                event.consume(() -> {
+                    String target = Utils.getLoreLines(stack).stream()
+                            .dropWhile(s -> !s.contains("Items Required:"))
+                            .skip(1)
+                            .findFirst()
+                            .orElse("");
+                    if (!target.isEmpty()) {
+                        int index = target.lastIndexOf(" x");
+                        target = index > 0 ? target.substring(0, index) : target;
+                        Utils.sendMessage("/recipe " + target);
+                    }
+                });
             }
         }
     }

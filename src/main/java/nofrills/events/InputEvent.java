@@ -2,6 +2,8 @@ package nofrills.events;
 
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonInfo;
+import nofrills.config.SettingKeybind;
+import org.lwjgl.glfw.GLFW;
 
 public final class InputEvent extends Cancellable {
     public int key, modifiers, action;
@@ -25,5 +27,35 @@ public final class InputEvent extends Cancellable {
         this.action = action;
         this.isMouse = true;
         this.mouseInput = input;
+    }
+
+    public boolean isPress() {
+        return this.action == GLFW.GLFW_PRESS;
+    }
+
+    public boolean isRepeat() {
+        return this.action == GLFW.GLFW_REPEAT;
+    }
+
+    public boolean isRelease() {
+        return this.action == GLFW.GLFW_RELEASE;
+    }
+
+    public boolean isKey(int key) {
+        return this.key == key;
+    }
+
+    public boolean isKey(SettingKeybind keybind) {
+        return keybind.isKey(this.key);
+    }
+
+    /**
+     * Cancels the input and runs the provided callback if the input is a press.
+     */
+    public void consume(Runnable onPress) {
+        if (this.isPress()) {
+            onPress.run();
+        }
+        this.cancel();
     }
 }

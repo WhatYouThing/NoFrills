@@ -14,7 +14,6 @@ import nofrills.events.EventListener;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -49,8 +48,7 @@ public class StreamerMode {
             .maximumSize(10000L)
             .build();
     private static final Cache<String, Object> lobbyCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(Duration.ofMinutes(30))
-            .maximumSize(100L)
+            .maximumSize(10L)
             .build();
     private static final ConcurrentHashMap<String, String> playerToNick = new ConcurrentHashMap<>();
     private static final Random random = new Random();

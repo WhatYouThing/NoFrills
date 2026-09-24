@@ -803,10 +803,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Better Visibility", WateringHelper.betterVisibility, "Makes the crop water levels more visible by replacing them with seethrough text."),
                                 new Settings.Toggle("Hide Particles", WateringHelper.hideParticles, "Removes the particles that appear while using a watering can.")
                         ))),
-                        new Module("Equipment Highlight", EquipmentHighlight.instance, "Highlights your farming and pest spawning equipment in the equipment menu.", new Settings(
-                                new Settings.ColorPicker("Farm Color", EquipmentHighlight.farmColor, "The color of the farming equipment highlight."),
-                                new Settings.ColorPicker("Pest Color", EquipmentHighlight.pestColor, "The color of the pest spawning equipment highlight.")
-                        )),
                         new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.")
                 ))
         );

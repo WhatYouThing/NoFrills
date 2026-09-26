@@ -319,7 +319,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Force Pack Position", LegacyTextures.forcePackPos, "Forces the official resource pack to be at the bottom by default.\nMay require a game restart to apply."),
                                 new Settings.Toggle("No Tooltip Styling", LegacyTextures.noTooltipStyle, "Disables custom styling of tooltips. Reverts item tooltips if the official pack is below the vanilla pack."),
                                 new Settings.Toggle("No Bow Cooldown", LegacyTextures.noBowCooldown, "Prevents the cooldown overlay from rendering on bows/shortbows."),
-                                new Settings.Toggle("More Legacy", LegacyTextures.moreLegacy, "Reverts several items which used to be axes (before the Foraging Update) into axes.")
+                                new Settings.Toggle("More Legacy", LegacyTextures.moreLegacy, "Reverts several items which used to be axes (before the Foraging Update) into axes."),
+                                new Settings.Toggle("Master Stars", LegacyTextures.masterStars, "Reverts the visual feedback of Master Stars applied to items.")
                         ))
                 )),
                 new Category("Misc", List.of(
@@ -378,7 +379,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Join Alert", BlockList.joinAlert, "Notifies you when a blocked player is detected in your lobby.")
                         )),
                         new Module("Streamer Mode", StreamerMode.instance, "While nicked: replaces your nick with your real username, hides the lobby ID, and hides all player names.", new Settings(
-                                new Settings.TextInput("Base Name", StreamerMode.baseName, "The name to use to hide the names of other players. Replaces placeholders \"{}\" with random digits.")
+                                new Settings.TextInput("Base Name", StreamerMode.baseName, "The name to use to hide the names of other players. Replaces placeholders \"{}\" with random digits."),
+                                new Settings.TextInput("Current Nick", StreamerMode.currentNick, "This option stores your last known nick (or nothing when unnicked).")
                         )),
                         new Module("Sound Blocker", SoundBlocker.instance, "Prevents various sounds from playing.", new Settings(
                                 new Settings.EnumToggle<>("Explosions", SoundBlocker.explosions, "Cancels explosion sound effects."),
@@ -801,10 +803,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Better Visibility", WateringHelper.betterVisibility, "Makes the crop water levels more visible by replacing them with seethrough text."),
                                 new Settings.Toggle("Hide Particles", WateringHelper.hideParticles, "Removes the particles that appear while using a watering can.")
                         ))),
-                        new Module("Equipment Highlight", EquipmentHighlight.instance, "Highlights your farming and pest spawning equipment in the equipment menu.", new Settings(
-                                new Settings.ColorPicker("Farm Color", EquipmentHighlight.farmColor, "The color of the farming equipment highlight."),
-                                new Settings.ColorPicker("Pest Color", EquipmentHighlight.pestColor, "The color of the pest spawning equipment highlight.")
-                        )),
                         new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.")
                 ))
         );

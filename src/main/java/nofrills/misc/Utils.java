@@ -64,6 +64,7 @@ import nofrills.mixin.AbstractContainerScreenAccessor;
 import nofrills.mixin.BossHealthOverlayAccessor;
 import nofrills.mixin.PlayerTabOverlayAccessor;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -1022,6 +1023,15 @@ public class Utils {
             }
             return Optional.empty();
         }, Style.EMPTY);
+    }
+
+    public static List<Pair<Style, String>> getStyles(Component text) {
+        List<Pair<Style, String>> list = new ArrayList<>();
+        text.visit(((style, contents) -> {
+            list.add(Pair.of(style, contents));
+            return Optional.empty();
+        }), text.getStyle());
+        return list;
     }
 
     public static boolean hasColor(Style style, ChatFormatting color) {

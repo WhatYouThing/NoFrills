@@ -13,6 +13,9 @@ public interface ListeningHudElement {
     default void onServerJoin() {
     }
 
+    default void onSendPacket(SendPacketEvent event) {
+    }
+
     default void onReceivePacket(ReceivePacketEvent event) {
     }
 

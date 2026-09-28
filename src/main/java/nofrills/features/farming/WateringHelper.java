@@ -14,6 +14,8 @@ import nofrills.misc.EntityCache;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
+import java.util.regex.Pattern;
+
 @EventListener
 public class WateringHelper {
     public static final Feature instance = new Feature("wateringHelper");
@@ -22,10 +24,7 @@ public class WateringHelper {
     public static final SettingBool hideParticles = new SettingBool(false, "hideParticles", instance);
 
     private static final EntityCache waterLevels = new EntityCache();
-
-    private static boolean isActive() {
-        return instance.isActive() && Utils.isInGarden();
-    }
+    private static final Pattern namePattern = Pattern.compile("\\|*");
 
     private static boolean isHoldingWateringCan() {
         CompoundTag data = Utils.getCustomData(Utils.getHeldItem());
@@ -34,7 +33,7 @@ public class WateringHelper {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (isActive() && betterVisibility.value() && event.namePlain.equals("||||||||||||||||")) {
+        if (instance.isActive() && Utils.isInGarden() && betterVisibility.value() && namePattern.matcher(event.namePlain).matches()) {
             event.entity.setCustomNameVisible(false);
             waterLevels.add(event.entity);
         }
@@ -42,7 +41,7 @@ public class WateringHelper {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (isActive() && betterVisibility.value()) {
+        if (instance.isActive() && betterVisibility.value() && !waterLevels.empty()) {
             for (Entity ent : waterLevels.get()) {
                 if (!ent.hasCustomName()) {
                     continue;
@@ -54,8 +53,10 @@ public class WateringHelper {
 
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
-        if (isActive() && hideParticles.value() && isHoldingWateringCan() && event.type.equals(ParticleTypes.DRIPPING_WATER)) {
-            event.cancel();
+        if (instance.isActive() && Utils.isInGarden() && hideParticles.value() && isHoldingWateringCan()) {
+            if (event.type.equals(ParticleTypes.DRIPPING_WATER) || event.type.equals(ParticleTypes.ENTITY_EFFECT)) {
+                event.cancel();
+            }
         }
     }
 }

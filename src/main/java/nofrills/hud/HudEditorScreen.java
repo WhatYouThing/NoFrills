@@ -25,8 +25,9 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
+
     public HudEditorScreen() {
-        super(Component.nullToEmpty(""));
+        super(Component.literal(""));
     }
 
     @Override
@@ -49,11 +50,11 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void drawComponentTooltip(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         for (HudElement element : HudManager.getElements()) {
             if (element.isAdded()) element.updatePosition();
         }
-        super.drawComponentTooltip(context, mouseX, mouseY, delta);
+        super.extractRenderState(context, mouseX, mouseY, delta);
         int center = context.guiWidth() / 2;
         context.centeredText(mc.font, "NoFrills HUD Editor", center, 10, RenderColor.WHITE.argb);
         context.centeredText(mc.font, "Left click element to toggle visibility", center, 20, RenderColor.WHITE.argb);

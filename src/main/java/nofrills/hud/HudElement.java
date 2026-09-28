@@ -130,8 +130,7 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
     public boolean onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
         if (this.isAdded()) {
             boolean result = super.onMouseDrag(click, deltaX, deltaY);
-            Window window = mc.getWindow();
-            this.savePosition(this.xOffset / window.getGuiScaledWidth(), this.yOffset / window.getGuiScaledHeight());
+            this.savePosition(this.xOffset, this.yOffset);
             return result;
         }
         return false;
@@ -227,16 +226,21 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
 
     public void updatePosition() {
         Window window = mc.getWindow();
-        int width = window.getGuiScaledWidth(), height = window.getGuiScaledHeight();
-        this.xOffset = Math.clamp(this.xPos.value() * width, 0, Math.clamp(width - this.width(), 0, width));
-        this.yOffset = Math.clamp(this.yPos.value() * height, 0, Math.clamp(height - this.height(), 0, height));
+        this.updatePosition(this.xPos.value() * window.getGuiScaledWidth(), this.yPos.value() * window.getGuiScaledHeight());
+    }
+
+    public void updatePosition(double x, double y) {
+        Window window = mc.getWindow();
+        this.xOffset = Math.clamp(x, 0, Math.clamp(window.getGuiScaledWidth() - this.width(), 0, window.getGuiScaledWidth()));
+        this.yOffset = Math.clamp(y, 0, Math.clamp(window.getGuiScaledHeight() - this.height(), 0, window.getGuiScaledHeight()));
         this.updateX(0);
         this.updateY(0);
     }
 
     public void savePosition(double x, double y) {
-        this.xPos.set(x);
-        this.yPos.set(y);
+        Window window = mc.getWindow();
+        this.xPos.set(x / window.getGuiScaledWidth());
+        this.yPos.set(y / window.getGuiScaledHeight());
     }
 
     public void toggle() {

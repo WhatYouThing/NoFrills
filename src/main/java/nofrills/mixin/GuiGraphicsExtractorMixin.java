@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -42,11 +43,12 @@ public abstract class GuiGraphicsExtractorMixin {
     public abstract int guiHeight();
 
     @ModifyExpressionValue(method = "componentHoverEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/HoverEvent$ShowText;value()Lnet/minecraft/network/chat/Component;"))
-    private Component getHoveredText(Component original, @Local(argsOnly = true) Style style) {
-        if (CommandTooltip.instance.isActive() && style.getClickEvent() instanceof ClickEvent.RunCommand(
-                String command
-        )) {
-            return original.copy().append("\n\n").append(Utils.getShortTag().append(Utils.format("§7Command: {}", command)));
+    private Component getHoveredText(Component original, @Local(argsOnly = true, name = "hoveredStyle") Style hoveredStyle) {
+        if (CommandTooltip.instance.isActive()) {
+            if (hoveredStyle.getClickEvent() instanceof ClickEvent.RunCommand(String command)) {
+                return original.copy().append("\n\n")
+                        .append(Utils.getShortTag().append(Utils.formatText("Command: {}", command).withStyle(ChatFormatting.GRAY)));
+            }
         }
         return original;
     }

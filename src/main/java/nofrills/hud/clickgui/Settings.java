@@ -17,7 +17,6 @@ import net.minecraft.resources.Identifier;
 import nofrills.config.*;
 import nofrills.hud.ColorPickerScreen;
 import nofrills.hud.clickgui.components.*;
-import nofrills.misc.MutableReference;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
@@ -29,6 +28,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static nofrills.Main.mc;
@@ -318,7 +318,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.padding(Insets.of(5));
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             this.verticalAlignment(VerticalAlignment.CENTER);
-            MutableReference<RenderColor> reference = new MutableReference<>(currentValue);
+            AtomicReference<RenderColor> reference = new AtomicReference<>(currentValue);
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));

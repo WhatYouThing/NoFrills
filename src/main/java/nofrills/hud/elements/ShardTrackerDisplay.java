@@ -11,17 +11,17 @@ import nofrills.features.hunting.ShardTracker;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
 import nofrills.hud.clickgui.Settings;
-import nofrills.misc.MutableReference;
 import nofrills.misc.ShardData;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class ShardTrackerDisplay extends SimpleTextElement implements ListeningHudElement {
     private static final String displayNone = "Shard Tracker\n§7None tracked.";
     public final SettingBool hideIfNone = new SettingBool(false, "hideIfNone", instance);
-    private final MutableReference<String> display = new MutableReference<>(displayNone);
+    private final AtomicReference<String> display = new AtomicReference<>(displayNone);
 
     public ShardTrackerDisplay() {
         super(Component.literal(displayNone), new Feature("shardTrackerElement"), "Shard Tracker Display");

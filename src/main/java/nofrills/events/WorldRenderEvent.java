@@ -95,9 +95,18 @@ public class WorldRenderEvent {
         this.drawBeam(center.add(0, box.maxY - center.y(), 0), height, throughWalls, color);
     }
 
+    public void drawLine(Vec3 from, Vec3 to, double width, boolean throughWalls, RenderColor color) {
+        LineGizmo gizmo = new LineGizmo(from, to, color.argb, (float) width);
+        if (throughWalls) {
+            gizmos.add(gizmo).setAlwaysOnTop();
+        } else {
+            gizmos.add(gizmo);
+        }
+    }
+
     public void drawTracer(Vec3 pos, float width, RenderColor color) {
         Vec3 point = this.camera.pos.add(Vec3.directionFromRotation(this.camera.xRot, this.camera.yRot));
-        gizmos.add(new LineGizmo(point, pos, color.argb, width)).setAlwaysOnTop();
+        this.drawLine(point, pos, width, true, color);
     }
 
     public void drawTracer(Vec3 pos, RenderColor color) {

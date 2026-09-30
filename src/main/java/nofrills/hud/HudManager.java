@@ -115,7 +115,12 @@ public class HudManager {
     }
 
     @EventHandler
-    private static void onPing(ReceivePacketEvent event) {
+    private static void onSendPacket(SendPacketEvent event) {
+        forEachListening(element -> element.onSendPacket(event));
+    }
+
+    @EventHandler
+    private static void onReceivePacket(ReceivePacketEvent event) {
         forEachListening(element -> element.onReceivePacket(event));
     }
 

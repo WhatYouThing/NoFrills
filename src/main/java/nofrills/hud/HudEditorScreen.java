@@ -4,14 +4,13 @@ import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.core.*;
+import io.wispforest.owo.ui.core.OwoUIAdapter;
+import io.wispforest.owo.ui.core.Surface;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import nofrills.features.misc.AutoSave;
 import nofrills.hud.clickgui.Settings;
-import nofrills.hud.clickgui.components.PlainLabel;
-import nofrills.hud.clickgui.components.ToggleButton;
 import nofrills.hud.elements.Armor;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
@@ -25,8 +24,16 @@ import java.util.List;
 import static nofrills.Main.mc;
 
 public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
+    private static final List<String> helpLines = List.of(
+            "NoFrills HUD Editor",
+            "Left click element to toggle visibility",
+            "Hold left click to drag element (Shift to snap)",
+            "Right click element to view its settings",
+            "Right click screen to add/remove elements"
+    );
+
     public HudEditorScreen() {
-        super(Component.nullToEmpty(""));
+        super(Component.literal(""));
     }
 
     @Override
@@ -49,16 +56,19 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void drawComponentTooltip(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         for (HudElement element : HudManager.getElements()) {
-            if (element.isAdded()) element.updatePosition();
+            if (element.isAdded()) {
+                element.updatePosition();
+            }
         }
-        super.drawComponentTooltip(context, mouseX, mouseY, delta);
+        context.fill((int) (context.guiWidth() * 0.5), 0, (int) (context.guiWidth() * 0.5 + 1), context.guiHeight(), RenderColor.WHITE.getArgb());
+        context.fill(0, (int) (context.guiHeight() * 0.5), context.guiWidth(), (int) (context.guiHeight() * 0.5 + 1), RenderColor.WHITE.getArgb());
+        super.extractRenderState(context, mouseX, mouseY, delta);
         int center = context.guiWidth() / 2;
-        context.centeredText(mc.font, "NoFrills HUD Editor", center, 10, RenderColor.WHITE.argb);
-        context.centeredText(mc.font, "Left click element to toggle visibility", center, 20, RenderColor.WHITE.argb);
-        context.centeredText(mc.font, "Right click element to view its settings", center, 30, RenderColor.WHITE.argb);
-        context.centeredText(mc.font, "Right click screen to add/remove elements", center, 40, RenderColor.WHITE.argb);
+        for (int i = 0; i < helpLines.size(); i++) {
+            context.centeredText(mc.font, helpLines.get(i), center, 10 * (i + 1), RenderColor.WHITE.argb);
+        }
     }
 
     @Override
@@ -84,21 +94,18 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
                 list.add(new Settings.Separator(category.name()));
                 elements.sort(Comparator.comparing(element -> element.elementLabel.getString()));
                 for (HudElement element : elements) {
-                    FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-                    layout.padding(Insets.of(5));
-                    PlainLabel label = new PlainLabel(element.elementLabel);
-                    label.tooltip(element.elementDesc);
-                    label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-                    ToggleButton toggle = new ToggleButton(element.isAdded());
-                    toggle.onToggled().subscribe(value -> {
-                        if (value && !element.instance.isActive()) {
-                            element.instance.setActive(true);
-                        }
-                        element.added.set(value);
-                    });
-                    layout.child(label);
-                    layout.child(toggle);
-                    list.add(layout);
+                    list.add(new Settings.Toggle(
+                            element.elementLabel.getString(),
+                            element.isAdded(),
+                            false,
+                            element.elementDesc.getString(),
+                            value -> {
+                                if (value && !element.instance.isActive()) {
+                                    element.instance.setActive(true);
+                                }
+                                element.added.set(value);
+                            })
+                    );
                 }
             }
             HudSettings settings = new HudSettings(list);

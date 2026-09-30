@@ -15,13 +15,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ResolvableProfile;
 import nofrills.config.*;
 import nofrills.events.EventListener;
 import nofrills.events.ServerJoinEvent;
-import nofrills.events.TooltipRenderEvent;
 import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.Utils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -46,10 +46,20 @@ public class LegacyTextures {
     public static final SettingBool masterStars = new SettingBool(false, "masterStars", instance);
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
 
+    private static final Cache<ItemStack, Optional<Identifier>> identifierCache = CacheBuilder.newBuilder()
+            .weakKeys()
+            .maximumSize(10000L)
+            .build();
+    private static final Cache<DataComponentHolder, Optional<ResolvableProfile>> profileCache = CacheBuilder.newBuilder()
+            .weakKeys()
+            .maximumSize(10000L)
+            .build();
+    private static final Cache<FormattedCharSequence, Optional<FormattedCharSequence>> starsCache = CacheBuilder.newBuilder()
+            .weakKeys()
+            .maximumSize(10000L)
+            .build();
     private static final DataFile textures = Config.getDataFile("LegacyTexturesCache.json");
     private static final List<String> starSymbols = List.of("➊", "➋", "➌", "➍", "➎");
-    private static final Cache<ItemStack, Optional<Identifier>> identifierCache = CacheBuilder.newBuilder().weakKeys().maximumSize(5000L).build();
-    private static final Cache<DataComponentHolder, Optional<ResolvableProfile>> profileCache = CacheBuilder.newBuilder().weakKeys().maximumSize(5000L).build();
     private static boolean texturesLoaded = false;
 
     public static Optional<Identifier> replaceIfNeeded(ItemStack stack) {
@@ -126,6 +136,34 @@ public class LegacyTextures {
         }
     }
 
+    public static Optional<FormattedCharSequence> replaceStarsIfNeeded(FormattedCharSequence sequence) {
+        try {
+            return starsCache.get(sequence, () -> {
+                String line = Utils.toPlain(sequence);
+                for (AtomicInteger i = new AtomicInteger(1); i.get() <= starSymbols.size(); i.incrementAndGet()) {
+                    String symbol = starSymbols.get(i.get() - 1);
+                    if (!line.contains(symbol)) continue;
+                    List<Pair<Style, String>> parts = Utils.getStyles(sequence);
+                    Pair<Style, String> first = parts.removeFirst();
+                    MutableComponent replacement = Component.literal(first.getRight()).setStyle(first.getLeft());
+                    for (Pair<Style, String> part : parts) {
+                        if (part.getRight().equals(symbol)) continue;
+                        if (part.getRight().equals("✪✪✪✪✪")) {
+                            replacement.append(Component.literal("✪".repeat(i.get())).withStyle(ChatFormatting.RED)
+                                    .append(Component.literal("✪".repeat(5 - i.get())).withStyle(ChatFormatting.GOLD)));
+                            continue;
+                        }
+                        replacement.append(Component.literal(part.getRight()).setStyle(part.getLeft()));
+                    }
+                    return Optional.of(replacement.getVisualOrderText());
+                }
+                return Optional.empty();
+            });
+        } catch (Exception _) {
+            return Optional.empty();
+        }
+    }
+
     public static boolean isWhitelisted(String id) {
         return data.value().has("whitelist") && data.value().get("whitelist").getAsJsonArray().contains(new JsonPrimitive(id));
     }
@@ -151,34 +189,6 @@ public class LegacyTextures {
         });
         identifierCache.invalidate(stack);
         profileCache.invalidate(stack);
-    }
-
-    @EventHandler
-    private static void onTooltip(TooltipRenderEvent event) {
-        if (instance.isActive() && masterStars.value() && !event.lines.isEmpty()) {
-            Component component = event.lines.getFirst();
-            String line = Utils.toPlain(component);
-            if (line.isEmpty()) return;
-            for (AtomicInteger i = new AtomicInteger(1); i.get() <= starSymbols.size(); i.incrementAndGet()) {
-                String symbol = starSymbols.get(i.get() - 1);
-                if (!line.contains(symbol)) continue;
-                List<Pair<Style, String>> parts = Utils.getStyles(component);
-                Pair<Style, String> first = parts.removeFirst();
-                MutableComponent replacement = Component.literal(first.getRight()).setStyle(first.getLeft());
-                for (Pair<Style, String> part : parts) {
-                    if (part.getRight().equals(symbol)) continue;
-                    if (part.getRight().equals("✪✪✪✪✪")) {
-                        replacement.append(Component.literal("✪".repeat(i.get())).withStyle(ChatFormatting.RED)
-                                .append(Component.literal("✪".repeat(5 - i.get())).withStyle(ChatFormatting.GOLD)));
-                        continue;
-                    }
-                    replacement.append(Component.literal(part.getRight()).setStyle(part.getLeft()));
-                }
-                event.removeLine(0);
-                event.addLine(0, replacement);
-                break;
-            }
-        }
     }
 
     @EventHandler

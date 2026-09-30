@@ -14,11 +14,11 @@ import net.minecraft.network.chat.Component;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatSlider;
 import nofrills.hud.clickgui.components.PlainLabel;
-import nofrills.misc.MutableReference;
 import nofrills.misc.RenderColor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static nofrills.Main.mc;
 
@@ -66,8 +66,8 @@ public class InventoryButtonSettings extends Settings {
     }
 
     protected static List<FlowLayout> buildScaleSettings(JsonObject buttonObject) {
-        MutableReference<FlowLayout> layoutX = new MutableReference<>(null);
-        MutableReference<FlowLayout> layoutY = new MutableReference<>(null);
+        AtomicReference<FlowLayout> layoutX = new AtomicReference<>(null);
+        AtomicReference<FlowLayout> layoutY = new AtomicReference<>(null);
         layoutX.set(new SliderDouble(
                 "Scale X",
                 0.5,

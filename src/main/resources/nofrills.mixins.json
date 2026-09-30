@@ -22,6 +22,7 @@
         "EntityMixin",
         "EntityRendererMixin",
         "FogRendererMixin",
+        "FontMixin",
         "GameRendererMixin",
         "GuiGraphicsExtractorMixin",
         "GuiMixin",

@@ -69,6 +69,16 @@ public abstract class SimpleTextElement extends HudElement {
         return super.getBaseSettings(list);
     }
 
+    @Override
+    public void updatePosition(double x, double y) {
+        super.updatePosition(x - this.getAlignOffset(), y);
+    }
+
+    @Override
+    public void savePosition(double x, double y) {
+        super.savePosition(x + this.getAlignOffset(), y);
+    }
+
     public void setText(String text) {
         this.setText(Component.literal(text));
     }
@@ -85,6 +95,14 @@ public abstract class SimpleTextElement extends HudElement {
 
     public final int getTextColor() {
         return this.textColor.value().hex;
+    }
+
+    public final double getAlignOffset() {
+        return switch (this.textAlignment.value()) {
+            case Left -> 0.0;
+            case Center -> this.width() * 0.5;
+            case Right -> this.width();
+        };
     }
 
     public enum TextAlignment {

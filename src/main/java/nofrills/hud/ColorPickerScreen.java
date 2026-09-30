@@ -13,12 +13,12 @@ import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatSlider;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
-import nofrills.misc.MutableReference;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static nofrills.Main.mc;
@@ -33,7 +33,7 @@ public class ColorPickerScreen extends Settings {
 
     public static ColorPickerScreen build(RenderColor currentColor, Screen previous, Consumer<RenderColor> updateCallback) {
         List<FlowLayout> list = new ArrayList<>();
-        MutableReference<RenderColor> reference = new MutableReference<>(currentColor);
+        AtomicReference<RenderColor> reference = new AtomicReference<>(currentColor);
 
         FlowLayout colorSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         colorSection.padding(Insets.of(5));

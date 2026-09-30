@@ -79,6 +79,7 @@ import java.text.DecimalFormat;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -1025,12 +1026,22 @@ public class Utils {
         }, Style.EMPTY);
     }
 
-    public static List<Pair<Style, String>> getStyles(Component text) {
+    public static List<Pair<Style, String>> getStyles(FormattedCharSequence text) {
         List<Pair<Style, String>> list = new ArrayList<>();
-        text.visit(((style, contents) -> {
-            list.add(Pair.of(style, contents));
-            return Optional.empty();
-        }), text.getStyle());
+        AtomicReference<StringBuilder> currentBuilder = new AtomicReference<>(new StringBuilder());
+        AtomicReference<Style> currentStyle = new AtomicReference<>();
+        text.accept((index, style, codePoint) -> {
+            if (currentStyle.get() == null) {
+                currentStyle.set(style);
+            }
+            if (currentStyle.get() != style) {
+                list.add(Pair.of(currentStyle.get(), currentBuilder.get().toString()));
+                currentBuilder.set(new StringBuilder());
+                currentStyle.set(null);
+            }
+            currentBuilder.get().appendCodePoint(codePoint);
+            return true;
+        });
         return list;
     }
 

@@ -2,20 +2,15 @@ package nofrills.hud;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
-import io.wispforest.owo.ui.base.BaseParentUIComponent;
 import io.wispforest.owo.ui.container.DraggableContainer;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.container.WrappingParentUIComponent;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingColor;
-import nofrills.config.SettingDouble;
+import nofrills.config.*;
 import nofrills.hud.clickgui.Settings;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -36,6 +31,7 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
     public final SettingDouble scale;
     public final SettingBool useBackground;
     public final SettingColor background;
+    public final SettingInt gridPrecision;
     public final Identifier identifier;
     public final Surface disabledSurface = Surface.flat(0x55ff0000);
     public MutableComponent elementDesc = Component.empty();
@@ -56,6 +52,7 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
         this.scale = new SettingDouble(1.0, "scale", instance);
         this.useBackground = new SettingBool(false, "useBackground", instance);
         this.background = new SettingColor(RenderColor.fromArgb(0x40000000), "background", instance);
+        this.gridPrecision = new SettingInt(5, "gridPrecision", instance);
         this.identifier = Identifier.fromNamespaceAndPath("nofrills", Utils.toLower(label.replaceAll(" ", "_")));
         this.positioning(Positioning.absolute(0, 0));
         this.layout = layout;
@@ -66,28 +63,8 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
         this.child(this.layout);
     }
 
-    public HudElement(Feature instance, String label) {
+    protected HudElement(Feature instance, String label) {
         this(UIContainers.horizontalFlow(Sizing.content(), Sizing.content()), instance, label);
-    }
-
-    @Override
-    public final BaseParentUIComponent positioning(Positioning positioning) {
-        return super.positioning(positioning);
-    }
-
-    @Override
-    public final DraggableContainer<FlowLayout> foreheadSize(int size) {
-        return super.foreheadSize(size);
-    }
-
-    @Override
-    public final ParentUIComponent allowOverflow(boolean allow) {
-        return super.allowOverflow(allow);
-    }
-
-    @Override
-    public final WrappingParentUIComponent<FlowLayout> child(FlowLayout layout) {
-        return super.child(layout);
     }
 
     @Override
@@ -129,10 +106,20 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
     @Override
     public boolean onMouseDrag(MouseButtonEvent click, double deltaX, double deltaY) {
         if (this.isAdded()) {
-            boolean result = super.onMouseDrag(click, deltaX, deltaY);
-            Window window = mc.getWindow();
-            this.savePosition(this.xOffset / window.getGuiScaledWidth(), this.yOffset / window.getGuiScaledHeight());
-            return result;
+            if (click.hasShiftDown()) {
+                Window window = mc.getWindow();
+                double newX = Math.clamp(mc.mouseHandler.getScaledXPos(window) - this.width() * 0.5, 0, window.getGuiScaledWidth() - this.width());
+                double newY = Math.clamp(mc.mouseHandler.getScaledYPos(window) - this.height() * 0.5, 0, window.getGuiScaledHeight() - this.height());
+                int precision = this.gridPrecision.value();
+                this.xOffset = Math.min(newX - (newX % precision), newX);
+                this.yOffset = Math.min(newY - (newY % precision), newY);
+                this.savePosition(this.xOffset, this.yOffset);
+                return true;
+            } else {
+                boolean result = super.onMouseDrag(click, deltaX, deltaY);
+                this.savePosition(this.xOffset, this.yOffset);
+                return result;
+            }
         }
         return false;
     }
@@ -204,6 +191,7 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
         list.add(new Settings.SliderDouble("Scale", 0.25, 5.0, 0.01, this.scale, "The scale multiplier of this element."));
         list.add(new Settings.Toggle("Use Background", this.useBackground, "Draw a background for this element."));
         list.add(new Settings.ColorPicker("Background", this.background, "The color of the background."));
+        list.add(new Settings.SliderInt("Grid Precision", 1, 20, 1, this.gridPrecision, "The precision of the grid snapping calculation while dragging this element around."));
         HudSettings settings = new HudSettings(list);
         settings.setTitle(this.elementLabel);
         return settings;
@@ -227,16 +215,35 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
 
     public void updatePosition() {
         Window window = mc.getWindow();
-        int width = window.getGuiScaledWidth(), height = window.getGuiScaledHeight();
-        this.xOffset = Math.clamp(this.xPos.value() * width, 0, Math.clamp(width - this.width(), 0, width));
-        this.yOffset = Math.clamp(this.yPos.value() * height, 0, Math.clamp(height - this.height(), 0, height));
+        this.updatePosition(this.xPos.value() * window.getGuiScaledWidth(), this.yPos.value() * window.getGuiScaledHeight());
+    }
+
+    public void updatePosition(double x, double y) {
+        Window window = mc.getWindow();
+        this.xOffset = Math.clamp(x, 0, Math.clamp(window.getGuiScaledWidth() - this.width(), 0, window.getGuiScaledWidth()));
+        this.yOffset = Math.clamp(y, 0, Math.clamp(window.getGuiScaledHeight() - this.height(), 0, window.getGuiScaledHeight()));
         this.updateX(0);
         this.updateY(0);
     }
 
     public void savePosition(double x, double y) {
-        this.xPos.set(x);
-        this.yPos.set(y);
+        Window window = mc.getWindow();
+        this.xPos.set(x / window.getGuiScaledWidth());
+        this.yPos.set(y / window.getGuiScaledHeight());
+    }
+
+    public boolean isInSnapDistance(MouseButtonEvent click) {
+        double mouseX = this.x() + click.x();
+        double mouseY = this.y() + click.y();
+        int precision = this.gridPrecision.value();
+        return mouseX >= this.x() - precision && mouseX <= this.x() + this.width() + precision
+                && mouseY >= this.y() - precision && mouseY <= this.y() + this.height() + precision;
+    }
+
+    public double snapDelta(double delta, double offset) {
+        double newOffset = offset + delta;
+        double snapOffset = Math.min(newOffset - (newOffset % this.gridPrecision.value()), newOffset);
+        return offset - snapOffset;
     }
 
     public void toggle() {

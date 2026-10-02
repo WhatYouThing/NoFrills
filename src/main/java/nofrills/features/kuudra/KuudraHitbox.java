@@ -1,7 +1,7 @@
 package nofrills.features.kuudra;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.entity.monster.cubemob.MagmaCube;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EventListener;

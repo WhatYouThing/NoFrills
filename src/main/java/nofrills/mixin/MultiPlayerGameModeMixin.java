@@ -18,4 +18,13 @@ public abstract class MultiPlayerGameModeMixin {
     private void onAttackEntity(Player player, Entity target, CallbackInfo ci) {
         eventBus.post(new AttackEntityEvent(target));
     }
+    @Inject(method = "dropItem", at = @At("HEAD"), cancellable = true)
+    private void beforeDropItem(net.minecraft.client.player.LocalPlayer player, boolean all, CallbackInfo ci) {
+        if (nofrills.features.general.ItemProtection.instance.isActive()) {
+            if (nofrills.misc.Utils.isInDungeons() && nofrills.misc.DungeonUtil.isDungeonStarted()) return;
+            var stack = player.getInventory().getSelectedItem();
+            if (!nofrills.features.general.ItemProtection.getProtectType(stack).equals(
+                    nofrills.features.general.ItemProtection.ProtectType.None)) ci.cancel();
+        }
+    }
 }

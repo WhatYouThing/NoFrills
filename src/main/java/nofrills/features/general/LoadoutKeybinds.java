@@ -19,7 +19,7 @@ import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 import nofrills.mixin.AbstractContainerScreenAccessor;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +34,7 @@ public class LoadoutKeybinds {
     public static final Feature instance = new Feature("loadoutKeybinds");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind editBindKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "editBindKey", instance);
+    public static final SettingKeybind editBindKey = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "editBindKey", instance);
     public static final SettingBool playSound = new SettingBool(false, "playSound", instance);
     public static final SettingString sound = new SettingString("block.note_block.cow_bell", "sound", instance);
     public static final SettingDouble volume = new SettingDouble(2.0, "volume", instance);
@@ -81,11 +81,11 @@ public class LoadoutKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
             String key = String.valueOf(event.key);
             if (!binding.isEmpty()) {
-                if (event.action == GLFW.GLFW_PRESS) {
-                    if (editBindKey.isKey(event.key) || event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT || event.key == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+                if (event.action == LegacyInput.PRESS) {
+                    if (editBindKey.isKey(event.key) || event.key == LegacyInput.MOUSE_BUTTON_LEFT || event.key == LegacyInput.MOUSE_BUTTON_RIGHT) {
                         Utils.infoRaw(Component.literal("Invalid key, not binding to loadout slot.").withStyle(ChatFormatting.RED));
                     } else {
                         data.edit(obj -> {
@@ -100,11 +100,11 @@ public class LoadoutKeybinds {
                 }
                 event.cancel();
             } else if (editBindKey.isKey(event.key)) {
-                Slot focused = ((AbstractContainerScreenAccessor) mc.screen).getHoveredSlot();
+                Slot focused = ((AbstractContainerScreenAccessor) mc.gui.screen()).getHoveredSlot();
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
                 if (isLoadoutButton(stack)) {
-                    if (event.action == GLFW.GLFW_PRESS) {
+                    if (event.action == LegacyInput.PRESS) {
                         String name = Utils.toPlain(stack.getHoverName());
                         if (data.value().entrySet().stream().anyMatch(entry -> entry.getValue().getAsString().equals(name))) {
                             data.edit(obj -> obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(name)));
@@ -125,8 +125,8 @@ public class LoadoutKeybinds {
                     ItemStack stack = slot.getItem();
                     if (stack.isEmpty()) continue;
                     if (name.equals(Utils.toPlain(stack.getHoverName()))) {
-                        if (event.action == GLFW.GLFW_PRESS) {
-                            Utils.click(screen.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_LEFT, ContainerInput.PICKUP);
+                        if (event.action == LegacyInput.PRESS) {
+                            Utils.click(screen.getMenu().containerId, slot.index, LegacyInput.MOUSE_BUTTON_LEFT, ContainerInput.PICKUP);
                             if (playSound.value()) {
                                 Utils.playSound(sound.value(), volume.valueFloat(), pitch.valueFloat());
                             }

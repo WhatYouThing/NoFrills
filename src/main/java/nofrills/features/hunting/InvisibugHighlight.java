@@ -29,9 +29,9 @@ public class InvisibugHighlight {
     private static final CopyOnWriteArrayList<Invisibug> invisibugList = new CopyOnWriteArrayList<>();
 
     private static boolean isInvisibugParticle(ClientboundLevelParticlesPacket packet) {
-        return packet.getCount() == 1 && packet.getMaxSpeed() == 0.0f && packet.getXDist() == 0.0f
-                && packet.getYDist() == 0.0f && packet.getZDist() == 0.0f
-                && packet.alwaysShow() && packet.isOverrideLimiter();
+        return packet.count() == 1 && nofrills.compat.ParticleCompat.hasSpeed(packet, 0.0f) && packet.xDist() == 0.0f
+                && packet.yDist() == 0.0f && packet.zDist() == 0.0f
+                && packet.alwaysShow() && packet.overrideLimiter();
     }
 
     private static boolean hasInvisibugMarker(Vec3 pos) {

@@ -1,35 +1,24 @@
 package nofrills.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.renderer.extract.LevelExtractor;
+import net.minecraft.client.renderer.state.level.PlayerRenderState;
 import nofrills.features.general.NoRender;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GameRenderer.class)
+/** World-camera portal and nausea strengths are now extracted into player render state. */
+@Mixin(LevelExtractor.class)
 public abstract class GameRendererMixin {
-
-    @ModifyExpressionValue(method = "renderLevel", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;oPortalEffectIntensity:F"))
-    private float onGetLastIntensity(float original) {
+    @Inject(method = "extractPlayerState", at = @At("TAIL"))
+    private void suppressCameraDistortion(Camera camera, DeltaTracker tracker, float partialTick,
+            PlayerRenderState state, CallbackInfo ci) {
         if (NoRender.instance.isActive() && NoRender.nausea.value()) {
-            return 0.0f;
+            state.portalEffectIntensity = 0.0f;
+            state.nauseaEffectIntensity = 0.0f;
         }
-        return original;
-    }
-
-    @ModifyExpressionValue(method = "renderLevel", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;portalEffectIntensity:F"))
-    private float onGetIntensity(float original) {
-        if (NoRender.instance.isActive() && NoRender.nausea.value()) {
-            return 0.0f;
-        }
-        return original;
-    }
-
-    @ModifyExpressionValue(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getEffectBlendFactor(Lnet/minecraft/core/Holder;F)F"))
-    private float onGetFactor(float original) {
-        if (NoRender.instance.isActive() && NoRender.nausea.value()) {
-            return 0.0f;
-        }
-        return original;
     }
 }

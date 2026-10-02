@@ -50,7 +50,7 @@ public class ExperimentSolver {
     }
 
     public static ExperimentType getExperimentType() {
-        if (mc.screen instanceof ContainerScreen container && Utils.isOnPrivateIsland()) {
+        if (mc.gui.screen() instanceof ContainerScreen container && Utils.isOnPrivateIsland()) {
             String title = container.getTitle().getString();
             if (title.startsWith("Chronomatron (")) return ExperimentType.Chronomatron;
             if (title.startsWith("Ultrasequencer (")) return ExperimentType.Ultrasequencer;

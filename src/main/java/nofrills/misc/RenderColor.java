@@ -48,8 +48,9 @@ public class RenderColor {
 
     @SuppressWarnings("DataFlowIssue")
     public static RenderColor fromFormat(ChatFormatting formatting) {
-        if (formatting.isColor()) {
-            return RenderColor.fromHex(formatting.getColor());
+        var color = net.minecraft.network.chat.TextColor.fromLegacyFormat(formatting);
+        if (color != null) {
+            return RenderColor.fromHex(color.getValue());
         } else {
             throw new IllegalStateException(Utils.format("RenderColor cannot be created from non-color ChatFormatting ({})", formatting));
         }

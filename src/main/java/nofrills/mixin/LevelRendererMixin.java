@@ -3,7 +3,7 @@ package nofrills.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.buffers.GpuBufferSlice;
+import com.mojang.renderpearl.api.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.framegraph.FramePass;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
@@ -41,18 +41,12 @@ public abstract class LevelRendererMixin {
     @Final
     private LevelTargetBundle targets;
 
-    @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;addWeatherPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V"))
-    private void onRenderWorld(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci, @Local FrameGraphBuilder frame) {
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;addMainPass(Lcom/mojang/blaze3d/framegraph/FrameGraphBuilder;Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;Lcom/mojang/renderpearl/api/buffers/GpuBufferSlice;Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;Z)V", shift = At.Shift.AFTER))
+    private void onRenderWorld(GraphicsResourceAllocator resourceAllocator, boolean renderOutline,
+            CameraRenderState cameraState, GpuBufferSlice terrainFog, Vector4f fogColor,
+            boolean renderSky, boolean renderDebug, CallbackInfo ci, @Local FrameGraphBuilder frame) {
         FramePass pass = frame.addPass("nofrills$world_render");
         this.targets.main = pass.readsAndWrites(this.targets.main);
         pass.executes(() -> eventBus.post(new WorldRenderEvent(cameraState, new PoseStack(), this.levelRenderState)).draw());
-    }
-
-    @WrapOperation(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;shouldRender(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/client/renderer/culling/Frustum;DDD)Z"))
-    private <E extends Entity> boolean onBeforeRenderEntity(EntityRenderDispatcher instance, E entity, Frustum culler, double camX, double camY, double camZ, Operation<Boolean> original) {
-        if (NoRender.instance.isActive() && NoRender.shouldCancelRender(entity)) {
-            return false;
-        }
-        return original.call(instance, entity, culler, camX, camY, camZ);
     }
 }

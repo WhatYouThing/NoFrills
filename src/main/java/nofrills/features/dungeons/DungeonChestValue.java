@@ -85,7 +85,7 @@ public class DungeonChestValue {
     @EventHandler
     private static void onSlot(SlotUpdateEvent event) {
         if (instance.isActive() && isChest(event.title) && Utils.isInLootArea()) {
-            if (event.isInventory || event.stack.getItem().equals(Items.BLACK_STAINED_GLASS_PANE)) {
+            if (event.isInventory || event.stack.getItem().equals(Items.STAINED_GLASS_PANE.black())) {
                 return;
             }
             String name = Utils.toPlain(event.stack.getHoverName());

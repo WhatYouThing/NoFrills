@@ -101,7 +101,7 @@ public class SkyblockData {
 
     private static void updateTabListIfDirty() {
         List<String> lines = new ArrayList<>();
-        for (PlayerInfo entry : mc.gui.getTabList().getPlayerInfos()) {
+        for (PlayerInfo entry : mc.gui.hud.getTabList().getPlayerInfos()) {
             if (entry != null && entry.getTabListDisplayName() != null) {
                 String name = Utils.toPlain(entry.getTabListDisplayName()).trim();
                 if (name.isEmpty()) continue;

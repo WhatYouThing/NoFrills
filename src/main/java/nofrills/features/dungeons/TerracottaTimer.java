@@ -41,7 +41,7 @@ public class TerracottaTimer {
                     continue;
                 }
                 MutableComponent text = Component.literal(Utils.formatDecimal(terra.ticks / 20.0f) + "s");
-                event.drawText(terra.pos.getCenter(), text, scale.valueFloat() * 0.1f, true, color.value());
+                event.drawText(net.minecraft.world.phys.Vec3.atCenterOf(terra.pos), text, scale.valueFloat() * 0.1f, true, color.value());
             }
         }
     }

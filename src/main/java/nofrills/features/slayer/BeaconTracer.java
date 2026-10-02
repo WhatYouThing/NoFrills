@@ -62,7 +62,7 @@ public class BeaconTracer {
                 return;
             }
             event.drawOutline(AABB.encapsulatingFullBlocks(beaconPos, beaconPos), false, color.value());
-            event.drawTracer(beaconPos.getCenter(), color.value());
+            event.drawTracer(net.minecraft.world.phys.Vec3.atCenterOf(beaconPos), color.value());
         }
     }
 

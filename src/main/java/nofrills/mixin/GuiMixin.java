@@ -6,7 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 import static nofrills.Main.eventBus;
 import static nofrills.Main.mc;
 
-@Mixin(Gui.class)
+@Mixin(Hud.class)
 public abstract class GuiMixin {
 
     @Inject(method = "extractArmor", at = @At("HEAD"), cancellable = true)
@@ -65,12 +65,12 @@ public abstract class GuiMixin {
 
     @Inject(method = "extractRenderState", at = @At("TAIL"))
     private void onRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (!mc.options.hideGui) {
+        if (!mc.gui.hud.isHidden()) {
             eventBus.post(new HudRenderEvent(graphics, this.getFont(), deltaTracker));
         }
     }
 
-    @Inject(method = "extractItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractSlot(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IILnet/minecraft/client/DeltaTracker;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;I)V", ordinal = 0, shift = At.Shift.AFTER))
+    @Inject(method = "extractItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;extractSlot(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IILnet/minecraft/client/DeltaTracker;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;I)V", ordinal = 0, shift = At.Shift.AFTER))
     private void onRenderItemHotbar(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci, @Local(name = "i") int slot_idx, @Local(name = "x") int x, @Local(name = "y") int y, @Local(name = "player") Player player) {
         if (ItemProtection.instance.isActive()) {
             ItemProtection.drawOverlayIcon(context, x, y, ItemProtection.getProtectType(player.getInventory().getNonEquipmentItems().get(slot_idx)));
@@ -105,7 +105,7 @@ public abstract class GuiMixin {
         }
     }
 
-    @Inject(method = "extractVignette", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIIII)V"), cancellable = true)
+    @Inject(method = "extractVignette", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIIII)V"), cancellable = true)
     private void onRenderVignette(GuiGraphicsExtractor context, Entity entity, CallbackInfo ci, @Local(ordinal = 0) float borderWarningStrength) {
         if (NoRender.instance.isActive()) {
             NoRender.VignetteMode mode = NoRender.vignette.value();

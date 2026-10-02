@@ -15,14 +15,14 @@ public final class SpawnParticleEvent extends Cancellable {
     public SpawnParticleEvent(ClientboundLevelParticlesPacket packet) {
         this.setCancelled(false);
         this.packet = packet;
-        this.type = packet.getParticle().getType();
-        this.pos = new Vec3(packet.getX(), packet.getY(), packet.getZ());
+        this.type = packet.particle().getType();
+        this.pos = new Vec3(packet.x(), packet.y(), packet.z());
     }
 
     public boolean matchParameters(ParticleType<?> type, int count, double speed, double offsetX, double offsetY, double offsetZ) {
-        return this.type.equals(type) && this.packet.getCount() == count && this.packet.getMaxSpeed() == (float) speed
-                && this.packet.getXDist() == (float) offsetX && this.packet.getYDist() == (float) offsetY
-                && this.packet.getZDist() == (float) offsetZ;
+        return this.type.equals(type) && this.packet.count() == count && nofrills.compat.ParticleCompat.hasSpeed(this.packet, (float) speed)
+                && this.packet.xDist() == (float) offsetX && this.packet.yDist() == (float) offsetY
+                && this.packet.zDist() == (float) offsetZ;
     }
 
     public boolean isCurveParticle() {

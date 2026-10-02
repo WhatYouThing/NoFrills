@@ -14,7 +14,7 @@ import nofrills.hud.elements.Armor;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -77,7 +77,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
             return false;
         }
         boolean clicked = this.uiAdapter.mouseClicked(click, doubled);
-        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && !clicked) {
+        if (LegacyInput.fromMouseButton(click.button()) == LegacyInput.MOUSE_BUTTON_RIGHT && !clicked) {
             List<FlowLayout> list = new ArrayList<>();
             HashMap<HudElement.Category, List<HudElement>> categories = new HashMap<>();
             for (HudElement element : HudManager.getElements()) {
@@ -110,7 +110,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
             }
             HudSettings settings = new HudSettings(list);
             settings.setTitle(Component.literal("HUD Elements"));
-            mc.setScreen(settings);
+            mc.gui.setScreen(settings);
             return true;
         }
         return clicked;
@@ -118,7 +118,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean mouseReleased(MouseButtonEvent click) {
-        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+        if (LegacyInput.fromMouseButton(click.button()) == LegacyInput.MOUSE_BUTTON_LEFT) {
             for (HudElement element : HudManager.getElements()) {
                 if (element.toggling && element.isAdded()) {
                     element.toggling = false;

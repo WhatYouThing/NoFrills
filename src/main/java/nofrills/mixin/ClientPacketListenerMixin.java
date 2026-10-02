@@ -90,9 +90,9 @@ public class ClientPacketListenerMixin {
 
     @Inject(method = "handleContainerSetSlot", at = @At("TAIL"))
     private void onUpdateInventory(ClientboundContainerSetSlotPacket packet, CallbackInfo ci) {
-        if (mc.screen instanceof ContainerScreen container) {
+        if (mc.gui.screen() instanceof ContainerScreen container) {
             eventBus.post(new SlotUpdateEvent(packet, container, container.getMenu(), packet.getSlot()));
-        } else if (mc.screen == null) {
+        } else if (mc.gui.screen() == null) {
             eventBus.post(new InventoryUpdateEvent(packet, packet.getItem(), packet.getSlot()));
         }
     }

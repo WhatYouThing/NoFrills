@@ -3,7 +3,7 @@ package nofrills.hud.clickgui.components;
 import io.wispforest.owo.ui.component.SlimSliderComponent;
 import io.wispforest.owo.ui.core.CursorStyle;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 public final class FlatSlider extends SlimSliderComponent {
     public int trackColor;
@@ -15,11 +15,11 @@ public final class FlatSlider extends SlimSliderComponent {
         this.sliderColor = sliderColor;
         this.cursorStyle(CursorStyle.POINTER);
         this.keyPress().subscribe((click) -> {
-            if (click.key() == GLFW.GLFW_KEY_LEFT) {
+            if (LegacyInput.fromKeyboard(click.key()) == LegacyInput.KEY_LEFT) {
                 this.value(this.value() - this.stepSize);
                 return true;
             }
-            if (click.key() == GLFW.GLFW_KEY_RIGHT) {
+            if (LegacyInput.fromKeyboard(click.key()) == LegacyInput.KEY_RIGHT) {
                 this.value(this.value() + this.stepSize);
                 return true;
             }

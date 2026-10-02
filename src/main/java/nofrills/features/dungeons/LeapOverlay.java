@@ -19,7 +19,7 @@ import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,10 +35,10 @@ public class LeapOverlay {
     public static final SettingBool send = new SettingBool(false, "send", instance.key());
     public static final SettingString message = new SettingString("/pc Leaped to {name}!", "message", instance.key());
     public static final SettingDouble scale = new SettingDouble(3.0, "scale", instance.key());
-    public static final SettingKeybind firstKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "firstKey", instance);
-    public static final SettingKeybind secondKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "secondKey", instance);
-    public static final SettingKeybind thirdKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "thirdKey", instance);
-    public static final SettingKeybind fourthKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "fourthKey", instance);
+    public static final SettingKeybind firstKey = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "firstKey", instance);
+    public static final SettingKeybind secondKey = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "secondKey", instance);
+    public static final SettingKeybind thirdKey = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "thirdKey", instance);
+    public static final SettingKeybind fourthKey = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "fourthKey", instance);
     public static final SettingColor healer = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", instance.key());
     public static final SettingColor mage = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", instance.key());
     public static final SettingColor bers = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", instance.key());
@@ -94,11 +94,11 @@ public class LeapOverlay {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (mc.screen != null && isLeapMenu(mc.screen.getTitle().getString())) {
+        if (mc.gui.screen() != null && isLeapMenu(mc.gui.screen().getTitle().getString())) {
             List<SettingKeybind> leapKeys = List.of(firstKey, secondKey, thirdKey, fourthKey);
             for (int i = 0; i < leapKeys.size(); i++) {
                 if (leapKeys.get(i).isKey(event.key) && leapButtons.size() >= i + 1) {
-                    leapButtons.get(i).click(((AbstractContainerScreen<?>) mc.screen).getMenu());
+                    leapButtons.get(i).click(((AbstractContainerScreen<?>) mc.gui.screen()).getMenu());
                     event.cancel();
                     return;
                 }

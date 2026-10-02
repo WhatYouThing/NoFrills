@@ -6,7 +6,7 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.hud.clickgui.components.PlainLabel;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import static nofrills.Main.mc;
 
@@ -41,10 +41,10 @@ public final class Module extends FlowLayout {
     @Override
     public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
         if (click.y() <= (double) this.label.fullSize().height()) {
-            if (click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
+            if (LegacyInput.fromMouseButton(click.button()) == LegacyInput.MOUSE_BUTTON_1) {
                 this.active(!this.feature.isActive());
-            } else if (click.button() == GLFW.GLFW_MOUSE_BUTTON_2 && this.options != null) {
-                mc.setScreen(this.options);
+            } else if (LegacyInput.fromMouseButton(click.button()) == LegacyInput.MOUSE_BUTTON_2 && this.options != null) {
+                mc.gui.setScreen(this.options);
             }
             return true;
         }

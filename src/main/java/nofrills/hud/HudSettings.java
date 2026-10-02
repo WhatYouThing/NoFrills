@@ -14,6 +14,6 @@ public class HudSettings extends Settings {
 
     @Override
     public void onClose() {
-        mc.setScreen(new HudEditorScreen());
+        mc.gui.setScreen(new HudEditorScreen());
     }
 }

@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
-import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.minecraft.SessionService;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.fabricmc.loader.api.FabricLoader;
@@ -103,9 +103,9 @@ public class Utils {
     );
 
     public static void showTitle(MutableComponent title, MutableComponent subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        mc.gui.setTitle(title);
-        mc.gui.setSubtitle(subtitle);
-        mc.gui.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
+        mc.gui.hud.setTitle(title);
+        mc.gui.hud.setSubtitle(subtitle);
+        mc.gui.hud.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
     }
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
@@ -203,7 +203,7 @@ public class Utils {
         if (message.getStyle().getColor() == null) {
             message.withColor(0xffffff);
         }
-        mc.execute(() -> mc.gui.getChat().addMessage(getTag().append(message), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator));
+        mc.execute(() -> mc.gui.hud.getChat().addMessage(getTag().append(message), null, GuiMessageSource.SYSTEM_CLIENT, noFrillsIndicator));
     }
 
     public static void infoFormat(String message, Object... values) {
@@ -611,7 +611,7 @@ public class Utils {
 
     public static String getTextureUrl(GameProfile profile) {
         if (profile != null) {
-            MinecraftSessionService service = mc.services().sessionService();
+            SessionService service = mc.services().sessionService();
             Property property = service.getPackedTextures(profile);
             MinecraftProfileTextures textures = service.unpackTextures(property);
             if (textures.skin() != null) {
@@ -846,7 +846,7 @@ public class Utils {
      */
     public static List<String> getFooterLines() {
         List<String> list = new ArrayList<>();
-        Component footer = ((PlayerTabOverlayAccessor) mc.gui.getTabList()).getFooter();
+        Component footer = ((PlayerTabOverlayAccessor) mc.gui.hud.getTabList()).getFooter();
         if (footer != null) {
             String[] lines = footer.getString().split("\n");
             for (String line : lines) {
@@ -860,7 +860,7 @@ public class Utils {
     }
 
     public static List<LerpingBossEvent> getBossBars() {
-        return ((BossHealthOverlayAccessor) mc.gui.getBossOverlay()).getEvents().values().stream().toList();
+        return ((BossHealthOverlayAccessor) mc.gui.hud.getBossOverlay()).getEvents().values().stream().toList();
     }
 
     /**
@@ -895,7 +895,7 @@ public class Utils {
     }
 
     public static Slot getFocusedSlot() {
-        return mc.screen instanceof AbstractContainerScreen<?> container ? ((AbstractContainerScreenAccessor) container).getHoveredSlot() : null;
+        return mc.gui.screen() instanceof AbstractContainerScreen<?> container ? ((AbstractContainerScreenAccessor) container).getHoveredSlot() : null;
     }
 
     private static int romanToInt(Character roman) {
@@ -1049,7 +1049,8 @@ public class Utils {
     }
 
     public static boolean hasColor(Style style, ChatFormatting color) {
-        return color.getColor() != null && hasColor(style, color.getColor());
+        var textColor = net.minecraft.network.chat.TextColor.fromLegacyFormat(color);
+        return textColor != null && hasColor(style, textColor.getValue());
     }
 
     public static boolean hasColor(Style style, int hex) {
@@ -1233,7 +1234,7 @@ public class Utils {
     }
 
     public static void setScreen(Screen screen) {
-        mc.execute(() -> mc.setScreen(screen));
+        mc.execute(() -> mc.gui.setScreen(screen));
     }
 
     public static void click(int containerId, int slotId, int button, ContainerInput containerInput) {

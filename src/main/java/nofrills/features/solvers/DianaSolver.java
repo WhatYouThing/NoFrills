@@ -16,7 +16,7 @@ import nofrills.events.EventListener;
 import nofrills.misc.CurveSolver;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -33,7 +33,7 @@ public class DianaSolver {
     public static final SettingColor treasureColor = new SettingColor(RenderColor.fromArgb(0xaaffaa00), "treasureColor", instance);
     public static final SettingColor enemyColor = new SettingColor(RenderColor.fromArgb(0xaaff5555), "enemyColor", instance);
     public static final SettingColor startColor = new SettingColor(RenderColor.fromArgb(0xaa55ff55), "startColor", instance);
-    public static final SettingKeybind warpKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "warpKey", instance);
+    public static final SettingKeybind warpKey = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "warpKey", instance);
     public static final SettingBool warpMsg = new SettingBool(false, "warpMsg", instance);
     public static final SettingBool hubToggle = new SettingBool(true, "hubToggle", instance);
     public static final SettingBool stonksToggle = new SettingBool(true, "stonksToggle", instance);
@@ -76,7 +76,7 @@ public class DianaSolver {
         double lowestDist = mc.player.position().distanceTo(pos);
         DianaWarp closestWarp = null;
         for (DianaWarp warp : warps) {
-            Vec3 warpPos = warp.pos.getCenter();
+            Vec3 warpPos = net.minecraft.world.phys.Vec3.atCenterOf(warp.pos);
             double warpDist = warpPos.distanceTo(pos);
             if (warp.toggle.value() && warpDist < lowestDist) {
                 lowestDist = warpDist;
@@ -120,8 +120,8 @@ public class DianaSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen == null && warpKey.key() == event.key && Utils.isInHub()) {
-            if (event.action == GLFW.GLFW_PRESS) {
+        if (instance.isActive() && mc.gui.screen() == null && warpKey.key() == event.key && Utils.isInHub()) {
+            if (event.action == LegacyInput.PRESS) {
                 Optional<Burrow> burrow = burrowsList.stream().filter(Burrow::isGuess).findFirst();
                 if (burrow.isPresent()) {
                     DianaWarp warp = findWarp(burrow.get().getVec());
@@ -271,7 +271,7 @@ public class DianaSolver {
         }
 
         public Vec3 getVec() {
-            return this.pos.getCenter().add(0, 0.5, 0);
+            return net.minecraft.world.phys.Vec3.atCenterOf(this.pos).add(0, 0.5, 0);
         }
 
         public double distanceTo() {

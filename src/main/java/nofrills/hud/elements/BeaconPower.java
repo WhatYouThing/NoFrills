@@ -68,7 +68,7 @@ public final class BeaconPower extends SimpleTextElement implements ListeningHud
         for (Component line : Utils.getLoreText(event.stack)) {
             String string = Utils.toPlain(line);
             if (string.equals("No active profile stat bonus set!")) {
-                this.data.get().addProperty("statColor", ChatFormatting.RED.getColor());
+                this.data.get().addProperty("statColor", net.minecraft.network.chat.TextColor.RED.getValue());
                 this.data.get().addProperty("statText", "No stat!");
                 break;
             }

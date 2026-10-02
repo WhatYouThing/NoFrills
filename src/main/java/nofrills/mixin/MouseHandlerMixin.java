@@ -12,7 +12,7 @@ import nofrills.events.InputEvent;
 import nofrills.features.farming.MouseLock;
 import nofrills.features.misc.HotbarScrollLock;
 import nofrills.features.tweaks.NoCursorReset;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -56,15 +56,15 @@ public abstract class MouseHandlerMixin {
         }
     }
 
-    @WrapOperation(method = "releaseMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabOrReleaseMouse(Lcom/mojang/blaze3d/platform/Window;IDD)V"))
-    private void onReleaseMouse(Window window, int cursorMode, double xpos, double ypos, Operation<Void> original) {
+    @WrapOperation(method = "releaseMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;releaseMouse(Lcom/mojang/blaze3d/platform/Window;DD)V"))
+    private void onReleaseMouse(Window window, double xpos, double ypos, Operation<Void> original) {
         if (NoCursorReset.isActive() && NoCursorReset.isPosStored()) {
             this.xpos = NoCursorReset.cursorX;
             this.ypos = NoCursorReset.cursorY;
-            original.call(window, cursorMode, NoCursorReset.cursorX, NoCursorReset.cursorY);
-            GLFW.glfwSetCursorPos(window.handle(), NoCursorReset.cursorX, NoCursorReset.cursorY);
+            original.call(window, NoCursorReset.cursorX, NoCursorReset.cursorY);
+            org.lwjgl.sdl.SDLMouse.SDL_WarpMouseInWindow(window.handle(), (float) NoCursorReset.cursorX, (float) NoCursorReset.cursorY);
         } else {
-            original.call(window, cursorMode, xpos, ypos);
+            original.call(window, xpos, ypos);
         }
     }
 

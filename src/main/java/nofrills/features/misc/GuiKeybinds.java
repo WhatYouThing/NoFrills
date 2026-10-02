@@ -13,7 +13,7 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import static nofrills.Main.mc;
 
@@ -21,11 +21,11 @@ import static nofrills.Main.mc;
 public class GuiKeybinds {
     public static final Feature instance = new Feature("guiKeybinds");
 
-    public static final SettingKeybind next = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "next", instance.key());
-    public static final SettingKeybind previous = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "previous", instance.key());
-    public static final SettingKeybind up = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "up", instance.key());
-    public static final SettingKeybind down = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "down", instance.key());
-    public static final SettingKeybind back = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "back", instance.key());
+    public static final SettingKeybind next = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "next", instance.key());
+    public static final SettingKeybind previous = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "previous", instance.key());
+    public static final SettingKeybind up = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "up", instance.key());
+    public static final SettingKeybind down = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "down", instance.key());
+    public static final SettingKeybind back = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "back", instance.key());
 
     private static ButtonType getButtonType(ItemStack stack) {
         if (!stack.isEmpty() && Utils.getSkyblockId(stack).isEmpty()) {
@@ -58,7 +58,7 @@ public class GuiKeybinds {
         mc.gameMode.handleContainerInput(
                 syncId,
                 slot.index,
-                extraLines ? GLFW.GLFW_MOUSE_BUTTON_LEFT : GLFW.GLFW_MOUSE_BUTTON_3,
+                extraLines ? LegacyInput.MOUSE_BUTTON_LEFT : LegacyInput.MOUSE_BUTTON_3,
                 extraLines ? ContainerInput.PICKUP : ContainerInput.CLONE,
                 mc.player
         );
@@ -66,12 +66,12 @@ public class GuiKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
+        if (instance.isActive() && mc.gui.screen() instanceof ContainerScreen container) {
             ChestMenu handler = container.getMenu();
             for (Slot slot : Utils.getContainerSlots(handler)) {
                 ButtonType type = getButtonType(slot.getItem());
                 if (!type.equals(ButtonType.None) && getBoundKey(type).key() == event.key) {
-                    if (event.action == GLFW.GLFW_PRESS) click(handler.containerId, slot);
+                    if (event.action == LegacyInput.PRESS) click(handler.containerId, slot);
                     event.cancel();
                     break;
                 }

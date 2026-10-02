@@ -16,12 +16,12 @@ public abstract class LightmapRenderStateExtractorMixin {
     @Final
     private static Vector3f AMBIENT_LIGHT_COLOR = new Vector3f(1.0f, 1.0f, 1.0f);
 
-    @ModifyExpressionValue(method = "extract", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;vector3fFromRGB24(I)Lorg/joml/Vector3f;", ordinal = 2))
-    private static Vector3f getAmbientLight(Vector3f original) {
+    @org.spongepowered.asm.mixin.injection.Inject(method = "extract", at = @At("TAIL"))
+    private void getAmbientLight(net.minecraft.client.renderer.state.LightmapRenderState state,
+            float partialTick, org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {
         if (Fullbright.instance.isActive() && Fullbright.mode.value().equals(Fullbright.Mode.Ambient)) {
-            return AMBIENT_LIGHT_COLOR;
+            state.ambientColor = AMBIENT_LIGHT_COLOR;
         }
-        return original;
     }
 
     @ModifyExpressionValue(method = "extract", at = @At(value = "INVOKE", target = "Ljava/lang/Double;floatValue()F", ordinal = 0))

@@ -1,7 +1,7 @@
 package nofrills.misc;
 
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
-import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.minecraft.SessionService;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.components.LerpingBossEvent;
@@ -49,7 +49,7 @@ public class DebugStuff {
     private static void logNbt(String message, Entity entity) {
         Thread.startVirtualThread(() -> {
             EntityDataAccessor accessor = new EntityDataAccessor(entity);
-            LOGGER.info(Utils.format(message, entity + "\n" + NbtUtils.prettyPrint(accessor.getData(), true)));
+            LOGGER.info(Utils.format(message, entity + "\n" + new net.minecraft.nbt.SnbtPrinterTagVisitor().visit(accessor.getData())));
         });
     }
 
@@ -87,7 +87,7 @@ public class DebugStuff {
     }
 
     public static void dumpPlayerTextures() {
-        MinecraftSessionService service = mc.services().sessionService();
+        SessionService service = mc.services().sessionService();
         for (Entity ent : Utils.getEntities()) {
             if (ent instanceof Player player) {
                 MinecraftProfileTextures textures = service.getTextures(player.getGameProfile());
@@ -206,18 +206,18 @@ public class DebugStuff {
         if (logParticles) {
             String msg = Utils.format("particle: {}, count: {}, speed: {}, offsetX: {}, offsetY: {}, offsetZ: {}, force: {}, important: {}, x: {}, y: {}, z: {}",
                     event.getParticleId(),
-                    event.packet.getCount(),
-                    event.packet.getMaxSpeed(),
-                    event.packet.getXDist(),
-                    event.packet.getYDist(),
-                    event.packet.getZDist(),
-                    event.packet.isOverrideLimiter(),
+                    event.packet.count(),
+                    nofrills.compat.ParticleCompat.describeSpeed(event.packet),
+                    event.packet.xDist(),
+                    event.packet.yDist(),
+                    event.packet.zDist(),
+                    event.packet.overrideLimiter(),
                     event.packet.alwaysShow(),
-                    event.packet.getX(),
-                    event.packet.getY(),
-                    event.packet.getZ()
+                    event.packet.x(),
+                    event.packet.y(),
+                    event.packet.z()
             );
-            if (event.packet.getParticle() instanceof DustParticleOptions dustParticle) {
+            if (event.packet.particle() instanceof DustParticleOptions dustParticle) {
                 Vector3f color = dustParticle.getColor();
                 msg = Utils.format("{}, color: {} {} {}", msg, color.x, color.y, color.z);
             }

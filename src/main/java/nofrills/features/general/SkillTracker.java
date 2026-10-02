@@ -79,7 +79,7 @@ public class SkillTracker {
             });
             ButtonComponent reset = UIComponents.button(Component.literal("Reset Session"), _ -> {
                 data.get().add(skill, getDefaultData());
-                mc.setScreen(buildSettings());
+                mc.gui.setScreen(buildSettings());
                 data.save();
             });
             reset.renderer(Settings.buttonRendererWhite);

@@ -12,7 +12,7 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import static nofrills.Main.mc;
 
@@ -22,9 +22,9 @@ public class FusionKeybinds {
 
     // ta? https://github.com/hannibal002/SkyHanni/commit/571f3976570092cc054f201a8fd71c7d672393f2
 
-    public static final SettingKeybind repeat = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "repeat", instance.key());
-    public static final SettingKeybind confirm = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "confirm", instance.key());
-    public static final SettingKeybind cancel = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "cancel", instance.key());
+    public static final SettingKeybind repeat = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "repeat", instance.key());
+    public static final SettingKeybind confirm = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "confirm", instance.key());
+    public static final SettingKeybind cancel = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "cancel", instance.key());
 
     private static boolean isBindValid(ItemStack stack, String title, int key) {
         if (!stack.isEmpty()) {
@@ -34,7 +34,7 @@ public class FusionKeybinds {
             }
             if (title.equals("Confirm Fusion")) {
                 Item item = stack.getItem();
-                return (item.equals(Items.LIME_TERRACOTTA) && key == confirm.value()) || (item.equals(Items.RED_TERRACOTTA) && key == cancel.value());
+                return (item.equals(Items.DYED_TERRACOTTA.lime()) && key == confirm.value()) || (item.equals(Items.DYED_TERRACOTTA.red()) && key == cancel.value());
             }
         }
         return false;
@@ -42,15 +42,15 @@ public class FusionKeybinds {
 
     @EventHandler
     private static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container) {
+        if (instance.isActive() && mc.gui.screen() instanceof ContainerScreen container) {
             String title = container.getTitle().getString();
             if (!title.contains("Fusion Box") && !title.equals("Confirm Fusion")) {
                 return;
             }
             for (Slot slot : container.getMenu().slots) {
                 if (isBindValid(slot.getItem(), title, event.key)) {
-                    if (event.action == GLFW.GLFW_PRESS) {
-                        mc.gameMode.handleContainerInput(container.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_3, ContainerInput.CLONE, mc.player);
+                    if (event.action == LegacyInput.PRESS) {
+                        mc.gameMode.handleContainerInput(container.getMenu().containerId, slot.index, LegacyInput.MOUSE_BUTTON_3, ContainerInput.CLONE, mc.player);
                     }
                     event.cancel();
                     return;

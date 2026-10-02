@@ -73,7 +73,7 @@ public class SpookyChestHighlight {
                 }
                 BlockPos pos = Utils.findGround(chest.blockPosition(), 4).above(1);
                 event.drawFilledWithBeam(AABB.encapsulatingFullBlocks(pos, pos), 256, true, color.value());
-                if (tracer.value()) event.drawTracer(pos.getCenter(), color.valueWithAlpha(1.0f));
+                if (tracer.value()) event.drawTracer(net.minecraft.world.phys.Vec3.atCenterOf(pos), color.valueWithAlpha(1.0f));
             }
         }
     }

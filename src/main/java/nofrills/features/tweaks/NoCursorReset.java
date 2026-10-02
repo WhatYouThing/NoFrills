@@ -28,7 +28,7 @@ public class NoCursorReset {
     }
 
     public static boolean isActive() {
-        return isActive(mc.screen);
+        return isActive(mc.gui.screen());
     }
 
     public static boolean isPosStored() {
@@ -60,7 +60,7 @@ public class NoCursorReset {
 
     @EventHandler
     private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && ticks > 0 && mc.screen == null) {
+        if (instance.isActive() && ticks > 0 && mc.gui.screen() == null) {
             ticks--;
             if (ticks == 0) {
                 cursorX = -1.0;

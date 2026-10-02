@@ -7,7 +7,7 @@ import nofrills.config.Feature;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.List;
 
@@ -30,9 +30,9 @@ public class QuickClose {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && event.isKeyboard && mc.screen instanceof ContainerScreen container) {
+        if (instance.isActive() && Utils.isInDungeons() && event.isKeyboard && mc.gui.screen() instanceof ContainerScreen container) {
             if (isChest(container.getTitle().getString()) && movementKeys.stream().anyMatch(key -> Utils.matchesKey(key, event.keyInput))) {
-                if (event.action == GLFW.GLFW_PRESS) {
+                if (event.action == LegacyInput.PRESS) {
                     container.onClose();
                 }
                 event.cancel();

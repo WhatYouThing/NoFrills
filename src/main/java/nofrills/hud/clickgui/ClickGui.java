@@ -33,7 +33,7 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,17 +57,17 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (input.key() != GLFW.GLFW_KEY_LEFT && input.key() != GLFW.GLFW_KEY_RIGHT && input.key() != GLFW.GLFW_KEY_PAGE_DOWN && input.key() != GLFW.GLFW_KEY_PAGE_UP) {
+        if (LegacyInput.fromKeyboard(input.key()) != LegacyInput.KEY_LEFT && LegacyInput.fromKeyboard(input.key()) != LegacyInput.KEY_RIGHT && LegacyInput.fromKeyboard(input.key()) != LegacyInput.KEY_PAGE_DOWN && LegacyInput.fromKeyboard(input.key()) != LegacyInput.KEY_PAGE_UP) {
             return super.keyPressed(input);
         } else {
             for (Category category : this.categories) {
                 for (Module module : category.features) {
                     if (module.isInBoundingBox(this.mouseX, this.mouseY)) {
-                        return category.scroll.onMouseScroll(0, 0, input.key() == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+                        return category.scroll.onMouseScroll(0, 0, LegacyInput.fromKeyboard(input.key()) == LegacyInput.KEY_PAGE_UP ? 4 : -4);
                     }
                 }
             }
-            return this.mainScroll.onMouseScroll(0, 0, input.key() == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+            return this.mainScroll.onMouseScroll(0, 0, LegacyInput.fromKeyboard(input.key()) == LegacyInput.KEY_PAGE_UP ? 4 : -4);
         }
     }
 
@@ -814,7 +814,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.mainScroll = UIContainers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
         this.mainScroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
         root.child(this.mainScroll);
-        ButtonComponent hudEditorButton = UIComponents.button(Component.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
+        ButtonComponent hudEditorButton = UIComponents.button(Component.literal("Open HUD Editor"), button -> mc.gui.setScreen(new HudEditorScreen()));
         hudEditorButton.margins(Insets.of(0, 3, 0, 3));
         hudEditorButton.positioning(Positioning.relative(100, 100));
         hudEditorButton.renderer((context, button, delta) -> {

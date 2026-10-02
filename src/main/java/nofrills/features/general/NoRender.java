@@ -145,8 +145,8 @@ public class NoRender {
     }
 
     private static boolean isPoofParticle(SpawnParticleEvent event) {
-        if (event.packet.getCount() == 1 && event.packet.getMaxSpeed() == 0.0f) {
-            for (float offset : new float[]{event.packet.getXDist(), event.packet.getYDist(), event.packet.getZDist()}) {
+        if (event.packet.count() == 1 && nofrills.compat.ParticleCompat.hasSpeed(event.packet, 0.0f)) {
+            for (float offset : new float[]{event.packet.xDist(), event.packet.yDist(), event.packet.zDist()}) {
                 if (offset >= 0.1f || offset <= -0.1f || offset == 0.0f) {
                     return false;
                 }
@@ -157,7 +157,7 @@ public class NoRender {
     }
 
     private static boolean isCoatingParticle(SpawnParticleEvent event) {
-        if (event.packet.getParticle() instanceof DustParticleOptions dustParticle) {
+        if (event.packet.particle() instanceof DustParticleOptions dustParticle) {
             Vector3f color = dustParticle.getColor();
             if ((color.x == 1.0f && color.y == 1.0f && color.z == 1.0f) || (color.x == 1.0f && color.y == 0.6f && color.z == 0.0f)) {
                 return event.matchParameters(ParticleTypes.DUST, 0, 1.0, 1.0, 1.0, 1.0)

@@ -24,7 +24,7 @@ import nofrills.features.tweaks.MiddleClickFix;
 import nofrills.features.tweaks.MiddleClickOverride;
 import nofrills.misc.SlotOptions;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,13 +51,14 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
         super(title);
     }
 
-    @WrapOperation(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", ordinal = 1))
-    private void onClickSlotRedirect(AbstractContainerScreen<?> instance, Slot slot, int slotId, int button, ContainerInput actionType, Operation<Void> original) {
+    @WrapOperation(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;ILnet/minecraft/client/input/MouseButtonEvent;Lnet/minecraft/world/inventory/ContainerInput;)V", ordinal = 1))
+    private void onClickSlotRedirect(AbstractContainerScreen<?> instance, Slot slot, int slotId, MouseButtonEvent click, ContainerInput actionType, Operation<Void> original) {
+        int button = LegacyInput.fromMouseButton(click.button());
         if (MiddleClickOverride.shouldOverride(slot, button, actionType)) {
-            instance.slotClicked(slot, slotId, GLFW.GLFW_MOUSE_BUTTON_3, ContainerInput.CLONE);
+            instance.slotClicked(slot, slotId, LegacyInput.MOUSE_BUTTON_3, ContainerInput.CLONE);
             this.doubleclick = false;
         } else {
-            original.call(instance, slot, slotId, button, actionType);
+            original.call(instance, slot, slotId, click, actionType);
         }
     }
 
@@ -103,7 +104,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
         }
     }
 
-    @Inject(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), cancellable = true)
+    @Inject(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;Z)V"), cancellable = true)
     private void onDrawTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
         if (NoRender.shouldHideTooltip(hoveredSlot, this.title.getString()) || SlotOptions.isDisabled(hoveredSlot)) {
             ci.cancel();
@@ -175,7 +176,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(MouseButtonEvent click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
-        if (LeapOverlay.isLeapMenu(this.title.getString()) && click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
+        if (LeapOverlay.isLeapMenu(this.title.getString()) && LegacyInput.fromMouseButton(click.button()) == LegacyInput.MOUSE_BUTTON_1) {
             for (LeapOverlay.LeapButton leapButton : LeapOverlay.getLeapButtons()) {
                 if (leapButton.isHovered(click.x(), click.y())) {
                     leapButton.click(this.menu);

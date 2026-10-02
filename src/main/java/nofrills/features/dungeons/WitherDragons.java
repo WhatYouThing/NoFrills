@@ -75,10 +75,10 @@ public class WitherDragons {
     }
 
     private static boolean isDragonParticle(ClientboundLevelParticlesPacket packet) {
-        return packet.getParticle().getType().equals(ParticleTypes.FLAME) && packet.getCount() == 20
-                && packet.getY() == 19 && packet.getXDist() == 2.0f && packet.getYDist() == 3.0f
-                && packet.getZDist() == 2.0f && packet.getMaxSpeed() == 0.0f && packet.getX() % 1 == 0.0
-                && packet.getZ() % 1 == 0.0;
+        return packet.particle().getType().equals(ParticleTypes.FLAME) && packet.count() == 20
+                && packet.y() == 19 && packet.xDist() == 2.0f && packet.yDist() == 3.0f
+                && packet.zDist() == 2.0f && nofrills.compat.ParticleCompat.hasSpeed(packet, 0.0f) && packet.x() % 1 == 0.0
+                && packet.z() % 1 == 0.0;
     }
 
     private static boolean isEitherPurple(Dragon first, Dragon second) {

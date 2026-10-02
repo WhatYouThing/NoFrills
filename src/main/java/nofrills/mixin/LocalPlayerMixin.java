@@ -60,16 +60,4 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
         return original;
     }
 
-    @Inject(method = "drop", at = @At("HEAD"), cancellable = true)
-    private void onBeforeDropItem(boolean all, CallbackInfoReturnable<Boolean> cir) {
-        if (ItemProtection.instance.isActive()) {
-            if (Utils.isInDungeons() && DungeonUtil.isDungeonStarted()) {
-                return; // items cannot be directly dropped while in an active dungeon due to the class ability
-            }
-            ItemStack stack = this.getInventory().getSelectedItem();
-            if (!ItemProtection.getProtectType(stack).equals(ItemProtection.ProtectType.None)) {
-                cir.setReturnValue(false);
-            }
-        }
-    }
 }

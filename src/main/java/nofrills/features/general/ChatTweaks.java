@@ -13,7 +13,7 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +24,8 @@ import static nofrills.Main.mc;
 public class ChatTweaks {
     public static final Feature instance = new Feature("chatTweaks");
 
-    public static final SettingKeybind copyKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "copyKey", instance);
-    public static final SettingKeybind copyLineKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "copyLineKey", instance);
+    public static final SettingKeybind copyKey = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "copyKey", instance);
+    public static final SettingKeybind copyLineKey = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "copyLineKey", instance);
     public static final SettingBool trimOnCopy = new SettingBool(false, "trimOnCopy", instance);
     public static final SettingBool msgOnCopy = new SettingBool(false, "msgOnCopy", instance);
     public static final SettingInt copyMsgLength = new SettingInt(50, "copyMsgLength", instance);
@@ -34,7 +34,7 @@ public class ChatTweaks {
     public static final SettingInt lines = new SettingInt(1000, "lines", instance);
 
     private static String getHoveredMsg(boolean singleLine) {
-        ChatComponent chatHud = mc.gui.getChat();
+        ChatComponent chatHud = mc.gui.hud.getChat();
         float mouseX = (float) mc.mouseHandler.getScaledXPos(mc.getWindow());
         float mouseY = (float) mc.mouseHandler.getScaledYPos(mc.getWindow());
         int chatBottom = Mth.floor((mc.getWindow().getGuiScaledHeight() - 40));
@@ -73,8 +73,8 @@ public class ChatTweaks {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof ChatScreen && (copyKey.isKey(event.key) || copyLineKey.isKey(event.key))) {
-            if (event.action == GLFW.GLFW_PRESS) {
+        if (instance.isActive() && mc.gui.screen() instanceof ChatScreen && (copyKey.isKey(event.key) || copyLineKey.isKey(event.key))) {
+            if (event.action == LegacyInput.PRESS) {
                 String message = getHoveredMsg(copyLineKey.isKey(event.key));
                 if (message.isEmpty()) return;
                 mc.keyboardHandler.setClipboard(trimOnCopy.value() ? message.trim() : message);

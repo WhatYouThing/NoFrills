@@ -15,7 +15,7 @@ import nofrills.misc.ConcurrentHashSet;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.Comparator;
 import java.util.List;
@@ -52,11 +52,11 @@ public class TerminalSolvers {
     public static final SettingColor backgroundColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.DARK_GRAY), "backgroundColor", instance);
 
     private static final Supplier<List<Item>> colorsOrder = () -> List.of(
-            Items.GREEN_STAINED_GLASS_PANE,
-            Items.YELLOW_STAINED_GLASS_PANE,
-            Items.ORANGE_STAINED_GLASS_PANE,
-            Items.RED_STAINED_GLASS_PANE,
-            Items.BLUE_STAINED_GLASS_PANE
+            Items.STAINED_GLASS_PANE.green(),
+            Items.STAINED_GLASS_PANE.yellow(),
+            Items.STAINED_GLASS_PANE.orange(),
+            Items.STAINED_GLASS_PANE.red(),
+            Items.STAINED_GLASS_PANE.blue()
     );
     private static TerminalSolution currentSolution = null;
     private static int tickCounter = 0;
@@ -122,9 +122,9 @@ public class TerminalSolvers {
             switch (type) {
                 case Panes -> {
                     Item item = event.stack.getItem();
-                    if (item.equals(Items.RED_STAINED_GLASS_PANE)) {
+                    if (item.equals(Items.STAINED_GLASS_PANE.red())) {
                         currentSolution.setEnabled(event.slot);
-                    } else if (item.equals(Items.LIME_STAINED_GLASS_PANE)) {
+                    } else if (item.equals(Items.STAINED_GLASS_PANE.lime())) {
                         currentSolution.setDisabled(event.slot);
                     }
                 }
@@ -160,9 +160,9 @@ public class TerminalSolvers {
                 }
                 case InOrder -> {
                     Item item = event.stack.getItem();
-                    if (item.equals(Items.RED_STAINED_GLASS_PANE)) {
+                    if (item.equals(Items.STAINED_GLASS_PANE.red())) {
                         currentSolution.setEnabled(event.slot, event.stack.count());
-                    } else if (item.equals(Items.LIME_STAINED_GLASS_PANE)) {
+                    } else if (item.equals(Items.STAINED_GLASS_PANE.lime())) {
                         currentSolution.setDisabled(event.slot);
                     }
                 }
@@ -341,7 +341,7 @@ public class TerminalSolvers {
             if (this.type.equals(TerminalType.Colors)) {
                 int index = this.solutionMap.getOrDefault(slot.index, -1);
                 if (index != -1) {
-                    int modifier = button == GLFW.GLFW_MOUSE_BUTTON_RIGHT ? -1 : 1;
+                    int modifier = button == LegacyInput.MOUSE_BUTTON_RIGHT ? -1 : 1;
                     int newIndex = index - modifier;
                     if (newIndex < 0) {
                         this.solutionMap.put(slot.index, 4);

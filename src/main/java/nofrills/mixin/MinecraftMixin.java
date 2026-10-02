@@ -40,36 +40,6 @@ public abstract class MinecraftMixin {
     @Final
     private SoundManager soundManager;
 
-    @Shadow
-    public abstract void setScreen(@Nullable Screen screen);
-
-    @Shadow
-    public abstract @Nullable ServerData getCurrentServer();
-
-    @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
-    private void onBeforeOpenScreen(Screen screen, CallbackInfo ci) {
-        if (NoLoadingScreen.instance.isActive() && screen instanceof LevelLoadingScreen) {
-            if (NoLoadingScreen.serverOnly.value()) {
-                ServerData serverEntry = this.getCurrentServer();
-                if (serverEntry == null || serverEntry.isLan()) {
-                    return;
-                }
-            }
-            this.setScreen(null);
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "setScreen", at = @At("TAIL"))
-    private void onOpenScreen(Screen screen, CallbackInfo ci) {
-        if (this.level == null) return;
-        if (screen != null) {
-            eventBus.post(new ScreenOpenEvent(screen));
-        } else {
-            eventBus.post(new ScreenCloseEvent());
-        }
-    }
-
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/EntityHitResult;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;"), cancellable = true)
     private void onInteractEntity(CallbackInfo ci, @Local Entity entity, @Local EntityHitResult entityHitResult) {
         if (eventBus.post(new InteractEntityEvent(entity, entityHitResult)).isCancelled()) {
@@ -96,9 +66,10 @@ public abstract class MinecraftMixin {
         eventBus.post(new AttackBlockEvent(blockHitResult, blockPos));
     }
 
-    @Inject(method = "destroy", at = @At("HEAD"))
+    @Inject(method = "close", at = @At("HEAD"))
     private void beforeStop(CallbackInfo ci) {
         Config.saveBlocking();
+        WorldRenderEvent.closeBuffers();
     }
 
     @ModifyReturnValue(method = "isGameLoadFinished", at = @At("RETURN"))

@@ -1,5 +1,5 @@
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
+    id 'net.fabricmc.fabric-loom' version '1.16.3'
     id 'maven-publish'
 }
 
@@ -11,6 +11,20 @@ base {
 }
 
 repositories {
+    // A caller-supplied repository allows building against an unpublished owo port.
+    def portRepository = providers.gradleProperty('portDependencyRepository')
+            .orElse(providers.gradleProperty('owo_local_repository'))
+    if (portRepository.isPresent()) {
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = 'portDependencies'
+                    url = uri(portRepository.get())
+                }
+            }
+            filter { includeModule('io.wispforest', 'owo-lib') }
+        }
+    }
     maven {
         name = "wispforest-maven"
         url = 'https://maven.wispforest.io/releases/'
@@ -75,6 +89,7 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
     it.options.release = 25
+    options.compilerArgs += ["-Xmaxerrs", "10000"]
 }
 
 java {

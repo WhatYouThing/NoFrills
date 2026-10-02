@@ -7,7 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public class MiddleClickOverride {
     );
 
     private static boolean isLeftClick(int button, ContainerInput actionType) {
-        return button == GLFW.GLFW_MOUSE_BUTTON_LEFT && actionType.equals(ContainerInput.PICKUP);
+        return button == LegacyInput.MOUSE_BUTTON_LEFT && actionType.equals(ContainerInput.PICKUP);
     }
 
     private static boolean isBlacklisted(String title) {
@@ -94,7 +94,7 @@ public class MiddleClickOverride {
     }
 
     public static boolean shouldOverride(Slot slot, int button, ContainerInput actionType) {
-        if (instance.isActive() && mc.screen instanceof ContainerScreen container && slot != null && isLeftClick(button, actionType)) {
+        if (instance.isActive() && mc.gui.screen() instanceof ContainerScreen container && slot != null && isLeftClick(button, actionType)) {
             String title = container.getTitle().getString();
             ItemStack stack = slot.getItem();
             if (stack.isEmpty() || isBlacklisted(title) || !Utils.isInSkyblock() || isInLoadoutEdit(container)) {

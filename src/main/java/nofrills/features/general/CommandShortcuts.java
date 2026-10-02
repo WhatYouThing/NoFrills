@@ -70,7 +70,7 @@ public final class CommandShortcuts {
                 obj.addProperty("message", "");
                 object.get("shortcuts").getAsJsonArray().add(obj);
             });
-            mc.setScreen(buildSettings());
+            mc.gui.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
         list.add(button);
@@ -118,7 +118,7 @@ public final class CommandShortcuts {
 
             this.delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("shortcuts").getAsJsonArray().remove(this.index));
-                mc.setScreen(buildSettings());
+                mc.gui.setScreen(buildSettings());
             });
             this.delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18));
             this.delete.renderer((context, btn, delta) -> {

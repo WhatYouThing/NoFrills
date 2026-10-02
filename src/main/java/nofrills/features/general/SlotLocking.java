@@ -21,7 +21,7 @@ import nofrills.events.ScreenRenderEvent;
 import nofrills.events.SlotClickEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class SlotLocking {
     public static final Feature instance = new Feature("slotLocking");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "keybind", instance);
+    public static final SettingKeybind keybind = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "keybind", instance);
     public static final SettingBool overlay = new SettingBool(true, "overlay", instance);
     public static final SettingColor color = new SettingColor(RenderColor.fromFormat(ChatFormatting.YELLOW).withAlpha(0.33f), "color", instance);
 
@@ -46,12 +46,12 @@ public class SlotLocking {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container && keybind.isKey(event.key)) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && keybind.isKey(event.key)) {
             Slot focused = Utils.getFocusedSlot();
             List<Slot> inventorySlots = getInventorySlots(container.getMenu());
             if (focused == null || !inventorySlots.contains(focused)) return;
             int slotIndex = inventorySlots.indexOf(focused) + getFirstSlotOffset(inventorySlots);
-            if (event.action == GLFW.GLFW_PRESS) {
+            if (event.action == LegacyInput.PRESS) {
                 data.edit(obj -> {
                     if (!obj.has("slots")) {
                         obj.add("slots", new JsonArray());
@@ -72,7 +72,7 @@ public class SlotLocking {
 
     @EventHandler
     private static void onRender(ScreenRenderEvent.After event) {
-        if (instance.isActive() && overlay.value() && mc.screen instanceof AbstractContainerScreen<?>) {
+        if (instance.isActive() && overlay.value() && mc.gui.screen() instanceof AbstractContainerScreen<?>) {
             if (!data.value().has("slots")) return;
             List<Slot> inventorySlots = getInventorySlots(event.handler);
             int offset = getFirstSlotOffset(inventorySlots);
@@ -87,8 +87,8 @@ public class SlotLocking {
 
     @EventHandler(priority = EventPriority.LOW)
     private static void onClickSlot(SlotClickEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?>) {
-            if (event.actionType.equals(ContainerInput.CLONE) && mc.screen instanceof InventoryScreen) return;
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?>) {
+            if (event.actionType.equals(ContainerInput.CLONE) && mc.gui.screen() instanceof InventoryScreen) return;
             if (!data.value().has("slots")) return;
             List<Slot> inventorySlots = getInventorySlots(event.handler);
             if (event.slot == null || event.slot.getItem().isEmpty() || !inventorySlots.contains(event.slot)) return;

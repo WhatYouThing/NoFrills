@@ -1,14 +1,14 @@
 package nofrills.events;
 
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.CompareOp;
+import com.mojang.renderpearl.api.pipeline.DepthStencilState;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.CompareOp;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
+import nofrills.compat.WorldBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.*;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -25,7 +25,7 @@ import static net.minecraft.util.LightCoordsUtil.FULL_BRIGHT;
 import static nofrills.Main.mc;
 
 public class WorldRenderEvent {
-    private static final MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(new ByteBufferBuilder(2048));
+    private static final WorldBufferSource immediate = new WorldBufferSource();
 
     private static final RenderPipeline DEBUG_FILLED_BOX_NO_CULL_PIPELINE = RenderPipelines.register(
             RenderPipeline.builder(RenderPipelines.DEBUG_FILLED_SNIPPET)
@@ -50,7 +50,6 @@ public class WorldRenderEvent {
             "nofrills_lines_translucent_no_cull",
             RenderSetup.builder(LINES_TRANSLUCENT_NO_CULL_PIPELINE)
                     .setLayeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
-                    .setOutputTarget(OutputTarget.ITEM_ENTITY_TARGET)
                     .createRenderSetup()
     );
 
@@ -145,7 +144,8 @@ public class WorldRenderEvent {
         matrices.translate(textX, textY, textZ);
         matrices.rotate(camera.orientation);
         matrices.scale(scale, -scale, scale);
-        mc.font.drawInBatch(text, -mc.font.width(text) / 2f, 1.0f, color.argb, true, matrices, immediate, throughWalls ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, 0, FULL_BRIGHT);
+        immediate.drawText(mc.font.prepareText(text.getVisualOrderText(), -mc.font.width(text) / 2f, 1.0f, color.argb, true, false, 0),
+                matrices, throughWalls ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, FULL_BRIGHT);
     }
 
     public void drawDistanceScaledText(Vec3 pos, Component text, float baseScale, float scaling, boolean throughWalls, RenderColor color) {
@@ -183,7 +183,11 @@ public class WorldRenderEvent {
         return this.tickCounter.getGameTimeDeltaPartialTick(true);
     }
 
+    public static void closeBuffers() {
+        immediate.close();
+    }
+
     public void draw() {
-        immediate.endBatch();
+        immediate.endBatch(mc.gameRenderer.mainRenderTarget());
     }
 }

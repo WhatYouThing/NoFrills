@@ -54,7 +54,7 @@ public abstract class GuiGraphicsExtractorMixin {
     }
 
     @Inject(method = "tooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil;extractTooltipBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIIILnet/minecraft/resources/Identifier;)V"))
-    private void beforeDrawTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style, CallbackInfo ci, @Local(name = "textWidth") int textWidth, @Local(name = "tempHeight") int tempHeight) {
+    private void beforeDrawTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style, boolean titleSpacing, CallbackInfo ci, @Local(name = "textWidth") int textWidth, @Local(name = "tempHeight") int tempHeight) {
         if (TooltipScale.instance.isActive()) {
             if (TooltipScale.isDynamic()) {
                 int screenX = this.guiWidth();

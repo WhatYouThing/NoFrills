@@ -3,7 +3,7 @@ package nofrills.events;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import nofrills.config.SettingKeybind;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 public final class InputEvent extends Cancellable {
     public int key, modifiers, action;
@@ -13,32 +13,32 @@ public final class InputEvent extends Cancellable {
 
     public InputEvent(KeyEvent input, int action) {
         this.setCancelled(false);
-        this.key = input.key();
-        this.modifiers = input.modifiers();
-        this.action = action;
+        this.key = LegacyInput.fromKeyboard(input.key());
+        this.modifiers = LegacyInput.fromModifiers(input.modifiers());
+        this.action = LegacyInput.fromAction(action);
         this.isKeyboard = true;
         this.keyInput = input;
     }
 
     public InputEvent(MouseButtonInfo input, int action) {
         this.setCancelled(false);
-        this.key = input.button();
-        this.modifiers = input.modifiers();
-        this.action = action;
+        this.key = LegacyInput.fromMouseButton(input.button());
+        this.modifiers = LegacyInput.fromModifiers(input.modifiers());
+        this.action = LegacyInput.fromAction(action);
         this.isMouse = true;
         this.mouseInput = input;
     }
 
     public boolean isPress() {
-        return this.action == GLFW.GLFW_PRESS;
+        return this.action == LegacyInput.PRESS;
     }
 
     public boolean isRepeat() {
-        return this.action == GLFW.GLFW_REPEAT;
+        return this.action == LegacyInput.REPEAT;
     }
 
     public boolean isRelease() {
-        return this.action == GLFW.GLFW_RELEASE;
+        return this.action == LegacyInput.RELEASE;
     }
 
     public boolean isKey(int key) {

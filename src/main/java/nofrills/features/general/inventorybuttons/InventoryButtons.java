@@ -26,7 +26,7 @@ import nofrills.events.InputEvent;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class InventoryButtons {
     public static final Feature instance = new Feature("inventoryButtons");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind manageKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "addButtonKey", instance);
+    public static final SettingKeybind manageKey = new SettingKeybind(LegacyInput.KEY_UNKNOWN, "addButtonKey", instance);
     public static final SettingInt gridPrecision = new SettingInt(5, "gridPrecision", instance);
 
     public static void addWidgets(AbstractContainerScreen<?> container) {
@@ -86,14 +86,14 @@ public class InventoryButtons {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> container && manageKey.isKey(event.key)) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && manageKey.isKey(event.key)) {
             Optional<InventoryButtonWidget> hoveredWidget = container.renderables
                     .stream()
                     .filter(renderable -> renderable instanceof InventoryButtonWidget button && button.isHovered())
                     .map(renderable -> (InventoryButtonWidget) renderable)
                     .findFirst();
             Slot hoveredSlot = Utils.getFocusedSlot();
-            if (event.action == GLFW.GLFW_PRESS) {
+            if (event.action == LegacyInput.PRESS) {
                 if (hoveredWidget.isPresent()) {
                     InventoryButtonWidget widget = hoveredWidget.get();
                     if (widget.unlockPosition) {

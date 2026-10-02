@@ -21,7 +21,7 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -113,11 +113,11 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (isBinding(this.settings, input.key())) {
+        if (isBinding(this.settings, LegacyInput.fromKeyboard(input.key()))) {
             return true;
         }
-        if (input.key() == GLFW.GLFW_KEY_PAGE_UP || input.key() == GLFW.GLFW_KEY_PAGE_DOWN) {
-            this.scroll.onMouseScroll(0, 0, input.key() == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+        if (LegacyInput.fromKeyboard(input.key()) == LegacyInput.KEY_PAGE_UP || LegacyInput.fromKeyboard(input.key()) == LegacyInput.KEY_PAGE_DOWN) {
+            this.scroll.onMouseScroll(0, 0, LegacyInput.fromKeyboard(input.key()) == LegacyInput.KEY_PAGE_UP ? 4 : -4);
             return true;
         }
         return super.keyPressed(input);
@@ -131,7 +131,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
-        if (isBinding(this.settings, click.button())) {
+        if (isBinding(this.settings, LegacyInput.fromMouseButton(click.button()))) {
             return true;
         }
         return super.mouseClicked(click, doubled);
@@ -173,7 +173,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void onClose() {
-        mc.setScreen(new ClickGui());
+        mc.gui.setScreen(new ClickGui());
     }
 
     public Settings setTitle(Component title) {
@@ -332,7 +332,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                     updateCallback.accept(color);
                 });
                 pickerScreen.setTitle(Component.literal(!Utils.toLower(name).endsWith("color") ? name + " Color" : name));
-                mc.setScreen(pickerScreen);
+                mc.gui.setScreen(pickerScreen);
             });
             editButton.horizontalSizing(Sizing.fixed(60));
             editButton.renderer(buttonRenderer);

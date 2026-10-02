@@ -27,7 +27,7 @@ public abstract class LivingEntityMixin extends Entity {
     @Shadow
     public abstract boolean isHolding(Item item);
 
-    @ModifyExpressionValue(method = "getCurrentSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffectUtil;hasDigSpeed(Lnet/minecraft/world/entity/LivingEntity;)Z"))
+    @ModifyExpressionValue(method = "getModifiedSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/effect/MobEffectUtil;hasDigSpeed(Lnet/minecraft/world/entity/LivingEntity;)Z"))
     private boolean hasHaste(boolean original) {
         if (Viewmodel.instance.isActive() && Viewmodel.noHaste.value() && Utils.isSelf(this)) {
             return false;
@@ -35,7 +35,7 @@ public abstract class LivingEntityMixin extends Entity {
         return original;
     }
 
-    @ModifyExpressionValue(method = "getCurrentSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hasEffect(Lnet/minecraft/core/Holder;)Z"))
+    @ModifyExpressionValue(method = "getModifiedSwingDuration", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;hasEffect(Lnet/minecraft/core/Holder;)Z"))
     private boolean hasMiningFatigue(boolean original) {
         if (Viewmodel.instance.isActive() && Viewmodel.noHaste.value() && Utils.isSelf(this)) {
             return false;
@@ -43,7 +43,7 @@ public abstract class LivingEntityMixin extends Entity {
         return original;
     }
 
-    @ModifyReturnValue(method = "getCurrentSwingDuration", at = @At("RETURN"))
+    @ModifyReturnValue(method = "getModifiedSwingDuration", at = @At("RETURN"))
     private int getSwingSpeed(int original) {
         if (Viewmodel.instance.isActive() && Utils.isSelf(this)) {
             if (Viewmodel.noBowSwing.value() && this.isHolding(Items.BOW)) {
@@ -56,12 +56,15 @@ public abstract class LivingEntityMixin extends Entity {
         return original;
     }
 
-    @ModifyExpressionValue(method = "swing(Lnet/minecraft/world/InteractionHand;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getCurrentSwingDuration()I"))
-    private int onGetSwingDuration(int original) {
-        if (Viewmodel.instance.isActive() && Viewmodel.noSwingReset.value() && Utils.isSelf(this)) {
-            return original * 2; // force the check to require 100% swing progress instead of 50%
+    @com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation(method = "swing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity$SwingState;startIfAble(Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/component/SwingAnimation;I)Z"))
+    private boolean onStartSwing(LivingEntity.SwingState state, net.minecraft.world.InteractionHand hand,
+            net.minecraft.world.item.component.SwingAnimation animation, int duration,
+            com.llamalad7.mixinextras.injector.wrapoperation.Operation<Boolean> original) {
+        if (Viewmodel.instance.isActive() && Viewmodel.noSwingReset.value() && Utils.isSelf(this)
+                && duration > 0 && state.isSwinging() && state.getAnimation(1.0f) < 1.0f) {
+            return false; // Wait for the current swing to finish while preserving its real animation duration.
         }
-        return original;
+        return original.call(state, hand, animation, duration);
     }
 
     @ModifyReturnValue(method = "hasEffect", at = @At("RETURN"))

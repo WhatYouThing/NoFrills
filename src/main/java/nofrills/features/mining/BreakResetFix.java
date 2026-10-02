@@ -18,7 +18,7 @@ public class BreakResetFix {
         if (instance.isActive() && mc.player != null && mc.gameMode != null) {
             if (event.slotId >= 36 && event.slotId <= 44 && mc.player.getInventory().getSelectedSlot() == event.slotId - 36) {
                 ((MultiPlayerGameModeAccessor) mc.gameMode).setStack(event.stack);
-                ((ItemInHandRendererAccessor) mc.getEntityRenderDispatcher().getItemInHandRenderer()).setStack(event.stack);
+                ((ItemInHandRendererAccessor) mc.player.firstPersonHandsAndItems()).setStack(event.stack);
             } // manually update the variable once the server updates our held item, prevents the mismatch and thus fixes the break cancel
         }
     }

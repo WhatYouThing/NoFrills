@@ -40,15 +40,15 @@ public class LividSolver {
     private static HashMap<Block, Livid> buildLividData() {
         HashMap<Block, Livid> map = new HashMap<>();
         List<Livid> list = List.of(
-                new Livid("Hockey Livid", "§c§lRED", Blocks.RED_WOOL, Blocks.RED_STAINED_GLASS),
-                new Livid("Arcade Livid", "§e§lYELLOW", Blocks.YELLOW_WOOL, Blocks.YELLOW_STAINED_GLASS),
-                new Livid("Smile Livid", "§a§lGREEN", Blocks.LIME_WOOL, Blocks.LIME_STAINED_GLASS),
-                new Livid("Frog Livid", "§2§lDARK GREEN", Blocks.GREEN_WOOL, Blocks.GREEN_STAINED_GLASS),
-                new Livid("Scream Livid", "§9§lBLUE", Blocks.BLUE_WOOL, Blocks.BLUE_STAINED_GLASS),
-                new Livid("Crossed Livid", "§d§lPINK", Blocks.MAGENTA_WOOL, Blocks.MAGENTA_STAINED_GLASS),
-                new Livid("Purple Livid", "§5§lPURPLE", Blocks.PURPLE_WOOL, Blocks.PURPLE_STAINED_GLASS),
-                new Livid("Doctor Livid", "§7§lGRAY", Blocks.GRAY_WOOL, Blocks.GRAY_STAINED_GLASS),
-                new Livid("Vendetta Livid", "§f§lWHITE", Blocks.WHITE_WOOL, Blocks.WHITE_STAINED_GLASS)
+                new Livid("Hockey Livid", "§c§lRED", Blocks.WOOL.red(), Blocks.STAINED_GLASS.red()),
+                new Livid("Arcade Livid", "§e§lYELLOW", Blocks.WOOL.yellow(), Blocks.STAINED_GLASS.yellow()),
+                new Livid("Smile Livid", "§a§lGREEN", Blocks.WOOL.lime(), Blocks.STAINED_GLASS.lime()),
+                new Livid("Frog Livid", "§2§lDARK GREEN", Blocks.WOOL.green(), Blocks.STAINED_GLASS.green()),
+                new Livid("Scream Livid", "§9§lBLUE", Blocks.WOOL.blue(), Blocks.STAINED_GLASS.blue()),
+                new Livid("Crossed Livid", "§d§lPINK", Blocks.WOOL.magenta(), Blocks.STAINED_GLASS.magenta()),
+                new Livid("Purple Livid", "§5§lPURPLE", Blocks.WOOL.purple(), Blocks.STAINED_GLASS.purple()),
+                new Livid("Doctor Livid", "§7§lGRAY", Blocks.WOOL.gray(), Blocks.STAINED_GLASS.gray()),
+                new Livid("Vendetta Livid", "§f§lWHITE", Blocks.WOOL.white(), Blocks.STAINED_GLASS.white())
         );
         for (Livid livid : list) {
             map.put(livid.wool, livid);

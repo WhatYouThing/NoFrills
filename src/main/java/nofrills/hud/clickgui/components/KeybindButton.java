@@ -7,15 +7,15 @@ import io.wispforest.owo.util.EventStream;
 import net.minecraft.network.chat.Component;
 import nofrills.config.SettingKeybind;
 import nofrills.misc.Rendering;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.List;
 
 public final class KeybindButton extends ButtonComponent {
     private final EventStream<KeybindChanged> changedEvents = KeybindChanged.newStream();
     private final List<Integer> keybindBlacklist = List.of(
-            GLFW.GLFW_KEY_UNKNOWN,
-            GLFW.GLFW_KEY_ESCAPE
+            LegacyInput.KEY_UNKNOWN,
+            LegacyInput.KEY_ESCAPE
     );
     public Component unbound = Component.literal("Not Bound").withColor(0xffffff);
     public Component binding = Component.literal("Press Key...").withColor(0xffffff);
@@ -26,7 +26,7 @@ public final class KeybindButton extends ButtonComponent {
         });
         this.onPress(button -> {
             if (this.isBinding) {
-                this.bind(GLFW.GLFW_KEY_UNKNOWN);
+                this.bind(LegacyInput.KEY_UNKNOWN);
             } else {
                 this.setMessage(this.binding);
                 this.isBinding = true;
@@ -47,7 +47,7 @@ public final class KeybindButton extends ButtonComponent {
     public void bind(int key) {
         if (!this.valid(key)) {
             this.setMessage(this.unbound);
-            changedEvents.sink().onBind(GLFW.GLFW_KEY_UNKNOWN);
+            changedEvents.sink().onBind(LegacyInput.KEY_UNKNOWN);
         } else {
             this.setMessage(getKeyLabel(key));
             changedEvents.sink().onBind(key);

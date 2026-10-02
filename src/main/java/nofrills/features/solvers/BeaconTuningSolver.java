@@ -60,7 +60,7 @@ public class BeaconTuningSolver {
     }
 
     public static TuningType getTuningType() {
-        if (mc.screen instanceof ContainerScreen container) {
+        if (mc.gui.screen() instanceof ContainerScreen container) {
             String title = container.getTitle().getString();
             if (title.startsWith("Tune Frequency")) {
                 return TuningType.Normal;
@@ -80,11 +80,11 @@ public class BeaconTuningSolver {
 
     private static void updateSpeedSlot(ChestMenu handler) {
         if (speedSlot1Id != -1) {
-            ItemStack stack = Items.WHITE_WOOL.getDefaultInstance();
+            ItemStack stack = Items.WOOL.white().getDefaultInstance();
             if (matchSpeed > 0 && matchSpeed == changeSpeed) {
-                stack = Items.GREEN_WOOL.getDefaultInstance();
+                stack = Items.WOOL.green().getDefaultInstance();
             } else if (matchSpeed > 0) {
-                stack = Items.RED_WOOL.getDefaultInstance();
+                stack = Items.WOOL.red().getDefaultInstance();
             }
             stack.set(DataComponents.LORE, new ItemLore(List.of(
                     Component.literal("Target speed: ").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE))
@@ -103,7 +103,7 @@ public class BeaconTuningSolver {
     private static void updatePitchSlot(ChestMenu handler) {
         if (pitchSlot1Id != -1) {
             ItemStack stack;
-            stack = Items.CYAN_WOOL.getDefaultInstance();
+            stack = Items.WOOL.cyan().getDefaultInstance();
             stack.set(DataComponents.LORE, new ItemLore(List.of(
                     Component.literal("Wait for the target tile to move once to see the target pitch.").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE)),
                     Component.literal("If possible target is empty - it's likely already solved.").withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE)),
@@ -133,14 +133,14 @@ public class BeaconTuningSolver {
         colorTarget1 = target1 < target2 ? -target1 : target2;
         ItemStack stack;
         if (colorTarget1 < 0) {
-            stack = Items.GREEN_WOOL.getDefaultInstance();
+            stack = Items.WOOL.green().getDefaultInstance();
             stack.set(DataComponents.LORE, new ItemLore(List.of(
                     Component.literal("Left clicks ").withStyle(style -> style.withColor(RenderColor.GREEN.hex))
                             .append(Component.literal(Utils.format("required: {}", Math.abs(colorTarget1)))
                                     .withStyle(style -> style.withItalic(false).withColor(ChatFormatting.WHITE)))
             )));
         } else if (colorTarget1 > 0) {
-            stack = Items.ORANGE_WOOL.getDefaultInstance();
+            stack = Items.WOOL.orange().getDefaultInstance();
             stack.set(DataComponents.LORE, new ItemLore(List.of(
                     Component.literal("Right clicks ").withStyle(style -> style.withColor(RenderColor.RED.hex))
                             .append(Component.literal(Utils.format("required: {}", Math.abs(colorTarget1)))
@@ -148,7 +148,7 @@ public class BeaconTuningSolver {
             )));
         } else {
             // just in case, unreachable
-            stack = Items.WHITE_WOOL.getDefaultInstance();
+            stack = Items.WOOL.white().getDefaultInstance();
         }
         SlotOptions.setSpoofed(handler.getSlot(colorSlot1Id), SlotOptions.stackWithName(
                 SlotOptions.stackWithCount(stack, Math.abs(colorTarget1)),

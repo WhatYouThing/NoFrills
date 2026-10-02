@@ -26,7 +26,7 @@ import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
+import nofrills.compat.LegacyInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class ItemProtection {
     private static boolean isSalvageGUI = false;
 
     public static ProtectType getProtectType(ItemStack stack) {
-        if (mc.screen instanceof AbstractContainerScreen<?> && overrideKey.isDown()) {
+        if (mc.gui.screen() instanceof AbstractContainerScreen<?> && overrideKey.isDown()) {
             return ProtectType.None;
         }
         try {
@@ -185,12 +185,12 @@ public class ItemProtection {
 
     @EventHandler
     private static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?>) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?>) {
             if (overrideKey.isKey(event.key)) {
-                if (event.action == GLFW.GLFW_PRESS) {
+                if (event.action == LegacyInput.PRESS) {
                     Utils.infoRaw(Component.literal("Item Protection override is now active.").withStyle(ChatFormatting.RED));
                     if (playOverrideSound.value()) Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
-                } else if (event.action == GLFW.GLFW_RELEASE) {
+                } else if (event.action == LegacyInput.RELEASE) {
                     Utils.infoRaw(Component.literal("Item Protection override deactivated.").withStyle(ChatFormatting.GREEN));
                     if (playOverrideSound.value()) Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 }
@@ -202,7 +202,7 @@ public class ItemProtection {
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
                 if (!stack.isEmpty()) {
-                    if (event.action == GLFW.GLFW_PRESS) {
+                    if (event.action == LegacyInput.PRESS) {
                         if (uuidKey.isKey(event.key)) addUUID(stack);
                         if (skyblockIdKey.isKey(event.key)) addSkyblockID(stack);
                     }
@@ -215,7 +215,7 @@ public class ItemProtection {
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && !event.stack.isEmpty() && event.customData != null) {
-            if (hideTooltip.value() && !InputConstants.isKeyDown(mc.getWindow(), InputConstants.KEY_LSHIFT)) {
+            if (hideTooltip.value() && !InputConstants.isKeyDown(InputConstants.KEY_LSHIFT)) {
                 return;
             }
             ProtectType type = getProtectType(event.stack);

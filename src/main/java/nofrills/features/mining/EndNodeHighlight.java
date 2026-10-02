@@ -43,13 +43,13 @@ public class EndNodeHighlight {
     );
 
     private static boolean isNodeBlock(BlockState state) {
-        return state.getBlock().equals(Blocks.PURPLE_TERRACOTTA);
+        return state.getBlock().equals(Blocks.DYED_TERRACOTTA.purple());
     }
 
     private static boolean isNodeParticle(ClientboundLevelParticlesPacket packet) {
-        return packet.alwaysShow() && packet.isOverrideLimiter()
-                && packet.getCount() == 2 && packet.getMaxSpeed() == 0.0f
-                && (packet.getXDist() == 0.25f || packet.getYDist() == 0.25f || packet.getZDist() == 0.25f);
+        return packet.alwaysShow() && packet.overrideLimiter()
+                && packet.count() == 2 && nofrills.compat.ParticleCompat.hasSpeed(packet, 0.0f)
+                && (packet.xDist() == 0.25f || packet.yDist() == 0.25f || packet.zDist() == 0.25f);
     }
 
     @EventHandler

@@ -7,7 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Blaze;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
 import net.minecraft.world.entity.monster.spider.CaveSpider;
 import net.minecraft.world.entity.monster.spider.Spider;
@@ -30,7 +30,7 @@ public class SlayerUtil {
     public static final SlayerBoss REVENANT = new SlayerBoss("Revenant Horror", List.of("Revenant Horror", "Atoned Horror"), ent -> ent instanceof Zombie);
     public static final SlayerBoss TARANTULA = new SlayerBoss("Tarantula Broodfather", List.of("Tarantula Broodfather", "Conjoined Brood"), ent -> ent instanceof Spider && !(ent instanceof CaveSpider));
     public static final SlayerBoss SVEN = new SlayerBoss("Sven Packmaster", List.of("Sven Packmaster"), ent -> ent instanceof Wolf);
-    public static final SlayerBoss VOIDGLOOM = new SlayerBoss("Voidgloom Seraph", List.of("Voidgloom Seraph"), ent -> ent instanceof EnderMan);
+    public static final SlayerBoss VOIDGLOOM = new SlayerBoss("Voidgloom Seraph", List.of("Voidgloom Seraph"), ent -> ent instanceof Enderman);
     public static final SlayerBoss VAMPIRE = new SlayerBoss("Riftstalker Bloodfiend", List.of("Bloodfiend"), ent -> ent instanceof Player player && !Utils.isPlayer(player));
     public static final SlayerBoss BLAZE = new SlayerBoss("Inferno Demonlord", List.of("Inferno Demonlord", "ⓉⓎⓅⒽⓄⒺⓊⓈ", "ⓆⓊⒶⓏⒾⒾ"), ent -> ent instanceof Blaze || ent instanceof ZombifiedPiglin || ent instanceof WitherSkeleton);
     public static final List<SlayerBoss> bossList = List.of(REVENANT, TARANTULA, SVEN, VOIDGLOOM, VAMPIRE, BLAZE);

@@ -28,6 +28,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
@@ -138,26 +139,24 @@ public class LegacyTextures {
                 .findFirst()
                 .orElse(0);
         if (stars > 0) {
-            MutableComponent replacement = null;
-            for (Pair<Style, String> style : styles) {
-                if (getStarIndex(style.getRight()) > 0) {
-                    if (style.getRight().endsWith(" ")) {
-                        replacement = createOrAppend(replacement, Component.literal(" "));
-                    }
-                    continue;
-                }
-                if (style.getRight().endsWith("✪✪✪✪✪")) {
-                    replacement = createOrAppend(replacement, Component.literal(style.getRight().replace("✪✪✪✪✪", ""))
-                            .setStyle(style.getLeft()));
-                    replacement = createOrAppend(replacement, Component.literal("✪".repeat(stars)).withStyle(ChatFormatting.RED)
-                            .append(Component.literal("✪".repeat(5 - stars)).withStyle(ChatFormatting.GOLD)));
-                    continue;
-                }
-                replacement = createOrAppend(replacement, Component.literal(style.getRight()).setStyle(style.getLeft()));
-            }
-            if (replacement != null) {
-                return Optional.of(replacement.getVisualOrderText());
-            }
+            return Optional.of(styles.stream()
+                    .map(style -> {
+                        if (getStarIndex(style.getRight()) > 0) {
+                            if (style.getRight().endsWith(" ")) {
+                                return Component.literal(" ");
+                            }
+                            return Component.literal("");
+                        }
+                        if (style.getRight().endsWith("✪✪✪✪✪")) {
+                            return Component.literal(style.getRight().replace("✪✪✪✪✪", "")).setStyle(style.getLeft())
+                                    .append(Component.literal("✪".repeat(stars)).withStyle(ChatFormatting.RED))
+                                    .append(Component.literal("✪".repeat(5 - stars)).withStyle(ChatFormatting.GOLD));
+                        }
+                        return Component.literal(style.getRight()).setStyle(style.getLeft());
+                    })
+                    .collect(Collector.of(Component::empty, MutableComponent::append, MutableComponent::append))
+                    .getVisualOrderText()
+            );
         }
         return Optional.empty();
     }
@@ -198,13 +197,6 @@ public class LegacyTextures {
             case "➎" -> 5;
             default -> 0;
         };
-    }
-
-    private static MutableComponent createOrAppend(MutableComponent replacement, MutableComponent text) {
-        if (replacement == null) {
-            return text;
-        }
-        return replacement.append(text);
     }
 
     @EventHandler

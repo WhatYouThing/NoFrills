@@ -1033,18 +1033,21 @@ public class Utils {
         List<Pair<Style, String>> list = new ArrayList<>();
         AtomicReference<StringBuilder> currentBuilder = new AtomicReference<>(new StringBuilder());
         AtomicReference<Style> currentStyle = new AtomicReference<>();
-        text.accept((index, style, codePoint) -> {
+        text.accept((_, style, codePoint) -> {
             if (currentStyle.get() == null) {
                 currentStyle.set(style);
             }
             if (currentStyle.get() != style) {
                 list.add(Pair.of(currentStyle.get(), currentBuilder.get().toString()));
                 currentBuilder.set(new StringBuilder());
-                currentStyle.set(null);
+                currentStyle.set(style);
             }
             currentBuilder.get().appendCodePoint(codePoint);
             return true;
         });
+        if (!currentBuilder.get().isEmpty()) {
+            list.add(Pair.of(currentStyle.get(), currentBuilder.get().toString()));
+        }
         return list;
     }
 

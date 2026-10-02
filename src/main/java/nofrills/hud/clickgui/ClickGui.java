@@ -387,7 +387,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Angry Enderman", SoundBlocker.angryEnderman, "Prevents the angry Enderman noises from being played by the client."),
                                 new Settings.Toggle("Vampire Abilities", SoundBlocker.vampireAbilities, "Cancels the Vampire Slayer Mania and Killer Springs sound effects."),
                                 new Settings.Toggle("Reindrake Gifts", SoundBlocker.reindrakeGifts, "Cancels the loud Totem of Undying sound effects that play when picking up Reindrake loot."),
-                                new Settings.Toggle("Composter", SoundBlocker.composter, "Cancels the sounds that the running composter makes.")
+                                new Settings.Toggle("Composter", SoundBlocker.composter, "Cancels the sounds that the running composter makes."),
+                                new Settings.Toggle("Farming Tool Overflow", SoundBlocker.farmingToolOverflow, "Cancels the sound effect that plays when the EXP level of your farming tool overflows.")
                         ))
                 )),
                 new Category("Solvers", List.of(

@@ -28,7 +28,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collector;
 
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
@@ -54,12 +54,7 @@ public class LegacyTextures {
             .weakKeys()
             .maximumSize(10000L)
             .build();
-    private static final Cache<FormattedCharSequence, Optional<FormattedCharSequence>> starsCache = CacheBuilder.newBuilder()
-            .weakKeys()
-            .maximumSize(10000L)
-            .build();
     private static final DataFile textures = Config.getDataFile("LegacyTexturesCache.json");
-    private static final List<String> starSymbols = List.of("➊", "➋", "➌", "➍", "➎");
     private static boolean texturesLoaded = false;
 
     public static Optional<Identifier> replaceIfNeeded(ItemStack stack) {
@@ -137,31 +132,33 @@ public class LegacyTextures {
     }
 
     public static Optional<FormattedCharSequence> replaceStarsIfNeeded(FormattedCharSequence sequence) {
-        try {
-            return starsCache.get(sequence, () -> {
-                String line = Utils.toPlain(sequence);
-                for (AtomicInteger i = new AtomicInteger(1); i.get() <= starSymbols.size(); i.incrementAndGet()) {
-                    String symbol = starSymbols.get(i.get() - 1);
-                    if (!line.contains(symbol)) continue;
-                    List<Pair<Style, String>> parts = Utils.getStyles(sequence);
-                    Pair<Style, String> first = parts.removeFirst();
-                    MutableComponent replacement = Component.literal(first.getRight()).setStyle(first.getLeft());
-                    for (Pair<Style, String> part : parts) {
-                        if (part.getRight().equals(symbol)) continue;
-                        if (part.getRight().equals("✪✪✪✪✪")) {
-                            replacement.append(Component.literal("✪".repeat(i.get())).withStyle(ChatFormatting.RED)
-                                    .append(Component.literal("✪".repeat(5 - i.get())).withStyle(ChatFormatting.GOLD)));
-                            continue;
+        List<Pair<Style, String>> styles = Utils.getStyles(sequence);
+        int stars = styles.stream()
+                .map(style -> getStarIndex(style.getRight()))
+                .filter(e -> e > 0)
+                .findFirst()
+                .orElse(0);
+        if (stars > 0) {
+            return Optional.of(styles.stream()
+                    .map(style -> {
+                        if (getStarIndex(style.getRight()) > 0) {
+                            if (style.getRight().endsWith(" ")) {
+                                return Component.literal(" ");
+                            }
+                            return Component.literal("");
                         }
-                        replacement.append(Component.literal(part.getRight()).setStyle(part.getLeft()));
-                    }
-                    return Optional.of(replacement.getVisualOrderText());
-                }
-                return Optional.empty();
-            });
-        } catch (Exception _) {
-            return Optional.empty();
+                        if (style.getRight().endsWith("✪✪✪✪✪")) {
+                            return Component.literal(style.getRight().replace("✪✪✪✪✪", "")).setStyle(style.getLeft())
+                                    .append(Component.literal("✪".repeat(stars)).withStyle(ChatFormatting.RED))
+                                    .append(Component.literal("✪".repeat(5 - stars)).withStyle(ChatFormatting.GOLD));
+                        }
+                        return Component.literal(style.getRight()).setStyle(style.getLeft());
+                    })
+                    .collect(Collector.of(Component::empty, MutableComponent::append, MutableComponent::append))
+                    .getVisualOrderText()
+            );
         }
+        return Optional.empty();
     }
 
     public static boolean isWhitelisted(String id) {
@@ -189,6 +186,17 @@ public class LegacyTextures {
         });
         identifierCache.invalidate(stack);
         profileCache.invalidate(stack);
+    }
+
+    private static int getStarIndex(String star) {
+        return switch (star.trim()) {
+            case "➊" -> 1;
+            case "➋" -> 2;
+            case "➌" -> 3;
+            case "➍" -> 4;
+            case "➎" -> 5;
+            default -> 0;
+        };
     }
 
     @EventHandler

@@ -18,6 +18,7 @@ public class SoundBlocker {
     public static final SettingBool vampireAbilities = new SettingBool(false, "vampireAbilities", instance);
     public static final SettingBool reindrakeGifts = new SettingBool(false, "reindrakeGifts", instance);
     public static final SettingBool composter = new SettingBool(false, "composter", instance);
+    public static final SettingBool farmingToolOverflow = new SettingBool(false, "farmingToolOverflow", instance);
 
     private static boolean isComposterSound(PlaySoundEvent event) {
         if (event.pitch() == 0.5873016f) {
@@ -47,6 +48,9 @@ public class SoundBlocker {
                 event.cancel();
             }
             if (composter.value() && isComposterSound(event) && Utils.isInGarden()) {
+                event.cancel();
+            }
+            if (farmingToolOverflow.value() && event.isSound(SoundEvents.PORTAL_TRAVEL) && Utils.isInGarden()) {
                 event.cancel();
             }
         }

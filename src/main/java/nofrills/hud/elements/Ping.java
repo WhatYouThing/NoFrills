@@ -25,6 +25,7 @@ public final class Ping extends SimpleTextElement implements ListeningHudElement
     private final List<Long> pingList = new CopyOnWriteArrayList<>();
     private int pingTicks = this.delay.value();
     private int updateTicks = this.delay.value();
+    private boolean sentPing = false;
     private long lastPing = 0;
 
     public Ping() {
@@ -50,7 +51,8 @@ public final class Ping extends SimpleTextElement implements ListeningHudElement
         if (this.pingTicks > 0) {
             this.pingTicks -= 1;
             if (this.pingTicks == 0) {
-                Utils.sendPingPacket();
+                if (!this.sentPing) Utils.sendPingPacket();
+                this.pingTicks = this.delay.value();
             }
         }
         if (this.updateTicks > 0) {
@@ -67,19 +69,13 @@ public final class Ping extends SimpleTextElement implements ListeningHudElement
                 this.updateTicks = this.delay.value();
             }
         }
-    }
-
-    @Override
-    public void onServerJoin() {
-        this.pingTicks = this.delay.value();
-        this.lastPing = 0;
-        this.pingList.clear();
+        this.sentPing = false;
     }
 
     @Override
     public void onSendPacket(SendPacketEvent event) {
         if (event.packet instanceof ServerboundPingRequestPacket) {
-            this.pingTicks = this.delay.value();
+            this.sentPing = true;
         }
     }
 

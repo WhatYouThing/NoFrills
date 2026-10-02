@@ -177,6 +177,7 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
         if (this.hideF3.value() && mc.debugEntries.isOverlayVisible()) {
             return false;
         }
+        this.updatePosition();
         return active;
     }
 

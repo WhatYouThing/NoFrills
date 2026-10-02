@@ -91,11 +91,6 @@ public class HudManager {
 
     @EventHandler
     private static void onRenderHud(HudRenderEvent event) {
-        if (!isEditingHud()) {
-            for (HudElement element : HudManager.elements) {
-                if (element.isAdded()) element.updatePosition();
-            }
-        }
         if (currentTitle.isActive()) {
             currentTitle.draw(event.context);
         }

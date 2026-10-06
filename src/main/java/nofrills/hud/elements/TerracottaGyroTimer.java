@@ -21,7 +21,7 @@ public final class TerracottaGyroTimer extends TickTimerElement implements Liste
     @Override
     public void onChatMessage(ChatMsgEvent event) {
         if (event.msg().equals("[BOSS] Sadan: So you made it all the way here... Now you wish to defy me? Sadan?!") && DungeonUtil.isOnFloor("6")) {
-            this.setStartTicks(267);
+            this.setStartTicks(247);
             this.start();
         }
     }

@@ -553,9 +553,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Text Color", TerracottaTimer.color, "The color of the timer text.")
                         ))),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(
-                                new Settings.Toggle("Spawn Alert", WitherDragons.alert, "Alerts you when a dragon is about to spawn.\nThis option also calculates the priority on the initial spawn based on your selected class."),
-                                new Settings.SliderDouble("Split Power", 0, 32, 0.1, WitherDragons.power, "The required Power blessing level to consider a split possible.\nLeaving this option at 0 is recommended for party finder teams."),
-                                new Settings.SliderDouble("Easy Power", 0, 32, 0.1, WitherDragons.powerEasy, "The required Power blessing level to consider a split possible, as long as one of the dragons is Purple."),
+                                new Settings.Toggle("Spawn Alert", WitherDragons.alert, "Alerts you when a dragon is about to spawn."),
                                 new Settings.Toggle("Kill Areas", WitherDragons.boxes, "Renders the kill areas of every alive dragon."),
                                 new Settings.Toggle("Hitboxes", WitherDragons.hitboxes, "Renders the hitbox parts of every alive dragon."),
                                 new Settings.Toggle("Tracers", WitherDragons.tracers, "Draws tracer lines to spawning dragons."),

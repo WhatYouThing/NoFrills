@@ -25,7 +25,6 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
-import nofrills.config.SettingDouble;
 import nofrills.config.SettingEnum;
 import nofrills.events.*;
 import nofrills.misc.*;
@@ -43,8 +42,6 @@ public class WitherDragons {
     public static final Feature instance = new Feature("witherDragons");
 
     public static final SettingBool alert = new SettingBool(false, "alert", instance);
-    public static final SettingDouble power = new SettingDouble(0.0, "power", instance);
-    public static final SettingDouble powerEasy = new SettingDouble(0.0, "powerEasy", instance);
     public static final SettingBool boxes = new SettingBool(false, "boxes", instance);
     public static final SettingBool hitboxes = new SettingBool(false, "hitboxes", instance);
     public static final SettingBool tracers = new SettingBool(false, "tracers", instance);
@@ -63,7 +60,6 @@ public class WitherDragons {
     );
     private static final MappedEntityCache<String> teammateArrows = new MappedEntityCache<>();
     private static final CopyOnWriteArrayList<FireBowPoint> firePoints = new CopyOnWriteArrayList<>();
-    private static boolean splitDone = false;
     private static int tickCounter = 0;
 
     private static boolean isArcherTeam() {
@@ -98,15 +94,6 @@ public class WitherDragons {
             return first.archPriority > second.archPriority ? first : second;
         }
         return first.bersPriority > second.bersPriority ? first : second;
-    }
-
-    private static void announceSpawn(Dragon drag, boolean split) {
-        MutableComponent title = Component.literal(Utils.toUpper(drag.name) + " IS SPAWNING").setStyle(Style.EMPTY.withBold(true).withColor(drag.color.hex));
-        Utils.showTitle(title, Component.empty(), 0, 30, 10);
-        Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
-        Utils.infoRaw(Component.literal(drag.name).withColor(drag.color.hex).append(
-                Component.literal(split ? " is your priority dragon." : " is spawning.").withStyle(ChatFormatting.GRAY)
-        ));
     }
 
     private static void updateDragonEntities(Entity entity) {
@@ -258,23 +245,14 @@ public class WitherDragons {
             for (Dragon drag : dragons) {
                 if (drag.spawnTicks == 0 && drag.area.contains(event.pos)) {
                     drag.startTicking();
-                    List<Dragon> spawning = dragons.stream().filter(Dragon::isSpawning).toList();
-                    if (!splitDone && spawning.size() == 2) {
-                        if (alert.value()) {
-                            double currentPower = getPowerLevel();
-                            Dragon first = spawning.getFirst();
-                            Dragon second = spawning.getLast();
-                            if ((currentPower >= powerEasy.value() && isEitherPurple(first, second)) || currentPower >= power.value()) {
-                                announceSpawn(getHigherPriority(first, second, isArcherTeam()), true);
-                            } else { // no split
-                                announceSpawn(getHigherPriority(first, second, true), true);
-                            }
-                            splitDone = true;
-                        }
-                    } else if (splitDone) {
-                        if (alert.value()) {
-                            announceSpawn(drag, false);
-                        }
+                    if (alert.value()) {
+                        MutableComponent title = Component.literal(Utils.toUpper(drag.name) + " IS SPAWNING")
+                                .setStyle(Style.EMPTY.withBold(true).withColor(drag.color.hex));
+                        Utils.showTitle(title, Component.empty(), 0, 30, 10);
+                        Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
+                        Utils.infoRaw(Component.literal(drag.name).withColor(drag.color.hex).append(
+                                Component.literal(" is spawning.").withStyle(ChatFormatting.GRAY)
+                        ));
                     }
                 }
             }
@@ -331,7 +309,6 @@ public class WitherDragons {
     private static void onJoin(ServerJoinEvent event) {
         teammateArrows.clear();
         firePoints.clear();
-        splitDone = false;
         tickCounter = 0;
         for (Dragon drag : dragons) {
             drag.reset();

@@ -3,6 +3,7 @@ package nofrills.features.dungeons;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
@@ -42,7 +43,7 @@ public class StarredMobHighlight {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && isStarred(event.namePlain)) {
-            List<Entity> otherEntities = Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, StarredMobHighlight::isDungeonMob);
+            List<Entity> otherEntities = Utils.getOtherEntities(event.entity, 0.5, 2.0, 0.5, StarredMobHighlight::isDungeonMob);
             Entity closest = Utils.findNametagOwner(event.entity, otherEntities);
             if (closest != null && !MinibossHighlight.cache.has(closest)) {
                 cache.add(closest);
@@ -55,8 +56,14 @@ public class StarredMobHighlight {
         if (instance.isActive() && Utils.isInDungeons()) {
             for (Entity ent : cache.get()) {
                 if (!ent.isAlive()) continue;
-                AABB box = Utils.getLerpedBox(ent, event.tickCounter.getGameTimeDeltaPartialTick(true));
-                event.drawStyled(box, style.value(), false, outlineColor.value(), fillColor.value());
+                AABB box = Utils.getLerpedBox(ent, event.delta());
+                event.drawStyled(
+                        ent instanceof EnderMan && ent.isInvisible() ? box.contract(0.0, 2.3, 0.0) : box,
+                        style.value(),
+                        false,
+                        outlineColor.value(),
+                        fillColor.value()
+                );
             }
         }
     }

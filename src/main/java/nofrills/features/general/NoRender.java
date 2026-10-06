@@ -2,7 +2,6 @@ package nofrills.features.general;
 
 import com.google.common.collect.Sets;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
@@ -31,6 +30,7 @@ import org.joml.Vector3f;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
 import static nofrills.misc.SlayerUtil.TARANTULA;
@@ -70,6 +70,7 @@ public class NoRender {
     public static final SettingBool expOrbs = new SettingBool(false, "expOrbs", instance.key());
     public static final SettingBool stuckArrows = new SettingBool(false, "stuckArrows", instance);
 
+    public static final AtomicReference<Boolean> isFogEnvironmental = new AtomicReference<>(false);
     private static final List<Pattern> deadPatterns = List.of(
             Pattern.compile(".* 0" + Utils.Symbols.heart),
             Pattern.compile(".* 0/.*" + Utils.Symbols.heart)
@@ -94,14 +95,6 @@ public class NoRender {
                     || sound.equals(SoundType.NETHER_WOOD);
         }
         return false;
-    }
-
-    public static FogData getFogAsEmpty(FogData data) {
-        data.renderDistanceStart = Float.MAX_VALUE;
-        data.renderDistanceEnd = Float.MAX_VALUE;
-        data.environmentalStart = Float.MAX_VALUE;
-        data.environmentalEnd = Float.MAX_VALUE;
-        return data;
     }
 
     public static boolean shouldHideTooltip(Slot slot, String title) {

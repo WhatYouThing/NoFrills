@@ -92,6 +92,10 @@ public final class MappedEntityCache<T> {
         return this.entities.keySet().stream().toList();
     }
 
+    public List<T> getValues() {
+        return this.entities.values().stream().toList();
+    }
+
     public Entity getFirst() {
         return this.entities.keySet().stream().findFirst().orElse(null);
     }

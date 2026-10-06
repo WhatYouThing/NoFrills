@@ -29,10 +29,9 @@ import nofrills.config.SettingEnum;
 import nofrills.events.*;
 import nofrills.misc.*;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static nofrills.Main.mc;
@@ -59,16 +58,7 @@ public class WitherDragons {
             Dragon.GREEN
     );
     private static final MappedEntityCache<String> teammateArrows = new MappedEntityCache<>();
-    private static final CopyOnWriteArrayList<FireBowPoint> firePoints = new CopyOnWriteArrayList<>();
     private static int tickCounter = 0;
-
-    private static boolean isArcherTeam() {
-        return DungeonUtil.isClass("Archer") || DungeonUtil.isClass("Tank");
-    }
-
-    private static double getPowerLevel() {
-        return DungeonUtil.getPower();
-    }
 
     private static boolean isDragonParticle(ClientboundLevelParticlesPacket packet) {
         return packet.getParticle().getType().equals(ParticleTypes.FLAME) && packet.getCount() == 20
@@ -77,23 +67,12 @@ public class WitherDragons {
                 && packet.getZ() % 1 == 0.0;
     }
 
-    private static boolean isEitherPurple(Dragon first, Dragon second) {
-        return first == Dragon.PURPLE || second == Dragon.PURPLE;
-    }
-
     private static boolean isIceSprayEntity(ArmorStand stand) {
         if (stand.isMarker()) {
             ItemStack item = stand.getItemBySlot(EquipmentSlot.MAINHAND);
             return item.getItem().equals(Items.PACKED_ICE) && item.count() == 1 && Utils.getCustomData(item) == null;
         }
         return false;
-    }
-
-    private static Dragon getHigherPriority(Dragon first, Dragon second, boolean archerTeam) {
-        if (archerTeam) {
-            return first.archPriority > second.archPriority ? first : second;
-        }
-        return first.bersPriority > second.bersPriority ? first : second;
     }
 
     private static void updateDragonEntities(Entity entity) {
@@ -130,28 +109,29 @@ public class WitherDragons {
             if (Float.isNaN(rot.x) || Float.isNaN(rot.y) || mc.level == null) {
                 return;
             }
-            float rotPitch = Mth.wrapDegrees(rot.x);
-            float rotYaw = Mth.wrapDegrees(rot.y);
-            double pitchDiff = Math.clamp(10.0 / (Math.abs(event.motion().x) + Math.abs(event.motion().z)), 2.5, 20.0);
-            for (AbstractClientPlayer player : new ArrayList<>(mc.level.players())) {
-                if (!Utils.isPlayer(player)) continue;
-                List<FireBowPoint> points = player.equals(mc.player) ? firePoints : List.of(new FireBowPoint(
-                        player.position(),
-                        Mth.wrapDegrees(player.getXRot()),
-                        Mth.wrapDegrees(player.getYRot()),
-                        0
-                ));
-                for (FireBowPoint point : points) {
-                    if (Utils.difference(point.pitch + 90.0f, rotPitch + 90.0f) > pitchDiff) continue;
-                    if (point.pitch < -85.0 || point.pitch > 85.0) {
-                        if (Utils.horizontalDistance(event.arrow().position(), point.pos) > 1.0) continue;
-                    } else {
-                        if (Utils.difference(point.yaw + 180.0f, rotYaw + 180.0f) > 15.0f) continue;
-                        if (Utils.horizontalDistance(event.arrow().position(), point.pos) > 4.0) continue;
-                    }
-                    teammateArrows.add(event.arrow(), player.getName().getString());
-                    return;
-                }
+            Entity owner = event.arrow().getOwner();
+            if (owner instanceof AbstractClientPlayer player) {
+                teammateArrows.add(event.arrow(), player.getName().getString());
+            } else if (owner == null) {
+                float pitch = Mth.wrapDegrees(rot.x);
+                float yaw = Mth.wrapDegrees(rot.y);
+                teammateArrows.get().stream()
+                        .filter(e -> ((Arrow) e.getKey()).getOwner() != null && !e.getValue().isEmpty())
+                        .sorted(Comparator.comparingInt(e -> e.getKey().getId()))
+                        .forEach(e -> {
+                                    Entity arrow = e.getKey();
+                                    Vec2 arrowRot = arrow.getDeltaMovement().rotation();
+                                    if (Float.isNaN(arrowRot.x) || Float.isNaN(arrowRot.y)) {
+                                        return;
+                                    }
+                                    float arrowPitch = Mth.wrapDegrees(arrowRot.x);
+                                    float arrowYaw = Mth.wrapDegrees(arrowRot.y);
+                                    if (Utils.difference(pitch, arrowPitch) <= 5.0 && Utils.difference(yaw, arrowYaw) <= 25.0) {
+                                        if (teammateArrows.has(arrow)) return;
+                                        teammateArrows.add(arrow, e.getValue());
+                                    }
+                                }
+                        );
             }
         }
     }
@@ -232,7 +212,7 @@ public class WitherDragons {
             if (tracers.value()) {
                 List<Dragon> spawning = dragons.stream().filter(Dragon::isSpawning).toList();
                 if (!spawning.isEmpty()) {
-                    Dragon drag = spawning.size() == 2 ? getHigherPriority(spawning.getFirst(), spawning.get(1), isArcherTeam()) : spawning.getFirst();
+                    Dragon drag = spawning.getFirst();
                     event.drawTracer(drag.pos.getCenter(), drag.color);
                 }
             }
@@ -287,28 +267,12 @@ public class WitherDragons {
             for (Dragon drag : dragons) {
                 drag.tick();
             }
-            firePoints.removeIf(point -> point.tick + 60 < tickCounter);
             tickCounter++;
         }
     }
 
     @EventHandler
-    private static void onWorldTick(WorldTickEvent event) {
-        if (instance.isActive() && (mc.options.keyAttack.isDown() || mc.options.keyUse.isDown()) && mc.player.isHolding(Items.BOW)) {
-            Vec3 pos = mc.player.position();
-            firePoints.add(new FireBowPoint(
-                    new Vec3(pos.x, pos.y, pos.z),
-                    Mth.wrapDegrees(mc.player.getXRot()),
-                    Mth.wrapDegrees(mc.player.getYRot()),
-                    tickCounter
-            ));
-        }
-    }
-
-    @EventHandler
     private static void onJoin(ServerJoinEvent event) {
-        teammateArrows.clear();
-        firePoints.clear();
         tickCounter = 0;
         for (Dragon drag : dragons) {
             drag.reset();
@@ -319,9 +283,6 @@ public class WitherDragons {
         Disabled,
         Simple,
         Advanced
-    }
-
-    private record FireBowPoint(Vec3 pos, float pitch, float yaw, int tick) {
     }
 
     private static class Dragon { // box coordinates taken from odin's WitherDragonEnum xqcL

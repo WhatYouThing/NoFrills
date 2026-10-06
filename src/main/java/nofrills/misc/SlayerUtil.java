@@ -14,12 +14,14 @@ import net.minecraft.world.entity.monster.spider.Spider;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
-import nofrills.events.ChatMsgEvent;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.EventListener;
 import nofrills.events.WorldTickEvent;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -36,17 +38,12 @@ public class SlayerUtil {
     public static final List<SlayerBoss> bossList = List.of(REVENANT, TARANTULA, SVEN, VOIDGLOOM, VAMPIRE, BLAZE);
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
-    private static final Predicate<Entity> predicate = entity -> entity.isAlive() && Utils.isMob(entity);
-    private static final EntityCache spawnerCache = new EntityCache();
-    private static final EntityCache timerCache = new EntityCache();
-    private static final EntityCache nameCache = new EntityCache();
-    private static final EntityCache bossCache = new EntityCache();
-    private static final ConcurrentHashSet<String> minibossNameCache = new ConcurrentHashSet<>();
+    private static final MappedEntityCache<CurrentBoss> bossCache = new MappedEntityCache<>();
     public static boolean bossAlive = false;
     public static SlayerBoss currentBoss = null;
 
     public static boolean isSpawner(String name) {
-        return name.equals(Utils.format("Spawned by: {}", mc.player.getName().getString()));
+        return name.equals("SLAYER BOSS");
     }
 
     public static boolean isTimer(String name) {
@@ -62,23 +59,25 @@ public class SlayerUtil {
     }
 
     public static ArmorStand getSpawnerEntity() {
-        return (ArmorStand) spawnerCache.getFirst();
+        return (ArmorStand) getCurrentBoss().map(Map.Entry::getKey).orElse(null);
     }
 
     public static ArmorStand getTimerEntity() {
-        return (ArmorStand) timerCache.getFirst();
+        return getCurrentBoss().map(b -> b.getValue().timer).orElse(null);
     }
 
     public static ArmorStand getNameEntity() {
-        return (ArmorStand) nameCache.getFirst();
+        return getCurrentBoss().map(b -> b.getValue().name).orElse(null);
     }
 
     public static LivingEntity getBossEntity() {
-        return (LivingEntity) bossCache.getFirst();
+        return getCurrentBoss().map(b -> b.getValue().boss).orElse(null);
     }
 
-    public static ConcurrentHashSet<String> getMinibossNames() {
-        return minibossNameCache;
+    public static Optional<Map.Entry<Entity, CurrentBoss>> getCurrentBoss() {
+        if (mc.player == null) return Optional.empty();
+        return bossCache.get().stream()
+                .min(Comparator.comparingDouble(b -> b.getKey().distanceTo(mc.player)));
     }
 
     public static void updateQuestState(List<String> lines) {
@@ -94,45 +93,49 @@ public class SlayerUtil {
         currentBoss = null;
     }
 
-    private static void setCachedEntity(EntityCache cache, Entity entity) {
-        cache.add(entity);
-        cache.removeIf(ent -> !ent.equals(entity));
-    }
-
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         if (currentBoss != null && isSpawner(event.namePlain)) {
-            spawnerCache.add(event.entity);
-        }
-    }
-
-    @EventHandler
-    private static void onMessage(ChatMsgEvent event) {
-        if (currentBoss != null && event.msg().startsWith("SLAYER MINI-BOSS ")) {
-            minibossNameCache.add(event.msg().replace("SLAYER MINI-BOSS ", "").replace(" has spawned!", "").trim());
+            bossCache.add(event.entity, new CurrentBoss());
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTick(WorldTickEvent event) {
         if (currentBoss != null) {
-            Entity spawner = getSpawnerEntity();
-            if (spawner == null) return;
-            for (Entity entity : Utils.getOtherEntities(spawner, 0.5, 2.0, 0.5, predicate)) {
-                if (entity instanceof ArmorStand stand) {
-                    String name = Utils.toPlain(stand.getName());
-                    if (isTimer(name)) {
-                        setCachedEntity(timerCache, entity);
+            bossCache.get().forEach(b -> {
+                for (Entity entity : Utils.getOtherEntities(b.getKey(), 0.5, 2.0, 0.5, e -> e.isAlive() && Utils.isMob(e))) {
+                    if (entity instanceof ArmorStand stand) {
+                        String name = Utils.toPlain(stand.getName());
+                        if (isTimer(name)) {
+                            bossCache.add(b.getKey(), b.getValue().withTimer(entity));
+                        } else if (isName(name)) {
+                            bossCache.add(b.getKey(), b.getValue().withName(entity));
+                        }
+                    } else if (currentBoss.predicate.test(entity)) {
+                        bossCache.add(b.getKey(), b.getValue().withBoss(entity));
                     }
-                    if (isName(name)) {
-                        setCachedEntity(nameCache, entity);
-                    }
-                    continue;
                 }
-                if (currentBoss.predicate.test(entity)) {
-                    setCachedEntity(bossCache, entity);
-                }
-            }
+            });
+        }
+    }
+
+    public record CurrentBoss(ArmorStand timer, ArmorStand name, LivingEntity boss) {
+
+        public CurrentBoss() {
+            this(null, null, null);
+        }
+
+        public CurrentBoss withTimer(Entity timer) {
+            return new CurrentBoss((ArmorStand) timer, this.name, this.boss);
+        }
+
+        public CurrentBoss withName(Entity name) {
+            return new CurrentBoss(this.timer, (ArmorStand) name, this.boss);
+        }
+
+        public CurrentBoss withBoss(Entity boss) {
+            return new CurrentBoss(this.timer, this.name, (LivingEntity) boss);
         }
     }
 

@@ -728,6 +728,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt."),
                         new Module("Spawn Alert", SpawnAlert.instance, "Alerts you when your slayer boss is spawned."),
                         new Module("Miniboss Highlight", SlayerMinibossHighlight.instance, "Highlights slayer minibosses.", new Settings(List.of(
+                                new Settings.Toggle("Hide Nametag", SlayerMinibossHighlight.hide, "Hides the apparent \"SLAYER MINIBOSS\" nametag that appears above the miniboss."),
                                 new Settings.EnumToggle<>("Highlight Style", SlayerMinibossHighlight.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Fill Color", SlayerMinibossHighlight.fillColor, "The color of the filled box."),
                                 new Settings.ColorPicker("Outline Color", SlayerMinibossHighlight.outlineColor, "The color of the outline box.")

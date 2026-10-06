@@ -22,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -63,15 +64,15 @@ public class SlayerUtil {
     }
 
     public static ArmorStand getTimerEntity() {
-        return getCurrentBoss().map(b -> b.getValue().timer).orElse(null);
+        return getCurrentBoss().map(b -> b.getValue().timer().get()).orElse(null);
     }
 
     public static ArmorStand getNameEntity() {
-        return getCurrentBoss().map(b -> b.getValue().name).orElse(null);
+        return getCurrentBoss().map(b -> b.getValue().name().get()).orElse(null);
     }
 
     public static LivingEntity getBossEntity() {
-        return getCurrentBoss().map(b -> b.getValue().boss).orElse(null);
+        return getCurrentBoss().map(b -> b.getValue().boss().get()).orElse(null);
     }
 
     public static Optional<Map.Entry<Entity, CurrentBoss>> getCurrentBoss() {
@@ -104,38 +105,39 @@ public class SlayerUtil {
     private static void onTick(WorldTickEvent event) {
         if (currentBoss != null) {
             bossCache.get().forEach(b -> {
-                for (Entity entity : Utils.getOtherEntities(b.getKey(), 0.5, 2.0, 0.5, e -> e.isAlive() && Utils.isMob(e))) {
+                for (Entity entity : Utils.getOtherEntities(b.getKey(), 1.0, 3.0, 1.0, e -> e.isAlive() && Utils.isMob(e))) {
                     if (entity instanceof ArmorStand stand) {
                         String name = Utils.toPlain(stand.getName());
                         if (isTimer(name)) {
-                            bossCache.add(b.getKey(), b.getValue().withTimer(entity));
+                            b.getValue().setTimer(stand);
                         } else if (isName(name)) {
-                            bossCache.add(b.getKey(), b.getValue().withName(entity));
+                            b.getValue().setName(stand);
                         }
                     } else if (currentBoss.predicate.test(entity)) {
-                        bossCache.add(b.getKey(), b.getValue().withBoss(entity));
+                        b.getValue().setBoss(entity);
                     }
                 }
             });
         }
     }
 
-    public record CurrentBoss(ArmorStand timer, ArmorStand name, LivingEntity boss) {
+    public record CurrentBoss(AtomicReference<ArmorStand> timer, AtomicReference<ArmorStand> name,
+                              AtomicReference<LivingEntity> boss) {
 
         public CurrentBoss() {
-            this(null, null, null);
+            this(new AtomicReference<>(), new AtomicReference<>(), new AtomicReference<>());
         }
 
-        public CurrentBoss withTimer(Entity timer) {
-            return new CurrentBoss((ArmorStand) timer, this.name, this.boss);
+        public void setTimer(Entity timer) {
+            this.timer().set((ArmorStand) timer);
         }
 
-        public CurrentBoss withName(Entity name) {
-            return new CurrentBoss(this.timer, (ArmorStand) name, this.boss);
+        public void setName(Entity name) {
+            this.name().set((ArmorStand) name);
         }
 
-        public CurrentBoss withBoss(Entity boss) {
-            return new CurrentBoss(this.timer, this.name, (LivingEntity) boss);
+        public void setBoss(Entity boss) {
+            this.boss().set((LivingEntity) boss);
         }
     }
 

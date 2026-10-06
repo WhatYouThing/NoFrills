@@ -57,7 +57,7 @@ public final class BossHealth extends SimpleTextElement implements ListeningHudE
                 this.setText(Component.literal(name)
                         .append(": ")
                         .append(Component.literal(Utils.formatDecimal(bar.getProgress() * 100.0) + "%")
-                                .withColor(Utils.getPercentageColor(bar.getProgress()).getHex())
+                                .withColor(Utils.getPercentageColor(bar.getProgress(), true).getHex())
                         ));
                 return;
             }
@@ -70,7 +70,7 @@ public final class BossHealth extends SimpleTextElement implements ListeningHudE
                 this.setText(Component.literal("Kuudra")
                         .append(": ")
                         .append(Component.literal(Utils.formatDecimal(percent * 100.0) + "%")
-                                .withColor(Utils.getPercentageColor(percent).getHex())
+                                .withColor(Utils.getPercentageColor(percent, true).getHex())
                         ));
                 return;
             }
@@ -85,7 +85,7 @@ public final class BossHealth extends SimpleTextElement implements ListeningHudE
                 this.setText(Component.literal("Kuudra")
                         .append(": ")
                         .append(Component.literal(Utils.formatDecimal(currentHealth * 0.000001) + "M")
-                                .withColor(Utils.getPercentageColor(currentHealth / 240_000_000.0f).getHex())
+                                .withColor(Utils.getPercentageColor(currentHealth / 240_000_000.0f, true).getHex())
                         )
                         .append(" ")
                         .append(Component.literal("(" + Utils.formatDecimal(this.kuudraDPS * 0.000001) + "M DPS)")

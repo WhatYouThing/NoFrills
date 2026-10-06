@@ -24,10 +24,20 @@ public abstract class FogRendererMixin {
     @Final
     private static List<FogEnvironment> FOG_ENVIRONMENTS;
 
-    @Inject(method = "setupFog", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/fog/environment/FogEnvironment;setupFog(Lnet/minecraft/client/renderer/fog/FogData;Lnet/minecraft/client/Camera;Lnet/minecraft/client/multiplayer/ClientLevel;FLnet/minecraft/client/DeltaTracker;)V"))
-    private void onGetFocused(Camera camera, int renderDistanceInChunks, DeltaTracker deltaTracker, float darkenWorldAmount, ClientLevel level, CallbackInfoReturnable<FogData> cir, @Local(name = "fogEnvironment") FogEnvironment fogEnvironment) {
+    @Inject(method = "setupFog", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/fog/environment/FogEnvironment;setupFog(Lnet/minecraft/client/renderer/fog/FogData;Lnet/minecraft/client/Camera;Lnet/minecraft/client/multiplayer/ClientLevel;FLnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
+    private void onSetupFog(Camera camera, int renderDistanceInChunks, DeltaTracker deltaTracker, float darkenWorldAmount, ClientLevel level, CallbackInfoReturnable<FogData> cir, @Local(name = "fogEnvironment") FogEnvironment fogEnvironment) {
         if (NoRender.instance.isActive() && NoRender.fog.value()) {
-            NoRender.isFogEnvironmental.set(fogEnvironment == FOG_ENVIRONMENTS.getLast()); // tracks if the last fog update uses the default/atmospheric fog
+            NoRender.isFogEnvironmental.set(fogEnvironment == FOG_ENVIRONMENTS.getLast()); // tracks if the last fog update uses the default fog
+        }
+    }
+
+    @Inject(method = "setupFog", at = @At("RETURN"))
+    private void onAfterSetup(Camera camera, int renderDistanceInChunks, DeltaTracker deltaTracker, float darkenWorldAmount, ClientLevel level, CallbackInfoReturnable<FogData> cir, @Local(name = "fog") FogData fog) {
+        if (NoRender.instance.isActive() && NoRender.fog.value() && NoRender.isFogEnvironmental.get()) {
+            fog.renderDistanceStart = Float.MAX_VALUE;
+            fog.renderDistanceEnd = Float.MAX_VALUE;
+            fog.environmentalStart = Float.MAX_VALUE;
+            fog.environmentalEnd = Float.MAX_VALUE;
         }
     }
 }

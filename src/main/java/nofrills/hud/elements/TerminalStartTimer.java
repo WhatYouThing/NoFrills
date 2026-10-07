@@ -9,7 +9,7 @@ public final class TerminalStartTimer extends TickTimerElement implements Listen
 
     public TerminalStartTimer() {
         super("Terminal Start: {}", new Feature("terminalStartTimerElement"), "Terminal Start Timer");
-        this.setStartTicks(104);
+        this.setStartTicks(64);
         this.options = this.getBaseSettings();
         this.setDesc("Displays a tick timer for the start of the Goldor phase in F7/M7.");
         this.setAutoPause();

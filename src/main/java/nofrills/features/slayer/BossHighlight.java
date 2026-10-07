@@ -9,11 +9,10 @@ import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
-import nofrills.events.WorldTickEvent;
 import nofrills.misc.*;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 @EventListener
 public class BossHighlight {
@@ -31,8 +30,7 @@ public class BossHighlight {
     public static final SettingColor crystalFill = new SettingColor(RenderColor.fromArgb(0x5500ffff), "crystalFill", instance.key());
     public static final SettingColor crystalOutline = new SettingColor(RenderColor.fromArgb(0xff00ffff), "crystalOutline", instance.key());
 
-    private static final EntityCache blazeCache = new EntityCache();
-    private static final ConcurrentHashMap<Integer, String> attunementMap = new ConcurrentHashMap<>();
+    private static final MappedEntityCache<String> blazeCache = new MappedEntityCache<>();
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
@@ -41,8 +39,7 @@ public class BossHighlight {
             List<Entity> other = Utils.getOtherEntities(event.entity, 1.0, 3.0, 1.0, SlayerUtil.BLAZE.predicate);
             Entity owner = Utils.findNametagOwner(event.entity, other);
             if (owner != null) {
-                attunementMap.put(owner.getId(), attunement);
-                blazeCache.add(owner);
+                blazeCache.add(owner, attunement);
             }
         }
     }
@@ -51,32 +48,26 @@ public class BossHighlight {
     private static void onRender(WorldRenderEvent event) {
         if (instance.isActive() && SlayerUtil.bossAlive) {
             if (SlayerUtil.isFightingBoss(SlayerUtil.BLAZE)) {
-                for (Entity ent : blazeCache.get()) {
+                for (Map.Entry<Entity, String> entry : blazeCache.get()) {
+                    Entity ent = entry.getKey();
                     if (!ent.isAlive()) return;
-                    AABB box = Utils.getLerpedBox(ent, event.tickCounter.getGameTimeDeltaPartialTick(true));
-                    String attunement = attunementMap.getOrDefault(ent.getId(), "");
-                    RenderStyle style = highlightStyle.value();
-                    switch (attunement) {
-                        case "ASHEN" -> event.drawStyled(box, style, false, ashenOutline.value(), ashenFill.value());
-                        case "SPIRIT" -> event.drawStyled(box, style, false, spiritOutline.value(), spiritFill.value());
-                        case "AURIC" -> event.drawStyled(box, style, false, auricOutline.value(), auricFill.value());
+                    AABB box = Utils.getLerpedBox(ent, event.delta());
+                    switch (entry.getValue()) {
+                        case "ASHEN" ->
+                                event.drawStyled(box, highlightStyle.value(), false, ashenOutline.value(), ashenFill.value());
+                        case "SPIRIT" ->
+                                event.drawStyled(box, highlightStyle.value(), false, spiritOutline.value(), spiritFill.value());
+                        case "AURIC" ->
+                                event.drawStyled(box, highlightStyle.value(), false, auricOutline.value(), auricFill.value());
                         case "CRYSTAL" ->
-                                event.drawStyled(box, style, false, crystalOutline.value(), crystalFill.value());
+                                event.drawStyled(box, highlightStyle.value(), false, crystalOutline.value(), crystalFill.value());
                     }
                 }
             } else {
                 Entity boss = SlayerUtil.getBossEntity();
                 if (boss == null || !boss.isAlive()) return;
-                AABB box = Utils.getLerpedBox(boss, event.tickCounter.getGameTimeDeltaPartialTick(true));
-                event.drawStyled(box, highlightStyle.value(), false, outlineColor.value(), fillColor.value());
+                event.drawStyled(Utils.getLerpedBox(boss, event.delta()), highlightStyle.value(), false, outlineColor.value(), fillColor.value());
             }
-        }
-    }
-
-    @EventHandler
-    private static void onTick(WorldTickEvent event) {
-        if (instance.isActive() && !SlayerUtil.bossAlive && !attunementMap.isEmpty()) {
-            attunementMap.clear();
         }
     }
 }

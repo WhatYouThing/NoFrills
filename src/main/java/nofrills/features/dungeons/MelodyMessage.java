@@ -24,7 +24,7 @@ public class MelodyMessage {
     public static final SettingBool progress = new SettingBool(false, "progress", instance.key());
     public static final SettingString progressMsg = new SettingString("/pc Melody {percent}", "progressMsg", instance.key());
 
-    private static final int rows = 4;
+    private static final int rows = 3;
     private static int lastCount = rows;
 
     private static boolean isMelody(String title) {
@@ -54,9 +54,8 @@ public class MelodyMessage {
                 } // go from last slot to first, count every terracotta item, find the terminal progress from the first lime terracotta
                 if (item.equals(Items.DYED_TERRACOTTA.lime()) && count < lastCount) {
                     String percent = switch (count) {
-                        case 1 -> "75%";
-                        case 2 -> "50%";
-                        case 3 -> "25%";
+                        case 1 -> "66%";
+                        case 2 -> "33%";
                         default -> "";
                     };
                     if (!percent.isEmpty()) {

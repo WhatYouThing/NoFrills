@@ -233,20 +233,6 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
         this.yPos.set(y / window.getGuiScaledHeight());
     }
 
-    public boolean isInSnapDistance(MouseButtonEvent click) {
-        double mouseX = this.x() + click.x();
-        double mouseY = this.y() + click.y();
-        int precision = this.gridPrecision.value();
-        return mouseX >= this.x() - precision && mouseX <= this.x() + this.width() + precision
-                && mouseY >= this.y() - precision && mouseY <= this.y() + this.height() + precision;
-    }
-
-    public double snapDelta(double delta, double offset) {
-        double newOffset = offset + delta;
-        double snapOffset = Math.min(newOffset - (newOffset % this.gridPrecision.value()), newOffset);
-        return offset - snapOffset;
-    }
-
     public void toggle() {
         this.instance.setActive(!this.instance.isActive());
     }

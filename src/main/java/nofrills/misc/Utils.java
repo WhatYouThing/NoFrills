@@ -338,13 +338,9 @@ public class Utils {
     }
 
     public static List<Entity> getOtherEntities(Entity except, AABB box, Predicate<? super Entity> filter) {
-        List<Entity> entities = new ArrayList<>();
-        for (Entity ent : getEntities()) {
-            if (ent != null && ent != except && (filter == null || filter.test(ent)) && ent.getBoundingBox().intersects(box)) {
-                entities.add(ent);
-            }
-        }
-        return entities;
+        return getEntities().stream()
+                .filter(e -> e != null && e != except && (filter == null || filter.test(e)) && e.getBoundingBox().intersects(box))
+                .toList();
     }
 
     public static List<Entity> getOtherEntities(Entity from, double distX, double distY, double distZ, Predicate<? super Entity> filter) {
@@ -820,21 +816,13 @@ public class Utils {
     }
 
     /**
-     * Tries to find the entity that the provided Armor Stand belongs to, based on horizontal distance.
+     * Tries to find the entity that the provided Armor Stand belongs to based on entity ID.
      */
-    public static Entity findNametagOwner(Entity armorStand, List<Entity> otherEntities) {
-        Entity entity = null;
-        float lowestDist = 2.0f;
-        double maxY = armorStand.position().y();
-        for (Entity ent : otherEntities) {
-            if (ent instanceof ArmorStand) continue;
-            float dist = horizontalDistance(ent.position(), armorStand.position());
-            if (ent.position().y() < maxY && dist < lowestDist) {
-                entity = ent;
-                lowestDist = dist;
-            }
-        }
-        return entity;
+    public static Entity getNameTagOwner(Entity armorStand, List<Entity> otherEntities) {
+        return otherEntities.stream()
+                .filter(e -> !(e instanceof ArmorStand))
+                .min(Comparator.comparingInt(e -> Utils.difference(e.getId(), armorStand.getId())))
+                .orElse(null);
     }
 
     public static List<String> getTabListLines() {

@@ -44,7 +44,7 @@ public class StarredMobHighlight {
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && Utils.isInDungeons() && isStarred(event.namePlain)) {
             List<Entity> otherEntities = Utils.getOtherEntities(event.entity, 0.5, 2.0, 0.5, StarredMobHighlight::isDungeonMob);
-            Entity closest = Utils.findNametagOwner(event.entity, otherEntities);
+            Entity closest = Utils.getNameTagOwner(event.entity, otherEntities);
             if (closest != null && !MinibossHighlight.cache.has(closest)) {
                 cache.add(closest);
             }

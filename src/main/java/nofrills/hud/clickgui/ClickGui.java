@@ -516,12 +516,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Keybind("Leap First Key", LeapOverlay.firstKey, "The keybind to leap to the first player on the overlay (left -> right order)."),
                                 new Settings.Keybind("Leap Second Key", LeapOverlay.secondKey, "The keybind to leap to the second player on the overlay (left -> right order)."),
                                 new Settings.Keybind("Leap Third Key", LeapOverlay.thirdKey, "The keybind to leap to the third player on the overlay (left -> right order)."),
-                                new Settings.Keybind("Leap Fourth Key", LeapOverlay.fourthKey, "The keybind to leap to the fourth player on the overlay (left -> right order)."),
-                                new Settings.ColorPicker("Healer Color", LeapOverlay.healer, "The color used for Healer on the overlay."),
-                                new Settings.ColorPicker("Mage Color", LeapOverlay.mage, "The color used for Mage on the overlay."),
-                                new Settings.ColorPicker("Bers Color", LeapOverlay.bers, "The color used for Berserker on the overlay."),
-                                new Settings.ColorPicker("Arch Color", LeapOverlay.arch, "The color used for Archer on the overlay."),
-                                new Settings.ColorPicker("Tank Color", LeapOverlay.tank, "The color used for Tank on the overlay.")
+                                new Settings.Keybind("Leap Fourth Key", LeapOverlay.fourthKey, "The keybind to leap to the fourth player on the overlay (left -> right order).")
                         ))),
                         new Module("Terminal Solvers", TerminalSolvers.instance, "Solves terminals and prevents wrong clicks in F7/M7. Also hides item tooltips in every terminal.", new Settings(List.of(
                                 new Settings.Toggle("Solve Panes", TerminalSolvers.panes, "Solves the \"Correct all panes\" terminal."),
@@ -617,12 +612,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
                         new Module("Class Nametags", ClassNametags.instance, "Renders large nametags for your teammates, indicating their selected class and position.", new Settings(List.of(
-                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, ClassNametags.scale, "The scale of the text."),
-                                new Settings.ColorPicker("Healer Color", ClassNametags.healer, "The text color for Healer."),
-                                new Settings.ColorPicker("Mage Color", ClassNametags.mage, "The text color for Mage."),
-                                new Settings.ColorPicker("Bers Color", ClassNametags.bers, "The text color for Berserker."),
-                                new Settings.ColorPicker("Arch Color", ClassNametags.arch, "The text color for Archer."),
-                                new Settings.ColorPicker("Tank Color", ClassNametags.tank, "The text color for Tank.")
+                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, ClassNametags.scale, "The scale of the text.")
                         ))),
                         new Module("Score Calculator", ScoreCalculator.instance, "Calculates the score in your dungeon runs.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Paul State", ScoreCalculator.paulState, "Allows you to force the state of Paul's EZPZ perk.\nSet to Auto to automatically check for EZPZ through the NoFrills API."),
@@ -657,6 +647,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Dupe Class Alert", DupeClassAlert.instance, "Shows text on screen if your party has multiple of the same class before the dungeon starts."),
                         new Module("Leap Message", LeapMessage.instance, "Sends a message when you leap to another player.", new Settings(
                                 new Settings.TextInput("Message", LeapMessage.message, "The message to send. Replaces {name} with the player's name.")
+                        )),
+                        new Module("Class Colors", ClassColors.instance, "Controls the colors used for the dungeon classes across various features.", new Settings(
+                                new Settings.ColorPicker("Healer Color", ClassColors.heal, "The color used for Healer."),
+                                new Settings.ColorPicker("Mage Color", ClassColors.mage, "The color used for Mage."),
+                                new Settings.ColorPicker("Bers Color", ClassColors.bers, "The color used for Berserker."),
+                                new Settings.ColorPicker("Arch Color", ClassColors.arch, "The color used for Archer."),
+                                new Settings.ColorPicker("Tank Color", ClassColors.tank, "The color used for Tank.")
                         ))
                 )),
                 new Category("Kuudra", List.of(

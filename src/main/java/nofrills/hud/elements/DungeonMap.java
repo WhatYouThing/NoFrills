@@ -21,7 +21,11 @@ import net.minecraft.world.level.saveddata.maps.MapDecoration;
 import net.minecraft.world.level.saveddata.maps.MapDecorationTypes;
 import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
 import net.minecraft.world.phys.Vec3;
-import nofrills.config.*;
+import nofrills.config.Feature;
+import nofrills.config.SettingBool;
+import nofrills.config.SettingDouble;
+import nofrills.config.SettingEnum;
+import nofrills.features.dungeons.ClassColors;
 import nofrills.hud.HudElement;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.clickgui.Settings;
@@ -43,11 +47,6 @@ public final class DungeonMap extends HudElement implements ListeningHudElement 
     private final SettingDouble playerNameScale = new SettingDouble(0.8, "playerNameScale", this.instance);
     private final SettingEnum<NameMode> playerNameMode = new SettingEnum<>(NameMode.Normal, NameMode.class, "playerNameMode", this.instance);
     private final SettingEnum<NameDisplayMode> playerNameDisplayMode = new SettingEnum<>(NameDisplayMode.Disabled, NameDisplayMode.class, "playerNameDisplayMode", this.instance);
-    private final SettingColor healColor = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", this.instance);
-    private final SettingColor mageColor = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", this.instance);
-    private final SettingColor bersColor = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", this.instance);
-    private final SettingColor archColor = new SettingColor(RenderColor.fromHex(0x4a14b7), "archColor", this.instance);
-    private final SettingColor tankColor = new SettingColor(RenderColor.fromHex(0x768f46), "tankColor", this.instance);
     private final SettingBool debug = new SettingBool(false, "debug", this.instance);
     private List<DungeonUtil.Teammate> teammates = List.of();
     private MapParameters parameters = null;
@@ -62,11 +61,6 @@ public final class DungeonMap extends HudElement implements ListeningHudElement 
                 new Settings.SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.playerNameScale, "The scale of the name displayed below teammate markers."),
                 new Settings.EnumToggle<>("Name Mode", this.playerNameMode, "The mode of how the player names are displayed.\n\nNormal: The full name of the player is displayed.\nClass: A short player class label is displayed (\"Arch\", \"Bers\" etc.)."),
                 new Settings.EnumToggle<>("Name Display Mode", this.playerNameDisplayMode, "The mode of when the player names are displayed.\n\nAlways: The names are always displayed.\nLeapOnly: The names are displayed only while holding a leap.\nDisabled: No names displayed."),
-                new Settings.ColorPicker("Healer Color", this.healColor, "The color used for the Healer marker name text."),
-                new Settings.ColorPicker("Mage Color", this.mageColor, "The color used for the Mage marker name text."),
-                new Settings.ColorPicker("Bers Color", this.bersColor, "The color used for the Berserk marker name text."),
-                new Settings.ColorPicker("Archer Color", this.archColor, "The color used for the Archer marker name text."),
-                new Settings.ColorPicker("Tank Color", this.tankColor, "The color used for the Tank marker name text."),
                 new Settings.Toggle("Debug", this.debug, "Outputs debug information about the map's behavior.")
         ));
         this.setDesc("Displays the dungeon map while in Dungeons.");
@@ -180,14 +174,7 @@ public final class DungeonMap extends HudElement implements ListeningHudElement 
             default -> teammate.selectedClass();
         };
         float width = mc.font.width(text);
-        int color = switch (teammate.selectedClass()) {
-            case "Healer" -> this.healColor.value().argb;
-            case "Mage" -> this.mageColor.value().argb;
-            case "Berserk" -> this.bersColor.value().argb;
-            case "Archer" -> this.archColor.value().argb;
-            case "Tank" -> this.tankColor.value().argb;
-            default -> 0xffffff;
-        };
+        int color = ClassColors.getForClass(teammate.selectedClass()).orElse(RenderColor.WHITE).getArgb();
         FormattedCharSequence orderedText = Component.literal(text).getVisualOrderText();
         Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();

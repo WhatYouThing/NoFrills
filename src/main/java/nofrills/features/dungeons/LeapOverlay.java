@@ -12,7 +12,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import nofrills.config.Feature;
-import nofrills.config.SettingColor;
 import nofrills.config.SettingDouble;
 import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
@@ -42,11 +41,6 @@ public class LeapOverlay {
     public static final SettingKeybind secondKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "secondKey", instance);
     public static final SettingKeybind thirdKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "thirdKey", instance);
     public static final SettingKeybind fourthKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "fourthKey", instance);
-    public static final SettingColor healer = new SettingColor(RenderColor.fromHex(0xecb50c), "healerColor", instance.key());
-    public static final SettingColor mage = new SettingColor(RenderColor.fromHex(0x1793c4), "mageColor", instance.key());
-    public static final SettingColor bers = new SettingColor(RenderColor.fromHex(0xe7413c), "bersColor", instance.key());
-    public static final SettingColor arch = new SettingColor(RenderColor.fromHex(0x4a14b7), "archColor", instance.key());
-    public static final SettingColor tank = new SettingColor(RenderColor.fromHex(0x768f46), "tankColor", instance.key());
     public static final RenderColor nameColor = RenderColor.fromHex(0xffffff);
     public static final RenderColor deadColor = RenderColor.fromHex(0xaaaaaa);
 
@@ -143,15 +137,7 @@ public class LeapOverlay {
             this.dungeonClass = Component.literal(target.dungeonClass);
             this.dead = target.dead;
             this.nameColor = LeapOverlay.nameColor;
-            this.classColor = switch (target.dungeonClass) {
-                case "Healer" -> healer.value();
-                case "Mage" -> mage.value();
-                case "Berserk" -> bers.value();
-                case "Archer" -> arch.value();
-                case "Tank" -> tank.value();
-                case "Empty" -> deadColor;
-                default -> nameColor;
-            };
+            this.classColor = target.dungeonClass.equals("Empty") ? deadColor : ClassColors.getForClass(target.dungeonClass).orElse(nameColor);
             this.background = RenderColor.fromFloat(0.0f, 0.0f, 0.0f, 0.67f);
             this.backgroundHover = RenderColor.fromFloat(this.classColor.r * 0.33f, this.classColor.g * 0.33f, this.classColor.b * 0.33f, 0.67f);
             this.border = RenderColor.fromFloat(this.classColor.r, this.classColor.g, this.classColor.b, 1.0f);

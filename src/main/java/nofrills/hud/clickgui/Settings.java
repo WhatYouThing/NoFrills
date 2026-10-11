@@ -301,7 +301,8 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.child(button);
             this.child(buildResetButton(_ -> {
                 updateCallback.accept(defaultValue);
-                button.setMessage(Component.literal(defaultValue.name()));
+                button.setValue(defaultValue);
+                button.setMessage(Component.literal(defaultValue.toString()));
             }));
         }
 

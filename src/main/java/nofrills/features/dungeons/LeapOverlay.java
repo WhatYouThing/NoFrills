@@ -1,6 +1,7 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -10,7 +11,10 @@ import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import nofrills.config.*;
+import nofrills.config.Feature;
+import nofrills.config.SettingColor;
+import nofrills.config.SettingDouble;
+import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenCloseEvent;
@@ -19,6 +23,7 @@ import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
+import org.jspecify.annotations.NonNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -32,8 +37,6 @@ import static nofrills.Main.mc;
 public class LeapOverlay {
     public static final Feature instance = new Feature("leapOverlay");
 
-    public static final SettingBool send = new SettingBool(false, "send", instance.key());
-    public static final SettingString message = new SettingString("/pc Leaped to {name}!", "message", instance.key());
     public static final SettingDouble scale = new SettingDouble(3.0, "scale", instance.key());
     public static final SettingKeybind firstKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "firstKey", instance);
     public static final SettingKeybind secondKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "secondKey", instance);
@@ -48,11 +51,9 @@ public class LeapOverlay {
     public static final RenderColor deadColor = RenderColor.fromHex(0xaaaaaa);
 
     private static final List<LeapButton> leapButtons = new ArrayList<>();
-    private static final String leapMenuName = "Spirit Leap";
-    private static boolean sentLeapMsg = false;
 
     public static boolean isLeapMenu(String title) {
-        return instance.isActive() && title.equals(leapMenuName) && Utils.isInDungeons();
+        return instance.isActive() && title.equals("Spirit Leap") && Utils.isInDungeons();
     }
 
     public static List<LeapButton> getLeapButtons() {
@@ -80,7 +81,6 @@ public class LeapOverlay {
                 }
             }
             leapButtons.clear();
-            sentLeapMsg = false;
             for (LeapTarget target : targets) {
                 leapButtons.add(new LeapOverlay.LeapButton(target, leapButtons.size()));
             }
@@ -177,16 +177,12 @@ public class LeapOverlay {
                 if (!stack.getItem().equals(Items.PLAYER_HEAD)) continue;
                 List<String> lore = Utils.getLoreLines(stack);
                 if (!lore.isEmpty() && Utils.toPlain(stack.getHoverName()).equals(this.player.getString()) && lore.getFirst().equals("Click to teleport!")) {
-                    mc.gameMode.handleContainerInput(handler.containerId, slot.index, 0, ContainerInput.PICKUP, mc.player);
-                    handler.setCarried(ItemStack.EMPTY);
-                    if (LeapOverlay.send.value() && !LeapOverlay.message.value().isEmpty() && !sentLeapMsg) {
-                        Utils.sendMessage(LeapOverlay.message.value().replace("{name}", this.player.getString()));
-                        sentLeapMsg = true;
-                    }
+                    Utils.click(handler.containerId, slot.index, 0, ContainerInput.PICKUP);
+                    Utils.infoRaw(Utils.formatText("Leaping to {}.", this.player.getString()).withStyle(ChatFormatting.GREEN));
                     return;
                 }
             }
-            Utils.infoFormat("§7Could not leap to {}, valid teleport button not found.", this.player.getString());
+            Utils.infoRaw(Utils.formatText("Could not leap to {}, teleport button not found.", this.player.getString()).withStyle(ChatFormatting.RED));
         }
 
         public void drawText(GuiGraphicsExtractor context, Component text, int x, int y, float scale, RenderColor color) {
@@ -198,7 +194,7 @@ public class LeapOverlay {
         }
 
         @Override
-        public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        public void extractRenderState(@NonNull GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
             this.minX = getX(context, this.offsetX);
             this.minY = getY(context, this.offsetY);
             this.maxX = getX(context, this.offsetX + 0.2f);

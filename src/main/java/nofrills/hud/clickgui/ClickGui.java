@@ -512,8 +512,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")
                         ))),
                         new Module("Leap Overlay", LeapOverlay.instance, "Renders a custom overlay in place of the Spirit Leap menu.", new Settings(List.of(
-                                new Settings.Toggle("Send Message", LeapOverlay.send, "Sends a message once you leap to a teammate."),
-                                new Settings.TextInput("Leap Message", LeapOverlay.message, "The message to send. Replaces {name} with the name of the player."),
                                 new Settings.SliderDouble("Text Scale", 1.0, 4.0, 1.0, LeapOverlay.scale, "The scale of the text on the overlay."),
                                 new Settings.Keybind("Leap First Key", LeapOverlay.firstKey, "The keybind to leap to the first player on the overlay (left -> right order)."),
                                 new Settings.Keybind("Leap Second Key", LeapOverlay.secondKey, "The keybind to leap to the second player on the overlay (left -> right order)."),
@@ -656,7 +654,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Value Tooltip", CroesusSolver.valueTooltip, "Displays the value of individual chests in the tooltip."),
                                 new Settings.Toggle("Floor Label", CroesusSolver.floorLabel, "Adds labels which indicate the floor the loot was obtained on.")
                         )),
-                        new Module("Dupe Class Alert", DupeClassAlert.instance, "Shows text on screen if your party has multiple of the same class before the dungeon starts.")
+                        new Module("Dupe Class Alert", DupeClassAlert.instance, "Shows text on screen if your party has multiple of the same class before the dungeon starts."),
+                        new Module("Leap Message", LeapMessage.instance, "Sends a message when you leap to another player.", new Settings(
+                                new Settings.TextInput("Message", LeapMessage.message, "The message to send. Replaces {name} with the player's name.")
+                        ))
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Fresh Timer", FreshTimer.instance, "Shows a timer on screen for the Fresh Tools essence shop ability.", new Settings(List.of(

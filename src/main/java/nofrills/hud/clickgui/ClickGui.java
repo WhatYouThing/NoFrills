@@ -84,8 +84,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void drawComponentTooltip(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
-        super.drawComponentTooltip(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         int height = context.guiHeight();
@@ -602,14 +602,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Score Calculator", ScoreCalculator.instance, "Calculates the score in your dungeon runs.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Paul State", ScoreCalculator.paulState, "Allows you to force the state of Paul's EZPZ perk.\nSet to Auto to automatically check for EZPZ through the NoFrills API."),
-                                new Settings.Toggle("Send 270 Message", ScoreCalculator.sendMsg270, "If enabled, send a message upon reaching 270 (S) score."),
-                                new Settings.TextInput("270 Message", ScoreCalculator.msg270, "The message to send when 270 (S) score is reached."),
-                                new Settings.Toggle("Show 270 Title", ScoreCalculator.showTitle270, "If enabled, show a title on screen upon reaching 270 (S) score."),
-                                new Settings.TextInput("270 Title", ScoreCalculator.title270, "The title to show when 270 (S) score is reached."),
-                                new Settings.Toggle("Send 300 Message", ScoreCalculator.sendMsg300, "If enabled, send a message upon reaching 300 (S+) score."),
-                                new Settings.TextInput("300 Message", ScoreCalculator.msg300, "The message to send when 300 (S+) score is reached."),
-                                new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 (S+) score."),
-                                new Settings.TextInput("300 Title", ScoreCalculator.title300, "The title to show when 300 (S+) score is reached.")
+                                new Settings.Toggle("Send 270 Message", ScoreCalculator.sendMsg270, "If enabled, send a message upon reaching 270 score."),
+                                new Settings.TextInput("270 Message", ScoreCalculator.msg270, "The message to send when 270 score is reached."),
+                                new Settings.Toggle("Show 270 Title", ScoreCalculator.showTitle270, "If enabled, show a title on screen upon reaching 270 score."),
+                                new Settings.TitleInput("270 Title", ScoreCalculator.title270, "The title to show when 270 score is reached."),
+                                new Settings.SoundInput("270 Sound", ScoreCalculator.sound270, "The sound to play when the 270 title is shown."),
+                                new Settings.Toggle("Send 300 Message", ScoreCalculator.sendMsg300, "If enabled, send a message upon reaching 300 score."),
+                                new Settings.TextInput("300 Message", ScoreCalculator.msg300, "The message to send when 300 score is reached."),
+                                new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 score."),
+                                new Settings.TitleInput("300 Title", ScoreCalculator.title300, "The title to show when 300 score is reached."),
+                                new Settings.SoundInput("300 Sound", ScoreCalculator.sound300, "The sound to play when the 300 title is shown.")
                         ))),
                         new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 area which you mine in Necron phase to stop the platform from breaking.", new Settings(
                                 new Settings.Toggle("Healer Only", PlatformHighlight.healerOnly, "Whether to only draw the highlight while playing as Healer."),

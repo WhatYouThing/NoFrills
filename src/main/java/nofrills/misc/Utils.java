@@ -61,7 +61,9 @@ import net.minecraft.world.level.entity.LevelEntityGetterAdapter;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import nofrills.config.SettingTitle;
 import nofrills.events.InputEvent;
+import nofrills.hud.HudManager;
 import nofrills.mixin.AbstractContainerScreenAccessor;
 import nofrills.mixin.BossHealthOverlayAccessor;
 import nofrills.mixin.PlayerTabOverlayAccessor;
@@ -116,6 +118,14 @@ public class Utils {
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
         showTitle(Component.literal(title), Component.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks);
+    }
+
+    public static void showTitle(SettingTitle setting) {
+        if (setting.vanilla().value()) {
+            showTitle(ofUserFormatted(setting.title().value()), Component.empty(), setting.fadeIn().value(), setting.stay().value(), setting.fadeOut().value());
+        } else {
+            HudManager.setCustomTitle(ofUserFormatted(setting.title().value()), setting.stay().value());
+        }
     }
 
     public static boolean isNearlyEqual(double a, double b, double eps) {

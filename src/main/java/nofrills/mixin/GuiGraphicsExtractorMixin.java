@@ -1,6 +1,6 @@
 package nofrills.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -28,6 +28,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(GuiGraphicsExtractor.class)
@@ -35,6 +36,8 @@ public abstract class GuiGraphicsExtractorMixin {
     @Shadow
     @Final
     private Matrix3x2fStack pose;
+    @Shadow
+    private @org.jspecify.annotations.Nullable Style hoveredTextStyle;
 
     @Shadow
     public abstract int guiWidth();
@@ -42,15 +45,20 @@ public abstract class GuiGraphicsExtractorMixin {
     @Shadow
     public abstract int guiHeight();
 
-    @ModifyExpressionValue(method = "componentHoverEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/HoverEvent$ShowText;value()Lnet/minecraft/network/chat/Component;"))
-    private Component getHoveredText(Component original, @Local(argsOnly = true, name = "hoveredStyle") Style hoveredStyle) {
-        if (CommandTooltip.instance.isActive()) {
-            if (hoveredStyle.getClickEvent() instanceof ClickEvent.RunCommand(String command)) {
-                return original.copy().append("\n\n")
-                        .append(Utils.getShortTag().append(Utils.formatText("Command: {}", command).withStyle(ChatFormatting.GRAY)));
-            }
+    @WrapMethod(method = "setTooltipForNextFrameInternal")
+    private void onSetNextFrameTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style, boolean replaceExisting, Operation<Void> original) {
+        if (CommandTooltip.instance.isActive() && this.hoveredTextStyle != null && this.hoveredTextStyle.getClickEvent() instanceof ClickEvent.RunCommand(
+                String command
+        )) {
+            List<ClientTooltipComponent> copy = new ArrayList<>(lines);
+            copy.add(ClientTooltipComponent.create(Component.empty().getVisualOrderText()));
+            copy.add(ClientTooltipComponent.create(
+                    Utils.getShortTag().append(Utils.formatText("Command: {}", command).withStyle(ChatFormatting.GRAY)).getVisualOrderText()
+            ));
+            original.call(font, copy, xo, yo, positioner, style, replaceExisting);
+        } else {
+            original.call(font, lines, xo, yo, positioner, style, replaceExisting);
         }
-        return original;
     }
 
     @Inject(method = "tooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil;extractTooltipBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIIILnet/minecraft/resources/Identifier;)V"))

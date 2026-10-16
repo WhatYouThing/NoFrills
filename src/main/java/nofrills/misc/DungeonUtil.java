@@ -49,6 +49,10 @@ public class DungeonUtil {
         return classCache;
     }
 
+    public static HashSet<String> getDungeonClasses() {
+        return dungeonClasses;
+    }
+
     public static List<Teammate> getAliveTeammates(boolean excludeSelf) {
         List<Teammate> list = new ArrayList<>();
         String playerName = mc.player.getName().getString();

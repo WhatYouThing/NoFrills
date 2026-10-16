@@ -117,7 +117,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.EnumToggle<>("Keybind Style", WardrobeKeybinds.style, "The style of keybinds you want to use.\n\nSimple: Uses the 1-9 keyboard keys.\nHotbar: Uses your hotbar slot keybinds from the Minecraft controls screen.\nCustom: Uses the custom keys which you can define below."),
                                 new Settings.Toggle("No Unequip", WardrobeKeybinds.noUnequip, "Prevents you from being able to unequip your armor set with a keybind."),
                                 new Settings.Toggle("Sound Effect", WardrobeKeybinds.playSound, "Plays a sound effect upon using a keybind."),
-                                new Settings.SoundInput("Sound", WardrobeKeybinds.sound, WardrobeKeybinds.volume, WardrobeKeybinds.pitch, "The sound to play on set switch."),
+                                new Settings.SoundInput("Sound", WardrobeKeybinds.sound, "The sound to play on set switch."),
                                 new Settings.Keybind("Custom Slot 1", WardrobeKeybinds.custom1, "Your custom keybind for the 1st wardrobe slot."),
                                 new Settings.Keybind("Custom Slot 2", WardrobeKeybinds.custom2, "Your custom keybind for the 2nd wardrobe slot."),
                                 new Settings.Keybind("Custom Slot 3", WardrobeKeybinds.custom3, "Your custom keybind for the 3rd wardrobe slot."),
@@ -142,13 +142,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("Duration", 1, 600, 1, ChatWaypoints.allDuration, "The duration (in seconds) that all chat waypoints should be rendered for."),
                                 new Settings.ColorPicker("Color", ChatWaypoints.allColor, "The color used for the all chat waypoints.")
                         ))),
-                        new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(List.of(
+                        new Module("Etherwarp Overlay", EtherwarpOverlay.instance, "Highlights the block you are targeting with the Ether Transmission ability.", new Settings(
                                 new Settings.Separator("Sound"),
                                 new Settings.Toggle("Warp Sound", EtherwarpOverlay.doSound, "Plays a custom sound effect upon teleporting."),
                                 new Settings.Toggle("Pingless Sound", EtherwarpOverlay.pinglessSound, "If enabled, the custom sound will play as soon as you click.\nMakes teleporting more responsive on high ping, but may produce false positives."),
-                                new Settings.TextInput("Sound", EtherwarpOverlay.sound, "The identifier of the sound to play."),
-                                new Settings.SliderDouble("Volume", 0.0, 5.0, 0.1, EtherwarpOverlay.volume, "The volume of the sound."),
-                                new Settings.SliderDouble("Pitch", 0.0, 2.0, 0.05, EtherwarpOverlay.pitch, "The pitch of the sound."),
+                                new Settings.SoundInput("Sound", EtherwarpOverlay.sound, "The sound to play upon teleporting."),
                                 new Settings.Toggle("Cancel Sound", EtherwarpOverlay.cancelSound, "Prevents the intended Ether Transmission sound effect from playing."),
                                 new Settings.Separator("Highlight"),
                                 new Settings.EnumToggle<>("Highlight Style", EtherwarpOverlay.highlightStyle, "The style of the highlight"),
@@ -156,7 +154,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Wrong Fill", EtherwarpOverlay.fillWrong, "The fill color used when your Etherwarp target is considered invalid."),
                                 new Settings.ColorPicker("Correct Outline", EtherwarpOverlay.outlineCorrect, "The outline color used when your Etherwarp target is considered valid."),
                                 new Settings.ColorPicker("Wrong Outline", EtherwarpOverlay.outlineWrong, "The outline color used when your Etherwarp target is considered invalid.")
-                        ))),
+                        )),
                         new Module("Fullbright", Fullbright.instance, "You know him, you love him.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Mode", Fullbright.mode, "The lighting mode.\n\nAmbient: Increases dimension ambient light, most reliable.\nGamma: Increases the Minecraft brightness setting to a high value.\nPotion: Permanently applies the Night Vision potion effect to your player."),
                                 new Settings.Toggle("No Effect", Fullbright.noEffect, "Removes the Night Vision effect while active. Ignored if you use the Potion mode.")
@@ -269,7 +267,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Description("Usage", "Press the Edit Bind key while hovering over a loadout in the Loadouts menu."),
                                 new Settings.Keybind("Edit Bind Key", LoadoutKeybinds.editBindKey, "The key to edit your keybinds. Press while hovering over a loadout slot to use."),
                                 new Settings.Toggle("Play Sound", LoadoutKeybinds.playSound, "Plays a sound effect upon successfully switching loadout."),
-                                new Settings.SoundInput("Sound", LoadoutKeybinds.sound, LoadoutKeybinds.volume, LoadoutKeybinds.pitch, "The sound to play on loadout switch.")
+                                new Settings.SoundInput("Sound", LoadoutKeybinds.sound, "The sound to play on loadout switch.")
                         ))),
                         new Module("Slot Locking", SlotLocking.instance, "Allows you to lock inventory slots to prevent accidental clicks.", new Settings(List.of(
                                 new Settings.Keybind("Lock Key", SlotLocking.keybind, "The key to lock/unlock a slot."),
@@ -512,18 +510,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Color", SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")
                         ))),
                         new Module("Leap Overlay", LeapOverlay.instance, "Renders a custom overlay in place of the Spirit Leap menu.", new Settings(List.of(
-                                new Settings.Toggle("Send Message", LeapOverlay.send, "Sends a message once you leap to a teammate."),
-                                new Settings.TextInput("Leap Message", LeapOverlay.message, "The message to send. Replaces {name} with the name of the player."),
                                 new Settings.SliderDouble("Text Scale", 1.0, 4.0, 1.0, LeapOverlay.scale, "The scale of the text on the overlay."),
                                 new Settings.Keybind("Leap First Key", LeapOverlay.firstKey, "The keybind to leap to the first player on the overlay (left -> right order)."),
                                 new Settings.Keybind("Leap Second Key", LeapOverlay.secondKey, "The keybind to leap to the second player on the overlay (left -> right order)."),
                                 new Settings.Keybind("Leap Third Key", LeapOverlay.thirdKey, "The keybind to leap to the third player on the overlay (left -> right order)."),
-                                new Settings.Keybind("Leap Fourth Key", LeapOverlay.fourthKey, "The keybind to leap to the fourth player on the overlay (left -> right order)."),
-                                new Settings.ColorPicker("Healer Color", LeapOverlay.healer, "The color used for Healer on the overlay."),
-                                new Settings.ColorPicker("Mage Color", LeapOverlay.mage, "The color used for Mage on the overlay."),
-                                new Settings.ColorPicker("Bers Color", LeapOverlay.bers, "The color used for Berserker on the overlay."),
-                                new Settings.ColorPicker("Arch Color", LeapOverlay.arch, "The color used for Archer on the overlay."),
-                                new Settings.ColorPicker("Tank Color", LeapOverlay.tank, "The color used for Tank on the overlay.")
+                                new Settings.Keybind("Leap Fourth Key", LeapOverlay.fourthKey, "The keybind to leap to the fourth player on the overlay (left -> right order).")
                         ))),
                         new Module("Terminal Solvers", TerminalSolvers.instance, "Solves terminals and prevents wrong clicks in F7/M7. Also hides item tooltips in every terminal.", new Settings(List.of(
                                 new Settings.Toggle("Solve Panes", TerminalSolvers.panes, "Solves the \"Correct all panes\" terminal."),
@@ -543,9 +534,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SliderInt("First Click Ticks", 0, 20, 1, TerminalSolvers.firstClickTicks, "Blocks the first click in a terminal for the specified amount of server ticks.\nHelps prevent false flagging Watchdog if the server is lagging."),
                                 new Settings.SliderInt("Throttle Ticks", 0, 10, 1, TerminalSolvers.throttleTicks, "Allows only a single click to go through until the specified amount of server ticks passes.\nHelps prevent your clicks from being rate limited if the server is lagging."),
                                 new Settings.Toggle("Sound On Click", TerminalSolvers.soundOnClick, "Plays a sound effect upon clicking a terminal slot."),
-                                new Settings.TextInput("Click Sound", TerminalSolvers.clickSound, "The identifier of the sound to play."),
-                                new Settings.SliderDouble("Sound Volume", 0.0, 5.0, 0.1, TerminalSolvers.clickSoundVolume, "The volume of the sound."),
-                                new Settings.SliderDouble("Sound Pitch", 0.0, 2.0, 0.05, TerminalSolvers.clickSoundPitch, "The pitch of the sound."),
+                                new Settings.SoundInput("Click Sound", TerminalSolvers.clickSound, "The sound to play on click."),
                                 new Settings.ColorPicker("Background Color", TerminalSolvers.backgroundColor, "The color used to depict already clicked/solved terminal slots.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.", new Settings(List.of(
@@ -588,25 +577,15 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Secret Chime", SecretChime.instance, "Plays sounds upon collecting specific secrets.", new Settings(List.of(
                                 new Settings.Toggle("Items", SecretChime.itemsToggle, "Play a chime upon picking up a secret item."),
-                                new Settings.TextInput("Items Sound", SecretChime.itemsSound, "The identifier of the sound to play."),
-                                new Settings.SliderDouble("Items Volume", 0.0, 5.0, 0.1, SecretChime.itemsVolume, "The volume of the sound."),
-                                new Settings.SliderDouble("Items Pitch", 0.0, 2.0, 0.05, SecretChime.itemsPitch, "The pitch of the sound."),
+                                new Settings.SoundInput("Items Sound", SecretChime.itemsSound, "The sound to play upon picking up a secret item."),
                                 new Settings.Toggle("Chests", SecretChime.chestToggle, "Play a chime upon opening a secret chest."),
-                                new Settings.TextInput("Chests Sound", SecretChime.chestSound, "The identifier of the sound to play."),
-                                new Settings.SliderDouble("Chests Volume", 0.0, 5.0, 0.1, SecretChime.chestVolume, "The volume of the sound."),
-                                new Settings.SliderDouble("Chests Pitch", 0.0, 2.0, 0.05, SecretChime.chestPitch, "The pitch of the sound."),
+                                new Settings.SoundInput("Chests Sound", SecretChime.chestSound, "The sound to play upon opening a secret chest."),
                                 new Settings.Toggle("Essence", SecretChime.essenceToggle, "Play a chime upon collecting a Wither Essence secret."),
-                                new Settings.TextInput("Essence Sound", SecretChime.essenceSound, "The identifier of the sound to play."),
-                                new Settings.SliderDouble("Essence Volume", 0.0, 5.0, 0.1, SecretChime.essenceVolume, "The volume of the sound."),
-                                new Settings.SliderDouble("Essence Pitch", 0.0, 2.0, 0.05, SecretChime.essencePitch, "The pitch of the sound."),
+                                new Settings.SoundInput("Essence Sound", SecretChime.essenceSound, "The sound to play upon collecting a Wither Essence secret."),
                                 new Settings.Toggle("Bats", SecretChime.batToggle, "Play a chime upon killing a secret bat."),
-                                new Settings.TextInput("Bats Sound", SecretChime.batSound, "The identifier of the sound to play."),
-                                new Settings.SliderDouble("Bats Volume", 0.0, 5.0, 0.1, SecretChime.batVolume, "The volume of the sound."),
-                                new Settings.SliderDouble("Bats Pitch", 0.0, 2.0, 0.05, SecretChime.batPitch, "The pitch of the sound."),
+                                new Settings.SoundInput("Bats Sound", SecretChime.batSound, "The sound to play upon killing a secret bat."),
                                 new Settings.Toggle("Levers", SecretChime.leverToggle, "Play a chime upon interacting with a lever."),
-                                new Settings.TextInput("Levers Sound", SecretChime.leverSound, "The identifier of the sound to play."),
-                                new Settings.SliderDouble("Levers Volume", 0.0, 5.0, 0.1, SecretChime.leverVolume, "The volume of the sound."),
-                                new Settings.SliderDouble("Levers Pitch", 0.0, 2.0, 0.05, SecretChime.leverPitch, "The pitch of the sound.")
+                                new Settings.SoundInput("Levers Sound", SecretChime.leverSound, "The sound to play upon interacting with a lever.")
                         ))),
                         new Module("Melody Message", MelodyMessage.instance, "Send start and progress messages when you get the Melody terminal in F7/M7.", new Settings(List.of(
                                 new Settings.TextInput("Message", MelodyMessage.msg, "The message to send when the terminal is opened."),
@@ -619,12 +598,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Relic Highlight", RelicHighlight.instance, "Highlights the correct placement position of your M7 king relic."),
                         new Module("Class Nametags", ClassNametags.instance, "Renders large nametags for your teammates, indicating their selected class and position.", new Settings(List.of(
-                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, ClassNametags.scale, "The scale of the text."),
-                                new Settings.ColorPicker("Healer Color", ClassNametags.healer, "The text color for Healer."),
-                                new Settings.ColorPicker("Mage Color", ClassNametags.mage, "The text color for Mage."),
-                                new Settings.ColorPicker("Bers Color", ClassNametags.bers, "The text color for Berserker."),
-                                new Settings.ColorPicker("Arch Color", ClassNametags.arch, "The text color for Archer."),
-                                new Settings.ColorPicker("Tank Color", ClassNametags.tank, "The text color for Tank.")
+                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, ClassNametags.scale, "The scale of the text.")
                         ))),
                         new Module("Score Calculator", ScoreCalculator.instance, "Calculates the score in your dungeon runs.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Paul State", ScoreCalculator.paulState, "Allows you to force the state of Paul's EZPZ perk.\nSet to Auto to automatically check for EZPZ through the NoFrills API."),
@@ -656,7 +630,17 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Value Tooltip", CroesusSolver.valueTooltip, "Displays the value of individual chests in the tooltip."),
                                 new Settings.Toggle("Floor Label", CroesusSolver.floorLabel, "Adds labels which indicate the floor the loot was obtained on.")
                         )),
-                        new Module("Dupe Class Alert", DupeClassAlert.instance, "Shows text on screen if your party has multiple of the same class before the dungeon starts.")
+                        new Module("Dupe Class Alert", DupeClassAlert.instance, "Shows text on screen if your party has multiple of the same class before the dungeon starts."),
+                        new Module("Leap Message", LeapMessage.instance, "Sends a message when you leap to another player.", new Settings(
+                                new Settings.TextInput("Message", LeapMessage.message, "The message to send. Replaces {name} with the player's name.")
+                        )),
+                        new Module("Class Colors", ClassColors.instance, "Controls the colors used for the dungeon classes across various features.", new Settings(
+                                new Settings.ColorPicker("Healer Color", ClassColors.heal, "The color used for Healer."),
+                                new Settings.ColorPicker("Mage Color", ClassColors.mage, "The color used for Mage."),
+                                new Settings.ColorPicker("Bers Color", ClassColors.bers, "The color used for Berserker."),
+                                new Settings.ColorPicker("Arch Color", ClassColors.arch, "The color used for Archer."),
+                                new Settings.ColorPicker("Tank Color", ClassColors.tank, "The color used for Tank.")
+                        ))
                 )),
                 new Category("Kuudra", List.of(
                         new Module("Fresh Timer", FreshTimer.instance, "Shows a timer on screen for the Fresh Tools essence shop ability.", new Settings(List.of(

@@ -31,7 +31,7 @@ public class RareHighlight {
         if (instance.isActive() && SeaCreatureData.isSeaCreature(event.namePlain) && !Utils.isInDungeons()) {
             for (SeaCreatureData.SeaCreature creature : SeaCreatureData.list) {
                 if (creature.rare && creature.glow && event.namePlain.contains(creature.name)) {
-                    Entity owner = Utils.findNametagOwner(event.entity, Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, RareHighlight::isMob));
+                    Entity owner = Utils.getNameTagOwner(event.entity, Utils.getOtherEntities(event.entity, 0.5, 2, 0.5, RareHighlight::isMob));
                     if (owner != null) {
                         cache.add(owner);
                         if (owner.isPassenger()) {

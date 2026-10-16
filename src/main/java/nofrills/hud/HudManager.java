@@ -46,7 +46,7 @@ public class HudManager {
             new FreshToolsTimer(),
             new SeaCreatures(),
             new FishingBobber(),
-            new FishingBag(),
+            new BaitSack(),
             new BeaconPower(),
             new ShardTrackerDisplay(),
             new SkillTrackerDisplay(),

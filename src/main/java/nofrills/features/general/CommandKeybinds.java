@@ -7,19 +7,26 @@ import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.container.UIContainers;
-import io.wispforest.owo.ui.core.*;
+import io.wispforest.owo.ui.core.HorizontalAlignment;
+import io.wispforest.owo.ui.core.Insets;
+import io.wispforest.owo.ui.core.Positioning;
+import io.wispforest.owo.ui.core.Sizing;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.AnvilScreen;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
+import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
+import nofrills.hud.InnerSettingsScreen;
 import nofrills.hud.clickgui.Settings;
-import nofrills.hud.clickgui.components.*;
+import nofrills.hud.clickgui.components.FlatTextbox;
+import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 
@@ -51,7 +58,8 @@ public final class CommandKeybinds {
                 obj.addProperty("enabled", true);
                 obj.addProperty("allowInGui", false);
                 obj.addProperty("modifier", Modifier.Any.name());
-                obj.addProperty("islandFilter", "");
+                obj.add("classFilterList", new JsonArray());
+                obj.add("islandFilterList", new JsonArray());
                 object.get("binds").getAsJsonArray().add(obj);
             });
             mc.gui.setScreen(buildSettings());
@@ -99,43 +107,49 @@ public final class CommandKeybinds {
         };
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     public static void onKey(InputEvent event) {
-        if (instance.isActive()) {
-            if (data.value().has("binds")) {
-                for (JsonElement entry : data.value().get("binds").getAsJsonArray()) {
-                    JsonObject bind = entry.getAsJsonObject();
-                    if (!bind.has("enabled") || !bind.get("enabled").getAsBoolean()) {
+        if (instance.isActive() && data.value().has("binds")) {
+            for (JsonElement entry : data.value().get("binds").getAsJsonArray()) {
+                JsonObject bind = entry.getAsJsonObject();
+                if (!bind.has("enabled") || !bind.get("enabled").getAsBoolean()) {
+                    continue;
+                }
+                if (!isValidScreen(bind.has("allowInGui") && bind.get("allowInGui").getAsBoolean())) {
+                    continue;
+                }
+                if (bind.get("key").getAsInt() != event.key) {
+                    continue;
+                }
+                if (bind.has("modifier")) {
+                    String modifier = bind.get("modifier").getAsString();
+                    int required = getRequiredModifier(getModifierType(modifier));
+                    if (required != -1 && event.modifiers != required) {
                         continue;
                     }
-                    if (!isValidScreen(bind.has("allowInGui") && bind.get("allowInGui").getAsBoolean())) {
+                }
+                if (bind.has("classFilterList")) {
+                    String className = Utils.toLower(DungeonUtil.getPlayerClass());
+                    List<String> list = bind.get("classFilterList").getAsJsonArray().asList().stream()
+                            .map(e -> Utils.toLower(e.getAsString().trim()))
+                            .toList();
+                    if (!className.isEmpty() && !list.contains(className)) {
                         continue;
                     }
-                    if (bind.get("key").getAsInt() != event.key) {
+                }
+                if (bind.has("islandFilterList")) {
+                    String area = Utils.toLower(SkyblockData.getArea());
+                    List<String> list = bind.get("islandFilterList").getAsJsonArray().asList().stream()
+                            .map(e -> Utils.toLower(e.getAsString().trim()))
+                            .toList();
+                    if (!area.isEmpty() && !list.contains(area)) {
                         continue;
                     }
-                    if (bind.has("modifier")) {
-                        String modifier = bind.get("modifier").getAsString();
-                        int required = getRequiredModifier(getModifierType(modifier));
-                        if (required != -1 && event.modifiers != required) {
-                            continue;
-                        }
-                    }
-                    if (bind.has("islandFilter")) {
-                        String filter = bind.get("islandFilter").getAsString();
-                        String island = SkyblockData.getArea();
-                        if (!filter.isEmpty() && !island.isEmpty() && !Utils.toLower(filter).contains(Utils.toLower(island))) {
-                            continue;
-                        }
-                    }
-                    String command = bind.get("command").getAsString();
-                    if (!command.isEmpty()) {
-                        if (event.action == InputConstants.PRESS) {
-                            Utils.sendMessage(command);
-                        }
-                        event.cancel();
-                        break;
-                    }
+                }
+                String command = bind.get("command").getAsString();
+                if (!command.isEmpty()) {
+                    event.consume(() -> Utils.sendMessage(command));
+                    break;
                 }
             }
         }
@@ -193,102 +207,81 @@ public final class CommandKeybinds {
         }
 
         public FlowLayout buildCommandInputSetting() {
-            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-            layout.padding(Insets.of(5));
-            layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Component.literal("Command"));
-            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
-            input.text(this.getData().get("command").getAsString());
-            input.tooltip(Component.literal("The message/command that this keybind will send."));
-            input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("command", value)));
-            layout.child(label);
-            layout.child(input);
-            return layout;
+            return new Settings.TextInput(
+                    "Command",
+                    this.getData().get("command").getAsString(),
+                    "",
+                    "The message/command that this keybind will send.",
+                    s -> data.edit(obj -> this.getData(obj).addProperty("command", s))
+            );
         }
 
         public FlowLayout buildAllowInGuiSetting() {
-            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-            layout.padding(Insets.of(5));
-            layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Component.literal("Allow in GUI"));
-            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            ToggleButton allowInGuiToggle = new ToggleButton(this.getData().has("allowInGui") && this.getData().get("allowInGui").getAsBoolean());
-            allowInGuiToggle.sizing(Sizing.fixed(50), Sizing.fixed(20));
-            allowInGuiToggle.tooltip(Component.literal("Allow this keybind to work while any container GUI (inventory/chest/furnace/etc.) is open."));
-            allowInGuiToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("allowInGui", toggle)));
-            layout.child(label);
-            layout.child(allowInGuiToggle);
-            return layout;
+            return new Settings.Toggle(
+                    "Allow in GUI",
+                    this.getData().has("allowInGui") && this.getData().get("allowInGui").getAsBoolean(),
+                    false,
+                    "Allow this keybind to work while any container GUI (inventory/chest/furnace/etc.) is open.",
+                    b -> data.edit(obj -> this.getData(obj).addProperty("allowInGui", b))
+            );
         }
 
         public FlowLayout buildKeybindSetting() {
-            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-            layout.padding(Insets.of(5));
-            layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Component.literal("Keybind"));
-            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            KeybindButton keybind = new KeybindButton();
-            keybind.verticalSizing(Sizing.fixed(20)).horizontalSizing(Sizing.fixed(100));
-            keybind.bind(this.getData(data.value()).get("key").getAsInt());
-            keybind.tooltip(Component.literal("The key bound to this command."));
-            keybind.onBound().subscribe(key -> data.edit(object -> this.getData(object).addProperty("key", key)));
-            layout.child(label);
-            layout.child(keybind);
-            return layout;
+            return new Settings.Keybind(
+                    "Keybind",
+                    this.getData().get("key").getAsInt(),
+                    SettingKeybind.UNKNOWN_KEY,
+                    "The key bound to this command.",
+                    k -> data.edit(object -> this.getData(object).addProperty("key", k))
+            );
         }
 
         public FlowLayout buildModifierSetting() {
-            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-            layout.padding(Insets.of(5));
-            layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Component.literal("Modifier Key"));
-            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            EnumButton<Modifier> modifier = new EnumButton<>(this.getData(data.value()).has("modifier") ? this.getData(data.value()).get("modifier").getAsString() : "Any", Modifier.Any, Modifier.class);
-            modifier.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("modifier", value)));
-            modifier.sizing(Sizing.fixed(80), Sizing.fixed(20));
-            modifier.tooltip(Component.literal("The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held."));
-            layout.child(label);
-            layout.child(modifier);
-            return layout;
+            return new Settings.EnumToggle<>(
+                    "Modifier Key",
+                    getModifierType(this.getData().has("modifier") ? this.getData().get("modifier").getAsString() : "Any"),
+                    Modifier.Any,
+                    Modifier.class,
+                    "The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held.",
+                    e -> data.edit(object -> this.getData(object).addProperty("modifier", e.name()))
+            );
+        }
+
+        public FlowLayout buildClassFilterSetting() {
+            return new Settings.TextEntryList(
+                    "Class Filter",
+                    () -> this.getData().has("classFilterList")
+                            ? this.getData().get("classFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
+                            : DungeonUtil.getDungeonClasses().stream().toList(),
+                    "Prevents this keybind from working if your selected dungeon class is not on this list.\nLeave empty to disable class filtering.",
+                    l -> data.edit(obj -> this.getData(obj).add("classFilterList", Utils.toJsonArray(l)))
+            );
         }
 
         public FlowLayout buildIslandFilterSetting() {
-            FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-            layout.padding(Insets.of(5));
-            layout.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Component.literal("Island Filter"));
-            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
-            FlatTextbox input = new FlatTextbox(Sizing.fixed(200));
-            input.text(this.getData().has("islandFilter") ? this.getData().get("islandFilter").getAsString() : "");
-            input.tooltip(Component.literal("A list of islands that this keybind requires to work.\nFor example: \"catacombs kuudra\" will disable the keybind\nif your current area is not either Kuudra or Dungeons.\n\nLeave empty to disable island filtering."));
-            input.onChanged().subscribe(value -> data.edit(obj -> this.getData(obj).addProperty("islandFilter", value)));
-            layout.child(label);
-            layout.child(input);
-            return layout;
+            return new Settings.TextEntryList(
+                    "Island Filter",
+                    () -> this.getData().has("islandFilterList")
+                            ? this.getData().get("islandFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
+                            : List.of(),
+                    "Prevents this keybind from working if the current tablist area name is not on this list.\nLeave empty to disable island filtering.",
+                    l -> data.edit(obj -> this.getData(obj).add("islandFilterList", Utils.toJsonArray(l)))
+            );
         }
 
-        public CommandKeybindsSettings buildKeybindSettings() {
+        public InnerSettingsScreen buildKeybindSettings() {
             List<FlowLayout> list = new ArrayList<>();
             list.add(this.buildCommandInputSetting());
             list.add(this.buildAllowInGuiSetting());
             list.add(this.buildKeybindSetting());
             list.add(this.buildModifierSetting());
+            list.add(this.buildClassFilterSetting());
             list.add(this.buildIslandFilterSetting());
-            CommandKeybindsSettings settings = new CommandKeybindsSettings(list);
-            settings.setTitle(Component.literal("Command Keybind: " + (this.getData().has("name") ? this.getData().get("name").getAsString() : "New Keybind")));
-            return settings;
-        }
-    }
-
-    public static final class CommandKeybindsSettings extends Settings {
-        public CommandKeybindsSettings(List<FlowLayout> settings) {
-            super(settings);
-        }
-
-        @Override
-        public void onClose() {
-            mc.gui.setScreen(buildSettings());
+            return new InnerSettingsScreen(
+                    list,
+                    Component.literal("Command Keybind: " + (this.getData().has("name") ? this.getData().get("name").getAsString() : "New Keybind")),
+                    buildSettings()
+            );
         }
     }
 }

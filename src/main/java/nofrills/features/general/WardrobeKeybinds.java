@@ -26,9 +26,15 @@ public class WardrobeKeybinds {
     public static final SettingEnum<KeybindStyle> style = new SettingEnum<>(KeybindStyle.Simple, KeybindStyle.class, "style", instance.key());
     public static final SettingBool noUnequip = new SettingBool(false, "noUnequip", instance.key());
     public static final SettingBool playSound = new SettingBool(false, "sound", instance.key());
-    public static final SettingString sound = new SettingString("entity.horse.armor", "soundIdentifier", instance);
-    public static final SettingDouble volume = new SettingDouble(0.7, "volume", instance);
-    public static final SettingDouble pitch = new SettingDouble(1.0, "pitch", instance);
+    public static final SettingSound sound = new SettingSound(
+            "entity.horse.armor",
+            "soundIdentifier",
+            0.7,
+            "volume",
+            1.0,
+            "pitch",
+            instance
+    );
     public static final SettingKeybind custom1 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom1", instance.key());
     public static final SettingKeybind custom2 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom2", instance.key());
     public static final SettingKeybind custom3 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom3", instance.key());
@@ -120,7 +126,7 @@ public class WardrobeKeybinds {
                         if (event.action == InputConstants.PRESS) {
                             Utils.click(container.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
                             if (playSound.value()) {
-                                Utils.playSound(sound.value(), volume.valueFloat(), pitch.valueFloat());
+                                Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
                             }
                         }
                         break;

@@ -11,7 +11,7 @@ import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.ui.core.VerticalAlignment;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.InnerSettingsScreen;
 import nofrills.hud.clickgui.components.FlatSlider;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.misc.RenderColor;
@@ -22,12 +22,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static nofrills.Main.mc;
 
-public class InventoryButtonSettings extends Settings {
-    private final Screen previous;
+public class InventoryButtonSettings extends InnerSettingsScreen {
 
     public InventoryButtonSettings(List<FlowLayout> settings, Screen previous) {
-        this.previous = previous;
-        super(settings);
+        super(settings, previous);
     }
 
     public static InventoryButtonSettings of(InventoryButtonWidget widget, Screen previous) {
@@ -256,10 +254,5 @@ public class InventoryButtonSettings extends Settings {
             InventoryButtons.data.value().get("buttons").getAsJsonArray().remove(buttonObject);
             mc.gui.setScreen(previous);
         });
-    }
-
-    @Override
-    public void onClose() {
-        mc.gui.setScreen(this.previous);
     }
 }

@@ -37,7 +37,7 @@ public class BossHighlight {
         if (instance.isActive() && SlayerUtil.isFightingBoss(SlayerUtil.BLAZE) && SlayerUtil.isTimer(event.namePlain)) {
             String attunement = event.namePlain.contains(" ") ? event.namePlain.substring(0, event.namePlain.indexOf(" ")) : "";
             List<Entity> other = Utils.getOtherEntities(event.entity, 1.0, 3.0, 1.0, SlayerUtil.BLAZE.predicate);
-            Entity owner = Utils.findNametagOwner(event.entity, other);
+            Entity owner = Utils.getNameTagOwner(event.entity, other);
             if (owner != null) {
                 blazeCache.add(owner, attunement);
             }

@@ -18,15 +18,15 @@ import java.util.List;
 
 import static nofrills.Main.mc;
 
-public final class FishingBag extends SimpleTextElement implements ListeningHudElement {
+public final class BaitSack extends SimpleTextElement implements ListeningHudElement {
     public final SettingBool onlyRod = new SettingBool(true, "onlyRod", this.instance);
 
-    public FishingBag() {
-        super(Component.literal("Bait: §fN/A"), new Feature("fishingBagElement"), "Fishing Bag Display");
+    public BaitSack() {
+        super(Component.literal("Bait: §fN/A"), new Feature("fishingBagElement"), "Bait Sack Display");
         this.options = this.getBaseSettings(List.of(
                 new Settings.Toggle("Only If Rod", this.onlyRod, "Automatically hides the element if you are not holding a fishing rod.")
         ));
-        this.setDesc("Displays the type and the amount of bait in your fishing bag.");
+        this.setDesc("Displays the type and the amount of bait in your bait sack.");
         this.setCategory(Category.Fishing);
     }
 
@@ -45,19 +45,18 @@ public final class FishingBag extends SimpleTextElement implements ListeningHudE
         if (event.slotId != 44 && event.slotId != 9) return;
         ItemStack stack = event.stack;
         String name = Utils.toPlain(stack.getHoverName());
-        if (name.endsWith(" Bait")) {
-            for (Component text : Utils.getLoreText(stack)) {
-                String line = Utils.toPlain(text);
-                if (line.startsWith("Bait Remaining: ")) {
-                    String quantity = line.substring(line.indexOf(":") + 2);
-                    Style color = Utils.getStyle(stack.getHoverName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
-                    double percentage = Utils.parseInt(quantity.replaceAll(",", "")).orElse(0) / 2880.0; // max capacity, 5 * 9 * 64
-                    this.setText(Component.literal("Bait: ")
-                            .append(Component.literal(name.replace(" Bait", "")).setStyle(color))
-                            .append(Component.literal(" x" + quantity).withColor(Utils.getPercentageColor(percentage, true).getHex()))
-                    );
-                    break;
-                }
+        if (!name.endsWith(" Bait")) return;
+        for (Component text : Utils.getLoreText(stack)) {
+            String line = Utils.toPlain(text);
+            if (line.startsWith("Bait Remaining: ")) {
+                String quantity = line.substring(line.indexOf(":") + 2);
+                Style color = Utils.getStyle(stack.getHoverName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
+                double percentage = Utils.parseInt(quantity.replaceAll(",", "")).orElse(0) / 20160.0;
+                this.setText(Component.literal("Bait: ")
+                        .append(Component.literal(name.replace(" Bait", "")).setStyle(color))
+                        .append(Component.literal(" x" + quantity).withColor(Utils.getPercentageColor(percentage, true).getHex()))
+                );
+                break;
             }
         }
     }

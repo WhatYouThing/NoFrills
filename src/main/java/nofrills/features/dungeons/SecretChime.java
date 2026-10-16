@@ -13,10 +13,7 @@ import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.PlayerHeadBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingDouble;
-import nofrills.config.SettingString;
+import nofrills.config.*;
 import nofrills.events.*;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.EntityCache;
@@ -33,25 +30,35 @@ public class SecretChime {
     public static final Feature instance = new Feature("secretChime");
 
     public static final SettingBool itemsToggle = new SettingBool(false, "itemsToggle", instance);
-    public static final SettingString itemsSound = new SettingString("minecraft:entity.blaze.hurt", "itemsSound", instance);
-    public static final SettingDouble itemsVolume = new SettingDouble(2.0, "itemsVolume", instance);
-    public static final SettingDouble itemsPitch = new SettingDouble(2.0, "itemsPitch", instance);
+    public static final SettingSound itemsSound = new SettingSound(
+            new SettingString("minecraft:entity.blaze.hurt", "itemsSound", instance),
+            new SettingDouble(2.0, "itemsVolume", instance),
+            new SettingDouble(2.0, "itemsPitch", instance)
+    );
     public static final SettingBool chestToggle = new SettingBool(false, "chestToggle", instance);
-    public static final SettingString chestSound = new SettingString("minecraft:entity.blaze.hurt", "chestSound", instance);
-    public static final SettingDouble chestVolume = new SettingDouble(2.0, "chestVolume", instance);
-    public static final SettingDouble chestPitch = new SettingDouble(2.0, "chestPitch", instance);
+    public static final SettingSound chestSound = new SettingSound(
+            new SettingString("minecraft:entity.blaze.hurt", "chestSound", instance),
+            new SettingDouble(2.0, "chestVolume", instance),
+            new SettingDouble(2.0, "chestPitch", instance)
+    );
     public static final SettingBool essenceToggle = new SettingBool(false, "essenceToggle", instance);
-    public static final SettingString essenceSound = new SettingString("minecraft:entity.blaze.hurt", "essenceSound", instance);
-    public static final SettingDouble essenceVolume = new SettingDouble(2.0, "essenceVolume", instance);
-    public static final SettingDouble essencePitch = new SettingDouble(2.0, "essencePitch", instance);
+    public static final SettingSound essenceSound = new SettingSound(
+            new SettingString("minecraft:entity.blaze.hurt", "essenceSound", instance),
+            new SettingDouble(2.0, "essenceVolume", instance),
+            new SettingDouble(2.0, "essencePitch", instance)
+    );
     public static final SettingBool batToggle = new SettingBool(false, "batToggle", instance);
-    public static final SettingString batSound = new SettingString("minecraft:entity.blaze.hurt", "batSound", instance);
-    public static final SettingDouble batVolume = new SettingDouble(2.0, "batVolume", instance);
-    public static final SettingDouble batPitch = new SettingDouble(2.0, "batPitch", instance);
+    public static final SettingSound batSound = new SettingSound(
+            new SettingString("minecraft:entity.blaze.hurt", "batSound", instance),
+            new SettingDouble(2.0, "batVolume", instance),
+            new SettingDouble(2.0, "batPitch", instance)
+    );
     public static final SettingBool leverToggle = new SettingBool(false, "leverToggle", instance);
-    public static final SettingString leverSound = new SettingString("minecraft:entity.blaze.hurt", "leverSound", instance);
-    public static final SettingDouble leverVolume = new SettingDouble(2.0, "leverVolume", instance);
-    public static final SettingDouble leverPitch = new SettingDouble(2.0, "leverPitch", instance);
+    public static final SettingSound leverSound = new SettingSound(
+            new SettingString("minecraft:entity.blaze.hurt", "leverSound", instance),
+            new SettingDouble(2.0, "leverVolume", instance),
+            new SettingDouble(2.0, "leverPitch", instance)
+    );
 
     private static final HashSet<String> secretItems = Sets.newHashSet(
             "ARCHITECT_FIRST_DRAFT",
@@ -71,8 +78,8 @@ public class SecretChime {
     private static final int[] essenceUUID = new int[]{677717835, 815216974, -2125861790, -1670195120};
     private static boolean clickedThisTick = false;
 
-    private static void playSound(SettingString sound, SettingDouble volume, SettingDouble pitch) {
-        Utils.playSound(sound.value(), volume.valueFloat(), pitch.valueFloat());
+    private static void playSound(SettingSound sound) {
+        Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
     }
 
     private static boolean isEssence(BlockState state, BlockPos pos) {
@@ -92,14 +99,14 @@ public class SecretChime {
 
     private static void playItemChime(Entity entity) {
         if (mc.player != null && entity.distanceTo(mc.player) <= 8.0) {
-            playSound(itemsSound, itemsVolume, itemsPitch);
+            playSound(itemsSound);
             entityCache.remove(entity);
         }
     }
 
     private static void playBatChime(Entity entity) {
         if (mc.player != null && entity.distanceTo(mc.player) <= 10.0) {
-            playSound(batSound, batVolume, batPitch);
+            playSound(batSound);
             entityCache.remove(entity);
         }
     }
@@ -111,13 +118,13 @@ public class SecretChime {
             BlockState state = mc.level.getBlockState(pos);
             clickedThisTick = true;
             if (state.getBlock() instanceof ChestBlock && chestToggle.value()) {
-                playSound(chestSound, chestVolume, chestPitch);
+                playSound(chestSound);
             }
             if (state.getBlock() instanceof LeverBlock && leverToggle.value()) {
-                playSound(leverSound, leverVolume, leverPitch);
+                playSound(leverSound);
             }
             if (isEssence(state, pos) && essenceToggle.value()) {
-                playSound(essenceSound, essenceVolume, essencePitch);
+                playSound(essenceSound);
             }
         }
     }

@@ -32,7 +32,6 @@ import nofrills.misc.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 import static nofrills.Main.mc;
 
@@ -409,12 +408,22 @@ public class WitherDragons {
             }
             if (!this.hasEntity()) {
                 if (!this.arrowHits.isEmpty()) {
-                    String hitsText = this.arrowHits.entrySet().stream()
-                            .map(e -> DungeonUtil.getPlayerClass(e.getKey(), "Unknown") + " - " + e.getValue())
-                            .collect(Collectors.joining(", "));
+                    MutableComponent hitsText = Component.empty();
+                    this.arrowHits.forEach((key, value) -> {
+                        String dungeonClass = DungeonUtil.getPlayerClass(key, "Unknown");
+                        if (!hitsText.getString().isEmpty()) {
+                            hitsText.append(Component.literal(", ").withStyle(ChatFormatting.GRAY));
+                        }
+                        hitsText.append(Component.literal(dungeonClass)
+                                .withColor(ClassColors.getForClass(dungeonClass).orElse(RenderColor.GRAY).getHex())
+                                .append(Component.literal(" - " + value).withStyle(ChatFormatting.GRAY))
+                        );
+                    });
                     Utils.infoRaw(Component.literal("Arrows hit on ").withStyle(ChatFormatting.GRAY)
                             .append(Component.literal(this.name).withColor(this.color.hex))
-                            .append(Component.literal(": " + hitsText).withStyle(ChatFormatting.GRAY))
+                            .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
+                            .append(hitsText)
+                            .append(Component.literal(".").withStyle(ChatFormatting.GRAY))
                     );
                     this.arrowHits.clear();
                 }

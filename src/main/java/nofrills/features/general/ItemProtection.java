@@ -154,7 +154,7 @@ public class ItemProtection {
                 Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 array.add(primitive);
             }
-            stackCache.invalidate(stack);
+            stackCache.invalidateAll();
         });
     }
 
@@ -178,7 +178,7 @@ public class ItemProtection {
                 Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 array.add(primitive);
             }
-            stackCache.invalidate(stack);
+            stackCache.invalidateAll();
         });
     }
 

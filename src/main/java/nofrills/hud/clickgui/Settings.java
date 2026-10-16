@@ -11,12 +11,11 @@ import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.Identifier;
 import nofrills.config.*;
 import nofrills.hud.ColorPickerScreen;
+import nofrills.hud.InnerSettingsScreen;
 import nofrills.hud.clickgui.components.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
@@ -28,8 +27,11 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static nofrills.Main.mc;
 
@@ -49,8 +51,8 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     public Settings(List<FlowLayout> settings) {
         this.settings = settings;
         for (FlowLayout setting : this.settings) {
-            if (setting instanceof ColorPicker colorPicker) {
-                colorPicker.previous = this;
+            if (setting instanceof InnerSettings inner) {
+                inner.previousScreen = this;
             }
         }
     }
@@ -206,6 +208,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
     }
 
     public static final class SliderDouble extends FlowLayout {
+        public final FlatSlider slider;
 
         public SliderDouble(String name, double min, double max, double step, double currentValue, double defaultValue, String tooltip, Consumer<Double> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
@@ -213,15 +216,15 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
             FlatTextbox text = new FlatTextbox(Sizing.fixed(50));
-            FlatSlider slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
-            slider.min(min).max(max).stepSize(step).value(currentValue).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
+            this.slider = new FlatSlider(0xffdddddd, 0xff5ca0bf);
+            this.slider.min(min).max(max).stepSize(step).value(currentValue).horizontalSizing(Sizing.fixed(100)).verticalSizing(Sizing.fixed(20));
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
             text.onChanged().subscribe(change -> {
                 Utils.parseDouble(change).ifPresent(d -> {
                     double value = roundDouble(d);
                     updateCallback.accept(value);
-                    slider.value(value);
+                    this.slider.value(value);
                 });
             });
             text.text(String.valueOf(currentValue));
@@ -301,7 +304,8 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             this.child(button);
             this.child(buildResetButton(_ -> {
                 updateCallback.accept(defaultValue);
-                button.setMessage(Component.literal(defaultValue.name()));
+                button.setValue(defaultValue);
+                button.setMessage(Component.literal(defaultValue.toString()));
             }));
         }
 
@@ -310,8 +314,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static final class ColorPicker extends FlowLayout {
-        public Screen previous;
+    public static final class ColorPicker extends InnerSettings {
 
         public ColorPicker(String name, RenderColor currentValue, RenderColor defaultValue, String tooltip, Consumer<RenderColor> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
@@ -327,7 +330,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                     context.fill(component.x(), component.y(), component.x() + component.width(), component.y() + component.height(), reference.get().getArgb())
             ).margins(Insets.right(5));
             ButtonComponent editButton = UIComponents.button(Component.literal("Edit Color"), _ -> {
-                ColorPickerScreen pickerScreen = ColorPickerScreen.build(reference.get(), this.previous, color -> {
+                ColorPickerScreen pickerScreen = ColorPickerScreen.build(reference.get(), this.previousScreen, color -> {
                     reference.set(color);
                     updateCallback.accept(color);
                 });
@@ -347,6 +350,78 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
         public ColorPicker(String name, SettingColor setting, String tooltip) {
             this(name, setting.value(), RenderColor.fromArgb(setting.getDefault().getAsInt()), tooltip, setting::set);
+        }
+    }
+
+    public static class InnerSettings extends FlowLayout {
+        public Screen previousScreen = null;
+
+        public InnerSettings(Sizing horizontalSizing, Sizing verticalSizing, Algorithm algorithm) {
+            super(horizontalSizing, verticalSizing, algorithm);
+        }
+
+        public InnerSettings(String name, Supplier<List<FlowLayout>> settings, String buttonText, String tooltip) {
+            this(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
+            this.padding(Insets.of(5));
+            this.horizontalAlignment(HorizontalAlignment.LEFT);
+            this.verticalAlignment(VerticalAlignment.CENTER);
+            PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
+            label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).verticalSizing(Sizing.fixed(20));
+            label.tooltip(Component.literal(tooltip));
+            ButtonComponent editButton = UIComponents.button(Component.literal(buttonText), _ -> {
+                InnerSettingsScreen inner = new InnerSettingsScreen(settings.get(), this.previousScreen);
+                inner.setTitle(Component.literal(name));
+                Utils.setScreen(inner);
+            });
+            editButton.horizontalSizing(Sizing.fixed(60));
+            editButton.renderer(buttonRenderer);
+            this.child(label);
+            this.child(editButton);
+        }
+
+        public InnerSettings(String name, List<FlowLayout> settings, String buttonText, String tooltip) {
+            this(name, () -> settings, buttonText, tooltip);
+        }
+    }
+
+    public static final class TextEntryList extends InnerSettings {
+
+        public TextEntryList(String name, Supplier<List<String>> currentValue, String tooltip, Consumer<List<String>> updateCallback) {
+            AtomicReference<Supplier<List<FlowLayout>>> supplier = new AtomicReference<>();
+            supplier.set(() -> {
+                List<FlowLayout> list = new ArrayList<>();
+                list.add(new BigButton("Add New Entry", _ -> {
+                    List<String> newValue = new ArrayList<>(currentValue.get());
+                    newValue.add("");
+                    updateCallback.accept(newValue);
+                    InnerSettingsScreen.rebuild(supplier.get().get());
+                }));
+                List<String> value = currentValue.get();
+                for (AtomicInteger i = new AtomicInteger(0); i.get() < value.size(); i.incrementAndGet()) {
+                    int index = i.get();
+                    FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+                    layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
+                    FlatTextbox text = new FlatTextbox(Sizing.fixed(240));
+                    text.onChanged().subscribe(t -> {
+                        List<String> newValue = new ArrayList<>(currentValue.get());
+                        newValue.set(index, t);
+                        updateCallback.accept(newValue);
+                    });
+                    text.text(value.get(index));
+                    ButtonComponent button = UIComponents.button(Component.literal("Delete").withColor(0xffffff), _ -> {
+                        List<String> newValue = new ArrayList<>(currentValue.get());
+                        newValue.remove(index);
+                        updateCallback.accept(newValue);
+                        InnerSettingsScreen.rebuild(supplier.get().get());
+                    });
+                    button.renderer(buttonRendererWhite).positioning(Positioning.relative(100, 0));
+                    layout.child(text);
+                    layout.child(button);
+                    list.add(layout);
+                }
+                return list;
+            });
+            super(name, supplier.get(), "Edit List", tooltip);
         }
     }
 
@@ -475,69 +550,158 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
     }
 
-    public static final class SoundInput extends FlowLayout {
+    public static final class SoundInput extends InnerSettings {
 
         public SoundInput(String name, String currentSound, String defaultSound, double currentVolume, double defaultVolume, double currentPitch, double defaultPitch, String tooltip, Consumer<String> soundCallback, Consumer<Double> volumeCallback, Consumer<Double> pitchCallback) {
-            super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
-            this.padding(Insets.of(5));
-            this.horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Component.literal(name));
+            List<FlowLayout> list = new ArrayList<>();
+            FlowLayout soundLayout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+            soundLayout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
+            PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
+            FlatTextbox text = new FlatAutofillTextbox(Sizing.fixed(200), s ->
+                    mc.getSoundManager().getAvailableSounds().stream()
+                            .map(i -> (s.contains(":") ? i.toString() : i.getPath()).toLowerCase(Locale.ROOT))
+                            .filter(i -> i.startsWith(Utils.toLower(s)))
+                            .sorted()
+                            .toList()
+            );
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
-            ValidatorFlatTextbox inputSound = new ValidatorFlatTextbox(Sizing.fixed(100));
-            inputSound.setValidator(obj -> {
-                String text = obj.getValue();
-                Identifier identifier = Identifier.tryParse(text);
-                SoundManager soundManager = mc.getSoundManager();
-                if (text.isEmpty() || identifier == null) {
-                    obj.borderColor = RenderColor.NF_BLUE.getArgb();
-                    return true;
-                } else if (soundManager.getSoundEvent(identifier) == null) {
-                    obj.borderColor = RenderColor.RED.getArgb();
-                    return false;
-                } else {
-                    obj.borderColor = RenderColor.GREEN.getArgb();
-                    return true;
-                }
-            });
-            inputSound.text(currentSound);
-            inputSound.tooltip(Component.literal("The identifier of the sound."));
-            inputSound.onChanged().subscribe(soundCallback::accept);
-            FlatTextbox inputVolume = new FlatTextbox(Sizing.fixed(30));
-            inputVolume.text(String.valueOf(currentVolume));
-            inputVolume.tooltip(Component.literal("The volume of the sound."));
-            inputVolume.onChanged().subscribe(value -> Utils.parseDouble(value).ifPresent(volumeCallback));
-            FlatTextbox inputPitch = new FlatTextbox(Sizing.fixed(30));
-            inputPitch.text(String.valueOf(currentPitch));
-            inputPitch.tooltip(Component.literal("The pitch of the sound."));
-            inputPitch.onChanged().subscribe(value -> Utils.parseDouble(value).ifPresent(pitchCallback));
-            this.child(label);
-            this.child(inputSound);
-            this.child(inputVolume);
-            this.child(inputPitch);
-            this.child(buildResetButton(_ -> {
+            text.onChanged().subscribe(soundCallback::accept);
+            text.text(currentSound);
+            soundLayout.child(label);
+            soundLayout.child(text);
+            soundLayout.child(buildResetButton(_ -> {
                 soundCallback.accept(defaultSound);
-                volumeCallback.accept(defaultVolume);
-                pitchCallback.accept(defaultPitch);
-                inputSound.setValue(defaultSound);
-                inputVolume.setValue(String.valueOf(defaultVolume));
-                inputPitch.setValue(String.valueOf(defaultPitch));
+                text.setValue(defaultSound);
             }));
+            SliderDouble volumeSlider = new SliderDouble(
+                    "Volume",
+                    0.0,
+                    1.0,
+                    0.01,
+                    currentVolume,
+                    defaultVolume,
+                    "The volume of the sound.",
+                    volumeCallback
+            );
+            SliderDouble pitchSlider = new SliderDouble(
+                    "Pitch",
+                    0.0,
+                    2.0,
+                    0.01,
+                    currentPitch,
+                    defaultPitch,
+                    "The pitch of the sound.",
+                    pitchCallback
+            );
+            list.add(new BigButton("Play Sound", _ ->
+                    Utils.playSound(text.getValue(), (float) volumeSlider.slider.value(), (float) pitchSlider.slider.value()))
+            );
+            list.add(soundLayout);
+            list.add(volumeSlider);
+            list.add(pitchSlider);
+            super(name, list, "Edit Sound", tooltip);
         }
 
-        public SoundInput(String name, SettingString soundSetting, SettingDouble volumeSetting, SettingDouble pitchSetting, String tooltip) {
+        public SoundInput(String name, SettingSound setting, String tooltip) {
             this(
                     name,
-                    soundSetting.value(),
-                    soundSetting.getDefault().getAsString(),
-                    volumeSetting.value(),
-                    volumeSetting.getDefault().getAsDouble(),
-                    pitchSetting.value(),
-                    pitchSetting.getDefault().getAsDouble(),
+                    setting.sound().value(),
+                    setting.sound().getDefault().getAsString(),
+                    setting.volume().value(),
+                    setting.volume().getDefault().getAsDouble(),
+                    setting.pitch().value(),
+                    setting.pitch().getDefault().getAsDouble(),
                     tooltip,
-                    soundSetting::set,
-                    volumeSetting::set,
-                    pitchSetting::set
+                    s -> setting.sound().set(s),
+                    d -> setting.volume().set(d),
+                    d -> setting.pitch().set(d)
+            );
+        }
+    }
+
+    public static final class TitleInput extends InnerSettings {
+
+        public TitleInput(String name, String currentTitle, String defaultTitle, int currentFadeInTicks, int defaultFadeInTicks, int currentStayTicks, int defaultStayTicks, int currentFadeOutTicks, int defaultFadeOutTicks, boolean currentVanilla, boolean defaultVanilla, String tooltip, Consumer<String> titleCallback, Consumer<Integer> fadeInCallback, Consumer<Integer> stayCallback, Consumer<Integer> fadeOutCallback, Consumer<Boolean> vanillaCallback) {
+            List<FlowLayout> list = new ArrayList<>();
+            FlowLayout previewLayout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+            previewLayout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
+            PlainLabel previewLabel = new PlainLabel(Component.literal("Text Preview").withColor(0xffffff));
+            previewLabel.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
+            PlainLabel outputLabel = new PlainLabel(Utils.ofUserFormatted(currentTitle));
+            outputLabel.verticalTextAlignment(VerticalAlignment.CENTER).verticalSizing(Sizing.fixed(20));
+            previewLayout.child(previewLabel);
+            previewLayout.child(outputLabel);
+            list.add(previewLayout);
+            list.add(new TextInput(
+                    "Title Text",
+                    currentTitle,
+                    defaultTitle,
+                    "The text displayed on the title. You can use the \"&\" character to insert formatting codes.",
+                    s -> {
+                        outputLabel.text(Utils.ofUserFormatted(s));
+                        titleCallback.accept(s);
+                    }
+            ));
+            list.add(new SliderInt(
+                    "Fade In Ticks",
+                    0,
+                    200,
+                    1,
+                    currentFadeInTicks,
+                    defaultFadeInTicks,
+                    "The amount of ticks the title takes to fade in.",
+                    fadeInCallback
+            ));
+            list.add(new SliderInt(
+                    "Stay Ticks",
+                    0,
+                    200,
+                    1,
+                    currentStayTicks,
+                    defaultStayTicks,
+                    "The amount of ticks the title remains on screen for.",
+                    stayCallback
+            ));
+            list.add(new SliderInt(
+                    "Fade Out Ticks",
+                    0,
+                    200,
+                    1,
+                    currentFadeOutTicks,
+                    defaultFadeOutTicks,
+                    "The amount of ticks the title takes to fade out.",
+                    fadeOutCallback
+            ));
+            list.add(new Toggle(
+                    "Vanilla Title",
+                    currentVanilla,
+                    defaultVanilla,
+                    "Whether vanilla tooltip rendering should be used.\nDisable this option to use custom rendering and prevent the title from being overwritten.",
+                    vanillaCallback
+            ));
+            super(name, list, "Edit Title", tooltip);
+        }
+
+        public TitleInput(String name, SettingTitle setting, String tooltip) {
+            this(
+                    name,
+                    setting.title().value(),
+                    setting.title().getDefault().getAsString(),
+                    setting.fadeIn().value(),
+                    setting.fadeIn().getDefault().getAsInt(),
+                    setting.stay().value(),
+                    setting.stay().getDefault().getAsInt(),
+                    setting.fadeOut().value(),
+                    setting.fadeOut().getDefault().getAsInt(),
+                    setting.vanilla().value(),
+                    setting.vanilla().getDefault().getAsBoolean(),
+                    tooltip,
+                    s -> setting.title().set(s),
+                    i -> setting.fadeIn().set(i),
+                    i -> setting.stay().set(i),
+                    i -> setting.fadeOut().set(i),
+                    b -> setting.vanilla().set(b)
             );
         }
     }

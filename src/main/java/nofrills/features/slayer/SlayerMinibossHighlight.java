@@ -29,7 +29,7 @@ public class SlayerMinibossHighlight {
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive() && event.namePlain.equals("SLAYER MINIBOSS") && !cache.has(event.entity)) {
             List<Entity> otherEntities = Utils.getOtherEntities(event.entity, 1.0, 3.0, 1.0, Utils::isMob);
-            Entity closest = Utils.findNametagOwner(event.entity, otherEntities);
+            Entity closest = Utils.getNameTagOwner(event.entity, otherEntities);
             if (closest != null) {
                 if (hide.value()) {
                     event.entity.setCustomNameVisible(false);

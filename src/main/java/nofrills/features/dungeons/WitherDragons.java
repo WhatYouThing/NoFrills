@@ -79,7 +79,7 @@ public class WitherDragons {
             if (entity instanceof EnderDragon dragon) {
                 if (!drag.hasEntity()) {
                     for (Entity collar : drag.collarCache.get()) {
-                        if (Utils.horizontalDistance(dragon, collar) <= 10.0) {
+                        if (Utils.horizontalDistance(dragon, collar) <= 16.0) {
                             drag.setEntity(dragon);
                             break;
                         }
@@ -91,7 +91,7 @@ public class WitherDragons {
                 if (drag.isCollar(stand)) {
                     drag.collarCache.add(stand);
                     for (Entity dragon : drag.dragonCache.get()) {
-                        if (Utils.horizontalDistance(dragon, stand) <= 10.0) {
+                        if (Utils.horizontalDistance(dragon, stand) <= 16.0) {
                             drag.setEntity((EnderDragon) dragon);
                             break;
                         }
@@ -125,7 +125,7 @@ public class WitherDragons {
                                     }
                                     float arrowPitch = Mth.wrapDegrees(arrowRot.x);
                                     float arrowYaw = Mth.wrapDegrees(arrowRot.y);
-                                    if (Utils.difference(pitch, arrowPitch) <= 5.0 && Utils.difference(yaw, arrowYaw) <= 25.0) {
+                                    if (Utils.difference(pitch, arrowPitch) <= 5.0 && Utils.difference(yaw, arrowYaw) <= 25.0 && event.arrow().distanceTo(arrow) <= 4.0f) {
                                         if (teammateArrows.has(arrow)) return;
                                         teammateArrows.add(arrow, e.getValue());
                                     }

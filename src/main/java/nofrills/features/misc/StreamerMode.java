@@ -65,7 +65,7 @@ public class StreamerMode {
 
     private static String generateNick() {
         String nick = baseName.value().trim();
-        Pattern pattern = Pattern.compile("\\{}");
+        Pattern pattern = Utils.pattern("\\{}");
         int count = (int) pattern.matcher(nick).results().count();
         if (count == 0) return nick;
         String digits = String.valueOf(random.nextInt((int) Math.pow(10, count)));
@@ -77,7 +77,7 @@ public class StreamerMode {
 
     public static boolean isActive() {
         if (instance.isActive()) {
-            return !currentNick.value().isEmpty() && Utils.isInSkyblock() && !instancedIslands.contains(SkyblockData.getArea());
+            return !currentNick.value().isBlank() && Utils.isInSkyblock() && !instancedIslands.contains(SkyblockData.getArea());
         }
         return false;
     }

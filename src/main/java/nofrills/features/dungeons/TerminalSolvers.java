@@ -46,9 +46,11 @@ public class TerminalSolvers {
     public static final SettingInt firstClickTicks = new SettingInt(10, "firstClickTicks", instance);
     public static final SettingInt throttleTicks = new SettingInt(1, "throttleTicks", instance);
     public static final SettingBool soundOnClick = new SettingBool(false, "soundOnClick", instance);
-    public static final SettingString clickSound = new SettingString("minecraft:entity.blaze.hurt", "clickSound", instance);
-    public static final SettingDouble clickSoundVolume = new SettingDouble(2.0, "clickSoundVolume", instance);
-    public static final SettingDouble clickSoundPitch = new SettingDouble(2.0, "clickSoundPitch", instance);
+    public static final SettingSound clickSound = new SettingSound(
+            new SettingString("minecraft:entity.blaze.hurt", "clickSound", instance),
+            new SettingDouble(2.0, "clickSoundVolume", instance),
+            new SettingDouble(2.0, "clickSoundPitch", instance)
+    );
     public static final SettingColor backgroundColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.DARK_GRAY), "backgroundColor", instance);
 
     private static final Supplier<List<Item>> colorsOrder = () -> List.of(
@@ -356,7 +358,7 @@ public class TerminalSolvers {
             }
             this.clickedAtTick = tickCounter;
             if (soundOnClick.value()) {
-                Utils.playSound(clickSound.value(), clickSoundVolume.valueFloat(), clickSoundPitch.valueFloat());
+                Utils.playSound(clickSound.sound().value(), clickSound.volume().valueFloat(), clickSound.pitch().valueFloat());
             }
         }
 

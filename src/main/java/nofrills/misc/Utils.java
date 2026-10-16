@@ -1,13 +1,12 @@
 package nofrills.misc;
 
 import com.google.common.base.Splitter;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
@@ -68,6 +67,10 @@ import nofrills.mixin.BossHealthOverlayAccessor;
 import nofrills.mixin.PlayerTabOverlayAccessor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.intellij.lang.annotations.Language;
+import org.intellij.lang.annotations.MagicConstant;
+import org.jetbrains.annotations.NonNls;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,9 +82,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -93,8 +96,11 @@ import static nofrills.Main.*;
 public class Utils {
     public static final GuiMessageTag noFrillsIndicator = new GuiMessageTag(0x5ca0bf, null, Component.nullToEmpty("Message from NoFrills mod."), "NoFrills Mod");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final ConcurrentHashMap<String, Pattern> paginationPatternCache = new ConcurrentHashMap<>();
     private static final Supplier<ModContainer> modContainer = () -> FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow();
+    private static final Cache<String, Pattern> patternCache = CacheBuilder.newBuilder()
+            .expireAfterAccess(Duration.ofHours(1))
+            .maximumSize(1000L)
+            .build();
     private static final HashSet<String> lootIslands = Sets.newHashSet(
             "Catacombs",
             "Kuudra",
@@ -556,15 +562,24 @@ public class Utils {
         return id;
     }
 
+    public static Pattern pattern(@Language("RegExp") @NonNls @NonNull String regex, @MagicConstant(flagsFromClass = Pattern.class) int flags) {
+        try {
+            return patternCache.get(regex + flags, () -> Pattern.compile(regex, flags));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Pattern pattern(@Language("RegExp") @NonNls @NonNull String regex) {
+        return pattern(regex, 0);
+    }
+
     public static boolean hasItemQuantity(String name) {
-        return Pattern.matches(".* x[0-9]*", name);
+        return pattern(".* x[0-9]*").matcher(name).matches();
     }
 
     public static boolean isPaginatedMenu(String title, String match) {
-        if (!paginationPatternCache.containsKey(match)) {
-            paginationPatternCache.put(match, Pattern.compile("(?:|\\([0-9]*/[0-9]*\\) )" + match));
-        }
-        return paginationPatternCache.get(match).matcher(title).matches();
+        return pattern("(?:|\\([0-9]*/[0-9]*\\) )" + match).matcher(title).matches();
     }
 
     public static GameProfile getTextures(ItemStack stack) {
@@ -733,6 +748,12 @@ public class Utils {
 
     public static void atomicWrite(Path path, JsonObject content) throws IOException {
         atomicWrite(path, GSON.toJson(content));
+    }
+
+    public static JsonArray toJsonArray(List<String> list) {
+        JsonArray array = new JsonArray();
+        array.asList().addAll(list.stream().map(JsonPrimitive::new).toList());
+        return array;
     }
 
     public static ModContainer getModContainer() {
@@ -958,7 +979,7 @@ public class Utils {
     }
 
     public static String toPlain(String string) {
-        return string.replaceAll("(?i)§[0-9A-Z]", "");
+        return pattern("(?i)§[0-9A-Z]").matcher(string).replaceAll("");
     }
 
     public static <T extends Enum<?>> T toEnumConstant(String value, T[] constants, T fallback) {
@@ -1006,6 +1027,10 @@ public class Utils {
             return mutable;
         }
         return text.copy();
+    }
+
+    public static MutableComponent ofUserFormatted(String text) {
+        return Component.literal(pattern("&").matcher(text).replaceAll(Symbols.format));
     }
 
     public static Optional<Style> getStyle(Component text, Predicate<String> predicate) {

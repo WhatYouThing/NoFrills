@@ -184,8 +184,8 @@ public class LegacyTextures {
                 array.add(id);
             }
         });
-        identifierCache.invalidate(stack);
-        profileCache.invalidate(stack);
+        identifierCache.invalidateAll();
+        profileCache.invalidateAll();
     }
 
     private static int getStarIndex(String star) {

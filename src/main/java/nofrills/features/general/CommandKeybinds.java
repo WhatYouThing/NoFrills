@@ -21,9 +21,11 @@ import nofrills.config.SettingJson;
 import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
+import nofrills.hud.InnerSettingsScreen;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
@@ -56,7 +58,8 @@ public final class CommandKeybinds {
                 obj.addProperty("enabled", true);
                 obj.addProperty("allowInGui", false);
                 obj.addProperty("modifier", Modifier.Any.name());
-                obj.addProperty("islandFilter", "");
+                obj.add("classFilterList", new JsonArray());
+                obj.add("islandFilterList", new JsonArray());
                 object.get("binds").getAsJsonArray().add(obj);
             });
             mc.setScreen(buildSettings());
@@ -125,10 +128,21 @@ public final class CommandKeybinds {
                         continue;
                     }
                 }
-                if (bind.has("islandFilter")) {
-                    String filter = bind.get("islandFilter").getAsString();
-                    String island = SkyblockData.getArea();
-                    if (!filter.isEmpty() && !island.isEmpty() && !Utils.toLower(filter).contains(Utils.toLower(island))) {
+                if (bind.has("classFilterList")) {
+                    String className = Utils.toLower(DungeonUtil.getPlayerClass());
+                    List<String> list = bind.get("classFilterList").getAsJsonArray().asList().stream()
+                            .map(e -> Utils.toLower(e.getAsString().trim()))
+                            .toList();
+                    if (!className.isEmpty() && !list.contains(className)) {
+                        continue;
+                    }
+                }
+                if (bind.has("islandFilterList")) {
+                    String area = Utils.toLower(SkyblockData.getArea());
+                    List<String> list = bind.get("islandFilterList").getAsJsonArray().asList().stream()
+                            .map(e -> Utils.toLower(e.getAsString().trim()))
+                            .toList();
+                    if (!area.isEmpty() && !list.contains(area)) {
                         continue;
                     }
                 }
@@ -233,37 +247,41 @@ public final class CommandKeybinds {
             );
         }
 
-        public FlowLayout buildIslandFilterSetting() {
-            return new Settings.TextInput(
-                    "Island Filter",
-                    this.getData().has("islandFilter") ? this.getData().get("islandFilter").getAsString() : "",
-                    "",
-                    "A list of islands that this keybind requires to work.\nFor example: \"catacombs kuudra\" will disable the keybind\nif your current area is not either Kuudra or Dungeons.\n\nLeave empty to disable island filtering.",
-                    s -> data.edit(obj -> this.getData(obj).addProperty("islandFilter", s))
+        public FlowLayout buildClassFilterSetting() {
+            return new Settings.TextEntryList(
+                    "Class Filter",
+                    () -> this.getData().has("classFilterList")
+                            ? this.getData().get("classFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
+                            : DungeonUtil.getDungeonClasses().stream().toList(),
+                    "Prevents this keybind from working if your selected dungeon class is not on this list.\nLeave empty to disable class filtering.",
+                    l -> data.edit(obj -> this.getData(obj).add("classFilterList", Utils.toJsonArray(l)))
             );
         }
 
-        public CommandKeybindsSettings buildKeybindSettings() {
+        public FlowLayout buildIslandFilterSetting() {
+            return new Settings.TextEntryList(
+                    "Island Filter",
+                    () -> this.getData().has("islandFilterList")
+                            ? this.getData().get("islandFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
+                            : List.of(),
+                    "Prevents this keybind from working if the current tablist area name is not on this list.\nLeave empty to disable island filtering.",
+                    l -> data.edit(obj -> this.getData(obj).add("islandFilterList", Utils.toJsonArray(l)))
+            );
+        }
+
+        public InnerSettingsScreen buildKeybindSettings() {
             List<FlowLayout> list = new ArrayList<>();
             list.add(this.buildCommandInputSetting());
             list.add(this.buildAllowInGuiSetting());
             list.add(this.buildKeybindSetting());
             list.add(this.buildModifierSetting());
+            list.add(this.buildClassFilterSetting());
             list.add(this.buildIslandFilterSetting());
-            CommandKeybindsSettings settings = new CommandKeybindsSettings(list);
-            settings.setTitle(Component.literal("Command Keybind: " + (this.getData().has("name") ? this.getData().get("name").getAsString() : "New Keybind")));
-            return settings;
-        }
-    }
-
-    public static final class CommandKeybindsSettings extends Settings {
-        public CommandKeybindsSettings(List<FlowLayout> settings) {
-            super(settings);
-        }
-
-        @Override
-        public void onClose() {
-            mc.setScreen(buildSettings());
+            return new InnerSettingsScreen(
+                    list,
+                    Component.literal("Command Keybind: " + (this.getData().has("name") ? this.getData().get("name").getAsString() : "New Keybind")),
+                    buildSettings()
+            );
         }
     }
 }

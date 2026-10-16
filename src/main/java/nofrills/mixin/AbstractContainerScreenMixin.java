@@ -174,10 +174,10 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    private void onMouseClicked(MouseButtonEvent click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
-        if (LeapOverlay.isLeapMenu(this.title.getString()) && click.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
+    private void onMouseClicked(MouseButtonEvent event, boolean doubleClick, CallbackInfoReturnable<Boolean> cir) {
+        if (LeapOverlay.isLeapMenu(this.title.getString()) && event.button() == GLFW.GLFW_MOUSE_BUTTON_1) {
             for (LeapOverlay.LeapButton leapButton : LeapOverlay.getLeapButtons()) {
-                if (leapButton.isHovered(click.x(), click.y())) {
+                if (leapButton.isHovered(event.x(), event.y())) {
                     leapButton.click(this.menu);
                     cir.setReturnValue(true);
                 }

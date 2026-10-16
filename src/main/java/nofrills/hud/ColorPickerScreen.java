@@ -23,12 +23,10 @@ import java.util.function.Consumer;
 
 import static nofrills.Main.mc;
 
-public class ColorPickerScreen extends Settings {
-    private final Screen previous;
+public class ColorPickerScreen extends InnerSettingsScreen {
 
     public ColorPickerScreen(List<FlowLayout> settings, Screen previous) {
-        super(settings);
-        this.previous = previous;
+        super(settings, previous);
     }
 
     public static ColorPickerScreen build(RenderColor currentColor, Screen previous, Consumer<RenderColor> updateCallback) {
@@ -238,10 +236,5 @@ public class ColorPickerScreen extends Settings {
         label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.right(5)).sizing(Sizing.content(), Sizing.fixed(20));
         layout.child(label);
         return layout;
-    }
-
-    @Override
-    public void onClose() {
-        mc.setScreen(this.previous);
     }
 }

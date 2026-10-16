@@ -22,7 +22,6 @@ import nofrills.misc.Utils;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 
 import static nofrills.misc.NoFrillsAPI.auctionPricing;
 import static nofrills.misc.NoFrillsAPI.bazaarPricing;
@@ -109,7 +108,8 @@ public class VesuviusSolver {
                 if (KuudraChestValue.salvageValue.value() && KuudraChestValue.salvageAmounts.containsKey(id)) {
                     AtomicInteger stars = new AtomicInteger();
                     text.visit((textStyle, textString) -> {
-                        int count = (int) Pattern.compile(Utils.Symbols.dungeonStar).matcher(textString).results().count();
+                        @SuppressWarnings("LanguageMismatch")
+                        int count = (int) Utils.pattern(Utils.Symbols.dungeonStar).matcher(textString).results().count();
                         if (Utils.hasColor(textStyle, ChatFormatting.LIGHT_PURPLE)) {
                             stars.addAndGet(count * 2);
                         } else {

@@ -25,9 +25,11 @@ public class EtherwarpOverlay {
 
     public static final SettingBool doSound = new SettingBool(false, "doSound", instance);
     public static final SettingBool pinglessSound = new SettingBool(true, "pinglessSound", instance);
-    public static final SettingString sound = new SettingString("minecraft:block.note_block.pling", "sound", instance);
-    public static final SettingDouble volume = new SettingDouble(1.0, "volume", instance);
-    public static final SettingDouble pitch = new SettingDouble(1.0, "pitch", instance);
+    public static final SettingSound sound = new SettingSound(
+            new SettingString("minecraft:block.note_block.pling", "sound", instance),
+            new SettingDouble(1.0, "volume", instance),
+            new SettingDouble(1.0, "pitch", instance)
+    );
     public static final SettingBool cancelSound = new SettingBool(false, "cancelSound", instance);
     public static final SettingEnum<RenderStyle> highlightStyle = new SettingEnum<>(RenderStyle.Filled, RenderStyle.class, "highlightStyle", instance.key());
     public static final SettingColor fillCorrect = new SettingColor(new RenderColor(0, 255, 0, 127), "fillCorrect", instance.key());
@@ -108,7 +110,7 @@ public class EtherwarpOverlay {
     }
 
     private static void playCustomSound() {
-        Utils.playSound(sound.value(), volume.valueFloat(), pitch.valueFloat());
+        Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
     }
 
     private static void playPinglessSound() {

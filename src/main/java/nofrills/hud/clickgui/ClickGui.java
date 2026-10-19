@@ -538,8 +538,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Background Color", TerminalSolvers.backgroundColor, "The color used to depict already clicked/solved terminal slots.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.", new Settings(List.of(
-                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text."),
-                                new Settings.ColorPicker("Text Color", TerracottaTimer.color, "The color of the timer text.")
+                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text.")
                         ))),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(
                                 new Settings.Toggle("Spawn Alert", WitherDragons.alert, "Alerts you when a dragon is about to spawn."),

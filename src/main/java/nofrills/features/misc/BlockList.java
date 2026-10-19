@@ -15,6 +15,7 @@ import nofrills.config.*;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.EventListener;
 import nofrills.events.PlayerJoinedEvent;
+import nofrills.events.ServerTickEvent;
 import nofrills.misc.Utils;
 
 import java.io.InputStream;
@@ -22,6 +23,8 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -44,6 +47,7 @@ public class BlockList {
             .expireAfterAccess(Duration.ofMinutes(30L))
             .maximumSize(1000L)
             .build();
+    private static final ConcurrentHashMap<String, AtomicInteger> kickQueue = new ConcurrentHashMap<>();
     private static final Pattern validNameRegex = Pattern.compile("^[a-zA-Z0-9_]{3,16}$");
 
     public static List<JsonObject> getEntries() {
@@ -62,11 +66,10 @@ public class BlockList {
             FetchResult result = res.get();
             if (data.get().has(result.uuid())) {
                 JsonObject object = data.get().get(result.uuid()).getAsJsonObject();
-                Utils.infoRaw(Utils.formatText("{} is already blocked, updating entry. Previous name: {}. Previous block reason: \"{}\".",
-                        result.name(),
-                        object.get("name").getAsString(),
-                        object.get("reason").getAsString()
-                ).withStyle(ChatFormatting.GREEN));
+                Utils.infoRaw(Utils.formatText("{} is already blocked, updating entry.", result.name()).withStyle(ChatFormatting.GREEN)
+                        .append(Utils.formatText("\n- Previous name: {}.", object.get("name").getAsString()).withStyle(ChatFormatting.GRAY))
+                        .append(Utils.formatText("\n- Previous block reason: \"{}\".", object.get("reason").getAsString()).withStyle(ChatFormatting.GRAY))
+                );
                 object.addProperty("name", result.name());
                 object.addProperty("reason", reason);
             } else {
@@ -97,8 +100,10 @@ public class BlockList {
         }
     }
 
-    public static List<JsonObject> searchPlayer(String name) {
-        return getEntries().stream().filter(object -> Utils.toLower(object.get("name").getAsString()).contains(Utils.toLower(name))).toList();
+    public static List<JsonObject> searchPlayers(String query) {
+        return getEntries().stream()
+                .filter(o -> Utils.toLower(o.get("name").getAsString()).contains(query) || Utils.toLower(o.get("reason").getAsString()).contains(query))
+                .toList();
     }
 
     public static void importFromClipboard(String defaultReason) {
@@ -196,16 +201,6 @@ public class BlockList {
         });
     }
 
-    private static void kickPlayer(String name, long delay) {
-        Thread.startVirtualThread(() -> {
-            try {
-                Thread.sleep(delay);
-                mc.execute(() -> Utils.sendMessage("/party kick " + name));
-            } catch (Exception _) {
-            }
-        });
-    }
-
     @EventHandler
     private static void onMessage(ChatMsgEvent event) {
         if (instance.isActive() && event.isPartyFinderJoin()) {
@@ -220,21 +215,22 @@ public class BlockList {
                     FetchResult result = res.get();
                     if (data.get().has(result.uuid())) {
                         JsonObject obj = data.get().get(result.uuid()).getAsJsonObject();
-                        MutableComponent msg = Component.literal(name).setStyle(nameColor)
-                                .append(Component.literal(" is a blocked player.").withStyle(ChatFormatting.RED));
                         if (autoKick.value()) {
-                            msg.append(Component.literal(" Kicking automatically.").withStyle(ChatFormatting.RED));
                             if (sendKick.value()) {
                                 Utils.sendMessage(kickMsg.value()
                                         .replaceAll("\\{name}", name)
                                         .replaceAll("\\{reason}", obj.get("reason").getAsString())
                                 );
-                                kickPlayer(name, 500L);
+                                kickQueue.put(name, new AtomicInteger(10));
                             } else {
-                                kickPlayer(name, 0L);
+                                Utils.sendMessage("/party kick " + name);
                             }
+                            Utils.infoRaw(buildEntryLine(obj, Component.literal(name).setStyle(nameColor)
+                                    .append(Component.literal(" is a blocked player, kicking automatically.").withStyle(ChatFormatting.RED))));
+                        } else {
+                            Utils.infoRaw(buildEntryLine(obj, Component.literal(name).setStyle(nameColor)
+                                    .append(Component.literal(" is a blocked player.").withStyle(ChatFormatting.RED))));
                         }
-                        Utils.infoRaw(buildEntryLine(obj, msg));
                     }
                 } else {
                     Utils.infoRaw(Component.literal("Failed to fetch UUID for ").withStyle(ChatFormatting.GRAY)
@@ -252,9 +248,21 @@ public class BlockList {
             if (data.get().has(uuid)) {
                 Utils.infoRaw(buildEntryLine(
                         data.get().get(uuid).getAsJsonObject(),
-                        Utils.formatText("Blocked player found: {}.", event.entry.getProfile().name())
-                                .withStyle(ChatFormatting.RED)
+                        Utils.formatText("Blocked player detected: {}.", event.entry.getProfile().name())
+                                .withStyle(ChatFormatting.RED, ChatFormatting.BOLD)
                 ));
+            }
+        }
+    }
+
+    @EventHandler
+    private static void onServerTick(ServerTickEvent event) {
+        if (instance.isActive() && !kickQueue.isEmpty()) {
+            for (Map.Entry<String, AtomicInteger> entry : kickQueue.entrySet()) {
+                if (entry.getValue().decrementAndGet() == 0) {
+                    mc.execute(() -> Utils.sendMessage("/party kick " + entry.getKey()));
+                    kickQueue.remove(entry.getKey());
+                }
             }
         }
     }

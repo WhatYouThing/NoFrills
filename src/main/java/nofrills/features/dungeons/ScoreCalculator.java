@@ -3,7 +3,10 @@ package nofrills.features.dungeons;
 import meteordevelopment.orbit.EventHandler;
 import nofrills.config.*;
 import nofrills.events.*;
-import nofrills.misc.*;
+import nofrills.misc.ConcurrentHashSet;
+import nofrills.misc.DungeonUtil;
+import nofrills.misc.SkyblockData;
+import nofrills.misc.Utils;
 
 import java.util.List;
 import java.util.Optional;
@@ -72,7 +75,7 @@ public class ScoreCalculator {
 
     private static boolean isEZPZ() {
         return switch (paulState.value()) {
-            case Auto -> NoFrillsAPI.electionPerks.contains("EZPZ");
+            case Auto -> Utils.getElectionPerks().contains("EZPZ");
             case Active -> true;
             case Inactive -> false;
         };

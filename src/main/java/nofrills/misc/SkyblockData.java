@@ -4,13 +4,18 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
 import net.minecraft.util.Util;
 import net.minecraft.world.scores.*;
 import nofrills.events.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
@@ -55,6 +60,7 @@ public class SkyblockData {
     private static boolean showPing = false;
     private static boolean tabListDirty = true;
     private static boolean scoreboardDirty = true;
+    private static PerkpocalypsePerks currentPerks = PerkpocalypsePerks.EMPTY;
 
     /**
      * Returns the current location from the scoreboard, such as "⏣ Your Island". The location prefix is not omitted.
@@ -90,6 +96,10 @@ public class SkyblockData {
         return lines;
     }
 
+    public static PerkpocalypsePerks getPerkpocalypsePerks() {
+        return currentPerks;
+    }
+
     public static void showPing() {
         showPing = true;
         Utils.sendPingPacket();
@@ -102,7 +112,7 @@ public class SkyblockData {
     private static void updateTabListIfDirty() {
         List<String> lines = new ArrayList<>();
         for (PlayerInfo entry : mc.gui.getTabList().getPlayerInfos()) {
-            if (entry != null && entry.getTabListDisplayName() != null) {
+            if (entry.getTabListDisplayName() != null) {
                 String name = Utils.toPlain(entry.getTabListDisplayName()).trim();
                 if (name.isEmpty()) continue;
                 if (name.startsWith("Area: ") || name.startsWith("Dungeon: ")) {
@@ -189,8 +199,32 @@ public class SkyblockData {
     @EventHandler
     private static void onPing(ReceivePacketEvent event) {
         if (showPing && event.packet instanceof ClientboundPongResponsePacket(long time)) {
-            Utils.infoFormat("§aPing: §f{}ms", Util.getMillis() - time);
+            long ping = Util.getMillis() - time;
+            Utils.infoRaw(Component.literal("Ping: ").withStyle(ChatFormatting.GREEN)
+                    .append(Component.literal(ping + "ms").withColor(Utils.getPercentageColor(ping / 300.0, true).getHex()))
+            );
             showPing = false;
+        }
+    }
+
+    @EventHandler
+    private static void onSlot(SlotUpdateEvent event) {
+        if (event.title.equals("Calendar and Events") && Utils.toPlain(event.stack.getHoverName()).equals("Mayor Jerry")) {
+            List<Component> lore = Utils.getLoreText(event.stack);
+            Optional<Component> perkStart = lore.stream()
+                    .filter(c -> Utils.toPlain(c).trim().equals("Perkpocalypse Perks:"))
+                    .findFirst();
+            if (perkStart.isEmpty()) return;
+            Matcher matcher = Utils.pattern("Next set of perks in (?<time>.*)!").matcher(Utils.toPlain(lore.getLast()));
+            if (!matcher.matches()) return;
+            int startIndex = lore.indexOf(perkStart.get()) + 2;
+            Style perkStyle = lore.get(startIndex).getStyle();
+            List<String> perkList = lore.stream()
+                    .filter(c -> lore.indexOf(c) >= startIndex && c.getStyle().equals(perkStyle) && c.getSiblings().isEmpty())
+                    .map(Utils::toPlain)
+                    .filter(s -> !s.isBlank())
+                    .toList();
+            currentPerks = new PerkpocalypsePerks(perkList, Utils.parseTime(matcher.group("time")).getTimeInMillis());
         }
     }
 
@@ -207,6 +241,22 @@ public class SkyblockData {
         public InstanceType(String name, String type) {
             this.name = name;
             this.type = type;
+        }
+    }
+
+    public static class PerkpocalypsePerks {
+        public static final PerkpocalypsePerks EMPTY = new PerkpocalypsePerks(List.of(), 0L);
+
+        public List<String> perks;
+        public long until;
+
+        public PerkpocalypsePerks(List<String> perks, long until) {
+            this.perks = perks;
+            this.until = until;
+        }
+
+        public boolean areActive() {
+            return this.until > Instant.now().toEpochMilli();
         }
     }
 }

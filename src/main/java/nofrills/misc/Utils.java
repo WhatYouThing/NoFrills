@@ -22,7 +22,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
@@ -398,9 +397,8 @@ public class Utils {
     }
 
     public static void sendPingPacket() {
-        ClientPacketListener handler = mc.getConnection();
-        if (handler != null) {
-            handler.send(new ServerboundPingRequestPacket(Util.getMillis()));
+        if (mc.getConnection() != null) {
+            mc.getConnection().send(new ServerboundPingRequestPacket(Util.getMillis()));
         }
     }
 
@@ -814,6 +812,14 @@ public class Utils {
                 LOGGER.error("NoFrills update check failed.", exception);
             }
         });
+    }
+
+    public static HashSet<String> getElectionPerks() {
+        HashSet<String> perks = new HashSet<>(NoFrillsAPI.electionPerks);
+        if (SkyblockData.getPerkpocalypsePerks().areActive()) {
+            perks.addAll(SkyblockData.getPerkpocalypsePerks().perks);
+        }
+        return perks;
     }
 
     /**

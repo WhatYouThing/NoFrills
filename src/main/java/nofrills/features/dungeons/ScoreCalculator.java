@@ -18,13 +18,13 @@ public class ScoreCalculator {
     public static final SettingBool sendMsg270 = new SettingBool(false, "sendMsg270", instance);
     public static final SettingString msg270 = new SettingString("/pc 270", "msg270", instance);
     public static final SettingBool showTitle270 = new SettingBool(false, "showTitle270", instance);
-    public static final SettingTitle title270 = new SettingTitle("&c&l270", "title270", 0, "titleFadeIn270", 30, "titleStay270", 10, "titleFadeOut270", true, "titleVanilla270", instance);
-    public static final SettingSound sound270 = new SettingSound("entity.experience_orb.pickup", "sound270", 1.0, "volume270", 0.0, "pitch270", instance);
+    public static final SettingTitle title270 = new SettingTitle("&c&l270", 0, 30, 10, true, "title270", instance);
+    public static final SettingSound sound270 = new SettingSound("entity.experience_orb.pickup", 1.0, 0.0, "sound270", instance);
     public static final SettingBool sendMsg300 = new SettingBool(false, "sendMsg300", instance);
     public static final SettingString msg300 = new SettingString("/pc 300", "msg300", instance);
     public static final SettingBool showTitle300 = new SettingBool(false, "showTitle300", instance);
-    public static final SettingTitle title300 = new SettingTitle("&c&l300", "title300", 0, "titleFadeIn300", 30, "titleStay300", 10, "titleFadeOut300", true, "titleVanilla300", instance);
-    public static final SettingSound sound300 = new SettingSound("entity.experience_orb.pickup", "sound300", 1.0, "volume300", 0.0, "pitch300", instance);
+    public static final SettingTitle title300 = new SettingTitle("&c&l300", 0, 30, 10, true, "title300", instance);
+    public static final SettingSound sound300 = new SettingSound("entity.experience_orb.pickup", 1.0, 0.0, "sound300", instance);
 
     private static final List<String> scoreKeywords = List.of(
             "kill",

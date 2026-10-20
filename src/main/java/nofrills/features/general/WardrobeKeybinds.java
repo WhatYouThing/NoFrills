@@ -26,15 +26,7 @@ public class WardrobeKeybinds {
     public static final SettingEnum<KeybindStyle> style = new SettingEnum<>(KeybindStyle.Simple, KeybindStyle.class, "style", instance.key());
     public static final SettingBool noUnequip = new SettingBool(false, "noUnequip", instance.key());
     public static final SettingBool playSound = new SettingBool(false, "sound", instance.key());
-    public static final SettingSound sound = new SettingSound(
-            "entity.horse.armor",
-            "soundIdentifier",
-            0.7,
-            "volume",
-            1.0,
-            "pitch",
-            instance
-    );
+    public static final SettingSound sound = new SettingSound("entity.horse.armor", 1.0, 1.0, "sound", instance);
     public static final SettingKeybind custom1 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom1", instance.key());
     public static final SettingKeybind custom2 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom2", instance.key());
     public static final SettingKeybind custom3 = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "custom3", instance.key());

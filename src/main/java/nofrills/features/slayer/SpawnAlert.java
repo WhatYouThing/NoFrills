@@ -22,11 +22,11 @@ public class SpawnAlert {
     @EventHandler
     private static void onTick(WorldTickEvent event) {
         if (instance.isActive()) {
-            if (!spawned && SlayerUtil.bossAlive) {
+            if (!spawned && SlayerUtil.isBossAlive()) {
                 Utils.showTitle(title);
                 Utils.playSound(sound);
                 spawned = true;
-            } else if (!SlayerUtil.bossAlive) {
+            } else if (!SlayerUtil.isBossAlive()) {
                 spawned = false;
             }
         }

@@ -10,7 +10,10 @@ import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
 import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
-import nofrills.misc.*;
+import nofrills.misc.MappedEntityCache;
+import nofrills.misc.RenderColor;
+import nofrills.misc.RenderStyle;
+import nofrills.misc.Utils;
 
 import java.util.List;
 
@@ -41,7 +44,7 @@ public class SlayerMinibossHighlight {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && SlayerUtil.currentBoss != null && !cache.empty()) {
+        if (instance.isActive() && !cache.empty()) {
             for (Entity ent : cache.getValues()) {
                 if (!ent.isAlive()) continue;
                 AABB box = Utils.getLerpedBox(ent, event.delta());

@@ -40,8 +40,8 @@ public class SlayerUtil {
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
     private static final MappedEntityCache<CurrentBoss> bossCache = new MappedEntityCache<>();
-    public static boolean bossAlive = false;
-    public static SlayerBoss currentBoss = null;
+    private static boolean bossAlive = false;
+    private static SlayerBoss currentBoss = null;
 
     public static boolean isSpawner(String name) {
         return name.equals("SLAYER BOSS");
@@ -57,6 +57,14 @@ public class SlayerUtil {
 
     public static boolean isFightingBoss(SlayerBoss boss) {
         return bossAlive && currentBoss != null && currentBoss.equals(boss);
+    }
+
+    public static boolean isBossAlive() {
+        return bossAlive;
+    }
+
+    public static SlayerBoss getActiveQuest() {
+        return currentBoss;
     }
 
     public static ArmorStand getSpawnerEntity() {

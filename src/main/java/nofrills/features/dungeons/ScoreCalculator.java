@@ -1,13 +1,12 @@
 package nofrills.features.dungeons;
 
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.sounds.SoundEvents;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingEnum;
-import nofrills.config.SettingString;
+import nofrills.config.*;
 import nofrills.events.*;
-import nofrills.misc.*;
+import nofrills.misc.ConcurrentHashSet;
+import nofrills.misc.DungeonUtil;
+import nofrills.misc.SkyblockData;
+import nofrills.misc.Utils;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,13 +19,15 @@ public class ScoreCalculator {
 
     public static final SettingEnum<PaulState> paulState = new SettingEnum<>(PaulState.Auto, PaulState.class, "paulState", instance);
     public static final SettingBool sendMsg270 = new SettingBool(false, "sendMsg270", instance);
-    public static final SettingString msg270 = new SettingString("/pc 270 Score", "msg270", instance);
+    public static final SettingString msg270 = new SettingString("/pc 270", "msg270", instance);
     public static final SettingBool showTitle270 = new SettingBool(false, "showTitle270", instance);
-    public static final SettingString title270 = new SettingString("&c&l270", "title270", instance);
+    public static final SettingTitle title270 = new SettingTitle("&c&l270", 0, 30, 10, true, "title270", instance);
+    public static final SettingSound sound270 = new SettingSound("entity.experience_orb.pickup", 1.0, 0.0, "sound270", instance);
     public static final SettingBool sendMsg300 = new SettingBool(false, "sendMsg300", instance);
-    public static final SettingString msg300 = new SettingString("/pc 300 Score", "msg300", instance);
+    public static final SettingString msg300 = new SettingString("/pc 300", "msg300", instance);
     public static final SettingBool showTitle300 = new SettingBool(false, "showTitle300", instance);
-    public static final SettingString title300 = new SettingString("&c&l300", "title300", instance);
+    public static final SettingTitle title300 = new SettingTitle("&c&l300", 0, 30, 10, true, "title300", instance);
+    public static final SettingSound sound300 = new SettingSound("entity.experience_orb.pickup", 1.0, 0.0, "sound300", instance);
 
     private static final List<String> scoreKeywords = List.of(
             "kill",
@@ -62,19 +63,19 @@ public class ScoreCalculator {
         return 0;
     }
 
-    private static void processAlert(SettingBool send, SettingString msg, SettingBool doTitle, SettingString title) {
+    private static void processAlert(SettingBool send, SettingString msg, SettingBool doTitle, SettingTitle title, SettingSound sound) {
         if (send.value()) {
             Utils.sendMessage(msg.value());
         }
         if (doTitle.value()) {
-            Utils.showTitle(title.value().replaceAll("&", "§"), "", 0, 30, 10);
-            Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
+            Utils.showTitle(title);
+            Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
         }
     }
 
     private static boolean isEZPZ() {
         return switch (paulState.value()) {
-            case Auto -> NoFrillsAPI.electionPerks.contains("EZPZ");
+            case Auto -> Utils.getElectionPerks().contains("EZPZ");
             case Active -> true;
             case Inactive -> false;
         };
@@ -221,12 +222,12 @@ public class ScoreCalculator {
                     + getSpeedScore()
                     + getBonusScore();
             if (score >= 300 && !sent300) {
-                processAlert(sendMsg300, msg300, showTitle300, title300);
+                processAlert(sendMsg300, msg300, showTitle300, title300, sound300);
                 sent300 = true;
                 sent270 = true;
             }
             if (score >= 270 && !sent270) {
-                processAlert(sendMsg270, msg270, showTitle270, title270);
+                processAlert(sendMsg270, msg270, showTitle270, title270, sound270);
                 sent270 = true;
             }
         }

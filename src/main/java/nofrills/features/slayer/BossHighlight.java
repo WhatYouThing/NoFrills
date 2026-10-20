@@ -46,7 +46,7 @@ public class BossHighlight {
 
     @EventHandler
     private static void onRender(WorldRenderEvent event) {
-        if (instance.isActive() && SlayerUtil.bossAlive) {
+        if (instance.isActive() && SlayerUtil.isBossAlive()) {
             if (SlayerUtil.isFightingBoss(SlayerUtil.BLAZE)) {
                 for (Map.Entry<Entity, String> entry : blazeCache.get()) {
                     Entity ent = entry.getKey();

@@ -22,9 +22,9 @@ public class NoDamageSplash {
         if (instance.isActive()) {
             return switch (mode.value()) {
                 case Always -> true;
-                case SlayerOnly -> SlayerUtil.bossAlive;
+                case SlayerOnly -> SlayerUtil.isBossAlive();
                 case DungeonsOnly -> Utils.isInDungeons();
-                case Both -> SlayerUtil.bossAlive || Utils.isInDungeons();
+                case Both -> SlayerUtil.isBossAlive() || Utils.isInDungeons();
             };
         }
         return false;

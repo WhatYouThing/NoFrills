@@ -84,8 +84,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     }
 
     @Override
-    public void drawComponentTooltip(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
-        super.drawComponentTooltip(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         int height = context.guiHeight();
@@ -538,8 +538,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Background Color", TerminalSolvers.backgroundColor, "The color used to depict already clicked/solved terminal slots.")
                         ))),
                         new Module("Terracotta Timers", TerracottaTimer.instance, "Renders respawn timers for the dead terracottas in F6/M6.", new Settings(List.of(
-                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text."),
-                                new Settings.ColorPicker("Text Color", TerracottaTimer.color, "The color of the timer text.")
+                                new Settings.SliderDouble("Text Scale", 0.0, 1.0, 0.01, TerracottaTimer.scale, "The scale of the timer text.")
                         ))),
                         new Module("Wither Dragons", WitherDragons.instance, "Features for the last phase of M7.", new Settings(List.of(
                                 new Settings.Toggle("Spawn Alert", WitherDragons.alert, "Alerts you when a dragon is about to spawn."),
@@ -602,14 +601,16 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Score Calculator", ScoreCalculator.instance, "Calculates the score in your dungeon runs.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Paul State", ScoreCalculator.paulState, "Allows you to force the state of Paul's EZPZ perk.\nSet to Auto to automatically check for EZPZ through the NoFrills API."),
-                                new Settings.Toggle("Send 270 Message", ScoreCalculator.sendMsg270, "If enabled, send a message upon reaching 270 (S) score."),
-                                new Settings.TextInput("270 Message", ScoreCalculator.msg270, "The message to send when 270 (S) score is reached."),
-                                new Settings.Toggle("Show 270 Title", ScoreCalculator.showTitle270, "If enabled, show a title on screen upon reaching 270 (S) score."),
-                                new Settings.TextInput("270 Title", ScoreCalculator.title270, "The title to show when 270 (S) score is reached."),
-                                new Settings.Toggle("Send 300 Message", ScoreCalculator.sendMsg300, "If enabled, send a message upon reaching 300 (S+) score."),
-                                new Settings.TextInput("300 Message", ScoreCalculator.msg300, "The message to send when 300 (S+) score is reached."),
-                                new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 (S+) score."),
-                                new Settings.TextInput("300 Title", ScoreCalculator.title300, "The title to show when 300 (S+) score is reached.")
+                                new Settings.Toggle("Send 270 Message", ScoreCalculator.sendMsg270, "If enabled, send a message upon reaching 270 score."),
+                                new Settings.TextInput("270 Message", ScoreCalculator.msg270, "The message to send when 270 score is reached."),
+                                new Settings.Toggle("Show 270 Title", ScoreCalculator.showTitle270, "If enabled, show a title on screen upon reaching 270 score."),
+                                new Settings.TitleInput("270 Title", ScoreCalculator.title270, "The title to show when 270 score is reached."),
+                                new Settings.SoundInput("270 Sound", ScoreCalculator.sound270, "The sound to play when the 270 title is shown."),
+                                new Settings.Toggle("Send 300 Message", ScoreCalculator.sendMsg300, "If enabled, send a message upon reaching 300 score."),
+                                new Settings.TextInput("300 Message", ScoreCalculator.msg300, "The message to send when 300 score is reached."),
+                                new Settings.Toggle("Show 300 Title", ScoreCalculator.showTitle300, "If enabled, show a title on screen upon reaching 300 score."),
+                                new Settings.TitleInput("300 Title", ScoreCalculator.title300, "The title to show when 300 score is reached."),
+                                new Settings.SoundInput("300 Sound", ScoreCalculator.sound300, "The sound to play when the 300 title is shown.")
                         ))),
                         new Module("Platform Highlight", PlatformHighlight.instance, "Highlights the 3x3 area which you mine in Necron phase to stop the platform from breaking.", new Settings(
                                 new Settings.Toggle("Healer Only", PlatformHighlight.healerOnly, "Whether to only draw the highlight while playing as Healer."),
@@ -709,15 +710,21 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Beacon Tracer", BeaconTracer.instance, "Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", BeaconTracer.color, "The color of the tracer.")
                         ))),
-                        new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt."),
-                        new Module("Spawn Alert", SpawnAlert.instance, "Alerts you when your slayer boss is spawned."),
+                        new Module("Spawn Alert", SpawnAlert.instance, "Alerts you when your slayer boss is spawned.", new Settings(
+                                new Settings.TitleInput("Title", SpawnAlert.title, "The title to display once your boss is spawned."),
+                                new Settings.SoundInput("Sound", SpawnAlert.sound, "The sound to play once your boss is spawned.")
+                        )),
                         new Module("Miniboss Highlight", SlayerMinibossHighlight.instance, "Highlights slayer minibosses.", new Settings(List.of(
                                 new Settings.Toggle("Hide Nametag", SlayerMinibossHighlight.hide, "Hides the apparent \"SLAYER MINIBOSS\" nametag that appears above the miniboss."),
                                 new Settings.EnumToggle<>("Highlight Style", SlayerMinibossHighlight.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Fill Color", SlayerMinibossHighlight.fillColor, "The color of the filled box."),
                                 new Settings.ColorPicker("Outline Color", SlayerMinibossHighlight.outlineColor, "The color of the outline box.")
                         ))),
-                        new Module("Miniboss Alert", SlayerMinibossAlert.instance, "Alerts you when a slayer miniboss is spawned.")
+                        new Module("Miniboss Alert", SlayerMinibossAlert.instance, "Alerts you when a slayer miniboss is spawned.", new Settings(
+                                new Settings.TitleInput("Title", SlayerMinibossAlert.title, "The title to display once a miniboss is spawned. Replaces {name} with the name of the miniboss."),
+                                new Settings.SoundInput("Sound", SlayerMinibossAlert.sound, "The sound to play once a miniboss is spawned.")
+                        )),
+                        new Module("Spawn Timer", SpawnTimer.instance, "Tracks how long your slayer bosses take to spawn.")
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new Settings(List.of(

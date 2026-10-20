@@ -22,7 +22,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
@@ -58,7 +57,10 @@ import net.minecraft.world.level.entity.LevelEntityGetterAdapter;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import nofrills.config.SettingSound;
+import nofrills.config.SettingTitle;
 import nofrills.events.InputEvent;
+import nofrills.hud.HudManager;
 import nofrills.mixin.AbstractContainerScreenAccessor;
 import nofrills.mixin.BossHealthOverlayAccessor;
 import nofrills.mixin.PlayerTabOverlayAccessor;
@@ -105,14 +107,30 @@ public class Utils {
             "Crimson Isle"
     );
 
+    public static void showTitle(MutableComponent title, MutableComponent subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks, boolean vanilla) {
+        if (vanilla) {
+            mc.gui.hud.setTitle(title);
+            mc.gui.hud.setSubtitle(subtitle);
+            mc.gui.hud.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
+        } else {
+            HudManager.setCustomTitle(title, stayTicks);
+        }
+    }
+
+    public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks, boolean vanilla) {
+        showTitle(Component.literal(title), Component.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks, vanilla);
+    }
+
     public static void showTitle(MutableComponent title, MutableComponent subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        mc.gui.hud.setTitle(title);
-        mc.gui.hud.setSubtitle(subtitle);
-        mc.gui.hud.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
+        showTitle(title, subtitle, fadeInTicks, stayTicks, fadeOutTicks, true);
     }
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        showTitle(Component.literal(title), Component.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks);
+        showTitle(title, subtitle, fadeInTicks, stayTicks, fadeOutTicks, true);
+    }
+
+    public static void showTitle(SettingTitle setting) {
+        showTitle(ofUserFormatted(setting.title().value()), Component.empty(), setting.fadeIn().value(), setting.stay().value(), setting.fadeOut().value(), setting.vanilla().value());
     }
 
     public static boolean isNearlyEqual(double a, double b, double eps) {
@@ -149,7 +167,12 @@ public class Utils {
     }
 
     public static void playSound(String event, float volume, float pitch) {
+        if (event.isBlank()) return;
         playSound(SoundEvent.createVariableRangeEvent(Identifier.parse(event)), volume, pitch);
+    }
+
+    public static void playSound(SettingSound setting) {
+        playSound(setting.sound().value(), setting.volume().valueFloat(), setting.pitch().valueFloat());
     }
 
     public static void sendMessage(String message) {
@@ -371,9 +394,8 @@ public class Utils {
     }
 
     public static void sendPingPacket() {
-        ClientPacketListener handler = mc.getConnection();
-        if (handler != null) {
-            handler.send(new ServerboundPingRequestPacket(Util.getMillis()));
+        if (mc.getConnection() != null) {
+            mc.getConnection().send(new ServerboundPingRequestPacket(Util.getMillis()));
         }
     }
 
@@ -787,6 +809,14 @@ public class Utils {
                 LOGGER.error("NoFrills update check failed.", exception);
             }
         });
+    }
+
+    public static HashSet<String> getElectionPerks() {
+        HashSet<String> perks = new HashSet<>(NoFrillsAPI.electionPerks);
+        if (SkyblockData.getPerkpocalypsePerks().areActive()) {
+            perks.addAll(SkyblockData.getPerkpocalypsePerks().perks);
+        }
+        return perks;
     }
 
     /**

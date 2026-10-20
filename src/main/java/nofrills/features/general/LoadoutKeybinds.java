@@ -36,15 +36,7 @@ public class LoadoutKeybinds {
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingKeybind editBindKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "editBindKey", instance);
     public static final SettingBool playSound = new SettingBool(false, "playSound", instance);
-    public static final SettingSound sound = new SettingSound(
-            "block.note_block.cow_bell",
-            "sound",
-            1.0,
-            "volume",
-            1.0,
-            "pitch",
-            instance
-    );
+    public static final SettingSound sound = new SettingSound("entity.horse.armor", 1.0, 1.0, "sound", instance);
 
     private static final Pattern loadoutsPattern = Pattern.compile("\\([0-9]*/[0-9]*\\) Loadouts");
     private static String binding = "";

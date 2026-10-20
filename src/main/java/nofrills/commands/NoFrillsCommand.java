@@ -347,9 +347,9 @@ public class NoFrillsCommand {
                 return SINGLE_SUCCESS;
             }))).then(literal("find").executes(context -> {
                 return SINGLE_SUCCESS;
-            }).then(argument("playerName", StringArgumentType.word()).executes(context -> {
-                String name = StringArgumentType.getString(context, "playerName");
-                List<JsonObject> results = BlockList.searchPlayer(name);
+            }).then(argument("query", StringArgumentType.word()).executes(context -> {
+                String query = StringArgumentType.getString(context, "query");
+                List<JsonObject> results = BlockList.searchPlayers(Utils.toLower(query));
                 if (!results.isEmpty()) {
                     MutableComponent message = Component.literal(Utils.format("§aFound {} result(s) in Block List: §f", results.size()));
                     for (int i = 0; i < results.size(); i++) {

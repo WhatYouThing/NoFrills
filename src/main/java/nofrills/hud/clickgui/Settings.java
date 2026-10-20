@@ -556,7 +556,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             List<FlowLayout> list = new ArrayList<>();
             FlowLayout soundLayout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             soundLayout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-            PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
+            PlainLabel label = new PlainLabel(Component.literal("Sound").withColor(0xffffff));
             FlatTextbox text = new FlatAutofillTextbox(Sizing.fixed(200), s ->
                     mc.getSoundManager().getAvailableSounds().stream()
                             .map(i -> (s.contains(":") ? i.toString() : i.getPath()).toLowerCase(Locale.ROOT))

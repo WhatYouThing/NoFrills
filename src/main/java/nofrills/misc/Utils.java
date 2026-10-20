@@ -61,6 +61,7 @@ import net.minecraft.world.level.entity.LevelEntityGetterAdapter;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import nofrills.config.SettingSound;
 import nofrills.config.SettingTitle;
 import nofrills.events.InputEvent;
 import nofrills.hud.HudManager;
@@ -110,22 +111,30 @@ public class Utils {
             "Crimson Isle"
     );
 
+    public static void showTitle(MutableComponent title, MutableComponent subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks, boolean vanilla) {
+        if (vanilla) {
+            mc.gui.setTitle(title);
+            mc.gui.setSubtitle(subtitle);
+            mc.gui.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
+        } else {
+            HudManager.setCustomTitle(title, stayTicks);
+        }
+    }
+
+    public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks, boolean vanilla) {
+        showTitle(Component.literal(title), Component.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks, vanilla);
+    }
+
     public static void showTitle(MutableComponent title, MutableComponent subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        mc.gui.setTitle(title);
-        mc.gui.setSubtitle(subtitle);
-        mc.gui.setTimes(fadeInTicks, stayTicks, fadeOutTicks);
+        showTitle(title, subtitle, fadeInTicks, stayTicks, fadeOutTicks, true);
     }
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {
-        showTitle(Component.literal(title), Component.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks);
+        showTitle(title, subtitle, fadeInTicks, stayTicks, fadeOutTicks, true);
     }
 
     public static void showTitle(SettingTitle setting) {
-        if (setting.vanilla().value()) {
-            showTitle(ofUserFormatted(setting.title().value()), Component.empty(), setting.fadeIn().value(), setting.stay().value(), setting.fadeOut().value());
-        } else {
-            HudManager.setCustomTitle(ofUserFormatted(setting.title().value()), setting.stay().value());
-        }
+        showTitle(ofUserFormatted(setting.title().value()), Component.empty(), setting.fadeIn().value(), setting.stay().value(), setting.fadeOut().value(), setting.vanilla().value());
     }
 
     public static boolean isNearlyEqual(double a, double b, double eps) {
@@ -162,7 +171,12 @@ public class Utils {
     }
 
     public static void playSound(String event, float volume, float pitch) {
+        if (event.isBlank()) return;
         playSound(SoundEvent.createVariableRangeEvent(Identifier.parse(event)), volume, pitch);
+    }
+
+    public static void playSound(SettingSound setting) {
+        playSound(setting.sound().value(), setting.volume().valueFloat(), setting.pitch().valueFloat());
     }
 
     public static void sendMessage(String message) {

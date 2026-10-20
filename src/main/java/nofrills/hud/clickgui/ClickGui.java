@@ -710,15 +710,20 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("Beacon Tracer", BeaconTracer.instance, "Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", BeaconTracer.color, "The color of the tracer.")
                         ))),
-                        new Module("Cocoon Alert", CocoonAlert.instance, "Alerts you when your slayer boss is cocooned by your Primordial belt."),
-                        new Module("Spawn Alert", SpawnAlert.instance, "Alerts you when your slayer boss is spawned."),
+                        new Module("Spawn Alert", SpawnAlert.instance, "Alerts you when your slayer boss is spawned.", new Settings(
+                                new Settings.TitleInput("Title", SpawnAlert.title, "The title to display once your boss is spawned."),
+                                new Settings.SoundInput("Sound", SpawnAlert.sound, "The sound to play once your boss is spawned.")
+                        )),
                         new Module("Miniboss Highlight", SlayerMinibossHighlight.instance, "Highlights slayer minibosses.", new Settings(List.of(
                                 new Settings.Toggle("Hide Nametag", SlayerMinibossHighlight.hide, "Hides the apparent \"SLAYER MINIBOSS\" nametag that appears above the miniboss."),
                                 new Settings.EnumToggle<>("Highlight Style", SlayerMinibossHighlight.style, "The style of the highlight."),
                                 new Settings.ColorPicker("Fill Color", SlayerMinibossHighlight.fillColor, "The color of the filled box."),
                                 new Settings.ColorPicker("Outline Color", SlayerMinibossHighlight.outlineColor, "The color of the outline box.")
                         ))),
-                        new Module("Miniboss Alert", SlayerMinibossAlert.instance, "Alerts you when a slayer miniboss is spawned.")
+                        new Module("Miniboss Alert", SlayerMinibossAlert.instance, "Alerts you when a slayer miniboss is spawned.", new Settings(
+                                new Settings.TitleInput("Title", SlayerMinibossAlert.title, "The title to display once a miniboss is spawned."),
+                                new Settings.SoundInput("Sound", SlayerMinibossAlert.sound, "The sound to play once a miniboss is spawned.")
+                        ))
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new Settings(List.of(

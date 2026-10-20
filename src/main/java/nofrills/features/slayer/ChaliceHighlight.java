@@ -42,7 +42,7 @@ public class ChaliceHighlight {
                 BlockPos blockPos = Utils.findGround(ent.blockPosition(), 4);
                 Vec3 pos = ent.position();
                 Vec3 posAdjust = new Vec3(pos.x, blockPos.above(1).getY() + 0.5, pos.z);
-                event.drawFilledWithBeam(AABB.ofSize(posAdjust, 1, 1.25, 1), 256, true, color.value());
+                event.drawFilled(AABB.ofSize(posAdjust, 1, 1.25, 1), true, color.value());
             }
         }
     }

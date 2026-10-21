@@ -133,7 +133,7 @@ public final class CommandKeybinds {
                     List<String> list = bind.get("classFilterList").getAsJsonArray().asList().stream()
                             .map(e -> Utils.toLower(e.getAsString().trim()))
                             .toList();
-                    if (!className.isEmpty() && !list.contains(className)) {
+                    if (!list.isEmpty() && !className.isEmpty() && !list.contains(className)) {
                         continue;
                     }
                 }
@@ -142,7 +142,7 @@ public final class CommandKeybinds {
                     List<String> list = bind.get("islandFilterList").getAsJsonArray().asList().stream()
                             .map(e -> Utils.toLower(e.getAsString().trim()))
                             .toList();
-                    if (!area.isEmpty() && !list.contains(area)) {
+                    if (!list.isEmpty() && !area.isEmpty() && !list.contains(area)) {
                         continue;
                     }
                 }

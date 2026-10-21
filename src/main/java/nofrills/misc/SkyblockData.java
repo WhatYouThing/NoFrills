@@ -202,7 +202,7 @@ public class SkyblockData {
         if (showPing && event.packet instanceof ClientboundPongResponsePacket(long time)) {
             long ping = Util.getMillis() - time;
             Utils.infoRaw(Component.literal("Ping: ").withStyle(ChatFormatting.GREEN)
-                    .append(Component.literal(ping + "ms").withColor(Utils.getPercentageColor(ping / 300.0, true).getHex()))
+                    .append(Component.literal(ping + "ms").withColor(Utils.getPercentageColor(ping / 300.0).getHex()))
             );
             showPing = false;
         }

@@ -18,7 +18,6 @@ import nofrills.config.Feature;
 import nofrills.config.SettingJson;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.EventListener;
-import nofrills.hud.HudManager;
 import nofrills.hud.InnerSettingsScreen;
 import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatTextbox;
@@ -104,7 +103,7 @@ public final class ChatRules {
             List<String> list = rule.get("classFilterList").getAsJsonArray().asList().stream()
                     .map(e -> Utils.toLower(e.getAsString().trim()))
                     .toList();
-            if (!className.isEmpty() && !list.contains(className)) {
+            if (!list.isEmpty() && !className.isEmpty() && !list.contains(className)) {
                 return false;
             }
         }
@@ -113,7 +112,7 @@ public final class ChatRules {
             List<String> list = rule.get("islandFilterList").getAsJsonArray().asList().stream()
                     .map(e -> Utils.toLower(e.getAsString().trim()))
                     .toList();
-            if (!area.isEmpty() && !list.contains(area)) {
+            if (!list.isEmpty() && !area.isEmpty() && !list.contains(area)) {
                 return false;
             }
         }
@@ -145,17 +144,11 @@ public final class ChatRules {
                 if (matchRule(obj, event.messagePlain)) {
                     String title = obj.get("title").getAsString();
                     if (!title.isEmpty()) {
-                        if (obj.has("titleVanilla") && obj.get("titleVanilla").getAsBoolean()) {
-                            Utils.showTitle(
-                                    Utils.ofUserFormatted(title),
-                                    Component.empty(),
-                                    obj.get("titleFadeIn").getAsInt(),
-                                    obj.get("titleStay").getAsInt(),
-                                    obj.get("titleFadeOut").getAsInt()
-                            );
-                        } else {
-                            HudManager.setCustomTitle(Utils.ofUserFormatted(title), obj.get("titleStay").getAsInt());
-                        }
+                        Utils.showTitle(title, "",
+                                obj.get("titleFadeIn").getAsInt(),
+                                obj.get("titleStay").getAsInt(),
+                                obj.get("titleFadeOut").getAsInt(),
+                                obj.get("titleVanilla").getAsBoolean());
                     }
                     String sound = obj.get("sound").getAsString();
                     if (!sound.isEmpty()) {

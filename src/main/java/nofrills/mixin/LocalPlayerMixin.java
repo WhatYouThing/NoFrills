@@ -18,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import static nofrills.Main.mc;
+
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     public LocalPlayerMixin(ClientLevel world, GameProfile profile) {
@@ -41,7 +43,7 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
 
     @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Input;sprint()Z"))
     private boolean onIsSprinting(boolean original) {
-        if (AutoSprint.instance.isActive()) {
+        if (AutoSprint.instance.isActive() && mc.getConnection() != null && mc.getConnection().hasClientLoaded()) {
             if (AutoSprint.waterCheck.value() && this.isInWater()) {
                 return original;
             }

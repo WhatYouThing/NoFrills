@@ -118,7 +118,7 @@ public class Utils {
     }
 
     public static void showTitle(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks, boolean vanilla) {
-        showTitle(Component.literal(title), Component.literal(subtitle), fadeInTicks, stayTicks, fadeOutTicks, vanilla);
+        showTitle(ofUserFormatted(title), ofUserFormatted(subtitle), fadeInTicks, stayTicks, fadeOutTicks, vanilla);
     }
 
     public static void showTitle(MutableComponent title, MutableComponent subtitle, int fadeInTicks, int stayTicks, int fadeOutTicks) {

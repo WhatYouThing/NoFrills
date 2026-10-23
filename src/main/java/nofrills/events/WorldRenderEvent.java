@@ -6,10 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
-import net.minecraft.gizmos.CuboidGizmo;
-import net.minecraft.gizmos.GizmoStyle;
-import net.minecraft.gizmos.LineGizmo;
-import net.minecraft.gizmos.SimpleGizmoCollector;
+import net.minecraft.gizmos.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -36,21 +33,15 @@ public class WorldRenderEvent {
     }
 
     public void drawFilled(AABB box, boolean throughWalls, RenderColor color) {
-        CuboidGizmo gizmo = new CuboidGizmo(box, GizmoStyle.fill(color.getArgb()), false);
-        if (throughWalls) {
-            gizmos.add(gizmo).setAlwaysOnTop();
-        } else {
-            gizmos.add(gizmo);
-        }
+        this.pushGizmo(new CuboidGizmo(box, GizmoStyle.fill(color.getArgb()), false), throughWalls);
     }
 
     public void drawOutline(AABB box, boolean throughWalls, RenderColor color) {
-        CuboidGizmo gizmo = new CuboidGizmo(box, GizmoStyle.stroke(color.getArgb()), false);
-        if (throughWalls) {
-            gizmos.add(gizmo).setAlwaysOnTop();
-        } else {
-            gizmos.add(gizmo);
-        }
+        this.pushGizmo(new CuboidGizmo(box, GizmoStyle.stroke(color.getArgb()), false), throughWalls);
+    }
+
+    public void drawCircle(Vec3 point, double radius, boolean throughWalls, RenderColor color) {
+        this.pushGizmo(new CircleGizmo(point, (float) radius, GizmoStyle.stroke(color.getArgb())), throughWalls);
     }
 
     public void drawStyled(AABB box, RenderStyle style, boolean throughWalls, RenderColor outlineColor, RenderColor filledColor) {
@@ -96,12 +87,7 @@ public class WorldRenderEvent {
     }
 
     public void drawLine(Vec3 from, Vec3 to, double width, boolean throughWalls, RenderColor color) {
-        LineGizmo gizmo = new LineGizmo(from, to, color.argb, (float) width);
-        if (throughWalls) {
-            gizmos.add(gizmo).setAlwaysOnTop();
-        } else {
-            gizmos.add(gizmo);
-        }
+        this.pushGizmo(new LineGizmo(from, to, color.argb, (float) width), throughWalls);
     }
 
     public void drawTracer(Vec3 pos, float width, RenderColor color) {
@@ -115,5 +101,13 @@ public class WorldRenderEvent {
 
     public float delta() {
         return this.tickCounter.getGameTimeDeltaPartialTick(true);
+    }
+
+    public void pushGizmo(Gizmo gizmo, boolean throughWalls) {
+        if (throughWalls) {
+            this.gizmos.add(gizmo).setAlwaysOnTop();
+        } else {
+            this.gizmos.add(gizmo);
+        }
     }
 }

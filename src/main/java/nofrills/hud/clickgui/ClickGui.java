@@ -500,11 +500,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Outline Color", MinibossHighlight.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", MinibossHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
-                        new Module("Key Highlight", KeyHighlight.instance, "Highlights nearby Wither and Blood keys.", new Settings(List.of(
-                                new Settings.Toggle("Highlight", KeyHighlight.highlight, "Renders a highlight + beam on top of Wither Keys."),
-                                new Settings.Toggle("Tracer", KeyHighlight.tracer, "Renders a tracer towards the Wither Key."),
-                                new Settings.ColorPicker("Highlight Color", KeyHighlight.color, "The color of the highlight."),
-                                new Settings.ColorPicker("Tracer Color", KeyHighlight.tracerColor, "The color of the tracer.")
+                        new Module("Key Alert", KeyAlert.instance, "Alerts you when a Wither/Blood key is dropped/obtained.", new Settings(List.of(
+                                new Settings.TitleInput("Dropped Title", KeyAlert.droppedTitle, "The title to display once a key is dropped. Replaces {key} with the colored name of the key."),
+                                new Settings.SoundInput("Dropped Sound", KeyAlert.droppedSound, "The sound to play once a key is dropped."),
+                                new Settings.TitleInput("Obtained Title", KeyAlert.obtainedTitle, "The title to display once a key is obtained. Replaces {key} with the colored name of the key."),
+                                new Settings.SoundInput("Obtained Sound", KeyAlert.obtainedSound, "The sound to play once a key is obtained."),
+                                new Settings.Toggle("Pickup Radius", KeyAlert.radius, "Renders a pickup radius circle around dungeon door keys."),
+                                new Settings.ColorPicker("Radius Color", KeyAlert.radiusColor, "The color of the pickup radius.")
                         ))),
                         new Module("Spirit Bow Highlight", SpiritBowHighlight.instance, "Highlights the Spirit Bow in the F4/M4 boss fight.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")

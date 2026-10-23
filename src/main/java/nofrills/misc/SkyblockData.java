@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.ping.ClientboundPongResponsePacket;
 import net.minecraft.util.Util;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.scores.*;
 import nofrills.events.*;
 
@@ -201,7 +202,7 @@ public class SkyblockData {
         if (showPing && event.packet instanceof ClientboundPongResponsePacket(long time)) {
             long ping = Util.getMillis() - time;
             Utils.infoRaw(Component.literal("Ping: ").withStyle(ChatFormatting.GREEN)
-                    .append(Component.literal(ping + "ms").withColor(Utils.getPercentageColor(ping / 300.0, true).getHex()))
+                    .append(Component.literal(ping + "ms").withColor(Utils.getPercentageColor(ping / 300.0).getHex()))
             );
             showPing = false;
         }
@@ -209,7 +210,8 @@ public class SkyblockData {
 
     @EventHandler
     private static void onSlot(SlotUpdateEvent event) {
-        if (event.title.equals("Calendar and Events") && Utils.toPlain(event.stack.getHoverName()).equals("Mayor Jerry")) {
+        if ((event.title.equals("Calendar and Events") || event.title.equals("Mayor Jerry")) && event.stack.is(Items.PLAYER_HEAD)) {
+            if (!Utils.toPlain(event.stack.getHoverName()).equals("Mayor Jerry")) return;
             List<Component> lore = Utils.getLoreText(event.stack);
             Optional<Component> perkStart = lore.stream()
                     .filter(c -> Utils.toPlain(c).trim().equals("Perkpocalypse Perks:"))

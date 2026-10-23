@@ -44,7 +44,7 @@ public class BlockList {
     private static final DataFile data = Config.getDataFile("BlockList.json");
     private static final Cache<String, FetchResult> resultCache = CacheBuilder
             .newBuilder()
-            .expireAfterAccess(Duration.ofMinutes(30L))
+            .expireAfterWrite(Duration.ofMinutes(30L))
             .maximumSize(1000L)
             .build();
     private static final ConcurrentHashMap<String, AtomicInteger> kickQueue = new ConcurrentHashMap<>();

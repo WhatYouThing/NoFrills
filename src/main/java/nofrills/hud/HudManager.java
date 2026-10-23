@@ -19,6 +19,7 @@ import static nofrills.Main.mc;
 public class HudManager {
     public static final DungeonMap dungeonMap = new DungeonMap();
     public static final PickaxeAbilityTimer pickAbilityTimer = new PickaxeAbilityTimer();
+    public static final PetDisplay petDisplay = new PetDisplay();
     public static final List<HudElement> elements = List.of(
             new FPS(),
             new TPS(),
@@ -52,7 +53,8 @@ public class HudManager {
             new SkillTrackerDisplay(),
             new KickCooldownTimer(),
             dungeonMap,
-            pickAbilityTimer
+            pickAbilityTimer,
+            petDisplay
     );
 
     private static CustomTitle currentTitle = new CustomTitle(Component.empty(), 0);

@@ -22,7 +22,7 @@ public final class LagMeter extends SimpleTextElement implements ListeningHudEle
                 new Settings.SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
         ));
         this.setDesc("Displays the time since the last received server tick.\nHelps indicate if a lag spike is occurring.");
-        this.setCategory(Category.Info);
+        this.setCategory(Category.Misc);
     }
 
     @Override

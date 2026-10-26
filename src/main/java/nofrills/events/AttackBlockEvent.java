@@ -3,7 +3,7 @@ package nofrills.events;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class AttackBlockEvent {
+public class AttackBlockEvent extends Cancellable {
     public BlockHitResult blockHitResult;
     public BlockPos blockPos;
 

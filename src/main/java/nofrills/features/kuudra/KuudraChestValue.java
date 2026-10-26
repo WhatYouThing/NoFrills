@@ -24,7 +24,7 @@ import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
 @EventListener
 public class KuudraChestValue {
-    public static final Feature instance = new Feature("kuudraChestValue", Feature.Flags.UsePricingAPI);
+    public static final Feature instance = new Feature("kuudraChestValue", APIFlags.UsePricingAPI);
 
     public static final SettingInt petBonus = new SettingInt(0, "petBonus", instance);
     public static final SettingEnum<Factions> faction = new SettingEnum<>(Factions.Unknown, Factions.class, "faction", instance);

@@ -54,7 +54,7 @@ public class MelodyMessage {
                 } // go from last slot to first, count every terracotta item, find the terminal progress from the first lime terracotta
                 if (item.equals(Items.DYED_TERRACOTTA.lime()) && count < lastCount) {
                     String percent = switch (count) {
-                        case 1 -> "66%";
+                        case 1 -> "67%";
                         case 2 -> "33%";
                         default -> "";
                     };

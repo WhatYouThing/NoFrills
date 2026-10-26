@@ -15,7 +15,7 @@ import static nofrills.Main.mc;
 
 @EventListener
 public class ScoreCalculator {
-    public static final Feature instance = new Feature("scoreCalculator", Feature.Flags.UseElectionAPI);
+    public static final Feature instance = new Feature("scoreCalculator", APIFlags.UseElectionAPI);
 
     public static final SettingEnum<PaulState> paulState = new SettingEnum<>(PaulState.Auto, PaulState.class, "paulState", instance);
     public static final SettingBool sendMsg270 = new SettingBool(false, "sendMsg270", instance);

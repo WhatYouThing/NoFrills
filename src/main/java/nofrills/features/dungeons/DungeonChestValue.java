@@ -5,6 +5,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import nofrills.config.APIFlags;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
 import nofrills.events.EventListener;
@@ -23,7 +24,7 @@ import static nofrills.misc.NoFrillsAPI.*;
 
 @EventListener
 public class DungeonChestValue {
-    public static final Feature instance = new Feature("dungeonChestValue", Feature.Flags.UsePricingAPI);
+    public static final Feature instance = new Feature("dungeonChestValue", APIFlags.UsePricingAPI);
 
     public static final SettingColor background = new SettingColor(RenderColor.fromHex(0x202020, 0.8f), "background", instance);
 

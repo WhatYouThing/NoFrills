@@ -30,7 +30,7 @@ import static nofrills.misc.NoFrillsAPI.*;
 
 @EventListener
 public class PriceTooltips {
-    public static final Feature instance = new Feature("priceTooltips", Feature.Flags.UsePricingAPI);
+    public static final Feature instance = new Feature("priceTooltips", APIFlags.UsePricingAPI);
 
     public static final SettingBool auction = new SettingBool(false, "auction", instance.key());
     public static final SettingBool bazaar = new SettingBool(false, "bazaar", instance.key());

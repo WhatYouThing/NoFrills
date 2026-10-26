@@ -5,7 +5,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentHolder;
 import net.minecraft.core.component.DataComponentMap;
@@ -21,8 +20,6 @@ import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.component.ResolvableProfile;
 import nofrills.config.*;
 import nofrills.events.EventListener;
-import nofrills.events.ServerJoinEvent;
-import nofrills.misc.NoFrillsAPI;
 import nofrills.misc.Utils;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -30,12 +27,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collector;
 
-import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
 @EventListener
 public class LegacyTextures {
-    public static final Feature instance = new Feature("legacyTextures");
+    public static final Feature instance = new Feature("legacyTextures", APIFlags.UseItemTexturesAPI);
 
     public static final SettingBool revertItems = new SettingBool(true, "revertItems", instance);
     public static final SettingBool unlockPackPos = new SettingBool(false, "unlockPackPos", instance);
@@ -55,7 +51,6 @@ public class LegacyTextures {
             .maximumSize(10000L)
             .build();
     private static final DataFile textures = Config.getDataFile("LegacyTexturesCache.json");
-    private static boolean texturesLoaded = false;
 
     public static Optional<Identifier> replaceIfNeeded(ItemStack stack) {
         try {
@@ -188,6 +183,10 @@ public class LegacyTextures {
         profileCache.invalidateAll();
     }
 
+    public static DataFile getTextures() {
+        return textures;
+    }
+
     private static int getStarIndex(String star) {
         return switch (star.trim()) {
             case "➊" -> 1;
@@ -197,22 +196,5 @@ public class LegacyTextures {
             case "➎" -> 5;
             default -> 0;
         };
-    }
-
-    @EventHandler
-    private static void onJoin(ServerJoinEvent event) {
-        if (instance.isActive()) {
-            if (!texturesLoaded) {
-                Thread.startVirtualThread(() -> {
-                    try {
-                        textures.set(NoFrillsAPI.makeRequestObject("v1/items/get-item-textures/"));
-                    } catch (Exception exception) {
-                        LOGGER.error("Failed to refresh item textures from NoFrills API.", exception);
-                        texturesLoaded = false;
-                    }
-                });
-            }
-            texturesLoaded = true;
-        }
     }
 }

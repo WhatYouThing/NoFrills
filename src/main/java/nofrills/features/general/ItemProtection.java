@@ -35,7 +35,7 @@ import static nofrills.misc.NoFrillsAPI.*;
 
 @EventListener
 public class ItemProtection {
-    public static final Feature instance = new Feature("itemProtection", Feature.Flags.UsePricingAPI);
+    public static final Feature instance = new Feature("itemProtection", APIFlags.UsePricingAPI);
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingKeybind uuidKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "uuidKey", instance);

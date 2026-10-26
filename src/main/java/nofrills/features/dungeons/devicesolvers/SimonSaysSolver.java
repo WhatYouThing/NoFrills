@@ -81,7 +81,7 @@ public class SimonSaysSolver {
                     list.remove(event.pos.offset(1, 0, 0));
                     int progress = currentProgress.get();
                     if (progress > 0) {
-                        if (progressSend.value()) {
+                        if (progressSend.value() && progress < 4) {
                             String message = lastProgress.get() >= progress ? resetMsg.value() : progressMsg.value();
                             Utils.sendMessage(message.replaceAll("\\{percent}", (int) (progress / 4.0 * 100) + "%"));
                         }

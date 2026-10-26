@@ -92,8 +92,10 @@ public abstract class MinecraftMixin {
     }
 
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;startDestroyBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/core/Direction;)Z"), cancellable = true)
-    private void onAttackBlock(CallbackInfoReturnable<Boolean> cir, @Local BlockHitResult blockHitResult, @Local BlockPos blockPos) {
-        eventBus.post(new AttackBlockEvent(blockHitResult, blockPos));
+    private void onAttackBlock(CallbackInfoReturnable<Boolean> cir, @Local(name = "blockHit") BlockHitResult blockHit, @Local(name = "pos") BlockPos pos) {
+        if (eventBus.post(new AttackBlockEvent(blockHit, pos)).isCancelled()) {
+            cir.cancel();
+        }
     }
 
     @Inject(method = "destroy", at = @At("HEAD"))

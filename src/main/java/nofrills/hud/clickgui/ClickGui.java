@@ -12,6 +12,10 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
 import nofrills.features.dungeons.*;
+import nofrills.features.dungeons.devicesolvers.ArrowAlignSolver;
+import nofrills.features.dungeons.devicesolvers.DeviceSolvers;
+import nofrills.features.dungeons.devicesolvers.SharpshooterSolver;
+import nofrills.features.dungeons.devicesolvers.SimonSaysSolver;
 import nofrills.features.farming.*;
 import nofrills.features.fishing.RadarSolver;
 import nofrills.features.fishing.RareAnnounce;
@@ -476,19 +480,34 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         )))
                 )),
                 new Category("Dungeons", List.of(
-                        new Module("Device Solvers", DeviceSolvers.instance, "Solvers for various F7/M7 devices.", new Settings(List.of(
-                                new Settings.Separator("Sharpshooter"),
-                                new Settings.Toggle("Solve Sharpshooter", DeviceSolvers.sharpshooter, "Highlights the active and the hit targets while doing the 4th device."),
-                                new Settings.Toggle("Done Alert", DeviceSolvers.Sharpshooter.doneAlert, "Displays a title on screen once the device is completed. Useful for Pre4."),
-                                new Settings.EnumToggle<>("Render Style", DeviceSolvers.Sharpshooter.style, "The style of the target highlights."),
-                                new Settings.ColorPicker("Target Fill Color", DeviceSolvers.Sharpshooter.targetColorFill, "The fill color of the active target block."),
-                                new Settings.ColorPicker("Target Outline Color", DeviceSolvers.Sharpshooter.targetColorOutline, "The outline color of the active target block."),
-                                new Settings.ColorPicker("Hit Fill Color", DeviceSolvers.Sharpshooter.hitColorFill, "The fill color of the hit target blocks."),
-                                new Settings.ColorPicker("Hit Outline Color", DeviceSolvers.Sharpshooter.hitColorOutline, "The outline color of the hit target blocks."),
+                        new Module("Device Solvers", DeviceSolvers.instance, "Solvers for the F7/M7 devices.", new Settings(List.of(
+                                new Settings.Separator("Simon Says"),
+                                new Settings.Toggle("Solve Simon Says", DeviceSolvers.simonSays, "Shows the buttons you must click while doing the 1st device."),
+                                new Settings.Toggle("Block Wrong Clicks", SimonSaysSolver.blockWrong, "Prevents you from being able to click the wrong button."),
+                                new Settings.Toggle("Inverted Block", SimonSaysSolver.blockInvert, "Prevents wrong clicks while sneaking instead of while standing up."),
+                                new Settings.SliderInt("Throttle Ticks", 0, 10, 1, SimonSaysSolver.throttleTicks, "Allows only a single click to go through until the specified amount of server ticks passes.\nHelps prevent the device from resetting if the server is lagging."),
+                                new Settings.Toggle("Send Progress", SimonSaysSolver.progressSend, "Sends messages when you make progress in the device, similarly to Melody Message."),
+                                new Settings.TextInput("Progress Message", SimonSaysSolver.progressMsg, "The message to send when progress is made. Replaces {percent} with the percentage."),
+                                new Settings.TextInput("Reset Message", SimonSaysSolver.resetMsg, "The message to send when the progress is reset. Replaces {percent} with the percentage."),
+                                new Settings.EnumToggle<>("Render Style", SimonSaysSolver.style, "The style of the button highlights."),
+                                new Settings.ColorPicker("First Fill Color", SimonSaysSolver.firstColorFill, "The fill color of the first button to click."),
+                                new Settings.ColorPicker("First Outline Color", SimonSaysSolver.firstColorOutline, "The outline color of the first button to click."),
+                                new Settings.ColorPicker("Second Fill Color", SimonSaysSolver.secondColorFill, "The fill color of the second button to click."),
+                                new Settings.ColorPicker("Second Outline Color", SimonSaysSolver.secondColorOutline, "The outline color of the second button to click."),
+                                new Settings.ColorPicker("Third Fill Color", SimonSaysSolver.thirdColorFill, "The fill color of the third button to click."),
+                                new Settings.ColorPicker("Third Outline Color", SimonSaysSolver.thirdColorOutline, "The outline color of the third button to click."),
                                 new Settings.Separator("Arrow Align"),
                                 new Settings.Toggle("Solve Arrow Align", DeviceSolvers.arrowAlign, "Shows the amount of needed clicks while doing the 3rd device."),
-                                new Settings.Toggle("Block Wrong Clicks", DeviceSolvers.ArrowAlign.blockWrong, "Prevents you from rotating the arrows that already have the correct rotation."),
-                                new Settings.Toggle("Inverted Block", DeviceSolvers.ArrowAlign.blockInvert, "Prevents wrong rotations while sneaking instead of while standing up.")
+                                new Settings.Toggle("Block Wrong Clicks", ArrowAlignSolver.blockWrong, "Prevents you from rotating the arrows that already have the correct rotation."),
+                                new Settings.Toggle("Inverted Block", ArrowAlignSolver.blockInvert, "Prevents wrong rotations while sneaking instead of while standing up."),
+                                new Settings.Separator("Sharpshooter"),
+                                new Settings.Toggle("Solve Sharpshooter", DeviceSolvers.sharpshooter, "Highlights the active and the hit targets while doing the 4th device."),
+                                new Settings.Toggle("Done Alert", SharpshooterSolver.doneAlert, "Displays a title on screen once the device is completed. Useful for Pre4."),
+                                new Settings.EnumToggle<>("Render Style", SharpshooterSolver.style, "The style of the target highlights."),
+                                new Settings.ColorPicker("Target Fill Color", SharpshooterSolver.targetColorFill, "The fill color of the active target block."),
+                                new Settings.ColorPicker("Target Outline Color", SharpshooterSolver.targetColorOutline, "The outline color of the active target block."),
+                                new Settings.ColorPicker("Hit Fill Color", SharpshooterSolver.hitColorFill, "The fill color of the hit target blocks."),
+                                new Settings.ColorPicker("Hit Outline Color", SharpshooterSolver.hitColorOutline, "The outline color of the hit target blocks.")
                         ))),
                         new Module("Starred Mob Highlight", StarredMobHighlight.instance, "High performance starred mob highlights.", new Settings(List.of(
                                 new Settings.EnumToggle<>("Highlight Style", StarredMobHighlight.style, "The style of the starred mob highlight."),

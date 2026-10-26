@@ -6,9 +6,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.SharedConstants;
+import nofrills.config.APIFlags;
 import nofrills.config.Feature;
 import nofrills.events.EventListener;
 import nofrills.events.WorldTickEvent;
+import nofrills.features.tweaks.LegacyTextures;
+import nofrills.features.tweaks.MiddleClickOverride;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
@@ -33,7 +37,7 @@ public class NoFrillsAPI {
     public static HashSet<String> nonPlaceableItems = new HashSet<>();
     public static HashMap<String, MuseumData> museumData = new HashMap<>();
     private static final List<RefreshTask> tasks = List.of(
-            new RefreshTask(1200, Feature.Flags.UsePricingAPI, () -> Thread.startVirtualThread(() -> {
+            new RefreshTask(1200, APIFlags.UsePricingAPI, _ -> Thread.startVirtualThread(() -> {
                 try {
                     JsonObject json = makeRequestObject("v2/economy/get-item-pricing/");
                     HashMap<String, Long> auction = new HashMap<>();
@@ -59,7 +63,7 @@ public class NoFrillsAPI {
                     LOGGER.error("Failed to refresh item pricing from NoFrills API.", exception);
                 }
             })),
-            new RefreshTask(2400, Feature.Flags.UseElectionAPI, () -> Thread.startVirtualThread(() -> {
+            new RefreshTask(2400, APIFlags.UseElectionAPI, task -> Thread.startVirtualThread(() -> {
                 try {
                     JsonObject json = makeRequestObject("v1/election/get-active-perks");
                     HashSet<String> perks = new HashSet<>();
@@ -69,9 +73,10 @@ public class NoFrillsAPI {
                     electionPerks = perks;
                 } catch (Exception exception) {
                     LOGGER.error("Failed to refresh election perks from NoFrills API.", exception);
+                    task.currentTicks = 1200;
                 }
             })),
-            new RefreshTask(12000, Feature.Flags.UseNonPlaceableAPI, () -> Thread.startVirtualThread(() -> {
+            new RefreshTask(12000, APIFlags.UseNonPlaceableAPI, task -> Thread.startVirtualThread(() -> {
                 try {
                     JsonArray json = makeRequestArray("v1/items/get-non-placeable/");
                     HashSet<String> items = new HashSet<>();
@@ -81,9 +86,10 @@ public class NoFrillsAPI {
                     nonPlaceableItems = items;
                 } catch (Exception exception) {
                     LOGGER.error("Failed to refresh non-placeable items from NoFrills API.", exception);
+                    task.currentTicks = 1200;
                 }
             })),
-            new RefreshTask(12000, Feature.Flags.UseMuseumAPI, () -> Thread.startVirtualThread(() -> {
+            new RefreshTask(12000, APIFlags.UseMuseumAPI, task -> Thread.startVirtualThread(() -> {
                 try {
                     JsonObject json = makeRequestObject("v1/items/get-museum-data/");
                     HashMap<String, MuseumData> data = new HashMap<>();
@@ -96,6 +102,23 @@ public class NoFrillsAPI {
                     museumData = data;
                 } catch (Exception exception) {
                     LOGGER.error("Failed to refresh museum data from NoFrills API.", exception);
+                    task.currentTicks = 1200;
+                }
+            })),
+            new RefreshTask(72000, APIFlags.UseItemTexturesAPI, task -> Thread.startVirtualThread(() -> {
+                try {
+                    LegacyTextures.getTextures().set(NoFrillsAPI.makeRequestObject("v1/items/get-item-textures/"));
+                } catch (Exception exception) {
+                    LOGGER.error("Failed to refresh item textures from NoFrills API.", exception);
+                    task.currentTicks = 1200;
+                }
+            })),
+            new RefreshTask(72000, APIFlags.UseMiddleClickListsAPI, task -> Thread.startVirtualThread(() -> {
+                try {
+                    MiddleClickOverride.getLists().set(NoFrillsAPI.makeRequestObject("v1/data/middle-click-list"));
+                } catch (Exception exception) {
+                    LOGGER.error("Failed to refresh Middle Click Override lists from NoFrills API.", exception);
+                    task.currentTicks = 1200;
                 }
             }))
     );
@@ -124,7 +147,7 @@ public class NoFrillsAPI {
         return JsonParser.parseString(response).getAsJsonArray();
     }
 
-    public static boolean usingFlag(Feature.Flags flag) {
+    public static boolean usingFlag(APIFlags flag) {
         for (Feature feature : Feature.withFlags) {
             if (feature.hasFlag(flag) && feature.isActive()) {
                 return true;
@@ -143,12 +166,12 @@ public class NoFrillsAPI {
     }
 
     private static class RefreshTask {
-        public final Runnable task;
-        public final Feature.Flags requiredFlag;
+        public final Consumer<RefreshTask> task;
+        public final APIFlags requiredFlag;
         public final int ticks;
         public int currentTicks;
 
-        public RefreshTask(int ticks, Feature.Flags requiredFlag, Runnable task) {
+        public RefreshTask(int ticks, APIFlags requiredFlag, Consumer<RefreshTask> task) {
             this.task = task;
             this.requiredFlag = requiredFlag;
             this.ticks = ticks;
@@ -159,15 +182,14 @@ public class NoFrillsAPI {
             if (this.currentTicks > 0) {
                 this.currentTicks--;
             }
-            if (this.currentTicks == 0 && mc.isWindowActive() && NoFrillsAPI.usingFlag(this.requiredFlag)) {
-                this.task.run();
+            if (this.currentTicks == 0 && mc.isWindowActive() && usingFlag(this.requiredFlag)) {
+                this.task.accept(this);
                 this.currentTicks = this.ticks;
             }
         }
     }
 
     public record BazaarPrice(double buy, double sell) {
-
         public static final BazaarPrice ZERO = new BazaarPrice(0.0, 0.0);
     }
 

@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.DyedItemColor;
+import nofrills.config.APIFlags;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.events.EventListener;
@@ -18,7 +19,7 @@ import static nofrills.misc.NoFrillsAPI.museumData;
 
 @EventListener
 public class InfoTooltips {
-    public static final Feature instance = new Feature("infoTooltips", Feature.Flags.UseMuseumAPI);
+    public static final Feature instance = new Feature("infoTooltips", APIFlags.UseMuseumAPI);
 
     public static final SettingBool dungeonQuality = new SettingBool(false, "dungeonQuality", instance);
     public static final SettingBool createdDate = new SettingBool(false, "createdDate", instance);

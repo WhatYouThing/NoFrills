@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import nofrills.config.APIFlags;
 import nofrills.config.Feature;
 import nofrills.misc.Utils;
 
@@ -12,7 +13,7 @@ import java.util.HashSet;
 import static nofrills.misc.NoFrillsAPI.nonPlaceableItems;
 
 public class NoGhostPlace {
-    public static final Feature instance = new Feature("noGhostPlace", Feature.Flags.UseNonPlaceableAPI);
+    public static final Feature instance = new Feature("noGhostPlace", APIFlags.UseNonPlaceableAPI);
 
     private static final HashSet<String> abilityWhitelist = Sets.newHashSet(
             "ABINGOPHONE",

@@ -10,7 +10,7 @@ public class Feature {
     public String key;
     private int hash = 0;
     private boolean value = false;
-    private List<Flags> flags;
+    private List<APIFlags> flags;
 
     public Feature(String key) {
         this.key = key;
@@ -18,7 +18,7 @@ public class Feature {
         this.flags = List.of();
     }
 
-    public Feature(String key, Flags... featureFlags) {
+    public Feature(String key, APIFlags... featureFlags) {
         this(key);
         this.flags = List.of(featureFlags);
         withFlags.add(this);
@@ -54,18 +54,11 @@ public class Feature {
         Config.computeHash();
     }
 
-    public List<Flags> getFlags() {
+    public List<APIFlags> getFlags() {
         return this.flags;
     }
 
-    public boolean hasFlag(Flags flag) {
+    public boolean hasFlag(APIFlags flag) {
         return this.getFlags().contains(flag);
-    }
-
-    public enum Flags {
-        UsePricingAPI,
-        UseElectionAPI,
-        UseNonPlaceableAPI,
-        UseMuseumAPI
     }
 }

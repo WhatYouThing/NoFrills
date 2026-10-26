@@ -1,82 +1,49 @@
 package nofrills.features.tweaks;
 
+import com.google.gson.JsonElement;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
+import nofrills.config.*;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Set;
-
+import static nofrills.Main.LOGGER;
 import static nofrills.Main.mc;
 
 public class MiddleClickOverride {
-    public static final Feature instance = new Feature("middleClickOverride");
+    public static final Feature instance = new Feature("middleClickOverride", APIFlags.UseMiddleClickListsAPI);
 
     public static final SettingBool debug = new SettingBool(false, "debug", instance);
 
-    private static final Set<String> matchBlacklist = Set.of(
-            "Attribute Fusion",
-            "Beacon",
-            "Chest",
-            "Large Chest",
-            "Anvil",
-            "Storage",
-            "Drill Anvil",
-            "Runic Pedestal",
-            "Rune Removal",
-            "Reforge Anvil",
-            "Reforge Item",
-            "Offer Pets",
-            "Exp Sharing",
-            "Convert to Dungeon Item",
-            "Upgrade Item",
-            "Salvage Items",
-            "Fishing Rod Parts",
-            "Stats Tuning",
-            "Pet Sitter",
-            "Transfer to Profile",
-            "Kuudra Armor Type Transfer",
-            "Composter",
-            "Midas Anvil",
-            "Hunting Box"
-    );
-    private static final Set<String> matchWhitelist = Set.of(
-            "Stats & Equipment",
-            "Accessory Bag Thaumaturgy",
-            "Pets",
-            "Community Shop"
-    );
-    private static final Set<String> containBlacklist = Set.of(
-            " Minion ",
-            "Abiphone",
-            Utils.format("A{}iphone", Utils.Symbols.bingo),
-            "The Hex",
-            "Enchant Item",
-            "Auction",
-            "Cosmetic",
-            "Trap",
-            "Gemstones",
-            "Heart of the ",
-            "Widgets"
-    );
-    private static final Set<String> containWhitelist = Set.of(
-            "Bits Shop"
-    );
+    private static final DataFile lists = Config.getDataFile("MiddleClickOverrideCache.json");
 
     private static boolean isLeftClick(int button, ContainerInput actionType) {
         return button == GLFW.GLFW_MOUSE_BUTTON_LEFT && actionType.equals(ContainerInput.PICKUP);
     }
 
+    private static boolean isOnList(String title, String list) {
+        if (lists.get().has(list)) {
+            for (JsonElement element : lists.get().get(list).getAsJsonArray()) {
+                try {
+                    if (Utils.pattern(element.getAsString()).matcher(title).matches()) {
+                        return true;
+                    }
+                } catch (Exception e) {
+                    LOGGER.warn("Failed to compile Middle Click Override pattern: {}, {}", element.getAsString(), list, e);
+                }
+            }
+        }
+        return false;
+    }
+
     private static boolean isBlacklisted(String title) {
-        return matchBlacklist.stream().anyMatch(s -> Utils.isPaginatedMenu(title, s)) || containBlacklist.stream().anyMatch(title::contains);
+        return isOnList(title, "blacklist");
     }
 
     private static boolean isWhitelisted(String title) {
-        return matchWhitelist.stream().anyMatch(s -> Utils.isPaginatedMenu(title, s)) || containWhitelist.stream().anyMatch(title::contains);
+        return isOnList(title, "whitelist");
     }
 
     private static boolean isTransaction(ItemStack stack) {
@@ -87,10 +54,7 @@ public class MiddleClickOverride {
         return screen.getMenu().slots.stream()
                 .map(Slot::getItem)
                 .filter(stack -> !stack.isEmpty())
-                .anyMatch(stack -> {
-                    String name = stack.getHoverName().getString();
-                    return name.equals("Rename Loadout");
-                });
+                .anyMatch(stack -> stack.getHoverName().getString().equals("Rename Loadout"));
     }
 
     public static boolean shouldOverride(Slot slot, int button, ContainerInput actionType) {
@@ -108,5 +72,9 @@ public class MiddleClickOverride {
             }
         }
         return false;
+    }
+
+    public static DataFile getLists() {
+        return lists;
     }
 }

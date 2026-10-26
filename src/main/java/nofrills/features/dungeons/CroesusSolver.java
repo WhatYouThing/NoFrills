@@ -7,10 +7,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import nofrills.config.Feature;
-import nofrills.config.SettingBool;
-import nofrills.config.SettingColor;
-import nofrills.config.SettingDouble;
+import nofrills.config.*;
 import nofrills.events.EventListener;
 import nofrills.events.ScreenOpenEvent;
 import nofrills.events.SlotUpdateEvent;
@@ -26,7 +23,7 @@ import static nofrills.misc.NoFrillsAPI.bazaarPricing;
 
 @EventListener
 public class CroesusSolver {
-    public static final Feature instance = new Feature("croesusSolver", Feature.Flags.UsePricingAPI);
+    public static final Feature instance = new Feature("croesusSolver", APIFlags.UsePricingAPI);
 
     public static final SettingColor profitColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.GREEN), "profitColor", instance);
     public static final SettingColor profitSecondaryColor = new SettingColor(RenderColor.fromFormat(ChatFormatting.YELLOW), "profitSecondaryColor", instance);

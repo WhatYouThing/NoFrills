@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static nofrills.Main.eventBus;
-import static nofrills.Main.mc;
 
 @Mixin(Gui.class)
 public abstract class GuiMixin {
@@ -63,17 +62,15 @@ public abstract class GuiMixin {
     @Shadow
     public abstract Font getFont();
 
-    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractCameraOverlays(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
     private void onRender(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (!mc.options.hideGui) {
-            eventBus.post(new HudRenderEvent(graphics, this.getFont(), deltaTracker));
-        }
+        eventBus.post(new HudRenderEvent(graphics, this.getFont(), deltaTracker)); // target handles hidden gui check
     }
 
     @Inject(method = "extractItemHotbar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractSlot(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IILnet/minecraft/client/DeltaTracker;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;I)V", ordinal = 0, shift = At.Shift.AFTER))
-    private void onRenderItemHotbar(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci, @Local(name = "i") int slot_idx, @Local(name = "x") int x, @Local(name = "y") int y, @Local(name = "player") Player player) {
+    private void onRenderItemHotbar(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci, @Local(name = "i") int slot_idx, @Local(name = "x") int x, @Local(name = "y") int y, @Local(name = "player") Player player) {
         if (ItemProtection.instance.isActive()) {
-            ItemProtection.drawOverlayIcon(context, x, y, ItemProtection.getProtectType(player.getInventory().getNonEquipmentItems().get(slot_idx)));
+            ItemProtection.drawOverlayIcon(graphics, x, y, ItemProtection.getProtectType(player.getInventory().getNonEquipmentItems().get(slot_idx)));
         }
     }
 

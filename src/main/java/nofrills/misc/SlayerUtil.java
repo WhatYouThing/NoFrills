@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static nofrills.Main.mc;
@@ -39,12 +40,18 @@ public class SlayerUtil {
     public static final List<SlayerBoss> bossList = List.of(REVENANT, TARANTULA, SVEN, VOIDGLOOM, VAMPIRE, BLAZE);
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
+    private static final Pattern bossSpawnerRegex = Pattern.compile("(?:(?<name>.*)'s |)SLAYER BOSS");
     private static final MappedEntityCache<CurrentBoss> bossCache = new MappedEntityCache<>();
     private static boolean bossAlive = false;
     private static SlayerBoss currentBoss = null;
 
     public static boolean isSpawner(String name) {
-        return name.equals("SLAYER BOSS");
+        Matcher matcher = bossSpawnerRegex.matcher(name);
+        if (matcher.matches()) {
+            String player = matcher.group("name");
+            return player == null || player.equals(mc.getUser().getName());
+        }
+        return false;
     }
 
     public static boolean isTimer(String name) {
@@ -111,7 +118,7 @@ public class SlayerUtil {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTick(WorldTickEvent event) {
-        if (currentBoss != null) {
+        if (currentBoss != null && bossAlive) {
             bossCache.get().forEach(b -> {
                 for (Entity entity : Utils.getOtherEntities(b.getKey(), 1.0, 3.0, 1.0, e -> e.isAlive() && Utils.isMob(e))) {
                     if (entity instanceof ArmorStand stand) {

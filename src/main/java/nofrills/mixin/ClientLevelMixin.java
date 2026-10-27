@@ -6,10 +6,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.storage.WritableLevelData;
+import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.WorldTickEvent;
 import nofrills.features.general.NoRender;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,8 +36,13 @@ public abstract class ClientLevelMixin extends Level {
         }
     }
 
+    @Inject(method = "addEntity", at = @At("TAIL"))
+    private void onEntityAdd(Entity entity, CallbackInfo ci) {
+        eventBus.post(new EntityUpdatedEvent(entity));
+    }
+
     @Inject(method = "addDestroyBlockEffect", at = @At("HEAD"), cancellable = true)
-    private void onBreakParticle(BlockPos pos, BlockState state, CallbackInfo ci) {
+    private void onBreakParticle(BlockPos pos, BlockState blockState, CallbackInfo ci) {
         if (NoRender.instance.isActive() && NoRender.breakParticles.value()) {
             ci.cancel();
         }

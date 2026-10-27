@@ -83,11 +83,6 @@ public class ClientPacketListenerMixin {
         }
     }
 
-    @Inject(method = "handleAddEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/ClientPacketListener;postAddEntitySoundInstance(Lnet/minecraft/world/entity/Entity;)V"))
-    private void onEntitySpawn(ClientboundAddEntityPacket packet, CallbackInfo ci, @Local(name = "entity") Entity entity) {
-        eventBus.post(new EntityUpdatedEvent(entity));
-    }
-
     @Inject(method = "handleContainerSetSlot", at = @At("TAIL"))
     private void onUpdateInventory(ClientboundContainerSetSlotPacket packet, CallbackInfo ci) {
         if (mc.screen instanceof ContainerScreen container) {

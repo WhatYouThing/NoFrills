@@ -96,6 +96,9 @@ public class HudManager {
         if (currentTitle.isActive()) {
             currentTitle.draw(event.context);
         }
+        if (!isEditingHud()) {
+            elements.stream().filter(HudElement::isActive).forEach(HudElement::updatePosition);
+        }
     }
 
     @EventHandler

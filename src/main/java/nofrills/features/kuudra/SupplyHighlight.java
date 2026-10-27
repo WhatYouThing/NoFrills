@@ -5,9 +5,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
-import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.EventListener;
 import nofrills.events.WorldRenderEvent;
+import nofrills.events.WorldTickEvent;
 import nofrills.misc.EntityCache;
 import nofrills.misc.KuudraUtil;
 import nofrills.misc.RenderColor;
@@ -22,9 +22,9 @@ public class SupplyHighlight {
     private static final EntityCache cache = new EntityCache();
 
     @EventHandler
-    private static void onEntity(EntityUpdatedEvent event) {
-        if (instance.isActive() && Utils.isInKuudra() && KuudraUtil.isSupplyCrateEntity(event.entity)) {
-            cache.add(event.entity);
+    private static void onTick(WorldTickEvent event) {
+        if (instance.isActive() && Utils.isInKuudra()) {
+            Utils.getEntities().stream().filter(KuudraUtil::isSupplyCrateEntity).forEach(cache::add);
         }
     }
 

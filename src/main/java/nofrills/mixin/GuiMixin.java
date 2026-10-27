@@ -21,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static nofrills.Main.eventBus;
-import static nofrills.Main.mc;
 
 @Mixin(Gui.class)
 public abstract class GuiMixin {
@@ -59,7 +58,7 @@ public abstract class GuiMixin {
 
     @Inject(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
     private void onRender(DeltaTracker deltaTracker, boolean shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci, @Local(name = "graphics") GuiGraphicsExtractor graphics) {
-        if (!mc.gui.hud.isHidden()) {
+        if (!this.minecraft.gui.hud.isHidden()) {
             eventBus.post(new HudRenderEvent(graphics, this.minecraft.font, deltaTracker));
         }
     }

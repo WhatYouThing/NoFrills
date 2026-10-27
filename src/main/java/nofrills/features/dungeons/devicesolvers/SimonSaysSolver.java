@@ -3,6 +3,7 @@ package nofrills.features.dungeons.devicesolvers;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -36,10 +37,11 @@ public class SimonSaysSolver {
     public static final SettingColor thirdColorOutline = new SettingColor(RenderColor.fromFormat(ChatFormatting.RED), "simonThirdOutline", DeviceSolvers.instance);
 
     private static final CopyOnWriteArrayList<BlockPos> list = new CopyOnWriteArrayList<>();
+    private static final CopyOnWriteArrayList<BlockPos> board = new CopyOnWriteArrayList<>();
     private static final AABB lightsArea = AABB.encapsulatingFullBlocks(new BlockPos(111, 123, 92), new BlockPos(111, 120, 95));
     private static final AABB buttonsArea = AABB.encapsulatingFullBlocks(new BlockPos(110, 123, 92), new BlockPos(110, 120, 95));
-    private static final AtomicInteger currentProgress = new AtomicInteger();
-    private static final AtomicInteger lastProgress = new AtomicInteger();
+    private static final AtomicInteger failedAt = new AtomicInteger();
+    private static final AtomicInteger validClicks = new AtomicInteger();
     private static final AtomicInteger tickCounter = new AtomicInteger();
     private static final AtomicInteger lastClick = new AtomicInteger();
 
@@ -68,26 +70,32 @@ public class SimonSaysSolver {
             if (event.oldBlock.equals(Blocks.OBSIDIAN) && event.newBlock.equals(Blocks.SEA_LANTERN) && lightsArea.contains(center)) {
                 if (list.contains(event.pos)) return;
                 list.add(event.pos.immutable());
-                currentProgress.set(Math.max(list.size(), currentProgress.get()));
             }
             if (event.oldState.isAir() && event.newState.isAir() && buttonsArea.contains(center)) {
                 if (mc.level.getBlockState(event.pos.offset(1, 0, 0)).getBlock().equals(Blocks.SEA_LANTERN) && !list.isEmpty()) {
                     list.removeFirst(); // air -> air change happens due to successful skip
-                    currentProgress.decrementAndGet();
                 }
             }
+            if (event.oldState.isAir() && event.newBlock.equals(Blocks.STONE_BUTTON) && buttonsArea.contains(center)) {
+                board.add(event.pos.immutable());
+            }
             if (event.oldBlock.equals(Blocks.STONE_BUTTON) && event.newState.isAir() && buttonsArea.contains(center)) {
+                board.remove(event.pos);
+                if (board.isEmpty()) {
+                    if (failedAt.get() == tickCounter.get()) {
+                        if (progressSend.value()) {
+                            Utils.sendMessage(resetMsg.value());
+                        }
+                        validClicks.set(0);
+                    } else if (validClicks.get() > 0) {
+                        if (progressSend.value() && validClicks.get() < 4) {
+                            Utils.sendMessage(progressMsg.value().replaceAll("\\{percent}", (int) (validClicks.get() / 4.0 * 100) + "%"));
+                        }
+                        validClicks.set(0);
+                    }
+                }
                 if (mc.level.getBlockState(event.pos.offset(1, 0, 0)).getBlock().equals(Blocks.OBSIDIAN)) {
                     list.remove(event.pos.offset(1, 0, 0));
-                    int progress = currentProgress.get();
-                    if (progress > 0) {
-                        if (progressSend.value() && progress < 4) {
-                            String message = lastProgress.get() >= progress ? resetMsg.value() : progressMsg.value();
-                            Utils.sendMessage(message.replaceAll("\\{percent}", (int) (progress / 4.0 * 100) + "%"));
-                        }
-                        lastProgress.set(progress == 4 ? 0 : progress);
-                        currentProgress.set(0);
-                    }
                 }
             }
         }
@@ -130,6 +138,18 @@ public class SimonSaysSolver {
     }
 
     @EventHandler
+    private static void onSound(PlaySoundEvent event) {
+        if (isSolverActive() && DungeonUtil.isInBossRoom("7") && isDeviceActive()) {
+            if (event.isSound(SoundEvents.ENDERMAN_TELEPORT) && event.volume() == 8.0f && event.pitch() == 0.0f) {
+                failedAt.set(tickCounter.get());
+            }
+            if (event.isSound(SoundEvents.NOTE_BLOCK_PLING) && event.volume() == 8.0f && event.pitch() == 4.047619f) {
+                validClicks.incrementAndGet();
+            }
+        }
+    }
+
+    @EventHandler
     private static void onRender(WorldRenderEvent event) {
         if (isSolverActive() && !list.isEmpty() && DungeonUtil.isInBossRoom("7") && isDeviceActive()) {
             for (BlockPos pos : list) {
@@ -145,8 +165,8 @@ public class SimonSaysSolver {
 
     @EventHandler
     private static void onJoin(ServerJoinEvent event) {
-        currentProgress.set(0);
-        lastProgress.set(0);
+        failedAt.set(0);
+        validClicks.set(0);
         tickCounter.set(0);
         lastClick.set(0);
     }

@@ -3,6 +3,7 @@ package nofrills.features.dungeons;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -27,10 +28,15 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
 import nofrills.events.*;
-import nofrills.misc.*;
+import nofrills.misc.DungeonUtil;
+import nofrills.misc.MappedEntityCache;
+import nofrills.misc.RenderColor;
+import nofrills.misc.Utils;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nofrills.Main.mc;
@@ -57,6 +63,8 @@ public class WitherDragons {
             Dragon.GREEN
     );
     private static final MappedEntityCache<String> teammateArrows = new MappedEntityCache<>();
+    private static final MappedEntityCache<Optional<Dragon>> dragonsCache = new MappedEntityCache<>();
+    private static final MappedEntityCache<Dragon> collarsCache = new MappedEntityCache<>();
     private static int tickCounter = 0;
 
     private static boolean isDragonParticle(ClientboundLevelParticlesPacket packet) {
@@ -74,29 +82,14 @@ public class WitherDragons {
         return false;
     }
 
-    private static void updateDragonEntities(Entity entity) {
-        for (Dragon drag : dragons) {
-            if (entity instanceof EnderDragon dragon) {
-                if (!drag.hasEntity()) {
-                    for (Entity collar : drag.collarCache.get()) {
-                        if (Utils.horizontalDistance(dragon, collar) <= 16.0) {
-                            drag.setEntity(dragon);
-                            break;
-                        }
+    private static void updateDragonEntities() {
+        for (Map.Entry<Entity, Optional<Dragon>> entry : dragonsCache.get()) {
+            if (entry.getValue().isEmpty()) {
+                collarsCache.get().forEach(e -> {
+                    if (e.getKey().distanceTo(entry.getKey()) <= 8.0) {
+                        dragonsCache.add(entry.getKey(), Optional.of(e.getValue()));
                     }
-                } else if (drag.getEntity().equals(dragon)) {
-                    drag.setEntity(dragon);
-                }
-            } else if (entity instanceof ArmorStand stand) {
-                if (drag.isCollar(stand)) {
-                    drag.collarCache.add(stand);
-                    for (Entity dragon : drag.dragonCache.get()) {
-                        if (Utils.horizontalDistance(dragon, stand) <= 16.0) {
-                            drag.setEntity((EnderDragon) dragon);
-                            break;
-                        }
-                    }
-                }
+                });
             }
         }
     }
@@ -179,7 +172,7 @@ public class WitherDragons {
                     float seconds = drag.spawnTicks / 20.0f;
                     MutableComponent timerText = Component.literal(Utils.formatDecimal(seconds, 3) + "s")
                             .withColor(Utils.getPercentageColor(seconds / 5.0, true).getHex());
-                    event.drawText(drag.pos.getCenter().add(0.0, 4.0, 0.0), timerText, 0.3f, true, RenderColor.WHITE);
+                    event.drawText(Vec3.atCenterOf(drag.pos).add(0.0, 4.0, 0.0), timerText, 0.3f, true, RenderColor.WHITE);
                 }
                 if (boxes.value() && (drag.isSpawning() || drag.hasEntity())) {
                     event.drawOutline(drag.area, true, drag.color);
@@ -189,10 +182,10 @@ public class WitherDragons {
                         event.drawOutline(Utils.getLerpedBox(part, event.delta()), false, drag.color);
                     }
                 }
-                WaypointTypes waypointType = waypoints.value();
-                if (!waypointType.equals(WaypointTypes.Disabled) && drag.isSpawning()) {
-                    switch (waypointType) {
-                        case Simple -> event.drawFilled(drag.pos, false, drag.color.withAlpha(0.5f));
+                if (!waypoints.value().equals(WaypointTypes.Disabled) && drag.isSpawning()) {
+                    switch (waypoints.value()) {
+                        case Simple ->
+                                event.drawFilled(AABB.encapsulatingFullBlocks(drag.pos, drag.pos), false, drag.color.withAlpha(0.5f));
                         case Advanced -> {
                             for (AABB part : drag.parts) {
                                 event.drawFilled(part, false, drag.color.withAlpha(0.33f));
@@ -212,7 +205,7 @@ public class WitherDragons {
                 List<Dragon> spawning = dragons.stream().filter(Dragon::isSpawning).toList();
                 if (!spawning.isEmpty()) {
                     Dragon drag = spawning.getFirst();
-                    event.drawTracer(drag.pos.getCenter(), drag.color);
+                    event.drawTracer(Vec3.atCenterOf(drag.pos), drag.color);
                 }
             }
         }
@@ -222,7 +215,9 @@ public class WitherDragons {
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive() && isDragonParticle(event.packet) && DungeonUtil.isInDragonPhase()) {
             for (Dragon drag : dragons) {
-                if (drag.spawnTicks == 0 && drag.area.contains(event.pos)) {
+                if (drag.spawnTicks == 0) {
+                    BlockPos location = drag.pos.offset(0, 5, 0);
+                    if (event.packet.getX() != location.getX() || event.packet.getZ() != location.getZ()) continue;
                     drag.startTicking();
                     if (alert.value()) {
                         MutableComponent title = Component.literal(Utils.toUpper(drag.name) + " IS SPAWNING")
@@ -254,8 +249,24 @@ public class WitherDragons {
                         break;
                     }
                 }
-            } else {
-                updateDragonEntities(event.entity);
+            }
+            if (event.entity instanceof EnderDragon dragon) {
+                Optional<Dragon> current = dragonsCache.getOrDefault(dragon, Optional.empty());
+                if (current.isPresent()) {
+                    current.get().setEntity(dragon);
+                } else {
+                    dragonsCache.add(dragon, Optional.empty());
+                    updateDragonEntities();
+                }
+            }
+            if (event.entity instanceof ArmorStand stand && !collarsCache.has(stand)) {
+                for (Dragon drag : dragons) {
+                    if (drag.isCollar(stand)) {
+                        collarsCache.add(stand, drag);
+                        updateDragonEntities();
+                        break;
+                    }
+                }
             }
         }
     }
@@ -291,7 +302,7 @@ public class WitherDragons {
                 3,
                 "RED_KING_RELIC",
                 RenderColor.fromHex(0xff0000),
-                AABB.ofSize(new Vec3(27.0, 14.0, 59.0), 1, 1, 1),
+                new BlockPos(27, 14, 59),
                 List.of(
                         new AABB(25.5, 14.0, 52.0, 28.5, 17.0, 55.0),
                         new AABB(24.5, 14.0, 56.0, 29.5, 17.0, 61.0),
@@ -307,7 +318,7 @@ public class WitherDragons {
                 5,
                 "ORANGE_KING_RELIC",
                 RenderColor.fromHex(0xffaa00),
-                AABB.ofSize(new Vec3(85.0, 14.0, 56.0), 1, 1, 1),
+                new BlockPos(85, 14, 56),
                 List.of(
                         new AABB(83.5, 14.0, 49.0, 86.5, 17.0, 52.0),
                         new AABB(82.5, 14.0, 53.0, 87.5, 17.0, 58.0),
@@ -323,7 +334,7 @@ public class WitherDragons {
                 2,
                 "BLUE_KING_RELIC",
                 RenderColor.fromHex(0x55ffff),
-                AABB.ofSize(new Vec3(84.0, 14.0, 94.0), 1, 1, 1),
+                new BlockPos(84, 14, 94),
                 List.of(
                         new AABB(82.5, 14.0, 87.0, 85.5, 17.0, 90.0),
                         new AABB(81.5, 14.0, 91.0, 86.5, 17.0, 96.0),
@@ -339,7 +350,7 @@ public class WitherDragons {
                 1,
                 "PURPLE_KING_RELIC",
                 RenderColor.fromHex(0xaa00aa),
-                AABB.ofSize(new Vec3(56.0, 14.0, 125.0), 1, 1, 1),
+                new BlockPos(56, 14, 125),
                 List.of(
                         new AABB(54.5, 14.0, 118.0, 57.5, 17.0, 121.0),
                         new AABB(53.5, 14.0, 122.0, 58.5, 17.0, 127.0),
@@ -355,7 +366,7 @@ public class WitherDragons {
                 4,
                 "GREEN_KING_RELIC",
                 RenderColor.fromHex(0x00ff00),
-                AABB.ofSize(new Vec3(27.0, 14.0, 94.0), 1, 1, 1),
+                new BlockPos(27, 14, 94),
                 List.of(
                         new AABB(25.5, 14.0, 87.0, 28.5, 17.0, 90.0),
                         new AABB(24.5, 14.0, 91.0, 29.5, 17.0, 96.0),
@@ -366,15 +377,13 @@ public class WitherDragons {
                 new AABB(7, 5, 80, 37, 28, 110)
         );
 
-        public final EntityCache dragonCache = new EntityCache();
-        public final EntityCache collarCache = new EntityCache();
         public final ConcurrentHashMap<String, Integer> arrowHits = new ConcurrentHashMap<>();
         public final String name;
         public final int archPriority;
         public final int bersPriority;
         public final String relicID;
         public final RenderColor color;
-        public final AABB pos;
+        public final BlockPos pos;
         public final List<AABB> parts;
         public final AABB area;
         public float health = 0.0f;
@@ -383,7 +392,7 @@ public class WitherDragons {
         public int spawnedAt = 0;
         public boolean iceSprayed = false;
 
-        public Dragon(String name, int archPriority, int bersPriority, String relicID, RenderColor color, AABB pos, List<AABB> parts, AABB area) {
+        public Dragon(String name, int archPriority, int bersPriority, String relicID, RenderColor color, BlockPos pos, List<AABB> parts, AABB area) {
             this.name = name;
             this.archPriority = archPriority;
             this.bersPriority = bersPriority;
@@ -392,6 +401,16 @@ public class WitherDragons {
             this.pos = pos;
             this.parts = parts;
             this.area = area;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            return object == this || (object instanceof Dragon dragon && this.name.equals(dragon.name));
+        }
+
+        @Override
+        public int hashCode() {
+            return this.name.hashCode();
         }
 
         public boolean isSpawning() {
@@ -442,15 +461,18 @@ public class WitherDragons {
         }
 
         public boolean hasEntity() {
-            return !this.dragonCache.empty() && this.dragonCache.getFirst().isAlive();
+            return dragonsCache.getValues().stream().anyMatch(d -> d.isPresent() && d.get().equals(this));
         }
 
         public EnderDragon getEntity() {
-            return (EnderDragon) this.dragonCache.getFirst();
+            return (EnderDragon) dragonsCache.get().stream()
+                    .filter(e -> e.getValue().isPresent() && e.getValue().get().equals(this))
+                    .findFirst()
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
         }
 
         public void setEntity(EnderDragon ent) {
-            this.dragonCache.add(ent);
             this.health = ent.getHealth(); // store the health value on update, required as the client appears to reset it on the next tick
             this.maxHealth = ent.getAttributeBaseValue(Attributes.MAX_HEALTH);
             if (this.spawnedAt == 0) {

@@ -40,7 +40,7 @@ public class SlayerUtil {
     public static final List<SlayerBoss> bossList = List.of(REVENANT, TARANTULA, SVEN, VOIDGLOOM, VAMPIRE, BLAZE);
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
-    private static final Pattern bossSpawnerRegex = Pattern.compile("(?:(?<name>.*)'s |)SLAYER BOSS");
+    private static final Pattern bossSpawnerRegex = Pattern.compile("(?<name>.*)'(?:s | )SLAYER BOSS");
     private static final MappedEntityCache<CurrentBoss> bossCache = new MappedEntityCache<>();
     private static boolean bossAlive = false;
     private static SlayerBoss currentBoss = null;
@@ -48,8 +48,7 @@ public class SlayerUtil {
     public static boolean isSpawner(String name) {
         Matcher matcher = bossSpawnerRegex.matcher(name);
         if (matcher.matches()) {
-            String player = matcher.group("name");
-            return player == null || player.equals(mc.getUser().getName());
+            return matcher.group("name").equals(mc.getUser().getName());
         }
         return false;
     }

@@ -252,7 +252,7 @@ public class InventoryButtonSettings extends InnerSettingsScreen {
     protected static FlowLayout buildManageSetting(JsonObject buttonObject, Screen previous) {
         return new BigButton("Delete Button", _ -> {
             InventoryButtons.data.value().get("buttons").getAsJsonArray().remove(buttonObject);
-            mc.setScreen(previous);
+            mc.gui.setScreen(previous);
         });
     }
 }

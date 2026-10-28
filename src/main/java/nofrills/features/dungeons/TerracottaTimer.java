@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.FlowerPotBlock;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.Feature;
 import nofrills.config.SettingDouble;
 import nofrills.events.*;
@@ -41,7 +42,7 @@ public class TerracottaTimer {
                     continue;
                 }
                 event.drawText(
-                        terra.pos.getCenter(),
+                        Vec3.atCenterOf(terra.pos),
                         Component.literal(Utils.formatDecimal(terra.ticks / 20.0f) + "s"),
                         scale.valueFloat() * 0.1f,
                         true,

@@ -13,7 +13,6 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Arrays;
 
@@ -24,11 +23,11 @@ public class RecipeLookup {
     public static final Feature instance = new Feature("recipeLookup");
 
     public static final SettingEnum<Mode> mode = new SettingEnum<>(Mode.Recipe, Mode.class, "mode", instance);
-    public static final SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "bind", instance.key());
+    public static final SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "bind", instance.key());
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && event.isKey(keybind) && mc.screen instanceof AbstractContainerScreen<?> container) {
+        if (instance.isActive() && event.isKey(keybind) && mc.gui.screen() instanceof AbstractContainerScreen<?> container) {
             Slot focused = Utils.getFocusedSlot();
             if (focused == null) return;
             ItemStack stack = focused.getItem();

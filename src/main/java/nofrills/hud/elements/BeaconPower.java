@@ -5,6 +5,7 @@ import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.TextColor;
 import nofrills.config.Config;
 import nofrills.config.DataFile;
 import nofrills.config.Feature;
@@ -68,7 +69,7 @@ public final class BeaconPower extends SimpleTextElement implements ListeningHud
         for (Component line : Utils.getLoreText(event.stack)) {
             String string = Utils.toPlain(line);
             if (string.equals("No active profile stat bonus set!")) {
-                this.data.get().addProperty("statColor", ChatFormatting.RED.getColor());
+                this.data.get().addProperty("statColor", TextColor.RED.getValue());
                 this.data.get().addProperty("statText", "No stat!");
                 break;
             }

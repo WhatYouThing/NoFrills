@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -26,7 +27,6 @@ import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ import static nofrills.Main.mc;
 public final class SlotBinding {
     public static final Feature instance = new Feature("slotBinding");
 
-    public static final SettingKeybind keybind = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "keybind", instance.key());
+    public static final SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "keybind", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
     public static final SettingBool lines = new SettingBool(false, "lines", instance.key());
     public static final SettingDouble lineWidth = new SettingDouble(2.0, "lineWidth", instance.key());
@@ -107,7 +107,7 @@ public final class SlotBinding {
         list.add(new Settings.Separator("Presets"));
         Settings.BigButton button = new Settings.BigButton("Save New Preset", btn -> {
             savePreset("New preset");
-            mc.setScreen(buildSettings());
+            mc.gui.setScreen(buildSettings());
         });
         button.button.tooltip(Component.literal("Saves your current slot binding configuration as a preset.\nCan be loaded at any time to quickly change your binds."));
         button.button.verticalSizing(Sizing.fixed(18));
@@ -150,9 +150,9 @@ public final class SlotBinding {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof InventoryScreen inventory) {
+        if (instance.isActive() && mc.gui.screen() instanceof InventoryScreen inventory) {
             BoundSlot focused = new BoundSlot(Utils.getFocusedSlot());
-            if (event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT && event.action == GLFW.GLFW_PRESS && event.modifiers == GLFW.GLFW_MOD_SHIFT && focused.isValid()) {
+            if (event.key == InputConstants.MOUSE_BUTTON_LEFT && event.action == InputConstants.PRESS && event.modifiers == InputConstants.MOD_SHIFT && focused.isValid()) {
                 int syncId = inventory.getMenu().containerId;
                 if (focused.isHotbar() && focused.hasData()) {
                     JsonObject object = data.value().get(focused.getName()).getAsJsonObject();
@@ -160,14 +160,14 @@ public final class SlotBinding {
                     int last = object.get("last").getAsInt();
                     int first = !binds.isEmpty() ? binds.get(0).getAsInt() : 0;
                     if (last != 0 || first != 0) {
-                        mc.gameMode.handleContainerInput(syncId, last != 0 ? last : first, focused.toHotbar() - 1, ContainerInput.SWAP, mc.player);
+                        Utils.click(syncId, last != 0 ? last : first, focused.toHotbar() - 1, ContainerInput.SWAP);
                         event.cancel();
                     }
                 } else {
                     for (BoundSlot slot : getHotbarSlots()) {
                         JsonArray array = data.value().get(slot.getName()).getAsJsonObject().get("binds").getAsJsonArray();
                         if (array.contains(new JsonPrimitive(focused.id))) {
-                            mc.gameMode.handleContainerInput(syncId, focused.id, slot.toHotbar() - 1, ContainerInput.SWAP, mc.player);
+                            Utils.click(syncId, focused.id, slot.toHotbar() - 1, ContainerInput.SWAP);
                             data.edit(value -> value.get(slot.getName()).getAsJsonObject().addProperty("last", focused.id));
                             event.cancel();
                         }
@@ -175,10 +175,10 @@ public final class SlotBinding {
                 }
             }
             if (keybind.value() == event.key) {
-                if (event.action == GLFW.GLFW_PRESS && focused.isValid()) {
+                if (event.action == InputConstants.PRESS && focused.isValid()) {
                     lastSlot = focused;
                 }
-                if (event.action == GLFW.GLFW_RELEASE) {
+                if (event.action == InputConstants.RELEASE) {
                     if (focused.isValid() && lastSlot.equals(focused)) {
                         if (focused.isHotbar() && focused.hasData()) {
                             data.edit(value -> {
@@ -228,7 +228,7 @@ public final class SlotBinding {
 
     @EventHandler
     private static void onRender(ScreenRenderEvent.Before event) {
-        if (instance.isActive() && mc.screen instanceof InventoryScreen && event.focusedSlot != null) {
+        if (instance.isActive() && mc.gui.screen() instanceof InventoryScreen && event.focusedSlot != null) {
             BoundSlot focused = new BoundSlot(event.focusedSlot);
             if (focused.isHotbar() && focused.hasData()) {
                 for (JsonElement element : data.value().get(focused.getName()).getAsJsonObject().get("binds").getAsJsonArray()) {
@@ -344,7 +344,7 @@ public final class SlotBinding {
             loadButton.renderer(Settings.buttonRenderer);
             ButtonComponent deleteButton = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("presets").getAsJsonArray().remove(this.index));
-                mc.setScreen(buildSettings());
+                mc.gui.setScreen(buildSettings());
             });
             deleteButton.positioning(Positioning.relative(100, 0)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             deleteButton.renderer(Settings.buttonRendererWhite);

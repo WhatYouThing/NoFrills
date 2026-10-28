@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
@@ -35,7 +36,7 @@ public class SharpshooterSolver {
     }
 
     private static boolean isTargetBlock(BlockPos pos) {
-        return target.contains(pos.getCenter()) && pos.getX() % 2 == 0 && pos.getY() % 2 == 0;
+        return target.contains(Vec3.atCenterOf(pos)) && pos.getX() % 2 == 0 && pos.getY() % 2 == 0;
     }
 
     @EventHandler
@@ -52,12 +53,12 @@ public class SharpshooterSolver {
     public static void onBlockUpdate(BlockUpdateEvent event) {
         if (DeviceSolvers.instance.isActive() && DeviceSolvers.sharpshooter.value() && DungeonUtil.isInBossRoom("7") && isTargetBlock(event.pos)) {
             if (!isDeviceActive()) return;
-            if (event.oldBlock.equals(Blocks.EMERALD_BLOCK) && event.newBlock.equals(Blocks.BLUE_TERRACOTTA)) {
+            if (event.oldBlock.equals(Blocks.EMERALD_BLOCK) && event.newBlock.equals(Blocks.DYED_TERRACOTTA.blue())) {
                 list.add(event.pos.immutable());
                 if (next != null && next.equals(event.pos)) {
                     next = null;
                 }
-            } else if (event.oldBlock.equals(Blocks.BLUE_TERRACOTTA) && event.newBlock.equals(Blocks.EMERALD_BLOCK)) {
+            } else if (event.oldBlock.equals(Blocks.DYED_TERRACOTTA.blue()) && event.newBlock.equals(Blocks.EMERALD_BLOCK)) {
                 list.remove(event.pos);
                 next = event.pos.immutable();
             }
@@ -84,7 +85,7 @@ public class SharpshooterSolver {
     @EventHandler
     private static void onEntityNamed(EntityNamedEvent event) {
         if (DeviceSolvers.instance.isActive() && DeviceSolvers.sharpshooter.value() && DungeonUtil.isInBossRoom("7")) {
-            if (!done && event.namePlain.equals("Active") && area.getCenter().distanceTo(event.entity.position()) < 3.0) {
+            if (!done && event.namePlain.equals("Active") && Vec3.atCenterOf(area).distanceTo(event.entity.position()) < 3.0) {
                 if (doneAlert.value()) {
                     HudManager.setCustomTitle("§aSharpshooter Done", 40);
                     Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);

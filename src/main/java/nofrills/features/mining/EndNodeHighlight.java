@@ -43,7 +43,7 @@ public class EndNodeHighlight {
     );
 
     private static boolean isNodeBlock(BlockState state) {
-        return state.getBlock().equals(Blocks.PURPLE_TERRACOTTA);
+        return state.getBlock().equals(Blocks.DYED_TERRACOTTA.purple());
     }
 
     private static boolean isNodeParticle(ClientboundLevelParticlesPacket packet) {

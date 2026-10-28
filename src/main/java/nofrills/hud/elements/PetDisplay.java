@@ -67,7 +67,7 @@ public final class PetDisplay extends SimpleTextElement implements ListeningHudE
 
     // lower level mixin instead of click event for better mod support
     public void handleInput(int slotNum, int buttonNum, ContainerInput containerInput) {
-        if (mc.screen instanceof AbstractContainerScreen<?> container) {
+        if (mc.gui.screen() instanceof AbstractContainerScreen<?> container) {
             if (slotNum < 0 || slotNum >= container.getMenu().slots.size()) return;
             Slot slot = container.getMenu().getSlot(slotNum);
             String title = container.getTitle().getString();

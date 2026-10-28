@@ -30,11 +30,11 @@ public class SettingKeybind extends SettingInt {
     }
 
     public boolean bound() {
-        return this.value() != -1;
+        return this.value() != UNKNOWN_KEY;
     }
 
     public boolean isKey(int key) {
-        return key != -1 && key == this.value();
+        return key != UNKNOWN_KEY && key == this.value();
     }
 
     public InputConstants.Key asInputConstant() {

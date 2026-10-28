@@ -172,7 +172,7 @@ public class WitherDragons {
                     float seconds = drag.spawnTicks / 20.0f;
                     MutableComponent timerText = Component.literal(Utils.formatDecimal(seconds, 3) + "s")
                             .withColor(Utils.getPercentageColor(seconds / 5.0, true).getHex());
-                    event.drawText(drag.pos.getCenter().add(0.0, 4.0, 0.0), timerText, 0.3f, true, RenderColor.WHITE);
+                    event.drawText(Vec3.atCenterOf(drag.pos).add(0.0, 4.0, 0.0), timerText, 0.3f, true, RenderColor.WHITE);
                 }
                 if (boxes.value() && (drag.isSpawning() || drag.hasEntity())) {
                     event.drawOutline(drag.area, true, drag.color);
@@ -205,7 +205,7 @@ public class WitherDragons {
                 List<Dragon> spawning = dragons.stream().filter(Dragon::isSpawning).toList();
                 if (!spawning.isEmpty()) {
                     Dragon drag = spawning.getFirst();
-                    event.drawTracer(drag.pos.getCenter(), drag.color);
+                    event.drawTracer(Vec3.atCenterOf(drag.pos), drag.color);
                 }
             }
         }

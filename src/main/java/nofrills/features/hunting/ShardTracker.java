@@ -79,14 +79,14 @@ public final class ShardTracker {
         list.add(new Settings.Toggle("Filter Direct", filterDirect, "Hides every Direct/Bazaar shard while inside of the Fusion Machine."));
         Settings.BigButton clearButton = new Settings.BigButton("Clear Shard List", btn -> {
             data.edit(object -> object.add("shards", new JsonArray()));
-            mc.setScreen(buildSettings());
+            mc.gui.setScreen(buildSettings());
         });
         clearButton.button.verticalSizing(Sizing.fixed(18));
         clearButton.button.tooltip(Component.literal("Clears the list of your tracked shards."));
         list.add(clearButton);
         Settings.BigButton importButton = new Settings.BigButton("Import Shard Tree", btn -> {
             importTreeData();
-            mc.setScreen(buildSettings());
+            mc.gui.setScreen(buildSettings());
         });
         importButton.button.verticalSizing(Sizing.fixed(18));
         importButton.button.tooltip(Component.literal("Pastes the list of shards that you need to get."));
@@ -103,7 +103,7 @@ public final class ShardTracker {
                 obj.addProperty("source", "Direct");
                 object.get("shards").getAsJsonArray().add(obj);
             });
-            mc.setScreen(buildSettings());
+            mc.gui.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
         list.add(button);
@@ -214,7 +214,7 @@ public final class ShardTracker {
     }
 
     private static boolean isInFusion() {
-        if (mc.screen instanceof ContainerScreen container) {
+        if (mc.gui.screen() instanceof ContainerScreen container) {
             String title = container.getTitle().getString();
             return title.equals("Fusion Box") || title.equals("Confirm Fusion");
         }
@@ -325,7 +325,7 @@ public final class ShardTracker {
             this.inputSource.tooltip(Component.literal("The source that this shard is obtained from. Click to rotate."));
             this.delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("shards").getAsJsonArray().remove(this.index));
-                mc.setScreen(buildSettings());
+                mc.gui.setScreen(buildSettings());
             });
             this.delete.positioning(Positioning.relative(100, 0)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             this.delete.renderer((context, btn, delta) -> {

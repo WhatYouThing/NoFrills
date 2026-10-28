@@ -3,6 +3,7 @@ package nofrills.features.general;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -28,7 +29,6 @@ import nofrills.hud.clickgui.components.ToggleButton;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public final class CommandKeybinds {
                 }
                 JsonObject obj = new JsonObject();
                 obj.addProperty("name", "New Keybind");
-                obj.addProperty("key", GLFW.GLFW_KEY_UNKNOWN);
+                obj.addProperty("key", -1);
                 obj.addProperty("command", "");
                 obj.addProperty("enabled", true);
                 obj.addProperty("allowInGui", false);
@@ -62,7 +62,7 @@ public final class CommandKeybinds {
                 obj.add("islandFilterList", new JsonArray());
                 object.get("binds").getAsJsonArray().add(obj);
             });
-            mc.setScreen(buildSettings());
+            mc.gui.setScreen(buildSettings());
         });
         button.button.verticalSizing(Sizing.fixed(18));
         list.add(button);
@@ -82,10 +82,10 @@ public final class CommandKeybinds {
     }
 
     private static boolean isValidScreen(boolean allowBindInGui) {
-        if ((allowAllInGui.value() || allowBindInGui) && mc.screen instanceof AbstractContainerScreen<?>) {
-            return !(mc.screen instanceof AnvilScreen);
+        if ((allowAllInGui.value() || allowBindInGui) && mc.gui.screen() instanceof AbstractContainerScreen<?>) {
+            return !(mc.gui.screen() instanceof AnvilScreen);
         }
-        return mc.screen == null;
+        return mc.gui.screen() == null;
     }
 
     private static Modifier getModifierType(String modifier) {
@@ -101,9 +101,9 @@ public final class CommandKeybinds {
         return switch (modifier) {
             case Any -> -1;
             case None -> 0;
-            case Shift -> GLFW.GLFW_MOD_SHIFT;
-            case Alt -> GLFW.GLFW_MOD_ALT;
-            case Ctrl -> GLFW.GLFW_MOD_CONTROL;
+            case Shift -> InputConstants.MOD_SHIFT;
+            case Alt -> InputConstants.MOD_ALT;
+            case Ctrl -> InputConstants.MOD_CONTROL;
         };
     }
 
@@ -182,12 +182,12 @@ public final class CommandKeybinds {
             mainToggle.sizing(Sizing.fixed(50), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 3));
             mainToggle.tooltip(Component.literal("The main toggle for this command keybind."));
             mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));
-            ButtonComponent editButton = UIComponents.button(Component.literal("Edit").withColor(0xffffff), button -> mc.setScreen(this.buildKeybindSettings()));
+            ButtonComponent editButton = UIComponents.button(Component.literal("Edit").withColor(0xffffff), button -> mc.gui.setScreen(this.buildKeybindSettings()));
             editButton.sizing(Sizing.fixed(48), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
             editButton.renderer(Settings.buttonRendererWhite);
             ButtonComponent delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("binds").getAsJsonArray().remove(this.index));
-                mc.setScreen(buildSettings());
+                mc.gui.setScreen(buildSettings());
             });
             delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18));
             delete.renderer(Settings.buttonRendererWhite);

@@ -67,7 +67,7 @@ public class HudManager {
     }
 
     public static boolean isEditingHud() {
-        return mc.screen instanceof HudEditorScreen;
+        return mc.gui.screen() instanceof HudEditorScreen;
     }
 
     public static List<HudElement> getElements() {

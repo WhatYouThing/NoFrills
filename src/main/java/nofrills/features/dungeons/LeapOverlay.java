@@ -23,7 +23,6 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jspecify.annotations.NonNull;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,10 +36,10 @@ public class LeapOverlay {
     public static final Feature instance = new Feature("leapOverlay");
 
     public static final SettingDouble scale = new SettingDouble(3.0, "scale", instance.key());
-    public static final SettingKeybind firstKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "firstKey", instance);
-    public static final SettingKeybind secondKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "secondKey", instance);
-    public static final SettingKeybind thirdKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "thirdKey", instance);
-    public static final SettingKeybind fourthKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "fourthKey", instance);
+    public static final SettingKeybind firstKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "firstKey", instance);
+    public static final SettingKeybind secondKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "secondKey", instance);
+    public static final SettingKeybind thirdKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "thirdKey", instance);
+    public static final SettingKeybind fourthKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "fourthKey", instance);
     public static final RenderColor nameColor = RenderColor.fromHex(0xffffff);
     public static final RenderColor deadColor = RenderColor.fromHex(0xaaaaaa);
 
@@ -88,11 +87,11 @@ public class LeapOverlay {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (mc.screen != null && isLeapMenu(mc.screen.getTitle().getString())) {
+        if (mc.gui.screen() != null && isLeapMenu(mc.gui.screen().getTitle().getString())) {
             List<SettingKeybind> leapKeys = List.of(firstKey, secondKey, thirdKey, fourthKey);
             for (int i = 0; i < leapKeys.size(); i++) {
                 if (leapKeys.get(i).isKey(event.key) && leapButtons.size() >= i + 1) {
-                    leapButtons.get(i).click(((AbstractContainerScreen<?>) mc.screen).getMenu());
+                    leapButtons.get(i).click(((AbstractContainerScreen<?>) mc.gui.screen()).getMenu());
                     event.cancel();
                     return;
                 }

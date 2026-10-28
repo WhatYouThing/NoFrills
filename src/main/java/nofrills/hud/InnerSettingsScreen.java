@@ -24,13 +24,13 @@ public class InnerSettingsScreen extends Settings {
     }
 
     public static void rebuild(List<FlowLayout> settings) {
-        if (mc.screen instanceof InnerSettingsScreen inner) {
+        if (mc.gui.screen() instanceof InnerSettingsScreen inner) {
             Utils.setScreen(new InnerSettingsScreen(settings, inner.title, inner.previous));
         }
     }
 
     @Override
     public void onClose() {
-        mc.setScreen(this.previous);
+        mc.gui.setScreen(this.previous);
     }
 }

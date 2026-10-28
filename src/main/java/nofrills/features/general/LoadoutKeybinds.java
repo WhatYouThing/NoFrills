@@ -2,6 +2,7 @@ package nofrills.features.general;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -19,7 +20,6 @@ import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
 import nofrills.mixin.AbstractContainerScreenAccessor;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +34,7 @@ public class LoadoutKeybinds {
     public static final Feature instance = new Feature("loadoutKeybinds");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind editBindKey = new SettingKeybind(GLFW.GLFW_KEY_UNKNOWN, "editBindKey", instance);
+    public static final SettingKeybind editBindKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "editBindKey", instance);
     public static final SettingBool playSound = new SettingBool(false, "playSound", instance);
     public static final SettingSound sound = new SettingSound("entity.horse.armor", 1.0, 1.0, "sound", instance);
 
@@ -79,11 +79,11 @@ public class LoadoutKeybinds {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && mc.screen instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
             String key = String.valueOf(event.key);
             if (!binding.isEmpty()) {
-                if (event.action == GLFW.GLFW_PRESS) {
-                    if (editBindKey.isKey(event.key) || event.key == GLFW.GLFW_MOUSE_BUTTON_LEFT || event.key == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+                if (event.action == InputConstants.PRESS) {
+                    if (editBindKey.isKey(event.key) || event.key == InputConstants.MOUSE_BUTTON_LEFT || event.key == InputConstants.MOUSE_BUTTON_RIGHT) {
                         Utils.infoRaw(Component.literal("Invalid key, not binding to loadout slot.").withStyle(ChatFormatting.RED));
                     } else {
                         data.edit(obj -> {
@@ -98,11 +98,11 @@ public class LoadoutKeybinds {
                 }
                 event.cancel();
             } else if (editBindKey.isKey(event.key)) {
-                Slot focused = ((AbstractContainerScreenAccessor) mc.screen).getHoveredSlot();
+                Slot focused = ((AbstractContainerScreenAccessor) mc.gui.screen()).getHoveredSlot();
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
                 if (isLoadoutButton(stack)) {
-                    if (event.action == GLFW.GLFW_PRESS) {
+                    if (event.action == InputConstants.PRESS) {
                         String name = Utils.toPlain(stack.getHoverName());
                         if (data.value().entrySet().stream().anyMatch(entry -> entry.getValue().getAsString().equals(name))) {
                             data.edit(obj -> obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(name)));
@@ -123,8 +123,8 @@ public class LoadoutKeybinds {
                     ItemStack stack = slot.getItem();
                     if (stack.isEmpty()) continue;
                     if (name.equals(Utils.toPlain(stack.getHoverName()))) {
-                        if (event.action == GLFW.GLFW_PRESS) {
-                            Utils.click(screen.getMenu().containerId, slot.index, GLFW.GLFW_MOUSE_BUTTON_LEFT, ContainerInput.PICKUP);
+                        if (event.action == InputConstants.PRESS) {
+                            Utils.click(screen.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_LEFT, ContainerInput.PICKUP);
                             if (playSound.value()) {
                                 Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
                             }

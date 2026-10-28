@@ -1,6 +1,7 @@
 package nofrills.hud.clickgui;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
@@ -37,7 +38,6 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,17 +61,17 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (input.key() != GLFW.GLFW_KEY_LEFT && input.key() != GLFW.GLFW_KEY_RIGHT && input.key() != GLFW.GLFW_KEY_PAGE_DOWN && input.key() != GLFW.GLFW_KEY_PAGE_UP) {
+        if (input.key() != InputConstants.KEY_LEFT && input.key() != InputConstants.KEY_RIGHT && input.key() != InputConstants.KEY_PAGEDOWN && input.key() != InputConstants.KEY_PAGEUP) {
             return super.keyPressed(input);
         } else {
             for (Category category : this.categories) {
                 for (Module module : category.features) {
                     if (module.isInBoundingBox(this.mouseX, this.mouseY)) {
-                        return category.scroll.onMouseScroll(0, 0, input.key() == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+                        return category.scroll.onMouseScroll(0, 0, input.key() == InputConstants.KEY_PAGEUP ? 4 : -4);
                     }
                 }
             }
-            return this.mainScroll.onMouseScroll(0, 0, input.key() == GLFW.GLFW_KEY_PAGE_UP ? 4 : -4);
+            return this.mainScroll.onMouseScroll(0, 0, input.key() == InputConstants.KEY_PAGEUP ? 4 : -4);
         }
     }
 
@@ -519,11 +519,13 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Outline Color", MinibossHighlight.outlineColor, "The color of the outline style highlight."),
                                 new Settings.ColorPicker("Fill Color", MinibossHighlight.fillColor, "The color of the fill style highlight.")
                         ))),
-                        new Module("Key Highlight", KeyHighlight.instance, "Highlights nearby Wither and Blood keys.", new Settings(List.of(
-                                new Settings.Toggle("Highlight", KeyHighlight.highlight, "Renders a highlight + beam on top of Wither Keys."),
-                                new Settings.Toggle("Tracer", KeyHighlight.tracer, "Renders a tracer towards the Wither Key."),
-                                new Settings.ColorPicker("Highlight Color", KeyHighlight.color, "The color of the highlight."),
-                                new Settings.ColorPicker("Tracer Color", KeyHighlight.tracerColor, "The color of the tracer.")
+                        new Module("Key Alert", KeyAlert.instance, "Alerts you when a Wither/Blood key is dropped/obtained.", new Settings(List.of(
+                                new Settings.TitleInput("Dropped Title", KeyAlert.droppedTitle, "The title to display once a key is dropped. Replaces {key} with the colored name of the key."),
+                                new Settings.SoundInput("Dropped Sound", KeyAlert.droppedSound, "The sound to play once a key is dropped."),
+                                new Settings.TitleInput("Obtained Title", KeyAlert.obtainedTitle, "The title to display once a key is obtained. Replaces {key} with the colored name of the key."),
+                                new Settings.SoundInput("Obtained Sound", KeyAlert.obtainedSound, "The sound to play once a key is obtained."),
+                                new Settings.Toggle("Pickup Radius", KeyAlert.radius, "Renders a pickup radius circle around dungeon door keys."),
+                                new Settings.ColorPicker("Radius Color", KeyAlert.radiusColor, "The color of the pickup radius.")
                         ))),
                         new Module("Spirit Bow Highlight", SpiritBowHighlight.instance, "Highlights the Spirit Bow in the F4/M4 boss fight.", new Settings(List.of(
                                 new Settings.ColorPicker("Color", SpiritBowHighlight.color, "The color of the Spirit Bow highlight.")
@@ -823,7 +825,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.mainScroll = UIContainers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
         this.mainScroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
         root.child(this.mainScroll);
-        ButtonComponent hudEditorButton = UIComponents.button(Component.literal("Open HUD Editor"), button -> mc.setScreen(new HudEditorScreen()));
+        ButtonComponent hudEditorButton = UIComponents.button(Component.literal("Open HUD Editor"), button -> mc.gui.setScreen(new HudEditorScreen()));
         hudEditorButton.margins(Insets.of(0, 3, 0, 3));
         hudEditorButton.positioning(Positioning.relative(100, 100));
         hudEditorButton.renderer((context, button, delta) -> {

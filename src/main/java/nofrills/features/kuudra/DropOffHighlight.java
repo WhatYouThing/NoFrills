@@ -25,7 +25,7 @@ public class DropOffHighlight {
     private static Vec3 getGround(Vec3 pos) {
         BlockPos blockPos = BlockPos.containing(pos.x, Math.max(pos.y, 75), pos.z);
         BlockPos ground = Utils.findGround(blockPos, 4);
-        return new Vec3(pos.x, ground.getCenter().add(0, 0.5, 0).y, pos.z);
+        return new Vec3(pos.x, Vec3.atCenterOf(ground).add(0, 0.5, 0).y, pos.z);
     }
 
     @EventHandler

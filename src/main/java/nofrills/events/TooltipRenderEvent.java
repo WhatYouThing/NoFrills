@@ -27,7 +27,7 @@ public class TooltipRenderEvent extends Cancellable {
         this.replacement = null;
         this.stack = stack;
         this.customData = Utils.getCustomData(stack);
-        if (mc.screen instanceof AbstractContainerScreen<?> container) {
+        if (mc.gui.screen() instanceof AbstractContainerScreen<?> container) {
             this.title = container.getTitle().getString();
             this.slot = ((AbstractContainerScreenAccessor) container).getHoveredSlot();
         }

@@ -121,7 +121,7 @@ public class ColorPickerScreen extends InnerSettingsScreen {
 
         FlowLayout buttonSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         buttonSection.horizontalAlignment(HorizontalAlignment.LEFT).padding(Insets.of(5));
-        ButtonComponent backButton = UIComponents.button(Component.literal("Back"), (btn) -> mc.setScreen(previous));
+        ButtonComponent backButton = UIComponents.button(Component.literal("Back"), (btn) -> mc.gui.setScreen(previous));
         backButton.margins(Insets.right(5));
         backButton.renderer(Settings.buttonRenderer);
         ButtonComponent copyButton = UIComponents.button(Component.literal("Copy Color"), (btn) ->

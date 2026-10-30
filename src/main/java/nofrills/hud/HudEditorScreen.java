@@ -61,18 +61,18 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
         for (HudElement element : activeElements) {
             element.updatePosition();
         }
-        context.fill((int) (context.guiWidth() * 0.5), 0, (int) (context.guiWidth() * 0.5 + 1), context.guiHeight(), RenderColor.WHITE.getArgb());
-        context.fill(0, (int) (context.guiHeight() * 0.5), context.guiWidth(), (int) (context.guiHeight() * 0.5 + 1), RenderColor.WHITE.getArgb());
+        context.fill((int) (context.guiWidth() * 0.5), 0, (int) (context.guiWidth() * 0.5 + 1), context.guiHeight(), RenderColor.WHITE.argb());
+        context.fill(0, (int) (context.guiHeight() * 0.5), context.guiWidth(), (int) (context.guiHeight() * 0.5 + 1), RenderColor.WHITE.argb());
         super.extractRenderState(context, mouseX, mouseY, delta);
         int center = context.guiWidth() / 2;
         for (int i = 0; i < helpLines.size(); i++) {
-            context.centeredText(mc.font, helpLines.get(i), center, 10 * (i + 1), RenderColor.WHITE.argb);
+            context.centeredText(mc.font, helpLines.get(i), center, 10 * (i + 1), RenderColor.WHITE.argb());
         }
         for (HudElement element : activeElements) {
             if (element.isInBoundingBox(mouseX, mouseY)) {
                 int x = element.x(), y = element.y(), w = element.width(), h = element.height();
                 int halfW = (int) (w * 0.5), halfH = (int) (h * 0.5);
-                context.outline(x, y, w, h, RenderColor.WHITE.getArgb());
+                context.outline(x, y, w, h, RenderColor.WHITE.argb());
                 context.fill(x + halfW, y, x + halfW + 1, y + 1, 0xff000000);
                 context.fill(x + halfW, y + h - 1, x + halfW + 1, y + h, 0xff000000);
                 context.fill(x, y + halfH, x + 1, y + halfH + 1, 0xff000000);

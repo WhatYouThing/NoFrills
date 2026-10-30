@@ -37,21 +37,21 @@ public class ColorPickerScreen extends InnerSettingsScreen {
         colorSection.padding(Insets.of(5));
 
         BoxComponent colorDisplay = UIComponents.box(Sizing.fixed(290), Sizing.fixed(20));
-        colorDisplay.color(Color.ofArgb(currentColor.getArgb())).fill(true);
+        colorDisplay.color(Color.ofArgb(currentColor.argb())).fill(true);
         colorSection.child(colorDisplay);
 
         CustomHeight pickerSection = new Settings.CustomHeight(120);
         pickerSection.verticalSizing(Sizing.fixed(120));
         ColorPickerComponent colorPicker = new ColorPickerComponent();
         colorPicker.showAlpha(true).sizing(Sizing.fixed(110), Sizing.fixed(110));
-        colorPicker.selectedColor(Color.ofArgb(currentColor.getArgb()));
+        colorPicker.selectedColor(Color.ofArgb(currentColor.argb()));
         pickerSection.child(addLabel("Picker"));
         pickerSection.child(colorPicker);
 
         FlowLayout argbSection = UIContainers.horizontalFlow(Sizing.content(), Sizing.fixed(30));
         argbSection.horizontalAlignment(HorizontalAlignment.LEFT).padding(Insets.of(5));
         FlatTextbox argbInput = new FlatTextbox(Sizing.fixed(100));
-        argbInput.text("0x" + Integer.toHexString(currentColor.getArgb()));
+        argbInput.text("0x" + Integer.toHexString(currentColor.argb()));
         argbSection.child(addLabel("ARGB"));
         argbSection.child(argbInput);
 
@@ -101,14 +101,14 @@ public class ColorPickerScreen extends InnerSettingsScreen {
 
         Runnable syncValues = () -> {
             RenderColor color = reference.get();
-            int red = (int) (color.r * 255);
-            int green = (int) (color.g * 255);
-            int blue = (int) (color.b * 255);
-            int alpha = (int) (color.a * 255);
-            Color owoColor = Color.ofArgb(color.argb);
+            int red = (int) (color.r() * 255);
+            int green = (int) (color.g() * 255);
+            int blue = (int) (color.b() * 255);
+            int alpha = (int) (color.a() * 255);
+            Color owoColor = Color.ofArgb(color.argb());
             colorDisplay.color(owoColor).fill(true);
             colorPicker.selectedColor(owoColor);
-            argbInput.setValue("0x" + Integer.toHexString(color.argb));
+            argbInput.setValue("0x" + Integer.toHexString(color.argb()));
             redInput.setValue(String.valueOf(red));
             redSlider.value(red);
             greenInput.setValue(String.valueOf(green));
@@ -125,7 +125,7 @@ public class ColorPickerScreen extends InnerSettingsScreen {
         backButton.margins(Insets.right(5));
         backButton.renderer(Settings.buttonRenderer);
         ButtonComponent copyButton = UIComponents.button(Component.literal("Copy Color"), (btn) ->
-                mc.keyboardHandler.setClipboard("0x" + Integer.toHexString(reference.get().argb))
+                mc.keyboardHandler.setClipboard("0x" + Integer.toHexString(reference.get().argb()))
         );
         copyButton.margins(Insets.right(5));
         copyButton.renderer(Settings.buttonRenderer);

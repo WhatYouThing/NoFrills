@@ -144,7 +144,7 @@ public class CroesusSolver {
         if (instance.isActive() && valueTooltip.value() && Utils.isInLootArea()) {
             if (event.slot != null && chestValues.containsKey(event.slot)) {
                 double value = chestValues.get(event.slot);
-                MutableComponent valueText = Component.literal(Utils.formatSeparator(value)).withColor(value > 0 ? RenderColor.GREEN.argb : RenderColor.RED.argb);
+                MutableComponent valueText = Component.literal(Utils.formatSeparator(value)).withColor(value > 0 ? RenderColor.GREEN.argb() : RenderColor.RED.argb());
                 event.addLine(Utils.getShortTag().append("§bChest Value: §r").append(valueText));
             }
         }

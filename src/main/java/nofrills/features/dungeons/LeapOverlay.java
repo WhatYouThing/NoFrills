@@ -138,8 +138,8 @@ public class LeapOverlay {
             this.nameColor = LeapOverlay.nameColor;
             this.classColor = target.dungeonClass.equals("Empty") ? deadColor : ClassColors.getForClass(target.dungeonClass).orElse(nameColor);
             this.background = RenderColor.fromFloat(0.0f, 0.0f, 0.0f, 0.67f);
-            this.backgroundHover = RenderColor.fromFloat(this.classColor.r * 0.33f, this.classColor.g * 0.33f, this.classColor.b * 0.33f, 0.67f);
-            this.border = RenderColor.fromFloat(this.classColor.r, this.classColor.g, this.classColor.b, 1.0f);
+            this.backgroundHover = RenderColor.fromFloat(this.classColor.r() * 0.33f, this.classColor.g() * 0.33f, this.classColor.b() * 0.33f, 0.67f);
+            this.border = RenderColor.fromFloat(this.classColor.r(), this.classColor.g(), this.classColor.b(), 1.0f);
             this.offsetX = index == 0 || index == 2 ? 0.25f : 0.55f;
             this.offsetY = index <= 1 ? 0.25f : 0.55f;
         }
@@ -174,7 +174,7 @@ public class LeapOverlay {
             context.pose().pushMatrix();
             context.pose().translate(x - x * scale, y - y * scale);
             context.pose().scale(scale);
-            context.centeredText(mc.font, text, x, y, color.argb);
+            context.centeredText(mc.font, text, x, y, color.argb());
             context.pose().popMatrix();
         }
 
@@ -184,7 +184,7 @@ public class LeapOverlay {
             this.minY = getY(context, this.offsetY);
             this.maxX = getX(context, this.offsetX + 0.2f);
             this.maxY = getY(context, this.offsetY + 0.2f);
-            context.fill(minX, minY, maxX, maxY, this.isHovered(mouseX, mouseY) ? backgroundHover.argb : background.argb);
+            context.fill(minX, minY, maxX, maxY, this.isHovered(mouseX, mouseY) ? backgroundHover.argb() : background.argb());
             if (!this.player.getString().isEmpty()) {
                 Rendering.drawBorder(context, minX, minY, maxX - minX, maxY - minY, border);
             }

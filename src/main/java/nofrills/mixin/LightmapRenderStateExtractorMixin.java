@@ -14,7 +14,7 @@ public abstract class LightmapRenderStateExtractorMixin {
 
     @Unique
     @Final
-    private static Vector3f AMBIENT_LIGHT_COLOR = new Vector3f(1.0f, 1.0f, 1.0f);
+    private static final Vector3f AMBIENT_LIGHT_COLOR = new Vector3f(1.0f, 1.0f, 1.0f);
 
     @ModifyExpressionValue(method = "extract", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/ARGB;vector3fFromRGB24(I)Lorg/joml/Vector3f;", ordinal = 2))
     private static Vector3f getAmbientLight(Vector3f original) {

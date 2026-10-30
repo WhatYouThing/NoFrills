@@ -30,12 +30,6 @@ import static nofrills.Main.mc;
 @EventListener
 public class NoFrillsAPI {
     private static final HttpClient httpClient = HttpClient.newBuilder().build();
-    public static HashMap<String, Long> auctionPricing = new HashMap<>();
-    public static HashMap<String, BazaarPrice> bazaarPricing = new HashMap<>();
-    public static HashMap<String, NPCPrice> npcPricing = new HashMap<>();
-    public static HashSet<String> electionPerks = new HashSet<>();
-    public static HashSet<String> nonPlaceableItems = new HashSet<>();
-    public static HashMap<String, MuseumData> museumData = new HashMap<>();
     private static final List<RefreshTask> tasks = List.of(
             new RefreshTask(1200, APIFlags.UsePricingAPI, _ -> Thread.startVirtualThread(() -> {
                 try {
@@ -122,6 +116,12 @@ public class NoFrillsAPI {
                 }
             }))
     );
+    public static HashMap<String, Long> auctionPricing = new HashMap<>();
+    public static HashMap<String, BazaarPrice> bazaarPricing = new HashMap<>();
+    public static HashMap<String, NPCPrice> npcPricing = new HashMap<>();
+    public static HashSet<String> electionPerks = new HashSet<>();
+    public static HashSet<String> nonPlaceableItems = new HashSet<>();
+    public static HashMap<String, MuseumData> museumData = new HashMap<>();
 
     public static String makeRequest(String endpoint) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()

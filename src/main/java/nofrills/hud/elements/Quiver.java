@@ -56,7 +56,7 @@ public final class Quiver extends SimpleTextElement implements ListeningHudEleme
                     double percentage = Utils.parseInt(quantity.replaceAll(",", "")).orElse(0) / 2880.0; // max capacity, 5 * 9 * 64
                     this.setText(Component.literal("Quiver: ")
                             .append(Component.literal(name.replace(" Arrow", "")).setStyle(color))
-                            .append(Component.literal(" x" + quantity).withColor(Utils.getPercentageColor(percentage, true).getHex()))
+                            .append(Component.literal(" x" + quantity).withColor(Utils.getPercentageColor(percentage, true).hex()))
                     );
                     break;
                 }

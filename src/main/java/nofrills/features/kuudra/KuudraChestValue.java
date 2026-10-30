@@ -195,8 +195,8 @@ public class KuudraChestValue {
             int width = mc.font.width(value);
             int baseX = targetSlot.x + 8;
             int baseY = targetSlot.y + 8;
-            event.context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, background.value().argb);
-            event.context.centeredText(mc.font, value, baseX, baseY - 4, currentValue > 0 ? RenderColor.GREEN.argb : RenderColor.RED.argb);
+            event.context.fill((int) Math.floor(baseX - 2 - width * 0.5), baseY - 6, (int) Math.ceil(baseX + 2 + width * 0.5), baseY + 6, background.value().argb());
+            event.context.centeredText(mc.font, value, baseX, baseY - 4, currentValue > 0 ? RenderColor.GREEN.argb() : RenderColor.RED.argb());
         }
     }
 

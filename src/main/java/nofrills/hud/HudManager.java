@@ -20,6 +20,7 @@ public class HudManager {
     public static final DungeonMap dungeonMap = new DungeonMap();
     public static final PickaxeAbilityTimer pickAbilityTimer = new PickaxeAbilityTimer();
     public static final PetDisplay petDisplay = new PetDisplay();
+    public static final CustomTitleContainer customTitleContainer = new CustomTitleContainer();
     public static final List<HudElement> elements = List.of(
             new FPS(),
             new TPS(),
@@ -54,7 +55,8 @@ public class HudManager {
             new KickCooldownTimer(),
             dungeonMap,
             pickAbilityTimer,
-            petDisplay
+            petDisplay,
+            customTitleContainer
     );
 
     private static CustomTitle currentTitle = new CustomTitle(Component.empty(), 0);
@@ -84,7 +86,13 @@ public class HudManager {
     }
 
     public static void setCustomTitle(MutableComponent text, int ticks) {
-        currentTitle = new CustomTitle(text, ticks);
+        if (customTitleContainer.isActive()) {
+            customTitleContainer.setText(text);
+            customTitleContainer.setStartTicks(ticks);
+            customTitleContainer.start();
+        } else {
+            currentTitle = new CustomTitle(text, ticks);
+        }
     }
 
     public static void setCustomTitle(String text, int ticks) {

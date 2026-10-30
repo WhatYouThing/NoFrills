@@ -11,6 +11,7 @@ public class TickTimerElement extends SimpleTextElement implements ListeningHudE
     protected int startTicks = 0;
     protected boolean repeating = false;
     protected boolean autoPause = false;
+    protected boolean clientTick = false;
 
     public TickTimerElement(String text, Feature instance, String label) {
         super(Component.literal(Utils.format(text, "N/A")), instance, label);
@@ -30,7 +31,16 @@ public class TickTimerElement extends SimpleTextElement implements ListeningHudE
 
     @Override
     public void onServerTick() {
-        this.tick();
+        if (!this.clientTick) {
+            this.tick();
+        }
+    }
+
+    @Override
+    public void onClientTick() {
+        if (this.clientTick) {
+            this.tick();
+        }
     }
 
     @Override
@@ -52,7 +62,7 @@ public class TickTimerElement extends SimpleTextElement implements ListeningHudE
     }
 
     public int getTimeColor() {
-        return Utils.getPercentageColor((double) this.ticks / this.startTicks, true).getHex();
+        return Utils.getPercentageColor((double) this.ticks / this.startTicks, true).hex();
     }
 
     public void updateTimer() {
@@ -86,5 +96,9 @@ public class TickTimerElement extends SimpleTextElement implements ListeningHudE
 
     public void setAutoPause() {
         this.autoPause = true;
+    }
+
+    public void setClientTick() {
+        this.clientTick = true;
     }
 }

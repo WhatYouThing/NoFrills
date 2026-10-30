@@ -116,7 +116,7 @@ public class ItemProtection {
             case UUID, SkyblockID -> manualOverlay.value();
             default -> regularOverlay.value();
         };
-        context.blitSprite(RenderPipelines.GUI_TEXTURED, overlaySprite, slotX, slotY, 16, 16, color.getArgb());
+        context.blitSprite(RenderPipelines.GUI_TEXTURED, overlaySprite, slotX, slotY, 16, 16, color.argb());
     }
 
     private static boolean isSellStack(ItemStack stack) {

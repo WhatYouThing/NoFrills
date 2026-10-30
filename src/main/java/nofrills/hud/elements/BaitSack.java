@@ -54,7 +54,7 @@ public final class BaitSack extends SimpleTextElement implements ListeningHudEle
                 double percentage = Utils.parseInt(quantity.replaceAll(",", "")).orElse(0) / 20160.0;
                 this.setText(Component.literal("Bait: ")
                         .append(Component.literal(name.replace(" Bait", "")).setStyle(color))
-                        .append(Component.literal(" x" + quantity).withColor(Utils.getPercentageColor(percentage, true).getHex()))
+                        .append(Component.literal(" x" + quantity).withColor(Utils.getPercentageColor(percentage, true).hex()))
                 );
                 break;
             }

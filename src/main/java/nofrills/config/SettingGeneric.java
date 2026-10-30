@@ -29,7 +29,7 @@ public class SettingGeneric {
             case Boolean bool -> new JsonPrimitive(bool);
             case String string -> new JsonPrimitive(string);
             case Number number -> new JsonPrimitive(number);
-            case RenderColor color -> new JsonPrimitive(color.argb);
+            case RenderColor color -> new JsonPrimitive(color.argb());
             case JsonObject jsonObject -> jsonObject;
             case Enum<?> enumValue -> new JsonPrimitive(enumValue.name());
             default ->

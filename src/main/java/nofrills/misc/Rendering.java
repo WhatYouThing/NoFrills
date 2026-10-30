@@ -5,7 +5,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 public final class Rendering {
 
     public static void drawBorder(GuiGraphicsExtractor context, int x, int y, int width, int height, RenderColor color) {
-        drawBorder(context, x, y, width, height, color.argb);
+        drawBorder(context, x, y, width, height, color.argb());
     }
 
     public static void drawBorder(GuiGraphicsExtractor context, int x, int y, int width, int height, int argb) {

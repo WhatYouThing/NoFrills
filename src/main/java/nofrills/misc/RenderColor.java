@@ -4,31 +4,34 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.util.ARGB;
 
-public class RenderColor {
+public record RenderColor(float r, float g, float b, float a, int hex, int argb) {
     public static final RenderColor WHITE = fromFormat(ChatFormatting.WHITE);
     public static final RenderColor GREEN = fromFormat(ChatFormatting.GREEN);
     public static final RenderColor RED = fromFormat(ChatFormatting.RED);
     public static final RenderColor GRAY = fromFormat(ChatFormatting.GRAY);
     public static final RenderColor NF_BLUE = RenderColor.fromArgb(0xff5ca0bf);
 
-    public final float r;
-    public final float g;
-    public final float b;
-    public final float a;
-    public final int hex;
-    public final int argb;
-
     public RenderColor(float r, float g, float b, float a) {
-        this.r = Math.clamp(r, 0.0f, 1.0f);
-        this.g = Math.clamp(g, 0.0f, 1.0f);
-        this.b = Math.clamp(b, 0.0f, 1.0f);
-        this.a = Math.clamp(a, 0.0f, 1.0f);
-        this.hex = ((int) (this.r * 255) << 16) + ((int) (this.g * 255) << 8) + (int) (this.b * 255);
-        this.argb = ARGB.colorFromFloat(this.a, this.r, this.g, this.b);
+        this(
+                Math.clamp(r, 0.0f, 1.0f),
+                Math.clamp(g, 0.0f, 1.0f),
+                Math.clamp(b, 0.0f, 1.0f),
+                Math.clamp(a, 0.0f, 1.0f),
+                toHex(Math.clamp(r, 0.0f, 1.0f), Math.clamp(g, 0.0f, 1.0f), Math.clamp(b, 0.0f, 1.0f)),
+                toArgb(Math.clamp(r, 0.0f, 1.0f), Math.clamp(g, 0.0f, 1.0f), Math.clamp(b, 0.0f, 1.0f), Math.clamp(a, 0.0f, 1.0f))
+        );
     }
 
     public RenderColor(int r, int g, int b, int a) {
         this((float) Math.clamp(r, 0, 255) / 255, (float) Math.clamp(g, 0, 255) / 255, (float) Math.clamp(b, 0, 255) / 255, (float) Math.clamp(a, 0, 255) / 255);
+    }
+
+    public static int toHex(float r, float g, float b) {
+        return ((int) (r * 255) << 16) + ((int) (g * 255) << 8) + (int) (b * 255);
+    }
+
+    public static int toArgb(float r, float g, float b, float a) {
+        return ARGB.colorFromFloat(a, r, g, b);
     }
 
     public static RenderColor fromHex(int hex) {
@@ -70,14 +73,6 @@ public class RenderColor {
 
     public float getAlpha() {
         return this.a;
-    }
-
-    public int getHex() {
-        return this.hex;
-    }
-
-    public int getArgb() {
-        return this.argb;
     }
 
     public RenderColor withRed(float red) {

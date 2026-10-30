@@ -53,7 +53,7 @@ public class ScreenRenderEvent {
         if (slot1.isPresent() && slot2.isPresent()) {
             Slot first = slot1.get();
             Slot second = slot2.get();
-            this.drawLine(RenderPipelines.GUI, first.x + 8, first.y + 8, second.x + 8, second.y + 8, width, Color.ofArgb(color.argb));
+            this.drawLine(RenderPipelines.GUI, first.x + 8, first.y + 8, second.x + 8, second.y + 8, width, Color.ofArgb(color.argb()));
         }
     }
 
@@ -69,15 +69,15 @@ public class ScreenRenderEvent {
     }
 
     public void drawBorder(int slotId, RenderColor color) {
-        this.getSlot(slotId).ifPresent(slot -> Rendering.drawBorder(this.context, slot.x, slot.y, 16, 16, color.argb));
+        this.getSlot(slotId).ifPresent(slot -> Rendering.drawBorder(this.context, slot.x, slot.y, 16, 16, color.argb()));
     }
 
     public void drawLabel(int slotId, Component text) {
-        this.getSlot(slotId).ifPresent(slot -> this.context.centeredText(mc.font, text, slot.x + 8, slot.y + 4, RenderColor.WHITE.argb));
+        this.getSlot(slotId).ifPresent(slot -> this.context.centeredText(mc.font, text, slot.x + 8, slot.y + 4, RenderColor.WHITE.argb()));
     }
 
     public void drawFill(int slotId, RenderColor color) {
-        this.getSlot(slotId).ifPresent(slot -> this.context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, color.argb));
+        this.getSlot(slotId).ifPresent(slot -> this.context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, color.argb()));
     }
 
     public static class Before extends ScreenRenderEvent {

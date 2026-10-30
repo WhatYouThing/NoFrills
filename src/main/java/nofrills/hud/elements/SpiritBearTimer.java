@@ -45,7 +45,7 @@ public final class SpiritBearTimer extends TickTimerElement implements Listening
             int needed = DungeonUtil.isOnFloor("M4") ? 30 : 25;
             int kills = (int) Math.floor(needed * (this.count / 165.0));
             this.setText(Utils.formatText(this.timerText,
-                    Component.literal(kills + "/" + needed).withColor(Utils.getPercentageColor(kills / (double) needed, true).getHex()))
+                    Component.literal(kills + "/" + needed).withColor(Utils.getPercentageColor(kills / (double) needed, true).hex()))
             );
         }
     }

@@ -108,7 +108,7 @@ public final class DungeonMap extends HudElement implements ListeningHudElement 
                 }
             }
         } else if (this.isEditingHud()) {
-            context.centeredText(mc.font, "Dungeon Map", (int) (this.width * 0.5), (int) (this.height * 0.5) - 4, RenderColor.WHITE.argb);
+            context.centeredText(mc.font, "Dungeon Map", (int) (this.width * 0.5), (int) (this.height * 0.5) - 4, RenderColor.WHITE.argb());
         }
         matrices.popMatrix();
     }
@@ -174,7 +174,7 @@ public final class DungeonMap extends HudElement implements ListeningHudElement 
             default -> teammate.selectedClass();
         };
         float width = mc.font.width(text);
-        int color = ClassColors.getForClass(teammate.selectedClass()).orElse(RenderColor.WHITE).getArgb();
+        int color = ClassColors.getForClass(teammate.selectedClass()).orElse(RenderColor.WHITE).argb();
         FormattedCharSequence orderedText = Component.literal(text).getVisualOrderText();
         Matrix3x2fStack matrices = context.pose();
         matrices.pushMatrix();

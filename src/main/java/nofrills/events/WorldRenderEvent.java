@@ -33,15 +33,15 @@ public class WorldRenderEvent {
     }
 
     public void drawFilled(AABB box, boolean throughWalls, RenderColor color) {
-        this.pushGizmo(new CuboidGizmo(box, GizmoStyle.fill(color.getArgb()), false), throughWalls);
+        this.pushGizmo(new CuboidGizmo(box, GizmoStyle.fill(color.argb()), false), throughWalls);
     }
 
     public void drawOutline(AABB box, boolean throughWalls, RenderColor color) {
-        this.pushGizmo(new CuboidGizmo(box, GizmoStyle.stroke(color.getArgb()), false), throughWalls);
+        this.pushGizmo(new CuboidGizmo(box, GizmoStyle.stroke(color.argb()), false), throughWalls);
     }
 
     public void drawCircle(Vec3 point, double radius, boolean throughWalls, RenderColor color) {
-        this.pushGizmo(new CircleGizmo(point, (float) radius, GizmoStyle.stroke(color.getArgb())), throughWalls);
+        this.pushGizmo(new CircleGizmo(point, (float) radius, GizmoStyle.stroke(color.argb())), throughWalls);
     }
 
     public void drawStyled(AABB box, RenderStyle style, boolean throughWalls, RenderColor outlineColor, RenderColor filledColor) {
@@ -62,7 +62,7 @@ public class WorldRenderEvent {
         matrices.translate(textX, textY, textZ);
         matrices.rotateAround(camera.orientation, 0.0f, 0.0f, 0.0f);
         matrices.scale(scale, -scale, scale);
-        this.storage.submitText(matrices, -mc.font.width(text) / 2f, 1.0f, text.getVisualOrderText(), true, throughWalls ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, FULL_BRIGHT, color.argb, 0, 0);
+        this.storage.submitText(matrices, -mc.font.width(text) / 2f, 1.0f, text.getVisualOrderText(), true, throughWalls ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL, FULL_BRIGHT, color.argb(), 0, 0);
     }
 
     public void drawDistanceScaledText(Vec3 pos, Component text, float baseScale, float scaling, boolean throughWalls, RenderColor color) {
@@ -87,7 +87,7 @@ public class WorldRenderEvent {
     }
 
     public void drawLine(Vec3 from, Vec3 to, double width, boolean throughWalls, RenderColor color) {
-        this.pushGizmo(new LineGizmo(from, to, color.argb, (float) width), throughWalls);
+        this.pushGizmo(new LineGizmo(from, to, color.argb(), (float) width), throughWalls);
     }
 
     public void drawTracer(Vec3 pos, float width, RenderColor color) {

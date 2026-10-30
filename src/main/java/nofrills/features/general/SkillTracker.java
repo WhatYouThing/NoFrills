@@ -177,7 +177,7 @@ public class SkillTracker {
         }
         for (String skill : active) {
             SettingColor color = getSessionColor(skill);
-            MutableComponent sessionText = color != null ? Component.literal(skill).withColor(color.value().argb) : Component.literal(skill);
+            MutableComponent sessionText = color != null ? Component.literal(skill).withColor(color.value().argb()) : Component.literal(skill);
             JsonObject obj = data.get().has(skill) ? data.get().get(skill).getAsJsonObject() : getDefaultData();
             String elapsed = obj.has("totalTicks")
                     ? Utils.ticksToTime(obj.get("totalTicks").getAsLong())

@@ -79,6 +79,10 @@ public abstract class SimpleTextElement extends HudElement {
         super.savePosition(x + this.getAlignOffset(), y);
     }
 
+    public void onTextChanged(MutableComponent text) {
+        this.updatePosition();
+    }
+
     public void setText(String text) {
         this.setText(Component.literal(text));
     }
@@ -87,6 +91,7 @@ public abstract class SimpleTextElement extends HudElement {
         MutableComponent withColor = text.withColor(this.getTextColor());
         this.label.text(withColor);
         this.text = withColor;
+        this.onTextChanged(text);
     }
 
     public void setDefaultText() {
@@ -94,7 +99,7 @@ public abstract class SimpleTextElement extends HudElement {
     }
 
     public final int getTextColor() {
-        return this.textColor.value().hex;
+        return this.textColor.value().hex();
     }
 
     public final double getAlignOffset() {

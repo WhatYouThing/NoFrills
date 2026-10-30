@@ -107,7 +107,7 @@ public class HoneycombTimer {
                 long timeLeft = honeycomb.timestamp() - timestamp;
                 String time = timeLeft <= 0 ? "Ready" : Utils.millisecondsToTime(timeLeft);
                 MutableComponent text = Component.literal("#" + (honeycombs.indexOf(honeycomb) + 1) + ": " + time)
-                        .withColor(Utils.getPercentageColor(timeLeft / 3600000.0).getHex());
+                        .withColor(Utils.getPercentageColor(timeLeft / 3600000.0).hex());
                 event.drawBeam(Vec3.atCenterOf(honeycomb.pos()).add(0.0, 0.5, 0.0), 256, true, color.value());
                 event.drawDistanceScaledText(Vec3.atCenterOf(honeycomb.pos()), text, scale.valueFloat() * 0.1f, true, RenderColor.WHITE);
             }

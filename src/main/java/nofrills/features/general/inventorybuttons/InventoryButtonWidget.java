@@ -98,11 +98,11 @@ public final class InventoryButtonWidget extends ImageButton {
         if (this.buttonStyle.equals(InventoryButtonStyle.Vanilla)) {
             super.extractContents(graphics, mouseX, mouseY, a);
         } else if (this.buttonStyle.equals(InventoryButtonStyle.Color)) {
-            graphics.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), this.buttonColorBackground.getArgb());
+            graphics.fill(this.getX(), this.getY(), this.getX() + this.getWidth(), this.getY() + this.getHeight(), this.buttonColorBackground.argb());
             graphics.outline(this.getX(), this.getY(), this.getWidth(), this.getHeight(),
                     this.isHovered()
-                            ? this.buttonColorBorderHover.getArgb()
-                            : this.buttonColorBorder.getArgb()
+                            ? this.buttonColorBorderHover.argb()
+                            : this.buttonColorBorder.argb()
             );
         }
         graphics.pose().pushMatrix();

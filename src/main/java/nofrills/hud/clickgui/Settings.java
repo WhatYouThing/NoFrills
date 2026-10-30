@@ -327,7 +327,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             label.tooltip(Component.literal(tooltip));
             FlowLayout colorDisplay = UIContainers.verticalFlow(Sizing.fixed(20), Sizing.fixed(20));
             colorDisplay.surface((context, component) ->
-                    context.fill(component.x(), component.y(), component.x() + component.width(), component.y() + component.height(), reference.get().getArgb())
+                    context.fill(component.x(), component.y(), component.x() + component.width(), component.y() + component.height(), reference.get().argb())
             ).margins(Insets.right(5));
             ButtonComponent editButton = UIComponents.button(Component.literal("Edit Color"), _ -> {
                 ColorPickerScreen pickerScreen = ColorPickerScreen.build(reference.get(), this.previousScreen, color -> {

@@ -126,7 +126,7 @@ public class ChatWaypoints {
                 RenderColor color = waypoint.party ? partyColor.value() : allColor.value();
                 MutableComponent name = Component.literal(waypoint.name).withStyle(ChatFormatting.WHITE);
                 if (showDistance.value()) {
-                    name.append(Component.literal(" " + Utils.formatDecimal(waypoint.distance(), 1) + "m").withColor(color.hex));
+                    name.append(Component.literal(" " + Utils.formatDecimal(waypoint.distance(), 1) + "m").withColor(color.hex()));
                 }
                 event.drawFilledWithBeam(waypoint.box, 256, true, color);
                 event.drawDistanceScaledText(waypoint.box.getCenter().add(0, 1, 0), name, 0.05f, true, RenderColor.WHITE);

@@ -204,11 +204,11 @@ public class Utils {
     }
 
     public static MutableComponent getTag() {
-        return Component.literal("[NoFrills] ").withColor(RenderColor.NF_BLUE.getHex());
+        return Component.literal("[NoFrills] ").withColor(RenderColor.NF_BLUE.hex());
     }
 
     public static MutableComponent getShortTag() {
-        return Component.literal("[NF] ").withColor(RenderColor.NF_BLUE.getHex());
+        return Component.literal("[NF] ").withColor(RenderColor.NF_BLUE.hex());
     }
 
     public static void info(String message) {

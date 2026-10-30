@@ -159,7 +159,7 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
 
     public Surface getBackground() {
         if (this.useBackground.value()) {
-            return Surface.flat(this.background.value().argb);
+            return Surface.flat(this.background.value().argb());
         }
         return Surface.BLANK;
     }

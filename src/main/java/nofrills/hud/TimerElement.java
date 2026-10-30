@@ -36,7 +36,7 @@ public class TimerElement extends SimpleTextElement {
     }
 
     public int getTimeColor(long timeLeft) {
-        return Utils.getPercentageColor((double) timeLeft / this.duration).getHex();
+        return Utils.getPercentageColor((double) timeLeft / this.duration).hex();
     }
 
     public String getTimerText() {

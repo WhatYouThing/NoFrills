@@ -171,7 +171,7 @@ public class WitherDragons {
                 if (timer.value() && drag.isSpawning()) {
                     float seconds = drag.spawnTicks / 20.0f;
                     MutableComponent timerText = Component.literal(Utils.formatDecimal(seconds, 3) + "s")
-                            .withColor(Utils.getPercentageColor(seconds / 5.0, true).getHex());
+                            .withColor(Utils.getPercentageColor(seconds / 5.0, true).hex());
                     event.drawText(Vec3.atCenterOf(drag.pos).add(0.0, 4.0, 0.0), timerText, 0.3f, true, RenderColor.WHITE);
                 }
                 if (boxes.value() && (drag.isSpawning() || drag.hasEntity())) {
@@ -196,7 +196,7 @@ public class WitherDragons {
                 if (health.value() && drag.hasEntity()) {
                     double maxHealth = drag.maxHealth > 0.0 ? drag.maxHealth : 200.0;
                     MutableComponent healthText = Component.literal(Utils.formatDecimal(drag.health * 0.000001) + "M")
-                            .withColor(Utils.getPercentageColor(drag.health / maxHealth, true).getHex());
+                            .withColor(Utils.getPercentageColor(drag.health / maxHealth, true).hex());
                     Vec3 pos = drag.getEntity().getPosition(event.delta());
                     event.drawText(pos, healthText, 0.2f, true, RenderColor.WHITE);
                 }
@@ -221,10 +221,10 @@ public class WitherDragons {
                     drag.startTicking();
                     if (alert.value()) {
                         MutableComponent title = Component.literal(Utils.toUpper(drag.name) + " IS SPAWNING")
-                                .setStyle(Style.EMPTY.withBold(true).withColor(drag.color.hex));
+                                .setStyle(Style.EMPTY.withBold(true).withColor(drag.color.hex()));
                         Utils.showTitle(title, Component.empty(), 0, 30, 10);
                         Utils.playSound(SoundEvents.EXPERIENCE_ORB_PICKUP, 1, 0);
-                        Utils.infoRaw(Component.literal(drag.name).withColor(drag.color.hex).append(
+                        Utils.infoRaw(Component.literal(drag.name).withColor(drag.color.hex()).append(
                                 Component.literal(" is spawning.").withStyle(ChatFormatting.GRAY)
                         ));
                     }
@@ -242,7 +242,7 @@ public class WitherDragons {
                     if (!dragon.hasEntity()) continue;
                     EnderDragon entity = dragon.getEntity();
                     if (!dragon.iceSprayed && Utils.horizontalDistance(entity, stand) < 2.0 && stand.getY() > entity.getY()) {
-                        Utils.infoRaw(Component.literal(dragon.name).withColor(dragon.color.hex).append(
+                        Utils.infoRaw(Component.literal(dragon.name).withColor(dragon.color.hex()).append(
                                 Component.literal(Utils.format(" Ice Sprayed in {} tick(s).", tickCounter - dragon.spawnedAt)).withStyle(ChatFormatting.GRAY)
                         ));
                         dragon.iceSprayed = true;
@@ -434,12 +434,12 @@ public class WitherDragons {
                             hitsText.append(Component.literal(", ").withStyle(ChatFormatting.GRAY));
                         }
                         hitsText.append(Component.literal(dungeonClass)
-                                .withColor(ClassColors.getForClass(dungeonClass).orElse(RenderColor.GRAY).getHex())
+                                .withColor(ClassColors.getForClass(dungeonClass).orElse(RenderColor.GRAY).hex())
                                 .append(Component.literal(" - " + value).withStyle(ChatFormatting.GRAY))
                         );
                     });
                     Utils.infoRaw(Component.literal("Arrows hit on ").withStyle(ChatFormatting.GRAY)
-                            .append(Component.literal(this.name).withColor(this.color.hex))
+                            .append(Component.literal(this.name).withColor(this.color.hex()))
                             .append(Component.literal(": ").withStyle(ChatFormatting.GRAY))
                             .append(hitsText)
                             .append(Component.literal(".").withStyle(ChatFormatting.GRAY))

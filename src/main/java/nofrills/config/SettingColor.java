@@ -15,13 +15,13 @@ public class SettingColor extends SettingGeneric {
 
     public RenderColor value() {
         int current = this.get().getAsInt();
-        if (this.color.argb != current) {
+        if (this.color.argb() != current) {
             this.color = RenderColor.fromArgb(current);
         }
         return this.color;
     }
 
     public RenderColor valueWithAlpha(float alpha) {
-        return RenderColor.fromHex(this.value().hex, alpha);
+        return RenderColor.fromHex(this.value().hex(), alpha);
     }
 }

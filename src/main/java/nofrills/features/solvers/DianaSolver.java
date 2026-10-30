@@ -218,7 +218,7 @@ public class DianaSolver {
                         default -> RenderColor.WHITE;
                     };
                     event.drawBeam(pos, 256, true, color);
-                    event.drawDistanceScaledText(textPos, label, 0.05f, true, RenderColor.fromHex(color.hex));
+                    event.drawDistanceScaledText(textPos, label, 0.05f, true, RenderColor.fromHex(color.hex()));
                 }
             }
         }

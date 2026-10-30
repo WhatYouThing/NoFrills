@@ -225,7 +225,7 @@ public class InventoryButtonSettings extends InnerSettingsScreen {
                 widget.buttonColorBackground,
                 RenderColor.NF_BLUE.withAlpha(0.25f),
                 "The background color of this button. Only applies with the \"Color\" style.",
-                c -> buttonObject.addProperty("colorBackground", c.getArgb())
+                c -> buttonObject.addProperty("colorBackground", c.argb())
         );
     }
 
@@ -235,7 +235,7 @@ public class InventoryButtonSettings extends InnerSettingsScreen {
                 widget.buttonColorBorder,
                 RenderColor.NF_BLUE,
                 "The border color of this button. Only applies with the \"Color\" style.",
-                c -> buttonObject.addProperty("colorBorder", c.getArgb())
+                c -> buttonObject.addProperty("colorBorder", c.argb())
         );
     }
 
@@ -245,7 +245,7 @@ public class InventoryButtonSettings extends InnerSettingsScreen {
                 widget.buttonColorBorderHover,
                 RenderColor.WHITE,
                 "The border color of this button while hovered over. Only applies with the \"Color\" style.",
-                c -> buttonObject.addProperty("colorBorderHover", c.getArgb())
+                c -> buttonObject.addProperty("colorBorderHover", c.argb())
         );
     }
 

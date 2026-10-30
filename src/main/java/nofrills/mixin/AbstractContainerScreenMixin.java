@@ -158,7 +158,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
     @Inject(method = "extractSlot", at = @At("HEAD"))
     private void onRenderSlot(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         if (SlotOptions.hasBackground(slot)) {
-            graphics.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackground(slot).argb);
+            graphics.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, SlotOptions.getBackground(slot).argb());
         }
     }
 

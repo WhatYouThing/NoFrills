@@ -72,9 +72,9 @@ public class InventoryButtons {
                 Pair.of("inventoryOnly", new JsonPrimitive(false)),
                 Pair.of("snapPosition", new JsonPrimitive(true)),
                 Pair.of("style", new JsonPrimitive(InventoryButtonStyle.Vanilla.name())),
-                Pair.of("colorBackground", new JsonPrimitive(RenderColor.NF_BLUE.withAlpha(0.25f).getArgb())),
-                Pair.of("colorBorder", new JsonPrimitive(RenderColor.NF_BLUE.getArgb())),
-                Pair.of("colorBorderHover", new JsonPrimitive(RenderColor.WHITE.getArgb()))
+                Pair.of("colorBackground", new JsonPrimitive(RenderColor.NF_BLUE.withAlpha(0.25f).argb())),
+                Pair.of("colorBorder", new JsonPrimitive(RenderColor.NF_BLUE.argb())),
+                Pair.of("colorBorderHover", new JsonPrimitive(RenderColor.WHITE.argb()))
         );
         for (Pair<String, JsonPrimitive> value : values) {
             if (!object.has(value.getKey())) {

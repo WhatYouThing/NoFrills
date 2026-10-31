@@ -21,6 +21,7 @@ import nofrills.misc.RenderColor;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -31,6 +32,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static nofrills.Main.mc;
@@ -386,7 +388,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     public static final class TextEntryList extends InnerSettings {
 
-        public TextEntryList(String name, Supplier<List<String>> currentValue, String tooltip, Consumer<List<String>> updateCallback) {
+        public TextEntryList(String name, Supplier<List<String>> currentValue, String tooltip, Consumer<List<String>> updateCallback, @Nullable Function<String, List<String>> suggestionProvider) {
             AtomicReference<Supplier<List<FlowLayout>>> supplier = new AtomicReference<>();
             supplier.set(() -> {
                 List<FlowLayout> list = new ArrayList<>();
@@ -401,7 +403,9 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                     int index = i.get();
                     FlowLayout layout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
                     layout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
-                    FlatTextbox text = new FlatTextbox(Sizing.fixed(240));
+                    FlatTextbox text = suggestionProvider != null
+                            ? new FlatAutofillTextbox(Sizing.fixed(240), suggestionProvider)
+                            : new FlatTextbox(Sizing.fixed(240));
                     text.onChanged().subscribe(t -> {
                         List<String> newValue = new ArrayList<>(currentValue.get());
                         newValue.set(index, t);
@@ -422,6 +426,10 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
                 return list;
             });
             super(name, supplier.get(), "Edit List", tooltip);
+        }
+
+        public TextEntryList(String name, Supplier<List<String>> currentValue, String tooltip, Consumer<List<String>> updateCallback) {
+            this(name, currentValue, tooltip, updateCallback, null);
         }
     }
 

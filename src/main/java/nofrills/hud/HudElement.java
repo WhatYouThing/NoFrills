@@ -53,7 +53,7 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
         this.useBackground = new SettingBool(false, "useBackground", instance);
         this.background = new SettingColor(RenderColor.fromArgb(0x40000000), "background", instance);
         this.gridPrecision = new SettingInt(5, "gridPrecision", instance);
-        this.identifier = Identifier.fromNamespaceAndPath("nofrills", Utils.toLower(label.replaceAll(" ", "_")));
+        this.identifier = Identifier.fromNamespaceAndPath("nofrills", Utils.toLower(label.replace(" ", "_")));
         this.positioning(Positioning.absolute(0, 0));
         this.layout = layout;
         this.layout.sizing(Sizing.content(), Sizing.content());

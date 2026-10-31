@@ -256,10 +256,10 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 you stay safe:
 
 - The official Discord server link can be found on the Modrinth project page, under the Links section. **The official
-  server will not ask for any kind of account verification upon joining.**
+  server does not require any form of verification upon joining.**
 - There is no official website where you can download the mod from. The Modrinth and the GitHub are the only safe
   sources of the mod.
-- Microsoft does not care about your account safety. Never share your email address with anyone.
+- Microslop does not care about your account safety. Never share your email address with anyone.
 
 ## Installation
 
@@ -271,15 +271,13 @@ you stay safe:
     - [Mod Menu](https://modrinth.com/mod/modmenu) (Optional, settings can be accessed with `/nofrills`, or `/nf`)
 - To finish off, open the mod's settings screen, and configure it to your liking. **Every feature is off by default**.
 
-## Incompatibilities
+## Incompatibilities/Known issues
 
 - Some highlight features might not render correctly with Iris shaders active.
-- Input boxes in the config GUI won't save any changes with the Caxton mod installed.
-- The mod may not work with third party loaders such as Lunar or Feather, only Fabric is supported.
-    - If you aren't using Fabric already, it is recommended you upgrade to either
-      the [Modrinth App](https://modrinth.com/app) or the [Prism Launcher](https://prismlauncher.org/). Automatic mod
-      updates, instance management, and most
-      importantly: [no selling of your personal data](https://www.lunarclient.com/do-not-sell-or-share-my-personal-information).
+- Input boxes in the config GUI won't save any changes made with the Caxton mod installed.
+- The mod may not work with third party loaders such as Lunar or Feather (now known as Dawn), only Fabric is supported.
+- The config may fail to save if your game is shut down abruptly. Enabling the Auto Save feature gets around this issue
+  by saving your settings in real time.
 
 ## Credits
 

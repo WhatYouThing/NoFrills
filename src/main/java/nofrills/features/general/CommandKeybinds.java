@@ -252,9 +252,13 @@ public final class CommandKeybinds {
                     "Class Filter",
                     () -> this.getData().has("classFilterList")
                             ? this.getData().get("classFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
-                            : DungeonUtil.getDungeonClasses().stream().toList(),
+                            : List.of(),
                     "Prevents this keybind from working if your selected dungeon class is not on this list.\nLeave empty to disable class filtering.",
-                    l -> data.edit(obj -> this.getData(obj).add("classFilterList", Utils.toJsonArray(l)))
+                    l -> data.edit(obj -> this.getData(obj).add("classFilterList", Utils.toJsonArray(l))),
+                    s -> DungeonUtil.getDungeonClasses().stream()
+                            .filter(c -> Utils.toLower(c).startsWith(Utils.toLower(s)))
+                            .sorted()
+                            .toList()
             );
         }
 
@@ -265,7 +269,11 @@ public final class CommandKeybinds {
                             ? this.getData().get("islandFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
                             : List.of(),
                     "Prevents this keybind from working if the current tablist area name is not on this list.\nLeave empty to disable island filtering.",
-                    l -> data.edit(obj -> this.getData(obj).add("islandFilterList", Utils.toJsonArray(l)))
+                    l -> data.edit(obj -> this.getData(obj).add("islandFilterList", Utils.toJsonArray(l))),
+                    s -> SkyblockData.getKnownAreas().stream()
+                            .filter(a -> Utils.toLower(a).startsWith(Utils.toLower(s)))
+                            .sorted()
+                            .toList()
             );
         }
 

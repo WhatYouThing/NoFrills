@@ -12,14 +12,11 @@ public record RenderColor(float r, float g, float b, float a, int hex, int argb)
     public static final RenderColor NF_BLUE = RenderColor.fromArgb(0xff5ca0bf);
 
     public RenderColor(float r, float g, float b, float a) {
-        this(
-                Math.clamp(r, 0.0f, 1.0f),
-                Math.clamp(g, 0.0f, 1.0f),
-                Math.clamp(b, 0.0f, 1.0f),
-                Math.clamp(a, 0.0f, 1.0f),
-                toHex(Math.clamp(r, 0.0f, 1.0f), Math.clamp(g, 0.0f, 1.0f), Math.clamp(b, 0.0f, 1.0f)),
-                toArgb(Math.clamp(r, 0.0f, 1.0f), Math.clamp(g, 0.0f, 1.0f), Math.clamp(b, 0.0f, 1.0f), Math.clamp(a, 0.0f, 1.0f))
-        );
+        float red = Math.clamp(r, 0.0f, 1.0f);
+        float green = Math.clamp(g, 0.0f, 1.0f);
+        float blue = Math.clamp(b, 0.0f, 1.0f);
+        float alpha = Math.clamp(a, 0.0f, 1.0f);
+        this(red, green, blue, alpha, toHex(red, green, blue), toArgb(red, green, blue, alpha));
     }
 
     public RenderColor(int r, int g, int b, int a) {

@@ -50,8 +50,9 @@ public class SkyblockData {
             new InstanceType("t4", "KUUDRA_FIERY"),
             new InstanceType("t5", "KUUDRA_INFERNAL")
     );
-    private static final Pattern dungeonScoreRegex = Pattern.compile("Team Score: [0-9]* (.*)");
+    private static final Pattern dungeonScoreRegex = Pattern.compile("Team Score: [0-9]* \\(.*\\)");
     private static final Pattern kuudraTokensRegex = Pattern.compile("Tokens Earned: [0-9]*");
+    private static final ConcurrentHashSet<String> knownAreas = new ConcurrentHashSet<>();
     private static String location = "";
     private static String area = "";
     private static boolean inSkyblock = false;
@@ -75,6 +76,10 @@ public class SkyblockData {
      */
     public static String getArea() {
         return area;
+    }
+
+    public static ConcurrentHashSet<String> getKnownAreas() {
+        return knownAreas;
     }
 
     public static boolean isInSkyblock() {
@@ -118,6 +123,7 @@ public class SkyblockData {
                 if (name.isEmpty()) continue;
                 if (name.startsWith("Area: ") || name.startsWith("Dungeon: ")) {
                     area = name.split(":", 2)[1].trim();
+                    knownAreas.add(area);
                 }
                 lines.add(name);
             }

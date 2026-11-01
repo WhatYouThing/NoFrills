@@ -9,7 +9,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.*;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.minecraft.MinecraftProfileTextures;
-import com.mojang.authlib.minecraft.MinecraftSessionService;
+import com.mojang.authlib.minecraft.SessionService;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import net.fabricmc.loader.api.FabricLoader;
@@ -641,7 +641,7 @@ public class Utils {
 
     public static String getTextureUrl(GameProfile profile) {
         if (profile != null) {
-            MinecraftSessionService service = mc.services().sessionService();
+            SessionService service = mc.services().sessionService();
             Property property = service.getPackedTextures(profile);
             MinecraftProfileTextures textures = service.unpackTextures(property);
             if (textures.skin() != null) {

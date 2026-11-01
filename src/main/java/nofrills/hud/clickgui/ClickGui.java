@@ -296,9 +296,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         new Module("No Pearl Cooldown", NoPearlCooldown.instance, "Removes the visual cooldown from Ender Pearls.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", NoPearlCooldown.skyblockCheck, "Prevent the feature from activating outside of Skyblock.")
                         ))),
-                        new Module("Riding Camera Fix", RidingCameraFix.instance, "Removes the floaty camera movement effect while riding entities.", new Settings(List.of(
-                                new Settings.Toggle("Skyblock Only", RidingCameraFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock.")
-                        ))),
                         new Module("Animation Fix", AnimationFix.instance, "Fixes the sneaking/swimming animations being able to play twice.", new Settings(List.of(
                                 new Settings.Toggle("Skyblock Only", AnimationFix.skyblockCheck, "Prevent the feature from activating outside of Skyblock.")
                         ))),

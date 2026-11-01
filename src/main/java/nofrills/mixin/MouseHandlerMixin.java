@@ -4,7 +4,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.platform.Window;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,8 +11,6 @@ import nofrills.events.InputEvent;
 import nofrills.features.farming.MouseLock;
 import nofrills.features.misc.HotbarScrollLock;
 import nofrills.features.tweaks.NoCursorReset;
-import org.lwjgl.glfw.GLFW;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,10 +27,6 @@ public abstract class MouseHandlerMixin {
 
     @Shadow
     private double ypos;
-
-    @Shadow
-    @Final
-    private Minecraft minecraft;
 
     @Inject(method = "onButton", at = @At("HEAD"), cancellable = true)
     private void onMouseButton(long handle, MouseButtonInfo rawButtonInfo, int action, CallbackInfo ci) {
@@ -56,15 +49,14 @@ public abstract class MouseHandlerMixin {
         }
     }
 
-    @WrapOperation(method = "releaseMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;grabOrReleaseMouse(Lcom/mojang/blaze3d/platform/Window;IDD)V"))
-    private void onReleaseMouse(Window window, int cursorMode, double xpos, double ypos, Operation<Void> original) {
+    @WrapOperation(method = "releaseMouse", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/InputConstants;releaseMouse(Lcom/mojang/blaze3d/platform/Window;DD)V"))
+    private void onReleaseMouse(Window window, double xpos, double ypos, Operation<Void> original) {
         if (NoCursorReset.isActive() && NoCursorReset.isPosStored()) {
             this.xpos = NoCursorReset.cursorX;
             this.ypos = NoCursorReset.cursorY;
-            original.call(window, cursorMode, NoCursorReset.cursorX, NoCursorReset.cursorY);
-            GLFW.glfwSetCursorPos(window.handle(), NoCursorReset.cursorX, NoCursorReset.cursorY);
+            original.call(window, NoCursorReset.cursorX, NoCursorReset.cursorY);
         } else {
-            original.call(window, cursorMode, xpos, ypos);
+            original.call(window, xpos, ypos);
         }
     }
 

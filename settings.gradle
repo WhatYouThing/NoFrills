@@ -8,4 +8,5 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+
 include 'annotationprocessor'

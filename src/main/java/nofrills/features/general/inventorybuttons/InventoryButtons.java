@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -86,14 +85,14 @@ public class InventoryButtons {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && manageKey.isKey(event.key)) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && manageKey.isKey(event)) {
             Optional<InventoryButtonWidget> hoveredWidget = container.renderables
                     .stream()
                     .filter(renderable -> renderable instanceof InventoryButtonWidget button && button.isHovered())
                     .map(renderable -> (InventoryButtonWidget) renderable)
                     .findFirst();
             Slot hoveredSlot = Utils.getFocusedSlot();
-            if (event.action == InputConstants.PRESS) {
+            event.consume(() -> {
                 if (hoveredWidget.isPresent()) {
                     InventoryButtonWidget widget = hoveredWidget.get();
                     if (widget.unlockPosition) {
@@ -145,8 +144,7 @@ public class InventoryButtons {
                     Utils.infoRaw(Component.literal("Created new inventory button.").withStyle(ChatFormatting.GREEN));
                     Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 }
-            }
-            event.cancel();
+            });
         }
     }
 }

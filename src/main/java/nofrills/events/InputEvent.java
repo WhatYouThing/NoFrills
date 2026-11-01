@@ -1,9 +1,11 @@
 package nofrills.events;
 
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import nofrills.config.SettingKeybind;
-import org.lwjgl.glfw.GLFW;
 
 public final class InputEvent extends Cancellable {
     public int key, modifiers, action;
@@ -30,23 +32,40 @@ public final class InputEvent extends Cancellable {
     }
 
     public boolean isPress() {
-        return this.action == GLFW.GLFW_PRESS;
+        return this.action == InputConstants.PRESS;
     }
 
     public boolean isRepeat() {
-        return this.action == GLFW.GLFW_REPEAT;
+        return this.action == InputConstants.REPEAT;
     }
 
     public boolean isRelease() {
-        return this.action == GLFW.GLFW_RELEASE;
+        return this.action == InputConstants.RELEASE;
     }
 
     public boolean isKey(int key) {
-        return this.key == key;
+        return (this.isMouse && key < 0 && this.key == Math.abs(key)) || (this.isKeyboard && key >= 0 && this.key == key);
+    }
+
+    public boolean isMouse(int key) {
+        return this.isKey(-key);
+    }
+
+    public boolean isLeftClick() {
+        return this.isMouse(InputConstants.MOUSE_BUTTON_LEFT);
+    }
+
+    public boolean isRightClick() {
+        return this.isMouse(InputConstants.MOUSE_BUTTON_RIGHT);
     }
 
     public boolean isKey(SettingKeybind keybind) {
-        return keybind.isKey(this.key);
+        return keybind.isKey(this);
+    }
+
+    public boolean isKey(KeyMapping binding) {
+        return (this.keyInput != null && binding.matches(this.keyInput))
+                || (this.mouseInput != null && binding.matchesMouse(new MouseButtonEvent(0, 0, this.mouseInput)));
     }
 
     /**

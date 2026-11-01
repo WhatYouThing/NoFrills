@@ -20,21 +20,19 @@ import static nofrills.Main.mc;
 public class FusionKeybinds {
     public static final Feature instance = new Feature("fusionKeybinds");
 
-    // ta? https://github.com/hannibal002/SkyHanni/commit/571f3976570092cc054f201a8fd71c7d672393f2
-
     public static final SettingKeybind repeat = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "repeat", instance.key());
     public static final SettingKeybind confirm = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "confirm", instance.key());
     public static final SettingKeybind cancel = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "cancel", instance.key());
 
-    private static boolean isBindValid(ItemStack stack, String title, int key) {
+    private static boolean isBindValid(ItemStack stack, String title, InputEvent key) {
         if (!stack.isEmpty()) {
             String name = Utils.toPlain(stack.getHoverName());
             if (title.contains("Fusion Box")) {
-                return name.equals("Repeat Previous Fusion") && key == repeat.value();
+                return name.equals("Repeat Previous Fusion") && repeat.isKey(key);
             }
             if (title.equals("Confirm Fusion")) {
                 Item item = stack.getItem();
-                return (item.equals(Items.DYED_TERRACOTTA.lime()) && key == confirm.value()) || (item.equals(Items.DYED_TERRACOTTA.red()) && key == cancel.value());
+                return (item.equals(Items.DYED_TERRACOTTA.lime()) && confirm.isKey(key)) || (item.equals(Items.DYED_TERRACOTTA.red()) && cancel.isKey(key));
             }
         }
         return false;
@@ -48,11 +46,8 @@ public class FusionKeybinds {
                 return;
             }
             for (Slot slot : container.getMenu().slots) {
-                if (isBindValid(slot.getItem(), title, event.key)) {
-                    if (event.action == InputConstants.PRESS) {
-                        Utils.click(container.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
-                    }
-                    event.cancel();
+                if (isBindValid(slot.getItem(), title, event)) {
+                    event.consume(() -> Utils.click(container.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE));
                     return;
                 }
             }

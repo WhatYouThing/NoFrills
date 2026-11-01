@@ -185,7 +185,7 @@ public class ItemProtection {
     @EventHandler
     private static void onKey(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?>) {
-            if (overrideKey.isKey(event.key)) {
+            if (overrideKey.isKey(event)) {
                 if (event.action == InputConstants.PRESS) {
                     Utils.infoRaw(Component.literal("Item Protection override is now active.").withStyle(ChatFormatting.RED));
                     if (playOverrideSound.value()) Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
@@ -196,16 +196,19 @@ public class ItemProtection {
                 event.cancel();
                 return;
             }
-            if (uuidKey.isKey(event.key) || skyblockIdKey.isKey(event.key)) {
+            if (uuidKey.isKey(event) || skyblockIdKey.isKey(event)) {
                 Slot focused = Utils.getFocusedSlot();
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
                 if (!stack.isEmpty()) {
-                    if (event.action == InputConstants.PRESS) {
-                        if (uuidKey.isKey(event.key)) addUUID(stack);
-                        if (skyblockIdKey.isKey(event.key)) addSkyblockID(stack);
-                    }
-                    event.cancel();
+                    event.consume(() -> {
+                        if (uuidKey.isKey(event.key)) {
+                            addUUID(stack);
+                        }
+                        if (skyblockIdKey.isKey(event.key)) {
+                            addSkyblockID(stack);
+                        }
+                    });
                 }
             }
         }
@@ -214,7 +217,7 @@ public class ItemProtection {
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTooltip(TooltipRenderEvent event) {
         if (instance.isActive() && !event.stack.isEmpty() && event.customData != null) {
-            if (hideTooltip.value() && !InputConstants.isKeyDown(mc.getWindow(), InputConstants.KEY_LSHIFT)) {
+            if (hideTooltip.value() && !InputConstants.isKeyDown(InputConstants.KEY_LSHIFT)) {
                 return;
             }
             ProtectType type = getProtectType(event.stack);

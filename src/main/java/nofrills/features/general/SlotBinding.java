@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -152,7 +151,7 @@ public final class SlotBinding {
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() instanceof InventoryScreen inventory) {
             BoundSlot focused = new BoundSlot(Utils.getFocusedSlot());
-            if (event.key == InputConstants.MOUSE_BUTTON_LEFT && event.action == InputConstants.PRESS && event.modifiers == InputConstants.MOD_SHIFT && focused.isValid()) {
+            if (event.isLeftClick() && event.isPress() && event.mouseInput.hasShiftDown() && focused.isValid()) {
                 int syncId = inventory.getMenu().containerId;
                 if (focused.isHotbar() && focused.hasData()) {
                     JsonObject object = data.value().get(focused.getName()).getAsJsonObject();
@@ -174,11 +173,11 @@ public final class SlotBinding {
                     }
                 }
             }
-            if (keybind.value() == event.key) {
-                if (event.action == InputConstants.PRESS && focused.isValid()) {
+            if (keybind.isKey(event)) {
+                if (event.isPress() && focused.isValid()) {
                     lastSlot = focused;
                 }
-                if (event.action == InputConstants.RELEASE) {
+                if (event.isRelease()) {
                     if (focused.isValid() && lastSlot.equals(focused)) {
                         if (focused.isHotbar() && focused.hasData()) {
                             data.edit(value -> {

@@ -1,7 +1,6 @@
 package nofrills.features.farming;
 
 import com.google.common.collect.Sets;
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
@@ -47,7 +46,7 @@ public class VacuumSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && Utils.matchesKey(mc.options.keyAttack, event) && event.action == InputConstants.PRESS && Utils.isInGarden() && isHoldingVacuum()) {
+        if (instance.isActive() && event.isKey(mc.options.keyAttack) && event.isPress() && Utils.isInGarden() && isHoldingVacuum()) {
             solver.start();
         }
     }

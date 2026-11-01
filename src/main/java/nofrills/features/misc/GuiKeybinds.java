@@ -69,9 +69,8 @@ public class GuiKeybinds {
             ChestMenu handler = container.getMenu();
             for (Slot slot : Utils.getContainerSlots(handler)) {
                 ButtonType type = getButtonType(slot.getItem());
-                if (!type.equals(ButtonType.None) && getBoundKey(type).key() == event.key) {
-                    if (event.action == InputConstants.PRESS) click(handler.containerId, slot);
-                    event.cancel();
+                if (!type.equals(ButtonType.None) && getBoundKey(type).isKey(event)) {
+                    event.consume(() -> click(handler.containerId, slot));
                     break;
                 }
             }

@@ -1,7 +1,6 @@
 package nofrills.features.solvers;
 
 import com.google.common.collect.Sets;
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -120,8 +119,8 @@ public class DianaSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.gui.screen() == null && warpKey.key() == event.key && Utils.isInHub()) {
-            if (event.action == InputConstants.PRESS) {
+        if (instance.isActive() && mc.gui.screen() == null && warpKey.isKey(event) && Utils.isInHub()) {
+            event.consume(() -> {
                 Optional<Burrow> burrow = burrowsList.stream().filter(Burrow::isGuess).findFirst();
                 if (burrow.isPresent()) {
                     DianaWarp warp = findWarp(burrow.get().getVec());
@@ -134,8 +133,7 @@ public class DianaSolver {
                 } else {
                     Utils.info("§7No guess burrow exists, not warping.");
                 }
-            }
-            event.cancel();
+            });
         }
     }
 

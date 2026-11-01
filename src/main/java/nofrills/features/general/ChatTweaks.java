@@ -1,6 +1,5 @@
 package nofrills.features.general;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.components.ChatComponent;
@@ -73,13 +72,13 @@ public class ChatTweaks {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.gui.screen() instanceof ChatScreen && (copyKey.isKey(event.key) || copyLineKey.isKey(event.key))) {
-            if (event.action == InputConstants.PRESS) {
-                String message = getHoveredMsg(copyLineKey.isKey(event.key));
+        if (instance.isActive() && mc.gui.screen() instanceof ChatScreen && (copyKey.isKey(event) || copyLineKey.isKey(event))) {
+            event.consume(() -> {
+                String message = getHoveredMsg(copyLineKey.isKey(event));
                 if (message.isEmpty()) return;
                 mc.keyboardHandler.setClipboard(trimOnCopy.value() ? message.trim() : message);
                 if (msgOnCopy.value()) {
-                    String type = copyLineKey.isKey(event.key) ? "Line" : "Message";
+                    String type = copyLineKey.isKey(event) ? "Line" : "Message";
                     int length = copyMsgLength.value();
                     if (length == 0) {
                         Utils.infoFormat("§a{} copied to clipboard.", type);
@@ -90,8 +89,7 @@ public class ChatTweaks {
                         );
                     }
                 }
-            }
-            event.cancel();
+            });
         }
     }
 }

@@ -68,10 +68,10 @@ public class WitherDragons {
     private static int tickCounter = 0;
 
     private static boolean isDragonParticle(ClientboundLevelParticlesPacket packet) {
-        return packet.getParticle().getType().equals(ParticleTypes.FLAME) && packet.getCount() == 20
-                && packet.getY() == 19 && packet.getXDist() == 2.0f && packet.getYDist() == 3.0f
-                && packet.getZDist() == 2.0f && packet.getMaxSpeed() == 0.0f && packet.getX() % 1 == 0.0
-                && packet.getZ() % 1 == 0.0;
+        return packet.particle().getType().equals(ParticleTypes.FLAME) && packet.count() == 20
+                && packet.y() == 19 && packet.xDist() == 2.0f && packet.yDist() == 3.0f
+                && packet.zDist() == 2.0f && packet.x() % 1 == 0.0 && packet.z() % 1 == 0.0
+                && packet.xMaxSpeed() == 0.0f && packet.yMaxSpeed() == 0.0f && packet.zMaxSpeed() == 0.0f;
     }
 
     private static boolean isIceSprayEntity(ArmorStand stand) {
@@ -217,7 +217,7 @@ public class WitherDragons {
             for (Dragon drag : dragons) {
                 if (drag.spawnTicks == 0) {
                     BlockPos location = drag.pos.offset(0, 5, 0);
-                    if (event.packet.getX() != location.getX() || event.packet.getZ() != location.getZ()) continue;
+                    if (event.packet.x() != location.getX() || event.packet.z() != location.getZ()) continue;
                     drag.startTicking();
                     if (alert.value()) {
                         MutableComponent title = Component.literal(Utils.toUpper(drag.name) + " IS SPAWNING")

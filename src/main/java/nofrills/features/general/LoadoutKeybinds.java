@@ -56,8 +56,8 @@ public class LoadoutKeybinds {
         if (isLoadoutButton(stack)) {
             for (Map.Entry<String, JsonElement> entry : data.value().entrySet()) {
                 if (entry.getValue().getAsString().equals(name)) {
-                    int key = Utils.parseInt(entry.getKey()).orElse(-1);
-                    if (key != -1) {
+                    int key = Utils.parseInt(entry.getKey()).orElse(SettingKeybind.UNKNOWN_KEY);
+                    if (key != SettingKeybind.UNKNOWN_KEY) {
                         String keyName = SettingKeybind.asInputConstant(key).getDisplayName().getString();
                         SlotOptions.setCount(slot, keyName.contains(" ")
                                 ? Arrays.stream(keyName.split(" ")).map(part -> part.substring(0, 1)).collect(Collectors.joining())
@@ -80,10 +80,10 @@ public class LoadoutKeybinds {
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
-            String key = String.valueOf(event.key);
+            String key = event.isMouse ? String.valueOf(-event.key) : String.valueOf(event.key);
             if (!binding.isEmpty()) {
-                if (event.action == InputConstants.PRESS) {
-                    if (editBindKey.isKey(event.key) || event.key == InputConstants.MOUSE_BUTTON_LEFT || event.key == InputConstants.MOUSE_BUTTON_RIGHT) {
+                event.consume(() -> {
+                    if (editBindKey.isKey(event) || event.isLeftClick() || event.isRightClick()) {
                         Utils.infoRaw(Component.literal("Invalid key, not binding to loadout slot.").withStyle(ChatFormatting.RED));
                     } else {
                         data.edit(obj -> {
@@ -95,14 +95,13 @@ public class LoadoutKeybinds {
                         updateBindTextAll(screen.getMenu());
                     }
                     binding = "";
-                }
-                event.cancel();
-            } else if (editBindKey.isKey(event.key)) {
+                });
+            } else if (editBindKey.isKey(event)) {
                 Slot focused = ((AbstractContainerScreenAccessor) mc.gui.screen()).getHoveredSlot();
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
-                if (isLoadoutButton(stack)) {
-                    if (event.action == InputConstants.PRESS) {
+                event.consume(() -> {
+                    if (isLoadoutButton(stack)) {
                         String name = Utils.toPlain(stack.getHoverName());
                         if (data.value().entrySet().stream().anyMatch(entry -> entry.getValue().getAsString().equals(name))) {
                             data.edit(obj -> obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(name)));
@@ -115,21 +114,19 @@ public class LoadoutKeybinds {
                             binding = name;
                         }
                     }
-                }
-                event.cancel();
+                });
             } else if (data.value().has(key)) {
                 String name = data.value().get(key).getAsString();
                 for (Slot slot : Utils.getContainerSlots(screen.getMenu())) {
                     ItemStack stack = slot.getItem();
                     if (stack.isEmpty()) continue;
                     if (name.equals(Utils.toPlain(stack.getHoverName()))) {
-                        if (event.action == InputConstants.PRESS) {
+                        event.consume(() -> {
                             Utils.click(screen.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_LEFT, ContainerInput.PICKUP);
                             if (playSound.value()) {
                                 Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
                             }
-                        }
-                        event.cancel();
+                        });
                         break;
                     }
                 }

@@ -4,6 +4,7 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.phys.HitResult;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
@@ -52,7 +53,7 @@ public class DoubleUseFix {
     private static void onUseBlock(InteractBlockEvent event) {
         if (active() && getDisableType().equals(type.Rod)) {
             mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
-            mc.player.swing(InteractionHand.MAIN_HAND);
+            mc.player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
             event.cancel();
         }
     }

@@ -1,6 +1,6 @@
 package nofrills.events;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import io.wispforest.owo.ui.core.Color;
 import io.wispforest.owo.ui.renderstate.LineElementRenderState;
 import net.minecraft.client.gui.GuiGraphicsExtractor;

@@ -14,7 +14,7 @@ import java.util.List;
 public final class KeybindButton extends ButtonComponent {
     private final EventStream<KeybindChanged> changedEvents = KeybindChanged.newStream();
     private final List<Integer> keybindBlacklist = List.of(
-            -1,
+            SettingKeybind.UNKNOWN_KEY,
             InputConstants.KEY_ESCAPE
     );
     public Component unbound = Component.literal("Not Bound").withColor(0xffffff);
@@ -26,7 +26,7 @@ public final class KeybindButton extends ButtonComponent {
         });
         this.onPress(button -> {
             if (this.isBinding) {
-                this.bind(-1);
+                this.bind(SettingKeybind.UNKNOWN_KEY);
             } else {
                 this.setMessage(this.binding);
                 this.isBinding = true;
@@ -47,7 +47,7 @@ public final class KeybindButton extends ButtonComponent {
     public void bind(int key) {
         if (!this.valid(key)) {
             this.setMessage(this.unbound);
-            changedEvents.sink().onBind(-1);
+            changedEvents.sink().onBind(SettingKeybind.UNKNOWN_KEY);
         } else {
             this.setMessage(getKeyLabel(key));
             changedEvents.sink().onBind(key);

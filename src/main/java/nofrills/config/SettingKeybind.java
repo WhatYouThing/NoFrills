@@ -1,9 +1,8 @@
 package nofrills.config;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import org.lwjgl.glfw.GLFW;
-
-import static nofrills.Main.mc;
+import nofrills.events.InputEvent;
+import org.lwjgl.sdl.SDLMouse;
 
 public class SettingKeybind extends SettingInt {
     public static final int UNKNOWN_KEY = InputConstants.UNKNOWN.getValue();
@@ -17,16 +16,18 @@ public class SettingKeybind extends SettingInt {
     }
 
     public static InputConstants.Key asInputConstant(int key) {
-        InputConstants.Key keyboard = InputConstants.Type.KEYSYM.getOrCreate(key);
-        if (keyboard.getDisplayName().getString().equals(keyboard.getName())) { // fall back to a mouse key if the keyboard key has no translation
-            return InputConstants.Type.MOUSE.getOrCreate(key);
-        } else {
-            return keyboard;
+        if (key < 0) {
+            return InputConstants.Type.MOUSE.map.getOrDefault(Math.abs(key), InputConstants.UNKNOWN);
         }
+        return InputConstants.Type.KEYBOARD.map.getOrDefault(key, InputConstants.UNKNOWN);
     }
 
     public int key() {
         return this.value();
+    }
+
+    public int mouseKey() {
+        return Math.abs(this.key());
     }
 
     public boolean bound() {
@@ -34,7 +35,14 @@ public class SettingKeybind extends SettingInt {
     }
 
     public boolean isKey(int key) {
-        return key != UNKNOWN_KEY && key == this.value();
+        return this.bound() && key == this.value();
+    }
+
+    public boolean isKey(InputEvent event) {
+        if (this.bound()) {
+            return (event.isMouse && this.isMouse() && event.key == this.mouseKey()) || (event.isKeyboard && !this.isMouse() && event.key == this.key());
+        }
+        return false;
     }
 
     public InputConstants.Key asInputConstant() {
@@ -42,13 +50,13 @@ public class SettingKeybind extends SettingInt {
     }
 
     public boolean isMouse() {
-        return this.asInputConstant().getType().equals(InputConstants.Type.MOUSE);
+        return this.key() < 0; // store mouse buttons as negative since they now share values with keyboard keys
     }
 
     public boolean isDown() {
         if (this.isMouse()) {
-            return this.bound() && GLFW.glfwGetMouseButton(mc.getWindow().handle(), this.key()) == 1;
+            return this.bound() && (SDLMouse.SDL_GetMouseState(null, null) & (1 << (this.mouseKey() - 1))) > 0;
         }
-        return this.bound() && InputConstants.isKeyDown(mc.getWindow(), this.key());
+        return this.bound() && InputConstants.isKeyDown(this.key());
     }
 }

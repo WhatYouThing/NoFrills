@@ -13,8 +13,7 @@ import * as fs from "fs";
     const res = await fetch("https://whatyouth.ing/api/nofrills/v1/misc/post-beta-build", {
       method: "POST",
       headers: {
-        "NF-Beta-Auth": process.env.NF_API_BETA_AUTH,
-        "Content-Type": "multipart/form-data"
+        "NF-Beta-Auth": process.env.NF_API_BETA_AUTH
       },
       body: form
     })

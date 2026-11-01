@@ -34,8 +34,8 @@ public class MouseLock {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && keybind.isKey(event.key) && mc.gui.screen() == null && Utils.isInGarden()) {
-            if (event.action == InputConstants.PRESS) {
+        if (instance.isActive() && keybind.isKey(event) && mc.gui.screen() == null && Utils.isInGarden()) {
+            event.consume(() -> {
                 locked = !locked;
                 Utils.info(locked ? "§aMouse lock activated." : "§cMouse lock deactivated.");
                 if (rebind.value()) {
@@ -43,8 +43,7 @@ public class MouseLock {
                     bindOption(mc.options.keyJump, locked ? jumpKeyActive : jumpKeyInactive);
                     KeyMapping.resetMapping();
                 }
-            }
-            event.cancel();
+            });
         }
     }
 

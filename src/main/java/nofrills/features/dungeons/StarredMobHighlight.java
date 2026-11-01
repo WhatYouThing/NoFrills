@@ -3,7 +3,7 @@ package nofrills.features.dungeons;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingColor;
@@ -58,7 +58,7 @@ public class StarredMobHighlight {
                 if (!ent.isAlive()) continue;
                 AABB box = Utils.getLerpedBox(ent, event.delta());
                 event.drawStyled(
-                        ent instanceof EnderMan && ent.isInvisible() ? box.contract(0.0, 2.3, 0.0) : box,
+                        ent instanceof Enderman && ent.isInvisible() ? box.contract(0.0, 2.3, 0.0) : box,
                         style.value(),
                         false,
                         outlineColor.value(),

@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
@@ -51,13 +52,19 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
         super(title);
     }
 
-    @WrapOperation(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", ordinal = 1))
-    private void onClickSlotRedirect(AbstractContainerScreen<?> instance, Slot slot, int slotId, int button, ContainerInput actionType, Operation<Void> original) {
-        if (MiddleClickOverride.shouldOverride(slot, button, actionType)) {
-            instance.slotClicked(slot, slotId, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
+    @WrapOperation(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;ILnet/minecraft/client/input/MouseButtonEvent;Lnet/minecraft/world/inventory/ContainerInput;)V", ordinal = 1))
+    private void onClickSlotRedirect(AbstractContainerScreen<?> instance, Slot slot, int slotId, MouseButtonEvent event, ContainerInput containerInput, Operation<Void> original) {
+        if (MiddleClickOverride.shouldOverride(slot, event.button(), containerInput)) {
+            original.call(
+                    instance,
+                    slot,
+                    slotId,
+                    new MouseButtonEvent(event.x(), event.y(), new MouseButtonInfo(InputConstants.MOUSE_BUTTON_MIDDLE, event.modifiers())),
+                    ContainerInput.CLONE
+            );
             this.doubleclick = false;
         } else {
-            original.call(instance, slot, slotId, button, actionType);
+            original.call(instance, slot, slotId, event, containerInput);
         }
     }
 
@@ -103,7 +110,7 @@ public abstract class AbstractContainerScreenMixin<T extends AbstractContainerMe
         }
     }
 
-    @Inject(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), cancellable = true)
+    @Inject(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;Z)V"), cancellable = true)
     private void onDrawTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
         if (NoRender.shouldHideTooltip(hoveredSlot, this.title.getString()) || SlotOptions.isDisabled(hoveredSlot)) {
             ci.cancel();

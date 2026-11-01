@@ -3,7 +3,6 @@ package nofrills.features.general;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.ChatFormatting;
@@ -46,12 +45,12 @@ public class SlotLocking {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && keybind.isKey(event.key)) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && keybind.isKey(event)) {
             Slot focused = Utils.getFocusedSlot();
             List<Slot> inventorySlots = getInventorySlots(container.getMenu());
             if (focused == null || !inventorySlots.contains(focused)) return;
             int slotIndex = inventorySlots.indexOf(focused) + getFirstSlotOffset(inventorySlots);
-            if (event.action == InputConstants.PRESS) {
+            event.consume(() -> {
                 data.edit(obj -> {
                     if (!obj.has("slots")) {
                         obj.add("slots", new JsonArray());
@@ -65,8 +64,7 @@ public class SlotLocking {
                         Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 1.0f);
                     }
                 });
-            }
-            event.cancel();
+            });
         }
     }
 

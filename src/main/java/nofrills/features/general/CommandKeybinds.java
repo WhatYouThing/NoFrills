@@ -53,7 +53,7 @@ public final class CommandKeybinds {
                 }
                 JsonObject obj = new JsonObject();
                 obj.addProperty("name", "New Keybind");
-                obj.addProperty("key", -1);
+                obj.addProperty("key", SettingKeybind.UNKNOWN_KEY);
                 obj.addProperty("command", "");
                 obj.addProperty("enabled", true);
                 obj.addProperty("allowInGui", false);
@@ -118,7 +118,7 @@ public final class CommandKeybinds {
                 if (!isValidScreen(bind.has("allowInGui") && bind.get("allowInGui").getAsBoolean())) {
                     continue;
                 }
-                if (bind.get("key").getAsInt() != event.key) {
+                if (!event.isKey(bind.get("key").getAsInt())) {
                     continue;
                 }
                 if (bind.has("modifier")) {

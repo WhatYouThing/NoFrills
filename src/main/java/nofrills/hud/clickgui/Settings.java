@@ -135,7 +135,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
-        if (isBinding(this.settings, click.button())) {
+        if (isBinding(this.settings, -click.button())) {
             return true;
         }
         return super.mouseClicked(click, doubled);

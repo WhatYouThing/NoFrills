@@ -8,4 +8,11 @@ pluginManagement {
 		gradlePluginPortal()
 	}
 }
+
+sourceControl {
+	gitRepository("https://github.com/WhatYouThing/owo-lib.git") {
+		producesModule("io.wispforest:owo-lib")
+	}
+}
+
 include 'annotationprocessor'

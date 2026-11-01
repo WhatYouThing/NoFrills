@@ -89,8 +89,8 @@ public class HudMixin {
         }
     }
 
-    @Inject(method = "extractVignette", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIIII)V"), cancellable = true)
-    private void onRenderVignette(GuiGraphicsExtractor context, Entity entity, CallbackInfo ci, @Local(ordinal = 0) float borderWarningStrength) {
+    @Inject(method = "extractVignette", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIIII)V"), cancellable = true)
+    private void onRenderVignette(GuiGraphicsExtractor graphics, Entity camera, CallbackInfo ci, @Local(name = "borderWarningStrength") float borderWarningStrength) {
         if (NoRender.instance.isActive()) {
             NoRender.VignetteMode mode = NoRender.vignette.value();
             if (mode.equals(NoRender.VignetteMode.None)) return;

@@ -45,8 +45,8 @@ public abstract class GuiGraphicsExtractorMixin {
     @Shadow
     public abstract int guiHeight();
 
-    @WrapMethod(method = "setTooltipForNextFrameInternal")
-    private void onSetNextFrameTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style, boolean replaceExisting, Operation<Void> original) {
+    @WrapMethod(method = "setTooltipForNextFrameInternal(Lnet/minecraft/client/gui/Font;Ljava/util/List;IILnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;Lnet/minecraft/resources/Identifier;ZZ)V")
+    private void onSetNextFrameTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style, boolean replaceExisting, boolean extraSpaceAfterFirstLine, Operation<Void> original) {
         if (CommandTooltip.instance.isActive() && this.hoveredTextStyle != null && this.hoveredTextStyle.getClickEvent() instanceof ClickEvent.RunCommand(
                 String command
         )) {
@@ -55,14 +55,14 @@ public abstract class GuiGraphicsExtractorMixin {
             copy.add(ClientTooltipComponent.create(
                     Utils.getShortTag().append(Utils.formatText("Command: {}", command).withStyle(ChatFormatting.GRAY)).getVisualOrderText()
             ));
-            original.call(font, copy, xo, yo, positioner, style, replaceExisting);
+            original.call(font, copy, xo, yo, positioner, style, replaceExisting, extraSpaceAfterFirstLine);
         } else {
-            original.call(font, lines, xo, yo, positioner, style, replaceExisting);
+            original.call(font, lines, xo, yo, positioner, style, replaceExisting, extraSpaceAfterFirstLine);
         }
     }
 
     @Inject(method = "tooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil;extractTooltipBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIIILnet/minecraft/resources/Identifier;)V"))
-    private void beforeDrawTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style, CallbackInfo ci, @Local(name = "textWidth") int textWidth, @Local(name = "tempHeight") int tempHeight) {
+    private void beforeDrawTooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @org.jspecify.annotations.Nullable Identifier style, boolean extraSpaceAfterFirstLine, CallbackInfo ci, @Local(name = "textWidth") int textWidth, @Local(name = "tempHeight") int tempHeight) {
         if (TooltipScale.instance.isActive()) {
             if (TooltipScale.isDynamic()) {
                 int screenX = this.guiWidth();

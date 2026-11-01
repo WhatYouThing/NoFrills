@@ -11,12 +11,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Options.class)
 public abstract class OptionsMixin {
+
     @Shadow
-    public abstract void setCameraType(CameraType perspective);
+    public abstract void setCameraType(CameraType cameraType);
 
     @Inject(method = "setCameraType", at = @At("HEAD"), cancellable = true)
-    private void onChangePerspective(CameraType perspective, CallbackInfo ci) {
-        if (NoFrontPerspective.instance.isActive() && perspective == CameraType.THIRD_PERSON_FRONT) {
+    private void onChangePerspective(CameraType cameraType, CallbackInfo ci) {
+        if (NoFrontPerspective.instance.isActive() && cameraType == CameraType.THIRD_PERSON_FRONT) {
             setCameraType(CameraType.FIRST_PERSON);
             ci.cancel();
         }

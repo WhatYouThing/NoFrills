@@ -11,13 +11,14 @@ base {
 }
 
 repositories {
+    mavenCentral()
+
     maven {
         name = "wispforest-maven"
         url = 'https://maven.wispforest.io/releases/'
     }
 
     maven {
-        name = "jitpack-maven"
         url = 'https://jitpack.io'
     }
 
@@ -45,7 +46,17 @@ dependencies {
 
     include "meteordevelopment:orbit:${project.orbit_version}"
 
-    implementation("io.wispforest:owo-lib:${project.owolib_version}")
+    //implementation("io.wispforest:owo-lib:${project.owolib_version}")
+    implementation("io.wispforest:owo-lib") {
+        version {
+            branch = '26.3'
+        }
+    }
+    include("io.wispforest:owo-lib") {
+        version {
+            branch = '26.3'
+        }
+    }
 
     implementation("de.topobyte:jama:${project.jama_version}")
     include "de.topobyte:jama:${project.jama_version}"

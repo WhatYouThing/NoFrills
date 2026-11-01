@@ -67,7 +67,7 @@ public class WardrobeKeybinds {
     private static int getTargetSlot(InputEvent event, int page) {
         return switch (style.value()) {
             case Simple -> {
-                if (event.key >= InputConstants.KEY_1 && event.key <= InputConstants.KEY_9) {
+                if (event.isKeyboard && event.key >= InputConstants.KEY_1 && event.key <= InputConstants.KEY_9) {
                     yield event.key - 48 + (page - 1) * 9;
                 }
                 yield -1;
@@ -75,7 +75,7 @@ public class WardrobeKeybinds {
             case Hotbar -> {
                 for (int i = 1; i <= 9; i++) {
                     KeyMapping binding = mc.options.keyHotbarSlots[i - 1]; // could crash if someone is doing some voodoo
-                    if (Utils.matchesKey(binding, event.keyInput, event.mouseInput)) {
+                    if (event.isKey(binding)) {
                         yield i + (page - 1) * 9;
                     }
                 }
@@ -84,7 +84,7 @@ public class WardrobeKeybinds {
             case Custom -> {
                 for (int i = 1; i <= 9; i++) {
                     SettingKeybind binding = customKeys.get(i - 1);
-                    if (binding.value() == event.key) {
+                    if (binding.isKey(event)) {
                         yield i + (page - 1) * 9;
                     }
                 }
@@ -115,7 +115,7 @@ public class WardrobeKeybinds {
             if (target != -1) {
                 for (Slot slot : Utils.getContainerSlots(container.getMenu())) {
                     if (isEquipButton(slot, target)) {
-                        if (event.action == InputConstants.PRESS) {
+                        if (event.isPress()) {
                             Utils.click(container.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
                             if (playSound.value()) {
                                 Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());

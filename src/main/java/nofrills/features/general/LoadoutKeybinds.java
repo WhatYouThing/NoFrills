@@ -2,7 +2,6 @@ package nofrills.features.general;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -122,7 +121,7 @@ public class LoadoutKeybinds {
                     if (stack.isEmpty()) continue;
                     if (name.equals(Utils.toPlain(stack.getHoverName()))) {
                         event.consume(() -> {
-                            Utils.click(screen.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_LEFT, ContainerInput.PICKUP);
+                            Utils.click(screen.getMenu().containerId, slot.index, 0, ContainerInput.PICKUP);
                             if (playSound.value()) {
                                 Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
                             }

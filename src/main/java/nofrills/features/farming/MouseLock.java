@@ -20,8 +20,8 @@ public class MouseLock {
     public static SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "keybind", instance);
     public static SettingBool rebind = new SettingBool(false, "rebind", instance);
     public static SettingKeybind breakKeyActive = new SettingKeybind(InputConstants.KEY_SPACE, "breakKeyActive", instance);
-    public static SettingKeybind jumpKeyActive = new SettingKeybind(InputConstants.MOUSE_BUTTON_LEFT, "jumpKeyActive", instance);
-    public static SettingKeybind breakKeyInactive = new SettingKeybind(InputConstants.MOUSE_BUTTON_LEFT, "breakKeyInactive", instance);
+    public static SettingKeybind jumpKeyActive = new SettingKeybind(-InputConstants.MOUSE_BUTTON_LEFT, "jumpKeyActive", instance);
+    public static SettingKeybind breakKeyInactive = new SettingKeybind(-InputConstants.MOUSE_BUTTON_LEFT, "breakKeyInactive", instance);
     public static SettingKeybind jumpKeyInactive = new SettingKeybind(InputConstants.KEY_SPACE, "jumpKeyInactive", instance);
 
     public static boolean locked = false;

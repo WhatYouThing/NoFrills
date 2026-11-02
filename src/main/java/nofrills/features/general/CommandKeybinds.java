@@ -97,13 +97,16 @@ public final class CommandKeybinds {
         return Modifier.Any;
     }
 
-    private static int getRequiredModifier(Modifier modifier) {
+    private static boolean matchesModifier(Modifier modifier, int modifiers) {
+        boolean shift = (modifiers & InputConstants.MOD_SHIFT) != 0;
+        boolean alt = (modifiers & InputConstants.MOD_ALT) != 0;
+        boolean ctrl = (modifiers & InputConstants.MOD_CONTROL) != 0;
         return switch (modifier) {
-            case Any -> -1;
-            case None -> 0;
-            case Shift -> InputConstants.MOD_SHIFT;
-            case Alt -> InputConstants.MOD_ALT;
-            case Ctrl -> InputConstants.MOD_CONTROL;
+            case Any -> true;
+            case None -> !shift && !alt && !ctrl;
+            case Shift -> shift && !alt && !ctrl;
+            case Alt -> alt && !shift && !ctrl;
+            case Ctrl -> ctrl && !shift && !alt;
         };
     }
 
@@ -123,8 +126,7 @@ public final class CommandKeybinds {
                 }
                 if (bind.has("modifier")) {
                     String modifier = bind.get("modifier").getAsString();
-                    int required = getRequiredModifier(getModifierType(modifier));
-                    if (required != -1 && event.modifiers != required) {
+                    if (!matchesModifier(getModifierType(modifier), event.modifiers)) {
                         continue;
                     }
                 }

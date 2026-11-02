@@ -202,10 +202,10 @@ public class ItemProtection {
                 ItemStack stack = focused.getItem();
                 if (!stack.isEmpty()) {
                     event.consume(() -> {
-                        if (uuidKey.isKey(event.key)) {
+                        if (uuidKey.isKey(event)) {
                             addUUID(stack);
                         }
-                        if (skyblockIdKey.isKey(event.key)) {
+                        if (skyblockIdKey.isKey(event)) {
                             addSkyblockID(stack);
                         }
                     });

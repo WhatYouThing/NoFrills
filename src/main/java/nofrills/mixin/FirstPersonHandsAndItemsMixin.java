@@ -1,6 +1,7 @@
 package nofrills.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.player.FirstPersonHandsAndItems;
 import nofrills.features.general.Viewmodel;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,6 +22,14 @@ public class FirstPersonHandsAndItemsMixin {
     private float onGetSwapScale(float original) {
         if (Viewmodel.instance.isActive() && Viewmodel.noEquip.value()) {
             return 1.0f;
+        }
+        return original;
+    }
+
+    @ModifyReturnValue(method = "shouldInstantlyReplaceVisibleItem", at = @At("RETURN"))
+    private boolean onShouldReplace(boolean original) {
+        if (Viewmodel.instance.isActive() && Viewmodel.noEquip.value()) {
+            return true;
         }
         return original;
     }

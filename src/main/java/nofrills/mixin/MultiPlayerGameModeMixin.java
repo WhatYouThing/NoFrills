@@ -22,8 +22,8 @@ import static nofrills.Main.eventBus;
 public abstract class MultiPlayerGameModeMixin {
 
     @Inject(method = "attack", at = @At("TAIL"))
-    private void onAttackEntity(Player player, Entity target, CallbackInfo ci) {
-        eventBus.post(new AttackEntityEvent(target));
+    private void onAttackEntity(Player player, Entity entity, CallbackInfo ci) {
+        eventBus.post(new AttackEntityEvent(entity));
     }
 
     @Inject(method = "handleContainerInput", at = @At("HEAD"))

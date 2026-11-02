@@ -7,7 +7,6 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -162,7 +161,7 @@ public class LeapOverlay {
                 if (!stack.getItem().equals(Items.PLAYER_HEAD)) continue;
                 List<String> lore = Utils.getLoreLines(stack);
                 if (!lore.isEmpty() && Utils.toPlain(stack.getHoverName()).equals(this.player.getString()) && lore.getFirst().equals("Click to teleport!")) {
-                    Utils.click(handler.containerId, slot.index, 0, ContainerInput.PICKUP);
+                    Utils.leftClick(handler.containerId, slot.index);
                     Utils.infoRaw(Utils.formatText("Leaping to {}.", this.player.getString()).withStyle(ChatFormatting.GREEN));
                     return;
                 }

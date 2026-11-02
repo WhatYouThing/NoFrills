@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -116,7 +115,7 @@ public class WardrobeKeybinds {
                 for (Slot slot : Utils.getContainerSlots(container.getMenu())) {
                     if (isEquipButton(slot, target)) {
                         if (event.isPress()) {
-                            Utils.click(container.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE);
+                            Utils.middleClick(container.getMenu().containerId, slot.index);
                             if (playSound.value()) {
                                 Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
                             }

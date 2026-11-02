@@ -1286,6 +1286,18 @@ public class Utils {
         }
     }
 
+    public static void leftClick(int containerId, int slotId) {
+        click(containerId, slotId, 0, ContainerInput.PICKUP);
+    }
+
+    public static void middleClick(int containerId, int slotId) {
+        click(containerId, slotId, 2, ContainerInput.CLONE);
+    }
+
+    public static void rightClick(int containerId, int slotId) {
+        click(containerId, slotId, 1, ContainerInput.PICKUP);
+    }
+
     public static class Symbols {
         public static String zone = "\uE067";
         public static String zoneRift = "\uE020";

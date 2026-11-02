@@ -1,10 +1,8 @@
 package nofrills.features.misc;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.world.inventory.ChestMenu;
-import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -54,13 +52,11 @@ public class GuiKeybinds {
     }
 
     private static void click(int syncId, Slot slot) {
-        boolean extraLines = Utils.getLoreLines(slot.getItem()).size() > 1;
-        Utils.click(
-                syncId,
-                slot.index,
-                extraLines ? InputConstants.MOUSE_BUTTON_LEFT : InputConstants.MOUSE_BUTTON_MIDDLE,
-                extraLines ? ContainerInput.PICKUP : ContainerInput.CLONE
-        );
+        if (Utils.getLoreLines(slot.getItem()).size() > 1) {
+            Utils.leftClick(syncId, slot.index);
+        } else {
+            Utils.middleClick(syncId, slot.index);
+        }
     }
 
     @EventHandler

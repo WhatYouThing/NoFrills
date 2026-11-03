@@ -1,7 +1,6 @@
 package nofrills.features.dungeons;
 
 import com.google.common.collect.Maps;
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -343,7 +342,7 @@ public class TerminalSolvers {
             if (this.type.equals(TerminalType.Colors)) {
                 int index = this.solutionMap.getOrDefault(slot.index, -1);
                 if (index != -1) {
-                    int modifier = button == InputConstants.MOUSE_BUTTON_RIGHT ? -1 : 1;
+                    int modifier = button == 1 ? -1 : 1;
                     int newIndex = index - modifier;
                     if (newIndex < 0) {
                         this.solutionMap.put(slot.index, 4);

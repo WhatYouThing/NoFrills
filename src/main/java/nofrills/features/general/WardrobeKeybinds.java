@@ -67,7 +67,7 @@ public class WardrobeKeybinds {
         return switch (style.value()) {
             case Simple -> {
                 if (event.isKeyboard && event.key >= InputConstants.KEY_1 && event.key <= InputConstants.KEY_9) {
-                    yield event.key - 48 + (page - 1) * 9;
+                    yield event.key - InputConstants.KEY_1 + 1 + (page - 1) * 9;
                 }
                 yield -1;
             }

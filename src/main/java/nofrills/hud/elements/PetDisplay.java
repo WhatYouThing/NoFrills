@@ -1,6 +1,5 @@
 package nofrills.hud.elements;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -93,7 +92,7 @@ public final class PetDisplay extends SimpleTextElement implements ListeningHudE
                 if (!matcher.matches()) return;
                 List<String> lore = Utils.getLoreLines(stack);
                 if (lore.contains("Left-click to summon!")) {
-                    if (containerInput.equals(ContainerInput.PICKUP) && buttonNum == InputConstants.MOUSE_BUTTON_RIGHT)
+                    if (containerInput.equals(ContainerInput.PICKUP) && buttonNum == 1)
                         return;
                     this.apply(matcher.group("pet"), name, stack.getHoverName());
                 } else if (lore.contains("Click to despawn!")) {

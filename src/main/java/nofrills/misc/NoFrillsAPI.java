@@ -183,8 +183,8 @@ public class NoFrillsAPI {
                 this.currentTicks--;
             }
             if (this.currentTicks == 0 && mc.isWindowActive() && usingFlag(this.requiredFlag)) {
-                this.task.accept(this);
                 this.currentTicks = this.ticks;
+                this.task.accept(this);
             }
         }
     }

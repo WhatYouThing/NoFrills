@@ -1,9 +1,7 @@
 package nofrills.features.hunting;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +45,7 @@ public class FusionKeybinds {
             }
             for (Slot slot : container.getMenu().slots) {
                 if (isBindValid(slot.getItem(), title, event)) {
-                    event.consume(() -> Utils.click(container.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_MIDDLE, ContainerInput.CLONE));
+                    event.consume(() -> Utils.middleClick(container.getMenu().containerId, slot.index));
                     return;
                 }
             }

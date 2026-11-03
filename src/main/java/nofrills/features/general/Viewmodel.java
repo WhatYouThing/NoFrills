@@ -1,9 +1,13 @@
 package nofrills.features.general;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.world.item.ItemStack;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingDouble;
 import nofrills.config.SettingInt;
+import org.joml.Matrix4f;
 
 public class Viewmodel {
     public static final Feature instance = new Feature("viewmodel");
@@ -26,4 +30,21 @@ public class Viewmodel {
     public static final SettingDouble swingX = new SettingDouble(1.0, "swingX", instance.key());
     public static final SettingDouble swingY = new SettingDouble(1.0, "swingY", instance.key());
     public static final SettingDouble swingZ = new SettingDouble(1.0, "swingZ", instance.key());
+
+    public static void offset(PoseStack poseStack, ItemStack itemStack, boolean isMainHand) {
+        if (!applyToHand.value() && itemStack.isEmpty()) return;
+        if (isMainHand) {
+            poseStack.translate(offsetX.value(), offsetY.value(), offsetZ.value());
+        } else {
+            poseStack.translate(-offsetX.value(), offsetY.value(), offsetZ.value());
+        }
+    }
+
+    public static void scaleAndRotate(PoseStack poseStack, ItemStack itemStack) {
+        if (!applyToHand.value() && itemStack.isEmpty()) return;
+        poseStack.mulPose(Axis.XP.rotationDegrees((float) rotX.value()).get(new Matrix4f()));
+        poseStack.mulPose(Axis.YP.rotationDegrees((float) rotY.value()).get(new Matrix4f()));
+        poseStack.mulPose(Axis.ZP.rotationDegrees((float) rotZ.value()).get(new Matrix4f()));
+        poseStack.scale((float) scaleX.value(), (float) scaleY.value(), (float) scaleZ.value());
+    }
 }

@@ -8,7 +8,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import nofrills.config.*;
@@ -121,7 +120,7 @@ public class LoadoutKeybinds {
                     if (stack.isEmpty()) continue;
                     if (name.equals(Utils.toPlain(stack.getHoverName()))) {
                         event.consume(() -> {
-                            Utils.click(screen.getMenu().containerId, slot.index, 0, ContainerInput.PICKUP);
+                            Utils.leftClick(screen.getMenu().containerId, slot.index);
                             if (playSound.value()) {
                                 Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
                             }

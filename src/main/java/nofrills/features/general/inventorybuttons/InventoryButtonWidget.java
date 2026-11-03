@@ -1,6 +1,7 @@
 package nofrills.features.general.inventorybuttons;
 
 import com.google.gson.JsonObject;
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.core.PositionedRectangle;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ImageButton;
@@ -114,13 +115,13 @@ public final class InventoryButtonWidget extends ImageButton {
 
     @Override
     protected boolean isValidClickButton(final MouseButtonInfo buttonInfo) {
-        return buttonInfo.button() == 1 || super.isValidClickButton(buttonInfo);
+        return buttonInfo.button() == InputConstants.MOUSE_BUTTON_LEFT || buttonInfo.button() == InputConstants.MOUSE_BUTTON_RIGHT;
     }
 
     @Override
     public void onClick(@NonNull MouseButtonEvent event, boolean doubleClick) {
         if (this.unlockPosition) return;
-        if (event.buttonInfo().button() == 1) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
             Screen previous = mc.gui.screen();
             mc.gui.setScreen(InventoryButtonSettings.of(this, previous));
         } else {
@@ -131,7 +132,7 @@ public final class InventoryButtonWidget extends ImageButton {
     @Override
     protected void onDrag(final @NonNull MouseButtonEvent event, final double dx, final double dy) {
         if (!this.unlockPosition) return;
-        if (event.buttonInfo().button() == 0) {
+        if (event.buttonInfo().button() == InputConstants.MOUSE_BUTTON_LEFT) {
             double windowX = mc.getWindow().getGuiScaledWidth();
             double windowY = mc.getWindow().getGuiScaledHeight();
             double buttonSizeX = 20 * this.buttonScaleX;

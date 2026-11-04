@@ -77,9 +77,7 @@ public class Main implements ModInitializer {
             HudManager.registerElements();
         });
 
-        ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> {
-            Config.saveBlocking();
-        });
+        ClientLifecycleEvents.CLIENT_STOPPING.register(_ -> Config.saveBlocking());
 
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             String msg = Utils.toPlain(message);

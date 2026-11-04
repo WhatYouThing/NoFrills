@@ -86,13 +86,7 @@ public class HudManager {
     }
 
     public static void setCustomTitle(MutableComponent text, int ticks) {
-        if (customTitleContainer.isActive()) {
-            customTitleContainer.setText(text);
-            customTitleContainer.setStartTicks(ticks);
-            customTitleContainer.start();
-        } else {
-            currentTitle = new CustomTitle(text, ticks);
-        }
+        currentTitle = new CustomTitle(text, ticks);
     }
 
     public static void setCustomTitle(String text, int ticks) {
@@ -182,6 +176,7 @@ public class HudManager {
         public CustomTitle(MutableComponent text, int ticks) {
             this.text = text;
             this.ticks = ticks;
+            customTitleContainer.setText(text);
         }
 
         public boolean isActive() {
@@ -189,14 +184,21 @@ public class HudManager {
         }
 
         public void tick() {
-            this.ticks--;
+            if (this.ticks > 0) {
+                this.ticks--;
+                if (this.ticks == 0) {
+                    customTitleContainer.setDefaultText();
+                }
+            }
         }
 
         public void reset() {
             this.ticks = 0;
+            customTitleContainer.setDefaultText();
         }
 
         public void draw(GuiGraphicsExtractor context) {
+            if (customTitleContainer.isActive()) return;
             context.pose().pushMatrix();
             context.pose().translate(context.guiWidth() * 0.5f, context.guiHeight() * 0.5f);
             context.pose().pushMatrix();

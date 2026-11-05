@@ -1,10 +1,13 @@
 package nofrills.features.misc;
 
+import com.google.gson.JsonObject;
 import meteordevelopment.orbit.EventHandler;
+import meteordevelopment.orbit.EventPriority;
 import net.minecraft.sounds.SoundEvents;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
+import nofrills.config.SettingJson;
 import nofrills.events.EventListener;
 import nofrills.events.PlaySoundEvent;
 import nofrills.misc.Utils;
@@ -13,6 +16,7 @@ import nofrills.misc.Utils;
 public class SoundBlocker {
     public static final Feature instance = new Feature("soundBlocker");
 
+    public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
     public static final SettingEnum<ExplosionMode> explosions = new SettingEnum<>(ExplosionMode.Disabled, ExplosionMode.class, "explosions", instance);
     public static final SettingBool angryEnderman = new SettingBool(false, "angryEnderman", instance);
     public static final SettingBool vampireAbilities = new SettingBool(false, "vampireAbilities", instance);
@@ -32,7 +36,7 @@ public class SoundBlocker {
         return false;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOW)
     private static void onSound(PlaySoundEvent event) {
         if (instance.isActive()) {
             if (!explosions.value().equals(ExplosionMode.Disabled) && event.isSound(SoundEvents.GENERIC_EXPLODE)) {

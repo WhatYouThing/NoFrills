@@ -1,6 +1,7 @@
 package nofrills.hud.clickgui;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonElement;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
 import io.wispforest.owo.ui.component.ButtonComponent;
@@ -382,6 +383,15 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.TextInput("Current Nick", StreamerMode.currentNick, "This option stores your last known nick (or nothing when unnicked).")
                         )),
                         new Module("Sound Blocker", SoundBlocker.instance, "Prevents various sounds from playing.", new Settings(
+                                new Settings.TextEntryList(
+                                        "Custom Sounds",
+                                        () -> SoundBlocker.data.value().has("custom")
+                                                ? SoundBlocker.data.value().get("custom").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
+                                                : List.of(),
+                                        "Blocks sounds which match any of the sound identifiers on this list.",
+                                        l -> SoundBlocker.data.edit(obj -> obj.add("custom", Utils.toJsonArray(l))),
+                                        Settings.soundSuggestionProvider
+                                ),
                                 new Settings.EnumToggle<>("Explosions", SoundBlocker.explosions, "Cancels explosion sound effects."),
                                 new Settings.Toggle("Angry Enderman", SoundBlocker.angryEnderman, "Prevents the angry Enderman noises from being played by the client."),
                                 new Settings.Toggle("Vampire Abilities", SoundBlocker.vampireAbilities, "Cancels the Vampire Slayer Mania and Killer Springs sound effects."),

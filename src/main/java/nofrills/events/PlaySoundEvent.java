@@ -2,6 +2,7 @@ package nofrills.events;
 
 import net.minecraft.core.Holder;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.phys.Vec3;
 
@@ -16,7 +17,11 @@ public class PlaySoundEvent extends Cancellable {
     }
 
     public boolean isSound(String identifier) {
-        return packet.getSound().value().location().toString().equalsIgnoreCase(identifier);
+        return this.isSound(Identifier.tryParse(identifier));
+    }
+
+    public boolean isSound(Identifier identifier) {
+        return packet.getSound().value().location().equals(identifier);
     }
 
     /**

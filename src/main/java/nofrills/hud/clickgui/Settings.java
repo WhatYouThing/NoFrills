@@ -46,6 +46,12 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
         Rendering.drawBorder(context, button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xffffffff);
     };
+    public static final Function<String, List<String>> soundSuggestionProvider = s ->
+            mc.getSoundManager().getAvailableSounds().stream()
+                    .map(i -> (s.contains(":") ? i.toString() : i.getPath()).toLowerCase(Locale.ROOT))
+                    .filter(i -> i.startsWith(Utils.toLower(s)))
+                    .sorted()
+                    .toList();
     public List<FlowLayout> settings;
     public Component title = Component.empty();
     public ScrollContainer<FlowLayout> scroll;
@@ -565,13 +571,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
             FlowLayout soundLayout = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
             soundLayout.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Component.literal("Sound").withColor(0xffffff));
-            FlatTextbox text = new FlatAutofillTextbox(Sizing.fixed(200), s ->
-                    mc.getSoundManager().getAvailableSounds().stream()
-                            .map(i -> (s.contains(":") ? i.toString() : i.getPath()).toLowerCase(Locale.ROOT))
-                            .filter(i -> i.startsWith(Utils.toLower(s)))
-                            .sorted()
-                            .toList()
-            );
+            FlatTextbox text = new FlatAutofillTextbox(Sizing.fixed(200), soundSuggestionProvider);
             label.verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(0, 0, 0, 5)).verticalSizing(Sizing.fixed(20));
             label.tooltip(Component.literal(tooltip));
             text.onChanged().subscribe(soundCallback::accept);

@@ -1,36 +1,45 @@
 package nofrills.mixin;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import net.minecraft.client.player.FirstPersonHandsAndItems;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.item.ItemStack;
 import nofrills.features.general.Viewmodel;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(FirstPersonHandsAndItems.class)
 public class FirstPersonHandsAndItemsMixin {
 
-    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isHandsBusy()Z"))
-    private boolean onAreHandsBusy(boolean original) {
+    @Shadow
+    private float mainHandHeight;
+
+    @Shadow
+    private float offHandHeight;
+
+    @Shadow
+    private float oMainHandHeight;
+
+    @Shadow
+    private float oOffHandHeight;
+
+    @Inject(method = "shouldInstantlyReplaceVisibleItem", at = @At("HEAD"), cancellable = true)
+    private void onShouldSkipAnimation(ItemStack currentlyVisibleItem, ItemStack expectedItem, LocalPlayer player, CallbackInfoReturnable<Boolean> cir) {
         if (Viewmodel.instance.isActive() && Viewmodel.noEquip.value()) {
-            return false;
+            cir.setReturnValue(true);
         }
-        return original;
     }
 
-    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getItemSwapScale(F)F"))
-    private float onGetSwapScale(float original) {
+    @Inject(method = "tick", at = @At("TAIL"))
+    private void onUpdateHeldItems(CallbackInfo ci) {
         if (Viewmodel.instance.isActive() && Viewmodel.noEquip.value()) {
-            return 1.0f;
+            this.mainHandHeight = 1.0f;
+            this.offHandHeight = 1.0f;
+            this.oMainHandHeight = 1.0f;
+            this.oOffHandHeight = 1.0f;
         }
-        return original;
-    }
-
-    @ModifyReturnValue(method = "shouldInstantlyReplaceVisibleItem", at = @At("RETURN"))
-    private boolean onShouldReplace(boolean original) {
-        if (Viewmodel.instance.isActive() && Viewmodel.noEquip.value()) {
-            return true;
-        }
-        return original;
     }
 }

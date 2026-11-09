@@ -31,7 +31,8 @@ public class NoDamageSplash {
     }
 
     private static boolean isSplash(String name) {
-        return pattern.matcher(Utils.toAscii(name.replaceAll(",", ""))).matches();
+        String ascii = Utils.toAscii(name.replace(",", ""));
+        return !ascii.isBlank() && pattern.matcher(ascii).matches();
     }
 
     @EventHandler

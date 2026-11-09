@@ -52,7 +52,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     public int mouseY = 0;
 
     private boolean matchSearch(String text, String search) {
-        return Utils.toLower(text).replaceAll(" ", "").contains(Utils.toLower(search).replaceAll(" ", ""));
+        return Utils.toLower(text).replace(" ", "").contains(Utils.toLower(search).replace(" ", ""));
     }
 
     @Override

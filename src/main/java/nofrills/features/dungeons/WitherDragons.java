@@ -70,8 +70,7 @@ public class WitherDragons {
     private static boolean isDragonParticle(ClientboundLevelParticlesPacket packet) {
         return packet.getParticle().getType().equals(ParticleTypes.FLAME) && packet.getCount() == 20
                 && packet.getY() == 19 && packet.getXDist() == 2.0f && packet.getYDist() == 3.0f
-                && packet.getZDist() == 2.0f && packet.getMaxSpeed() == 0.0f && packet.getX() % 1 == 0.0
-                && packet.getZ() % 1 == 0.0;
+                && packet.getZDist() == 2.0f && packet.getMaxSpeed() == 0.0f;
     }
 
     private static boolean isIceSprayEntity(ArmorStand stand) {

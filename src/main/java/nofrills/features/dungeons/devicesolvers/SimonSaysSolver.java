@@ -89,7 +89,7 @@ public class SimonSaysSolver {
                         validClicks.set(0);
                     } else if (validClicks.get() > 0) {
                         if (progressSend.value() && validClicks.get() < 4) {
-                            Utils.sendMessage(progressMsg.value().replaceAll("\\{percent}", (int) (validClicks.get() / 4.0 * 100) + "%"));
+                            Utils.sendMessage(progressMsg.value().replace("{percent}", (int) (validClicks.get() / 4.0 * 100) + "%"));
                         }
                         validClicks.set(0);
                     }

@@ -56,8 +56,8 @@ public class ShaftAnnounce {
                 }
             }
             Utils.sendMessage(msg.value()
-                    .replaceAll("\\{id}", id.isEmpty() ? "Unknown ID" : id)
-                    .replaceAll("\\{corpses}", corpseList.isEmpty() ? "None" : corpseList.toString())
+                    .replace("{id}", id.isEmpty() ? "Unknown ID" : id)
+                    .replace("{corpses}", corpseList.isEmpty() ? "None" : corpseList.toString())
             );
             ticks = -1;
         }

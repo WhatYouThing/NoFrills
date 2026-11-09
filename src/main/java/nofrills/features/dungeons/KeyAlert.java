@@ -46,7 +46,7 @@ public class KeyAlert {
             if (!matcher.matches()) return;
             String key = matcher.group("key");
             Utils.showTitle(
-                    droppedTitle.title().value().replaceAll("\\{key}", getKeyColor(key) + key + " Key"),
+                    droppedTitle.title().value().replace("{key}", getKeyColor(key) + key + " Key"),
                     "",
                     droppedTitle.fadeIn().value(),
                     droppedTitle.stay().value(),
@@ -65,7 +65,7 @@ public class KeyAlert {
             if (!matcher.matches()) return;
             String key = matcher.group("key");
             Utils.showTitle(
-                    obtainedTitle.title().value().replaceAll("\\{key}", getKeyColor(key) + key + " Key"),
+                    obtainedTitle.title().value().replace("{key}", getKeyColor(key) + key + " Key"),
                     "",
                     obtainedTitle.fadeIn().value(),
                     obtainedTitle.stay().value(),

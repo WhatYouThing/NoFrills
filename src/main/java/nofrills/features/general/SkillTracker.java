@@ -194,7 +194,7 @@ public class SkillTracker {
     }
 
     private static Optional<Double> parseExp(String exp) {
-        return Utils.parseDouble(exp.replaceAll(",", ""));
+        return Utils.parseDouble(exp.replace(",", ""));
     }
 
     @EventHandler

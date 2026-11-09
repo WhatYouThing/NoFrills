@@ -51,7 +51,7 @@ public final class BaitSack extends SimpleTextElement implements ListeningHudEle
             if (line.startsWith("Bait Remaining: ")) {
                 String quantity = line.substring(line.indexOf(":") + 2);
                 Style color = Utils.getStyle(stack.getHoverName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
-                double percentage = Utils.parseInt(quantity.replaceAll(",", "")).orElse(0) / 20160.0;
+                double percentage = Utils.parseInt(quantity.replace(",", "")).orElse(0) / 20160.0;
                 this.setText(Component.literal("Bait: ")
                         .append(Component.literal(name.replace(" Bait", "")).setStyle(color))
                         .append(Component.literal(" x" + quantity).withColor(Utils.getPercentageColor(percentage, true).hex()))

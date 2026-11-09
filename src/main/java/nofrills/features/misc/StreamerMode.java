@@ -99,7 +99,7 @@ public class StreamerMode {
                         String id = prefix + lobbyID;
                         if (text.contains(id)) {
                             lobbyCache.put(lobbyID, new Object()); // refresh entry expiry time
-                            return Optional.of(text.replaceAll(id, "[REDACTED]"));
+                            return Optional.of(text.replace(id, "[REDACTED]"));
                         }
                     }
                 }

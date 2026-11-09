@@ -15,7 +15,6 @@
         "ClientPacketListenerMixin",
         "ConnectionMixin",
         "ContainerScreenMixin",
-        "CreeperMixin",
         "DataComponentHolderMixin",
         "EffectsInInventoryMixin",
         "EnderManMixin",

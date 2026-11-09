@@ -12,8 +12,10 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
-import nofrills.hud.clickgui.Settings;
 import nofrills.hud.clickgui.components.PlainLabel;
+import nofrills.hud.clickgui.settings.ColorPicker;
+import nofrills.hud.clickgui.settings.EnumToggle;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.RenderColor;
 
 import java.util.ArrayList;
@@ -56,16 +58,16 @@ public abstract class SimpleTextElement extends HudElement {
     }
 
     @Override
-    public HudSettings getBaseSettings() {
+    public HudSettingsScreen getBaseSettings() {
         return this.getBaseSettings(new ArrayList<>());
     }
 
     @Override
-    public HudSettings getBaseSettings(List<FlowLayout> extra) {
+    public HudSettingsScreen getBaseSettings(List<FlowLayout> extra) {
         List<FlowLayout> list = new ArrayList<>(extra);
-        list.add(new Settings.Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."));
-        list.add(new Settings.EnumToggle<>("Alignment", this.textAlignment, "The alignment of the element's text."));
-        list.add(new Settings.ColorPicker("Text Color", this.textColor, "The base color of the element's text."));
+        list.add(new Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."));
+        list.add(new EnumToggle<>("Alignment", this.textAlignment, "The alignment of the element's text."));
+        list.add(new ColorPicker("Text Color", this.textColor, "The base color of the element's text."));
         return super.getBaseSettings(list);
     }
 

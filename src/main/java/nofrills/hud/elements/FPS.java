@@ -6,7 +6,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public final class FPS extends SimpleTextElement implements ListeningHudElement 
     public FPS() {
         super(Component.literal("FPS: §f0"), new Feature("fpsElement"), "FPS Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Average", average, "Tracks and adds the average FPS to the element.")
+                new Toggle("Average", average, "Tracks and adds the average FPS to the element.")
         ));
         this.setDesc("Displays your FPS.");
         this.setCategory(Category.Info);

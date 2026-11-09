@@ -14,7 +14,7 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.events.ReceivePacketEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
@@ -35,7 +35,7 @@ public final class PetDisplay extends SimpleTextElement implements ListeningHudE
     public PetDisplay() {
         super(Component.literal("§cNo Pet"), new Feature("petDisplayElement"), "Pet Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Compact Mode", this.compact, "Makes the element more compact by removing the prefix.")
+                new Toggle("Compact Mode", this.compact, "Makes the element more compact by removing the prefix.")
         ));
         this.setDesc("Displays the name of your active pet.");
         this.setCategory(Category.Info);

@@ -16,13 +16,13 @@ public final class Module extends FlowLayout {
     public Component activeText;
     public Component inactiveText;
     public PlainLabel label;
-    public Settings options;
+    public SettingsScreen options;
 
     public Module(String name, Feature feature, String tooltip) {
         this(name, feature, tooltip, null);
     }
 
-    public Module(String name, Feature feature, String tooltip, Settings options) {
+    public Module(String name, Feature feature, String tooltip, SettingsScreen options) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
         this.activeText = Component.literal(name).withColor(0x5ca0bf);
         this.inactiveText = Component.literal(name).withColor(0xdddddd);
@@ -40,7 +40,7 @@ public final class Module extends FlowLayout {
 
     @Override
     public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
-        if (click.y() <= (double) this.label.fullSize().height()) {
+        if (this.isInBoundingBox(click.x() + this.x(), click.y() + this.y())) {
             if (click.button() == InputConstants.MOUSE_BUTTON_LEFT) {
                 this.active(!this.feature.isActive());
             } else if (click.button() == InputConstants.MOUSE_BUTTON_RIGHT && this.options != null) {

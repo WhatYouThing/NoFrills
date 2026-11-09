@@ -8,7 +8,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.KuudraUtil;
 import nofrills.misc.Utils;
@@ -26,8 +26,8 @@ public final class BossHealth extends SimpleTextElement implements ListeningHudE
     public BossHealth() {
         super(Component.literal("Boss Health: N/A"), new Feature("bossHealthElement"), "Boss Health");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Dungeon", this.dungeon, "If enabled, the health of the dungeon bosses is displayed."),
-                new Settings.Toggle("Kuudra", this.kuudra, "If enabled, the health of Kuudra is displayed.")
+                new Toggle("Dungeon", this.dungeon, "If enabled, the health of the dungeon bosses is displayed."),
+                new Toggle("Kuudra", this.kuudra, "If enabled, the health of Kuudra is displayed.")
         ));
         this.setDesc("Displays the health of Kuudra and/or the Catacombs bosses.");
         this.setCategory(Category.Misc);

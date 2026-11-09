@@ -6,7 +6,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Utils;
 
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ public final class Clock extends SimpleTextElement implements ListeningHudElemen
     public Clock() {
         super(Component.literal("Time: §f00:00:00"), new Feature("clockElement"), "Clock Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("24H Format", this.format24, "Use 24H format instead of 12H.")
+                new Toggle("24H Format", this.format24, "Use 24H format instead of 12H.")
         ));
         this.setDesc("Displays system clock.");
         this.setCategory(Category.Info);

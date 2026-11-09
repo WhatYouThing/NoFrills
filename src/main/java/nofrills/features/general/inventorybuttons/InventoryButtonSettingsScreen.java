@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import nofrills.hud.InnerSettingsScreen;
 import nofrills.hud.clickgui.components.FlatSlider;
 import nofrills.hud.clickgui.components.PlainLabel;
+import nofrills.hud.clickgui.settings.*;
 import nofrills.misc.RenderColor;
 
 import java.util.ArrayList;
@@ -22,13 +23,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static nofrills.Main.mc;
 
-public class InventoryButtonSettings extends InnerSettingsScreen {
+public class InventoryButtonSettingsScreen extends InnerSettingsScreen {
 
-    public InventoryButtonSettings(List<FlowLayout> settings, Screen previous) {
+    public InventoryButtonSettingsScreen(List<FlowLayout> settings, Screen previous) {
         super(settings, previous);
     }
 
-    public static InventoryButtonSettings of(InventoryButtonWidget widget, Screen previous) {
+    public static InventoryButtonSettingsScreen of(InventoryButtonWidget widget, Screen previous) {
         JsonObject buttonObject = widget.buttonObject;
         List<FlowLayout> list = new ArrayList<>();
         list.add(buildUniformSetting(buttonObject));
@@ -47,7 +48,7 @@ public class InventoryButtonSettings extends InnerSettingsScreen {
         list.add(buildBorderColorSetting(buttonObject, widget));
         list.add(buildBorderHoverColorSetting(buttonObject, widget));
         list.add(buildManageSetting(buttonObject, previous));
-        InventoryButtonSettings buttonSettings = new InventoryButtonSettings(list, previous);
+        InventoryButtonSettingsScreen buttonSettings = new InventoryButtonSettingsScreen(list, previous);
         String command = buttonObject.get("command").getAsString();
         buttonSettings.setTitle(Component.literal("Inventory Button: " + (command.isEmpty() ? "Blank" : command)));
         return buttonSettings;

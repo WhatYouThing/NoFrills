@@ -11,7 +11,7 @@ import nofrills.config.SettingBool;
 import nofrills.events.InventoryUpdateEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Utils;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public final class BaitSack extends SimpleTextElement implements ListeningHudEle
     public BaitSack() {
         super(Component.literal("Bait: §fN/A"), new Feature("fishingBagElement"), "Bait Sack Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Only If Rod", this.onlyRod, "Automatically hides the element if you are not holding a fishing rod.")
+                new Toggle("Only If Rod", this.onlyRod, "Automatically hides the element if you are not holding a fishing rod.")
         ));
         this.setDesc("Displays the type and the amount of bait in your bait sack.");
         this.setCategory(Category.Fishing);

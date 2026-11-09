@@ -23,8 +23,9 @@ import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.events.ScreenRenderEvent;
 import nofrills.events.TooltipRenderEvent;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.hud.clickgui.components.FlatTextbox;
+import nofrills.hud.clickgui.settings.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -101,11 +102,11 @@ public final class SlotBinding {
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
-        list.add(new Settings.Description("Using Binds", "Shift + Left click to swap items with the other bound slot."));
-        list.add(new Settings.Description("Adding Binds", "Hover over a slot, press the keybind, move your cursor to another slot, and release the keybind."));
-        list.add(new Settings.Description("Deleting Binds", "Press and release the keybind over a slot to clear every bound slot."));
-        list.add(new Settings.Separator("Presets"));
-        Settings.BigButton button = new Settings.BigButton("Save New Preset", btn -> {
+        list.add(new Description("Using Binds", "Shift + Left click to swap items with the other bound slot."));
+        list.add(new Description("Adding Binds", "Hover over a slot, press the keybind, move your cursor to another slot, and release the keybind."));
+        list.add(new Description("Deleting Binds", "Press and release the keybind over a slot to clear every bound slot."));
+        list.add(new Separator("Presets"));
+        BigButton button = new BigButton("Save New Preset", btn -> {
             savePreset("New preset");
             mc.gui.setScreen(buildSettings());
         });
@@ -118,18 +119,18 @@ public final class SlotBinding {
                 list.add(new Setting(i));
             }
         }
-        list.add(new Settings.Separator("Settings"));
-        list.add(new Settings.Keybind("Keybind", SlotBinding.keybind, "The keybind used for creating and removing slot binding combinations."));
-        list.add(new Settings.Toggle("Show Lines", SlotBinding.lines, "Draw lines between the slot you're hovering over, and any slots bound to it."));
-        list.add(new Settings.Toggle("Show Borders", SlotBinding.borders, "Draw borders around any slot that is bound to the slot you're hovering over."));
-        list.add(new Settings.SliderDouble("Line Width", 0.1, 5.0, 0.1, SlotBinding.lineWidth, "The width of the lines"));
-        list.add(new Settings.ColorPicker("Binding Color", SlotBinding.binding, "The color used to display the bind you are currently creating."));
-        list.add(new Settings.ColorPicker("Bound Color", SlotBinding.bound, "The color used to display existing slot binds."));
+        list.add(new Separator("Settings"));
+        list.add(new Keybind("Keybind", SlotBinding.keybind, "The keybind used for creating and removing slot binding combinations."));
+        list.add(new Toggle("Show Lines", SlotBinding.lines, "Draw lines between the slot you're hovering over, and any slots bound to it."));
+        list.add(new Toggle("Show Borders", SlotBinding.borders, "Draw borders around any slot that is bound to the slot you're hovering over."));
+        list.add(new SliderDouble("Line Width", 0.1, 5.0, 0.1, SlotBinding.lineWidth, "The width of the lines"));
+        list.add(new ColorPicker("Binding Color", SlotBinding.binding, "The color used to display the bind you are currently creating."));
+        list.add(new ColorPicker("Bound Color", SlotBinding.bound, "The color used to display existing slot binds."));
         return list;
     }
 
-    public static Settings buildSettings() {
-        Settings settings = new Settings(getSettingsList());
+    public static SettingsScreen buildSettings() {
+        SettingsScreen settings = new SettingsScreen(getSettingsList());
         settings.setTitle(Component.literal("Slot Binding"));
         return settings;
     }
@@ -341,13 +342,13 @@ public final class SlotBinding {
             input.onChanged().subscribe(value -> data.edit(object -> this.getData(object).addProperty("name", value)));
             ButtonComponent loadButton = UIComponents.button(Component.literal("Load").withColor(0xffffff), button -> loadPreset(this.getData(data.value())));
             loadButton.horizontalSizing(Sizing.fixed(42)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
-            loadButton.renderer(Settings.buttonRenderer);
+            loadButton.renderer(SettingsScreen.buttonRenderer);
             ButtonComponent deleteButton = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("presets").getAsJsonArray().remove(this.index));
                 mc.gui.setScreen(buildSettings());
             });
             deleteButton.positioning(Positioning.relative(100, 0)).verticalSizing(Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
-            deleteButton.renderer(Settings.buttonRendererWhite);
+            deleteButton.renderer(SettingsScreen.buttonRendererWhite);
             this.child(input);
             this.child(loadButton);
             this.child(deleteButton);

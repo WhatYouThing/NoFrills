@@ -9,6 +9,7 @@ public record RenderColor(float r, float g, float b, float a, int hex, int argb)
     public static final RenderColor GREEN = fromFormat(ChatFormatting.GREEN);
     public static final RenderColor RED = fromFormat(ChatFormatting.RED);
     public static final RenderColor GRAY = fromFormat(ChatFormatting.GRAY);
+    public static final RenderColor DARK_GRAY = fromFormat(ChatFormatting.DARK_GRAY);
     public static final RenderColor NF_BLUE = RenderColor.fromArgb(0xff5ca0bf);
 
     public RenderColor(float r, float g, float b, float a) {

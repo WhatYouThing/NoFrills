@@ -7,7 +7,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingInt;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.SliderInt;
 import nofrills.misc.Utils;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public final class LagMeter extends SimpleTextElement implements ListeningHudEle
     public LagMeter() {
         super(Component.literal("Last server tick was 0.00s ago"), new Feature("lagMeterElement"), "Lag Meter");
         this.options = this.getBaseSettings(List.of(
-                new Settings.SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
+                new SliderInt("Minimum Time", 0, 5000, 50, min, "The minimum amount of time (in milliseconds) since the last tick for the element to be visible.")
         ));
         this.setDesc("Displays the time since the last received server tick.\nHelps indicate if a lag spike is occurring.");
         this.setCategory(Category.Misc);

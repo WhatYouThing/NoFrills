@@ -12,7 +12,8 @@ import nofrills.events.ReceivePacketEvent;
 import nofrills.events.SendPacketEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.SliderInt;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Utils;
 
 import java.util.List;
@@ -31,9 +32,9 @@ public final class Ping extends SimpleTextElement implements ListeningHudElement
     public Ping() {
         super(Component.literal("Ping: §f0ms"), new Feature("pingElement"), "Ping Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.SliderInt("Delay", 1, 600, 1, this.delay, "The amount of ticks between ping updates."),
-                new Settings.Toggle("Average", this.average, "Tracks and adds your average ping to the element."),
-                new Settings.SliderInt("Average Limit", 1, 1000, 1, this.averageSize, "The maximum size of the ping history array.\nHigher values produce more accurate results at a higher performance cost.")
+                new SliderInt("Delay", 1, 600, 1, this.delay, "The amount of ticks between ping updates."),
+                new Toggle("Average", this.average, "Tracks and adds your average ping to the element."),
+                new SliderInt("Average Limit", 1, 1000, 1, this.averageSize, "The maximum size of the ping history array.\nHigher values produce more accurate results at a higher performance cost.")
         ));
         this.setDesc("Displays your ping.");
         this.setCategory(Category.Info);

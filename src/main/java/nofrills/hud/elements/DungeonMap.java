@@ -28,7 +28,9 @@ import nofrills.config.SettingEnum;
 import nofrills.features.dungeons.ClassColors;
 import nofrills.hud.HudElement;
 import nofrills.hud.ListeningHudElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.EnumToggle;
+import nofrills.hud.clickgui.settings.SliderDouble;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
@@ -56,12 +58,12 @@ public final class DungeonMap extends HudElement implements ListeningHudElement 
         super(new Feature("dungeonMapElement"), "Dungeon Map");
         this.layout.sizing(Sizing.fixed(128), Sizing.fixed(128));
         this.options = this.getBaseSettings(List.of(
-                new Settings.SliderDouble("Self Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),
-                new Settings.SliderDouble("Player Scale", 0.0, 2.0, 0.01, this.playerMarkerScale, "The scale of the markers of your teammates."),
-                new Settings.SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.playerNameScale, "The scale of the name displayed below teammate markers."),
-                new Settings.EnumToggle<>("Name Mode", this.playerNameMode, "The mode of how the player names are displayed.\n\nNormal: The full name of the player is displayed.\nClass: A short player class label is displayed (\"Arch\", \"Bers\" etc.)."),
-                new Settings.EnumToggle<>("Name Display Mode", this.playerNameDisplayMode, "The mode of when the player names are displayed.\n\nAlways: The names are always displayed.\nLeapOnly: The names are displayed only while holding a leap.\nDisabled: No names displayed."),
-                new Settings.Toggle("Debug", this.debug, "Outputs debug information about the map's behavior.")
+                new SliderDouble("Self Scale", 0.0, 10.0, 0.01, this.selfMarkerScale, "The scale of your own player marker on the map."),
+                new SliderDouble("Player Scale", 0.0, 2.0, 0.01, this.playerMarkerScale, "The scale of the markers of your teammates."),
+                new SliderDouble("Name Scale", 0.0, 1.0, 0.01, this.playerNameScale, "The scale of the name displayed below teammate markers."),
+                new EnumToggle<>("Name Mode", this.playerNameMode, "The mode of how the player names are displayed.\n\nNormal: The full name of the player is displayed.\nClass: A short player class label is displayed (\"Arch\", \"Bers\" etc.)."),
+                new EnumToggle<>("Name Display Mode", this.playerNameDisplayMode, "The mode of when the player names are displayed.\n\nAlways: The names are always displayed.\nLeapOnly: The names are displayed only while holding a leap.\nDisabled: No names displayed."),
+                new Toggle("Debug", this.debug, "Outputs debug information about the map's behavior.")
         ));
         this.setDesc("Displays the dungeon map while in Dungeons.");
         this.setCategory(Category.Dungeons);

@@ -13,7 +13,7 @@ import nofrills.config.SettingBool;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Utils;
 
 import java.time.Instant;
@@ -27,7 +27,7 @@ public final class BeaconPower extends SimpleTextElement implements ListeningHud
     public BeaconPower() {
         super(Component.literal("Beacon: §7Inactive"), new Feature("beaconPowerElement"), "Beacon Power");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Hide If Inactive", this.hideIfInactive, "Hides the HUD element if your Beacon power is inactive.")
+                new Toggle("Hide If Inactive", this.hideIfInactive, "Hides the HUD element if your Beacon power is inactive.")
         ));
         this.setDesc("Displays the duration and the stat upgrade granted by your Beacon.");
         this.setCategory(Category.Misc);

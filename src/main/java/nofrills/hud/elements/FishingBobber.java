@@ -11,7 +11,8 @@ import nofrills.config.SettingInt;
 import nofrills.events.EntityNamedEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.SliderInt;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
 
@@ -33,11 +34,11 @@ public final class FishingBobber extends SimpleTextElement implements ListeningH
     public FishingBobber() {
         super(Component.literal("Bobber: §7Inactive"), new Feature("bobberElement"), "Fishing Bobber");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Hide If Inactive", this.inactive, "Hides the element if your fishing bobber is inactive."),
-                new Settings.Toggle("Bobber Timer", this.timer, "Displays how long your fishing bobber has existed for, useful for Slugfish."),
-                new Settings.Toggle("Hide Hologram", this.hideHologram, "Hides the bobber timer hologram that appears above your bobber."),
-                new Settings.Toggle("Compact Mode", this.compact, "Makes the element more compact by removing the prefix."),
-                new Settings.SliderInt("Slugfish Timer", 0, 20, 1, this.slugfishTimer, "Amount of seconds to wait for Slugfish alarm to be sent. Set to 0 to disable.")
+                new Toggle("Hide If Inactive", this.inactive, "Hides the element if your fishing bobber is inactive."),
+                new Toggle("Bobber Timer", this.timer, "Displays how long your fishing bobber has existed for, useful for Slugfish."),
+                new Toggle("Hide Hologram", this.hideHologram, "Hides the bobber timer hologram that appears above your bobber."),
+                new Toggle("Compact Mode", this.compact, "Makes the element more compact by removing the prefix."),
+                new SliderInt("Slugfish Timer", 0, 20, 1, this.slugfishTimer, "Amount of seconds to wait for Slugfish alarm to be sent. Set to 0 to disable.")
         ));
         this.setDesc("Displays the fishing hologram timer, and optionally the existence time of your bobber.");
         this.setCategory(Category.Fishing);

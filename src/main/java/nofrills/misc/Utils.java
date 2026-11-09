@@ -73,6 +73,8 @@ import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
@@ -1155,6 +1157,10 @@ public class Utils {
 
     public static double difference(double first, double second) {
         return Math.abs(Math.abs(first) - Math.abs(second));
+    }
+
+    public static double roundDecimal(double value) {
+        return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_EVEN).doubleValue();
     }
 
     /**

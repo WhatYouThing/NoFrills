@@ -12,7 +12,7 @@ import nofrills.config.SettingBool;
 import nofrills.events.InventoryUpdateEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Utils;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public final class Quiver extends SimpleTextElement implements ListeningHudEleme
     public Quiver() {
         super(Component.literal("Quiver: §fN/A"), new Feature("quiverElement"), "Quiver Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Only If Bow", this.onlyBow, "Automatically hides the element if you are not holding a bow.")
+                new Toggle("Only If Bow", this.onlyBow, "Automatically hides the element if you are not holding a bow.")
         ));
         this.setDesc("Displays the type and the amount of arrows in your quiver.");
         this.setCategory(Category.Misc);

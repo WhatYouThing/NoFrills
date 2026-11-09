@@ -9,10 +9,11 @@ import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.hud.clickgui.components.FlatSlider;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
+import nofrills.hud.clickgui.settings.CustomHeight;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -40,7 +41,7 @@ public class ColorPickerScreen extends InnerSettingsScreen {
         colorDisplay.color(Color.ofArgb(currentColor.argb())).fill(true);
         colorSection.child(colorDisplay);
 
-        CustomHeight pickerSection = new Settings.CustomHeight(120);
+        CustomHeight pickerSection = new CustomHeight(120);
         pickerSection.verticalSizing(Sizing.fixed(120));
         ColorPickerComponent colorPicker = new ColorPickerComponent();
         colorPicker.showAlpha(true).sizing(Sizing.fixed(110), Sizing.fixed(110));
@@ -123,12 +124,12 @@ public class ColorPickerScreen extends InnerSettingsScreen {
         buttonSection.horizontalAlignment(HorizontalAlignment.LEFT).padding(Insets.of(5));
         ButtonComponent backButton = UIComponents.button(Component.literal("Back"), (btn) -> mc.gui.setScreen(previous));
         backButton.margins(Insets.right(5));
-        backButton.renderer(Settings.buttonRenderer);
+        backButton.renderer(SettingsScreen.buttonRenderer);
         ButtonComponent copyButton = UIComponents.button(Component.literal("Copy Color"), (btn) ->
                 mc.keyboardHandler.setClipboard("0x" + Integer.toHexString(reference.get().argb()))
         );
         copyButton.margins(Insets.right(5));
-        copyButton.renderer(Settings.buttonRenderer);
+        copyButton.renderer(SettingsScreen.buttonRenderer);
         ButtonComponent pasteButton = UIComponents.button(Component.literal("Paste Color"), (btn) -> {
             Utils.parseHex(mc.keyboardHandler.getClipboard()).ifPresent(integer -> {
                 RenderColor color = RenderColor.fromArgb(integer);
@@ -137,7 +138,7 @@ public class ColorPickerScreen extends InnerSettingsScreen {
             });
             syncValues.run();
         });
-        pasteButton.renderer(Settings.buttonRenderer);
+        pasteButton.renderer(SettingsScreen.buttonRenderer);
         buttonSection.child(backButton);
         buttonSection.child(copyButton);
         buttonSection.child(pasteButton);

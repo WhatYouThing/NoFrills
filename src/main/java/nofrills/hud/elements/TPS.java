@@ -6,7 +6,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Utils;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public final class TPS extends SimpleTextElement implements ListeningHudElement 
     public TPS() {
         super(Component.literal("TPS: §f20.00"), new Feature("tpsElement"), "TPS Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Average", average, "Tracks and adds the average TPS to the element.")
+                new Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
         this.setDesc("Displays the real time TPS of the server, and optionally the average TPS.");
         this.setCategory(Category.Info);

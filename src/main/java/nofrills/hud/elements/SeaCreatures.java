@@ -7,7 +7,7 @@ import nofrills.config.SettingBool;
 import nofrills.events.EntityNamedEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.EntityCache;
 import nofrills.misc.SeaCreatureData;
 import nofrills.misc.Utils;
@@ -21,7 +21,7 @@ public final class SeaCreatures extends SimpleTextElement implements ListeningHu
     public SeaCreatures() {
         super(Component.literal("Sea Creatures: §70"), new Feature("seaCreaturesElement"), "Sea Creatures");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
+                new Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
         ));
         this.setDesc("Displays the amount of nearby sea creatures.");
         this.setCategory(Category.Fishing);

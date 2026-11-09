@@ -10,7 +10,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import nofrills.features.misc.AutoSave;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Separator;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.hud.elements.Armor;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
@@ -102,10 +103,10 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
                 if (elements.isEmpty()) {
                     continue;
                 }
-                list.add(new Settings.Separator(category.name()));
+                list.add(new Separator(category.name()));
                 elements.sort(Comparator.comparing(element -> element.elementLabel.getString()));
                 for (HudElement element : elements) {
-                    list.add(new Settings.Toggle(
+                    list.add(new Toggle(
                             element.elementLabel.getString(),
                             element.isAdded(),
                             false,
@@ -119,7 +120,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
                     );
                 }
             }
-            HudSettings settings = new HudSettings(list);
+            HudSettingsScreen settings = new HudSettingsScreen(list);
             settings.setTitle(Component.literal("HUD Elements"));
             mc.gui.setScreen(settings);
             return true;

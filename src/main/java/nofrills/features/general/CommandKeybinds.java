@@ -23,9 +23,10 @@ import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.hud.InnerSettingsScreen;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.hud.clickgui.settings.*;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -44,9 +45,9 @@ public final class CommandKeybinds {
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
-        Settings.Toggle allowAllInGuiToggle = new Settings.Toggle("Allow All in GUI", allowAllInGui, "Allow all keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
+        Toggle allowAllInGuiToggle = new Toggle("Allow All in GUI", allowAllInGui, "Allow all keybinds to work while any container GUI (inventory/chest/furnace/etc.) is open.");
         list.add(allowAllInGuiToggle);
-        Settings.BigButton button = new Settings.BigButton("Add New Keybind", btn -> {
+        BigButton button = new BigButton("Add New Keybind", btn -> {
             data.edit(object -> {
                 if (!object.has("binds")) {
                     object.add("binds", new JsonArray());
@@ -75,8 +76,8 @@ public final class CommandKeybinds {
         return list;
     }
 
-    public static Settings buildSettings() {
-        Settings settings = new Settings(getSettingsList());
+    public static SettingsScreen buildSettings() {
+        SettingsScreen settings = new SettingsScreen(getSettingsList());
         settings.setTitle(Component.literal("Command Keybinds"));
         return settings;
     }
@@ -184,13 +185,13 @@ public final class CommandKeybinds {
             mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));
             ButtonComponent editButton = UIComponents.button(Component.literal("Edit").withColor(0xffffff), button -> mc.gui.setScreen(this.buildKeybindSettings()));
             editButton.sizing(Sizing.fixed(48), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
-            editButton.renderer(Settings.buttonRendererWhite);
+            editButton.renderer(SettingsScreen.buttonRendererWhite);
             ButtonComponent delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("binds").getAsJsonArray().remove(this.index));
                 mc.gui.setScreen(buildSettings());
             });
             delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18));
-            delete.renderer(Settings.buttonRendererWhite);
+            delete.renderer(SettingsScreen.buttonRendererWhite);
 
             this.child(input);
             this.child(mainToggle);
@@ -207,7 +208,7 @@ public final class CommandKeybinds {
         }
 
         public FlowLayout buildCommandInputSetting() {
-            return new Settings.TextInput(
+            return new TextInput(
                     "Command",
                     this.getData().get("command").getAsString(),
                     "",
@@ -217,7 +218,7 @@ public final class CommandKeybinds {
         }
 
         public FlowLayout buildAllowInGuiSetting() {
-            return new Settings.Toggle(
+            return new Toggle(
                     "Allow in GUI",
                     this.getData().has("allowInGui") && this.getData().get("allowInGui").getAsBoolean(),
                     false,
@@ -227,7 +228,7 @@ public final class CommandKeybinds {
         }
 
         public FlowLayout buildKeybindSetting() {
-            return new Settings.Keybind(
+            return new Keybind(
                     "Keybind",
                     this.getData().get("key").getAsInt(),
                     SettingKeybind.UNKNOWN_KEY,
@@ -237,7 +238,7 @@ public final class CommandKeybinds {
         }
 
         public FlowLayout buildModifierSetting() {
-            return new Settings.EnumToggle<>(
+            return new EnumToggle<>(
                     "Modifier Key",
                     getModifierType(this.getData().has("modifier") ? this.getData().get("modifier").getAsString() : "Any"),
                     Modifier.Any,
@@ -248,7 +249,7 @@ public final class CommandKeybinds {
         }
 
         public FlowLayout buildClassFilterSetting() {
-            return new Settings.TextEntryList(
+            return new TextEntryList(
                     "Class Filter",
                     () -> this.getData().has("classFilterList")
                             ? this.getData().get("classFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
@@ -263,7 +264,7 @@ public final class CommandKeybinds {
         }
 
         public FlowLayout buildIslandFilterSetting() {
-            return new Settings.TextEntryList(
+            return new TextEntryList(
                     "Island Filter",
                     () -> this.getData().has("islandFilterList")
                             ? this.getData().get("islandFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()

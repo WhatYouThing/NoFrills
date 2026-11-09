@@ -10,7 +10,7 @@ import nofrills.config.SettingBool;
 import nofrills.features.hunting.ShardTracker;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.ShardData;
 import nofrills.misc.Utils;
 
@@ -26,7 +26,7 @@ public final class ShardTrackerDisplay extends SimpleTextElement implements List
     public ShardTrackerDisplay() {
         super(Component.literal(displayNone), new Feature("shardTrackerElement"), "Shard Tracker Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Hide If None", hideIfNone, "Hides the element if you are not tracking any shards (or the Shard Tracker is disabled).")
+                new Toggle("Hide If None", hideIfNone, "Hides the element if you are not tracking any shards (or the Shard Tracker is disabled).")
         ));
         this.setDesc("Displays information about tracked attribute shards. Used by the Shard Tracker feature.");
         this.setCategory(Category.Misc);

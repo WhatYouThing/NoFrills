@@ -8,7 +8,7 @@ import nofrills.config.SettingBool;
 import nofrills.events.ChatMsgEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.TickTimerElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Utils;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public final class PadTimer extends TickTimerElement implements ListeningHudElem
         this.setStartTicks(20);
         this.setRepeating(true);
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Total Time", this.totalTime, "Displays the total time spent in the Storm phase.")
+                new Toggle("Total Time", this.totalTime, "Displays the total time spent in the Storm phase.")
         ));
         this.setDesc("Displays a tick timer for the pads in the F7/M7 Storm phase.");
         this.setAutoPause();

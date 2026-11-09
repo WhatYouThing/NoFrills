@@ -11,7 +11,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingEnum;
 import nofrills.hud.HudElement;
 import nofrills.hud.ListeningHudElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.EnumToggle;
 import nofrills.misc.Utils;
 
 import java.util.List;
@@ -30,7 +30,7 @@ public final class Armor extends HudElement implements ListeningHudElement {
         this.layout.alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         this.layout.child(this.content);
         this.options = this.getBaseSettings(List.of(
-                new Settings.EnumToggle<>("Alignment", align, "The alignment direction of the element.")
+                new EnumToggle<>("Alignment", align, "The alignment direction of the element.")
         ));
         this.setDesc("Displays your current armor set.");
         this.setCategory(Category.Info);

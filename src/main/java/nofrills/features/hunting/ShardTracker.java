@@ -22,9 +22,12 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.events.EventListener;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.features.general.PriceTooltips;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.hud.clickgui.components.EnumButton;
 import nofrills.hud.clickgui.components.FlatTextbox;
+import nofrills.hud.clickgui.settings.BigButton;
+import nofrills.hud.clickgui.settings.Description;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.Rendering;
 import nofrills.misc.ShardData;
 import nofrills.misc.Utils;
@@ -72,26 +75,26 @@ public final class ShardTracker {
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
-        list.add(new Settings.Description("Usage", "Run the \"/nf shardTracker\" command to see more information."));
-        list.add(new Settings.Toggle("Apply From Box", boxApply, "Automatically applies obtained amounts to shards when you open your Hunting Box."));
-        list.add(new Settings.Toggle("Done Message", doneMsg, "Shows a message in chat once you reach the needed amount for any shard."));
-        list.add(new Settings.Toggle("Filter Fuse", filterFuse, "Hides every Fuse/Cycle shard while outside of the Fusion Machine."));
-        list.add(new Settings.Toggle("Filter Direct", filterDirect, "Hides every Direct/Bazaar shard while inside of the Fusion Machine."));
-        Settings.BigButton clearButton = new Settings.BigButton("Clear Shard List", btn -> {
+        list.add(new Description("Usage", "Run the \"/nf shardTracker\" command to see more information."));
+        list.add(new Toggle("Apply From Box", boxApply, "Automatically applies obtained amounts to shards when you open your Hunting Box."));
+        list.add(new Toggle("Done Message", doneMsg, "Shows a message in chat once you reach the needed amount for any shard."));
+        list.add(new Toggle("Filter Fuse", filterFuse, "Hides every Fuse/Cycle shard while outside of the Fusion Machine."));
+        list.add(new Toggle("Filter Direct", filterDirect, "Hides every Direct/Bazaar shard while inside of the Fusion Machine."));
+        BigButton clearButton = new BigButton("Clear Shard List", btn -> {
             data.edit(object -> object.add("shards", new JsonArray()));
             mc.gui.setScreen(buildSettings());
         });
         clearButton.button.verticalSizing(Sizing.fixed(18));
         clearButton.button.tooltip(Component.literal("Clears the list of your tracked shards."));
         list.add(clearButton);
-        Settings.BigButton importButton = new Settings.BigButton("Import Shard Tree", btn -> {
+        BigButton importButton = new BigButton("Import Shard Tree", btn -> {
             importTreeData();
             mc.gui.setScreen(buildSettings());
         });
         importButton.button.verticalSizing(Sizing.fixed(18));
         importButton.button.tooltip(Component.literal("Pastes the list of shards that you need to get."));
         list.add(importButton);
-        Settings.BigButton button = new Settings.BigButton("Add New Shard", btn -> {
+        BigButton button = new BigButton("Add New Shard", btn -> {
             data.edit(object -> {
                 if (!object.has("shards")) {
                     object.add("shards", new JsonArray());
@@ -116,8 +119,8 @@ public final class ShardTracker {
         return list;
     }
 
-    public static Settings buildSettings() {
-        Settings settings = new Settings(getSettingsList());
+    public static SettingsScreen buildSettings() {
+        SettingsScreen settings = new SettingsScreen(getSettingsList());
         settings.setTitle(Component.literal("Shard Tracker"));
         return settings;
     }

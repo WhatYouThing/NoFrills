@@ -76,10 +76,10 @@ public abstract class MinecraftMixin {
 
     @ModifyExpressionValue(method = "renderFrame", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/FramerateLimitTracker;getFramerateLimit()I"))
     private int skipLimiter(int original) {
-        if (UnfocusedTweaks.isActive() && UnfocusedTweaks.fpsLimit.value() > 0) {
+        if (UnfocusedTweaks.isActive() && UnfocusedTweaks.limitFps.value()) {
             return UnfocusedTweaks.fpsLimit.value();
         }
-        if (UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.noVanilla.value()) {
+        if (UnfocusedTweaks.instance.isActive() && UnfocusedTweaks.noVanilla.value() && this.level != null) {
             return mc.options.framerateLimit().get();
         }
         return original;

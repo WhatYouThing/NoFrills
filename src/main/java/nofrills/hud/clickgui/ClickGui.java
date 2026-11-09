@@ -354,7 +354,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.Toggle("Skip World Render", UnfocusedTweaks.noWorldRender, "Skips world rendering while unfocused which greatly reduces usage."),
                                 new Settings.Toggle("Mute Sounds", UnfocusedTweaks.muteSounds, "Mutes the in-game sound while unfocused."),
                                 new Settings.Toggle("No Vanilla Limit", UnfocusedTweaks.noVanilla, "Fully disables the vanilla \"Reduce FPS\" option."),
-                                new Settings.SliderInt("FPS Limit", 0, 200, 1, UnfocusedTweaks.fpsLimit, "The max FPS the game will render at while unfocused. Set to 0 to disable.")
+                                new Settings.Toggle("Limit FPS", UnfocusedTweaks.limitFps, "Limits the FPS while the game is unfocused."),
+                                new Settings.SliderInt("Max FPS", 20, 300, 1, UnfocusedTweaks.fpsLimit, "The max FPS the game will render at while unfocused.")
                         ))),
                         new Module("GUI Keybinds", GuiKeybinds.instance, "Adds navigation keybinds to applicable Skyblock GUIs.", new Settings(List.of(
                                 new Settings.Keybind("Next Page", GuiKeybinds.next, "The keybind to go to the next page of the GUI."),

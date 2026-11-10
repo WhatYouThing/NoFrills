@@ -1,62 +1,78 @@
 package nofrills.config;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
 import nofrills.events.InputEvent;
 import org.lwjgl.sdl.SDLMouse;
 
-public class SettingKeybind extends SettingInt {
-    public static final int UNKNOWN_KEY = InputConstants.UNKNOWN.getValue();
+import java.util.Optional;
 
-    public SettingKeybind(int defaultValue, String key, String parentKey) {
+public class SettingKeybind extends SettingGeneric {
+    private InputConstants.Key key = InputConstants.UNKNOWN;
+
+    public SettingKeybind(InputConstants.Key defaultValue, String key, String parentKey) {
         super(defaultValue, key, parentKey);
     }
 
-    public SettingKeybind(int defaultValue, String key, Feature instance) {
+    public SettingKeybind(InputConstants.Key defaultValue, String key, Feature instance) {
         this(defaultValue, key, instance.key());
     }
 
-    public static InputConstants.Key asInputConstant(int key) {
-        if (key < 0) {
-            return InputConstants.Type.MOUSE.map.getOrDefault(Math.abs(key), InputConstants.UNKNOWN);
+    public SettingKeybind(String defaultValue, String key, String parentKey) {
+        this(InputConstants.getKey(defaultValue), key, parentKey);
+    }
+
+    public SettingKeybind(String defaultValue, String key, Feature instance) {
+        this(InputConstants.getKey(defaultValue), key, instance.key());
+    }
+
+    public static Optional<InputConstants.Key> upgrade(JsonElement element) { // TODO: remove in the future
+        if (element instanceof JsonPrimitive primitive && primitive.isNumber()) {
+            int key = Math.abs(primitive.getAsInt());
+            InputConstants.Key keyboardKey = InputConstants.Type.KEYBOARD.getOrCreate(key);
+            if (keyboardKey.getDisplayName().getString().equals(keyboardKey.getName())) {
+                return Optional.of(InputConstants.Type.MOUSE.getOrCreate(key));
+            } else {
+                return Optional.of(keyboardKey);
+            }
         }
-        return InputConstants.Type.KEYBOARD.map.getOrDefault(key, InputConstants.UNKNOWN);
+        return Optional.empty();
     }
 
-    public int key() {
-        return this.value();
-    }
-
-    public int mouseKey() {
-        return Math.abs(this.key());
+    public InputConstants.Key value() {
+        JsonElement current = this.get();
+        Optional<InputConstants.Key> upgraded = upgrade(current);
+        if (upgraded.isPresent()) {
+            this.set(upgraded.get().getName());
+            return upgraded.get();
+        }
+        if (!key.getName().equals(current.getAsString())) {
+            this.key = InputConstants.getKey(current.getAsString());
+        }
+        return this.key;
     }
 
     public boolean bound() {
-        return this.value() != UNKNOWN_KEY;
+        return !this.value().equals(InputConstants.UNKNOWN);
     }
 
     public boolean isKey(int key) {
-        return this.bound() && key == this.value();
+        return this.bound() && this.value().getValue() == key;
     }
 
     public boolean isKey(InputEvent event) {
-        if (this.bound()) {
-            return (event.isMouse && this.isMouse() && event.key == this.mouseKey()) || (event.isKeyboard && !this.isMouse() && event.key == this.key());
-        }
-        return false;
-    }
-
-    public InputConstants.Key asInputConstant() {
-        return asInputConstant(this.key());
+        return event.isKey(this);
     }
 
     public boolean isMouse() {
-        return this.key() < 0; // store mouse buttons as negative since they now share values with keyboard keys
+        return this.value().getType().equals(InputConstants.Type.MOUSE);
     }
 
     public boolean isDown() {
         if (this.isMouse()) {
-            return this.bound() && (SDLMouse.SDL_GetMouseState(null, null) & (1 << (this.mouseKey() - 1))) > 0;
+            return this.bound() && (SDLMouse.SDL_GetMouseState(null, null) & (1 << (this.value().getValue() - 1))) > 0;
         }
-        return this.bound() && InputConstants.isKeyDown(this.key());
+        return this.bound() && InputConstants.isKeyDown(this.value().getValue());
     }
 }

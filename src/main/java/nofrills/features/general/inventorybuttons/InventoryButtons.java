@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -38,7 +39,7 @@ public class InventoryButtons {
     public static final Feature instance = new Feature("inventoryButtons");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind manageKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "addButtonKey", instance);
+    public static final SettingKeybind manageKey = new SettingKeybind(InputConstants.UNKNOWN, "addButtonKey", instance);
     public static final SettingInt gridPrecision = new SettingInt(5, "gridPrecision", instance);
 
     public static void addWidgets(AbstractContainerScreen<?> container) {

@@ -26,15 +26,15 @@ public class WardrobeKeybinds {
     public static final SettingBool noUnequip = new SettingBool(false, "noUnequip", instance.key());
     public static final SettingBool playSound = new SettingBool(false, "sound", instance.key());
     public static final SettingSound sound = new SettingSound("entity.horse.armor", 1.0, 1.0, "sound", instance);
-    public static final SettingKeybind custom1 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom1", instance.key());
-    public static final SettingKeybind custom2 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom2", instance.key());
-    public static final SettingKeybind custom3 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom3", instance.key());
-    public static final SettingKeybind custom4 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom4", instance.key());
-    public static final SettingKeybind custom5 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom5", instance.key());
-    public static final SettingKeybind custom6 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom6", instance.key());
-    public static final SettingKeybind custom7 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom7", instance.key());
-    public static final SettingKeybind custom8 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom8", instance.key());
-    public static final SettingKeybind custom9 = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "custom9", instance.key());
+    public static final SettingKeybind custom1 = new SettingKeybind(InputConstants.UNKNOWN, "custom1", instance.key());
+    public static final SettingKeybind custom2 = new SettingKeybind(InputConstants.UNKNOWN, "custom2", instance.key());
+    public static final SettingKeybind custom3 = new SettingKeybind(InputConstants.UNKNOWN, "custom3", instance.key());
+    public static final SettingKeybind custom4 = new SettingKeybind(InputConstants.UNKNOWN, "custom4", instance.key());
+    public static final SettingKeybind custom5 = new SettingKeybind(InputConstants.UNKNOWN, "custom5", instance.key());
+    public static final SettingKeybind custom6 = new SettingKeybind(InputConstants.UNKNOWN, "custom6", instance.key());
+    public static final SettingKeybind custom7 = new SettingKeybind(InputConstants.UNKNOWN, "custom7", instance.key());
+    public static final SettingKeybind custom8 = new SettingKeybind(InputConstants.UNKNOWN, "custom8", instance.key());
+    public static final SettingKeybind custom9 = new SettingKeybind(InputConstants.UNKNOWN, "custom9", instance.key());
 
     private static final List<SettingKeybind> customKeys = List.of(
             custom1,
@@ -66,8 +66,8 @@ public class WardrobeKeybinds {
     private static int getTargetSlot(InputEvent event, int page) {
         return switch (style.value()) {
             case Simple -> {
-                if (event.isKeyboard && event.key >= InputConstants.KEY_1 && event.key <= InputConstants.KEY_9) {
-                    yield event.key - InputConstants.KEY_1 + 1 + (page - 1) * 9;
+                if (event.isKeyboard && event.key.getValue() >= InputConstants.KEY_1 && event.key.getValue() <= InputConstants.KEY_9) {
+                    yield event.key.getValue() - InputConstants.KEY_1 + 1 + (page - 1) * 9;
                 }
                 yield -1;
             }

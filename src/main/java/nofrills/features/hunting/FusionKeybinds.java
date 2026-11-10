@@ -1,5 +1,6 @@
 package nofrills.features.hunting;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.world.inventory.Slot;
@@ -18,9 +19,9 @@ import static nofrills.Main.mc;
 public class FusionKeybinds {
     public static final Feature instance = new Feature("fusionKeybinds");
 
-    public static final SettingKeybind repeat = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "repeat", instance.key());
-    public static final SettingKeybind confirm = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "confirm", instance.key());
-    public static final SettingKeybind cancel = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "cancel", instance.key());
+    public static final SettingKeybind repeat = new SettingKeybind(InputConstants.UNKNOWN, "repeat", instance.key());
+    public static final SettingKeybind confirm = new SettingKeybind(InputConstants.UNKNOWN, "confirm", instance.key());
+    public static final SettingKeybind cancel = new SettingKeybind(InputConstants.UNKNOWN, "cancel", instance.key());
 
     private static boolean isBindValid(ItemStack stack, String title, InputEvent key) {
         if (!stack.isEmpty()) {

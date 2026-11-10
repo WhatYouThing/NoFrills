@@ -101,7 +101,7 @@ public class CroesusSolver {
                 value += DungeonChestValue.getLootValue(id) * quantity;
             } else {
                 if (line.endsWith(" Coins")) {
-                    cost += Utils.parseInt(line.substring(0, line.indexOf(" ")).replaceAll(",", "")).orElse(0);
+                    cost += Utils.parseInt(line.substring(0, line.indexOf(" ")).replace(",", "")).orElse(0);
                 }
             }
         }

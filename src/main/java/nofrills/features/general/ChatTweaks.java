@@ -1,5 +1,6 @@
 package nofrills.features.general;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.components.ChatComponent;
@@ -23,8 +24,8 @@ import static nofrills.Main.mc;
 public class ChatTweaks {
     public static final Feature instance = new Feature("chatTweaks");
 
-    public static final SettingKeybind copyKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "copyKey", instance);
-    public static final SettingKeybind copyLineKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "copyLineKey", instance);
+    public static final SettingKeybind copyKey = new SettingKeybind(InputConstants.UNKNOWN, "copyKey", instance);
+    public static final SettingKeybind copyLineKey = new SettingKeybind(InputConstants.UNKNOWN, "copyLineKey", instance);
     public static final SettingBool trimOnCopy = new SettingBool(false, "trimOnCopy", instance);
     public static final SettingBool msgOnCopy = new SettingBool(false, "msgOnCopy", instance);
     public static final SettingInt copyMsgLength = new SettingInt(50, "copyMsgLength", instance);

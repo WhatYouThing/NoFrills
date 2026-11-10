@@ -3,6 +3,7 @@ package nofrills.features.general;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.ChatFormatting;
@@ -31,7 +32,7 @@ public class SlotLocking {
     public static final Feature instance = new Feature("slotLocking");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "keybind", instance);
+    public static final SettingKeybind keybind = new SettingKeybind(InputConstants.UNKNOWN, "keybind", instance);
     public static final SettingBool overlay = new SettingBool(true, "overlay", instance);
     public static final SettingColor color = new SettingColor(RenderColor.fromFormat(ChatFormatting.YELLOW).withAlpha(0.33f), "color", instance);
 
@@ -45,7 +46,7 @@ public class SlotLocking {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && keybind.isKey(event)) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && event.isKey(keybind)) {
             Slot focused = Utils.getFocusedSlot();
             List<Slot> inventorySlots = getInventorySlots(container.getMenu());
             if (focused == null || !inventorySlots.contains(focused)) return;

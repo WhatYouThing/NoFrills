@@ -192,7 +192,7 @@ public class KuudraUtil {
 
         public boolean matches(String msg) {
             String name = Utils.toLower(this.name);
-            return msg.equals("no " + name + "!") || msg.equals("no " + name.replaceAll(" ", "") + "!");
+            return msg.equals("no " + name + "!") || msg.equals("no " + name.replace(" ", "") + "!");
         }
     }
 }

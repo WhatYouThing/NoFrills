@@ -94,10 +94,10 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         return (int) Math.clamp(height, 30, mc.getWindow().getGuiScaledHeight() * 0.8);
     }
 
-    protected static boolean isBinding(List<FlowLayout> settings, int button) {
+    protected static boolean isBinding(List<FlowLayout> settings, InputConstants.Key key) {
         for (FlowLayout setting : settings) {
             for (UIComponent child : setting.children()) {
-                if (findKeybindButton(child, button)) {
+                if (findKeybindButton(child, key)) {
                     return true;
                 }
             }
@@ -105,15 +105,15 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         return false;
     }
 
-    protected static boolean findKeybindButton(UIComponent child, int button) {
+    protected static boolean findKeybindButton(UIComponent child, InputConstants.Key key) {
         if (child instanceof KeybindButton keybind) {
             if (keybind.isBinding) {
-                keybind.bind(button);
+                keybind.bind(key);
                 return true;
             }
         } else if (child instanceof FlowLayout layout) {
             for (UIComponent layoutChild : layout.children()) {
-                if (findKeybindButton(layoutChild, button)) {
+                if (findKeybindButton(layoutChild, key)) {
                     return true;
                 }
             }
@@ -123,7 +123,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (isBinding(this.settings, input.key())) {
+        if (isBinding(this.settings, InputConstants.Type.KEYBOARD.getOrCreate(input.key()))) {
             return true;
         }
         if (input.key() == InputConstants.KEY_PAGEUP || input.key() == InputConstants.KEY_PAGEDOWN) {
@@ -141,7 +141,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
-        if (isBinding(this.settings, -click.button())) {
+        if (isBinding(this.settings, InputConstants.Type.MOUSE.getOrCreate(click.button()))) {
             return true;
         }
         return super.mouseClicked(click, doubled);
@@ -503,7 +503,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
 
     public static final class Keybind extends FlowLayout {
 
-        public Keybind(String name, int currentValue, int defaultValue, String tooltip, Consumer<Integer> updateCallback) {
+        public Keybind(String name, InputConstants.Key currentValue, InputConstants.Key defaultValue, String tooltip, Consumer<InputConstants.Key> updateCallback) {
             super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
             this.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
             PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
@@ -521,7 +521,7 @@ public class Settings extends BaseOwoScreen<FlowLayout> {
         }
 
         public Keybind(String name, SettingKeybind setting, String tooltip) {
-            this(name, setting.key(), setting.getDefault().getAsInt(), tooltip, setting::set);
+            this(name, setting.value(), InputConstants.getKey(setting.getDefault().getAsString()), tooltip, setting::set);
         }
     }
 

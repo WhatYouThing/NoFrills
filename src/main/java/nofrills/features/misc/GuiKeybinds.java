@@ -1,5 +1,6 @@
 package nofrills.features.misc;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.world.inventory.ChestMenu;
@@ -19,11 +20,11 @@ import static nofrills.Main.mc;
 public class GuiKeybinds {
     public static final Feature instance = new Feature("guiKeybinds");
 
-    public static final SettingKeybind next = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "next", instance.key());
-    public static final SettingKeybind previous = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "previous", instance.key());
-    public static final SettingKeybind up = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "up", instance.key());
-    public static final SettingKeybind down = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "down", instance.key());
-    public static final SettingKeybind back = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "back", instance.key());
+    public static final SettingKeybind next = new SettingKeybind(InputConstants.UNKNOWN, "next", instance.key());
+    public static final SettingKeybind previous = new SettingKeybind(InputConstants.UNKNOWN, "previous", instance.key());
+    public static final SettingKeybind up = new SettingKeybind(InputConstants.UNKNOWN, "up", instance.key());
+    public static final SettingKeybind down = new SettingKeybind(InputConstants.UNKNOWN, "down", instance.key());
+    public static final SettingKeybind back = new SettingKeybind(InputConstants.UNKNOWN, "back", instance.key());
 
     private static ButtonType getButtonType(ItemStack stack) {
         if (!stack.isEmpty() && Utils.getSkyblockId(stack).isEmpty()) {

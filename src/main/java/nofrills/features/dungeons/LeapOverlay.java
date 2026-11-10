@@ -1,5 +1,6 @@
 package nofrills.features.dungeons;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -35,10 +36,10 @@ public class LeapOverlay {
     public static final Feature instance = new Feature("leapOverlay");
 
     public static final SettingDouble scale = new SettingDouble(3.0, "scale", instance.key());
-    public static final SettingKeybind firstKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "firstKey", instance);
-    public static final SettingKeybind secondKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "secondKey", instance);
-    public static final SettingKeybind thirdKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "thirdKey", instance);
-    public static final SettingKeybind fourthKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "fourthKey", instance);
+    public static final SettingKeybind firstKey = new SettingKeybind(InputConstants.UNKNOWN, "firstKey", instance);
+    public static final SettingKeybind secondKey = new SettingKeybind(InputConstants.UNKNOWN, "secondKey", instance);
+    public static final SettingKeybind thirdKey = new SettingKeybind(InputConstants.UNKNOWN, "thirdKey", instance);
+    public static final SettingKeybind fourthKey = new SettingKeybind(InputConstants.UNKNOWN, "fourthKey", instance);
     public static final RenderColor nameColor = RenderColor.fromHex(0xffffff);
     public static final RenderColor deadColor = RenderColor.fromHex(0xaaaaaa);
 

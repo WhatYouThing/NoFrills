@@ -145,7 +145,7 @@ public class KuudraChestValue {
         String[] parts = name.split(" ");
         String last = parts[parts.length - 1];
         if (last.startsWith("x")) {
-            Optional<Integer> quantity = Utils.parseInt(last.replaceAll("x", "").replaceAll(",", ""));
+            Optional<Integer> quantity = Utils.parseInt(last.replace("x", "").replace(",", ""));
             if (quantity.isPresent()) {
                 if (name.startsWith("Crimson Essence")) {
                     return (int) Math.floor(quantity.get() * getEssenceMultiplier());

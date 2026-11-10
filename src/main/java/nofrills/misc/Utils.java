@@ -12,6 +12,7 @@ import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.SessionService;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.ChatFormatting;
@@ -188,11 +189,11 @@ public class Utils {
     public static void refillItem(String refill_query, int amount) {
         int total = 0;
         Inventory inv = mc.player.getInventory();
-        String query = refill_query.replaceAll("_", " ");
+        String query = refill_query.replace("_", " ");
         for (int i = 0; i <= 35; i++) {
             ItemStack stack = inv.getItem(i);
             if (stack.isEmpty()) continue;
-            String id = getSkyblockId(stack).replaceAll("_", " ");
+            String id = getSkyblockId(stack).replace("_", " ");
             String name = toPlain(stack.getHoverName());
             if (query.equalsIgnoreCase(id) || query.equalsIgnoreCase(name)) {
                 total += stack.getCount();
@@ -393,6 +394,14 @@ public class Utils {
         return matchesKey(binding, null, mouseInput);
     }
 
+    public static InputConstants.Key getInputKey(String name) {
+        try {
+            return InputConstants.getKey(name);
+        } catch (Exception _) {
+            return InputConstants.UNKNOWN;
+        }
+    }
+
     public static void sendPingPacket() {
         if (mc.getConnection() != null) {
             mc.getConnection().send(new ServerboundPingRequestPacket(Util.getMillis()));
@@ -521,7 +530,7 @@ public class Utils {
             case "Shiny Necron's Handle" -> "NECRON_HANDLE";
             case "Dusty Travel Scroll to the Kuudra Skull" -> "NETHER_FORTRESS_BOSS_TRAVEL_SCROLL";
             case "Hellstorm Wand" -> "HELLSTORM_STAFF";
-            default -> toID(name.replaceAll(Symbols.dungeonStar, "").trim());
+            default -> toID(name.replace(Symbols.dungeonStar, "").trim());
         };
     }
 
@@ -740,7 +749,7 @@ public class Utils {
      * @param replaceUnderscores if true, automatically replace all underscores with spaces
      */
     public static String uppercaseFirst(String text, boolean replaceUnderscores) {
-        return Arrays.stream(replaceUnderscores ? text.replaceAll("_", " ").split("\\s") : text.split("\\s"))
+        return Arrays.stream(replaceUnderscores ? text.replace("_", " ").split("\\s") : text.split("\\s"))
                 .map(word -> Character.toTitleCase(word.charAt(0)) + word.substring(1))
                 .collect(Collectors.joining(" ")).trim();
     }
@@ -1002,7 +1011,7 @@ public class Utils {
     }
 
     public static String toID(String string) {
-        return toUpper(string.replace("'s", "").replaceAll(" ", "_"));
+        return toUpper(string.replace("'s", "").replace(" ", "_"));
     }
 
     public static String toPlain(String string) {

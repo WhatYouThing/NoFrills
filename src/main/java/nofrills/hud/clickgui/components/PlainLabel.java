@@ -27,7 +27,7 @@ public class PlainLabel extends LabelComponent {
 
     @Override
     public UIComponent tooltip(Component tooltip) {
-        this.plainTooltip = tooltip.getString().replaceAll("\n", " ");
+        this.plainTooltip = tooltip.getString().replace("\n", " ");
         return super.tooltip(tooltip);
     }
 

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -30,14 +31,16 @@ import nofrills.misc.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT;
 import static nofrills.Main.mc;
 
 @EventListener
 public final class SlotBinding {
     public static final Feature instance = new Feature("slotBinding");
 
-    public static final SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "keybind", instance.key());
+    public static final SettingKeybind keybind = new SettingKeybind(InputConstants.UNKNOWN, "keybind", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
     public static final SettingBool lines = new SettingBool(false, "lines", instance.key());
     public static final SettingDouble lineWidth = new SettingDouble(2.0, "lineWidth", instance.key());
@@ -45,6 +48,7 @@ public final class SlotBinding {
     public static final SettingColor binding = new SettingColor(RenderColor.fromHex(0x00ff00), "bindingColor", instance.key());
     public static final SettingColor bound = new SettingColor(RenderColor.fromHex(0x00ffff), "boundColor", instance.key());
 
+    private static final ConcurrentHashMap<String, Integer> lastSwapCache = new ConcurrentHashMap<>();
     private static final BoundSlot emptySlot = new BoundSlot(-1);
     public static BoundSlot lastSlot = emptySlot;
 
@@ -84,6 +88,7 @@ public final class SlotBinding {
                 }
             }
         });
+        lastSwapCache.clear();
     }
 
     public static Optional<JsonObject> findPresetByName(String name) {
@@ -151,24 +156,24 @@ public final class SlotBinding {
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() instanceof InventoryScreen inventory) {
             BoundSlot focused = new BoundSlot(Utils.getFocusedSlot());
-            if (event.isLeftClick() && event.isPress() && event.mouseInput.hasShiftDown() && focused.isValid()) {
+            if (event.isMouse(MOUSE_BUTTON_LEFT) && event.mouseInput.hasShiftDown() && focused.isValid()) {
                 int syncId = inventory.getMenu().containerId;
                 if (focused.isHotbar() && focused.hasData()) {
                     JsonObject object = data.value().get(focused.getName()).getAsJsonObject();
                     JsonArray binds = object.get("binds").getAsJsonArray();
-                    int last = object.get("last").getAsInt();
+                    int last = lastSwapCache.getOrDefault(focused.getName(), 0);
                     int first = !binds.isEmpty() ? binds.get(0).getAsInt() : 0;
                     if (last != 0 || first != 0) {
-                        Utils.click(syncId, last != 0 ? last : first, focused.toHotbar() - 1, ContainerInput.SWAP);
-                        event.cancel();
+                        event.consume(() -> Utils.click(syncId, last != 0 ? last : first, focused.toHotbar() - 1, ContainerInput.SWAP));
                     }
                 } else {
                     for (BoundSlot slot : getHotbarSlots()) {
                         JsonArray array = data.value().get(slot.getName()).getAsJsonObject().get("binds").getAsJsonArray();
                         if (array.contains(new JsonPrimitive(focused.id))) {
-                            Utils.click(syncId, focused.id, slot.toHotbar() - 1, ContainerInput.SWAP);
-                            data.edit(value -> value.get(slot.getName()).getAsJsonObject().addProperty("last", focused.id));
-                            event.cancel();
+                            event.consume(() -> {
+                                Utils.click(syncId, focused.id, slot.toHotbar() - 1, ContainerInput.SWAP);
+                                lastSwapCache.put(slot.getName(), focused.id);
+                            });
                         }
                     }
                 }
@@ -180,10 +185,8 @@ public final class SlotBinding {
                 if (event.isRelease()) {
                     if (focused.isValid() && lastSlot.equals(focused)) {
                         if (focused.isHotbar() && focused.hasData()) {
-                            data.edit(value -> {
-                                value.get(focused.getName()).getAsJsonObject().add("binds", new JsonArray());
-                                value.get(focused.getName()).getAsJsonObject().addProperty("last", 0);
-                            });
+                            data.edit(value -> value.get(focused.getName()).getAsJsonObject().add("binds", new JsonArray()));
+                            lastSwapCache.remove(focused.getName());
                             sendSuccess(Utils.format("Cleared every bind from hotbar slot {}.", focused.toHotbar()));
                         } else {
                             for (BoundSlot slot : getHotbarSlots()) {
@@ -191,6 +194,7 @@ public final class SlotBinding {
                                     JsonArray array = value.get(slot.getName()).getAsJsonObject().get("binds").getAsJsonArray();
                                     if (array.remove(new JsonPrimitive(focused.id))) {
                                         sendSuccess(Utils.format("Successfully unbound slot from hotbar slot {}.", slot.toHotbar()));
+                                        lastSwapCache.remove(focused.getName());
                                     }
                                 });
                             }
@@ -203,12 +207,12 @@ public final class SlotBinding {
                                 JsonArray array = value.get(hotbarSlot.getName()).getAsJsonObject().get("binds").getAsJsonArray();
                                 if (array.remove(new JsonPrimitive(slot.id))) {
                                     sendAlert(Utils.format("The target is already bound to hotbar slot {}, replacing the bind.", slot.toHotbar()));
+                                    lastSwapCache.remove(focused.getName());
                                     break;
                                 }
                             }
                             if (!value.has(hotbar.getName())) {
                                 JsonObject object = new JsonObject();
-                                object.addProperty("last", 0);
                                 object.add("binds", new JsonArray());
                                 value.add(hotbar.getName(), object);
                             }

@@ -53,7 +53,7 @@ public final class CommandKeybinds {
                 }
                 JsonObject obj = new JsonObject();
                 obj.addProperty("name", "New Keybind");
-                obj.addProperty("key", -1);
+                obj.addProperty("key", InputConstants.UNKNOWN.getName());
                 obj.addProperty("command", "");
                 obj.addProperty("enabled", true);
                 obj.addProperty("allowInGui", false);
@@ -118,7 +118,8 @@ public final class CommandKeybinds {
                 if (!isValidScreen(bind.has("allowInGui") && bind.get("allowInGui").getAsBoolean())) {
                     continue;
                 }
-                if (bind.get("key").getAsInt() != event.key) {
+                SettingKeybind.upgrade(bind.get("key")).ifPresent(key -> bind.addProperty("key", key.getName()));
+                if (!event.isKey(bind.get("key").getAsString())) {
                     continue;
                 }
                 if (bind.has("modifier")) {
@@ -229,10 +230,10 @@ public final class CommandKeybinds {
         public FlowLayout buildKeybindSetting() {
             return new Settings.Keybind(
                     "Keybind",
-                    this.getData().get("key").getAsInt(),
-                    SettingKeybind.UNKNOWN_KEY,
+                    SettingKeybind.upgrade(this.getData().get("key")).orElse(Utils.getInputKey(this.getData().get("key").getAsString())),
+                    InputConstants.UNKNOWN,
                     "The key bound to this command.",
-                    k -> data.edit(object -> this.getData(object).addProperty("key", k))
+                    k -> data.edit(object -> this.getData(object).addProperty("key", k.getName()))
             );
         }
 

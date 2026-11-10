@@ -39,7 +39,7 @@ public class InventoryButtons {
     public static final Feature instance = new Feature("inventoryButtons");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind manageKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "addButtonKey", instance);
+    public static final SettingKeybind manageKey = new SettingKeybind(InputConstants.UNKNOWN, "addButtonKey", instance);
     public static final SettingInt gridPrecision = new SettingInt(5, "gridPrecision", instance);
 
     public static void addWidgets(AbstractContainerScreen<?> container) {
@@ -86,7 +86,7 @@ public class InventoryButtons {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && manageKey.isKey(event.key)) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && event.isKey(manageKey)) {
             Optional<InventoryButtonWidget> hoveredWidget = container.renderables
                     .stream()
                     .filter(renderable -> renderable instanceof InventoryButtonWidget button && button.isHovered())

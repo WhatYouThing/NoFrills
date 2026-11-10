@@ -6,16 +6,15 @@ import io.wispforest.owo.ui.core.Sizing;
 import io.wispforest.owo.util.EventSource;
 import io.wispforest.owo.util.EventStream;
 import net.minecraft.network.chat.Component;
-import nofrills.config.SettingKeybind;
 import nofrills.misc.Rendering;
 
 import java.util.List;
 
 public final class KeybindButton extends ButtonComponent {
     private final EventStream<KeybindChanged> changedEvents = KeybindChanged.newStream();
-    private final List<Integer> keybindBlacklist = List.of(
-            -1,
-            InputConstants.KEY_ESCAPE
+    private final List<String> keybindBlacklist = List.of(
+            "key.keyboard.unknown",
+            "key.keyboard.escape"
     );
     public Component unbound = Component.literal("Not Bound").withColor(0xffffff);
     public Component binding = Component.literal("Press Key...").withColor(0xffffff);
@@ -26,7 +25,7 @@ public final class KeybindButton extends ButtonComponent {
         });
         this.onPress(button -> {
             if (this.isBinding) {
-                this.bind(-1);
+                this.bind(InputConstants.UNKNOWN);
             } else {
                 this.setMessage(this.binding);
                 this.isBinding = true;
@@ -40,16 +39,12 @@ public final class KeybindButton extends ButtonComponent {
         this.setMessage(this.unbound);
     }
 
-    public Component getKeyLabel(int keycode) {
-        return SettingKeybind.asInputConstant(keycode).getDisplayName();
-    }
-
-    public void bind(int key) {
+    public void bind(InputConstants.Key key) {
         if (!this.valid(key)) {
             this.setMessage(this.unbound);
-            changedEvents.sink().onBind(-1);
+            changedEvents.sink().onBind(InputConstants.UNKNOWN);
         } else {
-            this.setMessage(getKeyLabel(key));
+            this.setMessage(key.getDisplayName());
             changedEvents.sink().onBind(key);
         }
         this.isBinding = false;
@@ -59,24 +54,19 @@ public final class KeybindButton extends ButtonComponent {
         return changedEvents.source();
     }
 
-    private boolean valid(int key) {
-        for (int blacklisted : this.keybindBlacklist) {
-            if (key == blacklisted) {
-                return false;
-            }
-        }
-        return true;
+    private boolean valid(InputConstants.Key key) {
+        return !this.keybindBlacklist.contains(key.getName());
     }
 
     public interface KeybindChanged {
         static EventStream<KeybindChanged> newStream() {
-            return new EventStream<>(subscribers -> (keycode) -> {
+            return new EventStream<>(subscribers -> (key) -> {
                 for (var subscriber : subscribers) {
-                    subscriber.onBind(keycode);
+                    subscriber.onBind(key);
                 }
             });
         }
 
-        void onBind(int keycode);
+        void onBind(InputConstants.Key key);
     }
 }

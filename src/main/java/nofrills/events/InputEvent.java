@@ -1,19 +1,21 @@
 package nofrills.events;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import nofrills.config.SettingKeybind;
 import org.lwjgl.glfw.GLFW;
 
 public final class InputEvent extends Cancellable {
-    public int key, modifiers, action;
+    public InputConstants.Key key;
+    public int modifiers, action;
     public boolean isKeyboard = false, isMouse = false;
     public KeyEvent keyInput = null;
     public MouseButtonInfo mouseInput = null;
 
     public InputEvent(KeyEvent input, int action) {
         this.setCancelled(false);
-        this.key = input.key();
+        this.key = InputConstants.Type.KEYSYM.getOrCreate(input.key());
         this.modifiers = input.modifiers();
         this.action = action;
         this.isKeyboard = true;
@@ -22,7 +24,7 @@ public final class InputEvent extends Cancellable {
 
     public InputEvent(MouseButtonInfo input, int action) {
         this.setCancelled(false);
-        this.key = input.button();
+        this.key = InputConstants.Type.MOUSE.getOrCreate(input.button());
         this.modifiers = input.modifiers();
         this.action = action;
         this.isMouse = true;
@@ -41,12 +43,12 @@ public final class InputEvent extends Cancellable {
         return this.action == GLFW.GLFW_RELEASE;
     }
 
-    public boolean isKey(int key) {
-        return this.key == key;
+    public boolean isKey(String key) {
+        return this.key.getName().equals(key);
     }
 
     public boolean isKey(SettingKeybind keybind) {
-        return keybind.isKey(this.key);
+        return this.key.equals(keybind.value());
     }
 
     /**

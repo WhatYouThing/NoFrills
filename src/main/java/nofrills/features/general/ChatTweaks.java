@@ -24,8 +24,8 @@ import static nofrills.Main.mc;
 public class ChatTweaks {
     public static final Feature instance = new Feature("chatTweaks");
 
-    public static final SettingKeybind copyKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "copyKey", instance);
-    public static final SettingKeybind copyLineKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "copyLineKey", instance);
+    public static final SettingKeybind copyKey = new SettingKeybind(InputConstants.UNKNOWN, "copyKey", instance);
+    public static final SettingKeybind copyLineKey = new SettingKeybind(InputConstants.UNKNOWN, "copyLineKey", instance);
     public static final SettingBool trimOnCopy = new SettingBool(false, "trimOnCopy", instance);
     public static final SettingBool msgOnCopy = new SettingBool(false, "msgOnCopy", instance);
     public static final SettingInt copyMsgLength = new SettingInt(50, "copyMsgLength", instance);
@@ -73,13 +73,13 @@ public class ChatTweaks {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.gui.screen() instanceof ChatScreen && (copyKey.isKey(event.key) || copyLineKey.isKey(event.key))) {
+        if (instance.isActive() && mc.gui.screen() instanceof ChatScreen && (event.isKey(copyKey) || event.isKey(copyLineKey))) {
             if (event.action == InputConstants.PRESS) {
-                String message = getHoveredMsg(copyLineKey.isKey(event.key));
+                String message = getHoveredMsg(event.isKey(copyKey));
                 if (message.isEmpty()) return;
                 mc.keyboardHandler.setClipboard(trimOnCopy.value() ? message.trim() : message);
                 if (msgOnCopy.value()) {
-                    String type = copyLineKey.isKey(event.key) ? "Line" : "Message";
+                    String type = event.isKey(copyKey) ? "Line" : "Message";
                     int length = copyMsgLength.value();
                     if (length == 0) {
                         Utils.infoFormat("§a{} copied to clipboard.", type);

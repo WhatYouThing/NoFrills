@@ -33,7 +33,7 @@ public class DianaSolver {
     public static final SettingColor treasureColor = new SettingColor(RenderColor.fromArgb(0xaaffaa00), "treasureColor", instance);
     public static final SettingColor enemyColor = new SettingColor(RenderColor.fromArgb(0xaaff5555), "enemyColor", instance);
     public static final SettingColor startColor = new SettingColor(RenderColor.fromArgb(0xaa55ff55), "startColor", instance);
-    public static final SettingKeybind warpKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "warpKey", instance);
+    public static final SettingKeybind warpKey = new SettingKeybind(InputConstants.UNKNOWN, "warpKey", instance);
     public static final SettingBool warpMsg = new SettingBool(false, "warpMsg", instance);
     public static final SettingBool hubToggle = new SettingBool(true, "hubToggle", instance);
     public static final SettingBool stonksToggle = new SettingBool(true, "stonksToggle", instance);
@@ -120,7 +120,7 @@ public class DianaSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.gui.screen() == null && warpKey.key() == event.key && Utils.isInHub()) {
+        if (instance.isActive() && mc.gui.screen() == null && warpKey.value() == event.key && Utils.isInHub()) {
             if (event.action == InputConstants.PRESS) {
                 Optional<Burrow> burrow = burrowsList.stream().filter(Burrow::isGuess).findFirst();
                 if (burrow.isPresent()) {

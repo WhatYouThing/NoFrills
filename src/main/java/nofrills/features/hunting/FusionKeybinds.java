@@ -22,11 +22,11 @@ public class FusionKeybinds {
 
     // ta? https://github.com/hannibal002/SkyHanni/commit/571f3976570092cc054f201a8fd71c7d672393f2
 
-    public static final SettingKeybind repeat = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "repeat", instance.key());
-    public static final SettingKeybind confirm = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "confirm", instance.key());
-    public static final SettingKeybind cancel = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "cancel", instance.key());
+    public static final SettingKeybind repeat = new SettingKeybind(InputConstants.UNKNOWN, "repeat", instance.key());
+    public static final SettingKeybind confirm = new SettingKeybind(InputConstants.UNKNOWN, "confirm", instance.key());
+    public static final SettingKeybind cancel = new SettingKeybind(InputConstants.UNKNOWN, "cancel", instance.key());
 
-    private static boolean isBindValid(ItemStack stack, String title, int key) {
+    private static boolean isBindValid(ItemStack stack, String title, InputConstants.Key key) {
         if (!stack.isEmpty()) {
             String name = Utils.toPlain(stack.getHoverName());
             if (title.contains("Fusion Box")) {

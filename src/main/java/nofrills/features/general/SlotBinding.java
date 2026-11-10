@@ -33,13 +33,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT;
 import static nofrills.Main.mc;
 
 @EventListener
 public final class SlotBinding {
     public static final Feature instance = new Feature("slotBinding");
 
-    public static final SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "keybind", instance.key());
+    public static final SettingKeybind keybind = new SettingKeybind(InputConstants.UNKNOWN, "keybind", instance.key());
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance.key());
     public static final SettingBool lines = new SettingBool(false, "lines", instance.key());
     public static final SettingDouble lineWidth = new SettingDouble(2.0, "lineWidth", instance.key());
@@ -155,7 +156,7 @@ public final class SlotBinding {
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() instanceof InventoryScreen inventory) {
             BoundSlot focused = new BoundSlot(Utils.getFocusedSlot());
-            if (event.key == InputConstants.MOUSE_BUTTON_LEFT && event.modifiers == InputConstants.MOD_SHIFT && focused.isValid()) {
+            if (event.isMouse && event.mouseInput.button() == MOUSE_BUTTON_LEFT && event.modifiers == InputConstants.MOD_SHIFT && focused.isValid()) {
                 int syncId = inventory.getMenu().containerId;
                 if (focused.isHotbar() && focused.hasData()) {
                     JsonObject object = data.value().get(focused.getName()).getAsJsonObject();

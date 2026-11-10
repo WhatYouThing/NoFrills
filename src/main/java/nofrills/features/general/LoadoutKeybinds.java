@@ -19,7 +19,6 @@ import nofrills.events.ScreenOpenEvent;
 import nofrills.events.SlotUpdateEvent;
 import nofrills.misc.SlotOptions;
 import nofrills.misc.Utils;
-import nofrills.mixin.AbstractContainerScreenAccessor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +26,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT;
+import static com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_RIGHT;
 import static nofrills.Main.mc;
 
 @EventListener
@@ -34,7 +35,7 @@ public class LoadoutKeybinds {
     public static final Feature instance = new Feature("loadoutKeybinds");
 
     public static final SettingJson data = new SettingJson(new JsonObject(), "data", instance);
-    public static final SettingKeybind editBindKey = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "editBindKey", instance);
+    public static final SettingKeybind editBindKey = new SettingKeybind(InputConstants.UNKNOWN, "editBindKey", instance);
     public static final SettingBool playSound = new SettingBool(false, "playSound", instance);
     public static final SettingSound sound = new SettingSound("entity.horse.armor", 1.0, 1.0, "sound", instance);
 
@@ -56,15 +57,12 @@ public class LoadoutKeybinds {
         if (isLoadoutButton(stack)) {
             for (Map.Entry<String, JsonElement> entry : data.value().entrySet()) {
                 if (entry.getValue().getAsString().equals(name)) {
-                    int key = Utils.parseInt(entry.getKey()).orElse(-1);
-                    if (key != -1) {
-                        String keyName = SettingKeybind.asInputConstant(key).getDisplayName().getString();
-                        SlotOptions.setCount(slot, keyName.contains(" ")
-                                ? Arrays.stream(keyName.split(" ")).map(part -> part.substring(0, 1)).collect(Collectors.joining())
-                                : keyName.substring(0, Math.min(keyName.length(), 2))
-                        );
-                        return;
-                    }
+                    String keyName = Utils.getInputKey(entry.getKey()).getDisplayName().getString();
+                    SlotOptions.setCount(slot, keyName.contains(" ")
+                            ? Arrays.stream(keyName.split(" ")).map(part -> part.substring(0, 1)).collect(Collectors.joining())
+                            : keyName.substring(0, Math.min(keyName.length(), 2))
+                    );
+                    return;
                 }
             }
         }
@@ -80,10 +78,10 @@ public class LoadoutKeybinds {
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
-            String key = String.valueOf(event.key);
+            String key = event.key.getName();
             if (!binding.isEmpty()) {
                 if (event.action == InputConstants.PRESS) {
-                    if (editBindKey.isKey(event.key) || event.key == InputConstants.MOUSE_BUTTON_LEFT || event.key == InputConstants.MOUSE_BUTTON_RIGHT) {
+                    if (event.isKey(editBindKey) || (event.isMouse && (event.mouseInput.button() == MOUSE_BUTTON_LEFT || event.mouseInput.button() == MOUSE_BUTTON_RIGHT))) {
                         Utils.infoRaw(Component.literal("Invalid key, not binding to loadout slot.").withStyle(ChatFormatting.RED));
                     } else {
                         data.edit(obj -> {
@@ -97,8 +95,8 @@ public class LoadoutKeybinds {
                     binding = "";
                 }
                 event.cancel();
-            } else if (editBindKey.isKey(event.key)) {
-                Slot focused = ((AbstractContainerScreenAccessor) mc.gui.screen()).getHoveredSlot();
+            } else if (event.isKey(editBindKey)) {
+                Slot focused = Utils.getFocusedSlot();
                 if (focused == null) return;
                 ItemStack stack = focused.getItem();
                 if (isLoadoutButton(stack)) {
@@ -124,7 +122,7 @@ public class LoadoutKeybinds {
                     if (stack.isEmpty()) continue;
                     if (name.equals(Utils.toPlain(stack.getHoverName()))) {
                         if (event.action == InputConstants.PRESS) {
-                            Utils.click(screen.getMenu().containerId, slot.index, InputConstants.MOUSE_BUTTON_LEFT, ContainerInput.PICKUP);
+                            Utils.click(screen.getMenu().containerId, slot.index, MOUSE_BUTTON_LEFT, ContainerInput.PICKUP);
                             if (playSound.value()) {
                                 Utils.playSound(sound.sound().value(), sound.volume().valueFloat(), sound.pitch().valueFloat());
                             }

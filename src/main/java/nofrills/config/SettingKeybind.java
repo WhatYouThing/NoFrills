@@ -1,54 +1,75 @@
 package nofrills.config;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Optional;
+
 import static nofrills.Main.mc;
 
-public class SettingKeybind extends SettingInt {
-    public static final int UNKNOWN_KEY = InputConstants.UNKNOWN.getValue();
+public class SettingKeybind extends SettingGeneric {
+    private InputConstants.Key key = InputConstants.UNKNOWN;
 
-    public SettingKeybind(int defaultValue, String key, String parentKey) {
+    public SettingKeybind(InputConstants.Key defaultValue, String key, String parentKey) {
         super(defaultValue, key, parentKey);
     }
 
-    public SettingKeybind(int defaultValue, String key, Feature instance) {
+    public SettingKeybind(InputConstants.Key defaultValue, String key, Feature instance) {
         this(defaultValue, key, instance.key());
     }
 
-    public static InputConstants.Key asInputConstant(int key) {
-        InputConstants.Key keyboard = InputConstants.Type.KEYSYM.getOrCreate(key);
-        if (keyboard.getDisplayName().getString().equals(keyboard.getName())) { // fall back to a mouse key if the keyboard key has no translation
-            return InputConstants.Type.MOUSE.getOrCreate(key);
-        } else {
-            return keyboard;
-        }
+    public SettingKeybind(String defaultValue, String key, String parentKey) {
+        this(InputConstants.getKey(defaultValue), key, parentKey);
     }
 
-    public int key() {
-        return this.value();
+    public SettingKeybind(String defaultValue, String key, Feature instance) {
+        this(InputConstants.getKey(defaultValue), key, instance.key());
+    }
+
+    public static Optional<InputConstants.Key> upgrade(JsonElement element) { // TODO: remove in the future
+        if (element instanceof JsonPrimitive primitive && primitive.isNumber()) {
+            int key = Math.abs(primitive.getAsInt());
+            InputConstants.Key keyboardKey = InputConstants.Type.KEYSYM.getOrCreate(key);
+            if (keyboardKey.getDisplayName().getString().equals(keyboardKey.getName())) {
+                return Optional.of(InputConstants.Type.MOUSE.getOrCreate(key));
+            } else {
+                return Optional.of(keyboardKey);
+            }
+        }
+        return Optional.empty();
+    }
+
+    public InputConstants.Key value() {
+        JsonElement current = this.get();
+        Optional<InputConstants.Key> upgraded = upgrade(current);
+        if (upgraded.isPresent()) {
+            this.set(upgraded.get().getName());
+            return upgraded.get();
+        }
+        if (!key.getName().equals(current.getAsString())) {
+            this.key = InputConstants.getKey(current.getAsString());
+        }
+        return this.key;
     }
 
     public boolean bound() {
-        return this.value() != UNKNOWN_KEY;
+        return !this.value().equals(InputConstants.UNKNOWN);
     }
 
     public boolean isKey(int key) {
-        return key != UNKNOWN_KEY && key == this.value();
-    }
-
-    public InputConstants.Key asInputConstant() {
-        return asInputConstant(this.key());
+        return this.bound() && this.value().getValue() == key;
     }
 
     public boolean isMouse() {
-        return this.asInputConstant().getType().equals(InputConstants.Type.MOUSE);
+        return this.value().getType().equals(InputConstants.Type.MOUSE);
     }
 
     public boolean isDown() {
         if (this.isMouse()) {
-            return this.bound() && GLFW.glfwGetMouseButton(mc.getWindow().handle(), this.key()) == 1;
+            return this.bound() && GLFW.glfwGetMouseButton(mc.getWindow().handle(), this.value().getValue()) == 1;
         }
-        return this.bound() && InputConstants.isKeyDown(mc.getWindow(), this.key());
+        return this.bound() && InputConstants.isKeyDown(mc.getWindow(), this.value().getValue());
     }
 }

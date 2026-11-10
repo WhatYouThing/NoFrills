@@ -12,6 +12,7 @@ import com.mojang.authlib.minecraft.MinecraftProfileTextures;
 import com.mojang.authlib.minecraft.MinecraftSessionService;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.ChatFormatting;
@@ -391,6 +392,14 @@ public class Utils {
 
     public static boolean matchesKey(KeyMapping binding, MouseButtonInfo mouseInput) {
         return matchesKey(binding, null, mouseInput);
+    }
+
+    public static InputConstants.Key getInputKey(String name) {
+        try {
+            return InputConstants.getKey(name);
+        } catch (Exception _) {
+            return InputConstants.UNKNOWN;
+        }
     }
 
     public static void sendPingPacket() {

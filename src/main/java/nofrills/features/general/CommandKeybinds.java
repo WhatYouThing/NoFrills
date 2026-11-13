@@ -3,6 +3,7 @@ package nofrills.features.general;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
@@ -29,8 +30,10 @@ import nofrills.hud.clickgui.components.ToggleButton;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static nofrills.Main.mc;
@@ -51,16 +54,7 @@ public final class CommandKeybinds {
                 if (!object.has("binds")) {
                     object.add("binds", new JsonArray());
                 }
-                JsonObject obj = new JsonObject();
-                obj.addProperty("name", "New Keybind");
-                obj.addProperty("key", InputConstants.UNKNOWN.getName());
-                obj.addProperty("command", "");
-                obj.addProperty("enabled", true);
-                obj.addProperty("allowInGui", false);
-                obj.addProperty("modifier", Modifier.Any.name());
-                obj.add("classFilterList", new JsonArray());
-                obj.add("islandFilterList", new JsonArray());
-                object.get("binds").getAsJsonArray().add(obj);
+                object.get("binds").getAsJsonArray().add(fillDefaults(new JsonObject()));
             });
             mc.gui.setScreen(buildSettings());
         });
@@ -79,6 +73,43 @@ public final class CommandKeybinds {
         Settings settings = new Settings(getSettingsList());
         settings.setTitle(Component.literal("Command Keybinds"));
         return settings;
+    }
+
+    private static JsonObject fillDefaults(JsonObject object) {
+        List<Pair<String, JsonPrimitive>> values = List.of(
+                Pair.of("name", new JsonPrimitive("New Keybind")),
+                Pair.of("command", new JsonPrimitive("")),
+                Pair.of("enabled", new JsonPrimitive(true)),
+                Pair.of("allowInGui", new JsonPrimitive(false)),
+                Pair.of("modifier", new JsonPrimitive(Modifier.Any.name()))
+        );
+        if (object.has("key") && object.get("key").getAsJsonPrimitive().isNumber()) {
+            object.addProperty("key", SettingKeybind.upgrade(object.get("key")).orElse(InputConstants.UNKNOWN).getName());
+        } else if (!object.has("key")) {
+            object.addProperty("key", InputConstants.UNKNOWN.getName());
+        }
+        if (object.has("classFilter")) {
+            object.add("classFilterList",
+                    Utils.toJsonArray(Arrays.stream(object.get("classFilter").getAsString().split(",")).map(String::trim).toList())
+            );
+            object.remove("classFilter");
+        } else if (!object.has("classFilterList")) {
+            object.add("classFilterList", new JsonArray());
+        }
+        if (object.has("islandFilter")) {
+            object.add("islandFilterList",
+                    Utils.toJsonArray(Arrays.stream(object.get("islandFilter").getAsString().split(",")).map(String::trim).toList())
+            );
+            object.remove("islandFilter");
+        } else if (!object.has("islandFilterList")) {
+            object.add("islandFilterList", new JsonArray());
+        }
+        for (Pair<String, JsonPrimitive> value : values) {
+            if (!object.has(value.getKey())) {
+                object.add(value.getKey(), value.getValue());
+            }
+        }
+        return object;
     }
 
     private static boolean isValidScreen(boolean allowBindInGui) {
@@ -114,40 +145,33 @@ public final class CommandKeybinds {
     public static void onKey(InputEvent event) {
         if (instance.isActive() && data.value().has("binds")) {
             for (JsonElement entry : data.value().get("binds").getAsJsonArray()) {
-                JsonObject bind = entry.getAsJsonObject();
-                if (!bind.has("enabled") || !bind.get("enabled").getAsBoolean()) {
+                JsonObject bind = fillDefaults(entry.getAsJsonObject());
+                if (!bind.get("enabled").getAsBoolean()) {
                     continue;
                 }
-                if (!isValidScreen(bind.has("allowInGui") && bind.get("allowInGui").getAsBoolean())) {
+                if (!isValidScreen(bind.get("allowInGui").getAsBoolean())) {
                     continue;
                 }
-                SettingKeybind.upgrade(bind.get("key")).ifPresent(key -> bind.addProperty("key", key.getName()));
                 if (!event.isKey(bind.get("key").getAsString())) {
                     continue;
                 }
-                if (bind.has("modifier")) {
-                    String modifier = bind.get("modifier").getAsString();
-                    if (!matchesModifier(getModifierType(modifier), event.modifiers)) {
-                        continue;
-                    }
+                String modifier = bind.get("modifier").getAsString();
+                if (!matchesModifier(getModifierType(modifier), event.modifiers)) {
+                    continue;
                 }
-                if (bind.has("classFilterList")) {
-                    String className = Utils.toLower(DungeonUtil.getPlayerClass());
-                    List<String> list = bind.get("classFilterList").getAsJsonArray().asList().stream()
-                            .map(e -> Utils.toLower(e.getAsString().trim()))
-                            .toList();
-                    if (!list.isEmpty() && !className.isEmpty() && !list.contains(className)) {
-                        continue;
-                    }
+                String className = Utils.toLower(DungeonUtil.getPlayerClass());
+                List<String> classList = bind.get("classFilterList").getAsJsonArray().asList().stream()
+                        .map(e -> Utils.toLower(e.getAsString().trim()))
+                        .toList();
+                if (!classList.isEmpty() && !className.isEmpty() && !classList.contains(className)) {
+                    continue;
                 }
-                if (bind.has("islandFilterList")) {
-                    String area = Utils.toLower(SkyblockData.getArea());
-                    List<String> list = bind.get("islandFilterList").getAsJsonArray().asList().stream()
-                            .map(e -> Utils.toLower(e.getAsString().trim()))
-                            .toList();
-                    if (!list.isEmpty() && !area.isEmpty() && !list.contains(area)) {
-                        continue;
-                    }
+                String area = Utils.toLower(SkyblockData.getArea());
+                List<String> islandList = bind.get("islandFilterList").getAsJsonArray().asList().stream()
+                        .map(e -> Utils.toLower(e.getAsString().trim()))
+                        .toList();
+                if (!islandList.isEmpty() && !area.isEmpty() && !islandList.contains(area)) {
+                    continue;
                 }
                 String command = bind.get("command").getAsString();
                 if (!command.isEmpty()) {
@@ -202,7 +226,7 @@ public final class CommandKeybinds {
         }
 
         public JsonObject getData(JsonObject object) {
-            return object.get("binds").getAsJsonArray().get(this.index).getAsJsonObject();
+            return fillDefaults(object.get("binds").getAsJsonArray().get(this.index).getAsJsonObject());
         }
 
         public JsonObject getData() {
@@ -222,7 +246,7 @@ public final class CommandKeybinds {
         public FlowLayout buildAllowInGuiSetting() {
             return new Settings.Toggle(
                     "Allow in GUI",
-                    this.getData().has("allowInGui") && this.getData().get("allowInGui").getAsBoolean(),
+                    this.getData().get("allowInGui").getAsBoolean(),
                     false,
                     "Allow this keybind to work while any container GUI (inventory/chest/furnace/etc.) is open.",
                     b -> data.edit(obj -> this.getData(obj).addProperty("allowInGui", b))
@@ -232,7 +256,7 @@ public final class CommandKeybinds {
         public FlowLayout buildKeybindSetting() {
             return new Settings.Keybind(
                     "Keybind",
-                    SettingKeybind.upgrade(this.getData().get("key")).orElse(Utils.getInputKey(this.getData().get("key").getAsString())),
+                    Utils.getInputKey(this.getData().get("key").getAsString()),
                     InputConstants.UNKNOWN,
                     "The key bound to this command.",
                     k -> data.edit(object -> this.getData(object).addProperty("key", k.getName()))
@@ -242,7 +266,7 @@ public final class CommandKeybinds {
         public FlowLayout buildModifierSetting() {
             return new Settings.EnumToggle<>(
                     "Modifier Key",
-                    getModifierType(this.getData().has("modifier") ? this.getData().get("modifier").getAsString() : "Any"),
+                    getModifierType(this.getData().get("modifier").getAsString()),
                     Modifier.Any,
                     Modifier.class,
                     "The modifier key required to execute the keybind.\n\nAny: Executes regardless of modifier.\nNone: Executes only if no modifier (Shift, Alt, etc.) is held.\nShift: Executes only if Shift is held.\nCtrl: Executes only if Ctrl is held.\nAlt: Executes only if Alt is held.",
@@ -253,9 +277,7 @@ public final class CommandKeybinds {
         public FlowLayout buildClassFilterSetting() {
             return new Settings.TextEntryList(
                     "Class Filter",
-                    () -> this.getData().has("classFilterList")
-                            ? this.getData().get("classFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
-                            : List.of(),
+                    () -> this.getData().get("classFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList(),
                     "Prevents this keybind from working if your selected dungeon class is not on this list.\nLeave empty to disable class filtering.",
                     l -> data.edit(obj -> this.getData(obj).add("classFilterList", Utils.toJsonArray(l))),
                     s -> DungeonUtil.getDungeonClasses().stream()
@@ -268,9 +290,7 @@ public final class CommandKeybinds {
         public FlowLayout buildIslandFilterSetting() {
             return new Settings.TextEntryList(
                     "Island Filter",
-                    () -> this.getData().has("islandFilterList")
-                            ? this.getData().get("islandFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
-                            : List.of(),
+                    () -> this.getData().get("islandFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList(),
                     "Prevents this keybind from working if the current tablist area name is not on this list.\nLeave empty to disable island filtering.",
                     l -> data.edit(obj -> this.getData(obj).add("islandFilterList", Utils.toJsonArray(l))),
                     s -> SkyblockData.getKnownAreas().stream()
@@ -290,7 +310,7 @@ public final class CommandKeybinds {
             list.add(this.buildIslandFilterSetting());
             return new InnerSettingsScreen(
                     list,
-                    Component.literal("Command Keybind: " + (this.getData().has("name") ? this.getData().get("name").getAsString() : "New Keybind")),
+                    Component.literal("Command Keybind: " + this.getData().get("name").getAsString()),
                     buildSettings()
             );
         }

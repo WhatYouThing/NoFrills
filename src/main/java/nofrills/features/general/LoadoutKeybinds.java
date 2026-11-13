@@ -77,7 +77,6 @@ public class LoadoutKeybinds {
     @EventHandler
     public static void onKey(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> screen && isLoadoutsMenu(screen.getTitle().getString())) {
-            String key = event.key.getName();
             if (!binding.isEmpty()) {
                 if (event.action == InputConstants.PRESS) {
                     if (event.isKey(editBindKey) || event.isMouse(MOUSE_BUTTON_LEFT) || event.isMouse(MOUSE_BUTTON_RIGHT)) {
@@ -85,7 +84,7 @@ public class LoadoutKeybinds {
                     } else {
                         data.edit(obj -> {
                             obj.entrySet().removeIf(entry -> entry.getValue().getAsString().equals(binding));
-                            obj.addProperty(key, binding);
+                            obj.addProperty(event.key.getName(), binding);
                         });
                         Utils.infoRaw(Component.literal("Successfully bound key to loadout slot: " + binding + ".").withStyle(ChatFormatting.GREEN));
                         Utils.playSound(SoundEvents.NOTE_BLOCK_PLING, 1.0f, 0.0f);
@@ -113,8 +112,8 @@ public class LoadoutKeybinds {
                         }
                     }
                 });
-            } else if (data.value().has(key)) {
-                String name = data.value().get(key).getAsString();
+            } else if (data.value().has(event.key.getName())) {
+                String name = data.value().get(event.key.getName()).getAsString();
                 for (Slot slot : Utils.getContainerSlots(screen.getMenu())) {
                     ItemStack stack = slot.getItem();
                     if (stack.isEmpty()) continue;

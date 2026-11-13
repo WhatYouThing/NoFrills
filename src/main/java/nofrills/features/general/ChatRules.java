@@ -3,6 +3,7 @@ package nofrills.features.general;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import io.wispforest.owo.ui.component.ButtonComponent;
 import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
@@ -25,8 +26,10 @@ import nofrills.hud.clickgui.components.ToggleButton;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -45,24 +48,7 @@ public final class ChatRules {
                 if (!object.has("rules")) {
                     object.add("rules", new JsonArray());
                 }
-                JsonObject obj = new JsonObject();
-                obj.addProperty("name", "New Rule");
-                obj.addProperty("match", "");
-                obj.addProperty("enabled", false);
-                obj.addProperty("caseSensitive", false);
-                obj.addProperty("matchType", MatchType.Equals.name());
-                obj.addProperty("cancel", false);
-                obj.add("classFilterList", new JsonArray());
-                obj.add("islandFilterList", new JsonArray());
-                obj.addProperty("title", "");
-                obj.addProperty("titleFadeIn", 0);
-                obj.addProperty("titleStay", 30);
-                obj.addProperty("titleFadeOut", 10);
-                obj.addProperty("titleVanilla", true);
-                obj.addProperty("sound", "");
-                obj.addProperty("soundVolume", 1.0f);
-                obj.addProperty("soundPitch", 1.0f);
-                object.get("rules").getAsJsonArray().add(obj);
+                object.get("rules").getAsJsonArray().add(fillDefaults(new JsonObject()));
             });
             Config.computeHash();
             mc.gui.setScreen(buildSettings());
@@ -84,6 +70,47 @@ public final class ChatRules {
         return settings;
     }
 
+    private static JsonObject fillDefaults(JsonObject object) {
+        List<Pair<String, JsonPrimitive>> values = List.of(
+                Pair.of("name", new JsonPrimitive("New Rule")),
+                Pair.of("match", new JsonPrimitive("")),
+                Pair.of("enabled", new JsonPrimitive(true)),
+                Pair.of("caseSensitive", new JsonPrimitive(false)),
+                Pair.of("matchType", new JsonPrimitive(MatchType.Equals.name())),
+                Pair.of("cancel", new JsonPrimitive(false)),
+                Pair.of("title", new JsonPrimitive("")),
+                Pair.of("titleFadeIn", new JsonPrimitive(0)),
+                Pair.of("titleStay", new JsonPrimitive(30)),
+                Pair.of("titleFadeOut", new JsonPrimitive(10)),
+                Pair.of("titleVanilla", new JsonPrimitive(true)),
+                Pair.of("sound", new JsonPrimitive("")),
+                Pair.of("soundVolume", new JsonPrimitive(1.0f)),
+                Pair.of("soundPitch", new JsonPrimitive(1.0f))
+        );
+        if (object.has("classFilter")) {
+            object.add("classFilterList",
+                    Utils.toJsonArray(Arrays.stream(object.get("classFilter").getAsString().split(",")).map(String::trim).toList())
+            );
+            object.remove("classFilter");
+        } else if (!object.has("classFilterList")) {
+            object.add("classFilterList", new JsonArray());
+        }
+        if (object.has("islandFilter")) {
+            object.add("islandFilterList",
+                    Utils.toJsonArray(Arrays.stream(object.get("islandFilter").getAsString().split(",")).map(String::trim).toList())
+            );
+            object.remove("islandFilter");
+        } else if (!object.has("islandFilterList")) {
+            object.add("islandFilterList", new JsonArray());
+        }
+        for (Pair<String, JsonPrimitive> value : values) {
+            if (!object.has(value.getKey())) {
+                object.add(value.getKey(), value.getValue());
+            }
+        }
+        return object;
+    }
+
     private static MatchType getRuleMatchType(JsonObject rule) {
         String type = rule.get("matchType").getAsString();
         for (MatchType value : MatchType.values()) {
@@ -98,23 +125,19 @@ public final class ChatRules {
         if (!rule.get("enabled").getAsBoolean()) {
             return false;
         }
-        if (rule.has("classFilterList")) {
-            String className = Utils.toLower(DungeonUtil.getPlayerClass());
-            List<String> list = rule.get("classFilterList").getAsJsonArray().asList().stream()
-                    .map(e -> Utils.toLower(e.getAsString().trim()))
-                    .toList();
-            if (!list.isEmpty() && !className.isEmpty() && !list.contains(className)) {
-                return false;
-            }
+        String className = Utils.toLower(DungeonUtil.getPlayerClass());
+        List<String> classList = rule.get("classFilterList").getAsJsonArray().asList().stream()
+                .map(e -> Utils.toLower(e.getAsString().trim()))
+                .toList();
+        if (!classList.isEmpty() && !className.isEmpty() && !classList.contains(className)) {
+            return false;
         }
-        if (rule.has("islandFilterList")) {
-            String area = Utils.toLower(SkyblockData.getArea());
-            List<String> list = rule.get("islandFilterList").getAsJsonArray().asList().stream()
-                    .map(e -> Utils.toLower(e.getAsString().trim()))
-                    .toList();
-            if (!list.isEmpty() && !area.isEmpty() && !list.contains(area)) {
-                return false;
-            }
+        String area = Utils.toLower(SkyblockData.getArea());
+        List<String> islandList = rule.get("islandFilterList").getAsJsonArray().asList().stream()
+                .map(e -> Utils.toLower(e.getAsString().trim()))
+                .toList();
+        if (!islandList.isEmpty() && !area.isEmpty() && !islandList.contains(area)) {
+            return false;
         }
         boolean caseSensitive = rule.get("caseSensitive").getAsBoolean();
         String match = caseSensitive ? rule.get("match").getAsString() : Utils.toLower(rule.get("match").getAsString());
@@ -140,7 +163,7 @@ public final class ChatRules {
     private static void onMsg(ChatMsgEvent event) {
         if (instance.isActive() && data.value().has("rules")) {
             for (JsonElement rule : data.value().getAsJsonArray("rules")) {
-                JsonObject obj = rule.getAsJsonObject();
+                JsonObject obj = fillDefaults(rule.getAsJsonObject());
                 if (matchRule(obj, event.messagePlain)) {
                     String title = obj.get("title").getAsString();
                     if (!title.isEmpty()) {
@@ -207,7 +230,7 @@ public final class ChatRules {
         }
 
         public JsonObject getData(JsonObject object) {
-            return object.get("rules").getAsJsonArray().get(this.index).getAsJsonObject();
+            return fillDefaults(object.get("rules").getAsJsonArray().get(this.index).getAsJsonObject());
         }
 
         public JsonObject getData() {
@@ -258,9 +281,7 @@ public final class ChatRules {
         public FlowLayout buildClassFilterSetting() {
             return new Settings.TextEntryList(
                     "Class Filter",
-                    () -> this.getData().has("classFilterList")
-                            ? this.getData().get("classFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
-                            : List.of(),
+                    () -> this.getData().get("classFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList(),
                     "Prevents this rule from matching if your selected dungeon class is not on this list.\nLeave empty to disable class filtering.",
                     l -> data.edit(obj -> this.getData(obj).add("classFilterList", Utils.toJsonArray(l))),
                     s -> DungeonUtil.getDungeonClasses().stream()
@@ -273,9 +294,7 @@ public final class ChatRules {
         public FlowLayout buildIslandFilterSetting() {
             return new Settings.TextEntryList(
                     "Island Filter",
-                    () -> this.getData().has("islandFilterList")
-                            ? this.getData().get("islandFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()
-                            : List.of(),
+                    () -> this.getData().get("islandFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList(),
                     "Prevents this rule from matching if the current tablist area name is not on this list.\nLeave empty to disable island filtering.",
                     l -> data.edit(obj -> this.getData(obj).add("islandFilterList", Utils.toJsonArray(l))),
                     s -> SkyblockData.getKnownAreas().stream()
@@ -296,7 +315,7 @@ public final class ChatRules {
                     30,
                     this.getData().get("titleFadeOut").getAsInt(),
                     10,
-                    this.getData().has("titleVanilla") && this.getData().get("titleVanilla").getAsBoolean(),
+                    this.getData().get("titleVanilla").getAsBoolean(),
                     true,
                     "The title to display when this rule matches.",
                     s -> data.edit(obj -> this.getData(obj).addProperty("title", s)),

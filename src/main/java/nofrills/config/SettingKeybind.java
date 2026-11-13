@@ -3,6 +3,7 @@ package nofrills.config;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
+import nofrills.misc.Utils;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Optional;
@@ -21,21 +22,21 @@ public class SettingKeybind extends SettingGeneric {
     }
 
     public SettingKeybind(String defaultValue, String key, String parentKey) {
-        this(InputConstants.getKey(defaultValue), key, parentKey);
+        this(Utils.getInputKey(defaultValue), key, parentKey);
     }
 
     public SettingKeybind(String defaultValue, String key, Feature instance) {
-        this(InputConstants.getKey(defaultValue), key, instance.key());
+        this(Utils.getInputKey(defaultValue), key, instance.key());
     }
 
     public static Optional<InputConstants.Key> upgrade(JsonElement element) { // TODO: remove in the future
         if (element instanceof JsonPrimitive primitive && primitive.isNumber()) {
             int key = Math.abs(primitive.getAsInt());
-            InputConstants.Key keyboardKey = InputConstants.Type.KEYSYM.getOrCreate(key);
-            if (keyboardKey.getDisplayName().getString().equals(keyboardKey.getName())) {
-                return Optional.of(InputConstants.Type.MOUSE.getOrCreate(key));
-            } else {
-                return Optional.of(keyboardKey);
+            if (InputConstants.Type.MOUSE.map.containsKey(key)) {
+                return Optional.of(InputConstants.Type.MOUSE.map.get(key));
+            }
+            if (InputConstants.Type.KEYSYM.map.containsKey(key)) {
+                return Optional.of(InputConstants.Type.KEYSYM.map.get(key));
             }
         }
         return Optional.empty();
@@ -49,7 +50,7 @@ public class SettingKeybind extends SettingGeneric {
             return upgraded.get();
         }
         if (!key.getName().equals(current.getAsString())) {
-            this.key = InputConstants.getKey(current.getAsString());
+            this.key = Utils.getInputKey(current.getAsString());
         }
         return this.key;
     }

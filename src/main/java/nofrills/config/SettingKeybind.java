@@ -1,13 +1,10 @@
 package nofrills.config;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.mojang.blaze3d.platform.InputConstants;
 import nofrills.events.InputEvent;
 import nofrills.misc.Utils;
 import org.lwjgl.sdl.SDLMouse;
-
-import java.util.Optional;
 
 public class SettingKeybind extends SettingGeneric {
     private InputConstants.Key key = InputConstants.UNKNOWN;
@@ -28,27 +25,9 @@ public class SettingKeybind extends SettingGeneric {
         this(Utils.getInputKey(defaultValue), key, instance.key());
     }
 
-    public static Optional<InputConstants.Key> upgrade(JsonElement element) { // TODO: remove in the future
-        if (element instanceof JsonPrimitive primitive && primitive.isNumber()) {
-            int key = Math.abs(primitive.getAsInt());
-            if (InputConstants.Type.MOUSE.map.containsKey(key)) {
-                return Optional.of(InputConstants.Type.MOUSE.map.get(key));
-            }
-            if (InputConstants.Type.KEYBOARD.map.containsKey(key)) {
-                return Optional.of(InputConstants.Type.KEYBOARD.map.get(key));
-            }
-        }
-        return Optional.empty();
-    }
-
     public InputConstants.Key value() {
         JsonElement current = this.get();
-        Optional<InputConstants.Key> upgraded = upgrade(current);
-        if (upgraded.isPresent()) {
-            this.set(upgraded.get().getName());
-            return upgraded.get();
-        }
-        if (!key.getName().equals(current.getAsString())) {
+        if (!this.key.getName().equals(current.getAsString())) {
             this.key = Utils.getInputKey(current.getAsString());
         }
         return this.key;

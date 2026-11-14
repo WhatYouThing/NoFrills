@@ -20,7 +20,6 @@ import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingJson;
-import nofrills.config.SettingKeybind;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
 import nofrills.hud.InnerSettingsScreen;
@@ -79,15 +78,11 @@ public final class CommandKeybinds {
         List<Pair<String, JsonPrimitive>> values = List.of(
                 Pair.of("name", new JsonPrimitive("New Keybind")),
                 Pair.of("command", new JsonPrimitive("")),
+                Pair.of("key", new JsonPrimitive(InputConstants.UNKNOWN.getName())),
                 Pair.of("enabled", new JsonPrimitive(true)),
                 Pair.of("allowInGui", new JsonPrimitive(false)),
                 Pair.of("modifier", new JsonPrimitive(Modifier.Any.name()))
         );
-        if (object.has("key") && object.get("key").getAsJsonPrimitive().isNumber()) {
-            object.addProperty("key", SettingKeybind.upgrade(object.get("key")).orElse(InputConstants.UNKNOWN).getName());
-        } else if (!object.has("key")) {
-            object.addProperty("key", InputConstants.UNKNOWN.getName());
-        }
         if (object.has("classFilter")) {
             object.add("classFilterList",
                     Utils.toJsonArray(Arrays.stream(object.get("classFilter").getAsString().split(",")).map(String::trim).toList())

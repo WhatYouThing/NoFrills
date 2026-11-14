@@ -53,7 +53,7 @@ public final class FishingBobber extends SimpleTextElement implements ListeningH
         MutableComponent text = this.compact.value() ? Component.literal("") : Component.literal("Bobber: ");
         if (this.isBobberActive()) {
             Entity hologram = this.cache.getFirst();
-            if (hologram != null && hologram.hasCustomName()) {
+            if (hologram != null && hologram.getCustomName() != null) {
                 text.append(hologram.getCustomName());
             } else {
                 text.append("§aActive");

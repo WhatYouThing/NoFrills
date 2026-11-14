@@ -53,6 +53,7 @@ public class HudManager {
             new ShardTrackerDisplay(),
             new SkillTrackerDisplay(),
             new KickCooldownTimer(),
+            new Legion(),
             dungeonMap,
             pickAbilityTimer,
             petDisplay,
@@ -142,6 +143,11 @@ public class HudManager {
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
         forEachListening(element -> element.onEntityNamed(event));
+    }
+
+    @EventHandler
+    private static void onUpdated(EntityUpdatedEvent event) {
+        forEachListening(element -> element.onEntityUpdated(event));
     }
 
     @EventHandler

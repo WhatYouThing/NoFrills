@@ -54,6 +54,7 @@ public class HudManager {
             new SkillTrackerDisplay(),
             new KickCooldownTimer(),
             new Legion(),
+            new BobbinTime(),
             dungeonMap,
             pickAbilityTimer,
             petDisplay,

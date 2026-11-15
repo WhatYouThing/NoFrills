@@ -54,7 +54,7 @@ public class ShardData {
             case "beetle" -> "SHARD_CROPEETLE";
             case "wither spectre" -> "SHARD_WITHER_SPECTER";
             case "inferno demonlord" -> "SHARD_BURNINGSOUL";
-            default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replaceAll(" ", "_")));
+            default -> Utils.format("SHARD_{}", Utils.toUpper(shard.replace(" ", "_")));
         };
     }
 

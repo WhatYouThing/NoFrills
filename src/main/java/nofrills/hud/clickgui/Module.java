@@ -2,7 +2,10 @@ package nofrills.hud.clickgui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.container.FlowLayout;
-import io.wispforest.owo.ui.core.*;
+import io.wispforest.owo.ui.core.HorizontalAlignment;
+import io.wispforest.owo.ui.core.Insets;
+import io.wispforest.owo.ui.core.Sizing;
+import io.wispforest.owo.ui.core.VerticalAlignment;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
@@ -53,12 +56,8 @@ public final class Module extends FlowLayout {
 
     private void active(boolean active) {
         if (active) {
-            this.surface(Surface.flat(0xaa101010).and((context, component) -> {
-                context.fill(component.x(), component.y(), component.x() + 2, component.y() + component.height(), 0xffffffff);
-            }));
             this.label.text(this.activeText);
         } else {
-            this.surface(Surface.flat(0xaa000000));
             this.label.text(this.inactiveText);
         }
         this.feature.setActive(active);

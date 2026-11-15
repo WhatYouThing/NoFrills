@@ -53,7 +53,7 @@ public final class Quiver extends SimpleTextElement implements ListeningHudEleme
                     String name = Utils.toPlain(stack.getHoverName());
                     String quantity = line.substring(line.indexOf(":") + 2);
                     Style color = Utils.getStyle(stack.getHoverName(), s -> s.trim().equals(name)).orElse(Style.EMPTY.withColor(ChatFormatting.WHITE));
-                    double percentage = Utils.parseInt(quantity.replaceAll(",", "")).orElse(0) / 2880.0; // max capacity, 5 * 9 * 64
+                    double percentage = Utils.parseInt(quantity.replace(",", "")).orElse(0) / 2880.0; // max capacity, 5 * 9 * 64
                     this.setText(Component.literal("Quiver: ")
                             .append(Component.literal(name.replace(" Arrow", "")).setStyle(color))
                             .append(Component.literal(" x" + quantity).withColor(Utils.getPercentageColor(percentage, true).hex()))

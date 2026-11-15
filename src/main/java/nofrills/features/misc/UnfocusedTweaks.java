@@ -12,7 +12,8 @@ public class UnfocusedTweaks {
     public static final SettingBool noWorldRender = new SettingBool(false, "noWorldRender", instance.key());
     public static final SettingBool muteSounds = new SettingBool(false, "muteSounds", instance.key());
     public static final SettingBool noVanilla = new SettingBool(false, "noVanilla", instance.key());
-    public static final SettingInt fpsLimit = new SettingInt(0, "fpsLimit", instance.key());
+    public static final SettingBool limitFps = new SettingBool(false, "limitFps", instance.key());
+    public static final SettingInt fpsLimit = new SettingInt(20, "fpsLimit", instance.key());
 
     @SuppressWarnings("ConstantValue")
     public static boolean isActive() {

@@ -117,7 +117,7 @@ public class SlayerUtil {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private static void onTick(WorldTickEvent event) {
-        if (currentBoss != null && bossAlive) {
+        if (currentBoss != null) {
             bossCache.get().forEach(b -> {
                 for (Entity entity : Utils.getOtherEntities(b.getKey(), 1.0, 3.0, 1.0, e -> e.isAlive() && Utils.isMob(e))) {
                     if (entity instanceof ArmorStand stand) {

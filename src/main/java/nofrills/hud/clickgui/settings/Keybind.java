@@ -1,5 +1,6 @@
 package nofrills.hud.clickgui.settings;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.core.HorizontalAlignment;
 import io.wispforest.owo.ui.core.Insets;
@@ -10,12 +11,13 @@ import nofrills.config.SettingKeybind;
 import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.hud.clickgui.components.KeybindButton;
 import nofrills.hud.clickgui.components.PlainLabel;
+import nofrills.misc.Utils;
 
 import java.util.function.Consumer;
 
 public final class Keybind extends FlowLayout {
 
-    public Keybind(String name, int currentValue, int defaultValue, String tooltip, Consumer<Integer> updateCallback) {
+    public Keybind(String name, InputConstants.Key currentValue, InputConstants.Key defaultValue, String tooltip, Consumer<InputConstants.Key> updateCallback) {
         super(Sizing.content(), Sizing.content(), Algorithm.HORIZONTAL);
         this.padding(Insets.of(5)).horizontalAlignment(HorizontalAlignment.LEFT);
         PlainLabel label = new PlainLabel(Component.literal(name).withColor(0xffffff));
@@ -33,6 +35,6 @@ public final class Keybind extends FlowLayout {
     }
 
     public Keybind(String name, SettingKeybind setting, String tooltip) {
-        this(name, setting.key(), setting.getDefault().getAsInt(), tooltip, setting::set);
+        this(name, setting.value(), Utils.getInputKey(setting.getDefault().getAsString()), tooltip, setting::set);
     }
 }

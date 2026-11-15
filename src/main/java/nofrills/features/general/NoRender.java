@@ -164,7 +164,7 @@ public class NoRender {
     private static void onNamed(EntityNamedEvent event) {
         if (instance.isActive()) {
             if (deadEntities.value()) {
-                String name = event.namePlain.replaceAll(Utils.Symbols.vampLow, "");
+                String name = event.namePlain.replace(Utils.Symbols.vampLow, "");
                 for (Pattern pattern : deadPatterns) {
                     if (pattern.matcher(name).matches()) {
                         event.entity.setCustomNameVisible(false);

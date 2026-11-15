@@ -82,10 +82,10 @@ public class SettingsScreen extends BaseOwoScreen<FlowLayout> {
         return (int) Math.clamp(height, 30, mc.getWindow().getGuiScaledHeight() * 0.8);
     }
 
-    protected static boolean isBinding(List<FlowLayout> settings, int button) {
+    protected static boolean isBinding(List<FlowLayout> settings, InputConstants.Key key) {
         for (FlowLayout setting : settings) {
             for (UIComponent child : setting.children()) {
-                if (findKeybindButton(child, button)) {
+                if (findKeybindButton(child, key)) {
                     return true;
                 }
             }
@@ -93,15 +93,15 @@ public class SettingsScreen extends BaseOwoScreen<FlowLayout> {
         return false;
     }
 
-    protected static boolean findKeybindButton(UIComponent child, int button) {
+    protected static boolean findKeybindButton(UIComponent child, InputConstants.Key key) {
         if (child instanceof KeybindButton keybind) {
             if (keybind.isBinding) {
-                keybind.bind(button);
+                keybind.bind(key);
                 return true;
             }
         } else if (child instanceof FlowLayout layout) {
             for (UIComponent layoutChild : layout.children()) {
-                if (findKeybindButton(layoutChild, button)) {
+                if (findKeybindButton(layoutChild, key)) {
                     return true;
                 }
             }
@@ -111,7 +111,7 @@ public class SettingsScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean keyPressed(KeyEvent input) {
-        if (isBinding(this.settings, input.key())) {
+        if (isBinding(this.settings, InputConstants.Type.KEYSYM.getOrCreate(input.key()))) {
             return true;
         }
         if (input.key() == InputConstants.KEY_PAGEUP || input.key() == InputConstants.KEY_PAGEDOWN) {
@@ -129,7 +129,7 @@ public class SettingsScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public boolean mouseClicked(MouseButtonEvent click, boolean doubled) {
-        if (isBinding(this.settings, click.button())) {
+        if (isBinding(this.settings, InputConstants.Type.MOUSE.getOrCreate(click.button()))) {
             return true;
         }
         return super.mouseClicked(click, doubled);

@@ -21,7 +21,7 @@ public class HotbarSwap {
 
     @EventHandler
     public static void onKey(InputEvent event) {
-        if (instance.isActive() && event.key == InputConstants.MOUSE_BUTTON_LEFT && event.modifiers == 2) {
+        if (instance.isActive() && event.isMouse && event.mouseInput.button() == InputConstants.MOUSE_BUTTON_LEFT && event.modifiers == 2) {
             if (mc.gui.screen() instanceof InventoryScreen screen) {
                 Slot focusedSlot = Utils.getFocusedSlot();
                 if (focusedSlot != null && !focusedSlot.getItem().isEmpty()) {

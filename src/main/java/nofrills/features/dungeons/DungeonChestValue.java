@@ -68,7 +68,7 @@ public class DungeonChestValue {
         String[] parts = name.split(" ");
         String last = parts[parts.length - 1];
         if (last.startsWith("x")) {
-            return Utils.parseInt(last.replaceAll("x", "").replaceAll(",", "")).orElse(stack.getCount());
+            return Utils.parseInt(last.replace("x", "").replace(",", "")).orElse(stack.getCount());
         }
         return stack.getCount();
     }
@@ -95,7 +95,7 @@ public class DungeonChestValue {
                 if (name.equals("Open Reward Chest")) {
                     Optional<String> cost = Utils.getLoreLines(event.stack).stream().filter(line -> line.endsWith(" Coins")).findFirst();
                     if (cost.isPresent()) {
-                        String value = cost.get().replace(" Coins", "").replaceAll(",", "");
+                        String value = cost.get().replace(" Coins", "").replace(",", "");
                         currentValue -= Utils.parseInt(value).orElse(0);
                     }
                 }

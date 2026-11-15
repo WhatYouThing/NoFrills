@@ -3,6 +3,7 @@ package nofrills.config;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.blaze3d.platform.InputConstants;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -32,6 +33,7 @@ public class SettingGeneric {
             case RenderColor color -> new JsonPrimitive(color.argb());
             case JsonObject jsonObject -> jsonObject;
             case Enum<?> enumValue -> new JsonPrimitive(enumValue.name());
+            case InputConstants.Key inputKey -> new JsonPrimitive(inputKey.getName());
             default ->
                     throw new IllegalStateException(Utils.format("Unexpected value ({}) in {} {} setting class!", value, this.key, this.parent));
         };

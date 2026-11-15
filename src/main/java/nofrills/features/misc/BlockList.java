@@ -112,7 +112,7 @@ public class BlockList {
             List<String> addedPlayers = new ArrayList<>();
             JsonObject json = JsonParser.parseString(clipboard).getAsJsonObject();
             for (Map.Entry<String, JsonElement> e : json.entrySet()) {
-                String uuid = e.getKey().replaceAll("-", "");
+                String uuid = e.getKey().replace("-", "");
                 JsonObject entry = e.getValue().getAsJsonObject();
                 if (data.get().has(uuid)) {
                     continue;
@@ -218,8 +218,8 @@ public class BlockList {
                         if (autoKick.value()) {
                             if (sendKick.value()) {
                                 Utils.sendMessage(kickMsg.value()
-                                        .replaceAll("\\{name}", name)
-                                        .replaceAll("\\{reason}", obj.get("reason").getAsString())
+                                        .replace("{name}", name)
+                                        .replace("{reason}", obj.get("reason").getAsString())
                                 );
                                 kickQueue.put(name, new AtomicInteger(10));
                             } else {
@@ -244,7 +244,7 @@ public class BlockList {
     @EventHandler
     private static void onPlayerJoin(PlayerJoinedEvent event) {
         if (instance.isActive() && joinAlert.value() && event.isRealPlayer()) {
-            String uuid = event.uuid.toString().replaceAll("-", "");
+            String uuid = event.uuid.toString().replace("-", "");
             if (data.get().has(uuid)) {
                 Utils.infoRaw(buildEntryLine(
                         data.get().get(uuid).getAsJsonObject(),

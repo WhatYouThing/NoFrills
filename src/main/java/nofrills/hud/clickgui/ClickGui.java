@@ -315,7 +315,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Toggle("Skip World Render", UnfocusedTweaks.noWorldRender, "Skips world rendering while unfocused which greatly reduces usage."),
                                 new Toggle("Mute Sounds", UnfocusedTweaks.muteSounds, "Mutes the in-game sound while unfocused."),
                                 new Toggle("No Vanilla Limit", UnfocusedTweaks.noVanilla, "Fully disables the vanilla \"Reduce FPS\" option."),
-                                new SliderInt("FPS Limit", 0, 200, 1, UnfocusedTweaks.fpsLimit, "The max FPS the game will render at while unfocused. Set to 0 to disable.")
+                                new Toggle("Limit FPS", UnfocusedTweaks.limitFps, "Limits the FPS while the game is unfocused."),
+                                new SliderInt("Max FPS", 20, 300, 1, UnfocusedTweaks.fpsLimit, "The max FPS the game will render at while unfocused.")
                         ))),
                         new Module("GUI Keybinds", GuiKeybinds.instance, "Adds navigation keybinds to applicable Skyblock GUIs.", new SettingsScreen(List.of(
                                 new Keybind("Next Page", GuiKeybinds.next, "The keybind to go to the next page of the GUI."),
@@ -689,7 +690,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new ColorPicker("Crystal Fill", BossHighlight.crystalFill, "The color of the filled box if your boss is using the Crystal attunement."),
                                 new ColorPicker("Crystal Outline", BossHighlight.crystalOutline, "The color of the outline box if your boss is using the Crystal attunement.")
                         ))),
-                        new Module("Pillar Alert", PillarAlert.instance, "Displays the hits and the timer of your Blaze slayer fire pillars.\nThis feature tries to prevent false flags by tracking the \"path\" that the pillars take."),
+                        new Module("Pillar Alert", PillarAlert.instance, "Displays the hits and the timer of your Blaze slayer fire pillars."),
                         new Module("No Attunement Spam", NoAttunementSpam.instance, "Filters the chat messages about using the wrong attunement on the Blaze boss."),
                         new Module("Kill Timer", KillTimer.instance, "Tracks how long your slayer boss took to kill."),
                         new Module("Chalice Highlight", ChaliceHighlight.instance, "Highlights the Blood Ichor chalices spawned by the T5 Vampire.", new SettingsScreen(List.of(
@@ -716,7 +717,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new TitleInput("Title", SlayerMinibossAlert.title, "The title to display once a miniboss is spawned. Replaces {name} with the name of the miniboss."),
                                 new SoundInput("Sound", SlayerMinibossAlert.sound, "The sound to play once a miniboss is spawned.")
                         )),
-                        new Module("Spawn Timer", SpawnTimer.instance, "Tracks how long your slayer bosses take to spawn.")
+                        new Module("Spawn Timer", SpawnTimer.instance, "Tracks how long your slayer bosses take to spawn."),
+                        new Module("No Slayer Particles", NoBossParticles.instance, "Prevents all particles from rendering while your slayer boss is alive.")
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new SettingsScreen(List.of(
@@ -786,19 +788,25 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         );
         root.surface(Surface.VANILLA_TRANSLUCENT).alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         FlowLayout parent = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        parent.surface(Surface.flat(RenderColor.DARK_GRAY.argb())).padding(Insets.of(5));
+        parent.surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.25f).argb())).padding(Insets.of(10));
         this.categoriesParent = UIContainers.verticalScroll(
                 Sizing.content(),
-                Sizing.fixed(300),
+                Sizing.fixed(200),
                 UIContainers.verticalFlow(Sizing.content(), Sizing.content())
         );
-        this.categoriesParent.child().alignment(HorizontalAlignment.CENTER, VerticalAlignment.TOP);
+        this.categoriesParent.surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.4f).argb())).margins(Insets.right(10));
+        this.categoriesParent.child()
+                .alignment(HorizontalAlignment.CENTER, VerticalAlignment.TOP)
+                .horizontalSizing(Sizing.fixed(90));
         this.modulesParent = UIContainers.verticalScroll(
                 Sizing.content(),
-                Sizing.fixed(300),
+                Sizing.fixed(200),
                 UIContainers.verticalFlow(Sizing.content(), Sizing.content())
         );
-        this.modulesParent.child().alignment(HorizontalAlignment.CENTER, VerticalAlignment.TOP);
+        this.modulesParent.surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.325f).argb()));
+        this.modulesParent.child()
+                .alignment(HorizontalAlignment.CENTER, VerticalAlignment.TOP)
+                .horizontalSizing(Sizing.fixed(200));
         for (Category category : this.categories) {
             category.onClick = c -> {
                 this.updateCategories(c);

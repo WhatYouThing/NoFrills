@@ -24,7 +24,7 @@ public class LeapMessage {
         if (instance.isActive() && Utils.isInDungeons() && !DungeonUtil.isGhost()) {
             Matcher matcher = pattern.matcher(event.msg());
             if (!matcher.matches()) return;
-            Utils.sendMessage(message.value().replaceAll("\\{name}", matcher.group("name")));
+            Utils.sendMessage(message.value().replace("{name}", matcher.group("name")));
         }
     }
 }

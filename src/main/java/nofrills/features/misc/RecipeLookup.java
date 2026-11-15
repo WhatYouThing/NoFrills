@@ -2,6 +2,7 @@ package nofrills.features.misc;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.nbt.CompoundTag;
@@ -23,7 +24,7 @@ public class RecipeLookup {
     public static final Feature instance = new Feature("recipeLookup");
 
     public static final SettingEnum<Mode> mode = new SettingEnum<>(Mode.Recipe, Mode.class, "mode", instance);
-    public static final SettingKeybind keybind = new SettingKeybind(SettingKeybind.UNKNOWN_KEY, "bind", instance.key());
+    public static final SettingKeybind keybind = new SettingKeybind(InputConstants.UNKNOWN, "bind", instance.key());
 
     @EventHandler
     public static void onKey(InputEvent event) {

@@ -46,20 +46,20 @@ public class PriceTooltips {
         for (String line : Utils.getLoreLines(stack)) {
             if (line.startsWith("Stored: ") && line.contains("/")) {
                 String count = line.substring(line.indexOf(":") + 1, line.indexOf("/")).trim();
-                Optional<Integer> countInt = Utils.parseInt(count.replaceAll(",", ""));
+                Optional<Integer> countInt = Utils.parseInt(count.replace(",", ""));
                 if (countInt.isPresent()) {
                     return Math.max(1, countInt.get());
                 }
             }
             if (line.startsWith("Compost Available: ")) {
-                Optional<Integer> countInt = Utils.parseInt(line.substring(line.indexOf(":") + 2).replaceAll(",", ""));
+                Optional<Integer> countInt = Utils.parseInt(line.substring(line.indexOf(":") + 2).replace(",", ""));
                 if (countInt.isPresent()) {
                     return countInt.get();
                 }
             }
             if (line.startsWith("Syphon") && line.endsWith("more to level up!")) {
                 String replaced = line.replace("Syphon", "").trim();
-                Optional<Integer> countInt = Utils.parseInt(replaced.substring(0, replaced.indexOf(" ")).replaceAll(",", ""));
+                Optional<Integer> countInt = Utils.parseInt(replaced.substring(0, replaced.indexOf(" ")).replace(",", ""));
                 if (countInt.isPresent()) {
                     return Math.max(1, countInt.get());
                 }
@@ -67,7 +67,7 @@ public class PriceTooltips {
             if (line.startsWith("Owned: ")) {
                 int start = line.indexOf(":") + 2;
                 int end = line.indexOf(" ", start);
-                Optional<Integer> countInt = Utils.parseInt(line.substring(start, end).replaceAll(",", ""));
+                Optional<Integer> countInt = Utils.parseInt(line.substring(start, end).replace(",", ""));
                 if (countInt.isPresent()) {
                     return Math.max(1, countInt.get());
                 }
@@ -80,7 +80,7 @@ public class PriceTooltips {
         for (String line : Utils.getLoreLines(stack)) {
             if (line.startsWith("Cost: ")) {
                 String cost = Utils.toLower(line.substring(line.indexOf(":") + 2));
-                return Utils.parseLong(cost.replaceAll(",", "").replace("coins", "").trim()).orElse(0L);
+                return Utils.parseLong(cost.replace(",", "").replace("coins", "").trim()).orElse(0L);
             }
         }
         return 0L;

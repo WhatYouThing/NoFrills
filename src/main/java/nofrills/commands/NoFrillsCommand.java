@@ -91,7 +91,7 @@ public class NoFrillsCommand {
                     for (JsonElement player : PartyCommands.lists.value().get("whitelist").getAsJsonArray()) {
                         players.append(player.getAsString()).append(" ");
                     }
-                    Utils.infoFormat("§aList of all whitelisted players: §7{}", players.toString().trim().replaceAll(" ", ", "));
+                    Utils.infoFormat("§aList of all whitelisted players: §7{}", players.toString().trim().replace(" ", ", "));
                 }
                 return SINGLE_SUCCESS;
             })).then(literal("clear").executes(context -> {
@@ -141,7 +141,7 @@ public class NoFrillsCommand {
                     for (JsonElement player : PartyCommands.lists.value().get("blacklist").getAsJsonArray()) {
                         players.append(player.getAsString()).append(" ");
                     }
-                    Utils.infoFormat("§aList of all blacklisted players: §7{}", players.toString().trim().replaceAll(" ", ", "));
+                    Utils.infoFormat("§aList of all blacklisted players: §7{}", players.toString().trim().replace(" ", ", "));
                 }
                 return SINGLE_SUCCESS;
             })).then(literal("clear").executes(context -> {

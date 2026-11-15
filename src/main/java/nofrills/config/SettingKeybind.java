@@ -31,13 +31,14 @@ public class SettingKeybind extends SettingGeneric {
 
     public static Optional<InputConstants.Key> upgrade(JsonElement element) { // TODO: remove in the future
         if (element instanceof JsonPrimitive primitive && primitive.isNumber()) {
-            int key = Math.abs(primitive.getAsInt());
+            int key = primitive.getAsInt();
             if (InputConstants.Type.MOUSE.map.containsKey(key)) {
                 return Optional.of(InputConstants.Type.MOUSE.map.get(key));
             }
             if (InputConstants.Type.KEYSYM.map.containsKey(key)) {
                 return Optional.of(InputConstants.Type.KEYSYM.map.get(key));
             }
+            return Optional.of(InputConstants.UNKNOWN);
         }
         return Optional.empty();
     }

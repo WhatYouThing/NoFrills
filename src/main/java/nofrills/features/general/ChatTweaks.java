@@ -75,11 +75,11 @@ public class ChatTweaks {
     private static void onInput(InputEvent event) {
         if (instance.isActive() && mc.gui.screen() instanceof ChatScreen && (event.isKey(copyKey) || event.isKey(copyLineKey))) {
             if (event.action == InputConstants.PRESS) {
-                String message = getHoveredMsg(event.isKey(copyKey));
+                String message = getHoveredMsg(event.isKey(copyLineKey));
                 if (message.isEmpty()) return;
                 mc.keyboardHandler.setClipboard(trimOnCopy.value() ? message.trim() : message);
                 if (msgOnCopy.value()) {
-                    String type = event.isKey(copyKey) ? "Line" : "Message";
+                    String type = event.isKey(copyLineKey) ? "Line" : "Message";
                     int length = copyMsgLength.value();
                     if (length == 0) {
                         Utils.infoFormat("§a{} copied to clipboard.", type);

@@ -22,6 +22,9 @@ public interface ListeningHudElement {
     default void onEntityNamed(EntityNamedEvent event) {
     }
 
+    default void onEntityUpdated(EntityUpdatedEvent event) {
+    }
+
     default void onChatMessage(ChatMsgEvent event) {
     }
 

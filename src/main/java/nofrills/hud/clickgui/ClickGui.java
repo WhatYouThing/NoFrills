@@ -726,7 +726,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.ColorPicker("Crystal Fill", BossHighlight.crystalFill, "The color of the filled box if your boss is using the Crystal attunement."),
                                 new Settings.ColorPicker("Crystal Outline", BossHighlight.crystalOutline, "The color of the outline box if your boss is using the Crystal attunement.")
                         ))),
-                        new Module("Pillar Alert", PillarAlert.instance, "Displays the hits and the timer of your Blaze slayer fire pillars.\nThis feature tries to prevent false flags by tracking the \"path\" that the pillars take."),
+                        new Module("Pillar Alert", PillarAlert.instance, "Displays the hits and the timer of your Blaze slayer fire pillars."),
                         new Module("No Attunement Spam", NoAttunementSpam.instance, "Filters the chat messages about using the wrong attunement on the Blaze boss."),
                         new Module("Kill Timer", KillTimer.instance, "Tracks how long your slayer boss took to kill."),
                         new Module("Chalice Highlight", ChaliceHighlight.instance, "Highlights the Blood Ichor chalices spawned by the T5 Vampire.", new Settings(List.of(
@@ -753,7 +753,8 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.TitleInput("Title", SlayerMinibossAlert.title, "The title to display once a miniboss is spawned. Replaces {name} with the name of the miniboss."),
                                 new Settings.SoundInput("Sound", SlayerMinibossAlert.sound, "The sound to play once a miniboss is spawned.")
                         )),
-                        new Module("Spawn Timer", SpawnTimer.instance, "Tracks how long your slayer bosses take to spawn.")
+                        new Module("Spawn Timer", SpawnTimer.instance, "Tracks how long your slayer bosses take to spawn."),
+                        new Module("No Slayer Particles", NoBossParticles.instance, "Prevents all particles from rendering while your slayer boss is alive.")
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new Settings(List.of(

@@ -76,7 +76,7 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
     - **Experiment Solver**: Solves the Experimentation Table mini-games and prevents wrong clicks.
     - **Calendar Date**: Calculates the exact starting dates of events in the calendar.
-    - **Spooky Chests**: Highlights nearby trick or treat chests during the Spooky Festival.
+    - **Spooky Chest Highlight**: Highlights nearby trick or treat chests during the Spooky Festival.
     - **Diana Solver**: Guesses Diana burrow positions when using your spade. Also highlights nearby burrows.
     - **Hoppity Solver**: Guesses Hoppity egg positions when using your Egglocator.
     - **Foraging Beacon**: Solves the beacon tuning mini-game on foraging islands.
@@ -103,10 +103,10 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 
 - **Dungeons**
 
-    - **Device Solvers**: Solvers for various F7/M7 devices.
+    - **Device Solvers**: Solvers for the F7/M7 devices.
     - **Starred Mob Highlight**: High performance starred mob highlights.
     - **Miniboss Highlight**: Highlights minibosses.
-    - **Key Highlight**: Highlights nearby Wither and Blood keys.
+    - **Key Alert**: Alerts you when a Wither/Blood key is dropped/obtained.
     - **Spirit Bow Highlight**: Highlights the Spirit Bow in the F4/M4 boss fight.
     - **Leap Overlay**: Renders a custom overlay in place of the Spirit Leap menu.
     - **Terminal Solvers**: Solves terminals and prevents wrong clicks in F7/M7. Also hides item tooltips in every
@@ -127,6 +127,8 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Platform Highlight**: Highlights the 3x3 area which you mine in Necron phase to stop the platform from breaking.
     - **Croesus Solver**: Highlights Dungeons loot in the Croesus/Vesuvius menu.
     - **Dupe Class Alert**: Shows text on screen if your party has multiple of the same class before the dungeon starts.
+    - **Leap Message**: Sends a message when you leap to another player.
+    - **Class Colors**: Controls the colors used for the dungeon classes across various features.
 
 - **Kuudra**
 
@@ -150,10 +152,10 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Chalice Highlight**: Highlights the Blood Ichor chalices spawned by the T5 Vampire.
     - **Egg Hits Display**: Renders the needed hits for the Tarantula Broodfather egg sack phase.
     - **Beacon Tracer**: Draws tracers towards the Yang Glyphs thrown by the Voidgloom Seraph.
-    - **Cocoon Alert**: Alerts you when your slayer boss is cocooned by your Primordial belt.
     - **Spawn Alert**: Alerts you when your slayer boss is spawned.
     - **Miniboss Highlight**: Highlights slayer minibosses.
     - **Miniboss Alert**: Alerts you when a slayer miniboss is spawned.
+    - **Spawn Timer**: Tracks how long your slayer bosses take to spawn.
 
 - **Mining**
 
@@ -175,7 +177,6 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
     - **Plot Borders**: Renders borders for plots.
     - **Vacuum Solver**: Guesses Pest positions when using the Pest Tracker ability on your vacuum.
     - **Watering Helper**: Improves the Greenhouse watering cans.
-    - **Equipment Highlight**: Highlights your farming and pest spawning equipment in the equipment menu.
     - **Phantomleaf Solver**: Helps you with harvesting the Phantomleaf Greenhouse mutation.
 
 </details>
@@ -215,6 +216,10 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 <details>
 <summary>Click to expand HUD element list</summary>
 
+- **DungeonMap**: Displays the dungeon map while in Dungeons.
+- **PickaxeAbilityTimer**: Displays the duration of your pickaxe ability cooldown.
+- **PetDisplay**: Displays the name of your active pet.
+- **CustomTitleContainer**: Replaces non-vanilla title rendering with itself while active.
 - **FPS**: Displays your FPS.
 - **TPS**: Displays the real time TPS of the server, and optionally the average TPS.
 - **Clock**: Displays system clock.
@@ -224,18 +229,16 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **InventoryOverlay**: Displays the contents of your inventory.
 - **Quiver**: Displays the type and the amount of arrows in your quiver.
 - **LagMeter**: Displays the time since the last received server tick.
-- **PickaxeAbilityTimer**: Displays the duration of your pickaxe ability cooldown.
 - **QueueCooldownTimer**: Displays the cooldown for queueing for instances (Dungeons, Kuudra etc.).
 - **SlayerHealth**: Displays the name and health hologram of your slayer boss.
 - **SlayerTimer**: Displays the timer hologram of your slayer boss.
 - **BossHealth**: Displays the health of Kuudra and/or the Catacombs bosses.
-- **DungeonMap**: Displays the dungeon map while in Dungeons.
 - **DungeonScore**: Displays the current dungeon score. Used by the Score Calculator feature.
 - **SpiritMaskTimer**: Displays the cooldown of the Spirit Mask Second Wind ability.
 - **PhoenixPetTimer**: Displays the cooldown of the Phoenix Pet Rekindle ability.
 - **BonzoMaskTimer**: Displays the cooldown of the Bonzo's Mask Clownin' Around ability.
 - **SpiritBearTimer**: Displays a timer for the Spirit Bear spawning in F4/M4.
-- **TerracottaGyroTimer**: Displays a timer for the first and the ultimate giant gyro in F6/M6.
+- **TerracottaGyroTimer**: Displays a timer for the first terracotta phase and the final giant phase in F6/M6.
 - **PadTimer**: Displays a tick timer for the pads in the F7/M7 Storm phase.
 - **TerminalStartTimer**: Displays a tick timer for the start of the Goldor phase in F7/M7.
 - **GoldorTickTimer**: Displays a tick timer for the death tick in the F7/M7 Goldor phase.
@@ -243,10 +246,11 @@ It's in the name. Simple and effective Hypixel Skyblock mod for modern versions 
 - **FreshToolsTimer**: Displays a timer for the Fresh Tools perk shop ability in Kuudra.
 - **SeaCreatures**: Displays the amount of nearby sea creatures.
 - **FishingBobber**: Displays the fishing hologram timer, and optionally the existence time of your bobber.
-- **FishingBag**: Displays the type and the amount of bait in your fishing bag.
+- **BaitSack**: Displays the type and the amount of bait in your bait sack.
 - **BeaconPower**: Displays the duration and the stat upgrade granted by your Beacon.
 - **ShardTrackerDisplay**: Displays information about tracked attribute shards. Used by the Shard Tracker feature.
 - **SkillTrackerDisplay**: Displays information about your skill EXP gain. Used by the Skill Tracker feature.
+- **KickCooldownTimer**: Displays the SkyBlock join cooldown after you get kicked to the lobby.
 
 </details>
 

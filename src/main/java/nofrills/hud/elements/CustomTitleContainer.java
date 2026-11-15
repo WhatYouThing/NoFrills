@@ -2,6 +2,7 @@ package nofrills.hud.elements;
 
 import io.wispforest.owo.ui.core.OwoUIGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.config.Feature;
 import nofrills.hud.SimpleTextElement;
 
@@ -22,5 +23,12 @@ public final class CustomTitleContainer extends SimpleTextElement {
             return;
         }
         super.draw(context, mouseX, mouseY, partialTicks, delta);
+    }
+
+    @Override
+    public void setText(MutableComponent text) {
+        this.label.text(text);
+        this.text = text;
+        this.onTextChanged();
     }
 }

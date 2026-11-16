@@ -84,17 +84,19 @@ public final class CommandKeybinds {
                 Pair.of("modifier", new JsonPrimitive(Modifier.Any.name()))
         );
         if (object.has("classFilter")) {
-            object.add("classFilterList",
-                    Utils.toJsonArray(Arrays.stream(object.get("classFilter").getAsString().split(",")).map(String::trim).toList())
-            );
+            String filter = object.get("classFilter").getAsString();
+            if (!filter.isBlank()) {
+                object.add("classFilterList", Utils.toJsonArray(Arrays.stream(filter.split(",")).map(String::trim).toList()));
+            }
             object.remove("classFilter");
         } else if (!object.has("classFilterList")) {
             object.add("classFilterList", new JsonArray());
         }
         if (object.has("islandFilter")) {
-            object.add("islandFilterList",
-                    Utils.toJsonArray(Arrays.stream(object.get("islandFilter").getAsString().split(",")).map(String::trim).toList())
-            );
+            String filter = object.get("islandFilter").getAsString();
+            if (!filter.isBlank()) {
+                object.add("islandFilterList", Utils.toJsonArray(Arrays.stream(filter.split(",")).map(String::trim).toList()));
+            }
             object.remove("islandFilter");
         } else if (!object.has("islandFilterList")) {
             object.add("islandFilterList", new JsonArray());

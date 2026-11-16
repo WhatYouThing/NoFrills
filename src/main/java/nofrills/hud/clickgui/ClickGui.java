@@ -754,7 +754,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Settings.SoundInput("Sound", SlayerMinibossAlert.sound, "The sound to play once a miniboss is spawned.")
                         )),
                         new Module("Spawn Timer", SpawnTimer.instance, "Tracks how long your slayer bosses take to spawn."),
-                        new Module("No Slayer Particles", NoBossParticles.instance, "Prevents all particles from rendering while your slayer boss is alive.")
+                        new Module("No Boss Particles", NoBossParticles.instance, "Prevents all particles from rendering while your slayer boss is alive.")
                 )),
                 new Category("Mining", List.of(
                         new Module("Ability Alert", AbilityAlert.instance, "Alerts you when your Pickaxe Ability is available.\n\nIf present, uses the Pickaxe Ability widget for best accuracy.\nOtherwise, uses the cooldown displayed on your drill/pickaxe.\nMight be inaccurate in some cases.", new Settings(List.of(

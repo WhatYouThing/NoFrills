@@ -27,18 +27,19 @@ public final class Module extends FlowLayout {
 
     public Module(String name, Feature feature, String tooltip, SettingsScreen options) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
+        this.margins(Insets.of(2, 2, 0, 0));
         this.activeText = Component.literal(name).withColor(0x5ca0bf);
         this.inactiveText = Component.literal(name).withColor(0xdddddd);
         this.label = new PlainLabel(Component.literal(name));
-        this.label.horizontalTextAlignment(HorizontalAlignment.LEFT).verticalTextAlignment(VerticalAlignment.CENTER).margins(Insets.of(3, 2, 5, 5));
+        this.label.horizontalTextAlignment(HorizontalAlignment.LEFT).verticalTextAlignment(VerticalAlignment.CENTER);
         this.label.tooltip(Component.literal(tooltip));
-        this.child(label);
         this.options = options;
         if (this.options != null) {
             this.options.setTitle(Component.literal(name).withColor(0xffffff));
         }
         this.feature = feature;
         this.active(this.feature.isActive());
+        this.child(label);
     }
 
     @Override

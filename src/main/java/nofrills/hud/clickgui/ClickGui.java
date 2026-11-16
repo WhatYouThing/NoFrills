@@ -763,7 +763,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Keybind("Inactive Break Key", MouseLock.breakKeyInactive, "The key to set breaking to when deactivated."),
                                 new Keybind("Inactive Jump Key", MouseLock.jumpKeyInactive, "The key to set jumping to when deactivated.")
                         )),
-                        new Module("Glowing Mushrooms", GlowingMushroom.instance, "Highlights Glowing Mushrooms.", new SettingsScreen(List.of(
+                        new Module("Glowing Mushroom Highlight", GlowingMushroom.instance, "Highlights Glowing Mushrooms.", new SettingsScreen(List.of(
                                 new ColorPicker("Color", GlowingMushroom.color, "The color of the highlight.")
                         ))),
                         new Module("Plot Borders", PlotBorders.instance, "Renders borders for plots.", new SettingsScreen(List.of(
@@ -787,6 +787,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 ))
         );
         root.surface(Surface.VANILLA_TRANSLUCENT).alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
+        FlowLayout header = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
         FlowLayout parent = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
         parent.surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.25f).argb())).padding(Insets.of(10));
         this.categoriesParent = UIContainers.verticalScroll(
@@ -794,7 +795,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 Sizing.fixed(200),
                 UIContainers.verticalFlow(Sizing.content(), Sizing.content())
         );
-        this.categoriesParent.surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.4f).argb())).margins(Insets.right(10));
+        this.categoriesParent
+                .scrollbarThiccness(2)
+                .scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(RenderColor.WHITE.argb())))
+                .surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.4f).argb()))
+                .margins(Insets.right(10));
         this.categoriesParent.child()
                 .alignment(HorizontalAlignment.CENTER, VerticalAlignment.TOP)
                 .horizontalSizing(Sizing.fixed(90));
@@ -803,7 +808,10 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 Sizing.fixed(200),
                 UIContainers.verticalFlow(Sizing.content(), Sizing.content())
         );
-        this.modulesParent.surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.325f).argb()));
+        this.modulesParent
+                .scrollbarThiccness(2)
+                .scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(RenderColor.WHITE.argb())))
+                .surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.325f).argb()));
         this.modulesParent.child()
                 .alignment(HorizontalAlignment.CENTER, VerticalAlignment.TOP)
                 .horizontalSizing(Sizing.fixed(200));
@@ -816,6 +824,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         this.updateCategories(Optional.ofNullable(lastCategory.get()).orElse(this.categories.getFirst()));
         parent.child(this.categoriesParent);
         parent.child(this.modulesParent);
+        root.child(header);
         root.child(parent);
         /*
          this.mainScroll = UIContainers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);

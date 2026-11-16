@@ -12,26 +12,20 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nofrills.Main.mc;
-
 public final class Category extends FlowLayout {
     public Consumer<Category> onClick = _ -> {
     };
-    public int categoryWidth = 0;
     public List<Module> features;
     public PlainLabel label;
     public String title;
 
     public Category(String title, List<Module> children) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
-        this.margins(Insets.of(5, 0, 3, 0));
+        this.margins(Insets.of(2, 2, 0, 0));
         this.title = title;
         this.label = new PlainLabel(Component.literal(title));
         this.label.horizontalTextAlignment(HorizontalAlignment.CENTER).verticalTextAlignment(VerticalAlignment.CENTER);
         this.features = new ArrayList<>(children);
-        for (Module module : this.features) {
-            this.categoryWidth = Math.max(this.categoryWidth, mc.font.width(module.activeText.getString()) + 10);
-        }
         this.child(this.label);
     }
 

@@ -8,6 +8,8 @@ import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import nofrills.features.dungeons.*;
 import nofrills.features.dungeons.devicesolvers.ArrowAlignSolver;
 import nofrills.features.dungeons.devicesolvers.DeviceSolvers;
@@ -28,9 +30,11 @@ import nofrills.features.slayer.*;
 import nofrills.features.solvers.*;
 import nofrills.features.tweaks.*;
 import nofrills.hud.clickgui.components.FlatTextbox;
+import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.settings.*;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -788,11 +792,25 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         );
         root.surface(Surface.VANILLA_TRANSLUCENT).alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         FlowLayout header = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
+        header.surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.25f).argb()))
+                .verticalAlignment(VerticalAlignment.CENTER)
+                .padding(Insets.of(5, 0, 10, 10))
+                .sizing(Sizing.fixed(320), Sizing.fixed(30));
+        PlainLabel label = new PlainLabel(Component.literal("NoFrills").withColor(RenderColor.NF_BLUE.hex())
+                .append(Component.literal(" " + Utils.getModVersion()).withColor(RenderColor.WHITE.hex())));
+        this.searchBox = new FlatTextbox(Sizing.fixed(140));
+        this.searchBox.setSuggestion("Search...");
+        this.searchBox.positioning(Positioning.relative(100, 0))
+                .margins(Insets.of(2, 0, 0, 3));
+        this.searchBox.onChanged().subscribe(s -> {
+            this.searchBox.setSuggestion(s.isEmpty() ? "Search..." : "");
+            this.updateCategories(Optional.ofNullable(lastCategory.get()).orElse(this.categories.getFirst()));
+        });
         FlowLayout parent = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());
-        parent.surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.25f).argb())).padding(Insets.of(10));
+        parent.surface(Surface.flat(RenderColor.DARK_GRAY.scaled(0.25f).argb())).padding(Insets.of(0, 10, 10, 10));
         this.categoriesParent = UIContainers.verticalScroll(
                 Sizing.content(),
-                Sizing.fixed(200),
+                Sizing.fixed(180),
                 UIContainers.verticalFlow(Sizing.content(), Sizing.content())
         );
         this.categoriesParent
@@ -805,7 +823,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 .horizontalSizing(Sizing.fixed(90));
         this.modulesParent = UIContainers.verticalScroll(
                 Sizing.content(),
-                Sizing.fixed(200),
+                Sizing.fixed(180),
                 UIContainers.verticalFlow(Sizing.content(), Sizing.content())
         );
         this.modulesParent
@@ -822,67 +840,12 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
             };
         }
         this.updateCategories(Optional.ofNullable(lastCategory.get()).orElse(this.categories.getFirst()));
+        header.child(label);
+        header.child(this.searchBox);
         parent.child(this.categoriesParent);
         parent.child(this.modulesParent);
         root.child(header);
         root.child(parent);
-        /*
-         this.mainScroll = UIContainers.horizontalScroll(Sizing.fill(100), Sizing.fill(100), parent);
-        this.mainScroll.scrollbarThiccness(2).scrollbar(ScrollContainer.Scrollbar.flat(Color.ofArgb(0xffffffff)));
-        root.child(this.mainScroll);
-        ButtonComponent hudEditorButton = UIComponents.button(Component.literal("Open HUD Editor"), button -> mc.gui.setScreen(new HudEditorScreen()));
-        hudEditorButton.margins(Insets.of(0, 3, 0, 3));
-        hudEditorButton.positioning(Positioning.relative(100, 100));
-        hudEditorButton.renderer((context, button, delta) -> {
-            context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
-            Rendering.drawBorder(context, button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
-        });
-        root.child(hudEditorButton);
-        this.searchBox = new FlatTextbox(Sizing.fixed(200));
-        searchBox.setSuggestion("Search...");
-        searchBox.margins(Insets.of(0, 3, 0, 0));
-        searchBox.positioning(Positioning.relative(50, 100));
-        searchBox.onChanged().subscribe(value -> {
-            if (value.isEmpty()) {
-                searchBox.setSuggestion("Search...");
-                for (Category category : this.categories) {
-                    category.scroll.child().clearChildren();
-                    for (Module module : category.features) {
-                        module.horizontalSizing(Sizing.fixed(category.categoryWidth));
-                        category.scroll.child().child(module);
-                    }
-                }
-            } else {
-                searchBox.setSuggestion("");
-                for (Category category : this.categories) {
-                    List<Module> features = new ArrayList<>(category.features);
-                    features.removeIf(feature -> {
-                        if (matchSearch(feature.label.getText(), value) || matchSearch(feature.label.getTooltip(), value)) {
-                            return false;
-                        }
-                        if (feature.options != null) {
-                            for (FlowLayout setting : feature.options.settings) {
-                                for (UIComponent child : setting.children()) {
-                                    if (child instanceof PlainLabel label) {
-                                        if (matchSearch(label.getText(), value) || matchSearch(label.getTooltip(), value)) {
-                                            return false;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        return true;
-                    });
-                    category.scroll.child().clearChildren();
-                    for (Module module : features) {
-                        module.horizontalSizing(Sizing.fixed(category.categoryWidth));
-                        category.scroll.child().child(module);
-                    }
-                }
-            }
-        });
-        root.child(searchBox);
-         */
     }
 
     @Override
@@ -894,16 +857,25 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     }
 
     private void updateCategories(Category selected) {
+        List<Pair<Category, List<Module>>> result = this.categories.stream()
+                .map(c -> Pair.of(c, c.build(this.searchBox.getValue())))
+                .filter(p -> !p.getValue().isEmpty())
+                .toList();
+        Pair<Category, List<Module>> active = result.stream()
+                .filter(p -> p.getKey().title.equals(selected.title))
+                .findFirst()
+                .orElse(!result.isEmpty() ? result.getFirst() : null);
+        this.categoriesParent.child().clearChildren();
+        this.categoriesParent.child().children(result.stream().map(Pair::getKey).toList());
+        this.modulesParent.child().clearChildren();
         for (Category category : this.categories) {
-            if (category.title.equals(selected.title)) {
-                category.label.text(category.label.text().copy().withColor(RenderColor.NF_BLUE.hex()));
-                this.modulesParent.child().clearChildren();
-                this.modulesParent.child().children(category.build(""));
+            MutableComponent text = category.label.text().copy();
+            if (active != null && category.title.equals(active.getKey().title)) {
+                category.label.text(text.withColor(RenderColor.NF_BLUE.hex()));
+                this.modulesParent.child().children(active.getValue());
             } else {
-                category.label.text(category.label.text().copy().withColor(RenderColor.WHITE.hex()));
+                category.label.text(text.withColor(RenderColor.WHITE.hex()));
             }
         }
-        this.categoriesParent.child().clearChildren();
-        this.categoriesParent.child().children(this.categories);
     }
 }

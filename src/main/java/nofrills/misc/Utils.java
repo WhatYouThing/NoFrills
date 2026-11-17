@@ -790,6 +790,10 @@ public class Utils {
         return modContainer.get();
     }
 
+    public static String getModVersion() {
+        return getModContainer().getMetadata().getVersion().getFriendlyString();
+    }
+
     private static int getVersionNumber(String version) {
         String[] numbers = version.split("\\.");
         if (numbers.length >= 3) {

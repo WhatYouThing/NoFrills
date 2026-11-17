@@ -94,7 +94,8 @@ public final class CommandKeybinds {
                 object.add("classFilterList", Utils.toJsonArray(Arrays.stream(filter.split(",")).map(String::trim).toList()));
             }
             object.remove("classFilter");
-        } else if (!object.has("classFilterList")) {
+        }
+        if (!object.has("classFilterList")) {
             object.add("classFilterList", new JsonArray());
         }
         if (object.has("islandFilter")) {
@@ -103,7 +104,8 @@ public final class CommandKeybinds {
                 object.add("islandFilterList", Utils.toJsonArray(Arrays.stream(filter.split(",")).map(String::trim).toList()));
             }
             object.remove("islandFilter");
-        } else if (!object.has("islandFilterList")) {
+        }
+        if (!object.has("islandFilterList")) {
             object.add("islandFilterList", new JsonArray());
         }
         for (Pair<String, JsonPrimitive> value : values) {

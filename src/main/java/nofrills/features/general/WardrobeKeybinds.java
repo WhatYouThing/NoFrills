@@ -2,7 +2,6 @@ package nofrills.features.general;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
@@ -74,8 +73,7 @@ public class WardrobeKeybinds {
             }
             case Hotbar -> {
                 for (int i = 1; i <= 9; i++) {
-                    KeyMapping binding = mc.options.keyHotbarSlots[i - 1]; // could crash if someone is doing some voodoo
-                    if (Utils.matchesKey(binding, event.keyInput, event.mouseInput)) {
+                    if (event.isKey(mc.options.keyHotbarSlots[i - 1])) {
                         yield i + (page - 1) * 9;
                     }
                 }

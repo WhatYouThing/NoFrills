@@ -16,13 +16,9 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
@@ -60,7 +56,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import nofrills.config.SettingSound;
 import nofrills.config.SettingTitle;
-import nofrills.events.InputEvent;
 import nofrills.hud.HudManager;
 import nofrills.mixin.AbstractContainerScreenAccessor;
 import nofrills.mixin.BossHealthOverlayAccessor;
@@ -376,22 +371,6 @@ public class Utils {
 
     public static List<Entity> getOtherEntities(Entity from, double dist, Predicate<? super Entity> filter) {
         return getOtherEntities(from, AABB.ofSize(from.position(), dist, dist, dist), filter);
-    }
-
-    public static boolean matchesKey(KeyMapping binding, KeyEvent keyInput, MouseButtonInfo mouseInput) {
-        return (keyInput != null && binding.matches(keyInput)) || (mouseInput != null && binding.matchesMouse(new MouseButtonEvent(0, 0, mouseInput)));
-    }
-
-    public static boolean matchesKey(KeyMapping binding, InputEvent event) {
-        return matchesKey(binding, event.keyInput, event.mouseInput);
-    }
-
-    public static boolean matchesKey(KeyMapping binding, KeyEvent keyInput) {
-        return matchesKey(binding, keyInput, null);
-    }
-
-    public static boolean matchesKey(KeyMapping binding, MouseButtonInfo mouseInput) {
-        return matchesKey(binding, null, mouseInput);
     }
 
     public static InputConstants.Key getInputKey(String name) {

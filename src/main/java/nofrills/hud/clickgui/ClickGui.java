@@ -29,6 +29,7 @@ import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
 import nofrills.features.solvers.*;
 import nofrills.features.tweaks.*;
+import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.settings.*;
@@ -788,7 +789,11 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Toggle("Hide Particles", WateringHelper.hideParticles, "Removes the particles that appear while using a watering can.")
                         ))),
                         new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.")
-                ))
+                )),
+                new Category("HUD", HudManager.getElements().stream()
+                        .map(e -> new Module(e.elementLabel.getString(), e.instance, e.elementDesc.getString(), e.options))
+                        .toList()
+                )
         );
         root.surface(Surface.VANILLA_TRANSLUCENT).alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         FlowLayout header = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());

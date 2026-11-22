@@ -1,9 +1,8 @@
 package nofrills.features.dungeons;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import nofrills.config.Feature;
 import nofrills.events.EventListener;
 import nofrills.events.InputEvent;
@@ -25,17 +24,14 @@ public class QuickClose {
     );
 
     private static boolean isChest(String title) {
-        return title.endsWith("Chest") || DungeonChestValue.isChest(title);
+        return Utils.isInDungeons() && (title.endsWith("Chest") || DungeonChestValue.isChest(title));
     }
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && Utils.isInDungeons() && event.isKeyboard && mc.gui.screen() instanceof ContainerScreen container) {
-            if (isChest(container.getTitle().getString()) && movementKeys.stream().anyMatch(key -> Utils.matchesKey(key, event.keyInput))) {
-                if (event.action == InputConstants.PRESS) {
-                    container.onClose();
-                }
-                event.cancel();
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && isChest(container.getTitle().getString())) {
+            if (movementKeys.stream().anyMatch(event::isKey)) {
+                event.consume(container::onClose);
             }
         }
     }

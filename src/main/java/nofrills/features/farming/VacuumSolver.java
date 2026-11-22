@@ -47,7 +47,7 @@ public class VacuumSolver {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && Utils.matchesKey(mc.options.keyAttack, event) && event.action == InputConstants.PRESS && Utils.isInGarden() && isHoldingVacuum()) {
+        if (instance.isActive() && event.isKey(mc.options.keyAttack) && event.action == InputConstants.PRESS && Utils.isInGarden() && isHoldingVacuum()) {
             solver.start();
         }
     }

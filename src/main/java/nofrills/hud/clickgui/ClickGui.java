@@ -588,7 +588,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Toggle("Send Progress", MelodyMessage.progress, "Send messages when you make progress in the terminal."),
                                 new TextInput("% Message", MelodyMessage.progressMsg, "The message to send when you make progress.\nReplaces {percent} with your progress percentage (25%/50%/75%).")
                         ))),
-                        new Module("Quick Close", QuickClose.instance, "Quickly close Dungeon secret and/or loot chests by pressing any of the movement keys (WASD)."),
+                        new Module("Quick Close", QuickClose.instance, "Quickly close Dungeon secret and/or loot chests by pressing any of your movement keys."),
                         new Module("Chest Value", DungeonChestValue.instance, "Calculates the value of your Dungeons loot. Requires connectivity to the NoFrills API.", new SettingsScreen(List.of(
                                 new ColorPicker("Background", DungeonChestValue.background, "The color of the background of the value text.")
                         ))),

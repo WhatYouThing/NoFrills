@@ -30,11 +30,11 @@ import java.util.function.Function;
 import static nofrills.Main.mc;
 
 public class SettingsScreen extends BaseOwoScreen<FlowLayout> {
-    public static final ButtonComponent.Renderer buttonRenderer = (context, button, delta) -> {
+    public static final ButtonComponent.Renderer buttonRenderer = (context, button, _) -> {
         context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
         Rendering.drawBorder(context, button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xff5ca0bf);
     };
-    public static final ButtonComponent.Renderer buttonRendererWhite = (context, button, delta) -> {
+    public static final ButtonComponent.Renderer buttonRendererWhite = (context, button, _) -> {
         context.fill(button.getX(), button.getY(), button.getX() + button.getWidth(), button.getY() + button.getHeight(), 0xff101010);
         Rendering.drawBorder(context, button.getX(), button.getY(), button.getWidth(), button.getHeight(), 0xffffffff);
     };

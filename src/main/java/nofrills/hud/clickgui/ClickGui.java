@@ -3,6 +3,8 @@ package nofrills.hud.clickgui;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import io.wispforest.owo.ui.base.BaseOwoScreen;
+import io.wispforest.owo.ui.component.ButtonComponent;
+import io.wispforest.owo.ui.component.UIComponents;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.container.UIContainers;
@@ -29,6 +31,7 @@ import nofrills.features.misc.*;
 import nofrills.features.slayer.*;
 import nofrills.features.solvers.*;
 import nofrills.features.tweaks.*;
+import nofrills.hud.HudEditorScreen;
 import nofrills.hud.HudManager;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.PlainLabel;
@@ -41,6 +44,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static nofrills.Main.mc;
 
 public class ClickGui extends BaseOwoScreen<FlowLayout> {
     public static final AtomicReference<Category> lastCategory = new AtomicReference<>();
@@ -800,9 +805,14 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                 .sizing(Sizing.fixed(320), Sizing.fixed(30));
         PlainLabel label = new PlainLabel(Component.literal("NoFrills").withColor(RenderColor.NF_BLUE.hex())
                 .append(Component.literal(" " + Utils.getModVersion()).withColor(RenderColor.WHITE.hex())));
-        this.searchBox = new FlatTextbox(Sizing.fixed(140));
+        ButtonComponent editor = UIComponents.button(Component.literal("HUD Editor").withColor(0xffffff), _ -> mc.gui.setScreen(new HudEditorScreen()));
+        editor.renderer(SettingsScreen.buttonRenderer)
+                .positioning(Positioning.absolute(240, 0))
+                .verticalSizing(Sizing.fixed(18))
+                .margins(Insets.top(3));
+        this.searchBox = new FlatTextbox(Sizing.fixed(100));
         this.searchBox.setSuggestion("Search...");
-        this.searchBox.positioning(Positioning.relative(100, 0))
+        this.searchBox.positioning(Positioning.absolute(130, 0))
                 .margins(Insets.of(2, 0, 0, 3));
         this.searchBox.onChanged().subscribe(s -> {
             this.searchBox.setSuggestion(s.isEmpty() ? "Search..." : "");
@@ -843,6 +853,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         }
         this.updateCategories(Optional.ofNullable(lastCategory.get()).orElse(this.categories.getFirst()));
         header.child(label);
+        header.child(editor);
         header.child(this.searchBox);
         parent.child(this.categoriesParent);
         parent.child(this.modulesParent);

@@ -10,7 +10,6 @@ public final class PickaxeAbilityTimer extends TimerElement {
         super("Pickaxe Ability: {}", new Feature("pickaxeAbilityTimerElement"), "Pickaxe Ability Timer");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the duration of your pickaxe ability cooldown.\nUsed by the Ability Alert feature.");
-        this.setCategory(Category.Mining);
     }
 
     @Override

@@ -5,7 +5,7 @@ import io.wispforest.owo.util.EventSource;
 import io.wispforest.owo.util.EventStream;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.SettingsScreen;
 
 public final class ToggleButton extends ButtonComponent {
     public static final MutableComponent enabledText = Component.literal("Enabled").withColor(0x55ff55);
@@ -14,12 +14,12 @@ public final class ToggleButton extends ButtonComponent {
     private boolean toggle;
 
     public ToggleButton(boolean toggled) {
-        super(disabledText, buttonComponent -> {
+        super(disabledText, _ -> {
         });
-        this.renderer(Settings.buttonRenderer);
+        this.renderer(SettingsScreen.buttonRenderer);
         this.toggle = toggled;
         this.setMessage(this.toggle ? enabledText : disabledText);
-        this.onPress(button -> this.setToggle());
+        this.onPress(_ -> this.setToggle());
     }
 
     public void setToggle() {

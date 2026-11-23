@@ -20,9 +20,10 @@ import nofrills.config.SettingJson;
 import nofrills.events.ChatMsgEvent;
 import nofrills.events.EventListener;
 import nofrills.hud.InnerSettingsScreen;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.hud.clickgui.components.FlatTextbox;
 import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.hud.clickgui.settings.*;
 import nofrills.misc.DungeonUtil;
 import nofrills.misc.SkyblockData;
 import nofrills.misc.Utils;
@@ -43,7 +44,7 @@ public final class ChatRules {
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
-        Settings.BigButton button = new Settings.BigButton("Add New Chat Rule", btn -> {
+        BigButton button = new BigButton("Add New Chat Rule", btn -> {
             data.edit(object -> {
                 if (!object.has("rules")) {
                     object.add("rules", new JsonArray());
@@ -64,8 +65,8 @@ public final class ChatRules {
         return list;
     }
 
-    public static Settings buildSettings() {
-        Settings settings = new Settings(getSettingsList());
+    public static SettingsScreen buildSettings() {
+        SettingsScreen settings = new SettingsScreen(getSettingsList());
         settings.setTitle(Component.literal("Chat Rules"));
         return settings;
     }
@@ -93,7 +94,8 @@ public final class ChatRules {
                 object.add("classFilterList", Utils.toJsonArray(Arrays.stream(filter.split(",")).map(String::trim).toList()));
             }
             object.remove("classFilter");
-        } else if (!object.has("classFilterList")) {
+        }
+        if (!object.has("classFilterList")) {
             object.add("classFilterList", new JsonArray());
         }
         if (object.has("islandFilter")) {
@@ -102,7 +104,8 @@ public final class ChatRules {
                 object.add("islandFilterList", Utils.toJsonArray(Arrays.stream(filter.split(",")).map(String::trim).toList()));
             }
             object.remove("islandFilter");
-        } else if (!object.has("islandFilterList")) {
+        }
+        if (!object.has("islandFilterList")) {
             object.add("islandFilterList", new JsonArray());
         }
         for (Pair<String, JsonPrimitive> value : values) {
@@ -217,13 +220,13 @@ public final class ChatRules {
             mainToggle.onToggled().subscribe(toggle -> data.edit(obj -> this.getData(obj).addProperty("enabled", toggle)));
             ButtonComponent editButton = UIComponents.button(Component.literal("Edit").withColor(0xffffff), button -> mc.gui.setScreen(this.buildRuleSettings()));
             editButton.sizing(Sizing.fixed(48), Sizing.fixed(18)).margins(Insets.of(1, 0, 0, 0));
-            editButton.renderer(Settings.buttonRendererWhite);
+            editButton.renderer(SettingsScreen.buttonRendererWhite);
             ButtonComponent delete = UIComponents.button(Component.literal("Delete").withColor(0xffffff), button -> {
                 data.edit(object -> object.get("rules").getAsJsonArray().remove(this.index));
                 mc.gui.setScreen(buildSettings());
             });
             delete.positioning(Positioning.relative(100, 50)).verticalSizing(Sizing.fixed(18));
-            delete.renderer(Settings.buttonRendererWhite);
+            delete.renderer(SettingsScreen.buttonRendererWhite);
 
             this.child(input);
             this.child(mainToggle);
@@ -240,7 +243,7 @@ public final class ChatRules {
         }
 
         public FlowLayout buildMatchTextSetting() {
-            return new Settings.TextInput(
+            return new TextInput(
                     "Match Text",
                     this.getData().get("match").getAsString(),
                     "",
@@ -250,7 +253,7 @@ public final class ChatRules {
         }
 
         public FlowLayout buildMatchTypeSetting() {
-            return new Settings.EnumToggle<>(
+            return new EnumToggle<>(
                     "Match Type",
                     getRuleMatchType(this.getData()),
                     MatchType.Equals,
@@ -261,7 +264,7 @@ public final class ChatRules {
         }
 
         public FlowLayout buildCaseSensitiveSetting() {
-            return new Settings.Toggle(
+            return new Toggle(
                     "Case Sensitive",
                     this.getData().get("caseSensitive").getAsBoolean(),
                     false,
@@ -271,7 +274,7 @@ public final class ChatRules {
         }
 
         public FlowLayout buildCancelSetting() {
-            return new Settings.Toggle(
+            return new Toggle(
                     "Cancel Message",
                     this.getData().get("cancel").getAsBoolean(),
                     false,
@@ -281,7 +284,7 @@ public final class ChatRules {
         }
 
         public FlowLayout buildClassFilterSetting() {
-            return new Settings.TextEntryList(
+            return new TextEntryList(
                     "Class Filter",
                     () -> this.getData().get("classFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList(),
                     "Prevents this rule from matching if your selected dungeon class is not on this list.\nLeave empty to disable class filtering.",
@@ -294,7 +297,7 @@ public final class ChatRules {
         }
 
         public FlowLayout buildIslandFilterSetting() {
-            return new Settings.TextEntryList(
+            return new TextEntryList(
                     "Island Filter",
                     () -> this.getData().get("islandFilterList").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList(),
                     "Prevents this rule from matching if the current tablist area name is not on this list.\nLeave empty to disable island filtering.",
@@ -307,7 +310,7 @@ public final class ChatRules {
         }
 
         public FlowLayout buildTitleSetting() {
-            return new Settings.TitleInput(
+            return new TitleInput(
                     "Title",
                     this.getData().get("title").getAsString(),
                     "",
@@ -329,7 +332,7 @@ public final class ChatRules {
         }
 
         public FlowLayout buildSoundSetting() {
-            return new Settings.SoundInput(
+            return new SoundInput(
                     "Sound",
                     this.getData().get("sound").getAsString(),
                     "",

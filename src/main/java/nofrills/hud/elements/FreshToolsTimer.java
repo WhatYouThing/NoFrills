@@ -14,7 +14,6 @@ public final class FreshToolsTimer extends TickTimerElement implements Listening
         this.options = this.getBaseSettings();
         this.setDesc("Displays a timer for the Fresh Tools perk shop ability in Kuudra.");
         this.setAutoPause();
-        this.setCategory(Category.Kuudra);
     }
 
     @Override

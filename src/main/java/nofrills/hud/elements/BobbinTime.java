@@ -10,7 +10,7 @@ import nofrills.config.SettingBool;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
 
@@ -23,12 +23,11 @@ public final class BobbinTime extends SimpleTextElement implements ListeningHudE
     public final EntityCache cache = new EntityCache();
 
     public BobbinTime() {
-        super(Component.literal("Bobbin Time: §70"), new Feature("bobbinTimeElement"), "Bobbin Time");
+        super(Component.literal("Bobbin Time: §70"), new Feature("bobbinTimeElement"), "Bobbin Time Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Hide If None", this.none, "Hides the element if there are no bobbers nearby.")
+                new Toggle("Hide If None", this.none, "Hides the element if there are no bobbers nearby.")
         ));
         this.setDesc("Displays the amount of bobbers counted towards the Bobbin Time enchant.");
-        this.setCategory(Category.Fishing);
     }
 
     @Override

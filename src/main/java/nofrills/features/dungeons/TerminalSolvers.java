@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -182,7 +183,7 @@ public class TerminalSolvers {
 
     @EventHandler
     private static void onSlotClick(SlotClickEvent event) {
-        if (instance.isActive() && event.slot != null && !event.isInventory && DungeonUtil.isOnFloor("7")) {
+        if (instance.isActive() && event.slot != null && !event.isInventory && !event.actionType.equals(ContainerInput.QUICK_MOVE) && DungeonUtil.isOnFloor("7")) {
             TerminalType type = getTerminalType(event.title);
             if (isTypeEnabled(type) || type.equals(TerminalType.Melody)) {
                 if (shouldCancelClick()) {

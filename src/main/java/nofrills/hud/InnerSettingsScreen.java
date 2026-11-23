@@ -3,14 +3,14 @@ package nofrills.hud;
 import io.wispforest.owo.ui.container.FlowLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.misc.Utils;
 
 import java.util.List;
 
 import static nofrills.Main.mc;
 
-public class InnerSettingsScreen extends Settings {
+public class InnerSettingsScreen extends SettingsScreen {
     public final Screen previous;
 
     public InnerSettingsScreen(List<FlowLayout> settings, Screen previous) {

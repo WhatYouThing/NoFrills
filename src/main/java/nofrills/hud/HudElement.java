@@ -6,12 +6,16 @@ import io.wispforest.owo.ui.container.DraggableContainer;
 import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import nofrills.config.*;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.ColorPicker;
+import nofrills.hud.clickgui.settings.SliderDouble;
+import nofrills.hud.clickgui.settings.SliderInt;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -36,9 +40,8 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
     public final Surface disabledSurface = Surface.flat(0x55ff0000);
     public MutableComponent elementDesc = Component.empty();
     public FlowLayout layout;
-    public HudSettings options;
+    public List<FlowLayout> options;
     public boolean toggling = false;
-    public Category category = Category.Misc;
 
     protected HudElement(FlowLayout layout, Feature instance, String label) {
         super(Sizing.content(), Sizing.content(), layout);
@@ -96,7 +99,7 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
                 return true;
             }
             if (click.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
-                mc.gui.setScreen(this.options);
+                mc.gui.setScreen(this.buildSettings(new HudEditorScreen()));
                 return true;
             }
         }
@@ -180,33 +183,29 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
         return active;
     }
 
-    public HudSettings getBaseSettings() {
+    public List<FlowLayout> getBaseSettings() {
         return this.getBaseSettings(new ArrayList<>());
     }
 
-    public HudSettings getBaseSettings(List<FlowLayout> extra) {
+    public List<FlowLayout> getBaseSettings(List<FlowLayout> extra) {
         List<FlowLayout> list = new ArrayList<>(extra);
-        list.add(new Settings.Toggle("Hide In Tablist", this.hideTablist, "Automatically hide this element while the tablist is visible."));
-        list.add(new Settings.Toggle("Hide In F3", this.hideF3, "Automatically hide this element while the F3 screen is visible."));
-        list.add(new Settings.SliderDouble("Scale", 0.25, 5.0, 0.01, this.scale, "The scale multiplier of this element."));
-        list.add(new Settings.Toggle("Use Background", this.useBackground, "Draw a background for this element."));
-        list.add(new Settings.ColorPicker("Background", this.background, "The color of the background."));
-        list.add(new Settings.SliderInt("Grid Precision", 1, 20, 1, this.gridPrecision, "The precision of the grid snapping calculation while dragging this element around."));
-        HudSettings settings = new HudSettings(list);
+        list.add(new Toggle("Hide In Tablist", this.hideTablist, "Automatically hide this element while the tablist is visible."));
+        list.add(new Toggle("Hide In F3", this.hideF3, "Automatically hide this element while the F3 screen is visible."));
+        list.add(new SliderDouble("Scale", 0.25, 5.0, 0.01, this.scale, "The scale multiplier of this element."));
+        list.add(new Toggle("Use Background", this.useBackground, "Draw a background for this element."));
+        list.add(new ColorPicker("Background", this.background, "The color of the background."));
+        list.add(new SliderInt("Grid Precision", 1, 20, 1, this.gridPrecision, "The precision of the grid snapping calculation while dragging this element around."));
+        return list;
+    }
+
+    public InnerSettingsScreen buildSettings(Screen previous) {
+        InnerSettingsScreen settings = new InnerSettingsScreen(this.options, previous);
         settings.setTitle(this.elementLabel);
         return settings;
     }
 
     public void setDesc(String description) {
         this.elementDesc = Component.literal(description);
-    }
-
-    public Category getCategory() {
-        return this.category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
     }
 
     public boolean isEditingHud() {
@@ -238,15 +237,5 @@ public abstract class HudElement extends DraggableContainer<FlowLayout> {
 
     public Identifier getIdentifier() {
         return this.identifier;
-    }
-
-    public enum Category {
-        Info,
-        Dungeons,
-        Kuudra,
-        Slayer,
-        Fishing,
-        Mining,
-        Misc
     }
 }

@@ -12,7 +12,6 @@ public final class CustomTitleContainer extends SimpleTextElement {
         super(Component.literal("Custom Title"), new Feature("customTitleContainer"), "Custom Title Container");
         this.options = this.getBaseSettings();
         this.setDesc("Replaces non-vanilla title rendering with itself while active.");
-        this.setCategory(Category.Misc);
     }
 
     @Override

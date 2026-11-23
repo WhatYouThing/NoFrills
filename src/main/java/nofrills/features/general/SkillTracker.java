@@ -19,9 +19,10 @@ import nofrills.events.ChatMsgEvent;
 import nofrills.events.EventListener;
 import nofrills.events.OverlayMsgEvent;
 import nofrills.events.WorldTickEvent;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.components.ToggleButton;
+import nofrills.hud.clickgui.settings.ColorPicker;
 import nofrills.misc.RenderColor;
 import nofrills.misc.Utils;
 
@@ -82,7 +83,7 @@ public class SkillTracker {
                 mc.gui.setScreen(buildSettings());
                 data.save();
             });
-            reset.renderer(Settings.buttonRendererWhite);
+            reset.renderer(SettingsScreen.buttonRendererWhite);
             layout.child(label);
             layout.child(toggle);
             layout.child(reset);
@@ -91,14 +92,14 @@ public class SkillTracker {
         for (String skill : skills) {
             SettingColor color = getSessionColor(skill);
             if (color != null) {
-                list.add(new Settings.ColorPicker(skill + " Color", color, "The color used for " + skill + " on the Skill Tracker Display HUD element."));
+                list.add(new ColorPicker(skill + " Color", color, "The color used for " + skill + " on the Skill Tracker Display HUD element."));
             }
         }
         return list;
     }
 
-    public static Settings buildSettings() {
-        Settings settings = new Settings(getSettingsList());
+    public static SettingsScreen buildSettings() {
+        SettingsScreen settings = new SettingsScreen(getSettingsList());
         settings.setTitle(Component.literal("Skill Tracker"));
         return settings;
     }

@@ -11,7 +11,7 @@ import nofrills.config.SettingBool;
 import nofrills.events.EntityUpdatedEvent;
 import nofrills.hud.ListeningHudElement;
 import nofrills.hud.SimpleTextElement;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.settings.Toggle;
 import nofrills.misc.EntityCache;
 import nofrills.misc.Utils;
 
@@ -24,12 +24,11 @@ public final class Legion extends SimpleTextElement implements ListeningHudEleme
     public final EntityCache cache = new EntityCache();
 
     public Legion() {
-        super(Component.literal("Legion: §70"), new Feature("legionElement"), "Legion");
+        super(Component.literal("Legion: §70"), new Feature("legionElement"), "Legion Display");
         this.options = this.getBaseSettings(List.of(
-                new Settings.Toggle("Hide If None", this.none, "Hides the element if there are no players nearby.")
+                new Toggle("Hide If None", this.none, "Hides the element if there are no players nearby.")
         ));
         this.setDesc("Displays the amount of players counted towards the Legion enchant.");
-        this.setCategory(Category.Misc);
     }
 
     @Override

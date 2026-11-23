@@ -14,7 +14,6 @@ public final class GoldorTickTimer extends TickTimerElement implements Listening
         this.options = this.getBaseSettings();
         this.setDesc("Displays a tick timer for the death tick in the F7/M7 Goldor phase.");
         this.setAutoPause();
-        this.setCategory(Category.Dungeons);
     }
 
     @Override

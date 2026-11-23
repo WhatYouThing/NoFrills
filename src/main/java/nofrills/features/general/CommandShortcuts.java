@@ -18,8 +18,9 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
 import nofrills.config.SettingJson;
-import nofrills.hud.clickgui.Settings;
+import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.hud.clickgui.components.FlatTextbox;
+import nofrills.hud.clickgui.settings.BigButton;
 import nofrills.misc.Rendering;
 import nofrills.misc.Utils;
 
@@ -60,7 +61,7 @@ public final class CommandShortcuts {
 
     public static List<FlowLayout> getSettingsList() {
         List<FlowLayout> list = new ArrayList<>();
-        Settings.BigButton button = new Settings.BigButton("Add New Shortcut", btn -> {
+        BigButton button = new BigButton("Add New Shortcut", btn -> {
             data.edit(object -> {
                 if (!object.has("shortcuts")) {
                     object.add("shortcuts", new JsonArray());
@@ -83,8 +84,8 @@ public final class CommandShortcuts {
         return list;
     }
 
-    public static Settings buildSettings() {
-        Settings settings = new Settings(getSettingsList());
+    public static SettingsScreen buildSettings() {
+        SettingsScreen settings = new SettingsScreen(getSettingsList());
         settings.setTitle(Component.literal("Command Shortcuts"));
         return settings;
     }

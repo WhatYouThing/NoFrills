@@ -18,7 +18,6 @@ public final class KickCooldownTimer extends TimerElement implements ListeningHu
         super("Kick Cooldown: {}", new Feature("kickCooldownTimerElement"), "Kick Cooldown Timer");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the SkyBlock join cooldown after you get kicked to the lobby.");
-        this.setCategory(Category.Misc);
     }
 
     @Override

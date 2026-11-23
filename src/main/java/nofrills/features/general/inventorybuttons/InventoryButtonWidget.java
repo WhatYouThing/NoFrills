@@ -123,7 +123,7 @@ public final class InventoryButtonWidget extends ImageButton {
         if (this.unlockPosition) return;
         if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
             Screen previous = mc.gui.screen();
-            mc.gui.setScreen(InventoryButtonSettings.of(this, previous));
+            mc.gui.setScreen(InventoryButtonSettingsScreen.of(this, previous));
         } else {
             super.onClick(event, doubleClick);
         }

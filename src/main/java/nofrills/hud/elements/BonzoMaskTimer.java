@@ -18,7 +18,6 @@ public final class BonzoMaskTimer extends TimerElement implements ListeningHudEl
         this.options = this.getBaseSettings();
         this.setDesc("Displays the cooldown of the Bonzo's Mask Clownin' Around ability.");
         this.setAutoPause();
-        this.setCategory(Category.Dungeons);
     }
 
     @Override

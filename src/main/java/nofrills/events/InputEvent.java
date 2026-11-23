@@ -3,7 +3,6 @@ package nofrills.events;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import nofrills.config.SettingKeybind;
 
@@ -16,7 +15,7 @@ public final class InputEvent extends Cancellable {
 
     public InputEvent(KeyEvent input, int action) {
         this.setCancelled(false);
-        this.key = InputConstants.Type.KEYBOARD.getOrCreate(input.key());
+        this.key = InputConstants.getKey(input);
         this.modifiers = input.modifiers();
         this.action = action;
         this.isKeyboard = true;
@@ -52,9 +51,8 @@ public final class InputEvent extends Cancellable {
         return this.key.equals(keybind.value());
     }
 
-    public boolean isKey(KeyMapping binding) {
-        return (this.keyInput != null && binding.matches(this.keyInput))
-                || (this.mouseInput != null && binding.matchesMouse(new MouseButtonEvent(0, 0, this.mouseInput)));
+    public boolean isKey(KeyMapping mapping) {
+        return mapping.matches(this.key);
     }
 
     public boolean isMouse(int key) {

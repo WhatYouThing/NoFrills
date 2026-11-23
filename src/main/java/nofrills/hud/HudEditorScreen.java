@@ -10,15 +10,10 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import nofrills.features.misc.AutoSave;
-import nofrills.hud.clickgui.Settings;
 import nofrills.hud.elements.Armor;
 import nofrills.misc.RenderColor;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 import static nofrills.Main.mc;
@@ -28,8 +23,7 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
             "NoFrills HUD Editor",
             "Left click element to toggle visibility",
             "Hold left click to drag element (Shift to snap)",
-            "Right click element to view its settings",
-            "Right click screen to add/remove elements"
+            "Right click element to view its settings"
     );
 
     public HudEditorScreen() {
@@ -80,51 +74,6 @@ public class HudEditorScreen extends BaseOwoScreen<FlowLayout> {
                 break;
             }
         }
-    }
-
-    @Override
-    public boolean mouseClicked(@NonNull MouseButtonEvent click, boolean doubled) {
-        if (this.uiAdapter == null) {
-            return false;
-        }
-        boolean clicked = this.uiAdapter.mouseClicked(click, doubled);
-        if (click.button() == InputConstants.MOUSE_BUTTON_RIGHT && !clicked) {
-            List<FlowLayout> list = new ArrayList<>();
-            HashMap<HudElement.Category, List<HudElement>> categories = new HashMap<>();
-            for (HudElement element : HudManager.getElements()) {
-                if (!categories.containsKey(element.getCategory())) {
-                    categories.put(element.getCategory(), new ArrayList<>());
-                }
-                categories.get(element.getCategory()).add(element);
-            }
-            for (HudElement.Category category : HudElement.Category.values()) {
-                List<HudElement> elements = categories.getOrDefault(category, new ArrayList<>());
-                if (elements.isEmpty()) {
-                    continue;
-                }
-                list.add(new Settings.Separator(category.name()));
-                elements.sort(Comparator.comparing(element -> element.elementLabel.getString()));
-                for (HudElement element : elements) {
-                    list.add(new Settings.Toggle(
-                            element.elementLabel.getString(),
-                            element.isAdded(),
-                            false,
-                            element.elementDesc.getString(),
-                            value -> {
-                                if (value && !element.instance.isActive()) {
-                                    element.instance.setActive(true);
-                                }
-                                element.added.set(value);
-                            })
-                    );
-                }
-            }
-            HudSettings settings = new HudSettings(list);
-            settings.setTitle(Component.literal("HUD Elements"));
-            mc.gui.setScreen(settings);
-            return true;
-        }
-        return clicked;
     }
 
     @Override

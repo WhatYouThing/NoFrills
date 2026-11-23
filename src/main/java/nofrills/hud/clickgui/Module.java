@@ -9,7 +9,10 @@ import io.wispforest.owo.ui.core.VerticalAlignment;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import nofrills.config.Feature;
+import nofrills.hud.HudElement;
 import nofrills.hud.clickgui.components.PlainLabel;
+
+import java.util.function.Consumer;
 
 import static nofrills.Main.mc;
 
@@ -20,10 +23,8 @@ public final class Module extends FlowLayout {
     public Component inactiveText;
     public PlainLabel label;
     public SettingsScreen options;
-
-    public Module(String name, Feature feature, String tooltip) {
-        this(name, feature, tooltip, null);
-    }
+    public Consumer<Boolean> onToggle = _ -> {
+    };
 
     public Module(String name, Feature feature, String tooltip, SettingsScreen options) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
@@ -38,15 +39,30 @@ public final class Module extends FlowLayout {
             this.options.setTitle(Component.literal(name).withColor(0xffffff));
         }
         this.feature = feature;
-        this.active(this.feature.isActive());
+        this.toggleFeature(this.feature.isActive());
+        this.onToggle = b -> this.feature.setActive(b);
         this.child(label);
+    }
+
+    public Module(String name, Feature feature, String tooltip) {
+        this(name, feature, tooltip, null);
+    }
+
+    public Module(HudElement element, ClickGui previous) {
+        this(element.elementLabel.getString(), element.instance, element.elementDesc.getString(), element.buildSettings(previous));
+        this.onToggle = b -> {
+            if (b && !element.instance.isActive()) {
+                element.instance.setActive(true);
+            }
+            element.added.set(b);
+        };
     }
 
     @Override
     public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
         if (this.isInBoundingBox(click.x() + this.x(), click.y() + this.y())) {
             if (click.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-                this.active(!this.feature.isActive());
+                this.toggleFeature(!this.feature.isActive());
             } else if (click.button() == InputConstants.MOUSE_BUTTON_RIGHT && this.options != null) {
                 mc.gui.setScreen(this.options);
             }
@@ -55,13 +71,9 @@ public final class Module extends FlowLayout {
         return false;
     }
 
-    private void active(boolean active) {
-        if (active) {
-            this.label.text(this.activeText);
-        } else {
-            this.label.text(this.inactiveText);
-        }
-        this.feature.setActive(active);
+    private void toggleFeature(boolean active) {
+        this.label.text(active ? this.activeText : this.inactiveText);
+        this.onToggle.accept(active);
         this.active = active;
     }
 }

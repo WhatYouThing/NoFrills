@@ -22,7 +22,6 @@ public final class Clock extends SimpleTextElement implements ListeningHudElemen
                 new Toggle("24H Format", this.format24, "Use 24H format instead of 12H.")
         ));
         this.setDesc("Displays system clock.");
-        this.setCategory(Category.Info);
     }
 
     @Override

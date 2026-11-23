@@ -24,7 +24,6 @@ public final class TPS extends SimpleTextElement implements ListeningHudElement 
                 new Toggle("Average", average, "Tracks and adds the average TPS to the element.")
         ));
         this.setDesc("Displays the real time TPS of the server, and optionally the average TPS.");
-        this.setCategory(Category.Info);
     }
 
     @Override

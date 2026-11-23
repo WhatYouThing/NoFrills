@@ -38,7 +38,6 @@ public final class PetDisplay extends SimpleTextElement implements ListeningHudE
                 new Toggle("Compact Mode", this.compact, "Makes the element more compact by removing the prefix.")
         ));
         this.setDesc("Displays the name of your active pet.");
-        this.setCategory(Category.Info);
     }
 
     @Override

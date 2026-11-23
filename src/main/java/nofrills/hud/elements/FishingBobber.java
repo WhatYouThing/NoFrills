@@ -41,7 +41,6 @@ public final class FishingBobber extends SimpleTextElement implements ListeningH
                 new SliderInt("Slugfish Timer", 0, 20, 1, this.slugfishTimer, "Amount of seconds to wait for Slugfish alarm to be sent. Set to 0 to disable.")
         ));
         this.setDesc("Displays the fishing hologram timer, and optionally the existence time of your bobber.");
-        this.setCategory(Category.Fishing);
     }
 
     @Override

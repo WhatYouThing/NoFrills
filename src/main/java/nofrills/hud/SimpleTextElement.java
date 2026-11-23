@@ -58,12 +58,12 @@ public abstract class SimpleTextElement extends HudElement {
     }
 
     @Override
-    public HudSettingsScreen getBaseSettings() {
+    public List<FlowLayout> getBaseSettings() {
         return this.getBaseSettings(new ArrayList<>());
     }
 
     @Override
-    public HudSettingsScreen getBaseSettings(List<FlowLayout> extra) {
+    public List<FlowLayout> getBaseSettings(List<FlowLayout> extra) {
         List<FlowLayout> list = new ArrayList<>(extra);
         list.add(new Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."));
         list.add(new EnumToggle<>("Alignment", this.textAlignment, "The alignment of the element's text."));

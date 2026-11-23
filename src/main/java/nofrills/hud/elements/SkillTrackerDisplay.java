@@ -12,7 +12,6 @@ public final class SkillTrackerDisplay extends SimpleTextElement implements List
         super(SkillTracker.getText(), new Feature("skillTrackerElement"), "Skill Tracker Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays information about your skill EXP gain. Used by the Skill Tracker feature.");
-        this.setCategory(Category.Misc);
     }
 
     @Override

@@ -14,7 +14,6 @@ public final class Power extends SimpleTextElement implements ListeningHudElemen
         super(Component.literal("Power: §f0"), new Feature("powerElement"), "Power Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the power blessing level while in Dungeons.");
-        this.setCategory(Category.Dungeons);
     }
 
     @Override

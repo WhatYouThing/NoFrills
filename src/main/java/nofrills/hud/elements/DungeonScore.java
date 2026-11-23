@@ -16,7 +16,6 @@ public final class DungeonScore extends SimpleTextElement implements ListeningHu
         super(Component.literal("Score: §fN/A"), new Feature("dungeonScoreElement"), "Dungeon Score");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the current dungeon score. Used by the Score Calculator feature.");
-        this.setCategory(Category.Dungeons);
     }
 
     @Override

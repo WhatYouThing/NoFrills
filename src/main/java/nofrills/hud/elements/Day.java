@@ -19,7 +19,6 @@ public final class Day extends SimpleTextElement implements ListeningHudElement 
         super(Component.literal("Day: §f0"), new Feature("dayElement"), "Day Display");
         this.options = this.getBaseSettings();
         this.setDesc("Displays the day that the server world is on.");
-        this.setCategory(Category.Info);
     }
 
     @Override

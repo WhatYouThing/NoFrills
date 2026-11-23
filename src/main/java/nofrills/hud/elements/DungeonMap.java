@@ -66,7 +66,6 @@ public final class DungeonMap extends HudElement implements ListeningHudElement 
                 new Toggle("Debug", this.debug, "Outputs debug information about the map's behavior.")
         ));
         this.setDesc("Displays the dungeon map while in Dungeons.");
-        this.setCategory(Category.Dungeons);
     }
 
     @Override

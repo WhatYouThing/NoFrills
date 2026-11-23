@@ -15,7 +15,6 @@ public final class TerracottaGyroTimer extends TickTimerElement implements Liste
         this.options = this.getBaseSettings();
         this.setDesc("Displays a timer for the first terracotta phase and the final giant phase in F6/M6.");
         this.setAutoPause();
-        this.setCategory(Category.Dungeons);
     }
 
     @Override

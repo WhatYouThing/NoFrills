@@ -27,7 +27,6 @@ public final class BaitSack extends SimpleTextElement implements ListeningHudEle
                 new Toggle("Only If Rod", this.onlyRod, "Automatically hides the element if you are not holding a fishing rod.")
         ));
         this.setDesc("Displays the type and the amount of bait in your bait sack.");
-        this.setCategory(Category.Fishing);
     }
 
     @Override

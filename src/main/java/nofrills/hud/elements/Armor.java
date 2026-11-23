@@ -33,7 +33,6 @@ public final class Armor extends HudElement implements ListeningHudElement {
                 new EnumToggle<>("Alignment", align, "The alignment direction of the element.")
         ));
         this.setDesc("Displays your current armor set.");
-        this.setCategory(Category.Info);
     }
 
     @Override

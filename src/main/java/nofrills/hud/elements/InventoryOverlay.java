@@ -42,7 +42,6 @@ public final class InventoryOverlay extends HudElement implements ListeningHudEl
                 new EnumToggle<>("Hide In Screen", this.hideMode, "Automatically hides the element while a screen is open.\n\nDisabled: The element will appear regardless of screen.\nInventory: The element will be hidden in screens that have item slots (player inventory, containers etc).\nAny: The element will be hidden if any type of screen is present.")
         ));
         this.setDesc("Displays the contents of your inventory.");
-        this.setCategory(Category.Info);
     }
 
     @Override

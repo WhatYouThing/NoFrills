@@ -12,7 +12,6 @@ public final class SpiritMaskTimer extends TimerElement implements ListeningHudE
         this.options = this.getBaseSettings();
         this.setDesc("Displays the cooldown of the Spirit Mask Second Wind ability.");
         this.setAutoPause();
-        this.setCategory(Category.Dungeons);
     }
 
     @Override

@@ -25,7 +25,6 @@ public final class FPS extends SimpleTextElement implements ListeningHudElement 
                 new Toggle("Average", average, "Tracks and adds the average FPS to the element.")
         ));
         this.setDesc("Displays your FPS.");
-        this.setCategory(Category.Info);
     }
 
     @Override

@@ -37,7 +37,6 @@ public final class Ping extends SimpleTextElement implements ListeningHudElement
                 new SliderInt("Average Limit", 1, 1000, 1, this.averageSize, "The maximum size of the ping history array.\nHigher values produce more accurate results at a higher performance cost.")
         ));
         this.setDesc("Displays your ping.");
-        this.setCategory(Category.Info);
     }
 
     @Override

@@ -24,7 +24,6 @@ public final class SeaCreatures extends SimpleTextElement implements ListeningHu
                 new Toggle("Hide If Zero", zero, "Hides the element if there are 0 sea creatures nearby.")
         ));
         this.setDesc("Displays the amount of nearby sea creatures.");
-        this.setCategory(Category.Fishing);
     }
 
     @Override

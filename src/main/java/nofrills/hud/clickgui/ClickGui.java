@@ -790,10 +790,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.")
                 )),
-                new Category("HUD", HudManager.getElements().stream()
-                        .map(e -> new Module(e.elementLabel.getString(), e.instance, e.elementDesc.getString(), e.options))
-                        .toList()
-                )
+                new Category("HUD", HudManager.getElements().stream().map(e -> new Module(e, this)).toList())
         );
         root.surface(Surface.VANILLA_TRANSLUCENT).alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         FlowLayout header = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());

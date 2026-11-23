@@ -30,7 +30,6 @@ public final class BossHealth extends SimpleTextElement implements ListeningHudE
                 new Toggle("Kuudra", this.kuudra, "If enabled, the health of Kuudra is displayed.")
         ));
         this.setDesc("Displays the health of Kuudra and/or the Catacombs bosses.");
-        this.setCategory(Category.Misc);
     }
 
     @Override

@@ -27,7 +27,6 @@ public final class PadTimer extends TickTimerElement implements ListeningHudElem
         ));
         this.setDesc("Displays a tick timer for the pads in the F7/M7 Storm phase.");
         this.setAutoPause();
-        this.setCategory(Category.Dungeons);
     }
 
     @Override

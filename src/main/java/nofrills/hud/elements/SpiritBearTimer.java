@@ -18,7 +18,6 @@ public final class SpiritBearTimer extends TickTimerElement implements Listening
         this.options = this.getBaseSettings();
         this.setDesc("Displays a timer for the Spirit Bear spawning in F4/M4.");
         this.setAutoPause();
-        this.setCategory(Category.Dungeons);
     }
 
     @Override

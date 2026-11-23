@@ -30,7 +30,6 @@ public final class BeaconPower extends SimpleTextElement implements ListeningHud
                 new Toggle("Hide If Inactive", this.hideIfInactive, "Hides the HUD element if your Beacon power is inactive.")
         ));
         this.setDesc("Displays the duration and the stat upgrade granted by your Beacon.");
-        this.setCategory(Category.Misc);
     }
 
     @Override

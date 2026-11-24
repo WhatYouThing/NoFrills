@@ -108,7 +108,7 @@ public class SlayerUtil {
         currentBoss = null;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     private static void onNamed(EntityNamedEvent event) {
         if (currentBoss != null && isSpawner(event.namePlain)) {
             bossCache.add(event.entity, new CurrentBoss());

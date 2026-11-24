@@ -29,7 +29,6 @@ import nofrills.misc.Utils;
 import org.joml.Vector3f;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 
@@ -71,10 +70,7 @@ public class NoRender {
     public static final SettingBool stuckArrows = new SettingBool(false, "stuckArrows", instance);
 
     public static final AtomicReference<Boolean> isFogEnvironmental = new AtomicReference<>(false);
-    private static final List<Pattern> deadPatterns = List.of(
-            Pattern.compile(".* 0" + Utils.Symbols.heart),
-            Pattern.compile(".* 0/.*" + Utils.Symbols.heart)
-    );
+    public static final Pattern deadPattern = Pattern.compile(".* 0(?:❤|/.*❤)(?:| " + Utils.Symbols.vampLow + ")");
     private static final HashSet<ParticleType<?>> explosionParticles = Sets.newHashSet(
             ParticleTypes.EXPLOSION,
             ParticleTypes.EXPLOSION_EMITTER,
@@ -162,16 +158,8 @@ public class NoRender {
 
     @EventHandler
     private static void onNamed(EntityNamedEvent event) {
-        if (instance.isActive()) {
-            if (deadEntities.value()) {
-                String name = event.namePlain.replace(Utils.Symbols.vampLow, "");
-                for (Pattern pattern : deadPatterns) {
-                    if (pattern.matcher(name).matches()) {
-                        event.entity.setCustomNameVisible(false);
-                        return;
-                    }
-                }
-            }
+        if (instance.isActive() && deadEntities.value() && deadPattern.matcher(event.namePlain).matches()) {
+            event.entity.setCustomNameVisible(false);
         }
     }
 

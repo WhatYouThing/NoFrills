@@ -796,7 +796,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
         ButtonComponent editor = UIComponents.button(Component.literal("HUD Editor").withColor(0xffffff), _ -> mc.gui.setScreen(new HudEditorScreen()));
         editor.renderer(SettingsScreen.buttonRenderer)
                 .positioning(Positioning.absolute(240, 0))
-                .verticalSizing(Sizing.fixed(18))
+                .sizing(Sizing.fixed(60), Sizing.fixed(18))
                 .margins(Insets.top(3));
         this.searchBox = new FlatTextbox(Sizing.fixed(100));
         this.searchBox.setSuggestion("Search...");

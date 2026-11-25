@@ -12,17 +12,14 @@ import nofrills.config.Feature;
 import nofrills.hud.HudElement;
 import nofrills.hud.clickgui.components.PlainLabel;
 
-import java.util.function.Consumer;
-
 public final class Module extends FlowLayout {
     public boolean active = false;
     public Feature feature;
+    public HudElement element;
     public Component activeText;
     public Component inactiveText;
     public PlainLabel label;
     public SettingsScreen options;
-    public Consumer<Boolean> onToggle = _ -> {
-    };
 
     public Module(String name, Feature feature, String tooltip, SettingsScreen options) {
         super(Sizing.content(), Sizing.content(), Algorithm.VERTICAL);
@@ -37,8 +34,7 @@ public final class Module extends FlowLayout {
             this.options.setTitle(Component.literal(name).withColor(0xffffff));
         }
         this.feature = feature;
-        this.toggleFeature(this.feature.isActive());
-        this.onToggle = b -> this.feature.setActive(b);
+        this.toggleFeature(this.feature.isActive(), false);
         this.child(label);
     }
 
@@ -48,19 +44,15 @@ public final class Module extends FlowLayout {
 
     public Module(HudElement element) {
         this(element.elementLabel.getString(), element.instance, element.elementDesc.getString(), element.options);
-        this.onToggle = b -> {
-            if (b && !element.instance.isActive()) {
-                element.instance.setActive(true);
-            }
-            element.added.set(b);
-        };
+        this.element = element;
+        this.toggleFeature(element.isAdded(), false);
     }
 
     @Override
     public boolean onMouseDown(MouseButtonEvent click, boolean doubled) {
         if (this.isInBoundingBox(click.x() + this.x(), click.y() + this.y())) {
             if (click.button() == InputConstants.MOUSE_BUTTON_LEFT) {
-                this.toggleFeature(!this.feature.isActive());
+                this.toggleFeature(this.element != null ? !this.element.isAdded() : !this.feature.isActive(), true);
             } else if (click.button() == InputConstants.MOUSE_BUTTON_RIGHT && this.options != null) {
                 this.options.open();
             }
@@ -69,9 +61,18 @@ public final class Module extends FlowLayout {
         return false;
     }
 
-    private void toggleFeature(boolean active) {
+    private void toggleFeature(boolean active, boolean write) {
         this.label.text(active ? this.activeText : this.inactiveText);
-        this.onToggle.accept(active);
         this.active = active;
+        if (write) {
+            if (this.element != null) {
+                if (active && !this.element.instance.isActive()) {
+                    this.element.instance.setActive(true);
+                }
+                this.element.added.set(active);
+            } else {
+                this.feature.setActive(active);
+            }
+        }
     }
 }

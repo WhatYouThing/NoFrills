@@ -9,7 +9,6 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import nofrills.features.dungeons.*;
@@ -59,17 +58,6 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
     @Override
     protected @NotNull OwoUIAdapter<FlowLayout> createAdapter() {
         return OwoUIAdapter.create(this, UIContainers::verticalFlow);
-    }
-
-    @Override
-    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
-        super.extractRenderState(context, mouseX, mouseY, delta);
-        this.mouseX = mouseX;
-        this.mouseY = mouseY;
-        int height = context.guiHeight();
-        context.text(this.font, "Left click a feature to toggle", 1, height - 30, RenderColor.WHITE.argb());
-        context.text(this.font, "Right click a feature open its settings", 1, height - 20, RenderColor.WHITE.argb());
-        context.text(this.font, "Scrolling supported in each category and the screen itself", 1, height - 10, RenderColor.WHITE.argb());
     }
 
     @Override
@@ -792,7 +780,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                         ))),
                         new Module("Phantomleaf Solver", PhantomleafSolver.instance, "Helps you with harvesting the Phantomleaf Greenhouse mutation.")
                 )),
-                new Category("HUD", HudManager.getElements().stream().map(e -> new Module(e, this)).toList())
+                new Category("HUD", HudManager.getElements().stream().map(Module::new).toList())
         );
         root.surface(Surface.VANILLA_TRANSLUCENT).alignment(HorizontalAlignment.CENTER, VerticalAlignment.CENTER);
         FlowLayout header = UIContainers.horizontalFlow(Sizing.content(), Sizing.content());

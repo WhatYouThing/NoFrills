@@ -30,8 +30,8 @@ public final class SeaCreatures extends SimpleTextElement implements ListeningHu
     public void draw(OwoUIGraphics context, int mouseX, int mouseY, float partialTicks, float delta) {
         if (!this.shouldRender()) {
             return;
-        } else if (!this.isEditingHud()) {
-            if (zero.value() && this.cache.empty()) return;
+        } else if (!this.isEditingHud() && zero.value() && this.cache.empty()) {
+            return;
         }
         if (this.cache.size() > 0) {
             this.setText(Utils.format("Sea Creatures: §f{}", this.cache.size()));

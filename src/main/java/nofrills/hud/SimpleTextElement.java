@@ -12,6 +12,7 @@ import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingColor;
 import nofrills.config.SettingEnum;
+import nofrills.hud.clickgui.SettingsScreen;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.settings.ColorPicker;
 import nofrills.hud.clickgui.settings.EnumToggle;
@@ -58,12 +59,12 @@ public abstract class SimpleTextElement extends HudElement {
     }
 
     @Override
-    public List<FlowLayout> getBaseSettings() {
+    public SettingsScreen getBaseSettings() {
         return this.getBaseSettings(new ArrayList<>());
     }
 
     @Override
-    public List<FlowLayout> getBaseSettings(List<FlowLayout> extra) {
+    public SettingsScreen getBaseSettings(List<FlowLayout> extra) {
         List<FlowLayout> list = new ArrayList<>(extra);
         list.add(new Toggle("Shadow", this.textShadow, "Adds a shadow to the element's text."));
         list.add(new EnumToggle<>("Alignment", this.textAlignment, "The alignment of the element's text."));

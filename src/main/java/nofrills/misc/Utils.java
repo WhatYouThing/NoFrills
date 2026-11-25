@@ -28,6 +28,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.network.protocol.ping.ServerboundPingRequestPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
@@ -88,6 +89,7 @@ import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static net.minecraft.locale.Language.DEFAULT_INSTANCE;
 import static nofrills.Main.*;
 
 public class Utils {
@@ -1017,6 +1019,9 @@ public class Utils {
      */
     public static String toPlain(Component text) {
         if (text != null) {
+            if (text.getContents() instanceof TranslatableContents translatable) {
+                return DEFAULT_INSTANCE.getOrDefault(translatable.getKey());
+            }
             return toPlain(text.getString());
         }
         return "";
@@ -1024,7 +1029,7 @@ public class Utils {
 
     public static String toPlain(FormattedCharSequence ordered) {
         StringBuilder builder = new StringBuilder();
-        ordered.accept((index, style, codePoint) -> {
+        ordered.accept((_, _, codePoint) -> {
             builder.appendCodePoint(codePoint);
             return true;
         });

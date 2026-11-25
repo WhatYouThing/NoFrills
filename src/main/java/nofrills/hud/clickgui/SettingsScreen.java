@@ -8,9 +8,11 @@ import io.wispforest.owo.ui.container.FlowLayout;
 import io.wispforest.owo.ui.container.ScrollContainer;
 import io.wispforest.owo.ui.container.UIContainers;
 import io.wispforest.owo.ui.core.*;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import nofrills.hud.HudEditorScreen;
 import nofrills.hud.clickgui.components.KeybindButton;
 import nofrills.hud.clickgui.components.PlainLabel;
 import nofrills.hud.clickgui.settings.CustomHeight;
@@ -45,6 +47,7 @@ public class SettingsScreen extends BaseOwoScreen<FlowLayout> {
                     .sorted()
                     .toList();
     public List<FlowLayout> settings;
+    public Screen previous = null;
     public Component title = Component.empty();
     public ScrollContainer<FlowLayout> scroll;
 
@@ -171,7 +174,15 @@ public class SettingsScreen extends BaseOwoScreen<FlowLayout> {
 
     @Override
     public void onClose() {
-        mc.gui.setScreen(new ClickGui());
+        mc.gui.setScreen(this.previous != null ? this.previous : new ClickGui());
+    }
+
+    public void open() {
+        Screen current = mc.gui.screen();
+        if (current instanceof ClickGui || current instanceof HudEditorScreen) {
+            this.previous = current;
+        }
+        mc.gui.setScreen(this);
     }
 
     public SettingsScreen setTitle(Component title) {

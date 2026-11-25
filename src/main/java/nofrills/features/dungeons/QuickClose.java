@@ -29,7 +29,7 @@ public class QuickClose {
 
     @EventHandler
     private static void onInput(InputEvent event) {
-        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && isChest(container.getTitle().getString())) {
+        if (instance.isActive() && mc.gui.screen() instanceof AbstractContainerScreen<?> container && isChest(Utils.toPlain(container.getTitle()))) {
             if (movementKeys.stream().anyMatch(event::isKey)) {
                 event.consume(container::onClose);
             }

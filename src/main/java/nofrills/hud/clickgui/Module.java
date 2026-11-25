@@ -14,8 +14,6 @@ import nofrills.hud.clickgui.components.PlainLabel;
 
 import java.util.function.Consumer;
 
-import static nofrills.Main.mc;
-
 public final class Module extends FlowLayout {
     public boolean active = false;
     public Feature feature;
@@ -48,8 +46,8 @@ public final class Module extends FlowLayout {
         this(name, feature, tooltip, null);
     }
 
-    public Module(HudElement element, ClickGui previous) {
-        this(element.elementLabel.getString(), element.instance, element.elementDesc.getString(), element.buildSettings(previous));
+    public Module(HudElement element) {
+        this(element.elementLabel.getString(), element.instance, element.elementDesc.getString(), element.options);
         this.onToggle = b -> {
             if (b && !element.instance.isActive()) {
                 element.instance.setActive(true);
@@ -64,7 +62,7 @@ public final class Module extends FlowLayout {
             if (click.button() == InputConstants.MOUSE_BUTTON_LEFT) {
                 this.toggleFeature(!this.feature.isActive());
             } else if (click.button() == InputConstants.MOUSE_BUTTON_RIGHT && this.options != null) {
-                mc.gui.setScreen(this.options);
+                this.options.open();
             }
             return true;
         }

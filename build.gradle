@@ -27,11 +27,6 @@ repositories {
     }
 
     maven {
-        name = "devauth-maven"
-        url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1"
-    }
-
-    maven {
         name = "jama-maven"
         url = "https://mvn.topobyte.de"
     }
@@ -49,8 +44,6 @@ dependencies {
 
     implementation("de.topobyte:jama:${project.jama_version}")
     include "de.topobyte:jama:${project.jama_version}"
-
-    runtimeOnly "net.litetex.mcm:dev-auth-neo:${project.devauth_version}"
 
     annotationProcessor project(":annotationprocessor")
 }

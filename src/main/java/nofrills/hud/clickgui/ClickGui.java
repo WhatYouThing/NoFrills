@@ -137,7 +137,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Toggle("Recipe Book", NoRender.recipeBook, "Removes the recipe book button from the inventory."),
                                 new Toggle("Selected Item Name", NoRender.selectedItemName, "Hides the selected item name text which appears above the hotbar."),
                                 new Toggle("Dead Entities", NoRender.deadEntities, "Hides entities that are in their death animation, and their health bars (if applicable)."),
-                                new Toggle("Dead Poof", NoRender.deadPoof, "Tries to hide the death \"poof\" particles that appear after a dead entity is deleted."),
+                                new Toggle("Dead Poof", NoRender.deadPoof, "Tries to hide the poof particles that appear once a dead entity despawns."),
                                 new Toggle("Lightning", NoRender.lightning, "Hides lightning strikes."),
                                 new Toggle("Falling Blocks", NoRender.fallingBlocks, "Hides falling block entities such as sand."),
                                 new Toggle("Entity Fire", NoRender.entityFire, "Hides the fire effect that appears on burning mobs."),

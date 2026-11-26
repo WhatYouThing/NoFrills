@@ -18,12 +18,15 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import nofrills.config.Feature;
 import nofrills.config.SettingBool;
 import nofrills.config.SettingEnum;
 import nofrills.events.EntityNamedEvent;
+import nofrills.events.EntityUpdatedEvent;
 import nofrills.events.EventListener;
 import nofrills.events.SpawnParticleEvent;
+import nofrills.misc.EntityCache;
 import nofrills.misc.SlayerUtil;
 import nofrills.misc.Utils;
 import org.joml.Vector3f;
@@ -72,6 +75,7 @@ public class NoRender {
 
     public static final AtomicReference<Boolean> isFogEnvironmental = new AtomicReference<>(false);
     public static final Pattern deadPattern = Pattern.compile(".* 0(?:❤|/.*❤)(?:| " + Utils.Symbols.vampLow + ")");
+    private static final EntityCache deadEntityCache = new EntityCache();
     private static final HashSet<ParticleType<?>> explosionParticles = Sets.newHashSet(
             ParticleTypes.EXPLOSION,
             ParticleTypes.EXPLOSION_EMITTER,
@@ -134,18 +138,6 @@ public class NoRender {
         return false;
     }
 
-    private static boolean isPoofParticle(SpawnParticleEvent event) {
-        if (event.packet.getCount() == 1 && event.packet.getMaxSpeed() == 0.0f) {
-            for (float offset : new float[]{event.packet.getXDist(), event.packet.getYDist(), event.packet.getZDist()}) {
-                if (offset >= 0.1f || offset <= -0.1f || offset == 0.0f) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-
     private static boolean isCoatingParticle(SpawnParticleEvent event) {
         if (event.packet.getParticle() instanceof DustParticleOptions dustParticle) {
             Vector3f color = dustParticle.getColor();
@@ -167,9 +159,12 @@ public class NoRender {
     @EventHandler
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive()) {
-            if (deadPoof.value() && event.type.equals(ParticleTypes.POOF) && isPoofParticle(event)) {
-                event.cancel();
-                return;
+            if (deadPoof.value() && event.type.equals(ParticleTypes.POOF) && event.packet.getCount() == 1 && event.packet.getMaxSpeed() == 0.0f) {
+                AABB box = AABB.ofSize(event.pos, 1.0, 1.0, 1.0);
+                if (deadEntityCache.get().stream().anyMatch(e -> box.intersects(e.getBoundingBox()))) {
+                    event.cancel();
+                    return;
+                }
             }
             if (explosions.value() && explosionParticles.contains(event.type)) {
                 event.cancel();
@@ -186,6 +181,13 @@ public class NoRender {
             if (powderCoating.value() && isCoatingParticle(event)) {
                 event.cancel();
             }
+        }
+    }
+
+    @EventHandler
+    private static void onEntityUpdate(EntityUpdatedEvent event) {
+        if (instance.isActive() && !event.entity.isAlive()) {
+            deadEntityCache.add(event.entity);
         }
     }
 

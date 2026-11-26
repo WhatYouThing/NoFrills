@@ -55,6 +55,7 @@ public class HudManager {
             new KickCooldownTimer(),
             new Legion(),
             new BobbinTime(),
+            new SlayerCocoonTimer(),
             dungeonMap,
             pickAbilityTimer,
             petDisplay,

@@ -14,25 +14,27 @@ import static nofrills.Main.mc;
 
 @Mixin(LivingEntityRenderer.class)
 public abstract class LivingEntityRendererMixin<T extends LivingEntity> {
+
     @ModifyExpressionValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDiscrete()Z"))
-    private boolean isSneaking(boolean original, T livingEntity) {
-        if (ForceNametag.isActive() && livingEntity instanceof Player) {
+    private boolean isSneaking(boolean original, T entity) {
+        if (ForceNametag.isActive() && entity instanceof Player) {
             return false;
         }
         return original;
     }
 
     @ModifyExpressionValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isInvisibleTo(Lnet/minecraft/world/entity/player/Player;)Z"))
-    private boolean isInvisible(boolean original, T livingEntity) {
-        if (ForceNametag.isActive() && livingEntity instanceof Player player && Utils.isPlayer(player)) {
+    private boolean isInvisible(boolean original, T entity) {
+        if (ForceNametag.isActive() && entity instanceof Player player && Utils.isPlayer(player)) {
             return false;
         }
         return original;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @ModifyReturnValue(method = "shouldShowName(Lnet/minecraft/world/entity/LivingEntity;D)Z", at = @At("RETURN"))
-    protected boolean hasLabel(boolean original, T livingEntity) {
-        if (ForceNametag.isActive() && ForceNametag.self.value() && livingEntity.equals(mc.player)) {
+    protected boolean hasLabel(boolean original, T entity) {
+        if (ForceNametag.isActive() && ForceNametag.self.value() && entity.equals(mc.player)) {
             return true;
         }
         return original;

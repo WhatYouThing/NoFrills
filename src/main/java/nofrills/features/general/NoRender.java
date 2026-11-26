@@ -55,6 +55,7 @@ public class NoRender {
     public static final SettingBool lightning = new SettingBool(false, "lightning", instance.key());
     public static final SettingBool fallingBlocks = new SettingBool(false, "fallingBlocks", instance.key());
     public static final SettingBool entityFire = new SettingBool(false, "entityFire", instance.key());
+    public static final SettingBool entityGlow = new SettingBool(false, "entityGlow", instance.key());
     public static final SettingBool mageBeam = new SettingBool(false, "mageBeam", instance.key());
     public static final SettingBool iceSpray = new SettingBool(false, "iceSpray", instance.key());
     public static final SettingBool powderCoating = new SettingBool(false, "powderCoating", instance.key());

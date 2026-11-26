@@ -53,7 +53,8 @@
         "ScreenMixin",
         "SoundEngineMixin",
         "StringDecomposerMixin",
-        "StuckInBodyLayerMixin"
+        "StuckInBodyLayerMixin",
+        "SubmitNodeCollectionMixin"
     ],
     "injectors": {
         "defaultRequire": 1

@@ -141,6 +141,7 @@ public class ClickGui extends BaseOwoScreen<FlowLayout> {
                                 new Toggle("Lightning", NoRender.lightning, "Hides lightning strikes."),
                                 new Toggle("Falling Blocks", NoRender.fallingBlocks, "Hides falling block entities such as sand."),
                                 new Toggle("Entity Fire", NoRender.entityFire, "Hides the fire effect that appears on burning mobs."),
+                                new Toggle("Entity Glow", NoRender.entityGlow, "Prevents the entity glow effect from working. Might not work correctly with features from other mods."),
                                 new Toggle("Mage Beam", NoRender.mageBeam, "Prevents the server from spawning the Mage Beam particles in Dungeons."),
                                 new Toggle("Ice Spray", NoRender.iceSpray, "Prevents the server from spawning the Ice Spray Wand particles."),
                                 new Toggle("Powder Coating", NoRender.powderCoating, "Prevents the server from spawning Divan's Powder Coating particles on your armor."),

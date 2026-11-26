@@ -160,7 +160,7 @@ public class NoRender {
     private static void onParticle(SpawnParticleEvent event) {
         if (instance.isActive()) {
             if (deadPoof.value() && event.type.equals(ParticleTypes.POOF) && event.packet.getCount() == 1 && event.packet.getMaxSpeed() == 0.0f) {
-                AABB box = AABB.ofSize(event.pos, 1.0, 1.0, 1.0);
+                AABB box = AABB.ofSize(event.pos, 2.0, 2.0, 2.0);
                 if (deadEntityCache.get().stream().anyMatch(e -> box.intersects(e.getBoundingBox()))) {
                     event.cancel();
                     return;

@@ -41,6 +41,7 @@ public class SlayerUtil {
 
     private static final Pattern bossTimerRegex = Pattern.compile(".*[0-9][0-9]:[0-9][0-9].*");
     private static final Pattern bossSpawnerRegex = Pattern.compile("(?<name>.*)'(?:s | )SLAYER BOSS");
+    private static final Pattern bossSpawnedRegex = Pattern.compile("SLAYER BOSS! The .* spawned!");
     private static final MappedEntityCache<CurrentBoss> bossCache = new MappedEntityCache<>();
     private static boolean bossAlive = false;
     private static SlayerBoss currentBoss = null;
@@ -67,6 +68,30 @@ public class SlayerUtil {
 
     public static boolean isBossAlive() {
         return bossAlive;
+    }
+
+    public static boolean isSpawnedMessage(String message) {
+        return bossSpawnedRegex.matcher(message).matches();
+    }
+
+    public static boolean isQuestCompleteMessage(String message) {
+        return message.trim().equals("SLAYER QUEST COMPLETE!");
+    }
+
+    public static boolean isQuestStartedMessage(String message) {
+        return message.trim().equals("SLAYER QUEST STARTED!");
+    }
+
+    public static boolean isQuestFailedMessage(String message) {
+        return message.trim().equals("SLAYER QUEST FAILED!");
+    }
+
+    public static boolean isBossCocoonedMessage(String message) {
+        return message.trim().equals("YOU COCOONED YOUR SLAYER BOSS");
+    }
+
+    public static boolean isQuestCancelledMessage(String message) {
+        return message.equals("Your Slayer Quest has been cancelled!");
     }
 
     public static SlayerBoss getActiveQuest() {
